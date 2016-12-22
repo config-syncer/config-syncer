@@ -2,6 +2,7 @@ package influx
 
 import (
 	"fmt"
+
 	api "github.com/appscode/api/kubernetes/v1beta1"
 	"github.com/appscode/log"
 	influxdb "github.com/influxdata/influxdb/client"

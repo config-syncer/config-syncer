@@ -1,11 +1,11 @@
 package watcher
 
 import (
-	"github.com/appscode/voyager/pkg/controller/certificates"
 	aci "github.com/appscode/k8s-addons/api"
 	"github.com/appscode/k8s-addons/pkg/events"
 	acw "github.com/appscode/k8s-addons/pkg/watcher"
 	"github.com/appscode/log"
+	"github.com/appscode/voyager/pkg/controller/certificates"
 	"k8s.io/kubernetes/pkg/client/cache"
 	"k8s.io/kubernetes/pkg/util/wait"
 )

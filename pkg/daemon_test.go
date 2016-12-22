@@ -1,20 +1,21 @@
 package pkg
 
 import (
-	"appscode.com/kubed/pkg/watcher"
 	"fmt"
 	"os"
 	"testing"
 	"time"
-	random "github.com/appscode/go-random"
-	"github.com/appscode/searchlight/pkg/client/icinga"
+
+	"appscode.com/kubed/pkg/watcher"
 	"github.com/appscode/client"
 	flags "github.com/appscode/go-flags"
+	random "github.com/appscode/go-random"
 	aci "github.com/appscode/k8s-addons/api"
 	_ "github.com/appscode/k8s-addons/api/install"
 	acs "github.com/appscode/k8s-addons/client/clientset"
 	acw "github.com/appscode/k8s-addons/pkg/watcher"
 	"github.com/appscode/log"
+	"github.com/appscode/searchlight/pkg/client/icinga"
 	"github.com/mikespook/golib/signal"
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/api/unversioned"

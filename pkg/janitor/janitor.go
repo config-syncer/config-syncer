@@ -1,11 +1,12 @@
 package janitor
 
 import (
+	"sync"
+	"time"
+
 	es "appscode.com/kubed/pkg/janitor/elasticsearch"
 	influx "appscode.com/kubed/pkg/janitor/influxdb"
 	"appscode.com/kubed/pkg/watcher"
-	"sync"
-	"time"
 	api "github.com/appscode/api/kubernetes/v1beta1"
 	"github.com/appscode/client"
 	"github.com/appscode/log"

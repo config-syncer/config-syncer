@@ -3,6 +3,7 @@ package es
 import (
 	"fmt"
 	"time"
+
 	api "github.com/appscode/api/kubernetes/v1beta1"
 	"github.com/appscode/log"
 	elastic "gopkg.in/olivere/elastic.v3"

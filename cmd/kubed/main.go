@@ -2,7 +2,7 @@ package main
 
 import (
 	_ "appscode/pkg/errorhandlers"
-	"appscode.com/kubed/pkg"
+	"appscode/pkg/kubed"
 	v "appscode/pkg/util/versionutil"
 	"appscode/pkg/util/wait"
 

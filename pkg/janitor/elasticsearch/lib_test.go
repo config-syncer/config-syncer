@@ -2,6 +2,7 @@ package es
 
 import (
 	"testing"
+
 	api "github.com/appscode/api/kubernetes/v1beta1"
 	"github.com/stretchr/testify/assert"
 	elastic "gopkg.in/olivere/elastic.v3"
