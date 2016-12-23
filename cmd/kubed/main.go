@@ -2,11 +2,11 @@ package main
 
 import (
 	_ "appscode/pkg/errorhandlers"
-	"appscode/pkg/kubed"
-	v "appscode/pkg/util/versionutil"
-	"appscode/pkg/util/wait"
 
-	flags "github.com/appscode/go-flags"
+	"appscode.com/kubed/pkg"
+	"github.com/appscode/go/flags"
+	"github.com/appscode/go/hold"
+	v "github.com/appscode/go/version"
 	_ "github.com/appscode/k8s-addons/api/install"
 	"github.com/appscode/log"
 	logs "github.com/appscode/log/golog"
@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	Name            string
 	Version         string
+	VersionStrategy string
 	Os              string
 	Arch            string
 	CommitHash      string
@@ -29,8 +29,8 @@ var (
 )
 
 func init() {
-	v.Version.Name = Name
 	v.Version.Version = Version
+	v.Version.VersionStrategy = VersionStrategy
 	v.Version.Os = Os
 	v.Version.Arch = Arch
 	v.Version.CommitHash = CommitHash
@@ -44,7 +44,7 @@ func init() {
 }
 
 func main() {
-	config := &kubed.Config{}
+	config := &pkg.Config{}
 	pflag.StringVarP(&config.APITokenPath, "api-token", "t", "/var/run/secrets/appscode/api-token", "Endpoint of elasticsearch")
 	pflag.StringVar(&config.Master, "master", "127.0.0.1:8080", "The address of the Kubernetes API server (overrides any value in kubeconfig)")
 	pflag.StringVar(&config.KubeConfig, "kubeconfig", "", "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
@@ -67,7 +67,7 @@ func main() {
 	}
 
 	log.Infoln("Starting Kubed Process...")
-	go kubed.Run(config)
+	go pkg.Run(config)
 
-	wait.Hold()
+	hold.Hold()
 }

@@ -1,16 +1,17 @@
 package pkg
 
 import (
-	"appscode/pkg/kubed/janitor"
-	"appscode/pkg/kubed/watcher"
-	"appscode/pkg/util/runtime"
-	"appscode/pkg/util/wait"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"strings"
 	"time"
 
+	"github.com/appscode/go/runtime"
+	"github.com/appscode/go/wait"
+
+	"appscode.com/kubed/pkg/janitor"
+	"appscode.com/kubed/pkg/watcher"
 	"github.com/appscode/client"
 	"github.com/appscode/errors"
 	_ "github.com/appscode/k8s-addons/api/install"

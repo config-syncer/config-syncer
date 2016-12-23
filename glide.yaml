@@ -1,0 +1,34 @@
+package: appscode.com/kubed
+import:
+- package: appscode
+  repo: git@diffusion.appscode.com:appscode/43/appscode.git
+  vcs: git
+- package: github.com/appscode/api
+  repo: git@diffusion.appscode.com:appscode/37/api.git
+  vcs: git
+- package: github.com/appscode/client
+  repo: git@diffusion.appscode.com:appscode/39/client.git
+  vcs: git
+- package: github.com/appscode/errors
+- package: github.com/appscode/go-flags
+- package: github.com/appscode/k8s-addons
+  version: 1.5
+- package: github.com/appscode/log
+- package: github.com/appscode/searchlight
+- package: github.com/appscode/voyager
+- package: github.com/influxdata/influxdb
+  version: v1.1.1
+- package: github.com/spf13/pflag
+- package: github.com/flosch/pongo2
+  version: 22499f94d3d56c7238591344a6902715d0b8fbbf
+- package: gopkg.in/olivere/elastic.v3
+  version: v3.0.59
+- package: k8s.io/kubernetes
+  version: 1.5.1-ac
+  repo: git@diffusion.appscode.com:appscode/50/kubernetes.git
+  vcs: git
+- package: github.com/appscode/go-random
+- package: github.com/mikespook/golib
+testImport:
+- package: github.com/stretchr/testify
+  version: v1.1.4
