@@ -12,7 +12,7 @@ import:
 - package: github.com/appscode/errors
 - package: github.com/appscode/go
 - package: github.com/appscode/k8s-addons
-  version: 1.5
+  version: release-1.5
 - package: github.com/appscode/log
 - package: github.com/appscode/searchlight
   version: release-1.5
