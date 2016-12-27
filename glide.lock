@@ -1,5 +1,5 @@
 hash: ec5da33434edb2312e58cf273e2b53971c7f08b75a32c79ec84720fdc86b5d42
-updated: 2016-12-27T07:30:24.615238269-08:00
+updated: 2016-12-27T12:44:00.945351199-08:00
 imports:
 - name: appscode
   version: 8a8ae219a336a0a46cfdf17aa4199e8b058d26f2
@@ -90,7 +90,7 @@ imports:
   subpackages:
   - golog
 - name: github.com/appscode/searchlight
-  version: 9962cad7a837c9a13e8d068e395c0a152a9f1bd3
+  version: 6b9db4dd9ef4c612a0e436faad992ad7e860c074
   subpackages:
   - data
   - data/files
@@ -105,7 +105,7 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: b62ef7002c6a9838850f2af6375ff46e8ddef0ce
+  version: dcf4ffec4de4e9deadc6fb678bad8d32777dbf85
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers

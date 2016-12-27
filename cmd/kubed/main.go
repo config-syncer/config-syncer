@@ -46,7 +46,7 @@ func init() {
 func main() {
 	config := &pkg.Config{}
 	pflag.StringVarP(&config.APITokenPath, "api-token", "t", "/var/run/secrets/appscode/api-token", "Endpoint of elasticsearch")
-	pflag.StringVar(&config.Master, "master", "127.0.0.1:8080", "The address of the Kubernetes API server (overrides any value in kubeconfig)")
+	pflag.StringVar(&config.Master, "master", "", "The address of the Kubernetes API server (overrides any value in kubeconfig)")
 	pflag.StringVar(&config.KubeConfig, "kubeconfig", "", "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
 	pflag.StringVarP(&config.APIEndpoint, "api-endpoint", "e", "api.appscode.com:50077", "appscode api server host:port")
 	pflag.StringVarP(&config.ProviderName, "cloud-provider", "c", "", "Name of cloud provider")
