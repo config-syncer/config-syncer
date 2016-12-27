@@ -56,6 +56,7 @@ func (watch *KubedWatcher) Run() {
 
 func (k *KubedWatcher) setup() {
 	lbc.SetLoadbalancerImage(k.LoadbalancerImage)
+	k.Watcher.Dispatch = k.Dispatch
 }
 
 func (k *KubedWatcher) Dispatch(e *events.Event) error {
