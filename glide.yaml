@@ -10,12 +10,14 @@ import:
   repo: git@diffusion.appscode.com:appscode/39/client.git
   vcs: git
 - package: github.com/appscode/errors
-- package: github.com/appscode/go-flags
+- package: github.com/appscode/go
 - package: github.com/appscode/k8s-addons
-  version: 1.5
+  version: release-1.5
 - package: github.com/appscode/log
 - package: github.com/appscode/searchlight
+  version: release-1.5
 - package: github.com/appscode/voyager
+  version: release-1.5
 - package: github.com/influxdata/influxdb
   version: v1.1.1
 - package: github.com/spf13/pflag
@@ -27,8 +29,11 @@ import:
   version: 1.5.1-ac
   repo: git@diffusion.appscode.com:appscode/50/kubernetes.git
   vcs: git
-- package: github.com/appscode/go-random
 - package: github.com/mikespook/golib
+- package: github.com/xenolf/lego
+  repo: git@github.com:appscode/lego.git
+  vcs: git
+  version: gcloud-jwt
 testImport:
 - package: github.com/stretchr/testify
   version: v1.1.4

@@ -58,7 +58,7 @@ func (c *DNSProvider) EnsureARecord(domain string, ip string) error {
 	}
 	relative := toRelativeRecord(domain, zoneDomain)
 
-	records, err := c.client.GetDnsRecords(zoneDomain)
+	records, err := c.client.GetDNSRecords(zoneDomain)
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func (c *DNSProvider) EnsureARecord(domain string, ip string) error {
 			return nil
 		}
 	}
-	return c.client.CreateDnsRecord(zoneDomain, relative, "A", ip, 0, 300)
+	return c.client.CreateDNSRecord(zoneDomain, relative, "A", ip, 0, 300)
 }
 
 func (c *DNSProvider) DeleteARecords(domain string) error {
@@ -78,13 +78,13 @@ func (c *DNSProvider) DeleteARecords(domain string) error {
 	}
 	relative := toRelativeRecord(domain, zoneDomain)
 
-	records, err := c.client.GetDnsRecords(zoneDomain)
+	records, err := c.client.GetDNSRecords(zoneDomain)
 	if err != nil {
 		return err
 	}
 	for _, record := range records {
 		if record.Type == "A" && record.Name == relative {
-			err = c.client.DeleteDnsRecord(zoneDomain, record.RecordID)
+			err = c.client.DeleteDNSRecord(zoneDomain, record.RecordID)
 			if err != nil {
 				return err
 			}
@@ -94,12 +94,12 @@ func (c *DNSProvider) DeleteARecords(domain string) error {
 }
 
 func (c *DNSProvider) getHostedZone(domain string) (string, error) {
-	domains, err := c.client.GetDnsDomains()
+	domains, err := c.client.GetDNSDomains()
 	if err != nil {
 		return "", fmt.Errorf("Vultr API call failed: %v", err)
 	}
 
-	var hostedDomain vultr.DnsDomain
+	var hostedDomain vultr.DNSDomain
 	for _, d := range domains {
 		if strings.HasSuffix(domain, d.Domain) {
 			if len(d.Domain) > len(hostedDomain.Domain) {

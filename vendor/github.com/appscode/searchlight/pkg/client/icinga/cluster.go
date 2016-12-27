@@ -13,6 +13,7 @@ const (
 	ConfigFile             = "/srv/icinga2/secrets/.env"
 	ConfigKeyPrefix        = "ICINGA"
 	IcingaService   string = "ICINGA_K8S_SERVICE"
+	IcingaURL       string = "ICINGA_URL"
 	IcingaAPIUser   string = "ICINGA_API_USER"
 	IcingaAPIPass   string = "ICINGA_API_PASSWORD"
 )
@@ -31,6 +32,12 @@ func NewInClusterClient(kubeClient clientset.Interface) (*IcingaClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	c := NewClient(fmt.Sprintf("https://%v:5665/v1", serviceIP), m[IcingaAPIUser], m[IcingaAPIPass], nil)
+	config := &IcingaConfig{
+		Endpoint: fmt.Sprintf("https://%v:5665/v1", serviceIP),
+		CaCert:   nil,
+	}
+	config.BasicAuth.Username = m[IcingaAPIUser]
+	config.BasicAuth.Password = m[IcingaAPIPass]
+	c := NewClient(config)
 	return c, nil
 }

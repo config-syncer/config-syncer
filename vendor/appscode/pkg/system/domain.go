@@ -86,10 +86,10 @@ func SubDomain(ns string) string {
 }
 
 func TeamDomain(ns string) string {
-	if _env.FromHost() == _env.Onebox || _env.FromHost() == _env.BoxDev {
-		return Config.Network.TeamUrls.BaseDomain
-	} else {
+	if _env.FromHost().IsHosted() {
 		return SubDomain(ns) + "." + Config.Network.TeamUrls.BaseDomain
+	} else {
+		return Config.Network.TeamUrls.BaseDomain
 	}
 }
 
@@ -102,10 +102,10 @@ func TeamURL(ns string, trails ...string) string {
 }
 
 func ClusterDomain(ns, cluster string) string {
-	if _env.FromHost() == _env.Onebox || _env.FromHost() == _env.BoxDev {
-		return strings.ToLower(cluster) + "." + Config.Network.ClusterUrls.BaseDomain
-	} else {
+	if _env.FromHost().IsHosted() {
 		return strings.ToLower(cluster) + "-" + SubDomain(ns) + "." + Config.Network.ClusterUrls.BaseDomain
+	} else {
+		return strings.ToLower(cluster) + "." + Config.Network.ClusterUrls.BaseDomain
 	}
 }
 

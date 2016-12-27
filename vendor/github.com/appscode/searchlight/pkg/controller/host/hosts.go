@@ -10,6 +10,10 @@ import (
 )
 
 const (
+	CheckComponentStatus  = "component_status"
+	CheckJsonPath         = "json_path"
+	CheckNodeCount        = "node_count"
+	CheckNodeStatus       = "node_status"
 	CheckCommandPodStatus = "pod_status"
 	CheckCommandPodExists = "pod_exists"
 )

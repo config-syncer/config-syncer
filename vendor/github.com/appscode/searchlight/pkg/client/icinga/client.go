@@ -9,13 +9,17 @@ import (
 	_ "github.com/appscode/k8s-addons/api/install"
 )
 
-type IcingaClient struct {
-	endpoint  string
-	basicAuth struct {
-		username string
-		password string
+type IcingaConfig struct {
+	Endpoint  string
+	BasicAuth struct {
+		Username string
+		Password string
 	}
-	caCert     []byte
+	CaCert []byte
+}
+
+type IcingaClient struct {
+	config     *IcingaConfig
 	pathPrefix string
 }
 
@@ -43,18 +47,15 @@ type IcingaApiResponse struct {
 	ResponseBody []byte
 }
 
-func NewClient(endpoint, username, password string, caCert []byte) *IcingaClient {
+func NewClient(icingaConfig *IcingaConfig) *IcingaClient {
 	c := &IcingaClient{
-		endpoint: endpoint,
-		caCert:   caCert,
+		config: icingaConfig,
 	}
-	c.basicAuth.username = username
-	c.basicAuth.password = password
 	return c
 }
 
 func (c *IcingaClient) SetEndpoint(endpoint string) *IcingaClient {
-	c.endpoint = endpoint
+	c.config.Endpoint = endpoint
 	return c
 }
 

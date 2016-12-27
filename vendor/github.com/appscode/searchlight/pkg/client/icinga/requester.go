@@ -56,9 +56,9 @@ func (r *IcingaApiResponse) Into(to interface{}) (int, error) {
 func (c *IcingaClient) newIcingaRequest(path string) *IcingaApiRequest {
 	mTLSConfig := &tls.Config{}
 
-	if c.caCert != nil {
+	if c.config.CaCert != nil {
 		certs := x509.NewCertPool()
-		certs.AppendCertsFromPEM(c.caCert)
+		certs.AppendCertsFromPEM(c.config.CaCert)
 		mTLSConfig.RootCAs = certs
 	} else {
 		mTLSConfig.InsecureSkipVerify = true
@@ -71,10 +71,10 @@ func (c *IcingaClient) newIcingaRequest(path string) *IcingaApiRequest {
 
 	c.pathPrefix = c.pathPrefix + path
 	return &IcingaApiRequest{
-		uri:      c.endpoint + c.pathPrefix,
+		uri:      c.config.Endpoint + c.pathPrefix,
 		client:   client,
-		userName: c.basicAuth.username,
-		password: c.basicAuth.password,
+		userName: c.config.BasicAuth.Username,
+		password: c.config.BasicAuth.Password,
 	}
 }
 

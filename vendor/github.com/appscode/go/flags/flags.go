@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"log"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -67,4 +68,10 @@ func EnsureAlterableFlags(cmd *cobra.Command, name ...string) {
 		fmt.Printf("One of flag [ %v ] must needs to be set.", flagNames)
 		os.Exit(3) // exit code 3 required for icinga plugins to indicate UNKNOWN state
 	}
+}
+
+func DumpAll() {
+	pflag.VisitAll(func(flag *pflag.Flag) {
+		log.Printf("FLAG: --%s=%q", flag.Name, flag.Value)
+	})
 }
