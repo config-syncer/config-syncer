@@ -38,7 +38,7 @@ from os.path import expandvars
 libbuild.REPO_ROOT = expandvars('$GOPATH') + '/src/appscode.com/kubed'
 BUILD_METADATA = libbuild.metadata(libbuild.REPO_ROOT)
 libbuild.BIN_MATRIX = {
-    'voyager': {
+    'kubed': {
         'type': 'go',
         'go_version': True,
         'use_cgo': True,
