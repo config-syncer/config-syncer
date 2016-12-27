@@ -108,7 +108,7 @@ func Run(config *Config) {
 		}
 	}
 
-	if config.InfluxSecretName {
+	if len(config.InfluxSecretName) > 0 {
 		// InfluxDB client
 		influxConfig, err := influxdb.LoadConfig(kubeWatcher.Client)
 		if err != nil {
