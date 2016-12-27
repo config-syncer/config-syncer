@@ -53,6 +53,7 @@ func main() {
 	pflag.StringVarP(&config.ClusterName, "cluster-name", "k", "", "Name of Kubernetes cluster")
 	pflag.StringVarP(&config.LoadbalancerImageName, "haproxy-image", "h", "appscode/haproxy:1.7.0-k8s", "haproxy image name to be run")
 	pflag.StringVarP(&config.ESEndpoint, "es-endpoint", "", "", "Endpoint of elasticsearch")
+	pflag.StringVarP(&config.InfluxSecretName, "influx-secret", "", "", "Influxdb secret name")
 
 	flags.InitFlags()
 	logs.InitLogs()

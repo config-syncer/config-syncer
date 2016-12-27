@@ -35,6 +35,7 @@ type Config struct {
 	Master                string
 	KubeConfig            string
 	ESEndpoint            string
+	InfluxSecretName      string
 }
 
 func Run(config *Config) {
@@ -107,13 +108,15 @@ func Run(config *Config) {
 		}
 	}
 
-	// InfluxDB client
-	influxConfig, err := influxdb.LoadConfig(kubeWatcher.Client)
-	if err != nil {
-		log.Errorln(err)
+	if config.InfluxSecretName {
+		// InfluxDB client
+		influxConfig, err := influxdb.LoadConfig(kubeWatcher.Client)
+		if err != nil {
+			log.Errorln(err)
+		} else {
+			kubeJanitor.InfluxConfig = *influxConfig
+		}
 	}
-	kubeJanitor.InfluxConfig = *influxConfig
-
 	go wait.Forever(kubeJanitor.Run, time.Hour*24)
 }
 
