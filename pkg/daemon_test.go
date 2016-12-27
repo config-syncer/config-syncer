@@ -8,8 +8,8 @@ import (
 
 	"appscode.com/kubed/pkg/watcher"
 	"github.com/appscode/client"
-	flags "github.com/appscode/go-flags"
-	random "github.com/appscode/go-random"
+	"github.com/appscode/go/crypto/rand"
+	"github.com/appscode/go/flags"
 	aci "github.com/appscode/k8s-addons/api"
 	_ "github.com/appscode/k8s-addons/api/install"
 	acs "github.com/appscode/k8s-addons/client/clientset"
@@ -51,7 +51,7 @@ func TestExtIngressCreate(t *testing.T) {
 
 	eng := &aci.Ingress{
 		ObjectMeta: api.ObjectMeta{
-			Name:      "engress-from-" + random.Characters(4),
+			Name:      "engress-from-" + rand.Characters(4),
 			Namespace: "default",
 			Labels: map[string]string{
 				"owner": "sadlil",

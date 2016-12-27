@@ -7,8 +7,8 @@ Package v1beta1 is a generated protocol buffer package.
 
 It is generated from these files:
 	disk.proto
-	persistentvolume.proto
 	persistentvolumeclaim.proto
+	persistentvolume.proto
 
 It has these top-level messages:
 	DiskCreateRequest
@@ -21,16 +21,16 @@ It has these top-level messages:
 	PVC
 	DiskDescribeRequest
 	DiskDescribeResponse
-	PVRegisterRequest
-	PVUnregisterRequest
-	PVDescribeRequest
-	PVInfo
-	PVDescribeResponse
 	PVCRegisterRequest
 	PVCUnregisterRequest
 	PVCDescribeRequest
 	PVCInfo
 	PVCDescribeResponse
+	PVRegisterRequest
+	PVUnregisterRequest
+	PVDescribeRequest
+	PVInfo
+	PVDescribeResponse
 */
 package v1beta1
 

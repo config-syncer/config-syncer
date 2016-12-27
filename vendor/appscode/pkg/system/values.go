@@ -17,10 +17,13 @@ const (
 	CIBotUser      = "ci-bot"
 	ClusterBotUser = "k8s-bot"
 
+	// WARNING: Never set phabricator.base-uri config, since this is never read from config table.
+	// This is computed based on /srv/appscode/config.ENV.yaml file in src/infrastructure/env/PhabricatorEnv.php
+	// BaseUri                     = "phabricator.base-uri"
+
 	AllowHttpAuth                  = "diffusion.allow-http-auth"
 	AppsCodePrivateAPIHttpEndpoint = "appscode.private-api-http-endpoint"
 	AppsCodePublicAPIHttpEndpoint  = "appscode.public-api-http-endpoint"
-	BaseUri                        = "phabricator.base-uri"
 	BraintreeCustomerID            = "braintree.customer-id"
 	BraintreeMerchantID            = "braintree.merchant-id"
 	BraintreePrivateKey            = "braintree.private-key"
