@@ -1,8 +1,8 @@
-hash: 99698798a9f60e8e09d6d51ccba0a7b739645c4945b7dd8a8c0ea67281739369
-updated: 2016-12-27T03:12:30.976812032-08:00
+hash: ec5da33434edb2312e58cf273e2b53971c7f08b75a32c79ec84720fdc86b5d42
+updated: 2016-12-27T07:30:24.615238269-08:00
 imports:
 - name: appscode
-  version: 9d483f138bdb9417a460c6eca8e400e4cb7a2754
+  version: 8a8ae219a336a0a46cfdf17aa4199e8b058d26f2
   repo: git@diffusion.appscode.com:appscode/43/appscode.git
   vcs: git
   subpackages:
@@ -65,7 +65,7 @@ imports:
   - version
   - wait
 - name: github.com/appscode/go-dns
-  version: bf9de158a4f438350fb37a0e0f5fb6ffb8d099c0
+  version: 9d54636c57c3b028ad7fc5743cfe620acec1caaa
   subpackages:
   - aws
   - azure
@@ -90,7 +90,7 @@ imports:
   subpackages:
   - golog
 - name: github.com/appscode/searchlight
-  version: afa12383396bbce7560a517ea9d680092e1b3345
+  version: 9962cad7a837c9a13e8d068e395c0a152a9f1bd3
   subpackages:
   - data
   - data/files
@@ -105,7 +105,7 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: 7c35d9eea7cd431dedaa3611d1e194c527a053fb
+  version: b62ef7002c6a9838850f2af6375ff46e8ddef0ce
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
@@ -442,7 +442,7 @@ imports:
 - name: github.com/xeipuuv/gojsonschema
   version: 93e72a773fade158921402d6a24c819b48aba29d
 - name: github.com/xenolf/lego
-  version: 0ed6e886bbaec583c1d2caef5096dec303a47ba5
+  version: e5e71ef12cd6b5babe7bff55760e012d81baac12
   repo: git@github.com:appscode/lego.git
   vcs: git
   subpackages:
