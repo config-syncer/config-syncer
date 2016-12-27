@@ -1,8 +1,8 @@
-hash: bdca9448f1f0c7ac0720cf5ec419af73102556364e970da48335486025ffb680
-updated: 2016-12-27T02:09:00.433301607-08:00
+hash: 99698798a9f60e8e09d6d51ccba0a7b739645c4945b7dd8a8c0ea67281739369
+updated: 2016-12-27T03:12:30.976812032-08:00
 imports:
 - name: appscode
-  version: 997eac2ee7108befe45fec44a71dc273f3cf08cf
+  version: 9d483f138bdb9417a460c6eca8e400e4cb7a2754
   repo: git@diffusion.appscode.com:appscode/43/appscode.git
   vcs: git
   subpackages:
@@ -90,7 +90,7 @@ imports:
   subpackages:
   - golog
 - name: github.com/appscode/searchlight
-  version: 6605e0299c2298850188a65ae315e28a8ef4785b
+  version: afa12383396bbce7560a517ea9d680092e1b3345
   subpackages:
   - data
   - data/files
@@ -105,11 +105,12 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: fa8a944714ab0c0823ce438ef49f1ba58ce9a3ab
+  version: 7c35d9eea7cd431dedaa3611d1e194c527a053fb
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
   - pkg/controller/ingress
+  - pkg/controller/ingress/template
 - name: github.com/aws/aws-sdk-go
   version: 8f2725740345a0561fa09669f5f75f905404ef8b
   subpackages:
