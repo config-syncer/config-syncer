@@ -33,7 +33,7 @@ import:
 - package: github.com/xenolf/lego
   repo: git@github.com:appscode/lego.git
   vcs: git
-  version: gcloud-jwt
+  version: e5e71ef12cd6b5babe7bff55760e012d81baac12
 testImport:
 - package: github.com/stretchr/testify
   version: v1.1.4
