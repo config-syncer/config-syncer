@@ -21,6 +21,7 @@ const (
 	// This is computed based on /srv/appscode/config.ENV.yaml file in src/infrastructure/env/PhabricatorEnv.php
 	// BaseUri                     = "phabricator.base-uri"
 
+	PhabricatorShowPrototypes      = "phabricator.show-prototypes"
 	AllowHttpAuth                  = "diffusion.allow-http-auth"
 	AppsCodePrivateAPIHttpEndpoint = "appscode.private-api-http-endpoint"
 	AppsCodePublicAPIHttpEndpoint  = "appscode.public-api-http-endpoint"
@@ -61,8 +62,7 @@ const (
 	TwilioPhoneNumber              = "twilio.phone-number"
 	VCSHost                        = "diffusion.ssh-host"
 	VCSUser                        = "diffusion.ssh-user"
-
-	GCS   = "gcs"
-	S3    = "s3"
-	Local = "local"
+	GCS                            = "gcs"
+	S3                             = "s3"
+	Local                          = "local"
 )

@@ -22,7 +22,7 @@ type DNSProvider struct {
 }
 
 type Options struct {
-	AuthToken string `json:"auth_token" envconfig:"DO_AUTH_TOKEN"`
+	AuthToken string `json:"auth_token" envconfig:"DO_AUTH_TOKEN" form:"digitalocean_auth_token"`
 }
 
 var _ dp.Provider = &DNSProvider{}

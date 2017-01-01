@@ -137,7 +137,7 @@ type secureConfig struct {
 	S3 struct {
 		AccessKey string `json:"access_key,omitempty"`
 		SecretKey string `json:"secret_key,omitempty"`
-		Region    string `json:"regopm,omitempty"`
+		Region    string `json:"region,omitempty"`
 		Endpoint  string `json:"endpoint,omitempty"`
 	} `json:"s3"`
 	Braintree struct {

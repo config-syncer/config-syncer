@@ -1,8 +1,8 @@
-hash: ec5da33434edb2312e58cf273e2b53971c7f08b75a32c79ec84720fdc86b5d42
-updated: 2016-12-27T12:44:00.945351199-08:00
+hash: 4ff29f79e2e78c5f61d0f7bb8be8b4ba9cbfb8eb7b7e5de2f7301e00f3e88d7f
+updated: 2017-01-01T11:21:31.666206465-08:00
 imports:
 - name: appscode
-  version: 8a8ae219a336a0a46cfdf17aa4199e8b058d26f2
+  version: f166cc14c9a89b9a5ce68056b531e77ac7abf811
   repo: git@diffusion.appscode.com:appscode/43/appscode.git
   vcs: git
   subpackages:
@@ -16,7 +16,7 @@ imports:
   - compute/metadata
   - internal
 - name: github.com/appscode/api
-  version: dbcff6f142efa34dbbfe4c7a2bd2595239b528d7
+  version: ec7bdb42a88f2dacdb9de3940985d2e389e27b0b
   repo: git@diffusion.appscode.com:appscode/37/api.git
   vcs: git
   subpackages:
@@ -47,7 +47,7 @@ imports:
   - credential
   - util
 - name: github.com/appscode/errors
-  version: 2a1d40bce2b635108dc8710c6fbd6e2c6d7ed68d
+  version: 333bedd8eaa101b4f5f73ed847a6cec033e37398
   subpackages:
   - h/mailgun
 - name: github.com/appscode/go
@@ -65,7 +65,7 @@ imports:
   - version
   - wait
 - name: github.com/appscode/go-dns
-  version: 9d54636c57c3b028ad7fc5743cfe620acec1caaa
+  version: e5a8f5967653d72f6540cccb83e4487c80a46e2d
   subpackages:
   - aws
   - azure
@@ -90,7 +90,7 @@ imports:
   subpackages:
   - golog
 - name: github.com/appscode/searchlight
-  version: 6b9db4dd9ef4c612a0e436faad992ad7e860c074
+  version: 73b28083194e92e5b09eb90d9add1e1ac786f0ad
   subpackages:
   - data
   - data/files
@@ -168,7 +168,9 @@ imports:
 - name: github.com/cloudflare/cloudflare-go
   version: ba610b87e64f5e99e8ddd614e50669c66c2ec9b5
 - name: github.com/coreos/go-oidc
-  version: 5644a2f50e2d2d5ba0b474bc5bc55fea1925936d
+  version: 6efba820ed9a75366742203f168832558de9defd
+  repo: https://github.com/appscode/go-oidc.git
+  vcs: git
   subpackages:
   - http
   - jose
@@ -275,7 +277,7 @@ imports:
   - models
   - pkg/escape
 - name: github.com/JamesClonk/vultr
-  version: 776892977e0b1f987d75256446db16dcf92aaaad
+  version: 9ec0427d51411407c0402b093a1771cb75af9679
   subpackages:
   - lib
 - name: github.com/jmespath/go-jmespath
@@ -442,7 +444,7 @@ imports:
 - name: github.com/xeipuuv/gojsonschema
   version: 93e72a773fade158921402d6a24c819b48aba29d
 - name: github.com/xenolf/lego
-  version: e5e71ef12cd6b5babe7bff55760e012d81baac12
+  version: efdf264cb25e03b7adab3401648e6daa7fbe8ebc
   repo: git@github.com:appscode/lego.git
   vcs: git
   subpackages:
@@ -564,7 +566,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 - name: k8s.io/kubernetes
-  version: 6e98dc62406fd717338f59d4160ba676acc3ef69
+  version: 636687f275b7df28203dc88ddcc5a35062d2318d
   repo: git@diffusion.appscode.com:appscode/50/kubernetes.git
   vcs: git
   subpackages:

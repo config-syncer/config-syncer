@@ -54,9 +54,9 @@ func (d customRetryer) RetryRules(r *request.Request) time.Duration {
 }
 
 type Options struct {
-	AccessKeyId     string `json:"access_key_id" envconfig:"AWS_ACCESS_KEY_ID"`
-	SecretAccessKey string `json:"secret_access_key" envconfig:"AWS_SECRET_ACCESS_KEY"`
-	Region          string `json:"region" envconfig:"AWS_REGION"`
+	AccessKeyId     string `json:"access_key_id" envconfig:"AWS_ACCESS_KEY_ID" form:"aws_access_key_id"`
+	SecretAccessKey string `json:"secret_access_key" envconfig:"AWS_SECRET_ACCESS_KEY" form:"aws_secret_access_key"`
+	Region          string `json:"region" envconfig:"AWS_REGION" form:"aws_region"`
 }
 
 // NewDNSProvider returns a DNSProvider instance configured for the AWS

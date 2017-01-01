@@ -31,7 +31,7 @@ type DNSProvider struct {
 }
 
 type Options struct {
-	ApiKey string `json:"api_key" envconfig:"LINODE_API_KEY"`
+	ApiKey string `json:"api_key" envconfig:"LINODE_API_KEY" form:"linode_api_key"`
 }
 
 var _ dp.Provider = &DNSProvider{}

@@ -25,9 +25,10 @@ type DNSProvider struct {
 }
 
 type Options struct {
-	Project        string `json:"project" envconfig:"GCE_PROJECT"`
-	CredentialFile string `json:"credential_file" ignore:"true"`
-	JsonKey        []byte `json:"-" ignore:"true"`
+	Project        string `json:"project" envconfig:"GCE_PROJECT"  form:"gcloud_project"`
+	CredentialFile string `json:"credential_file" ignore:"true" form:"-"`
+	CredentialJson string `json:"-" ignore:"true" form:"gcloud_credential_json"`
+	JsonKey        []byte `json:"-" ignore:"true"  form:"-"`
 }
 
 var _ dp.Provider = &DNSProvider{}

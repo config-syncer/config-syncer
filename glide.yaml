@@ -11,6 +11,7 @@ import:
   vcs: git
 - package: github.com/appscode/errors
 - package: github.com/appscode/go
+  version: master
 - package: github.com/appscode/k8s-addons
   version: release-1.5
 - package: github.com/appscode/log
@@ -22,7 +23,7 @@ import:
   version: v1.1.1
 - package: github.com/spf13/pflag
 - package: github.com/flosch/pongo2
-  version: 22499f94d3d56c7238591344a6902715d0b8fbbf
+  version: master
 - package: gopkg.in/olivere/elastic.v3
   version: v3.0.59
 - package: k8s.io/kubernetes
@@ -33,7 +34,7 @@ import:
 - package: github.com/xenolf/lego
   repo: git@github.com:appscode/lego.git
   vcs: git
-  version: e5e71ef12cd6b5babe7bff55760e012d81baac12
+  version: master
 testImport:
 - package: github.com/stretchr/testify
   version: v1.1.4

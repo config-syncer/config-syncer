@@ -27,11 +27,11 @@ type DNSProvider struct {
 var _ dp.Provider = &DNSProvider{}
 
 type Options struct {
-	TenantId       string `json:"tenant_id" envconfig:"AZURE_TENANT_ID"`
-	SubscriptionId string `json:"subscription_id" envconfig:"AZURE_SUBSCRIPTION_ID"`
-	ClientId       string `json:"client_id" envconfig:"AZURE_CLIENT_ID"`
-	ClientSecret   string `json:"client_secret" envconfig:"AZURE_CLIENT_SECRET"`
-	ResourceGroup  string `json:"resource_group" envconfig:"AZURE_RESOURCE_GROUP"`
+	TenantId       string `json:"tenant_id" envconfig:"AZURE_TENANT_ID" form:"azure_tenant_id"`
+	SubscriptionId string `json:"subscription_id" envconfig:"AZURE_SUBSCRIPTION_ID" form:"azure_subscription_id"`
+	ClientId       string `json:"client_id" envconfig:"AZURE_CLIENT_ID" form:"azure_client_id"`
+	ClientSecret   string `json:"client_secret" envconfig:"AZURE_CLIENT_SECRET" form:"azure_client_secret"`
+	ResourceGroup  string `json:"resource_group" envconfig:"AZURE_RESOURCE_GROUP" form:"azure_resource_group"`
 }
 
 // NewDNSProvider returns a DNSProvider instance configured for azure.

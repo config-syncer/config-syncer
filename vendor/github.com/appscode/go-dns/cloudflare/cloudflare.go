@@ -19,8 +19,8 @@ type DNSProvider struct {
 }
 
 type Options struct {
-	Email  string `json:"email" envconfig:"CLOUDFLARE_EMAIL"`
-	APIKey string `json:"api_key" envconfig:"CLOUDFLARE_API_KEY"`
+	Email  string `json:"email" envconfig:"CLOUDFLARE_EMAIL" form:"cloudflare_email"`
+	APIKey string `json:"api_key" envconfig:"CLOUDFLARE_API_KEY" form:"cloudflare_api_key"`
 }
 
 var _ dp.Provider = &DNSProvider{}

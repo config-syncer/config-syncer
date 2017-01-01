@@ -19,8 +19,10 @@ var publicMatrix = map[string]string{
 	"aws-ap-south-1":           "https://s3-ap-south-1.amazonaws.com/appscode-mumbai/binaries",
 	"aws-ap-southeast-1":       "https://s3-ap-southeast-1.amazonaws.com/appscode-singapore/binaries",
 	"aws-ap-southeast-2":       "https://s3-ap-southeast-2.amazonaws.com/appscode-sydney/binaries",
+	"aws-ca-central-1":         "https://s3-ca-central-1.amazonaws.com/appscode-montreal/binaries",
 	"aws-eu-central-1":         "https://s3-eu-central-1.amazonaws.com/appscode-frankfurt/binaries",
 	"aws-eu-west-1":            "https://s3-eu-west-1.amazonaws.com/appscode-ireland/binaries",
+	"aws-eu-west-2":            "https://s3-eu-west-2.amazonaws.com/appscode-london/binaries",
 	"aws-sa-east-1":            "https://s3-sa-east-1.amazonaws.com/appscode-saopaulo/binaries",
 	"aws-us-east-1":            "https://s3.amazonaws.com/appscode-virginia/binaries",
 	"aws-us-east-2":            "https://s3-us-east-2.amazonaws.com/appscode-ohio/binaries",
@@ -123,115 +125,12 @@ var publicMatrix = map[string]string{
 	"vultr-40":                 "https://storage.googleapis.com/appscode-asia/binaries", // Singapore
 }
 
-var debugMatrix = map[string]string{
-	"aws-ap-northeast-1":       "https://s3.amazonaws.com/appscode-dev/binaries",
-	"aws-ap-northeast-2":       "https://s3.amazonaws.com/appscode-dev/binaries",
-	"aws-ap-south-1":           "https://s3.amazonaws.com/appscode-dev/binaries",
-	"aws-ap-southeast-1":       "https://s3.amazonaws.com/appscode-dev/binaries",
-	"aws-ap-southeast-2":       "https://s3.amazonaws.com/appscode-dev/binaries",
-	"aws-eu-central-1":         "https://s3.amazonaws.com/appscode-dev/binaries",
-	"aws-eu-west-1":            "https://s3.amazonaws.com/appscode-dev/binaries",
-	"aws-sa-east-1":            "https://s3.amazonaws.com/appscode-dev/binaries",
-	"aws-us-east-1":            "https://s3.amazonaws.com/appscode-dev/binaries",
-	"aws-us-east-2":            "https://s3.amazonaws.com/appscode-dev/binaries",
-	"aws-us-west-1":            "https://s3.amazonaws.com/appscode-dev/binaries",
-	"aws-us-west-2":            "https://s3.amazonaws.com/appscode-dev/binaries",
-	"azure-eastus":             "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-eastus2":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-centralus":          "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-northcentralus":     "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-southcentralus":     "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-westcentralus":      "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-westus":             "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-westus2":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-canadaeast":         "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-canadacentral":      "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-brazilsouth":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-northeurope":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-westeurope":         "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-ukwest":             "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-uksouth":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-southeastasia":      "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-eastasia":           "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-australiaeast":      "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-australiasoutheast": "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-japaneast":          "https://storage.googleapis.com/appscode-dev/binaries",
-	"azure-japanwest":          "https://storage.googleapis.com/appscode-dev/binaries",
-	"digitalocean-ams2":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"digitalocean-ams3":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"digitalocean-blr1":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"digitalocean-fra1":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"digitalocean-lon1":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"digitalocean-nyc1":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"digitalocean-nyc2":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"digitalocean-nyc3":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"digitalocean-sfo1":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"digitalocean-sfo2":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"digitalocean-sgp1":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"digitalocean-tor1":        "https://storage.googleapis.com/appscode-dev/binaries",
-	"gce-asia":                 "https://storage.googleapis.com/appscode-dev/binaries",
-	"gce-eu":                   "https://storage.googleapis.com/appscode-dev/binaries",
-	"gce-us":                   "https://storage.googleapis.com/appscode-dev/binaries",
-	"hetzner":                  "https://storage.googleapis.com/appscode-dev/binaries",
-	"linode-2":                 "https://storage.googleapis.com/appscode-dev/binaries", // Dallas, TX, USA
-	"linode-3":                 "https://storage.googleapis.com/appscode-dev/binaries", // Fremont, CA, USA
-	"linode-4":                 "https://storage.googleapis.com/appscode-dev/binaries", // Atlanta, GA, USA
-	"linode-6":                 "https://storage.googleapis.com/appscode-dev/binaries", // Newark, NJ, USA
-	"linode-7":                 "https://storage.googleapis.com/appscode-dev/binaries", // London, England, UK
-	"linode-8":                 "https://storage.googleapis.com/appscode-dev/binaries", // Tokyo, JP
-	"linode-9":                 "https://storage.googleapis.com/appscode-dev/binaries", // Singapore, SG
-	"linode-10":                "https://storage.googleapis.com/appscode-dev/binaries", // Frankfurt, DE
-	"ovh-bhs1":                 "https://storage.googleapis.com/appscode-dev/binaries",
-	"ovh-gra1":                 "https://storage.googleapis.com/appscode-dev/binaries",
-	"ovh-sbg1":                 "https://storage.googleapis.com/appscode-dev/binaries",
-	"packet-ams1":              "https://storage.googleapis.com/appscode-dev/binaries",
-	"packet-ewr1":              "https://storage.googleapis.com/appscode-dev/binaries",
-	"packet-sjc1":              "https://storage.googleapis.com/appscode-dev/binaries",
-	"rackspace-dfw":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"rackspace-iad":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"rackspace-ord":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"rackspace-hkg":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"rackspace-syd":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"scaleway-ams1":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"scaleway-par1":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-ams":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-che":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-dal":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-fra":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-hkg":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-hou":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-lon":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-mel":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-mex":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-mil":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-mon":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-osl":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-par":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-sjc":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-sao":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-seo":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-sea":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-sng":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-syd":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-tok":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-tor":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"softlayer-wdc":            "https://storage.googleapis.com/appscode-dev/binaries",
-	"vultr-1":                  "https://storage.googleapis.com/appscode-dev/binaries", // New Jersey
-	"vultr-2":                  "https://storage.googleapis.com/appscode-dev/binaries", // Chicago
-	"vultr-3":                  "https://storage.googleapis.com/appscode-dev/binaries", // Dallas
-	"vultr-4":                  "https://storage.googleapis.com/appscode-dev/binaries", // Seattle
-	"vultr-5":                  "https://storage.googleapis.com/appscode-dev/binaries", // Los Angeles
-	"vultr-6":                  "https://storage.googleapis.com/appscode-dev/binaries", // Atlanta
-	"vultr-7":                  "https://storage.googleapis.com/appscode-dev/binaries", // Amsterdam
-	"vultr-8":                  "https://storage.googleapis.com/appscode-dev/binaries", // London
-	"vultr-9":                  "https://storage.googleapis.com/appscode-dev/binaries", // Frankfurt
-	"vultr-12":                 "https://storage.googleapis.com/appscode-dev/binaries", // Silicon Valley
-	"vultr-19":                 "https://storage.googleapis.com/appscode-dev/binaries", // Sydney
-	"vultr-24":                 "https://storage.googleapis.com/appscode-dev/binaries", // Paris
-	"vultr-25":                 "https://storage.googleapis.com/appscode-dev/binaries", // Tokyo
-	"vultr-39":                 "https://storage.googleapis.com/appscode-dev/binaries", // Miami
-	"vultr-40":                 "https://storage.googleapis.com/appscode-dev/binaries", // Singapore
+var devMatrix = map[string]string{
+	"aws": "https://s3.amazonaws.com/appscode-dev/binaries",
+	"gce": "https://storage.googleapis.com/appscode-dev/binaries",
 }
+
+const cdnPrefix = "https://cdn.appscode.com/binaries"
 
 const (
 	AppKubeServer     = "kubernetes-server"
@@ -247,92 +146,107 @@ const (
 func NewAppStartCI(provider, region, version string) *Application {
 	return &Application{
 		Name: AppCIStarter,
-		URL:  computeURL(provider, region, AppCIStarter, version, "start-ci-linux-amd64"),
+		URL:  cloudURL(provider, region, AppCIStarter, version, "start-ci-linux-amd64"),
 	}
 }
 
 func NewAppCISalt(provider, region, version string) *Application {
 	return &Application{
 		Name: AppCISaltbase,
-		URL:  computeURL(provider, region, AppCISaltbase, version, "ci-salt.tar.gz"),
+		URL:  cloudURL(provider, region, AppCISaltbase, version, "ci-salt.tar.gz"),
 	}
 }
 
 func NewAppHostfacts(provider, region, version string) *Application {
 	return &Application{
 		Name: AppHostfacts,
-		URL:  computeURL(provider, region, AppHostfacts, version, "hostfacts-linux-amd64"),
+		URL:  cdnURL(provider, region, AppHostfacts, version, "hostfacts-linux-amd64"),
 	}
 }
 
 func NewAppStartKubernetes(provider, region, version string) *Application {
 	return &Application{
 		Name: AppKubeStarter,
-		URL:  computeURL(provider, region, AppKubeStarter, version, "start-kubernetes-linux-amd64"),
+		URL:  cloudURL(provider, region, AppKubeStarter, version, "start-kubernetes-linux-amd64"),
 	}
 }
 
 func NewAppKubernetesSalt(provider, region, version string) *Application {
 	return &Application{
 		Name: AppKubeSaltbase,
-		URL:  computeURL(provider, region, AppKubeSaltbase, version, "kubernetes-salt.tar.gz"),
+		URL:  cloudURL(provider, region, AppKubeSaltbase, version, "kubernetes-salt.tar.gz"),
 	}
 }
 
 func NewAppOneboxApps(provider, region, version string) *Application {
 	return &Application{
 		Name: AppOneboxApps,
-		URL:  computeURL(provider, region, AppOneboxApps, version, "onebox-apps.tar.gz"),
+		URL:  cdnURL(provider, region, AppOneboxApps, version, "onebox-apps.tar.gz"),
 	}
 }
 
 func NewAppOneboxSalt(provider, region, version string) *Application {
 	return &Application{
 		Name: AppOneboxSaltbase,
-		URL:  computeURL(provider, region, AppOneboxSaltbase, version, "onebox-salt.tar.gz"),
+		URL:  cdnURL(provider, region, AppOneboxSaltbase, version, "onebox-salt.tar.gz"),
 	}
 }
 
 func NewAppKubernetesServer(provider, region, version string) *Application {
 	return &Application{
 		Name: AppKubeServer,
-		URL:  computeURL(provider, region, AppKubeServer, version, "kubernetes-server-linux-amd64.tar.gz"),
+		URL:  cloudURL(provider, region, AppKubeServer, version, "kubernetes-server-linux-amd64.tar.gz"),
 	}
 }
 
-func computeURL(provider, region, name, version, file string) string {
-	matrix := debugMatrix
+func cloudURL(provider, region, name, version, file string) string {
+	var prefix string
 	if _env.FromHost().IsPublic() {
-		matrix = publicMatrix
-	}
-
-	prefix := ""
-	if provider == "aws" {
-		prefix = matrix[provider+"-"+region]
-	} else if provider == "azure" {
-		prefix = matrix[provider+"-"+strings.ToLower(region)]
-	} else if provider == "gce" {
-		prefix = matrix[provider+"-"+region[0:strings.Index(region, "-")]]
-	} else if provider == "digitalocean" {
-		prefix = matrix[provider+"-"+region]
-	} else if provider == "linode" {
-		prefix = matrix[provider+"-"+region]
-	} else if provider == "vultr" {
-		prefix = matrix[provider+"-"+region]
-	} else if provider == "scaleway" {
-		prefix = matrix[provider+"-"+strings.ToLower(region)]
-	} else if provider == "softlayer" {
-		prefix = matrix[provider+"-"+strings.ToLower(region)]
-	} else if provider == "packet" {
-		prefix = matrix[provider+"-"+strings.ToLower(region)]
-	} else if provider == "hetzner" {
-		prefix = matrix[provider]
-	} else if provider == "rackspace" {
-		prefix = matrix[provider+"-"+strings.ToLower(region)]
-	} else if provider == "ovh" {
-		prefix = matrix[provider+"-"+strings.ToLower(region)]
+		matrix := publicMatrix
+		if provider == "aws" {
+			prefix = matrix[provider+"-"+region]
+		} else if provider == "azure" {
+			prefix = matrix[provider+"-"+strings.ToLower(region)]
+		} else if provider == "gce" {
+			prefix = matrix[provider+"-"+region[0:strings.Index(region, "-")]]
+		} else if provider == "digitalocean" {
+			prefix = matrix[provider+"-"+region]
+		} else if provider == "linode" {
+			prefix = matrix[provider+"-"+region]
+		} else if provider == "vultr" {
+			prefix = matrix[provider+"-"+region]
+		} else if provider == "scaleway" {
+			prefix = matrix[provider+"-"+strings.ToLower(region)]
+		} else if provider == "softlayer" {
+			prefix = matrix[provider+"-"+strings.ToLower(region)]
+		} else if provider == "packet" {
+			prefix = matrix[provider+"-"+strings.ToLower(region)]
+		} else if provider == "hetzner" {
+			prefix = matrix[provider]
+		} else if provider == "rackspace" {
+			prefix = matrix[provider+"-"+strings.ToLower(region)]
+		} else if provider == "ovh" {
+			prefix = matrix[provider+"-"+strings.ToLower(region)]
+		} else {
+			prefix = matrix["gce-us"]
+		}
 	} else {
-		prefix = matrix["gce-us"]
+		matrix := devMatrix
+		if provider == "aws" {
+			prefix = matrix["aws"]
+		} else {
+			prefix = matrix["gce"]
+		}
+	}
+	return fmt.Sprintf("%s/%s/%s/%s", prefix, name, version, file)
+}
+
+func cdnURL(provider, region, name, version, file string) string {
+	var prefix string
+	if _env.FromHost().IsPublic() {
+		prefix = cdnPrefix
+	} else {
+		prefix = devMatrix["gce"]
 	}
 	return fmt.Sprintf("%s/%s/%s/%s", prefix, name, version, file)
 }

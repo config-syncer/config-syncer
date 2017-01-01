@@ -21,7 +21,7 @@ type DNSProvider struct {
 }
 
 type Options struct {
-	ApiKey string `json:"api_key" envconfig:"VULTR_API_KEY"`
+	ApiKey string `json:"api_key" envconfig:"VULTR_API_KEY" form:"vultr_api_key"`
 }
 
 var _ dp.Provider = &DNSProvider{}
