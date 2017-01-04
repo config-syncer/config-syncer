@@ -1,8 +1,8 @@
 hash: 4ff29f79e2e78c5f61d0f7bb8be8b4ba9cbfb8eb7b7e5de2f7301e00f3e88d7f
-updated: 2017-01-01T11:21:31.666206465-08:00
+updated: 2017-01-04T06:19:20.118930578-08:00
 imports:
 - name: appscode
-  version: f166cc14c9a89b9a5ce68056b531e77ac7abf811
+  version: ca313f400e139fdf7df689019664dcb2a2345cfb
   repo: git@diffusion.appscode.com:appscode/43/appscode.git
   vcs: git
   subpackages:
@@ -47,11 +47,11 @@ imports:
   - credential
   - util
 - name: github.com/appscode/errors
-  version: 333bedd8eaa101b4f5f73ed847a6cec033e37398
+  version: 6a668ba07d02064c06707b7d8b0f5239db707045
   subpackages:
   - h/mailgun
 - name: github.com/appscode/go
-  version: 7995bcb0419b6ed977ca66d4482c3a625847270e
+  version: a7f716de7a1373d1e8a5b31728166ada8e7595c6
   subpackages:
   - arrays
   - crypto/rand
@@ -65,7 +65,7 @@ imports:
   - version
   - wait
 - name: github.com/appscode/go-dns
-  version: e5a8f5967653d72f6540cccb83e4487c80a46e2d
+  version: 778834f7a20bc680d378d16ee631fa3265cb1df9
   subpackages:
   - aws
   - azure
@@ -75,8 +75,13 @@ imports:
   - linode
   - provider
   - vultr
+- name: github.com/appscode/go-notify
+  version: 293f40652089c70c7e90180095ef698b9bbc305e
+  subpackages:
+  - mailgun
+  - smtp
 - name: github.com/appscode/k8s-addons
-  version: 05da01ad537cf3fbc57257425a71908ac249b2a8
+  version: 33355decdcfd7223715907341bac88c2106834a9
   subpackages:
   - api
   - api/install
@@ -86,11 +91,11 @@ imports:
   - pkg/stash
   - pkg/watcher
 - name: github.com/appscode/log
-  version: 3f1acdeb89863d101e1d5fc0fefb478b1e990b28
+  version: 68e0e42e42c01371f3950571fc87c2298a51dd8f
   subpackages:
   - golog
 - name: github.com/appscode/searchlight
-  version: 73b28083194e92e5b09eb90d9add1e1ac786f0ad
+  version: 243afb974bf44f771ef2d3380f6b00e1ef9c31a8
   subpackages:
   - data
   - data/files
@@ -105,7 +110,7 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: dcf4ffec4de4e9deadc6fb678bad8d32777dbf85
+  version: 2e6e67a2af4bd886ed372e6b711c8d231707e4d6
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
@@ -280,6 +285,8 @@ imports:
   version: 9ec0427d51411407c0402b093a1771cb75af9679
   subpackages:
   - lib
+- name: github.com/jaytaylor/html2text
+  version: 52d9b785554a1918cb09909b89a1509a98b853fd
 - name: github.com/jmespath/go-jmespath
   version: bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d
 - name: github.com/jonboulle/clockwork
@@ -287,7 +294,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 77ed1c8a01217656d2080ad51981f6e99adaa177
 - name: github.com/kelseyhightower/envconfig
-  version: 5c008110b20b657eb7e005b83d0a5f6aa6bb5f4b
+  version: 9aca109c9aec4633fced9717c4a09ecab3d33111
 - name: github.com/mailgun/mailgun-go
   version: 369a1fa57ce6fb314e627087b9fff0db5c266c0f
 - name: github.com/mailru/easyjson
@@ -319,7 +326,7 @@ imports:
 - name: github.com/mitchellh/mapstructure
   version: ca63d7c062ee3c9f34db231e352b60012b4fd0c1
 - name: github.com/ovh/go-ovh
-  version: a8a4c0bc40e56322142649bda7b2b4bb15145b6e
+  version: d2207178e10e4527e8f222fd8707982df8c3af17
   subpackages:
   - ovh
 - name: github.com/pborman/uuid
@@ -473,6 +480,8 @@ imports:
   subpackages:
   - context
   - context/ctxhttp
+  - html
+  - html/atom
   - http2
   - http2/hpack
   - idna
@@ -536,12 +545,16 @@ imports:
   - naming
   - peer
   - transport
+- name: gopkg.in/alexcesaro/quotedprintable.v3
+  version: 2caba252f4dc53eaf6b553000885530023f54623
 - name: gopkg.in/gcfg.v1
   version: 27e4946190b4a327b539185f2b5b1f7c84730728
   subpackages:
   - scanner
   - token
   - types
+- name: gopkg.in/gomail.v2
+  version: 81ebce5c23dfd25c6c67194b37d3dd3f338c98b1
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/ini.v1
@@ -566,7 +579,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 - name: k8s.io/kubernetes
-  version: 636687f275b7df28203dc88ddcc5a35062d2318d
+  version: 2d6c42e26a94c059d26f001cccab38a776b7bb3b
   repo: git@diffusion.appscode.com:appscode/50/kubernetes.git
   vcs: git
   subpackages:

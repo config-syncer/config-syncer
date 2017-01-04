@@ -2,6 +2,7 @@ package env
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -53,6 +54,17 @@ func (e Environment) DevMode() bool {
 	return e == Dev || e == BoxDev
 }
 
+func (e Environment) APIServer() (string, error) {
+	switch e {
+	case Prod:
+		return ProdApiServer, nil
+	case QA:
+		return QAApiServer, nil
+	default:
+		return "", fmt.Errorf("apiserver unknown for env %v", e)
+	}
+}
+
 func (e Environment) String() string {
 	return string(e)
 }
@@ -86,7 +98,7 @@ func FromString(e string) Environment {
 	case "dev":
 		return Dev
 	default:
-		if inCluster() {
+		if InCluster() {
 			return Prod
 		} else {
 			return Dev
@@ -96,7 +108,7 @@ func FromString(e string) Environment {
 
 // Possible returns true if loading an inside-kubernetes-cluster is possible.
 // ref: https://goo.gl/mrlLyr
-func inCluster() bool {
+func InCluster() bool {
 	fi, err := os.Stat("/var/run/secrets/kubernetes.io/serviceaccount/token")
 	return os.Getenv("KUBERNETES_SERVICE_HOST") != "" &&
 		os.Getenv("KUBERNETES_SERVICE_PORT") != "" &&

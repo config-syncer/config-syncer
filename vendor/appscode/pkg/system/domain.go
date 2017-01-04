@@ -137,8 +137,24 @@ func URLShortenerUrl(ns string) string {
 	return Scheme(Config.Network.URLShortenerUrls) + "://" + URLShortenerDomain(ns) + "/"
 }
 
-func MailUrl(ns string) string {
-	return Scheme(Config.Network.TeamUrls) + "://" + TeamDomain(ns) + "/mail/mailgun/"
+func MailgunInboundURL(ns string) string {
+	if _env.FromHost().IsHosted() {
+		// https://\g<ns>.appscode.io/mail/mailgun/
+		return Scheme(Config.Network.TeamUrls) + `://\g<ns>.` + Config.Network.TeamUrls.BaseDomain + "/mail/mailgun/"
+	} else {
+		// https://getappscode.com/mail/mailgun/
+		return Scheme(Config.Network.TeamUrls) + `://` + Config.Network.TeamUrls.BaseDomain + "/mail/mailgun/"
+	}
+}
+
+func MailgunRecipientRegex(ns string) string {
+	if _env.FromHost().IsHosted() {
+		// ^[a-zA-Z0-9_.+-]+@(?P<ns>[a-zA-Z0-9-]+)\.appscode\.io+$
+		return fmt.Sprintf(`^[a-zA-Z0-9_.+-]+@(?P<ns>[a-zA-Z0-9-]+)\.%v+$`, strings.Replace(Config.Network.TeamUrls.BaseDomain, `.`, `\.`, -1))
+	} else {
+		// ^[a-zA-Z0-9_.+-]+@getappscode\.com+$
+		return fmt.Sprintf(`^[a-zA-Z0-9_.+-]+@%v+$`, strings.Replace(Config.Network.TeamUrls.BaseDomain, `.`, `\.`, -1))
+	}
 }
 
 func MailAdapter() string {

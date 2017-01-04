@@ -4,10 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	_ "github.com/appscode/searchlight/pkg/controller/host/localhost"
-	_ "github.com/appscode/searchlight/pkg/controller/host/node"
-	_ "github.com/appscode/searchlight/pkg/controller/host/pod"
-
 	"github.com/appscode/errors"
 	aci "github.com/appscode/k8s-addons/api"
 	acs "github.com/appscode/k8s-addons/client/clientset"
@@ -17,6 +13,9 @@ import (
 	"github.com/appscode/searchlight/data"
 	"github.com/appscode/searchlight/pkg/client/icinga"
 	"github.com/appscode/searchlight/pkg/controller/host"
+	_ "github.com/appscode/searchlight/pkg/controller/host/localhost"
+	_ "github.com/appscode/searchlight/pkg/controller/host/node"
+	_ "github.com/appscode/searchlight/pkg/controller/host/pod"
 	"github.com/appscode/searchlight/pkg/controller/types"
 	kapi "k8s.io/kubernetes/pkg/api"
 	clientset "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"

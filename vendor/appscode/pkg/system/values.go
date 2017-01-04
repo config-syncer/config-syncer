@@ -43,6 +43,11 @@ const (
 	MailgunApiKey                  = "mailgun.api-key"
 	MailgunPublicDomain            = "mailgun.public-domain"
 	MailgunTeamDomain              = "mailgun.domain"
+	SMTPPublicDomain               = "smtp.public-domain"
+	SMTPHost                       = "phpmailer.smtp-host"
+	SMTPPassword                   = "phpmailer.smtp-password"
+	SMTPPort                       = "phpmailer.smtp-port"
+	SMTPUser                       = "phpmailer.smtp-user"
 	MetamtaDefaultAddress          = "metamta.default-address"
 	MetamtaDomain                  = "metamta.domain"
 	MetamtaMailAdapter             = "metamta.mail-adapter"
@@ -65,4 +70,6 @@ const (
 	GCS                            = "gcs"
 	S3                             = "s3"
 	Local                          = "local"
+	Mailgun                        = "mailgun"
+	SMTP                           = "smtp"
 )

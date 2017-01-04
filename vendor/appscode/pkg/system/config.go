@@ -7,8 +7,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/appscode/go/encoding/yaml"
-
 	"github.com/appscode/go-dns/aws"
 	"github.com/appscode/go-dns/azure"
 	"github.com/appscode/go-dns/cloudflare"
@@ -16,6 +14,9 @@ import (
 	"github.com/appscode/go-dns/googlecloud"
 	"github.com/appscode/go-dns/linode"
 	"github.com/appscode/go-dns/vultr"
+	"github.com/appscode/go-notify/mailgun"
+	"github.com/appscode/go-notify/smtp"
+	"github.com/appscode/go/encoding/yaml"
 	_env "github.com/appscode/go/env"
 	"github.com/appscode/log"
 )
@@ -108,11 +109,12 @@ type secureConfig struct {
 		AccountSid  string `json:"account_sid,omitempty"`
 		PhoneNumber string `json:"phone_number,omitempty"`
 	} `json:"twilio,omitempty"`
-	Mailgun struct {
-		ApiKey       string `json:"key,omitempty"`
-		PublicDomain string `json:"public_domain,omitempty"`
-		TeamDomain   string `json:"team_domain,omitempty"`
-	} `json:"mailgun"`
+	Mail struct {
+		PublicDomain string          `json:"public_domain,omitempty"`
+		Mailer       string          `json:"mailer, omitempty"`
+		Mailgun      mailgun.Options `json:"mailgun, omitempty"`
+		SMTP         smtp.Options    `json:"smtp, omitempty"`
+	} `json:"mail"`
 	DNS struct {
 		// Deprecated
 		Credential     map[string]string `json:"credential,omitempty"`

@@ -29,10 +29,10 @@ func Init() {
 }
 
 func NewEmailHandler() *mailgun.EmailHandler {
-	if system.Secrets.Mailgun.PublicDomain != "" && system.Secrets.Mailgun.ApiKey != "" {
+	if system.Secrets.Mail.PublicDomain != "" && system.Secrets.Mail.Mailgun.ApiKey != "" {
 		emailOptions := mailgun.NewDefaultEmailOptions(
-			system.Secrets.Mailgun.PublicDomain,
-			system.Secrets.Mailgun.ApiKey,
+			system.Secrets.Mail.PublicDomain,
+			system.Secrets.Mail.Mailgun.ApiKey,
 			"ERROR - ",
 			MailFrom+system.Config.Network.PublicUrls.BaseDomain,
 			[]string{"oplog" + "+" + "api" + "-" + _env.FromHost().String() + MailToSuffix},
