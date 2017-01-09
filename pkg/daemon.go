@@ -35,6 +35,7 @@ type Config struct {
 	KubeConfig            string
 	ESEndpoint            string
 	InfluxSecretName      string
+	IcingaSecretName      string
 }
 
 func Run(config *Config) {
@@ -62,12 +63,14 @@ func Run(config *Config) {
 		LoadbalancerImage:        config.LoadbalancerImageName,
 	}
 
-	// Icinga client
-	icingaClient, err := icinga.NewInClusterClient(kubeWatcher.Client)
-	if err != nil {
-		log.Errorln(err)
+	if config.IcingaSecretName != "" {
+		// Icinga client
+		icingaClient, err := icinga.NewInClusterIcingaClient(kubeWatcher.Client, config.IcingaSecretName)
+		if err != nil {
+			log.Errorln(err)
+		}
+		kubeWatcher.IcingaClient = icingaClient
 	}
-	kubeWatcher.IcingaClient = icingaClient
 
 	log.Infoln("configuration loadded, running kubed watcher")
 	go kubeWatcher.Run()
@@ -96,7 +99,7 @@ func Run(config *Config) {
 		}
 	}
 
-	if len(config.InfluxSecretName) > 0 {
+	if config.InfluxSecretName != "" {
 		// InfluxDB client
 		influxConfig, err := influxdb.GetInfluxDBConfig(config.InfluxSecretName)
 		if err != nil {
