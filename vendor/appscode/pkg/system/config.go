@@ -18,6 +18,7 @@ import (
 	"github.com/appscode/go-notify/smtp"
 	"github.com/appscode/go/encoding/yaml"
 	_env "github.com/appscode/go/env"
+	"github.com/appscode/go/strings"
 	"github.com/appscode/log"
 )
 
@@ -245,12 +246,18 @@ func applyDefaults(env _env.Environment) {
 		Config.Network.ClusterUrls.BaseDomain = "appscode.net"
 		Config.Network.URLShortenerUrls.BaseDomain = "appsco.de"
 		Config.Network.FileUrls.BaseDomain = "appscode.space"
-	} else if env == _env.QA || env == _env.Dev {
+	} else if env == _env.QA {
 		Config.Network.PublicUrls.BaseDomain = "appscode.info"
 		Config.Network.TeamUrls.BaseDomain = "appscode.ninja"
 		Config.Network.ClusterUrls.BaseDomain = "appscode.xyz"
 		Config.Network.URLShortenerUrls.BaseDomain = "appscode.co"
 		Config.Network.FileUrls.BaseDomain = "appscode.org"
+	} else if env == _env.Dev {
+		Config.Network.PublicUrls.BaseDomain = strings.Val(Config.Network.PublicUrls.BaseDomain, "appscode.info")
+		Config.Network.TeamUrls.BaseDomain = strings.Val(Config.Network.TeamUrls.BaseDomain, "appscode.ninja")
+		Config.Network.ClusterUrls.BaseDomain = strings.Val(Config.Network.ClusterUrls.BaseDomain, "appscode.xyz")
+		Config.Network.URLShortenerUrls.BaseDomain = strings.Val(Config.Network.URLShortenerUrls.BaseDomain, "appscode.co")
+		Config.Network.FileUrls.BaseDomain = strings.Val(Config.Network.FileUrls.BaseDomain, "appscode.org")
 	} else if env == _env.Onebox || env == _env.BoxDev {
 		// TeamUrls.BaseDomain must be provided by user
 		// Config.Network.TeamUrls.BaseDomain

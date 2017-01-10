@@ -1,8 +1,8 @@
-hash: 4ff29f79e2e78c5f61d0f7bb8be8b4ba9cbfb8eb7b7e5de2f7301e00f3e88d7f
-updated: 2017-01-04T06:19:20.118930578-08:00
+hash: faf46d92720e5127ade5f77371c24a8876e8829d636606dcdbdb5300f75de514
+updated: 2017-01-14T13:23:27.225637121-08:00
 imports:
 - name: appscode
-  version: ca313f400e139fdf7df689019664dcb2a2345cfb
+  version: e75bd7b5f27e537e6421f70c60e43c5f43fda3e0
   repo: git@diffusion.appscode.com:appscode/43/appscode.git
   vcs: git
   subpackages:
@@ -16,16 +16,14 @@ imports:
   - compute/metadata
   - internal
 - name: github.com/appscode/api
-  version: ec7bdb42a88f2dacdb9de3940985d2e389e27b0b
+  version: 662870e02ed00ba54eddd08ee9d48f23563cebf2
   repo: git@diffusion.appscode.com:appscode/37/api.git
   vcs: git
   subpackages:
   - artifactory/v1beta1
   - auth/v1beta1
   - backup/v1beta1
-  - billing/v1beta1
   - certificate/v1beta1
-  - ci/v1beta1
   - credential/v1beta1
   - db/v1beta1
   - dtypes
@@ -40,7 +38,7 @@ imports:
   - ssh/v1beta1
   - version
 - name: github.com/appscode/client
-  version: fa6cea0c22970ca7b2347219b2ac23594d920d9b
+  version: d882456fe513b51cd549bd2975e4199028f3a4c8
   repo: git@diffusion.appscode.com:appscode/39/client.git
   vcs: git
   subpackages:
@@ -51,7 +49,7 @@ imports:
   subpackages:
   - h/mailgun
 - name: github.com/appscode/go
-  version: a7f716de7a1373d1e8a5b31728166ada8e7595c6
+  version: c69e23742f9631e337197faa35c6d7ee1a93ee6c
   subpackages:
   - arrays
   - crypto/rand
@@ -59,13 +57,12 @@ imports:
   - env
   - flags
   - hold
-  - io
   - runtime
   - strings
   - version
   - wait
 - name: github.com/appscode/go-dns
-  version: 778834f7a20bc680d378d16ee631fa3265cb1df9
+  version: 85a13af2efc73ecc1864c6a736cfb5a46ba2aa7e
   subpackages:
   - aws
   - azure
@@ -81,7 +78,7 @@ imports:
   - mailgun
   - smtp
 - name: github.com/appscode/k8s-addons
-  version: 33355decdcfd7223715907341bac88c2106834a9
+  version: 8d1b3d70406095c62da705045f3ce3ed6c90469f
   subpackages:
   - api
   - api/install
@@ -95,7 +92,7 @@ imports:
   subpackages:
   - golog
 - name: github.com/appscode/searchlight
-  version: 243afb974bf44f771ef2d3380f6b00e1ef9c31a8
+  version: ede4cee2d883115a639010ef3dc5a311176402ef
   subpackages:
   - data
   - data/files
@@ -103,6 +100,7 @@ imports:
   - pkg/client/influxdb
   - pkg/client/k8s
   - pkg/controller
+  - pkg/controller/event
   - pkg/controller/host
   - pkg/controller/host/extpoints
   - pkg/controller/host/localhost
@@ -110,7 +108,7 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: 2e6e67a2af4bd886ed372e6b711c8d231707e4d6
+  version: 4ce2a9b1a5832fe2d2d538ba8af0e67fac85fb99
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
@@ -149,8 +147,7 @@ imports:
   - service/elb
   - service/route53
 - name: github.com/Azure/azure-sdk-for-go
-  version: 8316b9060f9c2443ba0864663245695d570a7fa2
-  vcs: git
+  version: 0984e0641ae43b89283223034574d6465be93bf4
   subpackages:
   - arm/compute
   - arm/dns
@@ -164,6 +161,7 @@ imports:
   - autorest/azure
   - autorest/date
   - autorest/to
+  - autorest/validation
 - name: github.com/beorn7/perks
   version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
   subpackages:
@@ -173,9 +171,7 @@ imports:
 - name: github.com/cloudflare/cloudflare-go
   version: ba610b87e64f5e99e8ddd614e50669c66c2ec9b5
 - name: github.com/coreos/go-oidc
-  version: 6efba820ed9a75366742203f168832558de9defd
-  repo: https://github.com/appscode/go-oidc.git
-  vcs: git
+  version: 2b5d73091ea4b7ddb15e3ac00077f153120b5b61
   subpackages:
   - http
   - jose
@@ -260,7 +256,7 @@ imports:
 - name: github.com/google/gofuzz
   version: bbcb9da2d746f8bdbd6a936686a0a6067ada0ec5
 - name: github.com/grpc-ecosystem/grpc-gateway
-  version: 93cde5d82c4bca62da70d631a348542eb2d44cd3
+  version: 0df7af644065817a5e7f6dfdb4c52ddca56e3c92
   repo: git@github.com:appscode/grpc-gateway.git
   vcs: git
   subpackages:
@@ -535,7 +531,7 @@ imports:
   - internal/urlfetch
   - urlfetch
 - name: google.golang.org/grpc
-  version: 777daa17ff9b5daef1cfdf915088a2ada3332bf0
+  version: 708a7f9f3283aa2d4f6132d287d78683babe55c8
   subpackages:
   - codes
   - credentials
@@ -544,6 +540,8 @@ imports:
   - metadata
   - naming
   - peer
+  - stats
+  - tap
   - transport
 - name: gopkg.in/alexcesaro/quotedprintable.v3
   version: 2caba252f4dc53eaf6b553000885530023f54623
@@ -579,7 +577,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 - name: k8s.io/kubernetes
-  version: 2d6c42e26a94c059d26f001cccab38a776b7bb3b
+  version: 486680add704e854c69b0d58889d30adf811394f
   repo: git@diffusion.appscode.com:appscode/50/kubernetes.git
   vcs: git
   subpackages:

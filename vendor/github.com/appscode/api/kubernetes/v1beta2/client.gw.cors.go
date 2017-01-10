@@ -29,3 +29,14 @@ func ExportClientsCorsPatterns() []runtime.Pattern {
 		pattern_Clients_UnregisterPersistentVolumeClaim_0,
 	}
 }
+
+// ExportDisksCorsPatterns returns an array of grpc gatway mux patterns for
+// Disks service to enable CORS.
+func ExportDisksCorsPatterns() []runtime.Pattern {
+	return []runtime.Pattern{
+		pattern_Disks_List_0,
+		pattern_Disks_Describe_0,
+		pattern_Disks_Create_0,
+		pattern_Disks_Delete_0,
+	}
+}

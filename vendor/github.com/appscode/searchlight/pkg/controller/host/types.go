@@ -19,9 +19,10 @@ type IcingaObject struct {
 type ResponseObject struct {
 	Results []struct {
 		Attrs struct {
-			Name          string                 `json:"name"`
-			CheckInterval float64                `json:"check_interval"`
-			Vars          map[string]interface{} `json:"vars"`
+			Name            string                 `json:"name"`
+			CheckInterval   float64                `json:"check_interval"`
+			Vars            map[string]interface{} `json:"vars"`
+			Acknowledgement float64                `json:"acknowledgement"`
 		} `json:"attrs"`
 		Name string `json:"name"`
 	} `json:"results"`

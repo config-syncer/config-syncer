@@ -63,7 +63,7 @@ func getIcingaSecretData(kubeClient clientset.Interface, secretName string) (*au
 		}
 		return authData, nil
 	}
-	return nil, errors.New("Invalid Icinga2 secret")
+	return nil, errors.New("Invalid Icinga secret")
 }
 
 func getIcingaConfig(kubeClient clientset.Interface, secretName string) *IcingaConfig {

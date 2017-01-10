@@ -4,14 +4,12 @@ import (
 	artifactory "github.com/appscode/api/artifactory/v1beta1"
 	auth "github.com/appscode/api/auth/v1beta1"
 	backup "github.com/appscode/api/backup/v1beta1"
-	billing "github.com/appscode/api/billing/v1beta1"
 	ca "github.com/appscode/api/certificate/v1beta1"
-	ci "github.com/appscode/api/ci/v1beta1"
 	db "github.com/appscode/api/db/v1beta1"
 	glusterfs "github.com/appscode/api/glusterfs/v1beta1"
 	kubernetesV1beta1 "github.com/appscode/api/kubernetes/v1beta1"
 	kubernetesV1beta2 "github.com/appscode/api/kubernetes/v1beta2"
-
+	namespace "github.com/appscode/api/namespace/v1beta1"
 	pv "github.com/appscode/api/pv/v1beta1"
 	"google.golang.org/grpc"
 )
@@ -22,9 +20,8 @@ type multiClientInterface interface {
 	Artifactory() *artifactoryService
 	Authentication() *authenticationService
 	Backup() *backupService
-	Billing() *billingService
+	Namespace() *nsService
 	CA() *caService
-	CI() *ciService
 	DB() *dbService
 	GlusterFS() *glusterFSService
 	Kubernetes() *versionedKubernetesService
@@ -35,9 +32,8 @@ type multiClientServices struct {
 	artifactoryClient         *artifactoryService
 	authenticationClient      *authenticationService
 	backupClient              *backupService
-	billingClient             *billingService
+	nsClient                  *nsService
 	caClient                  *caService
-	ciClient                  *ciService
 	glusterfsClient           *glusterFSService
 	versionedKubernetesClient *versionedKubernetesService
 	pvClient                  *pvService
@@ -59,18 +55,12 @@ func newMultiClientService(conn *grpc.ClientConn) multiClientInterface {
 			backupServerClient: backup.NewServersClient(conn),
 			backupClientClient: backup.NewClientsClient(conn),
 		},
-		billingClient: &billingService{
-			paymentMethodClient: billing.NewPaymentMethodsClient(conn),
-			quotaClient:         billing.NewQuotasClient(conn),
+		nsClient: &nsService{
+			teamClient:    namespace.NewTeamsClient(conn),
+			billingClient: namespace.NewBillingClient(conn),
 		},
 		caClient: &caService{
 			certificateClient: ca.NewCertificatesClient(conn),
-		},
-		ciClient: &ciService{
-			buildClient:  ci.NewBuildsClient(conn),
-			jobClient:    ci.NewJobsClient(conn),
-			masterClient: ci.NewMasterClient(conn),
-			agentClient:  ci.NewAgentsClient(conn),
 		},
 		glusterfsClient: &glusterFSService{
 			clusterClient: glusterfs.NewClustersClient(conn),
@@ -114,16 +104,12 @@ func (s *multiClientServices) Backup() *backupService {
 	return s.backupClient
 }
 
-func (s *multiClientServices) Billing() *billingService {
-	return s.billingClient
+func (s *multiClientServices) Namespace() *nsService {
+	return s.nsClient
 }
 
 func (s *multiClientServices) CA() *caService {
 	return s.caClient
-}
-
-func (s *multiClientServices) CI() *ciService {
-	return s.ciClient
 }
 
 func (s *multiClientServices) GlusterFS() *glusterFSService {
@@ -188,17 +174,17 @@ func (b *backupService) Client() backup.ClientsClient {
 	return b.backupClientClient
 }
 
-type billingService struct {
-	paymentMethodClient billing.PaymentMethodsClient
-	quotaClient         billing.QuotasClient
+type nsService struct {
+	teamClient    namespace.TeamsClient
+	billingClient namespace.BillingClient
 }
 
-func (b *billingService) PaymentMethod() billing.PaymentMethodsClient {
-	return b.paymentMethodClient
+func (b *nsService) Team() namespace.TeamsClient {
+	return b.teamClient
 }
 
-func (b *billingService) Quota() billing.QuotasClient {
-	return b.quotaClient
+func (b *nsService) Billing() namespace.BillingClient {
+	return b.billingClient
 }
 
 type caService struct {
@@ -207,29 +193,6 @@ type caService struct {
 
 func (c *caService) CertificatesClient() ca.CertificatesClient {
 	return c.certificateClient
-}
-
-type ciService struct {
-	agentClient  ci.AgentsClient
-	buildClient  ci.BuildsClient
-	jobClient    ci.JobsClient
-	masterClient ci.MasterClient
-}
-
-func (c *ciService) Build() ci.BuildsClient {
-	return c.buildClient
-}
-
-func (c *ciService) Job() ci.JobsClient {
-	return c.jobClient
-}
-
-func (c *ciService) Master() ci.MasterClient {
-	return c.masterClient
-}
-
-func (c *ciService) Agent() ci.AgentsClient {
-	return c.agentClient
 }
 
 type glusterFSService struct {

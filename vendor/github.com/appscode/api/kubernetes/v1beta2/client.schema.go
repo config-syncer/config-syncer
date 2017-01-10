@@ -9,14 +9,18 @@ import (
 
 var secretEditRequestSchema *gojsonschema.Schema
 var persistentVolumeClaimRegisterRequestSchema *gojsonschema.Schema
+var diskListRequestSchema *gojsonschema.Schema
 var createResourceRequestSchema *gojsonschema.Schema
 var updateResourceRequestSchema *gojsonschema.Schema
+var diskDescribeRequestSchema *gojsonschema.Schema
 var persistentVolumeUnRegisterRequestSchema *gojsonschema.Schema
 var copyResourceRequestSchema *gojsonschema.Schema
 var describeResourceRequestSchema *gojsonschema.Schema
 var configMapEditRequestSchema *gojsonschema.Schema
 var listResourceRequestSchema *gojsonschema.Schema
 var persistentVolumeClaimUnRegisterRequestSchema *gojsonschema.Schema
+var diskCreateRequestSchema *gojsonschema.Schema
+var diskDeleteRequestSchema *gojsonschema.Schema
 var persistentVolumeRegisterRequestSchema *gojsonschema.Schema
 var deleteResourceRequestSchema *gojsonschema.Schema
 
@@ -80,6 +84,18 @@ func init() {
     },
     "size_gb": {
       "type": "integer"
+    }
+  },
+  "type": "object"
+}`))
+	if err != nil {
+		glog.Fatal(err)
+	}
+	diskListRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "cluster": {
+      "type": "string"
     }
   },
   "type": "object"
@@ -156,6 +172,29 @@ func init() {
       "$ref": "#/definitions/v1beta2Raw"
     },
     "type": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`))
+	if err != nil {
+		glog.Fatal(err)
+	}
+	diskDescribeRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "cluster": {
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 63,
+      "pattern": "^[a-z0-9](?:[a-z0-9\\-]{0,61}[a-z0-9])?$",
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "vhd_container_name": {
       "type": "string"
     }
   },
@@ -357,6 +396,53 @@ func init() {
 	if err != nil {
 		glog.Fatal(err)
 	}
+	diskCreateRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "cluster": {
+      "type": "string"
+    },
+    "disk_type": {
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 63,
+      "pattern": "^[a-z0-9](?:[a-z0-9\\-]{0,61}[a-z0-9])?$",
+      "type": "string"
+    },
+    "size_gb": {
+      "type": "integer"
+    },
+    "vhd_container_name": {
+      "type": "string"
+    },
+    "zone": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`))
+	if err != nil {
+		glog.Fatal(err)
+	}
+	diskDeleteRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "cluster": {
+      "type": "string"
+    },
+    "uid": {
+      "type": "string"
+    },
+    "vhd_container_name": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`))
+	if err != nil {
+		glog.Fatal(err)
+	}
 	persistentVolumeRegisterRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
   "$schema": "http://json-schema.org/draft-04/schema#",
   "properties": {
@@ -421,6 +507,11 @@ func (m *PersistentVolumeClaimRegisterRequest) IsValid() (*gojsonschema.Result, 
 }
 func (m *PersistentVolumeClaimRegisterRequest) IsRequest() {}
 
+func (m *DiskListRequest) IsValid() (*gojsonschema.Result, error) {
+	return diskListRequestSchema.Validate(gojsonschema.NewGoLoader(m))
+}
+func (m *DiskListRequest) IsRequest() {}
+
 func (m *CreateResourceRequest) IsValid() (*gojsonschema.Result, error) {
 	return createResourceRequestSchema.Validate(gojsonschema.NewGoLoader(m))
 }
@@ -430,6 +521,11 @@ func (m *UpdateResourceRequest) IsValid() (*gojsonschema.Result, error) {
 	return updateResourceRequestSchema.Validate(gojsonschema.NewGoLoader(m))
 }
 func (m *UpdateResourceRequest) IsRequest() {}
+
+func (m *DiskDescribeRequest) IsValid() (*gojsonschema.Result, error) {
+	return diskDescribeRequestSchema.Validate(gojsonschema.NewGoLoader(m))
+}
+func (m *DiskDescribeRequest) IsRequest() {}
 
 func (m *PersistentVolumeUnRegisterRequest) IsValid() (*gojsonschema.Result, error) {
 	return persistentVolumeUnRegisterRequestSchema.Validate(gojsonschema.NewGoLoader(m))
@@ -461,6 +557,16 @@ func (m *PersistentVolumeClaimUnRegisterRequest) IsValid() (*gojsonschema.Result
 }
 func (m *PersistentVolumeClaimUnRegisterRequest) IsRequest() {}
 
+func (m *DiskCreateRequest) IsValid() (*gojsonschema.Result, error) {
+	return diskCreateRequestSchema.Validate(gojsonschema.NewGoLoader(m))
+}
+func (m *DiskCreateRequest) IsRequest() {}
+
+func (m *DiskDeleteRequest) IsValid() (*gojsonschema.Result, error) {
+	return diskDeleteRequestSchema.Validate(gojsonschema.NewGoLoader(m))
+}
+func (m *DiskDeleteRequest) IsRequest() {}
+
 func (m *PersistentVolumeRegisterRequest) IsValid() (*gojsonschema.Result, error) {
 	return persistentVolumeRegisterRequestSchema.Validate(gojsonschema.NewGoLoader(m))
 }
@@ -471,9 +577,15 @@ func (m *DeleteResourceRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *DeleteResourceRequest) IsRequest() {}
 
-func (m *ListResourceResponse) SetStatus(s *dtypes.Status) {
+func (m *DiskDescribeResponse) SetStatus(s *dtypes.Status) {
 	m.Status = s
 }
 func (m *DescribeResourceResponse) SetStatus(s *dtypes.Status) {
+	m.Status = s
+}
+func (m *DiskListResponse) SetStatus(s *dtypes.Status) {
+	m.Status = s
+}
+func (m *ListResourceResponse) SetStatus(s *dtypes.Status) {
 	m.Status = s
 }

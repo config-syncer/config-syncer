@@ -30,6 +30,7 @@ const (
 	BraintreePrivateKey            = "braintree.private-key"
 	BraintreePublicKey             = "braintree.public-key"
 	CIBucket                       = "ci.data-bucket-name"
+	CIInstalled                    = "ci.installed"
 	CIDefaultBot                   = "ci.default-bot"
 	CIMasterEndpoint               = "ci.master-endpoint"
 	CIMasterService                = "ci.master-service"

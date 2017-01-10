@@ -77,6 +77,7 @@ func (c *IcingaClient) Service(hostName string) *IcingaApiRequest {
 }
 
 func (c *IcingaClient) Actions(action string) *IcingaApiRequest {
+	c.pathPrefix = ""
 	return c.newIcingaRequest("/actions/" + action)
 }
 

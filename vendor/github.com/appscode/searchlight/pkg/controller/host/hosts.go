@@ -16,6 +16,8 @@ const (
 	CheckNodeStatus       = "node_status"
 	CheckCommandPodStatus = "pod_status"
 	CheckCommandPodExists = "pod_exists"
+	CheckCommandKubeEvent = "kube_event"
+	CheckCommandKubeExec  = "kube_exec"
 )
 
 func CreateIcingaHost(icingaClient *icinga.IcingaClient, objectList []*KubeObjectInfo, alertNamespace string) error {

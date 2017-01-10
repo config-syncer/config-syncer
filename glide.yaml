@@ -26,8 +26,10 @@ import:
   version: master
 - package: gopkg.in/olivere/elastic.v3
   version: v3.0.59
+- package: github.com/Azure/azure-sdk-for-go
+  version: v7.0.1-beta
 - package: k8s.io/kubernetes
-  version: 1.5.1-ac
+  version: 1.5.2-ac
   repo: git@diffusion.appscode.com:appscode/50/kubernetes.git
   vcs: git
 - package: github.com/mikespook/golib
@@ -35,6 +37,7 @@ import:
   repo: git@github.com:appscode/lego.git
   vcs: git
   version: master
+- package: github.com/coreos/go-oidc
 testImport:
 - package: github.com/stretchr/testify
   version: v1.1.4

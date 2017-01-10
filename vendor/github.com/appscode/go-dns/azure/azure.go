@@ -79,7 +79,7 @@ func (c *DNSProvider) EnsureARecord(domain string, ip string) error {
 
 	records := make([]dns.ARecord, 0)
 	if found {
-		records = *rs.Properties.ARecords
+		records = *rs.ARecords
 		for _, record := range records {
 			if *record.Ipv4Address == ip {
 				log.Println("DNS is already configured. No DNS related change is necessary.")
@@ -93,7 +93,7 @@ func (c *DNSProvider) EnsureARecord(domain string, ip string) error {
 
 	rec := dns.RecordSet{
 		Name: &relative,
-		Properties: &dns.RecordSetProperties{
+		RecordSetProperties: &dns.RecordSetProperties{
 			TTL:      to.Int64Ptr(300),
 			ARecords: &records,
 		},
@@ -112,7 +112,7 @@ func (c *DNSProvider) DeleteARecords(domain string) error {
 	rsc := dns.NewRecordSetsClient(c.opt.SubscriptionId)
 	rsc.Authorizer, err = c.newServicePrincipalTokenFromCredentials(azure.PublicCloud.ResourceManagerEndpoint)
 	relative := toRelativeRecord(fqdn, acme.ToFqdn(zone))
-	_, err = rsc.Delete(c.opt.ResourceGroup, zone, relative, "A", "", "")
+	_, err = rsc.Delete(c.opt.ResourceGroup, zone, relative, "A", "")
 
 	//resp, err := rsc.ListByType(c.resourceGroup, zone, "A", nil)
 	//if err != nil {

@@ -18,6 +18,5 @@ func ExportTeamsCorsPatterns() []runtime.Pattern {
 		pattern_Teams_Create_0,
 		pattern_Teams_Get_0,
 		pattern_Teams_IsAvailable_0,
-		pattern_Teams_Subscription_0,
 	}
 }

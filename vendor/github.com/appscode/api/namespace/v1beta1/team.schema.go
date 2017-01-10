@@ -96,9 +96,6 @@ func (m *IsAvailableRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *IsAvailableRequest) IsRequest() {}
 
-func (m *SubscriptionResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
 func (m *GetResponse) SetStatus(s *dtypes.Status) {
 	m.Status = s
 }
