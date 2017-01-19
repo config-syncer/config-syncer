@@ -3,7 +3,7 @@ package client
 import (
 	artifactory "github.com/appscode/api/artifactory/v1beta1"
 	auth "github.com/appscode/api/auth/v1beta1"
-	backup "github.com/appscode/api/backup/v1beta1"
+	ci "github.com/appscode/api/ci/v1beta1"
 	ca "github.com/appscode/api/certificate/v1beta1"
 	db "github.com/appscode/api/db/v1beta1"
 	glusterfs "github.com/appscode/api/glusterfs/v1beta1"
@@ -19,10 +19,10 @@ import (
 type multiClientInterface interface {
 	Artifactory() *artifactoryService
 	Authentication() *authenticationService
-	Backup() *backupService
-	Namespace() *nsService
 	CA() *caService
+	CI() *ciService
 	DB() *dbService
+	Namespace() *nsService
 	GlusterFS() *glusterFSService
 	Kubernetes() *versionedKubernetesService
 	PV() *pvService
@@ -31,10 +31,10 @@ type multiClientInterface interface {
 type multiClientServices struct {
 	artifactoryClient         *artifactoryService
 	authenticationClient      *authenticationService
-	backupClient              *backupService
-	nsClient                  *nsService
 	caClient                  *caService
+	ciClient                  *ciService
 	glusterfsClient           *glusterFSService
+	nsClient                  *nsService
 	versionedKubernetesClient *versionedKubernetesService
 	pvClient                  *pvService
 	dbClient                  *dbService
@@ -51,16 +51,12 @@ func newMultiClientService(conn *grpc.ClientConn) multiClientInterface {
 			conduitClient:        auth.NewConduitClient(conn),
 			projectClient:        auth.NewProjectsClient(conn),
 		},
-		backupClient: &backupService{
-			backupServerClient: backup.NewServersClient(conn),
-			backupClientClient: backup.NewClientsClient(conn),
-		},
-		nsClient: &nsService{
-			teamClient:    namespace.NewTeamsClient(conn),
-			billingClient: namespace.NewBillingClient(conn),
-		},
 		caClient: &caService{
 			certificateClient: ca.NewCertificatesClient(conn),
+		},
+		ciClient: &ciService{
+			agentsClient: ci.NewAgentsClient(conn),
+			metadataClient: ci.NewMetadataClient(conn),
 		},
 		glusterfsClient: &glusterFSService{
 			clusterClient: glusterfs.NewClustersClient(conn),
@@ -79,6 +75,10 @@ func newMultiClientService(conn *grpc.ClientConn) multiClientInterface {
 				clientsClient: kubernetesV1beta2.NewClientsClient(conn),
 				diskClient:    kubernetesV1beta2.NewDisksClient(conn),
 			},
+		},
+		nsClient: &nsService{
+			teamClient:    namespace.NewTeamsClient(conn),
+			billingClient: namespace.NewBillingClient(conn),
 		},
 		pvClient: &pvService{
 			diskClient: pv.NewDisksClient(conn),
@@ -100,16 +100,16 @@ func (s *multiClientServices) Authentication() *authenticationService {
 	return s.authenticationClient
 }
 
-func (s *multiClientServices) Backup() *backupService {
-	return s.backupClient
-}
-
 func (s *multiClientServices) Namespace() *nsService {
 	return s.nsClient
 }
 
 func (s *multiClientServices) CA() *caService {
 	return s.caClient
+}
+
+func (s *multiClientServices) CI() *ciService {
+	return s.ciClient
 }
 
 func (s *multiClientServices) GlusterFS() *glusterFSService {
@@ -161,17 +161,17 @@ func (a *authenticationService) Project() auth.ProjectsClient {
 	return a.projectClient
 }
 
-type backupService struct {
-	backupClientClient backup.ClientsClient
-	backupServerClient backup.ServersClient
+type ciService struct {
+	agentsClient ci.AgentsClient
+	metadataClient        ci.MetadataClient
 }
 
-func (b *backupService) Server() backup.ServersClient {
-	return b.backupServerClient
+func (a *ciService) Agents() ci.AgentsClient {
+	return a.agentsClient
 }
 
-func (b *backupService) Client() backup.ClientsClient {
-	return b.backupClientClient
+func (a *ciService) Metadata() ci.MetadataClient {
+	return a.metadataClient
 }
 
 type nsService struct {

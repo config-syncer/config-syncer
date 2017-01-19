@@ -193,9 +193,6 @@ func init() {
     },
     "provider": {
       "type": "string"
-    },
-    "vhd_container_name": {
-      "type": "string"
     }
   },
   "type": "object"
@@ -413,9 +410,6 @@ func init() {
     "size_gb": {
       "type": "integer"
     },
-    "vhd_container_name": {
-      "type": "string"
-    },
     "zone": {
       "type": "string"
     }
@@ -432,9 +426,6 @@ func init() {
       "type": "string"
     },
     "uid": {
-      "type": "string"
-    },
-    "vhd_container_name": {
       "type": "string"
     }
   },

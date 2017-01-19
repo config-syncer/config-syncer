@@ -69,7 +69,7 @@ func ForwardResponseStream(ctx context.Context, marshaler Marshaler, w http.Resp
 func handleForwardResponseServerMetadata(w http.ResponseWriter, md ServerMetadata) {
 	for k, vs := range md.HeaderMD {
 		hKey := k
-		if !strings.HasPrefix(strings.ToLower(k), corsHeaderPrefix) ||
+		if !strings.HasPrefix(strings.ToLower(k), corsHeaderPrefix) &&
 			!strings.HasPrefix(strings.ToLower(k), rateLimitHeaderPrefix) {
 			hKey = fmt.Sprintf("%s%s", MetadataHeaderPrefix, k)
 		}

@@ -1,8 +1,8 @@
 hash: faf46d92720e5127ade5f77371c24a8876e8829d636606dcdbdb5300f75de514
-updated: 2017-01-14T13:23:27.225637121-08:00
+updated: 2017-01-19T02:27:45.341820602-08:00
 imports:
 - name: appscode
-  version: e75bd7b5f27e537e6421f70c60e43c5f43fda3e0
+  version: be184589ca65fe83bf3c772ccb98873b6d12b797
   repo: git@diffusion.appscode.com:appscode/43/appscode.git
   vcs: git
   subpackages:
@@ -16,14 +16,14 @@ imports:
   - compute/metadata
   - internal
 - name: github.com/appscode/api
-  version: 662870e02ed00ba54eddd08ee9d48f23563cebf2
+  version: cf671fb833a346e4ccb9cc8f26c31e3b514f18f5
   repo: git@diffusion.appscode.com:appscode/37/api.git
   vcs: git
   subpackages:
   - artifactory/v1beta1
   - auth/v1beta1
-  - backup/v1beta1
   - certificate/v1beta1
+  - ci/v1beta1
   - credential/v1beta1
   - db/v1beta1
   - dtypes
@@ -38,7 +38,7 @@ imports:
   - ssh/v1beta1
   - version
 - name: github.com/appscode/client
-  version: d882456fe513b51cd549bd2975e4199028f3a4c8
+  version: f536d3ccd9fdba71c9663770160b9be8fcb90a5d
   repo: git@diffusion.appscode.com:appscode/39/client.git
   vcs: git
   subpackages:
@@ -49,7 +49,7 @@ imports:
   subpackages:
   - h/mailgun
 - name: github.com/appscode/go
-  version: c69e23742f9631e337197faa35c6d7ee1a93ee6c
+  version: 10a1572c8fec8c70fe11a05cf6cf2d0034c3ea2a
   subpackages:
   - arrays
   - crypto/rand
@@ -92,7 +92,7 @@ imports:
   subpackages:
   - golog
 - name: github.com/appscode/searchlight
-  version: ede4cee2d883115a639010ef3dc5a311176402ef
+  version: 11462e3f126588989a6c8b3e0b406a612da701fa
   subpackages:
   - data
   - data/files
@@ -108,7 +108,7 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: 4ce2a9b1a5832fe2d2d538ba8af0e67fac85fb99
+  version: 0310a1231da74dc49ff5752fcc726ab5d587514e
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
@@ -256,7 +256,7 @@ imports:
 - name: github.com/google/gofuzz
   version: bbcb9da2d746f8bdbd6a936686a0a6067ada0ec5
 - name: github.com/grpc-ecosystem/grpc-gateway
-  version: 0df7af644065817a5e7f6dfdb4c52ddca56e3c92
+  version: 9e2ec49480d7da3e5cae8a52821467c790ca496d
   repo: git@github.com:appscode/grpc-gateway.git
   vcs: git
   subpackages:
@@ -447,7 +447,7 @@ imports:
 - name: github.com/xeipuuv/gojsonschema
   version: 93e72a773fade158921402d6a24c819b48aba29d
 - name: github.com/xenolf/lego
-  version: efdf264cb25e03b7adab3401648e6daa7fbe8ebc
+  version: e35b0ffcf7c5217ab2b605ab0f266547ad26021e
   repo: git@github.com:appscode/lego.git
   vcs: git
   subpackages:
@@ -577,7 +577,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 - name: k8s.io/kubernetes
-  version: 486680add704e854c69b0d58889d30adf811394f
+  version: ab1ec7840931d698a3705a341ffff360d3838b15
   repo: git@diffusion.appscode.com:appscode/50/kubernetes.git
   vcs: git
   subpackages:
