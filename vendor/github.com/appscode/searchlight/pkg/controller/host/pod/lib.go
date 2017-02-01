@@ -179,7 +179,7 @@ func (b *biblio) delete(specificObject string) error {
 	alertSpec := b.Resource.Spec
 
 	// Get Icinga Host Info
-	objectList, err := host.GetObjectList(b.KubeClient, alertSpec.CheckCommand, host.HostTypePod, b.Resource.Namespace, b.ObjectType, b.ObjectName, "")
+	objectList, err := host.GetObjectList(b.KubeClient, alertSpec.CheckCommand, host.HostTypePod, b.Resource.Namespace, b.ObjectType, b.ObjectName, specificObject)
 	if err != nil {
 		return errors.New().WithCause(err).Internal()
 	}

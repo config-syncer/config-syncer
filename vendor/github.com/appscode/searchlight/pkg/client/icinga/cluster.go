@@ -17,7 +17,10 @@ const (
 )
 
 func NewInClusterIcingaClient(kubeClient clientset.Interface, secretName string) (*IcingaClient, error) {
-	config := getIcingaConfig(kubeClient, secretName)
+	config, err := getIcingaConfig(kubeClient, secretName)
+	if err != nil {
+		return nil, err
+	}
 	c := NewClient(config)
 	return c, nil
 }
@@ -29,7 +32,7 @@ func NewIcingaClient(kubeClient clientset.Interface) (*IcingaClient, error) {
 		fmt.Println("Set E2E_ICINGA_SECRET ENV to kubernetes secret name")
 		os.Exit(1)
 	}
-	config := getIcingaConfig(kubeClient, secretName)
+	config, _ := getIcingaConfig(kubeClient, secretName)
 
 	icinga_url := os.Getenv(IcingaURL)
 	if icinga_url == "" {
@@ -53,7 +56,7 @@ func NewIcingaClient(kubeClient clientset.Interface) (*IcingaClient, error) {
 			if serviceName, found := secretData.Get("", IcingaService); found {
 				parts := strings.Split(serviceName, ".")
 				name := parts[0]
-				namespace := "kube-system"
+				namespace := "default"
 				if len(parts) > 1 {
 					namespace = parts[1]
 				}

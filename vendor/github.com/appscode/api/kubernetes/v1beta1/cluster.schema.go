@@ -179,11 +179,14 @@ func init() {
       "type": "object"
     },
     "default_access_level": {
-      "title": "Default access level is to allow permission to the cluster\nwhen no Role matched for that specif user or group. This can\nset as\n   - v:cluster-admins    // to allow admin access\n   - v:cluster-deployer  // to allow deployer access\n   - v:cluster-viewer    // to allow viewer access\n   - \"\"                  // empty value stands for no access\nIf not set this will set \"\"",
+      "title": "Default access level is to allow permission to the cluster\nwhen no Role matched for that specif user or group. This can\nset as\n   - team-admins       // to allow ns admin access\n   - cluster-admins    // to allow admin access\n   - cluster-editors   // to allow editor access\n   - cluster-deployers // to allow deployer access\n   - cluster-viewers   // to allow viewer access\n   - no-access         // to allow no default access\nIf not set this will set \"\"",
       "type": "string"
     },
     "do_not_delete": {
       "type": "boolean"
+    },
+    "gce_project": {
+      "type": "string"
     },
     "hostfacts_version": {
       "type": "string"

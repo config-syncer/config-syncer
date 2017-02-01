@@ -37,6 +37,9 @@ func init() {
       "maxLength": 63,
       "pattern": "^[a-z0-9](?:[a-z0-9\\-]{0,61}[a-z0-9])?$",
       "type": "string"
+    },
+    "gce_project": {
+      "type": "string"
     }
   },
   "type": "object"

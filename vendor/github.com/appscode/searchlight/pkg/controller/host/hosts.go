@@ -101,11 +101,8 @@ func GetObjectList(kubeClient clientset.Interface, checkCommand, hostType, names
 		}
 	case HostTypeLocalhost:
 		hostName := checkCommand
-		switch checkCommand {
-		case CheckCommandPodStatus, CheckCommandPodExists:
-			if objectType != TypeCluster {
-				hostName = objectType + "|" + objectName
-			}
+		if objectType != TypeCluster {
+			hostName = objectType + "|" + objectName
 		}
 		return []*KubeObjectInfo{{Name: hostName + "@" + namespace, IP: "127.0.0.1"}}, nil
 	default:

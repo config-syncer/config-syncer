@@ -34,7 +34,7 @@ func NewEmailHandler() *mailgun.EmailHandler {
 			system.Secrets.Mail.PublicDomain,
 			system.Secrets.Mail.Mailgun.ApiKey,
 			"ERROR - ",
-			MailFrom+system.Config.Network.PublicUrls.BaseDomain,
+			MailFrom+system.PublicBaseDomain(),
 			[]string{"oplog" + "+" + "api" + "-" + _env.FromHost().String() + MailToSuffix},
 		)
 

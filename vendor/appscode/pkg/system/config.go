@@ -23,8 +23,8 @@ import (
 )
 
 type URLBase struct {
-	Scheme     string `json:"scheme,omitempty"`
-	BaseDomain string `json:"base_domain,omitempty"`
+	Scheme   string `json:"scheme,omitempty"`
+	BaseAddr string `json:"base_addr,omitempty"`
 }
 
 type config struct {
@@ -241,31 +241,31 @@ func Init() {
 
 func applyDefaults(env _env.Environment) {
 	if env == _env.Prod {
-		Config.Network.PublicUrls.BaseDomain = "appscode.com"
-		Config.Network.TeamUrls.BaseDomain = "appscode.io"
-		Config.Network.ClusterUrls.BaseDomain = "appscode.net"
-		Config.Network.URLShortenerUrls.BaseDomain = "appsco.de"
-		Config.Network.FileUrls.BaseDomain = "appscode.space"
+		Config.Network.PublicUrls.BaseAddr = "appscode.com"
+		Config.Network.TeamUrls.BaseAddr = "appscode.io"
+		Config.Network.ClusterUrls.BaseAddr = "appscode.net"
+		Config.Network.URLShortenerUrls.BaseAddr = "appsco.de"
+		Config.Network.FileUrls.BaseAddr = "appscode.space"
 	} else if env == _env.QA {
-		Config.Network.PublicUrls.BaseDomain = "appscode.info"
-		Config.Network.TeamUrls.BaseDomain = "appscode.ninja"
-		Config.Network.ClusterUrls.BaseDomain = "appscode.xyz"
-		Config.Network.URLShortenerUrls.BaseDomain = "appscode.co"
-		Config.Network.FileUrls.BaseDomain = "appscode.org"
+		Config.Network.PublicUrls.BaseAddr = "appscode.info"
+		Config.Network.TeamUrls.BaseAddr = "appscode.ninja"
+		Config.Network.ClusterUrls.BaseAddr = "appscode.xyz"
+		Config.Network.URLShortenerUrls.BaseAddr = "appscode.co"
+		Config.Network.FileUrls.BaseAddr = "appscode.org"
 	} else if env == _env.Dev {
-		Config.Network.PublicUrls.BaseDomain = strings.Val(Config.Network.PublicUrls.BaseDomain, "appscode.info")
-		Config.Network.TeamUrls.BaseDomain = strings.Val(Config.Network.TeamUrls.BaseDomain, "appscode.ninja")
-		Config.Network.ClusterUrls.BaseDomain = strings.Val(Config.Network.ClusterUrls.BaseDomain, "appscode.xyz")
-		Config.Network.URLShortenerUrls.BaseDomain = strings.Val(Config.Network.URLShortenerUrls.BaseDomain, "appscode.co")
-		Config.Network.FileUrls.BaseDomain = strings.Val(Config.Network.FileUrls.BaseDomain, "appscode.org")
+		Config.Network.PublicUrls.BaseAddr = strings.Val(Config.Network.PublicUrls.BaseAddr, "appscode.dev:9999")
+		Config.Network.TeamUrls.BaseAddr = strings.Val(Config.Network.TeamUrls.BaseAddr, "appscode.dev:9999")
+		Config.Network.ClusterUrls.BaseAddr = strings.Val(Config.Network.ClusterUrls.BaseAddr, "appscode.xyz")
+		Config.Network.URLShortenerUrls.BaseAddr = strings.Val(Config.Network.URLShortenerUrls.BaseAddr, "appscode.co")
+		Config.Network.FileUrls.BaseAddr = strings.Val(Config.Network.FileUrls.BaseAddr, "appscode.org")
 	} else if env == _env.Onebox || env == _env.BoxDev {
 		// TeamUrls.BaseDomain must be provided by user
 		// Config.Network.TeamUrls.BaseDomain
-		Config.Network.PublicUrls.BaseDomain = Config.Network.TeamUrls.BaseDomain
-		Config.Network.ClusterUrls.BaseDomain = "kubernetes." + Config.Network.TeamUrls.BaseDomain
-		Config.Network.URLShortenerUrls.BaseDomain = "x." + Config.Network.TeamUrls.BaseDomain
-		Config.Network.FileUrls.BaseDomain = Config.Network.TeamUrls.BaseDomain
+		Config.Network.PublicUrls.BaseAddr = Config.Network.TeamUrls.BaseAddr
+		Config.Network.ClusterUrls.BaseAddr = "kubernetes." + Config.Network.TeamUrls.BaseAddr
+		Config.Network.URLShortenerUrls.BaseAddr = "x." + Config.Network.TeamUrls.BaseAddr
+		Config.Network.FileUrls.BaseAddr = Config.Network.TeamUrls.BaseAddr
 	}
 	Config.Network.InClusterUrls.Scheme = "http"
-	Config.Network.InClusterUrls.BaseDomain = "default"
+	Config.Network.InClusterUrls.BaseAddr = "default"
 }

@@ -21,24 +21,29 @@ func Scheme(ub URLBase) string {
 	}
 }
 
+func PublicBaseDomain() string {
+	return strings.SplitN(Config.Network.PublicUrls.BaseAddr, ":", 2)[0]
+}
+
 /*
 apiserver ports - 50077 (public)   -> 3443 (https://)
                 - 50099 (private)
 proxy           - 9877  (public)   -> 443  (https://)
                 - 9899  (private)
 */
-func APIDomain() string {
-	return "api." + Config.Network.PublicUrls.BaseDomain
+func APIAddr() string {
+	return "api." + Config.Network.PublicUrls.BaseAddr
 }
 
 // https://api.appscode.com:443
 func PublicAPIHttpEndpoint() string {
-	return Scheme(Config.Network.PublicUrls) + "://" + APIDomain()
+	return Scheme(Config.Network.PublicUrls) + "://" + APIAddr()
 }
 
 // https://api.appscode.com:3443
 func PublicAPIGrpcEndpoint() string {
-	return Scheme(Config.Network.PublicUrls) + "://" + APIDomain() + ":3443"
+	addr := APIAddr()
+	return Scheme(Config.Network.PublicUrls) + "://" + strings.SplitN(addr, ":", 2)[0] + ":3443"
 }
 
 func PublicAPIHttpURL(trails ...string) string {
@@ -54,58 +59,60 @@ func KuberntesWebhookAuthorizationURL() string {
 }
 
 func InClusterPublicAPIHttpEndpoint() string {
-	return Scheme(Config.Network.InClusterUrls) + "://apiserver." + Config.Network.InClusterUrls.BaseDomain + ":9877"
-}
-
-func InClusterPublicAPIGrpcEndpoint() string {
-	return Scheme(Config.Network.InClusterUrls) + "://apiserver." + Config.Network.InClusterUrls.BaseDomain + ":50077"
+	baseDomain := strings.SplitN(Config.Network.InClusterUrls.BaseAddr, ":", 2)[0]
+	return Scheme(Config.Network.InClusterUrls) + "://apiserver." + baseDomain + ":9877"
 }
 
 func InClusterPrivateAPIHttpEndpoint() string {
-	return Scheme(Config.Network.InClusterUrls) + "://apiserver." + Config.Network.InClusterUrls.BaseDomain + ":9899"
+	baseDomain := strings.SplitN(Config.Network.InClusterUrls.BaseAddr, ":", 2)[0]
+	return Scheme(Config.Network.InClusterUrls) + "://apiserver." + baseDomain + ":9899"
 }
 
-func InClusterPrivateAPIGrpcEndpoint() string {
-	return Scheme(Config.Network.InClusterUrls) + "://apiserver." + Config.Network.InClusterUrls.BaseDomain + ":50099"
+func DockerAddr() string {
+	return "docker." + Config.Network.PublicUrls.BaseAddr
 }
 
-func DockerDomain() string {
-	return "docker." + Config.Network.PublicUrls.BaseDomain
-}
-
-func MavenDomain() string {
-	return "maven." + Config.Network.PublicUrls.BaseDomain
+func MavenAddr() string {
+	return "maven." + Config.Network.PublicUrls.BaseAddr
 }
 
 func DockerURL() string {
-	return Scheme(Config.Network.PublicUrls) + "://" + DockerDomain()
+	return Scheme(Config.Network.PublicUrls) + "://" + DockerAddr()
 }
 
 func SubDomain(ns string) string {
 	return ns
 }
 
-func TeamDomain(ns string) string {
+func TeamAddr(ns string) string {
 	if _env.FromHost().IsHosted() {
-		return SubDomain(ns) + "." + Config.Network.TeamUrls.BaseDomain
+		return SubDomain(ns) + "." + Config.Network.TeamUrls.BaseAddr
 	} else {
-		return Config.Network.TeamUrls.BaseDomain
+		return Config.Network.TeamUrls.BaseAddr
 	}
 }
 
+func TeamDomain(ns string) string {
+	return strings.SplitN(TeamAddr(ns), ":", 2)[0]
+}
+
 func TeamRootURL(ns string) string {
-	return Scheme(Config.Network.TeamUrls) + "://" + TeamDomain(ns)
+	return Scheme(Config.Network.TeamUrls) + "://" + TeamAddr(ns)
 }
 
 func TeamURL(ns string, trails ...string) string {
 	return strings.TrimRight(TeamRootURL(ns)+"/"+strings.Join(trails, "/"), "/")
 }
 
+func ClusterBaseDomain() string {
+	return strings.SplitN(Config.Network.ClusterUrls.BaseAddr, ":", 2)[0]
+}
+
 func ClusterDomain(ns, cluster string) string {
 	if _env.FromHost().IsHosted() {
-		return strings.ToLower(cluster) + "-" + SubDomain(ns) + "." + Config.Network.ClusterUrls.BaseDomain
+		return strings.ToLower(cluster) + "-" + SubDomain(ns) + "." + ClusterBaseDomain()
 	} else {
-		return strings.ToLower(cluster) + "." + Config.Network.ClusterUrls.BaseDomain
+		return strings.ToLower(cluster) + "." + ClusterBaseDomain()
 	}
 }
 
@@ -118,7 +125,7 @@ func ClusterUsername(ns, cluster, user string) string {
 }
 
 func FileDomain(ns string) string {
-	return SubDomain(ns) + "." + Config.Network.FileUrls.BaseDomain
+	return SubDomain(ns) + "." + Config.Network.FileUrls.BaseAddr
 }
 
 func FileURL(ns string) string {
@@ -126,11 +133,11 @@ func FileURL(ns string) string {
 }
 
 func GitHostingDomain() string {
-	return "diffusion." + Config.Network.PublicUrls.BaseDomain
+	return "diffusion." + Config.Network.PublicUrls.BaseAddr
 }
 
 func URLShortenerDomain(ns string) string {
-	return SubDomain(ns) + "." + Config.Network.URLShortenerUrls.BaseDomain
+	return SubDomain(ns) + "." + Config.Network.URLShortenerUrls.BaseAddr
 }
 
 func URLShortenerUrl(ns string) string {
@@ -140,20 +147,21 @@ func URLShortenerUrl(ns string) string {
 func MailgunInboundURL(ns string) string {
 	if _env.FromHost().IsHosted() {
 		// https://\g<ns>.appscode.io/mail/mailgun/
-		return Scheme(Config.Network.TeamUrls) + `://\g<ns>.` + Config.Network.TeamUrls.BaseDomain + "/mail/mailgun/"
+		return Scheme(Config.Network.TeamUrls) + `://\g<ns>.` + Config.Network.TeamUrls.BaseAddr + "/mail/mailgun/"
 	} else {
 		// https://getappscode.com/mail/mailgun/
-		return Scheme(Config.Network.TeamUrls) + `://` + Config.Network.TeamUrls.BaseDomain + "/mail/mailgun/"
+		return Scheme(Config.Network.TeamUrls) + `://` + Config.Network.TeamUrls.BaseAddr + "/mail/mailgun/"
 	}
 }
 
 func MailgunRecipientRegex(ns string) string {
+	baseDomain := strings.SplitN(Config.Network.TeamUrls.BaseAddr, ":", 2)[0]
 	if _env.FromHost().IsHosted() {
 		// ^[a-zA-Z0-9_.+-]+@(?P<ns>[a-zA-Z0-9-]+)\.appscode\.io+$
-		return fmt.Sprintf(`^[a-zA-Z0-9_.+-]+@(?P<ns>[a-zA-Z0-9-]+)\.%v+$`, strings.Replace(Config.Network.TeamUrls.BaseDomain, `.`, `\.`, -1))
+		return fmt.Sprintf(`^[a-zA-Z0-9_.+-]+@(?P<ns>[a-zA-Z0-9-]+)\.%v+$`, strings.Replace(baseDomain, `.`, `\.`, -1))
 	} else {
 		// ^[a-zA-Z0-9_.+-]+@getappscode\.com+$
-		return fmt.Sprintf(`^[a-zA-Z0-9_.+-]+@%v+$`, strings.Replace(Config.Network.TeamUrls.BaseDomain, `.`, `\.`, -1))
+		return fmt.Sprintf(`^[a-zA-Z0-9_.+-]+@%v+$`, strings.Replace(baseDomain, `.`, `\.`, -1))
 	}
 }
 
@@ -162,7 +170,7 @@ func MailAdapter() string {
 }
 
 func MailDefaultAddress(ns string) string {
-	return "noreply@" + TeamDomain(ns)
+	return "noreply@" + TeamAddr(ns)
 }
 
 func GrafanaEndpoint(ns string) string {
