@@ -36,6 +36,7 @@ type Config struct {
 	ESEndpoint            string
 	InfluxSecretName      string
 	IcingaSecretName      string
+	IngressClass          string
 }
 
 func Run(config *Config) {
@@ -61,6 +62,7 @@ func Run(config *Config) {
 		ProviderName:             config.ProviderName,
 		ClusterName:              config.ClusterName,
 		LoadbalancerImage:        config.LoadbalancerImageName,
+		IngressClass:             config.IngressClass,
 	}
 
 	if config.IcingaSecretName != "" {

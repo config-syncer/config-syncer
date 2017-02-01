@@ -55,6 +55,7 @@ func main() {
 	pflag.StringVarP(&config.ESEndpoint, "es-endpoint", "", "", "Endpoint of elasticsearch")
 	pflag.StringVarP(&config.InfluxSecretName, "influx-secret", "", "", "Influxdb secret name")
 	pflag.StringVarP(&config.IcingaSecretName, "icinga-secret", "", "", "Icinga secret name")
+	pflag.StringVarP(&config.IngressClass, "ingress-class", "I", "", "Ingress class name to use with")
 
 	flags.InitFlags()
 	logs.InitLogs()

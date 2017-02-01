@@ -33,6 +33,8 @@ type KubedWatcher struct {
 	// Loadbalancer image name that will be used to create
 	// the loadbalancer.
 	LoadbalancerImage string
+
+	IngressClass string
 }
 
 func (watch *KubedWatcher) Run() {
@@ -83,7 +85,7 @@ func (k *KubedWatcher) Dispatch(e *events.Event) error {
 			k.ProviderName,
 			k.Client,
 			k.AppsCodeExtensionClient,
-			k.Storage).Handle(e)
+			k.Storage, k.IngressClass).Handle(e)
 
 		// Check the Ingress or Extended Ingress Annotations. To Work for auto certificate
 		// operations.
@@ -108,7 +110,7 @@ func (k *KubedWatcher) Dispatch(e *events.Event) error {
 				k.ProviderName,
 				k.Client,
 				k.AppsCodeExtensionClient,
-				k.Storage)
+				k.Storage, k.IngressClass)
 		}
 	}
 
@@ -125,7 +127,7 @@ func (k *KubedWatcher) Dispatch(e *events.Event) error {
 					k.ProviderName,
 					k.Client,
 					k.AppsCodeExtensionClient,
-					k.Storage)
+					k.Storage, k.IngressClass)
 			}
 		}
 	}
