@@ -1,11 +1,10 @@
 package k8s
 
 import (
-	"log"
-
 	"github.com/appscode/errors"
 	_ "github.com/appscode/k8s-addons/api/install"
 	acs "github.com/appscode/k8s-addons/client/clientset"
+	"github.com/appscode/log"
 	clientset "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
 )
 
@@ -16,7 +15,7 @@ func NewClient() (*KubeClient, error) {
 	if err != nil {
 		return nil, errors.New().WithCause(err).Internal()
 	}
-	log.Println("Using cluster:", config.Host)
+	log.Debugln("Using cluster:", config.Host)
 
 	client, err := clientset.NewForConfig(config)
 	if err != nil {

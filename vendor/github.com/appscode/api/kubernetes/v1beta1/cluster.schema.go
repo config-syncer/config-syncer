@@ -128,10 +128,10 @@ func init() {
     "delete_dynamic_volumes": {
       "type": "boolean"
     },
-    "delete_lodabalancers": {
+    "force": {
       "type": "boolean"
     },
-    "force": {
+    "keep_lodabalancers": {
       "type": "boolean"
     },
     "name": {

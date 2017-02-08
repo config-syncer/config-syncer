@@ -1,8 +1,8 @@
 hash: faf46d92720e5127ade5f77371c24a8876e8829d636606dcdbdb5300f75de514
-updated: 2017-02-01T03:09:40.746055328-08:00
+updated: 2017-02-08T00:30:19.288433424-08:00
 imports:
 - name: appscode
-  version: a658a9003b41bb0e5386500af8341a41cc6eb8db
+  version: 56351d072aa81dc78d0b64fdbc42e9903284eb8d
   repo: git@diffusion.appscode.com:appscode/43/appscode.git
   vcs: git
   subpackages:
@@ -16,7 +16,7 @@ imports:
   - compute/metadata
   - internal
 - name: github.com/appscode/api
-  version: a0aa24b5b48454245292967b3ec7195722c30648
+  version: 688a529d9f1518e84da14fa635351b13968e5db1
   repo: git@diffusion.appscode.com:appscode/37/api.git
   vcs: git
   subpackages:
@@ -34,11 +34,10 @@ imports:
   - mailinglist/v1beta1
   - namespace/v1beta1
   - operation/v1beta1
-  - pv/v1beta1
   - ssh/v1beta1
   - version
 - name: github.com/appscode/client
-  version: f536d3ccd9fdba71c9663770160b9be8fcb90a5d
+  version: 5b8552c9798513d75b0f6b51125a4e9b440738e0
   repo: git@diffusion.appscode.com:appscode/39/client.git
   vcs: git
   subpackages:
@@ -78,7 +77,7 @@ imports:
   - mailgun
   - smtp
 - name: github.com/appscode/k8s-addons
-  version: df2733eb348ebeaadee7b704e009bce062eaca48
+  version: b7b5a31530be7e8fc686e3b529f69f2baac4ea0c
   subpackages:
   - api
   - api/install
@@ -92,7 +91,7 @@ imports:
   subpackages:
   - golog
 - name: github.com/appscode/searchlight
-  version: bfe7eb75a38e73d5ce3c8391fdb8ba62d2c0a090
+  version: 8d31ca4bebd4782c20bf9adf041a4540bda735ad
   subpackages:
   - data
   - data/files
@@ -108,7 +107,7 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: d7072bfaa4b06b4b3b18c2607afc298b824e7c47
+  version: 6009b0aabebe28510abeeff128718e49400bdb05
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
@@ -577,7 +576,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 - name: k8s.io/kubernetes
-  version: ed7ebb92afb291ba7a32767daa7efe41ae8edbcb
+  version: 25a4447d7c2f3a6ee9d9be5f74213d9f5dab4f08
   repo: git@diffusion.appscode.com:appscode/50/kubernetes.git
   vcs: git
   subpackages:

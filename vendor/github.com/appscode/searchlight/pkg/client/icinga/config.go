@@ -3,6 +3,7 @@ package icinga
 import (
 	"errors"
 	"fmt"
+	"net"
 	"strings"
 
 	_env "github.com/appscode/go/env"
@@ -13,11 +14,15 @@ import (
 )
 
 const (
-	env string = ".env"
+	ENV string = ".env"
 
-	IcingaService string = "ICINGA_K8S_SERVICE"
+	IcingaAddress string = "ICINGA_ADDRESS"
 	IcingaAPIUser string = "ICINGA_API_USER"
 	IcingaAPIPass string = "ICINGA_API_PASSWORD"
+
+	ConfigKeyPrefix = "ICINGA"
+
+	IcingaDefaultPort string = "5665"
 )
 
 type authInfo struct {
@@ -40,22 +45,36 @@ func getIcingaSecretData(kubeClient clientset.Interface, secretName string) (*au
 	}
 
 	authData := new(authInfo)
-	if data, found := secret.Data[env]; found {
+	if data, found := secret.Data[ENV]; found {
 		dataReader := strings.NewReader(string(data))
 		secretData, err := ini.Load(dataReader)
 		if err != nil {
 			return nil, err
 		}
 
-		if _env.InCluster() {
-			if host, found := secretData.Get("", IcingaService); found {
-				serviceIP, err := dns.GetServiceClusterIP(kubeClient, ConfigKeyPrefix, host)
+		address, found := secretData.Get("", IcingaAddress)
+		if !found {
+			return nil, errors.New("No ICINGA_ADDRESS found")
+		}
+
+		parts := strings.Split(address, ":")
+		host := parts[0]
+		port := IcingaDefaultPort
+		if len(parts) > 1 {
+			port = parts[1]
+		}
+
+		hostIP := net.ParseIP(host)
+		if hostIP == nil {
+			if _env.InCluster() {
+				host, err = dns.GetServiceClusterIP(kubeClient, ConfigKeyPrefix, host)
 				if err != nil {
 					return nil, err
 				}
-				authData.Endpoint = fmt.Sprintf("https://%v:5665/v1", serviceIP)
 			}
 		}
+
+		authData.Endpoint = fmt.Sprintf("https://%v:%v/v1", host, port)
 
 		if authData.Username, found = secretData.Get("", IcingaAPIUser); !found {
 			return nil, errors.New("No ICINGA_API_USER found")

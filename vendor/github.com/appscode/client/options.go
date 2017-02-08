@@ -1,13 +1,13 @@
 package client
 
 import (
+	"net"
 	"strings"
 	"time"
 
 	"github.com/appscode/client/credential"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"net"
 )
 
 var (

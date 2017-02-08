@@ -61,7 +61,7 @@ func (b *IcingaController) Handle(e *events.Event) error {
 	}
 
 	if err != nil {
-		log.Debugln(err)
+		log.Errorln(err)
 	}
 
 	return nil

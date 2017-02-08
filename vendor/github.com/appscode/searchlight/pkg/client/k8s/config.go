@@ -10,8 +10,8 @@ import (
 )
 
 type KubeClient struct {
-	Client                  *clientset.Clientset
-	AppscodeExtensionClient *acs.AppsCodeExtensionsClient
+	Client                  clientset.Interface
+	AppscodeExtensionClient acs.AppsCodeExtensionInterface
 }
 
 func GetKubeConfig() (config *rest.Config, err error) {

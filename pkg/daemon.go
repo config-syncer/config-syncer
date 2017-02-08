@@ -67,7 +67,7 @@ func Run(config *Config) {
 
 	if config.IcingaSecretName != "" {
 		// Icinga client
-		icingaClient, err := icinga.NewInClusterIcingaClient(kubeWatcher.Client, config.IcingaSecretName)
+		icingaClient, err := icinga.NewIcingaClient(kubeWatcher.Client, config.IcingaSecretName)
 		if err != nil {
 			log.Errorln(err)
 		}

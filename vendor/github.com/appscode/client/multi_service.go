@@ -3,14 +3,13 @@ package client
 import (
 	artifactory "github.com/appscode/api/artifactory/v1beta1"
 	auth "github.com/appscode/api/auth/v1beta1"
-	ci "github.com/appscode/api/ci/v1beta1"
 	ca "github.com/appscode/api/certificate/v1beta1"
+	ci "github.com/appscode/api/ci/v1beta1"
 	db "github.com/appscode/api/db/v1beta1"
 	glusterfs "github.com/appscode/api/glusterfs/v1beta1"
 	kubernetesV1beta1 "github.com/appscode/api/kubernetes/v1beta1"
 	kubernetesV1beta2 "github.com/appscode/api/kubernetes/v1beta2"
 	namespace "github.com/appscode/api/namespace/v1beta1"
-	pv "github.com/appscode/api/pv/v1beta1"
 	"google.golang.org/grpc"
 )
 
@@ -25,7 +24,6 @@ type multiClientInterface interface {
 	Namespace() *nsService
 	GlusterFS() *glusterFSService
 	Kubernetes() *versionedKubernetesService
-	PV() *pvService
 }
 
 type multiClientServices struct {
@@ -36,7 +34,6 @@ type multiClientServices struct {
 	glusterfsClient           *glusterFSService
 	nsClient                  *nsService
 	versionedKubernetesClient *versionedKubernetesService
-	pvClient                  *pvService
 	dbClient                  *dbService
 }
 
@@ -55,7 +52,7 @@ func newMultiClientService(conn *grpc.ClientConn) multiClientInterface {
 			certificateClient: ca.NewCertificatesClient(conn),
 		},
 		ciClient: &ciService{
-			agentsClient: ci.NewAgentsClient(conn),
+			agentsClient:   ci.NewAgentsClient(conn),
 			metadataClient: ci.NewMetadataClient(conn),
 		},
 		glusterfsClient: &glusterFSService{
@@ -79,11 +76,6 @@ func newMultiClientService(conn *grpc.ClientConn) multiClientInterface {
 		nsClient: &nsService{
 			teamClient:    namespace.NewTeamsClient(conn),
 			billingClient: namespace.NewBillingClient(conn),
-		},
-		pvClient: &pvService{
-			diskClient: pv.NewDisksClient(conn),
-			pvClient:   pv.NewPersistentVolumesClient(conn),
-			pvcClient:  pv.NewPersistentVolumeClaimsClient(conn),
 		},
 		dbClient: &dbService{
 			database: db.NewDatabasesClient(conn),
@@ -118,10 +110,6 @@ func (s *multiClientServices) GlusterFS() *glusterFSService {
 
 func (s *multiClientServices) Kubernetes() *versionedKubernetesService {
 	return s.versionedKubernetesClient
-}
-
-func (s *multiClientServices) PV() *pvService {
-	return s.pvClient
 }
 
 func (s *multiClientServices) DB() *dbService {
@@ -162,8 +150,8 @@ func (a *authenticationService) Project() auth.ProjectsClient {
 }
 
 type ciService struct {
-	agentsClient ci.AgentsClient
-	metadataClient        ci.MetadataClient
+	agentsClient   ci.AgentsClient
+	metadataClient ci.MetadataClient
 }
 
 func (a *ciService) Agents() ci.AgentsClient {
@@ -265,24 +253,6 @@ func (k *kubernetesV1beta2Service) Client() kubernetesV1beta2.ClientsClient {
 
 func (k *kubernetesV1beta2Service) Disk() kubernetesV1beta2.DisksClient {
 	return k.diskClient
-}
-
-type pvService struct {
-	diskClient pv.DisksClient
-	pvClient   pv.PersistentVolumesClient
-	pvcClient  pv.PersistentVolumeClaimsClient
-}
-
-func (p *pvService) Disk() pv.DisksClient {
-	return p.diskClient
-}
-
-func (p *pvService) PersistentVolume() pv.PersistentVolumesClient {
-	return p.pvClient
-}
-
-func (p *pvService) PersistentVolumeClaim() pv.PersistentVolumeClaimsClient {
-	return p.pvcClient
 }
 
 type dbService struct {
