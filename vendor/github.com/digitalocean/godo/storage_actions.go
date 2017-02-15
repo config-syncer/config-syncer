@@ -8,6 +8,7 @@ import "fmt"
 type StorageActionsService interface {
 	Attach(volumeID string, dropletID int) (*Action, *Response, error)
 	Detach(volumeID string) (*Action, *Response, error)
+	DetachByDropletID(volumeID string, dropletID int) (*Action, *Response, error)
 	Get(volumeID string, actionID int) (*Action, *Response, error)
 	List(volumeID string, opt *ListOptions) ([]Action, *Response, error)
 	Resize(volumeID string, sizeGigabytes int, regionSlug string) (*Action, *Response, error)
@@ -20,12 +21,12 @@ type StorageActionsServiceOp struct {
 }
 
 // StorageAttachment represents the attachement of a block storage
-// volume to a specific droplet under the device name.
+// volume to a specific Droplet under the device name.
 type StorageAttachment struct {
 	DropletID int `json:"droplet_id"`
 }
 
-// Attach a storage volume to a droplet.
+// Attach a storage volume to a Droplet.
 func (s *StorageActionsServiceOp) Attach(volumeID string, dropletID int) (*Action, *Response, error) {
 	request := &ActionRequest{
 		"type":       "attach",
@@ -34,10 +35,19 @@ func (s *StorageActionsServiceOp) Attach(volumeID string, dropletID int) (*Actio
 	return s.doAction(volumeID, request)
 }
 
-// Detach a storage volume from a droplet.
+// Detach a storage volume from a Droplet.
 func (s *StorageActionsServiceOp) Detach(volumeID string) (*Action, *Response, error) {
 	request := &ActionRequest{
 		"type": "detach",
+	}
+	return s.doAction(volumeID, request)
+}
+
+// DetachByDropletID a storage volume from a Droplet by Droplet ID.
+func (s *StorageActionsServiceOp) DetachByDropletID(volumeID string, dropletID int) (*Action, *Response, error) {
+	request := &ActionRequest{
+		"type":       "detach",
+		"droplet_id": dropletID,
 	}
 	return s.doAction(volumeID, request)
 }
@@ -83,7 +93,7 @@ func (s *StorageActionsServiceOp) doAction(volumeID string, request *ActionReque
 		return nil, resp, err
 	}
 
-	return &root.Event, resp, err
+	return root.Event, resp, err
 }
 
 func (s *StorageActionsServiceOp) get(path string) (*Action, *Response, error) {
@@ -98,7 +108,7 @@ func (s *StorageActionsServiceOp) get(path string) (*Action, *Response, error) {
 		return nil, resp, err
 	}
 
-	return &root.Event, resp, err
+	return root.Event, resp, err
 }
 
 func (s *StorageActionsServiceOp) list(path string) ([]Action, *Response, error) {

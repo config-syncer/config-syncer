@@ -5,6 +5,8 @@ import (
 	"regexp"
 
 	"github.com/appscode/errors"
+	aci "github.com/appscode/k8s-addons/api"
+	"github.com/appscode/searchlight/data"
 	"github.com/appscode/searchlight/pkg/controller/host"
 	"github.com/appscode/searchlight/pkg/controller/host/extpoints"
 	"github.com/appscode/searchlight/pkg/controller/types"
@@ -73,6 +75,24 @@ func (b *biblio) create(specificObject string) error {
 	return nil
 }
 
+func setParameterizedVariables(alertSpec aci.AlertSpec, objectName string, commandVars map[string]data.CommandVar, mp map[string]interface{}) (map[string]interface{}, error) {
+	for key, val := range alertSpec.Vars {
+		if v, found := commandVars[key]; found {
+			if !v.Parameterized {
+				continue
+			}
+			reg, err := regexp.Compile("pod_name[ ]*=[ ]*'[?]'")
+			if err != nil {
+				return nil, errors.New().WithCause(err).Internal()
+			}
+			mp[host.IVar(key)] = reg.ReplaceAllString(val.(string), fmt.Sprintf("pod_name='%s'", objectName))
+		} else {
+			return nil, errors.New().WithMessage(fmt.Sprintf("variable %v not found", key)).NotFound()
+		}
+	}
+	return mp, nil
+}
+
 func (b *biblio) createIcingaService(objectList []*host.KubeObjectInfo) error {
 	alertSpec := b.Resource.Spec
 
@@ -93,19 +113,9 @@ func (b *biblio) createIcingaService(objectList []*host.KubeObjectInfo) error {
 	}
 
 	for _, object := range objectList {
-		for key, val := range alertSpec.Vars {
-			if v, found := commandVars[key]; found {
-				if !v.Parameterized {
-					continue
-				}
-				reg, err := regexp.Compile("pod_name[ ]*=[ ]*'[?]'")
-				if err != nil {
-					return errors.New().WithCause(err).Internal()
-				}
-				mp[host.IVar(key)] = reg.ReplaceAllString(val.(string), fmt.Sprintf("pod_name='%s'", object.Name))
-			} else {
-				return errors.New().WithMessage(fmt.Sprintf("variable %v not found", key)).NotFound()
-			}
+		var err error
+		if mp, err = setParameterizedVariables(alertSpec, object.Name, commandVars, mp); err != nil {
+			return errors.New().WithCause(err).Internal()
 		}
 
 		if err := host.CreateIcingaService(b.IcingaClient, mp, object, b.Resource.Name); err != nil {
@@ -153,19 +163,9 @@ func (b *biblio) updateIcingaService(objectList []*host.KubeObjectInfo) error {
 	}
 
 	for _, object := range objectList {
-		for key, val := range alertSpec.Vars {
-			if v, found := commandVars[key]; found {
-				if !v.Parameterized {
-					continue
-				}
-				reg, err := regexp.Compile("pod_name[ ]*=[ ]*'[?]'")
-				if err != nil {
-					return errors.New().WithCause(err).Internal()
-				}
-				mp[host.IVar(key)] = reg.ReplaceAllString(val.(string), fmt.Sprintf("pod_name='%s'", object.Name))
-			} else {
-				return errors.New().WithMessage(fmt.Sprintf("variable %v not found", key)).NotFound()
-			}
+		var err error
+		if mp, err = setParameterizedVariables(alertSpec, object.Name, commandVars, mp); err != nil {
+			return errors.New().WithCause(err).Internal()
 		}
 
 		if err := host.UpdateIcingaService(b.IcingaClient, mp, object, b.Resource.Name); err != nil {
@@ -177,11 +177,17 @@ func (b *biblio) updateIcingaService(objectList []*host.KubeObjectInfo) error {
 
 func (b *biblio) delete(specificObject string) error {
 	alertSpec := b.Resource.Spec
-
-	// Get Icinga Host Info
-	objectList, err := host.GetObjectList(b.KubeClient, alertSpec.CheckCommand, host.HostTypePod, b.Resource.Namespace, b.ObjectType, b.ObjectName, specificObject)
-	if err != nil {
-		return errors.New().WithCause(err).Internal()
+	var objectList []*host.KubeObjectInfo
+	if specificObject != "" {
+		objectList = append(objectList, &host.KubeObjectInfo{Name: specificObject + "@" + b.Resource.Namespace})
+	} else {
+		// Get Icinga Host Info
+		var err error
+		objectList, err = host.GetObjectList(b.KubeClient, alertSpec.CheckCommand, host.HostTypePod,
+			b.Resource.Namespace, b.ObjectType, b.ObjectName, specificObject)
+		if err != nil {
+			return errors.New().WithCause(err).Internal()
+		}
 	}
 
 	if err := host.DeleteIcingaService(b.IcingaClient, objectList, b.Resource.Name); err != nil {

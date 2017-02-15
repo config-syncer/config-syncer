@@ -44,6 +44,10 @@ func CreateAlertEvent(kubeClient clientset.Interface, alert *aci.Alert, reason t
 		event.Reason = reason.String()
 		event.Message = fmt.Sprintf(`failed to create Icinga objects. Error: %v`, additionalMessage)
 		event.Type = kapi.EventTypeWarning
+	case types.NoIcingaObjectCreated:
+		event.Reason = reason.String()
+		event.Message = fmt.Sprintf(`no Icinga object is created. Reason: %v`, additionalMessage)
+		event.Type = kapi.EventTypeNormal
 	case types.CreatedIcingaObjects:
 		event.Reason = reason.String()
 		event.Message = fmt.Sprintf(`successfully created Icinga objects`)

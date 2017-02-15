@@ -56,11 +56,11 @@ func getLabels(client clientset.Interface, namespace, objectType, objectName str
 		}
 		labelsMap = replicaSet.Spec.Selector.MatchLabels
 	} else if objectType == TypeStatefulSet {
-		petSet, err := client.Apps().StatefulSets(namespace).Get(objectName)
+		statefulSet, err := client.Apps().StatefulSets(namespace).Get(objectName)
 		if err != nil {
 			return nil, errors.New().WithCause(err).Internal()
 		}
-		labelsMap = petSet.Spec.Selector.MatchLabels
+		labelsMap = statefulSet.Spec.Selector.MatchLabels
 	} else if objectType == TypeDeployments {
 		deployment, err := client.Extensions().Deployments(namespace).Get(objectName)
 		if err != nil {

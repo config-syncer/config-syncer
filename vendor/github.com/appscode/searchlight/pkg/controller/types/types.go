@@ -17,6 +17,7 @@ const (
 	// Icinga objects create event list
 	CreatingIcingaObjects       EventReason = "Creating"
 	FailedToCreateIcingaObjects EventReason = "FailedToCreate"
+	NoIcingaObjectCreated       EventReason = "NoIcingaObjectCreated"
 	CreatedIcingaObjects        EventReason = "Created"
 
 	// Icinga objects update event list

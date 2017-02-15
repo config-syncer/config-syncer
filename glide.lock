@@ -1,8 +1,8 @@
 hash: faf46d92720e5127ade5f77371c24a8876e8829d636606dcdbdb5300f75de514
-updated: 2017-02-08T00:30:19.288433424-08:00
+updated: 2017-02-14T07:49:19.64152999-08:00
 imports:
 - name: appscode
-  version: 56351d072aa81dc78d0b64fdbc42e9903284eb8d
+  version: 575a740549c4b1a4cb8880c25705bddb529fb296
   repo: git@diffusion.appscode.com:appscode/43/appscode.git
   vcs: git
   subpackages:
@@ -91,7 +91,7 @@ imports:
   subpackages:
   - golog
 - name: github.com/appscode/searchlight
-  version: 8d31ca4bebd4782c20bf9adf041a4540bda735ad
+  version: f96bff6a304c0a90a558731bed17f6b9bde2abfd
   subpackages:
   - data
   - data/files
@@ -107,7 +107,7 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: 6009b0aabebe28510abeeff128718e49400bdb05
+  version: c641a9d52d5acc0aac6d30f620f59996ffdad375
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
@@ -190,7 +190,7 @@ imports:
 - name: github.com/dgrijalva/jwt-go
   version: 9ed569b5d1ac936e6494082958d63a6aa4fff99a
 - name: github.com/digitalocean/godo
-  version: 2ff8a02a86cd6918b384a5000ceebe886844fbce
+  version: 0d31061e91e5731ebe54b520c1de7f5c75fb641d
 - name: github.com/docker/distribution
   version: cd27f179f2c10c5d300e6d09025b538c475b0d51
   subpackages:
@@ -221,7 +221,7 @@ imports:
 - name: github.com/facebookgo/stack
   version: d9d227395bc3d7a635388c75b2e3b3a750e11888
 - name: github.com/flosch/pongo2
-  version: 22499f94d3d56c7238591344a6902715d0b8fbbf
+  version: 17d7c034174b22592c187661011b02fd7e7c3a83
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/go-ini/ini
@@ -286,6 +286,8 @@ imports:
   version: bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d
 - name: github.com/jonboulle/clockwork
   version: 3f831b65b61282ba6bece21b91beea2edc4c887a
+- name: github.com/juju/errors
+  version: 6f54ff6318409d31ff16261533ce2c8381a4fd5d
 - name: github.com/juju/ratelimit
   version: 77ed1c8a01217656d2080ad51981f6e99adaa177
 - name: github.com/kelseyhightower/envconfig
@@ -576,7 +578,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 - name: k8s.io/kubernetes
-  version: 25a4447d7c2f3a6ee9d9be5f74213d9f5dab4f08
+  version: 0196997c05e9313b762681f4c24bd25af64d396b
   repo: git@diffusion.appscode.com:appscode/50/kubernetes.git
   vcs: git
   subpackages:
