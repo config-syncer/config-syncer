@@ -59,6 +59,8 @@ type Client struct {
 	Storage           StorageService
 	StorageActions    StorageActionsService
 	Tags              TagsService
+	LoadBalancers     LoadBalancersService
+	Certificates	  CertificatesService
 
 	// Optional function called after every successful request made to the DO APIs
 	onRequestCompleted RequestCompletionCallback
@@ -167,6 +169,8 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Storage = &StorageServiceOp{client: c}
 	c.StorageActions = &StorageActionsServiceOp{client: c}
 	c.Tags = &TagsServiceOp{client: c}
+	c.LoadBalancers = &LoadBalancersServiceOp{client: c}
+	c.Certificates = &CertificatesServiceOp{client: c}
 
 	return c
 }

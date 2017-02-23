@@ -108,7 +108,7 @@ func ClusterBaseDomain() string {
 	return strings.SplitN(Config.Network.ClusterUrls.BaseAddr, ":", 2)[0]
 }
 
-func ClusterDomain(ns, cluster string) string {
+func ClusterExternalDomain(ns, cluster string) string {
 	if _env.FromHost().IsHosted() {
 		return strings.ToLower(cluster) + "-" + SubDomain(ns) + "." + ClusterBaseDomain()
 	} else {
@@ -116,12 +116,16 @@ func ClusterDomain(ns, cluster string) string {
 	}
 }
 
+func ClusterInternalDomain(ns, cluster string) string {
+	return "internal." + ClusterExternalDomain(ns, cluster)
+}
+
 func ClusterCAName(ns, cluster string) string {
-	return "ca@" + ClusterDomain(ns, cluster)
+	return "ca@" + ClusterExternalDomain(ns, cluster)
 }
 
 func ClusterUsername(ns, cluster, user string) string {
-	return user + "@" + ClusterDomain(ns, cluster)
+	return user + "@" + ClusterExternalDomain(ns, cluster)
 }
 
 func FileDomain(ns string) string {
@@ -190,7 +194,7 @@ func GraphanaServiceUrl(ns, clusterName, kubeNamespace, serviceName string) stri
 }
 
 func IcingaApiEndpoint(ns, cluster string) string {
-	return IcingaHostApiEndpoint(ClusterDomain(ns, cluster))
+	return IcingaHostApiEndpoint(ClusterExternalDomain(ns, cluster))
 }
 
 func IcingaHostApiEndpoint(host string) string {
@@ -199,7 +203,7 @@ func IcingaHostApiEndpoint(host string) string {
 }
 
 func IcingaWebEndpoint(ns, cluster string) string {
-	return Scheme(Config.Network.ClusterUrls) + "://" + fmt.Sprintf("%v/icingaweb2", ClusterDomain(ns, cluster))
+	return Scheme(Config.Network.ClusterUrls) + "://" + fmt.Sprintf("%v/icingaweb2", ClusterExternalDomain(ns, cluster))
 }
 
 func IcingaWebDashboard(ns, cluster string) string {
@@ -231,7 +235,7 @@ func IcingaWebAppHostUrl(ns, cluster, hostName, appName string) string {
 }
 
 func KibanaUrl(ns, cluster string) string {
-	return Scheme(Config.Network.ClusterUrls) + "://" + ClusterDomain(ns, cluster) + "/kibana"
+	return Scheme(Config.Network.ClusterUrls) + "://" + ClusterExternalDomain(ns, cluster) + "/kibana"
 }
 
 func KibanaPodUrl(ns, cluster, namespace, podName string) string {

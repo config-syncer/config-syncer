@@ -20,7 +20,7 @@ func ExportClustersCorsPatterns() []runtime.Pattern {
 		pattern_Clusters_Create_0,
 		pattern_Clusters_Update_0,
 		pattern_Clusters_Scale_0,
-		pattern_Clusters_Upgrade_0,
+		pattern_Clusters_SetVersion_0,
 		pattern_Clusters_Delete_0,
 		pattern_Clusters_ClientConfig_0,
 		pattern_Clusters_Instances_0,

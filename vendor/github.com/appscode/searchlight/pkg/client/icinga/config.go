@@ -31,15 +31,8 @@ type authInfo struct {
 	Password string
 }
 
-func getIcingaSecretData(kubeClient clientset.Interface, secretName string) (*authInfo, error) {
-	parts := strings.Split(secretName, ".")
-	name := parts[0]
-	namespace := "default"
-	if len(parts) > 1 {
-		namespace = parts[1]
-	}
-
-	secret, err := kubeClient.Core().Secrets(namespace).Get(name)
+func getIcingaSecretData(kubeClient clientset.Interface, secretName, secretNamespace string) (*authInfo, error) {
+	secret, err := kubeClient.Core().Secrets(secretNamespace).Get(secretName)
 	if err != nil {
 		return nil, err
 	}
@@ -88,8 +81,8 @@ func getIcingaSecretData(kubeClient clientset.Interface, secretName string) (*au
 	return nil, errors.New("Invalid Icinga secret")
 }
 
-func getIcingaConfig(kubeClient clientset.Interface, secretName string) (*IcingaConfig, error) {
-	authData, err := getIcingaSecretData(kubeClient, secretName)
+func getIcingaConfig(kubeClient clientset.Interface, secretName, secretNamespace string) (*IcingaConfig, error) {
+	authData, err := getIcingaSecretData(kubeClient, secretName, secretNamespace)
 	if err != nil {
 		return nil, err
 	}

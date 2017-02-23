@@ -10,10 +10,10 @@ import (
 var clusterScaleRequestSchema *gojsonschema.Schema
 var clusterInstanceListRequestSchema *gojsonschema.Schema
 var clusterInstanceByIPRequestSchema *gojsonschema.Schema
-var clusterUpgradeRequestSchema *gojsonschema.Schema
+var clusterUpdateRequestSchema *gojsonschema.Schema
+var clusterSetVersionRequestSchema *gojsonschema.Schema
 var clusterDeleteRequestSchema *gojsonschema.Schema
 var clusterCreateRequestSchema *gojsonschema.Schema
-var clusterUpdateRequestSchema *gojsonschema.Schema
 var clusterDescribeRequestSchema *gojsonschema.Schema
 var clusterListRequestSchema *gojsonschema.Schema
 var clusterStartupConfigRequestSchema *gojsonschema.Schema
@@ -93,9 +93,54 @@ func init() {
 	if err != nil {
 		glog.Fatal(err)
 	}
-	clusterUpgradeRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
+	clusterUpdateRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {
+    "v1beta1ClusterSettings": {
+      "properties": {
+        "log_index_prefix": {
+          "type": "string"
+        },
+        "log_storage_lifetime": {
+          "title": "Number of secs logs will be stored in ElasticSearch",
+          "type": "integer"
+        },
+        "monitoring_storage_lifetime": {
+          "title": "Number of secs logs will be stored in InfluxDB",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "default_access_level": {
+      "title": "Default access level is to allow permission to the cluster\nwhen no Role matched for that specif user or group. This can\nset as\n   - v:cluster-admins    // to allow admin access\n   - v:cluster-deployer  // to allow deployer access\n   - v:cluster-viewer    // to allow viewer access\n   - \"\"                  // empty value stands for no access",
+      "type": "string"
+    },
+    "do_not_delete": {
+      "type": "boolean"
+    },
+    "name": {
+      "maxLength": 63,
+      "pattern": "^[a-z0-9](?:[a-z0-9\\-]{0,61}[a-z0-9])?$",
+      "type": "string"
+    },
+    "settings": {
+      "$ref": "#/definitions/v1beta1ClusterSettings"
+    }
+  },
+  "type": "object"
+}`))
+	if err != nil {
+		glog.Fatal(err)
+	}
+	clusterSetVersionRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
   "$schema": "http://json-schema.org/draft-04/schema#",
   "properties": {
+    "apply_to_master": {
+      "type": "boolean"
+    },
     "hostfacts_version": {
       "type": "string"
     },
@@ -111,6 +156,9 @@ func init() {
     "name": {
       "maxLength": 63,
       "pattern": "^[a-z0-9](?:[a-z0-9\\-]{0,61}[a-z0-9])?$",
+      "type": "string"
+    },
+    "sku": {
       "type": "string"
     },
     "version": {
@@ -232,48 +280,6 @@ func init() {
 	if err != nil {
 		glog.Fatal(err)
 	}
-	clusterUpdateRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "definitions": {
-    "v1beta1ClusterSettings": {
-      "properties": {
-        "log_index_prefix": {
-          "type": "string"
-        },
-        "log_storage_lifetime": {
-          "title": "Number of secs logs will be stored in ElasticSearch",
-          "type": "integer"
-        },
-        "monitoring_storage_lifetime": {
-          "title": "Number of secs logs will be stored in InfluxDB",
-          "type": "integer"
-        }
-      },
-      "type": "object"
-    }
-  },
-  "properties": {
-    "default_access_level": {
-      "title": "Default access level is to allow permission to the cluster\nwhen no Role matched for that specif user or group. This can\nset as\n   - v:cluster-admins    // to allow admin access\n   - v:cluster-deployer  // to allow deployer access\n   - v:cluster-viewer    // to allow viewer access\n   - \"\"                  // empty value stands for no access",
-      "type": "string"
-    },
-    "do_not_delete": {
-      "type": "boolean"
-    },
-    "name": {
-      "maxLength": 63,
-      "pattern": "^[a-z0-9](?:[a-z0-9\\-]{0,61}[a-z0-9])?$",
-      "type": "string"
-    },
-    "settings": {
-      "$ref": "#/definitions/v1beta1ClusterSettings"
-    }
-  },
-  "type": "object"
-}`))
-	if err != nil {
-		glog.Fatal(err)
-	}
 	clusterDescribeRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
   "$schema": "http://json-schema.org/draft-04/schema#",
   "properties": {
@@ -348,10 +354,15 @@ func (m *ClusterInstanceByIPRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *ClusterInstanceByIPRequest) IsRequest() {}
 
-func (m *ClusterUpgradeRequest) IsValid() (*gojsonschema.Result, error) {
-	return clusterUpgradeRequestSchema.Validate(gojsonschema.NewGoLoader(m))
+func (m *ClusterUpdateRequest) IsValid() (*gojsonschema.Result, error) {
+	return clusterUpdateRequestSchema.Validate(gojsonschema.NewGoLoader(m))
 }
-func (m *ClusterUpgradeRequest) IsRequest() {}
+func (m *ClusterUpdateRequest) IsRequest() {}
+
+func (m *ClusterSetVersionRequest) IsValid() (*gojsonschema.Result, error) {
+	return clusterSetVersionRequestSchema.Validate(gojsonschema.NewGoLoader(m))
+}
+func (m *ClusterSetVersionRequest) IsRequest() {}
 
 func (m *ClusterDeleteRequest) IsValid() (*gojsonschema.Result, error) {
 	return clusterDeleteRequestSchema.Validate(gojsonschema.NewGoLoader(m))
@@ -362,11 +373,6 @@ func (m *ClusterCreateRequest) IsValid() (*gojsonschema.Result, error) {
 	return clusterCreateRequestSchema.Validate(gojsonschema.NewGoLoader(m))
 }
 func (m *ClusterCreateRequest) IsRequest() {}
-
-func (m *ClusterUpdateRequest) IsValid() (*gojsonschema.Result, error) {
-	return clusterUpdateRequestSchema.Validate(gojsonschema.NewGoLoader(m))
-}
-func (m *ClusterUpdateRequest) IsRequest() {}
 
 func (m *ClusterDescribeRequest) IsValid() (*gojsonschema.Result, error) {
 	return clusterDescribeRequestSchema.Validate(gojsonschema.NewGoLoader(m))

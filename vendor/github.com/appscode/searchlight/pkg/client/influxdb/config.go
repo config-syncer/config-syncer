@@ -30,20 +30,13 @@ type AuthInfo struct {
 	Database string
 }
 
-func GetInfluxDBSecretData(secretName string) (*AuthInfo, error) {
+func GetInfluxDBSecretData(secretName, namespace string) (*AuthInfo, error) {
 	kubeClient, err := k8s.NewClient()
 	if err != nil {
 		return nil, err
 	}
 
-	parts := strings.Split(secretName, ".")
-	name := parts[0]
-	namespace := "default"
-	if len(parts) > 1 {
-		namespace = parts[1]
-	}
-
-	secret, err := kubeClient.Client.Core().Secrets(namespace).Get(name)
+	secret, err := kubeClient.Client.Core().Secrets(namespace).Get(secretName)
 	if err != nil {
 		return nil, err
 	}
@@ -74,8 +67,8 @@ func GetInfluxDBSecretData(secretName string) (*AuthInfo, error) {
 	return nil, errors.New("Invalid InfluxDB secret")
 }
 
-func GetInfluxDBConfig(secretName string) (*influxdb.Config, error) {
-	authData, err := GetInfluxDBSecretData(secretName)
+func GetInfluxDBConfig(secretName, namespace string) (*influxdb.Config, error) {
+	authData, err := GetInfluxDBSecretData(secretName, namespace)
 	if err != nil {
 		return nil, err
 	}

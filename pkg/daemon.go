@@ -35,7 +35,9 @@ type Config struct {
 	KubeConfig            string
 	ESEndpoint            string
 	InfluxSecretName      string
+	InfluxSecretNamespace string
 	IcingaSecretName      string
+	IcingaSecretNamespace string
 	IngressClass          string
 }
 
@@ -67,7 +69,7 @@ func Run(config *Config) {
 
 	if config.IcingaSecretName != "" {
 		// Icinga client
-		icingaClient, err := icinga.NewIcingaClient(kubeWatcher.Client, config.IcingaSecretName)
+		icingaClient, err := icinga.NewIcingaClient(kubeWatcher.Client, config.IcingaSecretName, config.IcingaSecretNamespace)
 		if err != nil {
 			log.Errorln(err)
 		}
@@ -103,7 +105,7 @@ func Run(config *Config) {
 
 	if config.InfluxSecretName != "" {
 		// InfluxDB client
-		influxConfig, err := influxdb.GetInfluxDBConfig(config.InfluxSecretName)
+		influxConfig, err := influxdb.GetInfluxDBConfig(config.InfluxSecretName, config.InfluxSecretNamespace)
 		if err != nil {
 			log.Errorln(err)
 		} else {

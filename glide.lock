@@ -1,8 +1,8 @@
 hash: faf46d92720e5127ade5f77371c24a8876e8829d636606dcdbdb5300f75de514
-updated: 2017-02-14T07:49:19.64152999-08:00
+updated: 2017-02-22T20:25:20.129429539-08:00
 imports:
 - name: appscode
-  version: 575a740549c4b1a4cb8880c25705bddb529fb296
+  version: b5d983fb9037a9eedb4f9b09d9f0b222e0553904
   repo: git@diffusion.appscode.com:appscode/43/appscode.git
   vcs: git
   subpackages:
@@ -16,7 +16,7 @@ imports:
   - compute/metadata
   - internal
 - name: github.com/appscode/api
-  version: 688a529d9f1518e84da14fa635351b13968e5db1
+  version: 1bf348c58851e4c6a79b8e908fd00a02b527414d
   repo: git@diffusion.appscode.com:appscode/37/api.git
   vcs: git
   subpackages:
@@ -72,12 +72,12 @@ imports:
   - provider
   - vultr
 - name: github.com/appscode/go-notify
-  version: 293f40652089c70c7e90180095ef698b9bbc305e
+  version: ad6069b3ac6eaf5afea580ae8257d3aeeff6286c
   subpackages:
   - mailgun
   - smtp
 - name: github.com/appscode/k8s-addons
-  version: b7b5a31530be7e8fc686e3b529f69f2baac4ea0c
+  version: 6c456dc8cb1c02a834c55d910330176569bfb62a
   subpackages:
   - api
   - api/install
@@ -91,7 +91,7 @@ imports:
   subpackages:
   - golog
 - name: github.com/appscode/searchlight
-  version: f96bff6a304c0a90a558731bed17f6b9bde2abfd
+  version: 6f0415ee03166a20c2087facde0c9f7d20181941
   subpackages:
   - data
   - data/files
@@ -107,7 +107,7 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: c641a9d52d5acc0aac6d30f620f59996ffdad375
+  version: a26a7c220ae6db7a06a4c5a38de675b4fb7718c3
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
@@ -190,7 +190,7 @@ imports:
 - name: github.com/dgrijalva/jwt-go
   version: 9ed569b5d1ac936e6494082958d63a6aa4fff99a
 - name: github.com/digitalocean/godo
-  version: 0d31061e91e5731ebe54b520c1de7f5c75fb641d
+  version: 19ceffc21b50d6d561ca8a73827586a60012b784
 - name: github.com/docker/distribution
   version: cd27f179f2c10c5d300e6d09025b538c475b0d51
   subpackages:
@@ -291,7 +291,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 77ed1c8a01217656d2080ad51981f6e99adaa177
 - name: github.com/kelseyhightower/envconfig
-  version: 9aca109c9aec4633fced9717c4a09ecab3d33111
+  version: 8bf4bbfc795e2c7c8a5ea47b707453ed019e2ad4
 - name: github.com/mailgun/mailgun-go
   version: 369a1fa57ce6fb314e627087b9fff0db5c266c0f
 - name: github.com/mailru/easyjson
@@ -448,7 +448,7 @@ imports:
 - name: github.com/xeipuuv/gojsonschema
   version: 93e72a773fade158921402d6a24c819b48aba29d
 - name: github.com/xenolf/lego
-  version: e35b0ffcf7c5217ab2b605ab0f266547ad26021e
+  version: 9daa55c337f252e32554e849cb399ae12c9fa21a
   repo: git@github.com:appscode/lego.git
   vcs: git
   subpackages:
@@ -578,7 +578,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 - name: k8s.io/kubernetes
-  version: 0196997c05e9313b762681f4c24bd25af64d396b
+  version: 38628be52fd4fec3ed20f37c05c038ecbbff3842
   repo: git@diffusion.appscode.com:appscode/50/kubernetes.git
   vcs: git
   subpackages:

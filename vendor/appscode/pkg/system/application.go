@@ -79,6 +79,7 @@ var publicMatrix = map[string]string{
 	"packet-ams1":              "https://storage.googleapis.com/appscode-eu/binaries",
 	"packet-ewr1":              "https://storage.googleapis.com/appscode-us/binaries",
 	"packet-sjc1":              "https://storage.googleapis.com/appscode-us/binaries",
+	"packet-nrt1":              "https://storage.googleapis.com/appscode-asia/binaries",
 	"rackspace-dfw":            "https://storage.googleapis.com/appscode-us/binaries",
 	"rackspace-iad":            "https://storage.googleapis.com/appscode-us/binaries",
 	"rackspace-ord":            "https://storage.googleapis.com/appscode-us/binaries",

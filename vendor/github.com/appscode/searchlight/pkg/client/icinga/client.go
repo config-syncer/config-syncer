@@ -132,8 +132,8 @@ func (r *IcingaApiRequest) Params(param map[string]string) *IcingaApiRequest {
 	return r
 }
 
-func NewIcingaClient(kubeClient clientset.Interface, secretName string) (*IcingaClient, error) {
-	config, err := getIcingaConfig(kubeClient, secretName)
+func NewIcingaClient(kubeClient clientset.Interface, secretName, secretNamespace string) (*IcingaClient, error) {
+	config, err := getIcingaConfig(kubeClient, secretName, secretNamespace)
 	if err != nil {
 		return nil, err
 	}
