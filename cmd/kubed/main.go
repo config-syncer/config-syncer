@@ -17,6 +17,10 @@ func main() {
 		APITokenPath:          "/var/run/secrets/appscode/api-token",
 		APIEndpoint:           "api.appscode.com:50077",
 		LoadbalancerImageName: "appscode/haproxy:1.7.0-1.5.0",
+		InfluxSecretName:      "appscode-influx",
+		InfluxSecretNamespace: "kube-system",
+		IcingaSecretName:      "appscode-icinga",
+		IcingaSecretNamespace: "kube-system",
 	}
 	pflag.StringVar(&config.APITokenPath, "api-token", config.APITokenPath, "Endpoint of elasticsearch")
 	pflag.StringVar(&config.Master, "master", config.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
