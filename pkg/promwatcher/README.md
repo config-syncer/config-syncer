@@ -30,6 +30,6 @@ If you want to know how this is working, see following workflow
 
 * ##### EventType `DELETED`
     1. When a Prometheus object is deleted, Watcher detects it.
-    2. Controller deleted deployment of Prometheus Proxy.
+    2. Controller deletes deployment of Prometheus Proxy.
     3. Controller deletes service for Prometheus Proxy.
     4. Controller removes Ingress rule.
