@@ -4,15 +4,14 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-LIB_ROOT=$(dirname "${BASH_SOURCE}")/..
-source "$LIB_ROOT/libbuild/common/lib.sh"
-source "$LIB_ROOT/libbuild/common/public_image.sh"
-
 GOPATH=$(go env GOPATH)
 SRC=$GOPATH/src
 BIN=$GOPATH/bin
 ROOT=$GOPATH
-REPO_ROOT=$GOPATH/src/appscode.com/kubed
+REPO_ROOT=$GOPATH/src/github.com/appscode/kubed
+
+source "$REPO_ROOT/hack/libbuild/common/lib.sh"
+source "$REPO_ROOT/hack/libbuild/common/public_image.sh"
 
 APPSCODE_ENV=${APPSCODE_ENV:-dev}
 IMG=kubed
@@ -42,7 +41,7 @@ build_docker() {
 	chmod 755 kubed
 
 	cat >Dockerfile <<EOL
-FROM appscode/base:8.6
+FROM appscode/base:8.7
 
 RUN set -x \
   && apt-get update \
