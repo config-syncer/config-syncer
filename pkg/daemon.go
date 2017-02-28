@@ -7,13 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/appscode/go/runtime"
-	"github.com/appscode/go/wait"
-
 	"appscode.com/kubed/pkg/janitor"
+	promwatcher "appscode.com/kubed/pkg/promwatcher"
 	"appscode.com/kubed/pkg/watcher"
 	"github.com/appscode/client"
 	"github.com/appscode/errors"
+	"github.com/appscode/go/runtime"
+	"github.com/appscode/go/wait"
 	_ "github.com/appscode/k8s-addons/api/install"
 	acs "github.com/appscode/k8s-addons/client/clientset"
 	"github.com/appscode/k8s-addons/pkg/dns"
@@ -21,6 +21,8 @@ import (
 	"github.com/appscode/log"
 	"github.com/appscode/searchlight/pkg/client/icinga"
 	"github.com/appscode/searchlight/pkg/client/influxdb"
+	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
+	cgcmd "k8s.io/client-go/tools/clientcmd"
 	clientset "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
 	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
 )
@@ -39,6 +41,7 @@ type Config struct {
 	IcingaSecretName      string
 	IcingaSecretNamespace string
 	IngressClass          string
+	EnablePromMonitoring  bool
 }
 
 func Run(config *Config) {
@@ -78,6 +81,27 @@ func Run(config *Config) {
 
 	log.Infoln("configuration loadded, running kubed watcher")
 	go kubeWatcher.Run()
+
+	if config.EnablePromMonitoring {
+		// get rest.Config for "k8s.io/client-go/tools/clientcmd" package
+		config, err := cgcmd.BuildConfigFromFlags(config.Master, config.KubeConfig)
+		if err == nil {
+			// get client for Prometheus TPR monitoring
+			client, err := pcm.NewForConfig(config)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			watcher := &promwatcher.PromWatcher{
+				Watcher:    kubeWatcher.Watcher,
+				PromClient: client,
+				SyncPeriod: time.Minute * 2,
+			}
+			log.Infoln("running Prometheus watcher")
+			watcher.WatchPrometheus()
+		} else {
+			log.Fatalln(err)
+		}
+	}
 
 	// initializing kube janitor tasks
 	kubeJanitor := janitor.Janitor{
