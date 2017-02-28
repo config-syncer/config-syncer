@@ -10,12 +10,11 @@ To start Prometheus Watcher with `kubed`, use `--enable-prometheus-monitoring` f
 $ kubed --enable-prometheus-monitoring
 ```
 
-### Architectural Design
+## Architectural Design
 
 If you want to know how this is working, see following workflow
 
-#### Workflow
-
+### Workflow
 <p align="center">
     <img src="flow.png" width="715">
 </p>
