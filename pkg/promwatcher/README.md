@@ -15,15 +15,16 @@ $ kubed --enable-prometheus-monitoring
 If you want to know how this is working, see following workflow
 
 ### Workflow
-<p align="center">
+<div align="center">
     <img src="flow.png" width="715">
-</p>
+</div>
 
 * ##### EventType `ADDED`
     1. When a Prometheus object is created, Watcher detects it.
     2. Controller creates deployment for Prometheus Proxy.
     3. Controller creates service for Prometheus Proxy.
     4. Controller adds Ingress rule.
+
         > Add HTTP rule with path `/prometheus-<prometheus-name>.<namespace>`
 
 
