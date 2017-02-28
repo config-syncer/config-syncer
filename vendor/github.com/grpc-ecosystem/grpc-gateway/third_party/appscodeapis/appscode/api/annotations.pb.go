@@ -36,7 +36,6 @@ var E_Cors = &proto.ExtensionDesc{
 	Field:         50000,
 	Name:          "appscode.api.cors",
 	Tag:           "bytes,50000,opt,name=cors",
-	Filename:      "appscode/api/annotations.proto",
 }
 
 func init() {

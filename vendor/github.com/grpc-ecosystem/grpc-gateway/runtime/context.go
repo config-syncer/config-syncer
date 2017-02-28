@@ -15,13 +15,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// MetadataHeaderPrefix is prepended to HTTP headers in order to convert them to
-// gRPC metadata for incoming requests processed by grpc-gateway
-const MetadataHeaderPrefix = "Grpc-Metadata-"
-
-// MetadataTrailerPrefix is prepended to gRPC metadata as it is converted to
-// HTTP headers in a response handled by grpc-gateway
-const MetadataTrailerPrefix = "Grpc-Trailer-"
+const metadataHeaderPrefix = "Grpc-Metadata-"
+const metadataTrailerPrefix = "Grpc-Trailer-"
 const metadataGrpcTimeout = "Grpc-Timeout"
 
 const xForwardedFor = "X-Forwarded-For"
@@ -29,7 +24,6 @@ const xForwardedHost = "X-Forwarded-Host"
 const cookieHeader = "Cookie"
 const csrfTokenHeader = "X-Phabricator-Csrf"
 const corsHeaderPrefix = "access-control-"
-const rateLimitHeaderPrefix = "x-ratelimit-"
 
 var (
 	// DefaultContextTimeout is used for gRPC call context.WithTimeout whenever a Grpc-Timeout inbound
@@ -72,8 +66,8 @@ func AnnotateContext(ctx context.Context, req *http.Request) (context.Context, e
 				pairs = append(pairs, key, val)
 				continue
 			}
-			if strings.HasPrefix(key, MetadataHeaderPrefix) {
-				pairs = append(pairs, key[len(MetadataHeaderPrefix):], val)
+			if strings.HasPrefix(key, metadataHeaderPrefix) {
+				pairs = append(pairs, key[len(metadataHeaderPrefix):], val)
 			}
 		}
 	}

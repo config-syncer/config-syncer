@@ -35,7 +35,7 @@ import subprocess
 import sys
 from os.path import expandvars
 
-libbuild.REPO_ROOT = expandvars('$GOPATH') + '/src/appscode.com/kubed'
+libbuild.REPO_ROOT = expandvars('$GOPATH') + '/src/github.com/appscode/kubed'
 BUILD_METADATA = libbuild.metadata(libbuild.REPO_ROOT)
 libbuild.BIN_MATRIX = {
     'kubed': {
@@ -75,6 +75,7 @@ def version():
 
 
 def fmt():
+    libbuild.ungroup_go_imports('pkg', 'cmd')
     die(call('goimports -w cmd pkg'))
     call('gofmt -s -w cmd pkg')
 

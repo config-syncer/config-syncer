@@ -1,10 +1,7 @@
 package main
 
 import (
-	_ "appscode/pkg/errorhandlers"
-
 	v "github.com/appscode/go/version"
-	_ "github.com/appscode/k8s-addons/api/install"
 )
 
 var (

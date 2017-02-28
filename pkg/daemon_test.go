@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"appscode.com/kubed/pkg/watcher"
 	"github.com/appscode/client"
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/go/flags"
@@ -14,6 +13,7 @@ import (
 	_ "github.com/appscode/k8s-addons/api/install"
 	acs "github.com/appscode/k8s-addons/client/clientset"
 	acw "github.com/appscode/k8s-addons/pkg/watcher"
+	"github.com/appscode/kubed/pkg/watcher"
 	"github.com/appscode/log"
 	"github.com/appscode/searchlight/pkg/client/icinga"
 	"github.com/mikespook/golib/signal"

@@ -354,8 +354,7 @@ func init() {
     "label_selector": {
       "additionalProperties": {
         "type": "string"
-      },
-      "type": "object"
+      }
     },
     "namespace": {
       "maxLength": 63,

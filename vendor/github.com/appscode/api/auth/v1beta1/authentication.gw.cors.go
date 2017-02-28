@@ -20,5 +20,6 @@ func ExportAuthenticationCorsPatterns() []runtime.Pattern {
 		pattern_Authentication_Logout_0,
 		pattern_Authentication_Logout_1,
 		pattern_Authentication_Token_0,
+		pattern_Authentication_CSRFToken_0,
 	}
 }

@@ -1,7 +1,7 @@
 package client
 
 import (
-	artifactory "github.com/appscode/api/artifactory/v1beta1"
+	attic "github.com/appscode/api/attic/v1beta1"
 	auth "github.com/appscode/api/auth/v1beta1"
 	ca "github.com/appscode/api/certificate/v1beta1"
 	ci "github.com/appscode/api/ci/v1beta1"
@@ -16,7 +16,7 @@ import (
 // multi client services are grouped by there main client. the api service
 // clients are wrapped around with sub-service.
 type multiClientInterface interface {
-	Artifactory() *artifactoryService
+	Attic() *atticService
 	Authentication() *authenticationService
 	CA() *caService
 	CI() *ciService
@@ -27,7 +27,7 @@ type multiClientInterface interface {
 }
 
 type multiClientServices struct {
-	artifactoryClient         *artifactoryService
+	atticClient               *atticService
 	authenticationClient      *authenticationService
 	caClient                  *caService
 	ciClient                  *ciService
@@ -39,9 +39,9 @@ type multiClientServices struct {
 
 func newMultiClientService(conn *grpc.ClientConn) multiClientInterface {
 	return &multiClientServices{
-		artifactoryClient: &artifactoryService{
-			artifactClient: artifactory.NewArtifactsClient(conn),
-			versionClient:  artifactory.NewVersionsClient(conn),
+		atticClient: &atticService{
+			artifactClient: attic.NewArtifactsClient(conn),
+			versionClient:  attic.NewVersionsClient(conn),
 		},
 		authenticationClient: &authenticationService{
 			authenticationClient: auth.NewAuthenticationClient(conn),
@@ -84,8 +84,8 @@ func newMultiClientService(conn *grpc.ClientConn) multiClientInterface {
 	}
 }
 
-func (s *multiClientServices) Artifactory() *artifactoryService {
-	return s.artifactoryClient
+func (s *multiClientServices) Attic() *atticService {
+	return s.atticClient
 }
 
 func (s *multiClientServices) Authentication() *authenticationService {
@@ -118,16 +118,16 @@ func (s *multiClientServices) DB() *dbService {
 
 // original service clients that needs to exposed under grouped wrapper
 // services.
-type artifactoryService struct {
-	artifactClient artifactory.ArtifactsClient
-	versionClient  artifactory.VersionsClient
+type atticService struct {
+	artifactClient attic.ArtifactsClient
+	versionClient  attic.VersionsClient
 }
 
-func (a *artifactoryService) Artifacts() artifactory.ArtifactsClient {
+func (a *atticService) Artifacts() attic.ArtifactsClient {
 	return a.artifactClient
 }
 
-func (a *artifactoryService) Versions() artifactory.VersionsClient {
+func (a *atticService) Versions() attic.VersionsClient {
 	return a.versionClient
 }
 

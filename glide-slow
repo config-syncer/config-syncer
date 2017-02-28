@@ -5,13 +5,7 @@
 # - ???
 # - Profit
 
-pushd $GOPATH/src/appscode.com/kubed
-
-# bust glide cache
-rm -rf ~/.glide/cache/{info,src}/git-diffusion.appscode.com-appscode-37-api*
-rm -rf ~/.glide/cache/{info,src}/git-diffusion.appscode.com-appscode-39-client*
-rm -rf ~/.glide/cache/{info,src}/git-diffusion.appscode.com-appscode-40-data*
-rm -rf ~/.glide/cache/{info,src}/git-diffusion.appscode.com-appscode-38-appctl*
+pushd $GOPATH/src/github.com/appscode/kubed
 
 glide up -v
 glide vc --only-code --no-tests
