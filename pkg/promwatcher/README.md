@@ -1,8 +1,8 @@
-## Prometheus Watcher
+# Prometheus Watcher
 
 Watch Prometheus TPR instance to deploy proxy for authentication.
 
-#### User Guide
+## User Guide
 
 To start Prometheus Watcher with `kubed`, use `--enable-prometheus-monitoring` flag.
 
@@ -10,11 +10,11 @@ To start Prometheus Watcher with `kubed`, use `--enable-prometheus-monitoring` f
 $ kubed --enable-prometheus-monitoring
 ```
 
-#### Architectural Design
+### Architectural Design
 
 If you want to know how this is working, see following workflow
 
-##### Workflow
+#### Workflow
 
 <p align="center">
     <img src="flow.png" width="715">
@@ -33,4 +33,3 @@ If you want to know how this is working, see following workflow
     2. Controller deleted deployment of Prometheus Proxy.
     3. Controller deletes service for Prometheus Proxy.
     4. Controller removes Ingress rule.
-
