@@ -21,6 +21,7 @@ func main() {
 		InfluxSecretNamespace: "kube-system",
 		IcingaSecretName:      "appscode-icinga",
 		IcingaSecretNamespace: "kube-system",
+		EnablePromMonitoring:  false,
 	}
 	pflag.StringVar(&config.APITokenPath, "api-token", config.APITokenPath, "Endpoint of elasticsearch")
 	pflag.StringVar(&config.Master, "master", config.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
@@ -35,6 +36,7 @@ func main() {
 	pflag.StringVar(&config.IcingaSecretName, "icinga-secret", config.IcingaSecretName, "Icinga secret name")
 	pflag.StringVar(&config.IcingaSecretNamespace, "icinga-secret-namespace", config.IcingaSecretNamespace, "Icinga secret namespace")
 	pflag.StringVar(&config.IngressClass, "ingress-class", config.IngressClass, "Ingress class name to use with")
+	pflag.BoolVar(&config.EnablePromMonitoring, "enable-prometheus-monitoring", config.EnablePromMonitoring, "Enable Prometheus monitoring")
 
 	flags.InitFlags()
 	logs.InitLogs()
