@@ -1,5 +1,5 @@
 hash: ca25e2047609ffb33f6df8499529c84735e37b9dc13419620783713c6c080cbc
-updated: 2017-02-28T00:40:42.031832104-08:00
+updated: 2017-02-28T10:37:37.176289121-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -48,7 +48,7 @@ imports:
   - version
   - wait
 - name: github.com/appscode/k8s-addons
-  version: 6c456dc8cb1c02a834c55d910330176569bfb62a
+  version: efc6a8ade8d4d0378480277dc561c87730acf3c7
   subpackages:
   - api
   - api/install
@@ -78,7 +78,7 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: be5dac1bc5cf55c644736b5ef01fcf5030e0be1e
+  version: 66aba0708b553d9d95925e7e97b91177572d16ed
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
@@ -130,6 +130,8 @@ imports:
   - autorest/date
   - autorest/to
   - autorest/validation
+- name: github.com/benbjohnson/clock
+  version: 7dc76406b6d3c05b5f71a86293cbcf3c4ea03b19
 - name: github.com/beorn7/perks
   version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
   subpackages:
@@ -600,7 +602,7 @@ imports:
   - util/homedir
   - util/integer
 - name: k8s.io/kubernetes
-  version: 2972b76cbd71e9fca843582a55519b349cf762cf
+  version: 15ed08dc1a36bb7c5595ddbb01828aabe7982ae5
   repo: https://github.com/appscode/kubernetes.git
   vcs: git
   subpackages:
@@ -679,6 +681,7 @@ imports:
   - pkg/cloudprovider/providers/aws
   - pkg/cloudprovider/providers/azure
   - pkg/cloudprovider/providers/cloudstack
+  - pkg/cloudprovider/providers/fake
   - pkg/cloudprovider/providers/gce
   - pkg/cloudprovider/providers/mesos
   - pkg/cloudprovider/providers/openstack
