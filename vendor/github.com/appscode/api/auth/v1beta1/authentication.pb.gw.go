@@ -13,6 +13,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/appscode/api/dtypes"
 	"github.com/golang/protobuf/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/utilities"
@@ -88,6 +89,15 @@ func request_Authentication_Token_0(ctx context.Context, marshaler runtime.Marsh
 	}
 
 	msg, err := client.Token(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func request_Authentication_CSRFToken_0(ctx context.Context, marshaler runtime.Marshaler, client AuthenticationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq dtypes.VoidRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.CSRFToken(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -262,6 +272,34 @@ func RegisterAuthenticationHandler(ctx context.Context, mux *runtime.ServeMux, c
 
 	})
 
+	mux.Handle("GET", pattern_Authentication_CSRFToken_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+		if cn, ok := w.(http.CloseNotifier); ok {
+			go func(done <-chan struct{}, closed <-chan bool) {
+				select {
+				case <-done:
+				case <-closed:
+					cancel()
+				}
+			}(ctx.Done(), cn.CloseNotify())
+		}
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, req)
+		if err != nil {
+			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+		}
+		resp, md, err := request_Authentication_CSRFToken_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Authentication_CSRFToken_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -275,6 +313,8 @@ var (
 	pattern_Authentication_Logout_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"_appscode", "api", "auth", "v0.1", "logout"}, ""))
 
 	pattern_Authentication_Token_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"_appscode", "api", "auth", "v1beta1", "token"}, ""))
+
+	pattern_Authentication_CSRFToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"_appscode", "api", "auth", "v1beta1", "csrf-token"}, ""))
 )
 
 var (
@@ -287,4 +327,6 @@ var (
 	forward_Authentication_Logout_1 = runtime.ForwardResponseMessage
 
 	forward_Authentication_Token_0 = runtime.ForwardResponseMessage
+
+	forward_Authentication_CSRFToken_0 = runtime.ForwardResponseMessage
 )

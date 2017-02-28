@@ -69,9 +69,8 @@ func ForwardResponseStream(ctx context.Context, marshaler Marshaler, w http.Resp
 func handleForwardResponseServerMetadata(w http.ResponseWriter, md ServerMetadata) {
 	for k, vs := range md.HeaderMD {
 		hKey := k
-		if !strings.HasPrefix(strings.ToLower(k), corsHeaderPrefix) &&
-			!strings.HasPrefix(strings.ToLower(k), rateLimitHeaderPrefix) {
-			hKey = fmt.Sprintf("%s%s", MetadataHeaderPrefix, k)
+		if !strings.HasPrefix(strings.ToLower(k), corsHeaderPrefix) {
+			hKey = fmt.Sprintf("%s%s", metadataHeaderPrefix, k)
 		}
 		for i := range vs {
 			w.Header().Add(hKey, vs[i])
@@ -81,14 +80,14 @@ func handleForwardResponseServerMetadata(w http.ResponseWriter, md ServerMetadat
 
 func handleForwardResponseTrailerHeader(w http.ResponseWriter, md ServerMetadata) {
 	for k := range md.TrailerMD {
-		tKey := textproto.CanonicalMIMEHeaderKey(fmt.Sprintf("%s%s", MetadataTrailerPrefix, k))
+		tKey := textproto.CanonicalMIMEHeaderKey(fmt.Sprintf("%s%s", metadataTrailerPrefix, k))
 		w.Header().Add("Trailer", tKey)
 	}
 }
 
 func handleForwardResponseTrailer(w http.ResponseWriter, md ServerMetadata) {
 	for k, vs := range md.TrailerMD {
-		tKey := fmt.Sprintf("%s%s", MetadataTrailerPrefix, k)
+		tKey := fmt.Sprintf("%s%s", metadataTrailerPrefix, k)
 		for i := range vs {
 			w.Header().Add(tKey, vs[i])
 		}

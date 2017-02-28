@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"appscode.com/kubed/pkg/watcher"
 	acs "github.com/appscode/k8s-addons/client/clientset"
 	acw "github.com/appscode/k8s-addons/pkg/watcher"
+	"github.com/appscode/kubed/pkg/watcher"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/client-go/rest"

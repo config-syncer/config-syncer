@@ -1,12 +1,10 @@
 package main
 
 import (
-	_ "appscode/pkg/errorhandlers"
-
-	"appscode.com/kubed/pkg"
 	"github.com/appscode/go/flags"
 	"github.com/appscode/go/hold"
 	_ "github.com/appscode/k8s-addons/api/install"
+	"github.com/appscode/kubed/pkg"
 	"github.com/appscode/log"
 	logs "github.com/appscode/log/golog"
 	"github.com/spf13/pflag"

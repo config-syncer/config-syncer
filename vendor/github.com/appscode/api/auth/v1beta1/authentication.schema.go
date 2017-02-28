@@ -88,6 +88,9 @@ func (m *LoginRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *LoginRequest) IsRequest() {}
 
+func (m *CSRFTokenResponse) SetStatus(s *dtypes.Status) {
+	m.Status = s
+}
 func (m *TokenResponse) SetStatus(s *dtypes.Status) {
 	m.Status = s
 }

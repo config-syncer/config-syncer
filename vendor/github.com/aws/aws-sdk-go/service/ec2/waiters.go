@@ -226,35 +226,6 @@ func (c *EC2) WaitUntilImageAvailable(input *DescribeImagesInput) error {
 	return w.Wait()
 }
 
-func (c *EC2) WaitUntilImageExists(input *DescribeImagesInput) error {
-	waiterCfg := waiter.Config{
-		Operation:   "DescribeImages",
-		Delay:       15,
-		MaxAttempts: 40,
-		Acceptors: []waiter.WaitAcceptor{
-			{
-				State:    "success",
-				Matcher:  "path",
-				Argument: "length(Images[]) > `0`",
-				Expected: true,
-			},
-			{
-				State:    "retry",
-				Matcher:  "error",
-				Argument: "",
-				Expected: "InvalidAMIID.NotFound",
-			},
-		},
-	}
-
-	w := waiter.Waiter{
-		Client: c,
-		Input:  input,
-		Config: waiterCfg,
-	}
-	return w.Wait()
-}
-
 func (c *EC2) WaitUntilInstanceExists(input *DescribeInstancesInput) error {
 	waiterCfg := waiter.Config{
 		Operation:   "DescribeInstances",
@@ -263,15 +234,15 @@ func (c *EC2) WaitUntilInstanceExists(input *DescribeInstancesInput) error {
 		Acceptors: []waiter.WaitAcceptor{
 			{
 				State:    "success",
-				Matcher:  "path",
-				Argument: "length(Reservations[]) > `0`",
-				Expected: true,
+				Matcher:  "status",
+				Argument: "",
+				Expected: 200,
 			},
 			{
 				State:    "retry",
 				Matcher:  "error",
 				Argument: "",
-				Expected: "InvalidInstanceID.NotFound",
+				Expected: "InvalidInstanceIDNotFound",
 			},
 		},
 	}
@@ -314,12 +285,6 @@ func (c *EC2) WaitUntilInstanceRunning(input *DescribeInstancesInput) error {
 				Argument: "Reservations[].Instances[].State.Name",
 				Expected: "stopping",
 			},
-			{
-				State:    "retry",
-				Matcher:  "error",
-				Argument: "",
-				Expected: "InvalidInstanceID.NotFound",
-			},
 		},
 	}
 
@@ -342,12 +307,6 @@ func (c *EC2) WaitUntilInstanceStatusOk(input *DescribeInstanceStatusInput) erro
 				Matcher:  "pathAll",
 				Argument: "InstanceStatuses[].InstanceStatus.Status",
 				Expected: "ok",
-			},
-			{
-				State:    "retry",
-				Matcher:  "error",
-				Argument: "",
-				Expected: "InvalidInstanceID.NotFound",
 			},
 		},
 	}
@@ -446,54 +405,7 @@ func (c *EC2) WaitUntilKeyPairExists(input *DescribeKeyPairsInput) error {
 				State:    "retry",
 				Matcher:  "error",
 				Argument: "",
-				Expected: "InvalidKeyPair.NotFound",
-			},
-		},
-	}
-
-	w := waiter.Waiter{
-		Client: c,
-		Input:  input,
-		Config: waiterCfg,
-	}
-	return w.Wait()
-}
-
-func (c *EC2) WaitUntilNatGatewayAvailable(input *DescribeNatGatewaysInput) error {
-	waiterCfg := waiter.Config{
-		Operation:   "DescribeNatGateways",
-		Delay:       15,
-		MaxAttempts: 40,
-		Acceptors: []waiter.WaitAcceptor{
-			{
-				State:    "success",
-				Matcher:  "pathAll",
-				Argument: "NatGateways[].State",
-				Expected: "available",
-			},
-			{
-				State:    "failure",
-				Matcher:  "pathAny",
-				Argument: "NatGateways[].State",
-				Expected: "failed",
-			},
-			{
-				State:    "failure",
-				Matcher:  "pathAny",
-				Argument: "NatGateways[].State",
-				Expected: "deleting",
-			},
-			{
-				State:    "failure",
-				Matcher:  "pathAny",
-				Argument: "NatGateways[].State",
-				Expected: "deleted",
-			},
-			{
-				State:    "retry",
-				Matcher:  "error",
-				Argument: "",
-				Expected: "NatGatewayNotFound",
+				Expected: "InvalidKeyPairNotFound",
 			},
 		},
 	}
@@ -522,7 +434,7 @@ func (c *EC2) WaitUntilNetworkInterfaceAvailable(input *DescribeNetworkInterface
 				State:    "failure",
 				Matcher:  "error",
 				Argument: "",
-				Expected: "InvalidNetworkInterfaceID.NotFound",
+				Expected: "InvalidNetworkInterfaceIDNotFound",
 			},
 		},
 	}
@@ -719,7 +631,7 @@ func (c *EC2) WaitUntilVolumeDeleted(input *DescribeVolumesInput) error {
 				State:    "success",
 				Matcher:  "error",
 				Argument: "",
-				Expected: "InvalidVolume.NotFound",
+				Expected: "InvalidVolumeNotFound",
 			},
 		},
 	}
@@ -772,64 +684,6 @@ func (c *EC2) WaitUntilVpcAvailable(input *DescribeVpcsInput) error {
 				Matcher:  "pathAll",
 				Argument: "Vpcs[].State",
 				Expected: "available",
-			},
-		},
-	}
-
-	w := waiter.Waiter{
-		Client: c,
-		Input:  input,
-		Config: waiterCfg,
-	}
-	return w.Wait()
-}
-
-func (c *EC2) WaitUntilVpcExists(input *DescribeVpcsInput) error {
-	waiterCfg := waiter.Config{
-		Operation:   "DescribeVpcs",
-		Delay:       1,
-		MaxAttempts: 5,
-		Acceptors: []waiter.WaitAcceptor{
-			{
-				State:    "success",
-				Matcher:  "status",
-				Argument: "",
-				Expected: 200,
-			},
-			{
-				State:    "retry",
-				Matcher:  "error",
-				Argument: "",
-				Expected: "InvalidVpcID.NotFound",
-			},
-		},
-	}
-
-	w := waiter.Waiter{
-		Client: c,
-		Input:  input,
-		Config: waiterCfg,
-	}
-	return w.Wait()
-}
-
-func (c *EC2) WaitUntilVpcPeeringConnectionExists(input *DescribeVpcPeeringConnectionsInput) error {
-	waiterCfg := waiter.Config{
-		Operation:   "DescribeVpcPeeringConnections",
-		Delay:       15,
-		MaxAttempts: 40,
-		Acceptors: []waiter.WaitAcceptor{
-			{
-				State:    "success",
-				Matcher:  "status",
-				Argument: "",
-				Expected: 200,
-			},
-			{
-				State:    "retry",
-				Matcher:  "error",
-				Argument: "",
-				Expected: "InvalidVpcPeeringConnectionID.NotFound",
 			},
 		},
 	}

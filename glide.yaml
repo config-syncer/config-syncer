@@ -1,26 +1,20 @@
 package: appscode.com/kubed
 import:
-- package: appscode
-  repo: git@diffusion.appscode.com:appscode/43/appscode.git
-  vcs: git
 - package: github.com/appscode/api
-  repo: git@diffusion.appscode.com:appscode/37/api.git
-  vcs: git
 - package: github.com/appscode/client
-  repo: git@diffusion.appscode.com:appscode/39/client.git
-  vcs: git
 - package: github.com/appscode/errors
 - package: github.com/appscode/go
-  version: master
+- package: github.com/appscode/log
 - package: github.com/appscode/k8s-addons
   version: release-1.5
-- package: github.com/appscode/log
 - package: github.com/appscode/searchlight
   version: release-1.5
 - package: github.com/appscode/voyager
   version: release-1.5
+- package: github.com/coreos/prometheus-operator
+  version: v0.5.1
 - package: github.com/influxdata/influxdb
-  version: v1.1.1
+  version: v0.11.0
 - package: github.com/spf13/pflag
 - package: github.com/flosch/pongo2
   version: master
@@ -28,13 +22,17 @@ import:
   version: v3.0.59
 - package: github.com/Azure/azure-sdk-for-go
   version: v7.0.1-beta
+- package: k8s.io/apimachinery
+  version: 02fccf9462f0fb0287e82cb8a0f1d03b05f8d704
+- package: k8s.io/client-go
+  version: fcdf37233b57445e4a6a4038ec580e9aaac931de
 - package: k8s.io/kubernetes
   version: 1.5.2-ac
-  repo: git@diffusion.appscode.com:appscode/50/kubernetes.git
+  repo: https://github.com/appscode/kubernetes.git
   vcs: git
 - package: github.com/mikespook/golib
 - package: github.com/xenolf/lego
-  repo: git@github.com:appscode/lego.git
+  repo: https://github.com/appscode/lego.git
   vcs: git
   version: master
 - package: github.com/coreos/go-oidc

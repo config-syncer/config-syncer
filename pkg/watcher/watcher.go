@@ -3,11 +3,11 @@ package watcher
 import (
 	"reflect"
 
-	"appscode.com/kubed/pkg/handlers"
 	"github.com/appscode/client"
 	"github.com/appscode/k8s-addons/pkg/events"
 	"github.com/appscode/k8s-addons/pkg/stash"
 	acw "github.com/appscode/k8s-addons/pkg/watcher"
+	"github.com/appscode/kubed/pkg/handlers"
 	"github.com/appscode/log"
 	"github.com/appscode/searchlight/pkg/client/icinga"
 	aac "github.com/appscode/searchlight/pkg/controller"
