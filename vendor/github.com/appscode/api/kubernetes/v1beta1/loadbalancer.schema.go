@@ -51,20 +51,6 @@ func init() {
 	createRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
   "$schema": "http://json-schema.org/draft-04/schema#",
   "definitions": {
-    "kubernetesv1beta1Spec": {
-      "properties": {
-        "backend": {
-          "$ref": "#/definitions/v1beta1HTTPLoadBalancerRule"
-        },
-        "rules": {
-          "items": {
-            "$ref": "#/definitions/v1beta1LoadBalancerRule"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
     "kubernetesv1beta1Status": {
       "properties": {
         "status": {
@@ -124,7 +110,7 @@ func init() {
           "type": "object"
         },
         "spec": {
-          "$ref": "#/definitions/kubernetesv1beta1Spec"
+          "$ref": "#/definitions/v1beta1Spec"
         },
         "status": {
           "$ref": "#/definitions/kubernetesv1beta1Status"
@@ -174,6 +160,20 @@ func init() {
         },
         "host": {
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "v1beta1Spec": {
+      "properties": {
+        "backend": {
+          "$ref": "#/definitions/v1beta1HTTPLoadBalancerRule"
+        },
+        "rules": {
+          "items": {
+            "$ref": "#/definitions/v1beta1LoadBalancerRule"
+          },
+          "type": "array"
         }
       },
       "type": "object"
@@ -239,20 +239,6 @@ func init() {
 	updateRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
   "$schema": "http://json-schema.org/draft-04/schema#",
   "definitions": {
-    "kubernetesv1beta1Spec": {
-      "properties": {
-        "backend": {
-          "$ref": "#/definitions/v1beta1HTTPLoadBalancerRule"
-        },
-        "rules": {
-          "items": {
-            "$ref": "#/definitions/v1beta1LoadBalancerRule"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
     "kubernetesv1beta1Status": {
       "properties": {
         "status": {
@@ -312,7 +298,7 @@ func init() {
           "type": "object"
         },
         "spec": {
-          "$ref": "#/definitions/kubernetesv1beta1Spec"
+          "$ref": "#/definitions/v1beta1Spec"
         },
         "status": {
           "$ref": "#/definitions/kubernetesv1beta1Status"
@@ -362,6 +348,20 @@ func init() {
         },
         "host": {
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "v1beta1Spec": {
+      "properties": {
+        "backend": {
+          "$ref": "#/definitions/v1beta1HTTPLoadBalancerRule"
+        },
+        "rules": {
+          "items": {
+            "$ref": "#/definitions/v1beta1LoadBalancerRule"
+          },
+          "type": "array"
         }
       },
       "type": "object"

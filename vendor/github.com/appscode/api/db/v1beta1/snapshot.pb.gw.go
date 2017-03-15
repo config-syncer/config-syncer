@@ -410,15 +410,15 @@ func RegisterSnapshotsHandler(ctx context.Context, mux *runtime.ServeMux, conn *
 }
 
 var (
-	pattern_Snapshots_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"_appscode", "api", "kubernetes", "v1beta1", "clusters", "cluster", "databases", "uid", "snapshots"}, ""))
+	pattern_Snapshots_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9}, []string{"_appscode", "api", "kubernetes", "v1beta1", "clusters", "cluster", "databases", "uid", "snapshots", "json"}, ""))
 
-	pattern_Snapshots_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 1, 0, 4, 1, 5, 9}, []string{"_appscode", "api", "kubernetes", "v1beta1", "clusters", "cluster", "databases", "uid", "snapshots", "phid"}, ""))
+	pattern_Snapshots_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 1, 0, 4, 1, 5, 9, 2, 10}, []string{"_appscode", "api", "kubernetes", "v1beta1", "clusters", "cluster", "databases", "uid", "snapshots", "phid", "json"}, ""))
 
-	pattern_Snapshots_BackupSchedule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9}, []string{"_appscode", "api", "kubernetes", "v1beta1", "clusters", "cluster", "databases", "uid", "actions", "schedule-backup"}, ""))
+	pattern_Snapshots_BackupSchedule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9, 2, 10}, []string{"_appscode", "api", "kubernetes", "v1beta1", "clusters", "cluster", "databases", "uid", "actions", "schedule-backup", "json"}, ""))
 
-	pattern_Snapshots_BackupUnschedule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9}, []string{"_appscode", "api", "kubernetes", "v1beta1", "clusters", "cluster", "databases", "uid", "actions", "unschedule-backup"}, ""))
+	pattern_Snapshots_BackupUnschedule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9, 2, 10}, []string{"_appscode", "api", "kubernetes", "v1beta1", "clusters", "cluster", "databases", "uid", "actions", "unschedule-backup", "json"}, ""))
 
-	pattern_Snapshots_Restore_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9}, []string{"_appscode", "api", "kubernetes", "v1beta1", "clusters", "cluster", "databases", "uid", "actions", "restore"}, ""))
+	pattern_Snapshots_Restore_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9, 2, 10}, []string{"_appscode", "api", "kubernetes", "v1beta1", "clusters", "cluster", "databases", "uid", "actions", "restore", "json"}, ""))
 )
 
 var (

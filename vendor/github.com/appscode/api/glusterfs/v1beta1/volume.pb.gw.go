@@ -138,7 +138,7 @@ func RegisterVolumesHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 }
 
 var (
-	pattern_Volumes_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 1, 0, 4, 1, 5, 9, 2, 10}, []string{"_appscode", "api", "kubernetes", "v1beta1", "clusters", "kube_cluster", "namespaces", "kube_namespace", "glusterfs", "glusterfs_cluster", "volumes"}, ""))
+	pattern_Volumes_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 1, 0, 4, 1, 5, 9, 2, 10, 2, 11}, []string{"_appscode", "api", "kubernetes", "v1beta1", "clusters", "kube_cluster", "namespaces", "kube_namespace", "glusterfs", "glusterfs_cluster", "volumes", "json"}, ""))
 )
 
 var (

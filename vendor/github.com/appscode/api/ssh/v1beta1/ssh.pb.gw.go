@@ -106,7 +106,7 @@ func RegisterSSHHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.C
 }
 
 var (
-	pattern_SSH_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 2}, []string{"_appscode", "api", "ssh", "v1beta1"}, ""))
+	pattern_SSH_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 2, 2, 4}, []string{"_appscode", "api", "ssh", "v1beta1", "json"}, ""))
 )
 
 var (

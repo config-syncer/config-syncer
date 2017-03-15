@@ -1,5 +1,5 @@
 hash: 7e26a367405f03fedd48aa18d81526e397a716030c0d9eb317564f506ce58692
-updated: 2017-03-02T15:26:21.10052111-08:00
+updated: 2017-03-15T02:53:38.54945289-07:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -9,7 +9,7 @@ imports:
   - compute/metadata
   - internal
 - name: github.com/appscode/api
-  version: 7a6bdeb40b3e0f8c9fad5932270d55460bbe5cd1
+  version: 66e5242f33a4ef581eba2aaf36c84ae41009ea60
   subpackages:
   - attic/v1beta1
   - auth/v1beta1
@@ -28,14 +28,14 @@ imports:
   - ssh/v1beta1
   - version
 - name: github.com/appscode/client
-  version: 2282519d7aed06ca0698e3ee9ab675c4ceca8437
+  version: 6cf48ec95fe4eddcd88d6c5c56ad5eede95f68bb
   subpackages:
   - credential
   - util
 - name: github.com/appscode/errors
   version: 6a668ba07d02064c06707b7d8b0f5239db707045
 - name: github.com/appscode/go
-  version: 7ba1c0a441c6c319a501e54db6e93deaff5fe0dd
+  version: b9008e99fa90d7806f404e0eab52bdecb4444826
   subpackages:
   - arrays
   - crypto/rand
@@ -131,7 +131,7 @@ imports:
   - autorest/to
   - autorest/validation
 - name: github.com/benbjohnson/clock
-  version: 7dc76406b6d3c05b5f71a86293cbcf3c4ea03b19
+  version: a620c1cc9866f84a2550ad53f4f353ec030fa26b
 - name: github.com/beorn7/perks
   version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
   subpackages:
@@ -197,7 +197,7 @@ imports:
   - log
   - swagger
 - name: github.com/facebookgo/stack
-  version: 751773369052141c013c6e827a71e8f35c07879c
+  version: d9d227395bc3d7a635388c75b2e3b3a750e11888
 - name: github.com/flosch/pongo2
   version: 1d0f0d3af150c4a65dfd424d742f7374819e7d29
 - name: github.com/ghodss/yaml
@@ -364,7 +364,7 @@ imports:
 - name: github.com/spf13/cobra
   version: 9c28e4bbd74e5c3ed7aacbc552b2cab7cfdfe744
 - name: github.com/spf13/pflag
-  version: 5ccb023bc27df288a957c5e994cd44fd19619465
+  version: c7e63cf4530bcd3ba943729cee0efeff2ebea63f
 - name: github.com/timewasted/linode
   version: 37e84520dcf74488f67654f9c775b9752c232dc1
   subpackages:
@@ -514,7 +514,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/ini.v1
-  version: 74bdc99692c3408cb103221e38675ce8fda0a718
+  version: 6e4869b434bd001f6983749881c7ead3545887d8
 - name: gopkg.in/mgo.v2
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
@@ -602,7 +602,7 @@ imports:
   - util/homedir
   - util/integer
 - name: k8s.io/kubernetes
-  version: 86717cd94d404bf931a3407cc53ee62466a91006
+  version: 456adbd9c5f82f5033ec9cfe4ccdfcb8ced67cc1
   repo: https://github.com/appscode/kubernetes.git
   vcs: git
   subpackages:

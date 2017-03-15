@@ -173,11 +173,11 @@ func RegisterBillingHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 }
 
 var (
-	pattern_Billing_GetSubscription_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"_appscode", "api", "namespace", "v1beta1", "billing", "subscriptions"}, ""))
+	pattern_Billing_GetSubscription_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6}, []string{"_appscode", "api", "namespace", "v1beta1", "billing", "subscriptions", "json"}, ""))
 
-	pattern_Billing_GetQuota_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"_appscode", "api", "namespace", "v1beta1", "billing", "quotas"}, ""))
+	pattern_Billing_GetQuota_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6}, []string{"_appscode", "api", "namespace", "v1beta1", "billing", "quotas", "json"}, ""))
 
-	pattern_Billing_CheckPaymentMethod_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"_appscode", "api", "namespace", "v1beta1", "billing", "paymentmethods"}, ""))
+	pattern_Billing_CheckPaymentMethod_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6}, []string{"_appscode", "api", "namespace", "v1beta1", "billing", "paymentmethods", "json"}, ""))
 )
 
 var (

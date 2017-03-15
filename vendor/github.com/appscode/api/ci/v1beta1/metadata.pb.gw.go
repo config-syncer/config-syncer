@@ -99,7 +99,7 @@ func RegisterMetadataHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 }
 
 var (
-	pattern_Metadata_ServerInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"_appscode", "api", "ci", "v1beta1", "metadata", "server_info"}, ""))
+	pattern_Metadata_ServerInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6}, []string{"_appscode", "api", "ci", "v1beta1", "metadata", "server-info", "json"}, ""))
 )
 
 var (

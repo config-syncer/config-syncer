@@ -161,9 +161,9 @@ func RegisterArtifactsHandler(ctx context.Context, mux *runtime.ServeMux, conn *
 }
 
 var (
-	pattern_Artifacts_Search_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"_appscode", "api", "attic", "v1beta1", "search"}, ""))
+	pattern_Artifacts_Search_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"_appscode", "api", "attic", "v1beta1", "search", "json"}, ""))
 
-	pattern_Artifacts_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"_appscode", "api", "attic", "v1beta1", "artifacts", "type"}, ""))
+	pattern_Artifacts_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"_appscode", "api", "attic", "v1beta1", "artifacts", "type", "json"}, ""))
 )
 
 var (

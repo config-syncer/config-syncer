@@ -9,12 +9,16 @@ import (
 
 var agentCreateRequestSchema *gojsonschema.Schema
 var agentDeleteRequestSchema *gojsonschema.Schema
+var agentGetRequestSchema *gojsonschema.Schema
 
 func init() {
 	var err error
 	agentCreateRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
   "$schema": "http://json-schema.org/draft-04/schema#",
   "properties": {
+    "ca_cert": {
+      "type": "string"
+    },
     "external_ip": {
       "type": "string"
     },
@@ -26,6 +30,9 @@ func init() {
     },
     "jenkins_jnlp_port": {
       "type": "integer"
+    },
+    "jenkins_url": {
+      "type": "string"
     },
     "name": {
       "type": "string"
@@ -48,7 +55,19 @@ func init() {
 	agentDeleteRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
   "$schema": "http://json-schema.org/draft-04/schema#",
   "properties": {
-    "name": {
+    "uid": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`))
+	if err != nil {
+		glog.Fatal(err)
+	}
+	agentGetRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "uid": {
       "type": "string"
     }
   },
@@ -69,6 +88,14 @@ func (m *AgentDeleteRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *AgentDeleteRequest) IsRequest() {}
 
+func (m *AgentGetRequest) IsValid() (*gojsonschema.Result, error) {
+	return agentGetRequestSchema.Validate(gojsonschema.NewGoLoader(m))
+}
+func (m *AgentGetRequest) IsRequest() {}
+
+func (m *AgentGetResponse) SetStatus(s *dtypes.Status) {
+	m.Status = s
+}
 func (m *AgentListResponse) SetStatus(s *dtypes.Status) {
 	m.Status = s
 }

@@ -326,15 +326,15 @@ func RegisterCertificatesHandler(ctx context.Context, mux *runtime.ServeMux, con
 }
 
 var (
-	pattern_Certificates_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"_appscode", "api", "certificate", "v1beta1", "certificates"}, ""))
+	pattern_Certificates_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"_appscode", "api", "certificate", "v1beta1", "certificates", "json"}, ""))
 
-	pattern_Certificates_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"_appscode", "api", "certificate", "v1beta1", "certificates", "uid"}, ""))
+	pattern_Certificates_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"_appscode", "api", "certificate", "v1beta1", "certificates", "uid", "json"}, ""))
 
-	pattern_Certificates_Load_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 2, 7}, []string{"_appscode", "api", "certificate", "v1beta1", "certificates", "name", "actions", "obtain"}, ""))
+	pattern_Certificates_Load_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 2, 7, 2, 8}, []string{"_appscode", "api", "certificate", "v1beta1", "certificates", "name", "actions", "obtain", "json"}, ""))
 
-	pattern_Certificates_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"_appscode", "api", "certificate", "v1beta1", "certificates", "uid"}, ""))
+	pattern_Certificates_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"_appscode", "api", "certificate", "v1beta1", "certificates", "uid", "json"}, ""))
 
-	pattern_Certificates_Deploy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 2, 7}, []string{"_appscode", "api", "certificate", "v1beta1", "certificates", "uid", "actions", "deploy"}, ""))
+	pattern_Certificates_Deploy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 2, 7, 2, 8}, []string{"_appscode", "api", "certificate", "v1beta1", "certificates", "uid", "actions", "deploy", "json"}, ""))
 )
 
 var (

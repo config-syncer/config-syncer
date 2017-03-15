@@ -368,17 +368,17 @@ func RegisterCredentialsHandler(ctx context.Context, mux *runtime.ServeMux, conn
 }
 
 var (
-	pattern_Credentials_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"_appscode", "api", "cloud", "v1beta1", "credentials"}, ""))
+	pattern_Credentials_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"_appscode", "api", "cloud", "v1beta1", "credentials", "json"}, ""))
 
-	pattern_Credentials_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"_appscode", "api", "cloud", "v1beta1", "credentials", "name"}, ""))
+	pattern_Credentials_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"_appscode", "api", "cloud", "v1beta1", "credentials", "name", "json"}, ""))
 
-	pattern_Credentials_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"_appscode", "api", "cloud", "v1beta1", "credentials"}, ""))
+	pattern_Credentials_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"_appscode", "api", "cloud", "v1beta1", "credentials", "json"}, ""))
 
-	pattern_Credentials_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"_appscode", "api", "cloud", "v1beta1", "credentials", "name"}, ""))
+	pattern_Credentials_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"_appscode", "api", "cloud", "v1beta1", "credentials", "name", "json"}, ""))
 
-	pattern_Credentials_IsAuthorized_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"_appscode", "api", "cloud", "v1beta1", "credentials", "name", "is-authorized"}, ""))
+	pattern_Credentials_IsAuthorized_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 2, 7}, []string{"_appscode", "api", "cloud", "v1beta1", "credentials", "name", "is-authorized", "json"}, ""))
 
-	pattern_Credentials_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"_appscode", "api", "cloud", "v1beta1", "credentials", "name"}, ""))
+	pattern_Credentials_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"_appscode", "api", "cloud", "v1beta1", "credentials", "name", "json"}, ""))
 )
 
 var (

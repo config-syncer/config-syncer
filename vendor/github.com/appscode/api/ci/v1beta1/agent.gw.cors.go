@@ -16,6 +16,7 @@ import "github.com/grpc-ecosystem/grpc-gateway/runtime"
 func ExportAgentsCorsPatterns() []runtime.Pattern {
 	return []runtime.Pattern{
 		pattern_Agents_List_0,
+		pattern_Agents_Get_0,
 		pattern_Agents_Create_0,
 		pattern_Agents_Delete_0,
 	}

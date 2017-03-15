@@ -143,9 +143,9 @@ func RegisterMailingListHandler(ctx context.Context, mux *runtime.ServeMux, conn
 }
 
 var (
-	pattern_MailingList_SendEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"_appscode", "api", "mail", "v1beta1"}, ""))
+	pattern_MailingList_SendEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"_appscode", "api", "mail", "v1beta1", "json"}, ""))
 
-	pattern_MailingList_Subscribe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"_appscode", "api", "mailinglist", "v1beta1", "subscribe"}, ""))
+	pattern_MailingList_Subscribe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"_appscode", "api", "mailinglist", "v1beta1", "subscribe", "json"}, ""))
 )
 
 var (

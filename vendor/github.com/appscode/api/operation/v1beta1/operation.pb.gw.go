@@ -182,9 +182,9 @@ func RegisterOperationsHandler(ctx context.Context, mux *runtime.ServeMux, conn 
 }
 
 var (
-	pattern_Operations_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"_appscode", "api", "operation", "v1beta1", "operations", "phid"}, ""))
+	pattern_Operations_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"_appscode", "api", "operation", "v1beta1", "operations", "phid", "json"}, ""))
 
-	pattern_Operations_DescribeLog_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"_appscode", "api", "operation", "v1beta1", "operations", "phid", "logs", "log_id"}, ""))
+	pattern_Operations_DescribeLog_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"_appscode", "api", "operation", "v1beta1", "operations", "phid", "logs", "log_id", "json"}, ""))
 )
 
 var (

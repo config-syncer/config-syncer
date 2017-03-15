@@ -1039,29 +1039,29 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 }
 
 var (
-	pattern_Clients_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "type"}, ""))
+	pattern_Clients_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "type", "json"}, ""))
 
-	pattern_Clients_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "type", "name"}, ""))
+	pattern_Clients_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "type", "name", "json"}, ""))
 
-	pattern_Clients_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "type"}, ""))
+	pattern_Clients_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "type", "json"}, ""))
 
-	pattern_Clients_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "type", "name"}, ""))
+	pattern_Clients_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "type", "name", "json"}, ""))
 
-	pattern_Clients_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "type", "name"}, ""))
+	pattern_Clients_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "type", "name", "json"}, ""))
 
-	pattern_Clients_Copy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"_appscode", "api", "kubernetes", "v1beta2", "actions", "copy"}, ""))
+	pattern_Clients_Copy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6}, []string{"_appscode", "api", "kubernetes", "v1beta2", "actions", "copy", "json"}, ""))
 
-	pattern_Clients_EditConfigMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 1, 0, 4, 1, 5, 9, 2, 10, 2, 11}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "namespaces", "namespace", "configmaps", "name", "actions", "edit"}, ""))
+	pattern_Clients_EditConfigMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 1, 0, 4, 1, 5, 9, 2, 10, 2, 11, 2, 12}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "namespaces", "namespace", "configmaps", "name", "actions", "edit", "json"}, ""))
 
-	pattern_Clients_EditSecret_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 1, 0, 4, 1, 5, 9, 2, 10, 2, 11}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "namespaces", "namespace", "secrets", "name", "actions", "edit"}, ""))
+	pattern_Clients_EditSecret_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 1, 0, 4, 1, 5, 9, 2, 10, 2, 11, 2, 12}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "namespaces", "namespace", "secrets", "name", "actions", "edit", "json"}, ""))
 
-	pattern_Clients_RegisterPersistentVolume_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "persistentvolumes", "name", "actions", "register"}, ""))
+	pattern_Clients_RegisterPersistentVolume_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9, 2, 10}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "persistentvolumes", "name", "actions", "register", "json"}, ""))
 
-	pattern_Clients_UnregisterPersistentVolume_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "persistentvolumes", "name", "actions", "unregister"}, ""))
+	pattern_Clients_UnregisterPersistentVolume_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9, 2, 10}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "persistentvolumes", "name", "actions", "unregister", "json"}, ""))
 
-	pattern_Clients_RegisterPersistentVolumeClaim_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "persistentvolumeclaims", "name", "actions", "register"}, ""))
+	pattern_Clients_RegisterPersistentVolumeClaim_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9, 2, 10}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "persistentvolumeclaims", "name", "actions", "register", "json"}, ""))
 
-	pattern_Clients_UnregisterPersistentVolumeClaim_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "persistentvolumeclaims", "name", "actions", "unregister"}, ""))
+	pattern_Clients_UnregisterPersistentVolumeClaim_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8, 2, 9, 2, 10}, []string{"_appscode", "api", "kubernetes", "v1beta2", "clusters", "cluster", "persistentvolumeclaims", "name", "actions", "unregister", "json"}, ""))
 )
 
 var (
@@ -1236,13 +1236,13 @@ func RegisterDisksHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc
 }
 
 var (
-	pattern_Disks_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"_appscode", "api", "cloud", "v1beta2", "disks"}, ""))
+	pattern_Disks_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"_appscode", "api", "cloud", "v1beta2", "disks", "json"}, ""))
 
-	pattern_Disks_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"_appscode", "api", "cloud", "v1beta2", "disks", "name"}, ""))
+	pattern_Disks_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"_appscode", "api", "cloud", "v1beta2", "disks", "name", "json"}, ""))
 
-	pattern_Disks_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"_appscode", "api", "cloud", "v1beta2", "disks"}, ""))
+	pattern_Disks_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"_appscode", "api", "cloud", "v1beta2", "disks", "json"}, ""))
 
-	pattern_Disks_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"_appscode", "api", "cloud", "v1beta2", "disks", "uid"}, ""))
+	pattern_Disks_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"_appscode", "api", "cloud", "v1beta2", "disks", "uid", "json"}, ""))
 )
 
 var (
