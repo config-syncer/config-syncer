@@ -12,7 +12,7 @@ import:
 - package: github.com/appscode/voyager
   version: release-1.5
 - package: github.com/coreos/prometheus-operator
-  version: v0.6.0
+  version: v0.7.0
 - package: github.com/influxdata/influxdb
   version: v0.11.0
 - package: github.com/spf13/pflag

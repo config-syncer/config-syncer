@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	"net/url"
+	"sort"
 )
 
 // DNSDomain represents a DNS domain on Vultr
@@ -10,6 +11,12 @@ type DNSDomain struct {
 	Domain  string `json:"domain"`
 	Created string `json:"date_created"`
 }
+
+type dnsdomains []DNSDomain
+
+func (d dnsdomains) Len() int           { return len(d) }
+func (d dnsdomains) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
+func (d dnsdomains) Less(i, j int) bool { return d[i].Domain < d[j].Domain }
 
 // DNSRecord represents a DNS record on Vultr
 type DNSRecord struct {
@@ -21,20 +28,41 @@ type DNSRecord struct {
 	TTL      int    `json:"ttl"`
 }
 
+type dnsrecords []DNSRecord
+
+func (d dnsrecords) Len() int      { return len(d) }
+func (d dnsrecords) Swap(i, j int) { d[i], d[j] = d[j], d[i] }
+func (d dnsrecords) Less(i, j int) bool {
+	// sort order: type, data, name
+	if d[i].Type < d[j].Type {
+		return true
+	} else if d[i].Type > d[j].Type {
+		return false
+	}
+	if d[i].Data < d[j].Data {
+		return true
+	} else if d[i].Data > d[j].Data {
+		return false
+	}
+	return d[i].Name < d[j].Name
+}
+
 // GetDNSDomains returns a list of available domains on Vultr account
-func (c *Client) GetDNSDomains() (dnsdomains []DNSDomain, err error) {
-	if err := c.get(`dns/list`, &dnsdomains); err != nil {
+func (c *Client) GetDNSDomains() (domains []DNSDomain, err error) {
+	if err := c.get(`dns/list`, &domains); err != nil {
 		return nil, err
 	}
-	return dnsdomains, nil
+	sort.Sort(dnsdomains(domains))
+	return domains, nil
 }
 
 // GetDNSRecords returns a list of all DNS records of a particular domain
-func (c *Client) GetDNSRecords(domain string) (dnsrecords []DNSRecord, err error) {
-	if err := c.get(`dns/records?domain=`+domain, &dnsrecords); err != nil {
+func (c *Client) GetDNSRecords(domain string) (records []DNSRecord, err error) {
+	if err := c.get(`dns/records?domain=`+domain, &records); err != nil {
 		return nil, err
 	}
-	return dnsrecords, nil
+	sort.Sort(dnsrecords(records))
+	return records, nil
 }
 
 // CreateDNSDomain creates a new DNS domain name on Vultr

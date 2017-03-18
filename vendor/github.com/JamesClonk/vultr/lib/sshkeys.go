@@ -1,6 +1,9 @@
 package lib
 
-import "net/url"
+import (
+	"net/url"
+	"sort"
+)
 
 // SSHKey on Vultr account
 type SSHKey struct {
@@ -9,6 +12,12 @@ type SSHKey struct {
 	Key     string `json:"ssh_key"`
 	Created string `json:"date_created"`
 }
+
+type sshkeys []SSHKey
+
+func (s sshkeys) Len() int           { return len(s) }
+func (s sshkeys) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s sshkeys) Less(i, j int) bool { return s[i].Name < s[j].Name }
 
 // GetSSHKeys returns a list of SSHKeys from Vultr account
 func (c *Client) GetSSHKeys() (keys []SSHKey, err error) {
@@ -20,6 +29,7 @@ func (c *Client) GetSSHKeys() (keys []SSHKey, err error) {
 	for _, key := range keyMap {
 		keys = append(keys, key)
 	}
+	sort.Sort(sshkeys(keys))
 	return keys, nil
 }
 

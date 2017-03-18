@@ -1,5 +1,5 @@
-hash: 7e26a367405f03fedd48aa18d81526e397a716030c0d9eb317564f506ce58692
-updated: 2017-03-15T02:53:38.54945289-07:00
+hash: 15aa34390b774d960c6d5bb0c9d4ff60701d20332e3dfccc788df36f91d309ea
+updated: 2017-03-18T04:56:51.3506943-07:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -153,7 +153,7 @@ imports:
   - httputil
   - timeutil
 - name: github.com/coreos/prometheus-operator
-  version: 2ab4f4a70b6927a9d164b064a6519167c474281a
+  version: 43fdeb95df2003c216b63a2cc486c052033bd4c7
   subpackages:
   - pkg/client/monitoring/v1alpha1
 - name: github.com/davecgh/go-spew
@@ -251,7 +251,7 @@ imports:
   - models
   - pkg/escape
 - name: github.com/JamesClonk/vultr
-  version: 9ec0427d51411407c0402b093a1771cb75af9679
+  version: 6d897f570bcdfa613af6a10efd16601de4707ae1
   subpackages:
   - lib
 - name: github.com/jmespath/go-jmespath
@@ -362,9 +362,9 @@ imports:
   subpackages:
   - zk
 - name: github.com/spf13/cobra
-  version: 9c28e4bbd74e5c3ed7aacbc552b2cab7cfdfe744
+  version: f62e98d28ab7ad31d707ba837a966378465c7b57
 - name: github.com/spf13/pflag
-  version: c7e63cf4530bcd3ba943729cee0efeff2ebea63f
+  version: 5ccb023bc27df288a957c5e994cd44fd19619465
 - name: github.com/timewasted/linode
   version: 37e84520dcf74488f67654f9c775b9752c232dc1
   subpackages:

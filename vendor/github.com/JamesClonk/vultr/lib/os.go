@@ -1,5 +1,7 @@
 package lib
 
+import "sort"
+
 // OS image on Vultr
 type OS struct {
 	ID        int    `json:"OSID"`
@@ -9,6 +11,12 @@ type OS struct {
 	Windows   bool   `json:"windows"`
 	Surcharge string `json:"surcharge"`
 }
+
+type oses []OS
+
+func (s oses) Len() int           { return len(s) }
+func (s oses) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s oses) Less(i, j int) bool { return s[i].Name < s[j].Name }
 
 // GetOS returns a list of all available operating systems on Vultr
 func (c *Client) GetOS() ([]OS, error) {
@@ -21,5 +29,6 @@ func (c *Client) GetOS() ([]OS, error) {
 	for _, os := range osMap {
 		osList = append(osList, os)
 	}
+	sort.Sort(oses(osList))
 	return osList, nil
 }

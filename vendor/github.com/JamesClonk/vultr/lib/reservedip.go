@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"sort"
 	"strconv"
 )
 
@@ -16,6 +17,25 @@ type IP struct {
 	SubnetSize int    `json:"subnet_size"`
 	Label      string `json:"label"`
 	AttachedTo string `json:"attached_SUBID,string"`
+}
+
+type ips []IP
+
+func (s ips) Len() int      { return len(s) }
+func (s ips) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s ips) Less(i, j int) bool {
+	// sort order: label, iptype, subnet
+	if s[i].Label < s[j].Label {
+		return true
+	} else if s[i].Label > s[j].Label {
+		return false
+	}
+	if s[i].IPType < s[j].IPType {
+		return true
+	} else if s[i].IPType > s[j].IPType {
+		return false
+	}
+	return s[i].Subnet < s[j].Subnet
 }
 
 // UnmarshalJSON implements json.Unmarshaller on IP.
@@ -89,11 +109,12 @@ func (c *Client) ListReservedIP() ([]IP, error) {
 		return nil, err
 	}
 
-	ips := make([]IP, 0)
+	ipList := make([]IP, 0)
 	for _, ip := range ipMap {
-		ips = append(ips, ip)
+		ipList = append(ipList, ip)
 	}
-	return ips, nil
+	sort.Sort(ips(ipList))
+	return ipList, nil
 }
 
 // GetReservedIP returns reserved IP with given ID

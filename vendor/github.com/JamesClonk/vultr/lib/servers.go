@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"sort"
 	"strconv"
 )
 
@@ -52,6 +53,20 @@ type ServerOptions struct {
 	DontNotifyOnActivate bool
 	Hostname             string
 	Tag                  string
+}
+
+type servers []Server
+
+func (s servers) Len() int      { return len(s) }
+func (s servers) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s servers) Less(i, j int) bool {
+	// sort order: name, ip
+	if s[i].Name < s[j].Name {
+		return true
+	} else if s[i].Name > s[j].Name {
+		return false
+	}
+	return s[i].MainIP < s[j].MainIP
 }
 
 // V6Network represents a IPv6 network of a Vultr server
@@ -180,29 +195,31 @@ func (s *Server) UnmarshalJSON(data []byte) (err error) {
 }
 
 // GetServers returns a list of current virtual machines on Vultr account
-func (c *Client) GetServers() (servers []Server, err error) {
+func (c *Client) GetServers() (serverList []Server, err error) {
 	var serverMap map[string]Server
 	if err := c.get(`server/list`, &serverMap); err != nil {
 		return nil, err
 	}
 
 	for _, server := range serverMap {
-		servers = append(servers, server)
+		serverList = append(serverList, server)
 	}
-	return servers, nil
+	sort.Sort(servers(serverList))
+	return serverList, nil
 }
 
 // GetServersByTag returns a list of all virtual machines matching by tag
-func (c *Client) GetServersByTag(tag string) (servers []Server, err error) {
+func (c *Client) GetServersByTag(tag string) (serverList []Server, err error) {
 	var serverMap map[string]Server
 	if err := c.get(`server/list?tag=`+tag, &serverMap); err != nil {
 		return nil, err
 	}
 
 	for _, server := range serverMap {
-		servers = append(servers, server)
+		serverList = append(serverList, server)
 	}
-	return servers, nil
+	sort.Sort(servers(serverList))
+	return serverList, nil
 }
 
 // GetServer returns the virtual machine with the given ID
@@ -371,6 +388,7 @@ func (c *Client) ListOSforServer(id string) (os []OS, err error) {
 	for _, o := range osMap {
 		os = append(os, o)
 	}
+	sort.Sort(oses(os))
 	return os, nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"sort"
 )
 
 // StartupScript on Vultr account
@@ -13,6 +14,12 @@ type StartupScript struct {
 	Type    string `json:"type"`
 	Content string `json:"script"`
 }
+
+type startupscripts []StartupScript
+
+func (s startupscripts) Len() int           { return len(s) }
+func (s startupscripts) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s startupscripts) Less(i, j int) bool { return s[i].Name < s[j].Name }
 
 // UnmarshalJSON implements json.Unmarshaller on StartupScript.
 // Necessary because the SCRIPTID field has inconsistent types.
@@ -47,6 +54,7 @@ func (c *Client) GetStartupScripts() (scripts []StartupScript, err error) {
 		}
 		scripts = append(scripts, script)
 	}
+	sort.Sort(startupscripts(scripts))
 	return scripts, nil
 }
 
