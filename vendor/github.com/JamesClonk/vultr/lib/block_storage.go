@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 // BlockStorage on Vultr account
@@ -26,9 +27,9 @@ func (b blockstorages) Len() int      { return len(b) }
 func (b blockstorages) Swap(i, j int) { b[i], b[j] = b[j], b[i] }
 func (b blockstorages) Less(i, j int) bool {
 	// sort order: name, size, status
-	if b[i].Name < b[j].Name {
+	if strings.ToLower(b[i].Name) < strings.ToLower(b[j].Name) {
 		return true
-	} else if b[i].Name > b[j].Name {
+	} else if strings.ToLower(b[i].Name) > strings.ToLower(b[j].Name) {
 		return false
 	}
 	if b[i].SizeGB < b[j].SizeGB {

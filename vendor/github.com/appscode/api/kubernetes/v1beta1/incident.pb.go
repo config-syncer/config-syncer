@@ -7,7 +7,7 @@ package v1beta1
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import _ "github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api"
+import _ "google.golang.org/genproto/googleapis/api/annotations"
 import _ "github.com/grpc-ecosystem/grpc-gateway/third_party/appscodeapis/appscode/api"
 import appscode_dtypes "github.com/appscode/api/dtypes"
 
@@ -45,7 +45,7 @@ type Incident struct {
 func (m *Incident) Reset()                    { *m = Incident{} }
 func (m *Incident) String() string            { return proto.CompactTextString(m) }
 func (*Incident) ProtoMessage()               {}
-func (*Incident) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{0} }
+func (*Incident) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
 
 func (m *Incident) GetPhid() string {
 	if m != nil {
@@ -170,7 +170,7 @@ type Incident_Event struct {
 func (m *Incident_Event) Reset()                    { *m = Incident_Event{} }
 func (m *Incident_Event) String() string            { return proto.CompactTextString(m) }
 func (*Incident_Event) ProtoMessage()               {}
-func (*Incident_Event) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{0, 0} }
+func (*Incident_Event) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0, 0} }
 
 func (m *Incident_Event) GetType() string {
 	if m != nil {
@@ -219,7 +219,7 @@ type IncidentListRequest struct {
 func (m *IncidentListRequest) Reset()                    { *m = IncidentListRequest{} }
 func (m *IncidentListRequest) String() string            { return proto.CompactTextString(m) }
 func (*IncidentListRequest) ProtoMessage()               {}
-func (*IncidentListRequest) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{1} }
+func (*IncidentListRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{1} }
 
 func (m *IncidentListRequest) GetKubernetesCluster() string {
 	if m != nil {
@@ -264,7 +264,7 @@ type IncidentListResponse struct {
 func (m *IncidentListResponse) Reset()                    { *m = IncidentListResponse{} }
 func (m *IncidentListResponse) String() string            { return proto.CompactTextString(m) }
 func (*IncidentListResponse) ProtoMessage()               {}
-func (*IncidentListResponse) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{2} }
+func (*IncidentListResponse) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{2} }
 
 func (m *IncidentListResponse) GetStatus() *appscode_dtypes.Status {
 	if m != nil {
@@ -288,7 +288,7 @@ type IncidentDescribeRequest struct {
 func (m *IncidentDescribeRequest) Reset()                    { *m = IncidentDescribeRequest{} }
 func (m *IncidentDescribeRequest) String() string            { return proto.CompactTextString(m) }
 func (*IncidentDescribeRequest) ProtoMessage()               {}
-func (*IncidentDescribeRequest) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{3} }
+func (*IncidentDescribeRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{3} }
 
 func (m *IncidentDescribeRequest) GetPhid() string {
 	if m != nil {
@@ -305,7 +305,7 @@ type IncidentDescribeResponse struct {
 func (m *IncidentDescribeResponse) Reset()                    { *m = IncidentDescribeResponse{} }
 func (m *IncidentDescribeResponse) String() string            { return proto.CompactTextString(m) }
 func (*IncidentDescribeResponse) ProtoMessage()               {}
-func (*IncidentDescribeResponse) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{4} }
+func (*IncidentDescribeResponse) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{4} }
 
 func (m *IncidentDescribeResponse) GetStatus() *appscode_dtypes.Status {
 	if m != nil {
@@ -340,7 +340,7 @@ type IncidentNotifyRequest struct {
 func (m *IncidentNotifyRequest) Reset()                    { *m = IncidentNotifyRequest{} }
 func (m *IncidentNotifyRequest) String() string            { return proto.CompactTextString(m) }
 func (*IncidentNotifyRequest) ProtoMessage()               {}
-func (*IncidentNotifyRequest) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{5} }
+func (*IncidentNotifyRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{5} }
 
 func (m *IncidentNotifyRequest) GetAlertPhid() string {
 	if m != nil {
@@ -423,7 +423,7 @@ type IncidentEventCreateRequest struct {
 func (m *IncidentEventCreateRequest) Reset()                    { *m = IncidentEventCreateRequest{} }
 func (m *IncidentEventCreateRequest) String() string            { return proto.CompactTextString(m) }
 func (*IncidentEventCreateRequest) ProtoMessage()               {}
-func (*IncidentEventCreateRequest) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{6} }
+func (*IncidentEventCreateRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{6} }
 
 func (m *IncidentEventCreateRequest) GetPhid() string {
 	if m != nil {
@@ -628,11 +628,11 @@ var _Incidents_serviceDesc = grpc.ServiceDesc{
 	Metadata: "incident.proto",
 }
 
-func init() { proto.RegisterFile("incident.proto", fileDescriptor3) }
+func init() { proto.RegisterFile("incident.proto", fileDescriptor1) }
 
-var fileDescriptor3 = []byte{
+var fileDescriptor1 = []byte{
 	// 966 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x9c, 0x56, 0x4f, 0x6f, 0x1b, 0x45,
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x56, 0x4f, 0x6f, 0x1b, 0x45,
 	0x14, 0xd7, 0xac, 0x1d, 0xc7, 0x7e, 0x4e, 0x52, 0x98, 0xa6, 0xe9, 0xc8, 0x05, 0xea, 0x6e, 0x55,
 	0x61, 0x81, 0xb2, 0xdb, 0x98, 0xa2, 0x0a, 0x0e, 0x45, 0x8e, 0xa9, 0x04, 0x12, 0x6a, 0xa3, 0x2d,
 	0xe5, 0x80, 0x90, 0xac, 0xf1, 0xee, 0x90, 0x6c, 0x6b, 0xef, 0x2c, 0x3b, 0xb3, 0xa9, 0xa2, 0xaa,

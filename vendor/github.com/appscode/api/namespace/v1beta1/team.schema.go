@@ -36,7 +36,16 @@ func init() {
       "pattern": "^[a-z0-9](?:[a-z0-9\\-]{0,61}[a-z0-9])?$",
       "type": "string"
     },
+    "options": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    },
     "password": {
+      "type": "string"
+    },
+    "payment_method_nonce": {
       "type": "string"
     },
     "subscription_type": {

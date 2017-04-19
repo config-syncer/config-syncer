@@ -712,18 +712,18 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Clients_List_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Clients_List_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Clients_List_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -740,18 +740,18 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Clients_Describe_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Clients_Describe_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Clients_Describe_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -768,18 +768,18 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Clients_Create_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Clients_Create_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Clients_Create_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -796,18 +796,18 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Clients_Delete_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Clients_Delete_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Clients_Delete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -824,18 +824,18 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Clients_Update_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Clients_Update_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Clients_Update_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -852,18 +852,18 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Clients_Copy_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Clients_Copy_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Clients_Copy_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -880,18 +880,18 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Clients_EditConfigMap_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Clients_EditConfigMap_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Clients_EditConfigMap_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -908,18 +908,18 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Clients_EditSecret_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Clients_EditSecret_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Clients_EditSecret_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -936,18 +936,18 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Clients_RegisterPersistentVolume_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Clients_RegisterPersistentVolume_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Clients_RegisterPersistentVolume_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -964,18 +964,18 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Clients_UnregisterPersistentVolume_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Clients_UnregisterPersistentVolume_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Clients_UnregisterPersistentVolume_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -992,18 +992,18 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Clients_RegisterPersistentVolumeClaim_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Clients_RegisterPersistentVolumeClaim_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Clients_RegisterPersistentVolumeClaim_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1020,18 +1020,18 @@ func RegisterClientsHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Clients_UnregisterPersistentVolumeClaim_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Clients_UnregisterPersistentVolumeClaim_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Clients_UnregisterPersistentVolumeClaim_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1133,18 +1133,18 @@ func RegisterDisksHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Disks_List_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Disks_List_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Disks_List_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1161,18 +1161,18 @@ func RegisterDisksHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Disks_Describe_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Disks_Describe_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Disks_Describe_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1189,18 +1189,18 @@ func RegisterDisksHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Disks_Create_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Disks_Create_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Disks_Create_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1217,18 +1217,18 @@ func RegisterDisksHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Disks_Delete_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Disks_Delete_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Disks_Delete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 

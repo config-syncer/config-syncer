@@ -63,8 +63,8 @@ var (
 )
 
 type errorBody struct {
-	Error string `json:"error"`
-	Code  int    `json:"code"`
+	Error string `protobuf:"bytes,1,name=error" json:"error"`
+	Code  int32  `protobuf:"varint,2,name=code" json:"code"`
 }
 
 //Make this also conform to proto.Message for builtin JSONPb Marshaler
@@ -78,14 +78,14 @@ func (*errorBody) ProtoMessage()    {}
 //
 // The response body returned by this function is a JSON object,
 // which contains a member whose key is "error" and whose value is err.Error().
-func DefaultHTTPError(ctx context.Context, marshaler Marshaler, w http.ResponseWriter, _ *http.Request, err error) {
+func DefaultHTTPError(ctx context.Context, mux *ServeMux, marshaler Marshaler, w http.ResponseWriter, _ *http.Request, err error) {
 	const fallback = `{"error": "failed to marshal error message"}`
 
 	w.Header().Del("Trailer")
 	w.Header().Set("Content-Type", marshaler.ContentType())
 	body := &errorBody{
 		Error: grpc.ErrorDesc(err),
-		Code:  int(grpc.Code(err)),
+		Code:  int32(grpc.Code(err)),
 	}
 
 	buf, merr := marshaler.Marshal(body)
@@ -103,7 +103,7 @@ func DefaultHTTPError(ctx context.Context, marshaler Marshaler, w http.ResponseW
 		grpclog.Printf("Failed to extract ServerMetadata from context")
 	}
 
-	handleForwardResponseServerMetadata(w, md)
+	handleForwardResponseServerMetadata(w, mux, md)
 	handleForwardResponseTrailerHeader(w, md)
 	st := HTTPStatusFromCode(grpc.Code(err))
 	w.WriteHeader(st)

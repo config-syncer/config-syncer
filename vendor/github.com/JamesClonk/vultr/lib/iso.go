@@ -1,6 +1,9 @@
 package lib
 
-import "sort"
+import (
+	"sort"
+	"strings"
+)
 
 // ISO image on Vultr
 type ISO struct {
@@ -17,9 +20,9 @@ func (s isos) Len() int      { return len(s) }
 func (s isos) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 func (s isos) Less(i, j int) bool {
 	// sort order: filename, created
-	if s[i].Filename < s[j].Filename {
+	if strings.ToLower(s[i].Filename) < strings.ToLower(s[j].Filename) {
 		return true
-	} else if s[i].Filename > s[j].Filename {
+	} else if strings.ToLower(s[i].Filename) > strings.ToLower(s[j].Filename) {
 		return false
 	}
 	return s[i].Created < s[j].Created

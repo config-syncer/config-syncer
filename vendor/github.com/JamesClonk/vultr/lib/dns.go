@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"sort"
+	"strings"
 )
 
 // DNSDomain represents a DNS domain on Vultr
@@ -14,9 +15,11 @@ type DNSDomain struct {
 
 type dnsdomains []DNSDomain
 
-func (d dnsdomains) Len() int           { return len(d) }
-func (d dnsdomains) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
-func (d dnsdomains) Less(i, j int) bool { return d[i].Domain < d[j].Domain }
+func (d dnsdomains) Len() int      { return len(d) }
+func (d dnsdomains) Swap(i, j int) { d[i], d[j] = d[j], d[i] }
+func (d dnsdomains) Less(i, j int) bool {
+	return strings.ToLower(d[i].Domain) < strings.ToLower(d[j].Domain)
+}
 
 // DNSRecord represents a DNS record on Vultr
 type DNSRecord struct {
@@ -44,7 +47,7 @@ func (d dnsrecords) Less(i, j int) bool {
 	} else if d[i].Data > d[j].Data {
 		return false
 	}
-	return d[i].Name < d[j].Name
+	return strings.ToLower(d[i].Name) < strings.ToLower(d[j].Name)
 }
 
 // GetDNSDomains returns a list of available domains on Vultr account

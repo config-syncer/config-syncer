@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 // IP on Vultr
@@ -25,9 +26,9 @@ func (s ips) Len() int      { return len(s) }
 func (s ips) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 func (s ips) Less(i, j int) bool {
 	// sort order: label, iptype, subnet
-	if s[i].Label < s[j].Label {
+	if strings.ToLower(s[i].Label) < strings.ToLower(s[j].Label) {
 		return true
-	} else if s[i].Label > s[j].Label {
+	} else if strings.ToLower(s[i].Label) > strings.ToLower(s[j].Label) {
 		return false
 	}
 	if s[i].IPType < s[j].IPType {

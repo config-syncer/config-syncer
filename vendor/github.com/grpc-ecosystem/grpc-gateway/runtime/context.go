@@ -15,15 +15,21 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const metadataHeaderPrefix = "Grpc-Metadata-"
-const metadataTrailerPrefix = "Grpc-Trailer-"
+// MetadataHeaderPrefix is the http prefix that represents custom metadata
+// parameters to or from a gRPC call.
+const MetadataHeaderPrefix = "Grpc-Metadata-"
+
+// MetadataPrefix is the prefix for grpc-gateway supplied custom metadata fields.
+const MetadataPrefix = "grpcgateway-"
+
+// MetadataTrailerPrefix is prepended to gRPC metadata as it is converted to
+// HTTP headers in a response handled by grpc-gateway
+const MetadataTrailerPrefix = "Grpc-Trailer-"
+
 const metadataGrpcTimeout = "Grpc-Timeout"
 
 const xForwardedFor = "X-Forwarded-For"
 const xForwardedHost = "X-Forwarded-Host"
-const cookieHeader = "Cookie"
-const csrfTokenHeader = "X-Phabricator-Csrf"
-const corsHeaderPrefix = "access-control-"
 
 var (
 	// DefaultContextTimeout is used for gRPC call context.WithTimeout whenever a Grpc-Timeout inbound
@@ -33,11 +39,12 @@ var (
 
 /*
 AnnotateContext adds context information such as metadata from the request.
+
 At a minimum, the RemoteAddr is included in the fashion of "X-Forwarded-For",
 except that the forwarded destination is not another HTTP service but rather
 a gRPC service.
 */
-func AnnotateContext(ctx context.Context, req *http.Request) (context.Context, error) {
+func AnnotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (context.Context, error) {
 	var pairs []string
 	timeout := DefaultContextTimeout
 	if tm := req.Header.Get(metadataGrpcTimeout); tm != "" {
@@ -49,25 +56,24 @@ func AnnotateContext(ctx context.Context, req *http.Request) (context.Context, e
 	}
 
 	for key, vals := range req.Header {
+	nextval:
 		for _, val := range vals {
-			if key == "Authorization" {
+			// For backwards-compatibility, pass through 'authorization' header with no prefix.
+			if strings.ToLower(key) == "authorization" {
 				pairs = append(pairs, "authorization", val)
+			}
+			for _, m := range mux.headerMatchers {
+				if m(key) {
+					pairs = append(pairs, key, val)
+					continue nextval
+				}
+			}
+			if isPermanentHTTPHeader(key) {
+				pairs = append(pairs, strings.ToLower(fmt.Sprintf("%s%s", MetadataPrefix, key)), val)
 				continue
 			}
-			if key == cookieHeader {
-				pairs = append(pairs, key, val)
-				continue
-			}
-			if strings.EqualFold(key, csrfTokenHeader) {
-				pairs = append(pairs, key, val)
-				continue
-			}
-			if strings.HasPrefix(strings.ToLower(key), corsHeaderPrefix) {
-				pairs = append(pairs, key, val)
-				continue
-			}
-			if strings.HasPrefix(key, metadataHeaderPrefix) {
-				pairs = append(pairs, key[len(metadataHeaderPrefix):], val)
+			if strings.HasPrefix(key, MetadataHeaderPrefix) {
+				pairs = append(pairs, key[len(MetadataHeaderPrefix):], val)
 			}
 		}
 	}
@@ -89,21 +95,17 @@ func AnnotateContext(ctx context.Context, req *http.Request) (context.Context, e
 		}
 	}
 
-	// adding extra headers to metadata
-	pairs = append(pairs,
-		"http-request-method", req.Method,
-		"http-request-endpoint", req.RequestURI,
-		"http-request-host", req.Host,
-		"http-userAgent", req.UserAgent(),
-	)
-
 	if timeout != 0 {
 		ctx, _ = context.WithTimeout(ctx, timeout)
+	}
+	mds := make([]metadata.MD, len(mux.metadataAdders))
+	for i, annotator := range mux.metadataAdders {
+		mds[i] = annotator(ctx, req)
 	}
 	if len(pairs) == 0 {
 		return ctx, nil
 	}
-	return metadata.NewContext(ctx, metadata.Pairs(pairs...)), nil
+	return metadata.NewContext(ctx, metadata.Join(append(mds, metadata.Pairs(pairs...))...)), nil
 }
 
 // ServerMetadata consists of metadata sent from gRPC server.
@@ -158,4 +160,39 @@ func timeoutUnitToDuration(u uint8) (d time.Duration, ok bool) {
 	default:
 	}
 	return
+}
+
+// isPermanentHTTPHeader checks whether hdr belongs to the list of
+// permenant request headers maintained by IANA.
+// http://www.iana.org/assignments/message-headers/message-headers.xml
+func isPermanentHTTPHeader(hdr string) bool {
+	switch hdr {
+	case
+		"Accept",
+		"Accept-Charset",
+		"Accept-Language",
+		"Accept-Ranges",
+		"Authorization",
+		"Cache-Control",
+		"Content-Type",
+		"Cookie",
+		"Date",
+		"Expect",
+		"From",
+		"Host",
+		"If-Match",
+		"If-Modified-Since",
+		"If-None-Match",
+		"If-Schedule-Tag-Match",
+		"If-Unmodified-Since",
+		"Max-Forwards",
+		"Origin",
+		"Pragma",
+		"Referer",
+		"User-Agent",
+		"Via",
+		"Warning":
+		return true
+	}
+	return false
 }

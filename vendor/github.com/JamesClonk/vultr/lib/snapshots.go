@@ -3,6 +3,7 @@ package lib
 import (
 	"net/url"
 	"sort"
+	"strings"
 )
 
 // Snapshot of a virtual machine on Vultr account
@@ -20,9 +21,9 @@ func (s snapshots) Len() int      { return len(s) }
 func (s snapshots) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 func (s snapshots) Less(i, j int) bool {
 	// sort order: description, created
-	if s[i].Description < s[j].Description {
+	if strings.ToLower(s[i].Description) < strings.ToLower(s[j].Description) {
 		return true
-	} else if s[i].Description > s[j].Description {
+	} else if strings.ToLower(s[i].Description) > strings.ToLower(s[j].Description) {
 		return false
 	}
 	return s[i].Created < s[j].Created

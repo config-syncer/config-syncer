@@ -1,7 +1,9 @@
 package: appscode.com/kubed
 import:
 - package: github.com/appscode/api
+  version: master
 - package: github.com/appscode/client
+  version: master
 - package: github.com/appscode/errors
 - package: github.com/appscode/go
 - package: github.com/appscode/log
@@ -12,7 +14,7 @@ import:
 - package: github.com/appscode/voyager
   version: release-1.5
 - package: github.com/coreos/prometheus-operator
-  version: v0.7.0
+  version: v0.8.1
 - package: github.com/influxdata/influxdb
   version: v0.11.0
 - package: github.com/spf13/pflag
@@ -22,12 +24,10 @@ import:
   version: v3.0.59
 - package: github.com/Azure/azure-sdk-for-go
   version: v7.0.1-beta
-- package: k8s.io/apimachinery
-  version: 02fccf9462f0fb0287e82cb8a0f1d03b05f8d704
 - package: k8s.io/client-go
-  version: fcdf37233b57445e4a6a4038ec580e9aaac931de
+  version: e121606b0d09b2e1c467183ee46217fa85a6b672
 - package: k8s.io/kubernetes
-  version: 1.5.2-ac
+  version: 1.5.6-ac
   repo: https://github.com/appscode/kubernetes.git
   vcs: git
 - package: github.com/mikespook/golib

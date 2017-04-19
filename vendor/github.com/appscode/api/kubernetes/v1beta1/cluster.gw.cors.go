@@ -22,7 +22,6 @@ func ExportClustersCorsPatterns() []runtime.Pattern {
 		pattern_Clusters_Reconfigure_0,
 		pattern_Clusters_Delete_0,
 		pattern_Clusters_ClientConfig_0,
-		pattern_Clusters_Instances_0,
 		pattern_Clusters_StartupConfig_0,
 		pattern_Clusters_StartupConfig_1,
 		pattern_Clusters_InstanceByIP_0,

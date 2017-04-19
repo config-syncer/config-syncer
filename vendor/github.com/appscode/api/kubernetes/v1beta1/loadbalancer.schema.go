@@ -20,6 +20,11 @@ func init() {
   "properties": {
     "cluster": {
       "type": "string"
+    },
+    "namespace": {
+      "maxLength": 63,
+      "pattern": "^[a-z0-9](?:[a-z0-9\\-]{0,61}[a-z0-9])?$",
+      "type": "string"
     }
   },
   "type": "object"
@@ -90,9 +95,6 @@ func init() {
         "creation_timestamp": {
           "type": "integer"
         },
-        "json": {
-          "type": "string"
-        },
         "kind": {
           "description": "'kind' defines is it the regular kubernetes instance or the\nappscode superset called Extended Ingress. This field will\nstrictly contains only those two values\n'ingress' - default kubernetes ingress object.\n'extendedIngress' - appscode superset of ingress.\nwhen creating a Loadbalancer from UI this field will always\nbe only 'extendedIngress.' List, Describe, Update and Delete\nwill support both two modes.\nCreate will support only extendedIngress.\nFor Creating or Updating an regular ingress one must use the\nkubectl or direct API calls directly to kubernetes.",
           "type": "string"
@@ -164,6 +166,17 @@ func init() {
       },
       "type": "object"
     },
+    "v1beta1Raw": {
+      "properties": {
+        "data": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "v1beta1Spec": {
       "properties": {
         "backend": {
@@ -208,6 +221,9 @@ func init() {
     },
     "namespace": {
       "type": "string"
+    },
+    "raw": {
+      "$ref": "#/definitions/v1beta1Raw"
     }
   },
   "type": "object"
@@ -228,6 +244,9 @@ func init() {
       "type": "string"
     },
     "namespace": {
+      "type": "string"
+    },
+    "raw": {
       "type": "string"
     }
   },
@@ -278,9 +297,6 @@ func init() {
         "creation_timestamp": {
           "type": "integer"
         },
-        "json": {
-          "type": "string"
-        },
         "kind": {
           "description": "'kind' defines is it the regular kubernetes instance or the\nappscode superset called Extended Ingress. This field will\nstrictly contains only those two values\n'ingress' - default kubernetes ingress object.\n'extendedIngress' - appscode superset of ingress.\nwhen creating a Loadbalancer from UI this field will always\nbe only 'extendedIngress.' List, Describe, Update and Delete\nwill support both two modes.\nCreate will support only extendedIngress.\nFor Creating or Updating an regular ingress one must use the\nkubectl or direct API calls directly to kubernetes.",
           "type": "string"
@@ -352,6 +368,17 @@ func init() {
       },
       "type": "object"
     },
+    "v1beta1Raw": {
+      "properties": {
+        "data": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "v1beta1Spec": {
       "properties": {
         "backend": {
@@ -393,6 +420,9 @@ func init() {
     },
     "name": {
       "type": "string"
+    },
+    "raw": {
+      "$ref": "#/definitions/v1beta1Raw"
     }
   },
   "type": "object"

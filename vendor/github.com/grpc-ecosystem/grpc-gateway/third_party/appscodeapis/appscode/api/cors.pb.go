@@ -86,6 +86,13 @@ func (m *CorsRule) String() string            { return proto.CompactTextString(m
 func (*CorsRule) ProtoMessage()               {}
 func (*CorsRule) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
 
+func (m *CorsRule) GetEnable() bool {
+	if m != nil {
+		return m.Enable
+	}
+	return false
+}
+
 func init() {
 	proto.RegisterType((*CorsRule)(nil), "appscode.api.CorsRule")
 }

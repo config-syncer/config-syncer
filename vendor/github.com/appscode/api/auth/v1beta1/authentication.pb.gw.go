@@ -145,18 +145,18 @@ func RegisterAuthenticationHandler(ctx context.Context, mux *runtime.ServeMux, c
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Authentication_Login_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Authentication_Login_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Authentication_Login_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -173,18 +173,18 @@ func RegisterAuthenticationHandler(ctx context.Context, mux *runtime.ServeMux, c
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Authentication_Login_1(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Authentication_Login_1(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Authentication_Login_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -201,18 +201,18 @@ func RegisterAuthenticationHandler(ctx context.Context, mux *runtime.ServeMux, c
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Authentication_Logout_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Authentication_Logout_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Authentication_Logout_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -229,18 +229,18 @@ func RegisterAuthenticationHandler(ctx context.Context, mux *runtime.ServeMux, c
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Authentication_Logout_1(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Authentication_Logout_1(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Authentication_Logout_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -257,18 +257,18 @@ func RegisterAuthenticationHandler(ctx context.Context, mux *runtime.ServeMux, c
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Authentication_Token_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Authentication_Token_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Authentication_Token_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -285,18 +285,18 @@ func RegisterAuthenticationHandler(ctx context.Context, mux *runtime.ServeMux, c
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Authentication_CSRFToken_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Authentication_CSRFToken_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Authentication_CSRFToken_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 

@@ -1,12 +1,14 @@
 package dtypes
 
 import (
-	"errors"
 	"strconv"
+	"strings"
 
+	"github.com/appscode/errors"
+	_env "github.com/appscode/go/env"
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
-	google_protobuf "github.com/golang/protobuf/ptypes/any"
+	"github.com/golang/protobuf/ptypes/any"
 	"github.com/xeipuuv/gojsonschema"
 )
 
@@ -54,11 +56,83 @@ func (s *Status) StatusString() string {
 	return s.Status
 }
 
+func NewStatusOK(message ...string) *Status {
+	glog.V(4).Infoln("Sending OK response with message ", message)
+	return &Status{
+		Code:    statusCodeString(int32(StatusCode_OK)),
+		Status:  StatusCode_OK.String(),
+		Message: strings.Join(message, ";"),
+	}
+}
+
+func NewStatusFromError(err error) *Status {
+	e := errors.Parse(err)
+	if e == nil {
+		// not an error, so sending ok response
+		return NewStatusOK()
+	}
+	glog.V(4).Infoln("Sending response ", e.Code(), " with message ", e.Message())
+	s := &Status{
+		Code:    statusCodeString(errorToAPICode(e.Code())),
+		Status:  e.Code(),
+		Message: statusMessage(e.Code(), e.Messages()),
+	}
+
+	if errorHelp := e.Help(); errorHelp != nil {
+		s.Help = &Help{
+			Url:         errorHelp.Url,
+			Description: errorHelp.Description,
+		}
+	}
+	if e.Trace() != nil {
+		if !_env.FromHost().IsPublic() {
+			s.AddDetails(&ErrorDetails{
+				RequestedResource: e.Error(),
+				Stacktrace:        e.TraceString(),
+			})
+		}
+	}
+	glog.V(4).Infoln("Sending EROR response with message", e.Messages())
+	return s
+}
+
+func NewStatusUnauthorized() *Status {
+	err := errors.New().Unauthorized()
+	return NewStatusFromError(err)
+}
+
+func NewStatusBadRequest(message ...string) *Status {
+	err := errors.New().WithMessage(message...).BadRequest()
+	return NewStatusFromError(err)
+}
+
+func statusCodeString(code int32) string {
+	return strconv.FormatInt(int64(code), 10)
+}
+
+func errorToAPICode(code string) int32 {
+	c, ok := StatusCode_value[code]
+	if ok {
+		return c
+	}
+	return -1
+}
+
+func statusMessage(code string, msg []string) string {
+	switch code {
+	case errors.Internal:
+		return "Internal Error. Contact support, support@appscode.com"
+	case errors.Unauthorized:
+		return "Unauthorized. Please Login."
+	}
+	return strings.Join(msg, ";")
+}
+
 // Adds any proto message in the details field of the Status message.
 // This uses google.protobuf.any to to hold and retried data.
 func (a *Status) AddDetails(v ...proto.Message) {
 	if len(a.Details) == 0 {
-		a.Details = make([]*google_protobuf.Any, 0)
+		a.Details = make([]*any.Any, 0)
 	}
 	for _, val := range v {
 		value, err := proto.Marshal(val)
@@ -66,7 +140,7 @@ func (a *Status) AddDetails(v ...proto.Message) {
 			glog.V(1).Infoln("Marshaling any failed.")
 			continue
 		}
-		anyValue := &google_protobuf.Any{
+		anyValue := &any.Any{
 			TypeUrl: proto.MessageName(val),
 			Value:   value,
 		}

@@ -3,6 +3,7 @@ package lib
 import (
 	"net/url"
 	"sort"
+	"strings"
 )
 
 // SSHKey on Vultr account
@@ -17,7 +18,7 @@ type sshkeys []SSHKey
 
 func (s sshkeys) Len() int           { return len(s) }
 func (s sshkeys) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s sshkeys) Less(i, j int) bool { return s[i].Name < s[j].Name }
+func (s sshkeys) Less(i, j int) bool { return strings.ToLower(s[i].Name) < strings.ToLower(s[j].Name) }
 
 // GetSSHKeys returns a list of SSHKeys from Vultr account
 func (c *Client) GetSSHKeys() (keys []SSHKey, err error) {

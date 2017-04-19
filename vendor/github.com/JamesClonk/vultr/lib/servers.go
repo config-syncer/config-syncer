@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 // Server (virtual machine) on Vultr account
@@ -37,6 +38,8 @@ type Server struct {
 	KVMUrl           string      `json:"kvm_url"`
 	AutoBackups      string      `json:"auto_backups"`
 	Tag              string      `json:"tag"`
+	OSID             string      `json:"OSID"`
+	AppID            string      `json:"APPID"`
 }
 
 // ServerOptions are optional parameters to be used during server creation
@@ -53,6 +56,7 @@ type ServerOptions struct {
 	DontNotifyOnActivate bool
 	Hostname             string
 	Tag                  string
+	AppID                string
 }
 
 type servers []Server
@@ -61,9 +65,9 @@ func (s servers) Len() int      { return len(s) }
 func (s servers) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 func (s servers) Less(i, j int) bool {
 	// sort order: name, ip
-	if s[i].Name < s[j].Name {
+	if strings.ToLower(s[i].Name) < strings.ToLower(s[j].Name) {
 		return true
-	} else if s[i].Name > s[j].Name {
+	} else if strings.ToLower(s[i].Name) > strings.ToLower(s[j].Name) {
 		return false
 	}
 	return s[i].MainIP < s[j].MainIP
@@ -154,6 +158,18 @@ func (s *Server) UnmarshalJSON(data []byte) (err error) {
 		return err
 	}
 	s.AllowedBandwidth = ab
+
+	value = fmt.Sprintf("%v", fields["OSID"])
+	if value == "<nil>" {
+		value = ""
+	}
+	s.OSID = value
+
+	value = fmt.Sprintf("%v", fields["APPID"])
+	if value == "<nil>" {
+		value = ""
+	}
+	s.AppID = value
 
 	s.ID = fmt.Sprintf("%v", fields["SUBID"])
 	s.Name = fmt.Sprintf("%v", fields["label"])
@@ -290,6 +306,10 @@ func (c *Client) CreateServer(name string, regionID, planID, osID int, options *
 
 		if options.Tag != "" {
 			values.Add("tag", options.Tag)
+		}
+
+		if options.AppID != "" {
+			values.Add("APPID", options.AppID)
 		}
 	}
 
@@ -463,4 +483,31 @@ func (c *Client) BandwidthOfServer(id string) (bandwidth []map[string]string, er
 	}
 
 	return bandwidth, nil
+}
+
+// ChangeApplicationofServer changes the virtual machine to a different application
+func (c *Client) ChangeApplicationofServer(id string, appID string) error {
+	values := url.Values{
+		"SUBID": {id},
+		"APPID": {appID},
+	}
+
+	if err := c.post(`server/app_change`, values, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ListApplicationsforServer lists all available operating systems to which an existing virtual machine can be changed
+func (c *Client) ListApplicationsforServer(id string) (apps []Application, err error) {
+	var appMap map[string]Application
+	if err := c.get(`server/app_change_list?SUBID=`+id, &appMap); err != nil {
+		return nil, err
+	}
+
+	for _, app := range appMap {
+		apps = append(apps, app)
+	}
+	sort.Sort(applications(apps))
+	return apps, nil
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"sort"
+	"strings"
 )
 
 // StartupScript on Vultr account
@@ -17,9 +18,11 @@ type StartupScript struct {
 
 type startupscripts []StartupScript
 
-func (s startupscripts) Len() int           { return len(s) }
-func (s startupscripts) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s startupscripts) Less(i, j int) bool { return s[i].Name < s[j].Name }
+func (s startupscripts) Len() int      { return len(s) }
+func (s startupscripts) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s startupscripts) Less(i, j int) bool {
+	return strings.ToLower(s[i].Name) < strings.ToLower(s[j].Name)
+}
 
 // UnmarshalJSON implements json.Unmarshaller on StartupScript.
 // Necessary because the SCRIPTID field has inconsistent types.

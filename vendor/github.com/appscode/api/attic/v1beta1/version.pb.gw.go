@@ -27,6 +27,10 @@ var _ io.Reader
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
+var (
+	filter_Versions_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"type": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
+
 func request_Versions_List_0(ctx context.Context, marshaler runtime.Marshaler, client VersionsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq VersionListRequest
 	var metadata runtime.ServerMetadata
@@ -49,21 +53,18 @@ func request_Versions_List_0(ctx context.Context, marshaler runtime.Marshaler, c
 		return nil, metadata, err
 	}
 
-	val, ok = pathParams["name"]
-	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
-	}
-
-	protoReq.Name, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, err
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_Versions_List_0); err != nil {
+		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.List(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
+
+var (
+	filter_Versions_Describe_0 = &utilities.DoubleArray{Encoding: map[string]int{"type": 0, "id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+)
 
 func request_Versions_Describe_0(ctx context.Context, marshaler runtime.Marshaler, client VersionsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq VersionDescribeRequest
@@ -87,17 +88,6 @@ func request_Versions_Describe_0(ctx context.Context, marshaler runtime.Marshale
 		return nil, metadata, err
 	}
 
-	val, ok = pathParams["name"]
-	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
-	}
-
-	protoReq.Name, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, err
-	}
-
 	val, ok = pathParams["id"]
 	if !ok {
 		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
@@ -107,6 +97,10 @@ func request_Versions_Describe_0(ctx context.Context, marshaler runtime.Marshale
 
 	if err != nil {
 		return nil, metadata, err
+	}
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_Versions_Describe_0); err != nil {
+		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.Describe(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -157,18 +151,18 @@ func RegisterVersionsHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Versions_List_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Versions_List_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Versions_List_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -185,18 +179,18 @@ func RegisterVersionsHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 			}(ctx.Done(), cn.CloseNotify())
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		}
 		resp, md, err := request_Versions_Describe_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Versions_Describe_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Versions_Describe_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -204,9 +198,9 @@ func RegisterVersionsHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 }
 
 var (
-	pattern_Versions_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 2, 7, 2, 8}, []string{"_appscode", "api", "attic", "v1beta1", "artifacts", "type", "name", "versions", "json"}, ""))
+	pattern_Versions_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 2, 7}, []string{"_appscode", "api", "attic", "v1beta1", "artifacts", "type", "versions", "json"}, ""))
 
-	pattern_Versions_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 2, 9}, []string{"_appscode", "api", "attic", "v1beta1", "artifacts", "type", "name", "versions", "id", "json"}, ""))
+	pattern_Versions_Describe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"_appscode", "api", "attic", "v1beta1", "artifacts", "type", "versions", "id", "json"}, ""))
 )
 
 var (

@@ -1,6 +1,9 @@
 package lib
 
-import "sort"
+import (
+	"sort"
+	"strings"
+)
 
 // OS image on Vultr
 type OS struct {
@@ -16,7 +19,7 @@ type oses []OS
 
 func (s oses) Len() int           { return len(s) }
 func (s oses) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s oses) Less(i, j int) bool { return s[i].Name < s[j].Name }
+func (s oses) Less(i, j int) bool { return strings.ToLower(s[i].Name) < strings.ToLower(s[j].Name) }
 
 // GetOS returns a list of all available operating systems on Vultr
 func (c *Client) GetOS() ([]OS, error) {

@@ -17,6 +17,9 @@ func init() {
   "properties": {
     "phid": {
       "type": "string"
+    },
+    "timestamp": {
+      "type": "integer"
     }
   },
   "type": "object"

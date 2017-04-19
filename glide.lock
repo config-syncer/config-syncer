@@ -1,5 +1,5 @@
-hash: 15aa34390b774d960c6d5bb0c9d4ff60701d20332e3dfccc788df36f91d309ea
-updated: 2017-03-18T04:56:51.3506943-07:00
+hash: 482ce2e06fbf6e379656a177cbab1c3821f8cc31751c6898bf96bb1f67c26e6b
+updated: 2017-04-19T10:09:29.264002717-07:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -9,16 +9,14 @@ imports:
   - compute/metadata
   - internal
 - name: github.com/appscode/api
-  version: 66e5242f33a4ef581eba2aaf36c84ae41009ea60
+  version: 2653ff310b43b1e2d655d7e381f79803bf10dc64
   subpackages:
   - attic/v1beta1
   - auth/v1beta1
   - certificate/v1beta1
   - ci/v1beta1
   - credential/v1beta1
-  - db/v1beta1
   - dtypes
-  - glusterfs/v1beta1
   - health
   - kubernetes/v1beta1
   - kubernetes/v1beta2
@@ -28,14 +26,14 @@ imports:
   - ssh/v1beta1
   - version
 - name: github.com/appscode/client
-  version: 6cf48ec95fe4eddcd88d6c5c56ad5eede95f68bb
+  version: 24d9ff98e3215ee585c6d43699c8ff01aa1521bc
   subpackages:
   - credential
   - util
 - name: github.com/appscode/errors
-  version: 6a668ba07d02064c06707b7d8b0f5239db707045
+  version: 87fb529db75df5295ccccd15cb038587cd5a9dd2
 - name: github.com/appscode/go
-  version: b9008e99fa90d7806f404e0eab52bdecb4444826
+  version: bd371af23fb2398b60c065a9e07df5084422d6ad
   subpackages:
   - arrays
   - crypto/rand
@@ -48,7 +46,7 @@ imports:
   - version
   - wait
 - name: github.com/appscode/k8s-addons
-  version: 2feea95b0d62ad215bef8d0789978be7c9d58d06
+  version: 3e80e94240b591fcb80f354fb77fdb3085f38675
   subpackages:
   - api
   - api/install
@@ -62,7 +60,7 @@ imports:
   subpackages:
   - golog
 - name: github.com/appscode/searchlight
-  version: 536d3ef8e6d2658b31e0fc8073903e471d7c2896
+  version: 0a7da39d93fa82deb114ac55095d8777918130fd
   subpackages:
   - data
   - data/files
@@ -78,14 +76,14 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: ab69c9b0eb10c1d7774198aa4321e610a5d0e4e0
+  version: 10473630e036e860ce454fe528290350e543f5d4
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
   - pkg/controller/ingress
   - pkg/controller/ingress/template
 - name: github.com/aws/aws-sdk-go
-  version: c924893c38ecc04b18d7aab8a7aa561cb8b4c4cc
+  version: 63ce630574a5ec05ecd8e8de5cea16332a5a684d
   subpackages:
   - aws
   - aws/awserr
@@ -95,11 +93,15 @@ imports:
   - aws/corehandlers
   - aws/credentials
   - aws/credentials/ec2rolecreds
+  - aws/credentials/endpointcreds
+  - aws/credentials/stscreds
   - aws/defaults
   - aws/ec2metadata
+  - aws/endpoints
   - aws/request
   - aws/session
-  - private/endpoints
+  - aws/signer/v4
+  - private/protocol
   - private/protocol/ec2query
   - private/protocol/json/jsonutil
   - private/protocol/jsonrpc
@@ -108,13 +110,13 @@ imports:
   - private/protocol/rest
   - private/protocol/restxml
   - private/protocol/xml/xmlutil
-  - private/signer/v4
   - private/waiter
   - service/autoscaling
   - service/ec2
   - service/ecr
   - service/elb
   - service/route53
+  - service/sts
 - name: github.com/Azure/azure-sdk-for-go
   version: 0984e0641ae43b89283223034574d6465be93bf4
   subpackages:
@@ -123,7 +125,7 @@ imports:
   - arm/storage
   - storage
 - name: github.com/Azure/go-autorest
-  version: e0c77ecbe74311e03f2a629834d2110f031f1453
+  version: d7c034a8af24eda120dd6460bfcd6d9ed14e43ca
   subpackages:
   - autorest
   - autorest/azure
@@ -153,7 +155,7 @@ imports:
   - httputil
   - timeutil
 - name: github.com/coreos/prometheus-operator
-  version: 43fdeb95df2003c216b63a2cc486c052033bd4c7
+  version: 6eaca3f4ce6cd9d7384097ac484b0178a95bfc56
   subpackages:
   - pkg/client/monitoring/v1alpha1
 - name: github.com/davecgh/go-spew
@@ -162,6 +164,10 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
+- name: github.com/dnsimple/dnsimple-go
+  version: 5a5b427618a76f9eed5ede0f3e6306fbd9311d2e
+  subpackages:
+  - dnsimple
 - name: github.com/docker/distribution
   version: cd27f179f2c10c5d300e6d09025b538c475b0d51
   subpackages:
@@ -192,7 +198,7 @@ imports:
 - name: github.com/docker/go-units
   version: 0bbddae09c5a5419a8c6dcdd7ff90da3d450393b
 - name: github.com/emicklei/go-restful
-  version: 09691a3b6378b740595c1002f40c34dd5f218a22
+  version: 89ef8af493ab468a45a42bb0d89a06fccdd2fb22
   subpackages:
   - log
   - swagger
@@ -220,23 +226,26 @@ imports:
 - name: github.com/golang/glog
   version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/protobuf
-  version: 888eb0692c857ec880338addf316bd662d5e630e
+  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
   subpackages:
   - jsonpb
   - proto
   - protoc-gen-go/descriptor
   - ptypes/any
+- name: github.com/google/go-querystring
+  version: 547ef5ac979778feb2f760cdb5f4eae1a2207b86
+  subpackages:
+  - query
 - name: github.com/google/gofuzz
-  version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
+  version: bbcb9da2d746f8bdbd6a936686a0a6067ada0ec5
 - name: github.com/grpc-ecosystem/grpc-gateway
-  version: 1923bb600d4a5a045b73f5c61549398bc5de9d56
-  repo: git@github.com:appscode/grpc-gateway.git
+  version: c5404aec15f65a822be621c29f98bfd14a046494
+  repo: https://github.com/appscode/grpc-gateway.git
   vcs: git
   subpackages:
   - runtime
   - runtime/internal
   - third_party/appscodeapis/appscode/api
-  - third_party/googleapis/google/api
   - utilities
 - name: github.com/howeyc/gopass
   version: 3ca23474a7c7203e0a0a070fd33508f6efdb9b3d
@@ -251,7 +260,7 @@ imports:
   - models
   - pkg/escape
 - name: github.com/JamesClonk/vultr
-  version: 6d897f570bcdfa613af6a10efd16601de4707ae1
+  version: 0f156dd232bc4ebf8a32ba83fec57c0e4c9db69f
   subpackages:
   - lib
 - name: github.com/jmespath/go-jmespath
@@ -362,15 +371,15 @@ imports:
   subpackages:
   - zk
 - name: github.com/spf13/cobra
-  version: f62e98d28ab7ad31d707ba837a966378465c7b57
+  version: 9c28e4bbd74e5c3ed7aacbc552b2cab7cfdfe744
 - name: github.com/spf13/pflag
-  version: 5ccb023bc27df288a957c5e994cd44fd19619465
+  version: c7e63cf4530bcd3ba943729cee0efeff2ebea63f
 - name: github.com/timewasted/linode
   version: 37e84520dcf74488f67654f9c775b9752c232dc1
   subpackages:
   - dns
 - name: github.com/ugorji/go
-  version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
+  version: f1f1a805ed361a0e078bb537e4ea78cd37dcf065
   subpackages:
   - codec
 - name: github.com/vaughan0/go-ini
@@ -397,10 +406,6 @@ imports:
   subpackages:
   - photon
   - photon/lightwave
-- name: github.com/weppos/dnsimple-go
-  version: 65c1ca73cb19baf0f8b2b33219b7f57595a3ccb0
-  subpackages:
-  - dnsimple
 - name: github.com/xanzy/go-cloudstack
   version: 1e2cbf647e57fa90353612074fdfc42faf5073bf
   subpackages:
@@ -412,7 +417,7 @@ imports:
 - name: github.com/xeipuuv/gojsonschema
   version: 93e72a773fade158921402d6a24c819b48aba29d
 - name: github.com/xenolf/lego
-  version: 9daa55c337f252e32554e849cb399ae12c9fa21a
+  version: 5ee956d6ca4ffbd8b940fc3ecb6e109c99d9a68a
   repo: https://github.com/appscode/lego.git
   vcs: git
   subpackages:
@@ -432,12 +437,12 @@ imports:
   - providers/dns/route53
   - providers/dns/vultr
 - name: golang.org/x/crypto
-  version: d172538b2cfce0c13cee31e647d0367aa8cd2486
+  version: 1f22c0103821b9390939b6776727195525381532
   subpackages:
   - ocsp
   - ssh/terminal
 - name: golang.org/x/net
-  version: f4b625ec9b21d620bb5ce57f2dfc3e08ca97fce6
+  version: e90d6d0afc4c315a0d87a568ae68577cc15149a0
   subpackages:
   - context
   - context/ctxhttp
@@ -494,16 +499,23 @@ imports:
   - internal/remote_api
   - internal/urlfetch
   - urlfetch
+- name: google.golang.org/genproto
+  version: 411e09b969b1170a9f0c467558eb4c4c110d9c77
+  subpackages:
+  - googleapis/api/annotations
 - name: google.golang.org/grpc
-  version: 777daa17ff9b5daef1cfdf915088a2ada3332bf0
+  version: 8050b9cbc271307e5a716a9d782803d09b0d6f2d
   subpackages:
   - codes
   - credentials
   - grpclog
   - internal
+  - keepalive
   - metadata
   - naming
   - peer
+  - stats
+  - tap
   - transport
 - name: gopkg.in/gcfg.v1
   version: 083575c3955c85df16fe9590cceab64d03f5eb6e
@@ -532,23 +544,33 @@ imports:
   - json
 - name: gopkg.in/yaml.v2
   version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
-- name: k8s.io/apimachinery
-  version: 02fccf9462f0fb0287e82cb8a0f1d03b05f8d704
+- name: k8s.io/client-go
+  version: e121606b0d09b2e1c467183ee46217fa85a6b672
   subpackages:
+  - dynamic
+  - pkg/api
   - pkg/api/errors
   - pkg/api/meta
-  - pkg/apimachinery
-  - pkg/apimachinery/announced
-  - pkg/apimachinery/registered
-  - pkg/apis/meta/v1
-  - pkg/apis/meta/v1/unstructured
+  - pkg/api/meta/metatypes
+  - pkg/api/resource
+  - pkg/api/unversioned
+  - pkg/api/v1
+  - pkg/api/validation/path
+  - pkg/apis/apps
+  - pkg/apis/autoscaling
+  - pkg/apis/batch
+  - pkg/apis/certificates
+  - pkg/apis/extensions
+  - pkg/apis/policy
+  - pkg/apis/rbac
+  - pkg/apis/storage
+  - pkg/auth/user
   - pkg/conversion
   - pkg/conversion/queryparams
   - pkg/fields
+  - pkg/genericapiserver/openapi/common
   - pkg/labels
-  - pkg/openapi
   - pkg/runtime
-  - pkg/runtime/schema
   - pkg/runtime/serializer
   - pkg/runtime/serializer/json
   - pkg/runtime/serializer/protobuf
@@ -556,38 +578,34 @@ imports:
   - pkg/runtime/serializer/streaming
   - pkg/runtime/serializer/versioning
   - pkg/selection
+  - pkg/third_party/forked/golang/reflect
   - pkg/types
+  - pkg/util
+  - pkg/util/cert
+  - pkg/util/clock
   - pkg/util/diff
   - pkg/util/errors
+  - pkg/util/flowcontrol
   - pkg/util/framer
+  - pkg/util/homedir
+  - pkg/util/integer
+  - pkg/util/intstr
   - pkg/util/json
+  - pkg/util/labels
   - pkg/util/net
+  - pkg/util/parsers
   - pkg/util/rand
   - pkg/util/runtime
   - pkg/util/sets
+  - pkg/util/uuid
   - pkg/util/validation
   - pkg/util/validation/field
   - pkg/util/wait
   - pkg/util/yaml
   - pkg/version
   - pkg/watch
-  - third_party/forked/golang/reflect
-- name: k8s.io/client-go
-  version: fcdf37233b57445e4a6a4038ec580e9aaac931de
-  subpackages:
-  - dynamic
-  - pkg/api
-  - pkg/api/resource
-  - pkg/api/v1
-  - pkg/apis/autoscaling
-  - pkg/apis/extensions
-  - pkg/util
-  - pkg/util/intstr
-  - pkg/util/labels
-  - pkg/util/parsers
-  - pkg/version
+  - pkg/watch/versioned
   - rest
-  - rest/watch
   - tools/auth
   - tools/cache
   - tools/clientcmd
@@ -596,13 +614,8 @@ imports:
   - tools/clientcmd/api/v1
   - tools/metrics
   - transport
-  - util/cert
-  - util/clock
-  - util/flowcontrol
-  - util/homedir
-  - util/integer
 - name: k8s.io/kubernetes
-  version: 456adbd9c5f82f5033ec9cfe4ccdfcb8ced67cc1
+  version: 92d272dff48ff092dc25eecbb2890bf4d61dbaab
   repo: https://github.com/appscode/kubernetes.git
   vcs: git
   subpackages:
