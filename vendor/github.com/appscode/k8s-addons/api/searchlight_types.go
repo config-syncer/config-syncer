@@ -25,20 +25,20 @@ type AlertPhase string
 
 const (
 	// used for Alert that are currently creating
-	PhaseAlertCreating AlertPhase = "Creating"
+	AlertPhaseCreating AlertPhase = "Creating"
 	// used for Alert that are created
-	PhaseAlertCreated AlertPhase = "Created"
+	AlertPhaseCreated AlertPhase = "Created"
 	// used for Alert that are currently deleting
-	PhaseAlertDeleting AlertPhase = "Deleting"
+	AlertPhaseDeleting AlertPhase = "Deleting"
 	// used for Alert that are Failed
-	PhaseAlertFailed AlertPhase = "Failed"
+	AlertPhaseFailed AlertPhase = "Failed"
 )
 
 type AlertStatus struct {
-	Created *unversioned.Time `json:"created,omitempty"`
-	Updated *unversioned.Time `json:"updated,omitempty"`
-	Phase   AlertPhase        `json:"phase,omitempty"`
-	Reason  string            `json:"reason,omitempty"`
+	CreationTime *unversioned.Time `json:"creationTime,omitempty"`
+	UpdateTime   *unversioned.Time `json:"updateTime,omitempty"`
+	Phase        AlertPhase        `json:"phase,omitempty"`
+	Reason       string            `json:"reason,omitempty"`
 }
 
 // AlertList is a collection of Alert.

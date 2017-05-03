@@ -56,24 +56,15 @@ func AnnotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 	}
 
 	for key, vals := range req.Header {
-	nextval:
 		for _, val := range vals {
 			// For backwards-compatibility, pass through 'authorization' header with no prefix.
 			if strings.ToLower(key) == "authorization" {
 				pairs = append(pairs, "authorization", val)
 			}
-			for _, m := range mux.headerMatchers {
-				if m(key) {
-					pairs = append(pairs, key, val)
-					continue nextval
+			if mux.incomingHeaderMatcher != nil {
+				if h, ok := mux.incomingHeaderMatcher(key); ok {
+					pairs = append(pairs, h, val)
 				}
-			}
-			if isPermanentHTTPHeader(key) {
-				pairs = append(pairs, strings.ToLower(fmt.Sprintf("%s%s", MetadataPrefix, key)), val)
-				continue
-			}
-			if strings.HasPrefix(key, MetadataHeaderPrefix) {
-				pairs = append(pairs, key[len(MetadataHeaderPrefix):], val)
 			}
 		}
 	}
@@ -98,14 +89,14 @@ func AnnotateContext(ctx context.Context, mux *ServeMux, req *http.Request) (con
 	if timeout != 0 {
 		ctx, _ = context.WithTimeout(ctx, timeout)
 	}
-	mds := make([]metadata.MD, len(mux.metadataAdders))
-	for i, annotator := range mux.metadataAdders {
-		mds[i] = annotator(ctx, req)
-	}
 	if len(pairs) == 0 {
 		return ctx, nil
 	}
-	return metadata.NewContext(ctx, metadata.Join(append(mds, metadata.Pairs(pairs...))...)), nil
+	md := metadata.Pairs(pairs...)
+	if mux.metadataAnnotator != nil {
+		md = metadata.Join(md, mux.metadataAnnotator(ctx, req))
+	}
+	return metadata.NewOutgoingContext(ctx, md), nil
 }
 
 // ServerMetadata consists of metadata sent from gRPC server.

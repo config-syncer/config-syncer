@@ -2,11 +2,11 @@ package runtime
 
 import (
 	"net/http"
+	"net/textproto"
 	"strings"
 
-	"golang.org/x/net/context"
-
 	"github.com/golang/protobuf/proto"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -20,8 +20,9 @@ type ServeMux struct {
 	handlers               map[string][]handler
 	forwardResponseOptions []func(context.Context, http.ResponseWriter, proto.Message) error
 	marshalers             marshalerRegistry
-	headerMatchers         []func(string) bool
-	metadataAdders         []func(context.Context, *http.Request) metadata.MD
+	incomingHeaderMatcher  HeaderMatcherFunc
+	outgoingHeaderMatcher  HeaderMatcherFunc
+	metadataAnnotator      func(context.Context, *http.Request) metadata.MD
 }
 
 // ServeMuxOption is an option that can be given to a ServeMux on construction.
@@ -39,10 +40,50 @@ func WithForwardResponseOption(forwardResponseOption func(context.Context, http.
 	}
 }
 
-// WithMetadata returns metadata to be passed with context.
+// HeaderMatcherFunc checks whether a header key should be forwarded to/from gRPC context.
+type HeaderMatcherFunc func(string) (string, bool)
+
+// DefaultHeaderMatcher is used to pass http request headers to/from gRPC context. This adds permanent HTTP header
+// keys (as specified by the IANA) to gRPC context with grpcgateway- prefix. HTTP headers that start with
+// 'Grpc-Metadata-' are mapped to gRPC metadata after removing prefix 'Grpc-Metadata-'.
+func DefaultHeaderMatcher(key string) (string, bool) {
+	key = textproto.CanonicalMIMEHeaderKey(key)
+	if isPermanentHTTPHeader(key) {
+		return MetadataPrefix + key, true
+	} else if strings.HasPrefix(key, MetadataHeaderPrefix) {
+		return key[len(MetadataHeaderPrefix):], true
+	}
+	return "", false
+}
+
+// WithIncomingHeaderMatcher returns a ServeMuxOption representing a headerMatcher for incoming request to gateway.
+//
+// This matcher will be called with each header in http.Request. If matcher returns true, that header will be
+// passed to gRPC context. To transform the header before passing to gRPC context, matcher should return modified header.
+func WithIncomingHeaderMatcher(fn HeaderMatcherFunc) ServeMuxOption {
+	return func(mux *ServeMux) {
+		mux.incomingHeaderMatcher = fn
+	}
+}
+
+// WithOutgoingHeaderMatcher returns a ServeMuxOption representing a headerMatcher for outgoing response from gateway.
+//
+// This matcher will be called with each header in response header metadata. If matcher returns true, that header will be
+// passed to http response returned from gateway. To transform the header before passing to response,
+// matcher should return modified header.
+func WithOutgoingHeaderMatcher(fn HeaderMatcherFunc) ServeMuxOption {
+	return func(mux *ServeMux) {
+		mux.outgoingHeaderMatcher = fn
+	}
+}
+
+// WithMetadata returns a ServeMuxOption for passing metadata to a gRPC context.
+//
+// This can be used by services that need to read from http.Request and modify gRPC context. A common use case
+// is reading token from cookie and adding it in gRPC context.
 func WithMetadata(annotator func(context.Context, *http.Request) metadata.MD) ServeMuxOption {
 	return func(serveMux *ServeMux) {
-		serveMux.metadataAdders = append(serveMux.metadataAdders, annotator)
+		serveMux.metadataAnnotator = annotator
 	}
 }
 
@@ -52,8 +93,7 @@ func NewServeMux(opts ...ServeMuxOption) *ServeMux {
 		handlers:               make(map[string][]handler),
 		forwardResponseOptions: make([]func(context.Context, http.ResponseWriter, proto.Message) error, 0),
 		marshalers:             makeMarshalerMIMERegistry(),
-		headerMatchers:         make([]func(string) bool, 0),
-		metadataAdders:          make([]func(context.Context, *http.Request) metadata.MD, 0),
+		incomingHeaderMatcher:  DefaultHeaderMatcher,
 	}
 
 	for _, opt := range opts {

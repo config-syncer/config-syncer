@@ -16,10 +16,7 @@ import "github.com/grpc-ecosystem/grpc-gateway/runtime"
 func ExportAuthenticationCorsPatterns() []runtime.Pattern {
 	return []runtime.Pattern{
 		pattern_Authentication_Login_0,
-		pattern_Authentication_Login_1,
 		pattern_Authentication_Logout_0,
-		pattern_Authentication_Logout_1,
-		pattern_Authentication_Token_0,
 		pattern_Authentication_CSRFToken_0,
 	}
 }

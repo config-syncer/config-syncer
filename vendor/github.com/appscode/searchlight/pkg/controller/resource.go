@@ -13,7 +13,7 @@ import (
 )
 
 func (b *IcingaController) IsObjectExists() error {
-	log.Infoln("Checking Kubernetes Object existance", b.ctx.Resource.ObjectMeta)
+	log.Infoln("Checking Kubernetes Object existence", b.ctx.Resource.ObjectMeta)
 	b.parseAlertOptions()
 
 	var err error
