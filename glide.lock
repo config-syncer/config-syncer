@@ -1,5 +1,5 @@
 hash: 482ce2e06fbf6e379656a177cbab1c3821f8cc31751c6898bf96bb1f67c26e6b
-updated: 2017-05-02T23:51:35.588939512-07:00
+updated: 2017-05-03T11:26:33.280071449-07:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -76,7 +76,7 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: 016ef36eb44b1a0f56c02e5b2ffaf65b81d30256
+  version: 1dd8d549734d7a02f408cf1de2ad6941360a5395
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
@@ -619,7 +619,7 @@ imports:
   - tools/metrics
   - transport
 - name: k8s.io/kubernetes
-  version: 92d272dff48ff092dc25eecbb2890bf4d61dbaab
+  version: 93e7daf07e4f6979622ae9d470d54a766b189513
   repo: https://github.com/appscode/kubernetes.git
   vcs: git
   subpackages:
