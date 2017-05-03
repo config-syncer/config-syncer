@@ -1,5 +1,5 @@
 hash: 482ce2e06fbf6e379656a177cbab1c3821f8cc31751c6898bf96bb1f67c26e6b
-updated: 2017-05-03T11:26:33.280071449-07:00
+updated: 2017-05-03T16:34:33.388111422-07:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -46,7 +46,7 @@ imports:
   - version
   - wait
 - name: github.com/appscode/k8s-addons
-  version: 1ce2385fa9796c6079e304058451a96f3f88b003
+  version: 8861b7938c5626baa96ebeb5c4146342806cd591
   subpackages:
   - api
   - api/install
@@ -76,7 +76,7 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: 1dd8d549734d7a02f408cf1de2ad6941360a5395
+  version: 2767ed16ecff0285489b898de805e3b27c1b1534
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
