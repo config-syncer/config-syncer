@@ -1,5 +1,5 @@
 hash: 482ce2e06fbf6e379656a177cbab1c3821f8cc31751c6898bf96bb1f67c26e6b
-updated: 2017-05-03T16:34:33.388111422-07:00
+updated: 2017-05-08T06:08:47.477160218-07:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -9,7 +9,7 @@ imports:
   - compute/metadata
   - internal
 - name: github.com/appscode/api
-  version: ca0987240ed0c60252fa08ee6c3d6ef07405070f
+  version: 8a929a1fcc2b6bd1563aeb07b1e1bbdcae64d0d2
   subpackages:
   - attic/v1beta1
   - auth/v1beta1
@@ -33,7 +33,7 @@ imports:
 - name: github.com/appscode/errors
   version: 87fb529db75df5295ccccd15cb038587cd5a9dd2
 - name: github.com/appscode/go
-  version: 16dae34745b8c485f42293ad6d16ea7d6c129564
+  version: 496a78e678c2a161788f53f94bdb0ab9c812231f
   subpackages:
   - arrays
   - crypto/rand
@@ -76,7 +76,7 @@ imports:
   - pkg/controller/host/pod
   - pkg/controller/types
 - name: github.com/appscode/voyager
-  version: 2767ed16ecff0285489b898de805e3b27c1b1534
+  version: bc53fcf1775db5690bca8513af89b39f4f77bff4
   subpackages:
   - pkg/controller/certificates
   - pkg/controller/certificates/providers
@@ -371,9 +371,9 @@ imports:
   subpackages:
   - zk
 - name: github.com/spf13/cobra
-  version: 8f0203be891287870100e4af46262cdf4a4261d1
+  version: c0bd07d7baca71fb9100f2eaae35bd451a80c506
 - name: github.com/spf13/pflag
-  version: c990990ab4981d84da820b7b00c85139ca150b5f
+  version: 80fe0fb4eba54167e2ccae1c6c950e72abf61b73
 - name: github.com/timewasted/linode
   version: 37e84520dcf74488f67654f9c775b9752c232dc1
   subpackages:
