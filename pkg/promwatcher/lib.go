@@ -148,11 +148,11 @@ func (p *PromWatcher) deleteProxyDeployment(prometheusName, namespace string) er
 	time.Sleep(time.Second * 30)
 	check := 0
 	for {
-		podList, err := p.Storage.PodStore.List(labelSelector)
+		podList, err := p.Client.Core().Pods(deployment.Namespace).List(kapi.ListOptions{LabelSelector: labelSelector})
 		if err != nil {
 			return err
 		}
-		if len(podList) == 0 {
+		if len(podList.Items) == 0 {
 			break
 		}
 
