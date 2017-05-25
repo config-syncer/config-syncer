@@ -22,7 +22,6 @@ func main() {
 	pflag.StringVar(&config.Master, "master", config.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
 	pflag.StringVar(&config.KubeConfig, "kubeconfig", config.KubeConfig, "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
 	pflag.StringVar(&config.APIEndpoint, "api-endpoint", config.APIEndpoint, "appscode api server host:port")
-	pflag.StringVar(&config.ProviderName, "cloud-provider", config.ProviderName, "Name of cloud provider")
 	pflag.StringVar(&config.ClusterName, "cluster-name", config.ClusterName, "Name of Kubernetes cluster")
 	pflag.StringVar(&config.ESEndpoint, "es-endpoint", config.ESEndpoint, "Endpoint of elasticsearch")
 	pflag.StringVar(&config.InfluxSecretName, "influx-secret", config.InfluxSecretName, "Influxdb secret name")
@@ -34,7 +33,6 @@ func main() {
 	defer logs.FlushLogs()
 
 	if config.APIEndpoint == "" ||
-		config.ProviderName == "" ||
 		config.ClusterName == "" ||
 		config.APITokenPath == "" {
 		log.Fatalln("required flag not provided.")
