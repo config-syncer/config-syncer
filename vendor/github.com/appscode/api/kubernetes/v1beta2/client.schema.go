@@ -2,7 +2,6 @@ package v1beta2
 
 // Auto-generated. DO NOT EDIT.
 import (
-	"github.com/appscode/api/dtypes"
 	"github.com/golang/glog"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -565,15 +564,3 @@ func (m *DeleteResourceRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *DeleteResourceRequest) IsRequest() {}
 
-func (m *DiskDescribeResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *DescribeResourceResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *DiskListResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *ListResourceResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}

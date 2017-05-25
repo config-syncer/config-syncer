@@ -2,7 +2,6 @@ package v1beta1
 
 // Auto-generated. DO NOT EDIT.
 import (
-	"github.com/appscode/api/dtypes"
 	"github.com/golang/glog"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -328,18 +327,3 @@ func (m *ClusterClientConfigRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *ClusterClientConfigRequest) IsRequest() {}
 
-func (m *ClusterListResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *ClusterInstanceByIPResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *ClusterClientConfigResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *ClusterStartupConfigResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *ClusterDescribeResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}

@@ -2,7 +2,6 @@ package v1beta1
 
 // Auto-generated. DO NOT EDIT.
 import (
-	"github.com/appscode/api/dtypes"
 	"github.com/golang/glog"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -56,17 +55,6 @@ func init() {
 	createRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
   "$schema": "http://json-schema.org/draft-04/schema#",
   "definitions": {
-    "kubernetesv1beta1Status": {
-      "properties": {
-        "status": {
-          "items": {
-            "$ref": "#/definitions/v1beta1LoadBalancerStatus"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
     "v1beta1HTTPLoadBalancerRule": {
       "properties": {
         "backend": {
@@ -115,7 +103,7 @@ func init() {
           "$ref": "#/definitions/v1beta1Spec"
         },
         "status": {
-          "$ref": "#/definitions/kubernetesv1beta1Status"
+          "$ref": "#/definitions/v1beta1Status"
         }
       },
       "type": "object"
@@ -185,6 +173,17 @@ func init() {
         "rules": {
           "items": {
             "$ref": "#/definitions/v1beta1LoadBalancerRule"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "v1beta1Status": {
+      "properties": {
+        "status": {
+          "items": {
+            "$ref": "#/definitions/v1beta1LoadBalancerStatus"
           },
           "type": "array"
         }
@@ -258,17 +257,6 @@ func init() {
 	updateRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
   "$schema": "http://json-schema.org/draft-04/schema#",
   "definitions": {
-    "kubernetesv1beta1Status": {
-      "properties": {
-        "status": {
-          "items": {
-            "$ref": "#/definitions/v1beta1LoadBalancerStatus"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
     "v1beta1HTTPLoadBalancerRule": {
       "properties": {
         "backend": {
@@ -317,7 +305,7 @@ func init() {
           "$ref": "#/definitions/v1beta1Spec"
         },
         "status": {
-          "$ref": "#/definitions/kubernetesv1beta1Status"
+          "$ref": "#/definitions/v1beta1Status"
         }
       },
       "type": "object"
@@ -393,6 +381,17 @@ func init() {
       },
       "type": "object"
     },
+    "v1beta1Status": {
+      "properties": {
+        "status": {
+          "items": {
+            "$ref": "#/definitions/v1beta1LoadBalancerStatus"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
     "v1beta1TCPLoadBalancerRule": {
       "properties": {
         "SSL_secret_name": {
@@ -457,9 +456,3 @@ func (m *UpdateRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *UpdateRequest) IsRequest() {}
 
-func (m *ListResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *DescribeResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}

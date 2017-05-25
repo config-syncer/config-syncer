@@ -2,7 +2,6 @@ package v1beta1
 
 // Auto-generated. DO NOT EDIT.
 import (
-	"github.com/appscode/api/dtypes"
 	"github.com/golang/glog"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -127,12 +126,3 @@ func (m *CredentialIsAuthorizedRequest) IsValid() (*gojsonschema.Result, error) 
 }
 func (m *CredentialIsAuthorizedRequest) IsRequest() {}
 
-func (m *CredentialIsAuthorizedResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *CredentialDescribeResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *CredentialListResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}

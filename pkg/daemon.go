@@ -19,7 +19,6 @@ import (
 	promwatcher "github.com/appscode/kubed/pkg/promwatcher"
 	"github.com/appscode/kubed/pkg/watcher"
 	"github.com/appscode/log"
-	"github.com/appscode/searchlight/pkg/client/icinga"
 	"github.com/appscode/searchlight/pkg/client/influxdb"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	cgcmd "k8s.io/client-go/tools/clientcmd"
@@ -32,15 +31,11 @@ type Config struct {
 	APIEndpoint           string
 	ProviderName          string
 	ClusterName           string
-	LoadbalancerImageName string
 	Master                string
 	KubeConfig            string
 	ESEndpoint            string
 	InfluxSecretName      string
 	InfluxSecretNamespace string
-	IcingaSecretName      string
-	IcingaSecretNamespace string
-	IngressClass          string
 	EnablePromMonitoring  bool
 }
 
@@ -64,19 +59,7 @@ func Run(config *Config) {
 			SyncPeriod:              time.Minute * 2,
 		},
 		AppsCodeApiClientOptions: apiOptions,
-		ProviderName:             config.ProviderName,
 		ClusterName:              config.ClusterName,
-		LoadbalancerImage:        config.LoadbalancerImageName,
-		IngressClass:             config.IngressClass,
-	}
-
-	if config.IcingaSecretName != "" {
-		// Icinga client
-		icingaClient, err := icinga.NewIcingaClient(kubeWatcher.Client, config.IcingaSecretName, config.IcingaSecretNamespace)
-		if err != nil {
-			log.Errorln(err)
-		}
-		kubeWatcher.IcingaClient = icingaClient
 	}
 
 	log.Infoln("configuration loadded, running kubed watcher")

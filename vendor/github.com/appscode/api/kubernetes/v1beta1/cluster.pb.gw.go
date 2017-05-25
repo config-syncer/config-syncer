@@ -20,10 +20,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/status"
 )
 
 var _ codes.Code
 var _ io.Reader
+var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
@@ -36,7 +38,7 @@ func request_Clusters_List_0(ctx context.Context, marshaler runtime.Marshaler, c
 	var metadata runtime.ServerMetadata
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_Clusters_List_0); err != nil {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "%v", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.List(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -57,7 +59,7 @@ func request_Clusters_Describe_0(ctx context.Context, marshaler runtime.Marshale
 
 	val, ok = pathParams["uid"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "uid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "uid")
 	}
 
 	protoReq.Uid, err = runtime.String(val)
@@ -76,7 +78,7 @@ func request_Clusters_Create_0(ctx context.Context, marshaler runtime.Marshaler,
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "%v", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.Create(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -89,7 +91,7 @@ func request_Clusters_Update_0(ctx context.Context, marshaler runtime.Marshaler,
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "%v", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	var (
@@ -101,7 +103,7 @@ func request_Clusters_Update_0(ctx context.Context, marshaler runtime.Marshaler,
 
 	val, ok = pathParams["name"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
 	}
 
 	protoReq.Name, err = runtime.String(val)
@@ -120,7 +122,7 @@ func request_Clusters_Reconfigure_0(ctx context.Context, marshaler runtime.Marsh
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "%v", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	var (
@@ -132,7 +134,7 @@ func request_Clusters_Reconfigure_0(ctx context.Context, marshaler runtime.Marsh
 
 	val, ok = pathParams["name"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
 	}
 
 	protoReq.Name, err = runtime.String(val)
@@ -163,7 +165,7 @@ func request_Clusters_Delete_0(ctx context.Context, marshaler runtime.Marshaler,
 
 	val, ok = pathParams["name"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
 	}
 
 	protoReq.Name, err = runtime.String(val)
@@ -173,7 +175,7 @@ func request_Clusters_Delete_0(ctx context.Context, marshaler runtime.Marshaler,
 	}
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_Clusters_Delete_0); err != nil {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "%v", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.Delete(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -194,7 +196,7 @@ func request_Clusters_ClientConfig_0(ctx context.Context, marshaler runtime.Mars
 
 	val, ok = pathParams["name"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
 	}
 
 	protoReq.Name, err = runtime.String(val)
@@ -221,7 +223,7 @@ func request_Clusters_StartupConfig_0(ctx context.Context, marshaler runtime.Mar
 
 	val, ok = pathParams["uid"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "uid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "uid")
 	}
 
 	protoReq.Uid, err = runtime.String(val)
@@ -232,7 +234,7 @@ func request_Clusters_StartupConfig_0(ctx context.Context, marshaler runtime.Mar
 
 	val, ok = pathParams["role"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "role")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "role")
 	}
 
 	protoReq.Role, err = runtime.String(val)
@@ -243,7 +245,7 @@ func request_Clusters_StartupConfig_0(ctx context.Context, marshaler runtime.Mar
 
 	val, ok = pathParams["context_version"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "context_version")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "context_version")
 	}
 
 	protoReq.ContextVersion, err = runtime.Int64(val)
@@ -270,7 +272,7 @@ func request_Clusters_StartupConfig_1(ctx context.Context, marshaler runtime.Mar
 
 	val, ok = pathParams["uid"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "uid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "uid")
 	}
 
 	protoReq.Uid, err = runtime.String(val)
@@ -281,7 +283,7 @@ func request_Clusters_StartupConfig_1(ctx context.Context, marshaler runtime.Mar
 
 	val, ok = pathParams["role"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "role")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "role")
 	}
 
 	protoReq.Role, err = runtime.String(val)
@@ -292,7 +294,7 @@ func request_Clusters_StartupConfig_1(ctx context.Context, marshaler runtime.Mar
 
 	val, ok = pathParams["context_version"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "context_version")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "context_version")
 	}
 
 	protoReq.ContextVersion, err = runtime.Int64(val)
@@ -319,7 +321,7 @@ func request_Clusters_InstanceByIP_0(ctx context.Context, marshaler runtime.Mars
 
 	val, ok = pathParams["phid"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "phid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "phid")
 	}
 
 	protoReq.Phid, err = runtime.String(val)
@@ -330,7 +332,7 @@ func request_Clusters_InstanceByIP_0(ctx context.Context, marshaler runtime.Mars
 
 	val, ok = pathParams["external_ip"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "external_ip")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "external_ip")
 	}
 
 	protoReq.ExternalIp, err = runtime.String(val)
@@ -357,7 +359,7 @@ func request_Clusters_InstanceByIP_1(ctx context.Context, marshaler runtime.Mars
 
 	val, ok = pathParams["phid"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "phid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "phid")
 	}
 
 	protoReq.Phid, err = runtime.String(val)
@@ -368,7 +370,7 @@ func request_Clusters_InstanceByIP_1(ctx context.Context, marshaler runtime.Mars
 
 	val, ok = pathParams["external_ip"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "external_ip")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "external_ip")
 	}
 
 	protoReq.ExternalIp, err = runtime.String(val)
@@ -428,6 +430,7 @@ func RegisterClustersHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Clusters_List_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
@@ -456,6 +459,7 @@ func RegisterClustersHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Clusters_Describe_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
@@ -484,6 +488,7 @@ func RegisterClustersHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Clusters_Create_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
@@ -512,6 +517,7 @@ func RegisterClustersHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Clusters_Update_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
@@ -540,6 +546,7 @@ func RegisterClustersHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Clusters_Reconfigure_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
@@ -568,6 +575,7 @@ func RegisterClustersHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Clusters_Delete_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
@@ -596,6 +604,7 @@ func RegisterClustersHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Clusters_ClientConfig_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
@@ -624,6 +633,7 @@ func RegisterClustersHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Clusters_StartupConfig_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
@@ -652,6 +662,7 @@ func RegisterClustersHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Clusters_StartupConfig_1(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
@@ -680,6 +691,7 @@ func RegisterClustersHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Clusters_InstanceByIP_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
@@ -708,6 +720,7 @@ func RegisterClustersHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Clusters_InstanceByIP_1(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)

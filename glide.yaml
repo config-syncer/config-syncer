@@ -11,8 +11,6 @@ import:
   version: release-1.5
 - package: github.com/appscode/searchlight
   version: release-1.5
-- package: github.com/appscode/voyager
-  version: release-1.5
 - package: github.com/coreos/prometheus-operator
   version: v0.8.1
 - package: github.com/influxdata/influxdb

@@ -2,7 +2,6 @@ package v1beta1
 
 // Auto-generated. DO NOT EDIT.
 import (
-	"github.com/appscode/api/dtypes"
 	"github.com/golang/glog"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -38,7 +37,18 @@ func init() {
       "pattern": "^[a-z0-9](?:[a-z0-9\\-]{0,61}[a-z0-9])?$",
       "type": "string"
     },
+    "cluster_uid": {
+      "type": "string"
+    },
     "gce_project": {
+      "type": "string"
+    },
+    "secret_name": {
+      "maxLength": 63,
+      "pattern": "^[a-z0-9](?:[a-z0-9\\-]{0,61}[a-z0-9])?$",
+      "type": "string"
+    },
+    "secret_namespace": {
       "type": "string"
     }
   },
@@ -78,12 +88,3 @@ func (m *RegionListRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *RegionListRequest) IsRequest() {}
 
-func (m *RegionListResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *BucketListResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *ZoneListResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}

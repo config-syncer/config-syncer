@@ -2,7 +2,6 @@ package v1beta1
 
 // Auto-generated. DO NOT EDIT.
 import (
-	"github.com/appscode/api/dtypes"
 	"github.com/golang/glog"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -41,6 +40,3 @@ func (m *SSHGetRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *SSHGetRequest) IsRequest() {}
 
-func (m *SSHGetResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}

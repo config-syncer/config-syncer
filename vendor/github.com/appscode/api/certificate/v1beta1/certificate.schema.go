@@ -2,7 +2,6 @@ package v1beta1
 
 // Auto-generated. DO NOT EDIT.
 import (
-	"github.com/appscode/api/dtypes"
 	"github.com/golang/glog"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -120,9 +119,3 @@ func (m *CertificateDeployRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *CertificateDeployRequest) IsRequest() {}
 
-func (m *CertificateListResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *CertificateDescribeResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}

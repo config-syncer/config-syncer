@@ -2,7 +2,6 @@ package v1beta1
 
 // Auto-generated. DO NOT EDIT.
 import (
-	"github.com/appscode/api/dtypes"
 	"github.com/golang/glog"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -44,9 +43,3 @@ func (m *LoginRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *LoginRequest) IsRequest() {}
 
-func (m *CSRFTokenResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *LoginResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}

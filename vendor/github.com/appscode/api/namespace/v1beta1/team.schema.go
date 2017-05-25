@@ -2,7 +2,6 @@ package v1beta1
 
 // Auto-generated. DO NOT EDIT.
 import (
-	"github.com/appscode/api/dtypes"
 	"github.com/golang/glog"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -16,14 +15,14 @@ func init() {
 	createRequestSchema, err = gojsonschema.NewSchema(gojsonschema.NewStringLoader(`{
   "$schema": "http://json-schema.org/draft-04/schema#",
   "properties": {
-    "client_ip": {
-      "type": "string"
-    },
     "display_name": {
       "type": "string"
     },
     "email": {
       "type": "string"
+    },
+    "initial_units": {
+      "type": "integer"
     },
     "invite_emails": {
       "items": {
@@ -36,19 +35,13 @@ func init() {
       "pattern": "^[a-z0-9](?:[a-z0-9\\-]{0,61}[a-z0-9])?$",
       "type": "string"
     },
-    "options": {
-      "additionalProperties": {
-        "type": "string"
-      },
-      "type": "object"
-    },
     "password": {
       "type": "string"
     },
     "payment_method_nonce": {
       "type": "string"
     },
-    "subscription_type": {
+    "subscription": {
       "type": "string"
     },
     "user_name": {
@@ -105,9 +98,3 @@ func (m *IsAvailableRequest) IsValid() (*gojsonschema.Result, error) {
 }
 func (m *IsAvailableRequest) IsRequest() {}
 
-func (m *GetResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}
-func (m *CreateResponse) SetStatus(s *dtypes.Status) {
-	m.Status = s
-}

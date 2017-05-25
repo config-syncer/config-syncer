@@ -14,7 +14,6 @@ const (
 	QA     Environment = "qa"
 	Prod   Environment = "prod"
 	Onebox Environment = "onebox"
-	BoxDev Environment = "boxdev"
 )
 
 const (
@@ -43,7 +42,7 @@ func (e Environment) IsHosted() bool {
 
 func (e Environment) DebugEnabled() bool {
 	switch e {
-	case Dev, QA, BoxDev:
+	case Dev, QA:
 		return true
 	default:
 		return false
@@ -51,7 +50,7 @@ func (e Environment) DebugEnabled() bool {
 }
 
 func (e Environment) DevMode() bool {
-	return e == Dev || e == BoxDev
+	return e == Dev
 }
 
 func (e Environment) APIServer() (string, error) {
@@ -93,8 +92,6 @@ func FromString(e string) Environment {
 		return Onebox
 	case "qa":
 		return QA
-	case "boxdev":
-		return BoxDev
 	case "dev":
 		return Dev
 	default:
