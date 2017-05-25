@@ -1,5 +1,5 @@
-hash: 482ce2e06fbf6e379656a177cbab1c3821f8cc31751c6898bf96bb1f67c26e6b
-updated: 2017-05-25T15:56:20.273151384-07:00
+hash: ba9eded48330a8d11e32083d36f1d0b9444c7b0c1fef91bd7de75f1f8109ad7e
+updated: 2017-05-25T16:00:15.81612328-07:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -60,8 +60,6 @@ imports:
   - pkg/client/icinga
   - pkg/client/influxdb
   - pkg/client/k8s
-- name: github.com/appscode/voyager
-  version: 290e3e89247743c3ab8c8ad831428ac4739f2dff
 - name: github.com/Azure/azure-sdk-for-go
   version: 0984e0641ae43b89283223034574d6465be93bf4
 - name: github.com/blang/semver
