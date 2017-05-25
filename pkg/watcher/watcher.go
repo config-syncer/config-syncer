@@ -15,9 +15,6 @@ import (
 type KubedWatcher struct {
 	acw.Watcher
 
-	// name of the cloud provider
-	ProviderName string
-
 	// name of the cluster the daemon running.
 	ClusterName string
 

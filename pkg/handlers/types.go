@@ -28,7 +28,7 @@ func New(t string) (runtime.Object, error) {
 	case ConfigMaps:
 		return &kapi.ConfigMap{}, nil
 	}
-	return nil, errors.NewGoError("Resource type: " + t + " not found")
+	return nil, errors.New("Resource type: " + t + " not found").Err()
 }
 
 func setObjectMeta(o interface{}, namespace string, t string) {

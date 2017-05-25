@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/appscode/client"
-	"github.com/appscode/errors"
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/go/wait"
 	_ "github.com/appscode/k8s-addons/api/install"
@@ -29,7 +29,6 @@ import (
 type Config struct {
 	APITokenPath          string
 	APIEndpoint           string
-	ProviderName          string
 	ClusterName           string
 	Master                string
 	KubeConfig            string
@@ -45,7 +44,8 @@ func Run(config *Config) {
 
 	c, err := clientcmd.BuildConfigFromFlags(config.Master, config.KubeConfig)
 	if err != nil {
-		errors.Exit(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 
 	apiOptions := client.NewOption(config.APIEndpoint)
