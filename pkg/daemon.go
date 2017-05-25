@@ -26,7 +26,7 @@ import (
 	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
 )
 
-type Config struct {
+type Options struct {
 	APITokenPath          string
 	APIEndpoint           string
 	ClusterName           string
@@ -38,19 +38,19 @@ type Config struct {
 	EnablePromMonitoring  bool
 }
 
-func Run(config *Config) {
-	log.Infoln("configurations provided for kubed", config)
+func Run(opt Options) {
+	log.Infoln("configurations provided for kubed", opt)
 	defer runtime.HandleCrash()
 
-	c, err := clientcmd.BuildConfigFromFlags(config.Master, config.KubeConfig)
+	c, err := clientcmd.BuildConfigFromFlags(opt.Master, opt.KubeConfig)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	apiOptions := client.NewOption(config.APIEndpoint)
+	apiOptions := client.NewOption(opt.APIEndpoint)
 	log.Infoln("api options", apiOptions)
-	apiOptions.BearerAuth(readAuth(config.APITokenPath))
+	apiOptions.BearerAuth(readAuth(opt.APITokenPath))
 
 	kubeWatcher := &watcher.KubedWatcher{
 		Watcher: acw.Watcher{
@@ -59,15 +59,15 @@ func Run(config *Config) {
 			SyncPeriod:              time.Minute * 2,
 		},
 		AppsCodeApiClientOptions: apiOptions,
-		ClusterName:              config.ClusterName,
+		ClusterName:              opt.ClusterName,
 	}
 
 	log.Infoln("configuration loadded, running kubed watcher")
 	go kubeWatcher.Run()
 
-	if config.EnablePromMonitoring {
+	if opt.EnablePromMonitoring {
 		// get rest.Config for "k8s.io/client-go/tools/clientcmd" package
-		config, err := cgcmd.BuildConfigFromFlags(config.Master, config.KubeConfig)
+		config, err := cgcmd.BuildConfigFromFlags(opt.Master, opt.KubeConfig)
 		if err == nil {
 			// get client for Prometheus TPR monitoring
 			client, err := pcm.NewForConfig(config)
@@ -92,10 +92,10 @@ func Run(config *Config) {
 		ElasticConfig: make(map[string]string),
 	}
 
-	if config.ESEndpoint != "" {
-		endpoint := config.ESEndpoint
-		if strings.HasPrefix(config.ESEndpoint, "http") {
-			endpoint = config.ESEndpoint[7:]
+	if opt.ESEndpoint != "" {
+		endpoint := opt.ESEndpoint
+		if strings.HasPrefix(opt.ESEndpoint, "http") {
+			endpoint = opt.ESEndpoint[7:]
 		}
 		parts := strings.Split(endpoint, ":")
 		if len(parts) == 2 {
@@ -110,9 +110,9 @@ func Run(config *Config) {
 		}
 	}
 
-	if config.InfluxSecretName != "" {
+	if opt.InfluxSecretName != "" {
 		// InfluxDB client
-		influxConfig, err := influxdb.GetInfluxDBConfig(config.InfluxSecretName, config.InfluxSecretNamespace)
+		influxConfig, err := influxdb.GetInfluxDBConfig(opt.InfluxSecretName, opt.InfluxSecretNamespace)
 		if err != nil {
 			log.Errorln(err)
 		} else {
