@@ -20,10 +20,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/status"
 )
 
 var _ codes.Code
 var _ io.Reader
+var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
@@ -44,7 +46,7 @@ func request_Operations_Describe_0(ctx context.Context, marshaler runtime.Marsha
 
 	val, ok = pathParams["phid"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "phid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "phid")
 	}
 
 	protoReq.Phid, err = runtime.String(val)
@@ -54,7 +56,7 @@ func request_Operations_Describe_0(ctx context.Context, marshaler runtime.Marsha
 	}
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_Operations_Describe_0); err != nil {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "%v", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.Describe(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -75,7 +77,7 @@ func request_Operations_DescribeLog_0(ctx context.Context, marshaler runtime.Mar
 
 	val, ok = pathParams["phid"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "phid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "phid")
 	}
 
 	protoReq.Phid, err = runtime.String(val)
@@ -86,7 +88,7 @@ func request_Operations_DescribeLog_0(ctx context.Context, marshaler runtime.Mar
 
 	val, ok = pathParams["log_id"]
 	if !ok {
-		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "log_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "log_id")
 	}
 
 	protoReq.LogId, err = runtime.String(val)
@@ -146,6 +148,7 @@ func RegisterOperationsHandler(ctx context.Context, mux *runtime.ServeMux, conn 
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Operations_Describe_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
@@ -174,6 +177,7 @@ func RegisterOperationsHandler(ctx context.Context, mux *runtime.ServeMux, conn 
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
 		}
 		resp, md, err := request_Operations_DescribeLog_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
