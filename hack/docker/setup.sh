@@ -41,14 +41,13 @@ build_docker() {
 	chmod 755 kubed
 
 	cat >Dockerfile <<EOL
-FROM appscode/base:8.7
-
+FROM alpine
 RUN set -x \
-  && apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates \
-  && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man /tmp/*
-
+  && apk update \
+  && apk add ca-certificates \
+  && rm -rf /var/cache/apk/*
 COPY kubed /kubed
+USER nobody:nobody
 ENTRYPOINT ["/kubed"]
 EOL
 	local cmd="docker build -t appscode/$IMG:$TAG ."
