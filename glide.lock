@@ -1,5 +1,5 @@
 hash: 55ad893c6501bf84c5e541c8845ac640a114a1afe76760cdd687d0e62c4f8c2d
-updated: 2017-05-30T20:47:09.287178587-07:00
+updated: 2017-05-30T21:26:21.497800838-07:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -52,6 +52,8 @@ imports:
   - pkg/watcher
 - name: github.com/appscode/log
   version: 68e0e42e42c01371f3950571fc87c2298a51dd8f
+  subpackages:
+  - golog
 - name: github.com/appscode/searchlight
   version: 6648277c140b6939daaf1848af05779381859ed8
   subpackages:
