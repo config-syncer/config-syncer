@@ -47,7 +47,6 @@ RUN set -x \
   && apk add ca-certificates \
   && rm -rf /var/cache/apk/*
 COPY kubed /kubed
-USER nobody:nobody
 ENTRYPOINT ["/kubed"]
 EOL
 	local cmd="docker build -t appscode/$IMG:$TAG ."
