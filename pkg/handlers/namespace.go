@@ -22,7 +22,7 @@ func (a *NamespaceHandler) Handle(e *events.Event) {
 	}
 	ns, ok := e.RuntimeObj[0].(*api.Namespace)
 	if ok {
-		a.ensureTypes(ns.Namespace)
+		a.ensureTypes(ns.Name)
 	}
 }
 
