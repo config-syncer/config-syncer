@@ -20,10 +20,14 @@ func NewCmdRun() *cobra.Command {
 		Use:   "run",
 		Short: "Run daemon",
 		Run: func(cmd *cobra.Command, args []string) {
-			if opt.APITokenPath == "" ||
-				opt.APIEndpoint == "" ||
-				opt.ClusterName == "" {
-				log.Fatalln("required flag not provided.")
+			if opt.APITokenPath == "" {
+				log.Fatalln("Missing required flag: --api-token")
+			}
+			if opt.APIEndpoint == "" {
+				log.Fatalln("Missing required flag: --api-endpoint")
+			}
+			if opt.ClusterName == "" {
+				log.Fatalln("Missing required flag: --cluster-name")
 			}
 			log.Infoln("Starting kubed...")
 			go pkg.Run(opt)
@@ -32,7 +36,7 @@ func NewCmdRun() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&opt.APIEndpoint, "api-endpoint", opt.APIEndpoint, "appscode api server host:port")
+	cmd.Flags().StringVar(&opt.APIEndpoint, "api-endpoint", opt.APIEndpoint, "AppsCode api server address host:port")
 	cmd.Flags().StringVar(&opt.APITokenPath, "api-token", opt.APITokenPath, "File path for AppsCode api token.")
 	cmd.Flags().StringVar(&opt.ClusterName, "cluster-name", opt.ClusterName, "Name of Kubernetes cluster")
 	cmd.Flags().BoolVar(&opt.EnablePromMonitoring, "enable-prometheus-monitoring", opt.EnablePromMonitoring, "Enable Prometheus monitoring")
