@@ -1,5 +1,5 @@
 hash: 55ad893c6501bf84c5e541c8845ac640a114a1afe76760cdd687d0e62c4f8c2d
-updated: 2017-05-25T16:05:43.655367133-07:00
+updated: 2017-05-30T20:47:09.287178587-07:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -29,7 +29,7 @@ imports:
   - credential
   - util
 - name: github.com/appscode/errors
-  version: 45337f4d7774392043ed9f8c237f9e810974dd98
+  version: 748883e321a9f99fe901bd2663c7af3fcae43ea4
 - name: github.com/appscode/go
   version: 04abd631dc552c01c9448db0763611932590cbc4
   subpackages:
@@ -52,8 +52,6 @@ imports:
   - pkg/watcher
 - name: github.com/appscode/log
   version: 68e0e42e42c01371f3950571fc87c2298a51dd8f
-  subpackages:
-  - golog
 - name: github.com/appscode/searchlight
   version: 6648277c140b6939daaf1848af05779381859ed8
   subpackages:
@@ -170,9 +168,9 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/spf13/cobra
-  version: ca57f0f5dba473a8a58765d16d7e811fb8027add
+  version: 9c28e4bbd74e5c3ed7aacbc552b2cab7cfdfe744
 - name: github.com/spf13/pflag
-  version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
+  version: c7e63cf4530bcd3ba943729cee0efeff2ebea63f
 - name: github.com/ugorji/go
   version: f1f1a805ed361a0e078bb537e4ea78cd37dcf065
   subpackages:
