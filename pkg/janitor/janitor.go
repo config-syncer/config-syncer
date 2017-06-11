@@ -8,8 +8,8 @@ import (
 	"github.com/appscode/client"
 	es "github.com/appscode/kubed/pkg/janitor/elasticsearch"
 	influx "github.com/appscode/kubed/pkg/janitor/influxdb"
-	"github.com/appscode/kubed/pkg/watcher"
 	"github.com/appscode/log"
+	"github.com/appscode/searchlight/pkg/client/icinga"
 	influxdb "github.com/influxdata/influxdb/client"
 	elastic "gopkg.in/olivere/elastic.v3"
 )
@@ -19,11 +19,16 @@ const (
 )
 
 type Janitor struct {
+	ClusterName   string
 	ElasticConfig map[string]string
 	InfluxConfig  influxdb.Config
 	IcingaConfig  map[string]string
 
-	*watcher.KubedWatcher
+	// appscode api server client
+	APIClientOptions *client.ClientOption
+
+	// Icinga Client
+	IcingaClient *icinga.IcingaClient
 
 	once sync.Once
 }
@@ -34,7 +39,7 @@ func (j *Janitor) Run() {
 		time.Sleep(time.Minute * 10)
 	})
 
-	conn, err := client.New(j.AppsCodeApiClientOptions)
+	conn, err := client.New(j.APIClientOptions)
 	if err != nil {
 		log.Errorln(err)
 		return

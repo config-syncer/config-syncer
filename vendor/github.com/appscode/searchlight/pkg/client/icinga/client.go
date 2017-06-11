@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	_ "github.com/appscode/k8s-addons/api/install"
+	_ "github.com/appscode/searchlight/api/install"
 	clientset "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
 )
 

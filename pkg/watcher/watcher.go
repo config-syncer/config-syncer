@@ -2,79 +2,64 @@ package watcher
 
 import (
 	"reflect"
+	"sync"
+	"time"
 
-	"github.com/appscode/client"
-	"github.com/appscode/k8s-addons/pkg/events"
-	"github.com/appscode/k8s-addons/pkg/stash"
-	acw "github.com/appscode/k8s-addons/pkg/watcher"
+	"github.com/appscode/kubed/pkg/events"
 	"github.com/appscode/kubed/pkg/handlers"
-	"github.com/appscode/log"
-	"github.com/appscode/searchlight/pkg/client/icinga"
+	kapi "k8s.io/kubernetes/pkg/api"
+	"k8s.io/kubernetes/pkg/client/cache"
+	clientset "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
+	"k8s.io/kubernetes/pkg/fields"
+	"k8s.io/kubernetes/pkg/util/wait"
 )
 
-type KubedWatcher struct {
-	acw.Watcher
+type Watcher struct {
+	// kubernetes client to apiserver
+	KubeClient clientset.Interface
 
-	// name of the cluster the daemon running.
-	ClusterName string
-
-	// appscode api server client
-	AppsCodeApiClientOptions *client.ClientOption
-
-	// Icinga Client
-	IcingaClient *icinga.IcingaClient
-
-	// Loadbalancer image name that will be used to create
-	// the loadbalancer.
-	LoadbalancerImage string
-
-	IngressClass string
+	SyncPeriod time.Duration
+	sync.Mutex
 }
 
-func (watch *KubedWatcher) Run() {
-	watch.setup()
-	watch.Storage = &stash.Storage{}
-	watch.Namespace()
+func (w *Watcher) Run() {
+	w.watchNamespaces()
 }
 
-func (k *KubedWatcher) setup() {
-	k.Watcher.Dispatch = k.Dispatch
+func (w *Watcher) watchNamespaces() {
+	lw := cache.NewListWatchFromClient(w.KubeClient.Core().RESTClient(), events.Namespace.String(), kapi.NamespaceAll, fields.Everything())
+	_, controller := cache.NewInformer(lw, &kapi.Namespace{}, w.SyncPeriod, eventHandlerFuncs(w))
+	go controller.Run(wait.NeverStop)
 }
 
-func (k *KubedWatcher) Dispatch(e *events.Event) error {
-	if ignoreAble(e) {
+func (w *Watcher) Dispatch(e *events.Event) error {
+	if e.Ignorable() {
 		return nil
 	}
-	log.Debugln("Dispatching event with resource", e.ResourceType, "event", e.EventType)
 	if e.ResourceType == events.Namespace && e.EventType == events.Added {
 		h := &handlers.NamespaceHandler{
-			Handler: &handlers.Handler{
-				ClientOptions: k.AppsCodeApiClientOptions,
-				ClusterName:   k.ClusterName,
-				Kube:          k.Client,
-				Storage:       k.Storage,
-			},
+			KubeClient: w.KubeClient,
 		}
 		h.Handle(e)
 	}
 	return nil
 }
 
-func ignoreAble(e *events.Event) bool {
-	if e.EventType == events.None {
-		return true
+func eventHandlerFuncs(k *Watcher) cache.ResourceEventHandlerFuncs {
+	return cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			e := events.New(events.Added, obj)
+			k.Dispatch(e)
+		},
+		DeleteFunc: func(obj interface{}) {
+			e := events.New(events.Deleted, obj)
+			k.Dispatch(e)
+		},
+		UpdateFunc: func(old, new interface{}) {
+			if !reflect.DeepEqual(old, new) {
+				e := events.New(events.Updated, old, new)
+				k.Dispatch(e)
+			}
+		},
 	}
-
-	if e.EventType == events.Updated {
-		// updated called but only old object is present.
-		if len(e.RuntimeObj) <= 1 {
-			return true
-		}
-
-		// updated but both are equal. no changes
-		if reflect.DeepEqual(e.RuntimeObj[0], e.RuntimeObj[1]) {
-			return true
-		}
-	}
-	return false
 }

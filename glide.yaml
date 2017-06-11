@@ -8,12 +8,8 @@ import:
   version: v2
 - package: github.com/appscode/go
 - package: github.com/appscode/log
-- package: github.com/appscode/k8s-addons
-  version: release-1.5
 - package: github.com/appscode/searchlight
   version: release-1.5
-- package: github.com/coreos/prometheus-operator
-  version: v0.8.1
 - package: github.com/influxdata/influxdb
   version: v0.11.0
 - package: github.com/spf13/pflag

@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	_env "github.com/appscode/go/env"
-	_ "github.com/appscode/k8s-addons/api/install"
-	"github.com/appscode/k8s-addons/pkg/dns"
+	_ "github.com/appscode/searchlight/api/install"
+	"github.com/appscode/searchlight/pkg/dns"
 	ini "github.com/vaughan0/go-ini"
 	clientset "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
 )

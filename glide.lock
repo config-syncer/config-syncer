@@ -1,5 +1,5 @@
-hash: 55ad893c6501bf84c5e541c8845ac640a114a1afe76760cdd687d0e62c4f8c2d
-updated: 2017-05-30T21:26:21.497800838-07:00
+hash: 758597f51667d3f6794a629ed977945190b451d4f6513b269cf3f775cba0b042
+updated: 2017-06-11T10:01:59.61929836-07:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -7,7 +7,7 @@ imports:
   - compute/metadata
   - internal
 - name: github.com/appscode/api
-  version: 6ccfba7540c2c013dd596d4955c4a9a5ab8b0812
+  version: e7e27c6907a387a93c0e7bba995fdbf32fcea265
   subpackages:
   - attic/v1beta1
   - auth/v1beta1
@@ -31,35 +31,27 @@ imports:
 - name: github.com/appscode/errors
   version: 748883e321a9f99fe901bd2663c7af3fcae43ea4
 - name: github.com/appscode/go
-  version: 04abd631dc552c01c9448db0763611932590cbc4
+  version: 5eabd32a8a0fe824b5e12c37dc53a0afea8507c9
   subpackages:
-  - crypto/rand
   - env
-  - flags
   - hold
   - runtime
   - version
   - wait
-- name: github.com/appscode/k8s-addons
-  version: a710ffd2f413cb9fb766ee5a71c835fca23f9ca0
-  subpackages:
-  - api
-  - api/install
-  - client/clientset
-  - pkg/dns
-  - pkg/events
-  - pkg/stash
-  - pkg/watcher
 - name: github.com/appscode/log
   version: 68e0e42e42c01371f3950571fc87c2298a51dd8f
   subpackages:
   - golog
 - name: github.com/appscode/searchlight
-  version: 6648277c140b6939daaf1848af05779381859ed8
+  version: af6a56d0bc259649a1a168ec14e63f83337e5a86
   subpackages:
+  - api
+  - api/install
+  - client/clientset
   - pkg/client/icinga
   - pkg/client/influxdb
   - pkg/client/k8s
+  - pkg/dns
 - name: github.com/Azure/azure-sdk-for-go
   version: 0984e0641ae43b89283223034574d6465be93bf4
 - name: github.com/blang/semver
@@ -75,13 +67,11 @@ imports:
 - name: github.com/coreos/pkg
   version: fa29b1d70f0beaddd4c7021607cc3c3be8ce94b8
   subpackages:
+  - capnslog
+  - dlopen
   - health
   - httputil
   - timeutil
-- name: github.com/coreos/prometheus-operator
-  version: 6eaca3f4ce6cd9d7384097ac484b0178a95bfc56
-  subpackages:
-  - pkg/client/monitoring/v1alpha1
 - name: github.com/davecgh/go-spew
   version: 3e6e67c4dcea3ac2f25fd4731abc0e1deaf36216
   subpackages:
@@ -113,8 +103,31 @@ imports:
 - name: github.com/gogo/protobuf
   version: e18d7aa8f8c624c915db340349aad4c49b10d173
   subpackages:
+  - gogoproto
+  - plugin/compare
+  - plugin/defaultcheck
+  - plugin/description
+  - plugin/embedcheck
+  - plugin/enumstringer
+  - plugin/equal
+  - plugin/face
+  - plugin/gostring
+  - plugin/marshalto
+  - plugin/oneofcheck
+  - plugin/populate
+  - plugin/size
+  - plugin/stringer
+  - plugin/testgen
+  - plugin/union
+  - plugin/unmarshal
   - proto
+  - protoc-gen-gogo/descriptor
+  - protoc-gen-gogo/generator
+  - protoc-gen-gogo/grpc
+  - protoc-gen-gogo/plugin
   - sortkeys
+  - vanity
+  - vanity/command
 - name: github.com/golang/glog
   version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/protobuf
@@ -127,7 +140,7 @@ imports:
 - name: github.com/google/gofuzz
   version: bbcb9da2d746f8bdbd6a936686a0a6067ada0ec5
 - name: github.com/grpc-ecosystem/grpc-gateway
-  version: e40837d7cc3a3e454c1e42012704e92bd49310af
+  version: 42a2d1c4991e79a4a8318984e5c81031b21f3c76
   repo: https://github.com/appscode/grpc-gateway.git
   vcs: git
   subpackages:
@@ -172,11 +185,12 @@ imports:
 - name: github.com/spf13/cobra
   version: 9c28e4bbd74e5c3ed7aacbc552b2cab7cfdfe744
 - name: github.com/spf13/pflag
-  version: c7e63cf4530bcd3ba943729cee0efeff2ebea63f
+  version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
 - name: github.com/ugorji/go
   version: f1f1a805ed361a0e078bb537e4ea78cd37dcf065
   subpackages:
   - codec
+  - codec/codecgen
 - name: github.com/vaughan0/go-ini
   version: a98ad7ee00ec53921f08832bc06ecf7fd600e6a1
 - name: github.com/xeipuuv/gojsonpointer
@@ -186,12 +200,18 @@ imports:
 - name: github.com/xeipuuv/gojsonschema
   version: 93e72a773fade158921402d6a24c819b48aba29d
 - name: github.com/xenolf/lego
-  version: 5ee956d6ca4ffbd8b940fc3ecb6e109c99d9a68a
+  version: e1e824640f726118b9d74d43b7c50a024e7a26af
   repo: https://github.com/appscode/lego.git
   vcs: git
 - name: golang.org/x/crypto
   version: 1f22c0103821b9390939b6776727195525381532
   subpackages:
+  - bcrypt
+  - blowfish
+  - curve25519
+  - pkcs12
+  - pkcs12/internal/rc2
+  - ssh
   - ssh/terminal
 - name: golang.org/x/net
   version: da118f7b8e5954f39d0d2130ab35d4bf0e3cb344
@@ -242,7 +262,7 @@ imports:
   - internal/urlfetch
   - urlfetch
 - name: google.golang.org/genproto
-  version: d80a6e20e776b0b17a324d0ba1ab50a39c8e8944
+  version: aa2eb687b4d3e17154372564ad8d6bf11c3cf21f
   subpackages:
   - googleapis/api/annotations
   - googleapis/rpc/status
@@ -278,74 +298,6 @@ imports:
   version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/client-go
   version: e121606b0d09b2e1c467183ee46217fa85a6b672
-  subpackages:
-  - dynamic
-  - pkg/api
-  - pkg/api/errors
-  - pkg/api/meta
-  - pkg/api/meta/metatypes
-  - pkg/api/resource
-  - pkg/api/unversioned
-  - pkg/api/v1
-  - pkg/api/validation/path
-  - pkg/apis/apps
-  - pkg/apis/autoscaling
-  - pkg/apis/batch
-  - pkg/apis/certificates
-  - pkg/apis/extensions
-  - pkg/apis/policy
-  - pkg/apis/rbac
-  - pkg/apis/storage
-  - pkg/auth/user
-  - pkg/conversion
-  - pkg/conversion/queryparams
-  - pkg/fields
-  - pkg/genericapiserver/openapi/common
-  - pkg/labels
-  - pkg/runtime
-  - pkg/runtime/serializer
-  - pkg/runtime/serializer/json
-  - pkg/runtime/serializer/protobuf
-  - pkg/runtime/serializer/recognizer
-  - pkg/runtime/serializer/streaming
-  - pkg/runtime/serializer/versioning
-  - pkg/selection
-  - pkg/third_party/forked/golang/reflect
-  - pkg/types
-  - pkg/util
-  - pkg/util/cert
-  - pkg/util/clock
-  - pkg/util/diff
-  - pkg/util/errors
-  - pkg/util/flowcontrol
-  - pkg/util/framer
-  - pkg/util/homedir
-  - pkg/util/integer
-  - pkg/util/intstr
-  - pkg/util/json
-  - pkg/util/labels
-  - pkg/util/net
-  - pkg/util/parsers
-  - pkg/util/rand
-  - pkg/util/runtime
-  - pkg/util/sets
-  - pkg/util/uuid
-  - pkg/util/validation
-  - pkg/util/validation/field
-  - pkg/util/wait
-  - pkg/util/yaml
-  - pkg/version
-  - pkg/watch
-  - pkg/watch/versioned
-  - rest
-  - tools/auth
-  - tools/cache
-  - tools/clientcmd
-  - tools/clientcmd/api
-  - tools/clientcmd/api/latest
-  - tools/clientcmd/api/v1
-  - tools/metrics
-  - transport
 - name: k8s.io/kubernetes
   version: 93e7daf07e4f6979622ae9d470d54a766b189513
   repo: https://github.com/appscode/kubernetes.git
