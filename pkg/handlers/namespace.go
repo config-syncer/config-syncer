@@ -15,7 +15,7 @@ const (
 	Secrets    string = "secrets"
 
 	KubeSecretAPIToken    = "appscode-api-token"
-	KubeSecretIcinga      = "appscode-icinga"
+	KubeSecretIcinga      = "searchlight-icinga"
 	KubeConfigMapMetadata = "cluster-metadata"
 )
 
