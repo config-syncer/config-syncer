@@ -3,7 +3,6 @@ package es
 import (
 	"testing"
 
-	api "github.com/appscode/api/kubernetes/v1beta1"
 	"github.com/stretchr/testify/assert"
 	elastic "gopkg.in/olivere/elastic.v3"
 )
@@ -16,10 +15,6 @@ func TestEsJanitor(t *testing.T) {
 	)
 	assert.Nil(t, err)
 
-	settings := &api.ClusterSettings{
-		LogIndexPrefix:     "",
-		LogStorageLifetime: 0,
-	}
-	err = DeleteIndices(esClient, settings)
+	err = DeleteIndices(esClient, "", 0)
 	assert.Nil(t, err)
 }

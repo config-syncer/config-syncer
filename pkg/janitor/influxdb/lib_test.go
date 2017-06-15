@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"testing"
 
-	api "github.com/appscode/api/kubernetes/v1beta1"
 	influxdb "github.com/influxdata/influxdb/client"
 	"github.com/stretchr/testify/assert"
 )
@@ -27,9 +26,6 @@ func TestInfluxJanitor(t *testing.T) {
 	influxClient, err := influxdb.NewClient(iConfig)
 	assert.Nil(t, err)
 
-	settings := &api.ClusterSettings{
-		MonitoringStorageLifetime: 6 * 60 * 60,
-	}
-	err = UpdateRetentionPolicy(influxClient, settings)
+	err = UpdateRetentionPolicy(influxClient, 6*60*60)
 	assert.Nil(t, err)
 }

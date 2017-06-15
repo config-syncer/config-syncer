@@ -5,7 +5,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/appscode/client"
 	es "github.com/appscode/kubed/pkg/janitor/elasticsearch"
 	influx "github.com/appscode/kubed/pkg/janitor/influxdb"
 	"github.com/appscode/log"
@@ -28,9 +27,6 @@ type Janitor struct {
 	InfluxConfig  influxdb.Config
 	IcingaConfig  map[string]string
 	KubeClient    clientset.Interface
-
-	// appscode api server client
-	APIClientOptions *client.ClientOption
 
 	// Icinga Client
 	IcingaClient *icinga.IcingaClient
