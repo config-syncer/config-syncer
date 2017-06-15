@@ -60,7 +60,7 @@ def metadata(cwd, goos='', goarch=''):
     if md['git_tag']:
         md['version'] = md['git_tag']
         md['version_strategy'] = 'tag'
-    elif not md['git_branch'] in ['master', 'HEAD']:
+    elif not md['git_branch'] in ['master', 'HEAD'] and not md['git_branch'].startswith('release-'):
         md['version'] = md['git_branch']
         md['version_strategy'] = 'branch'
     else:
