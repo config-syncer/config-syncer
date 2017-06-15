@@ -19,12 +19,10 @@ import:
   version: v3.0.59
 - package: github.com/Azure/azure-sdk-for-go
   version: v7.0.1-beta
+- package: k8s.io/apimachinery
+  version: 75b8dd260ef0469d96d578705a87cffd0e09dab8
 - package: k8s.io/client-go
-  version: e121606b0d09b2e1c467183ee46217fa85a6b672
-- package: k8s.io/kubernetes
-  version: 1.5.6-ac
-  repo: https://github.com/appscode/kubernetes.git
-  vcs: git
+  version: v3.0.0-beta.0
 - package: github.com/mikespook/golib
 - package: github.com/xenolf/lego
   repo: https://github.com/appscode/lego.git

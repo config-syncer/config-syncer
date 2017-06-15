@@ -4,10 +4,9 @@ import (
 	"github.com/appscode/errors"
 	"github.com/appscode/kubed/pkg/events"
 	"github.com/appscode/log"
-	"k8s.io/kubernetes/pkg/api"
-	kapi "k8s.io/kubernetes/pkg/api"
-	clientset "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
-	"k8s.io/kubernetes/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime"
+	clientset "k8s.io/client-go/kubernetes"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
@@ -26,20 +25,20 @@ type NamespaceHandler struct {
 func New(t string) (runtime.Object, error) {
 	switch t {
 	case Secrets:
-		return &kapi.Secret{}, nil
+		return &kapiv1.Secret{}, nil
 	case ConfigMaps:
-		return &kapi.ConfigMap{}, nil
+		return &kapiv1.ConfigMap{}, nil
 	}
 	return nil, errors.New("Resource type: " + t + " not found").Err()
 }
 
 func setObjectMeta(o interface{}, namespace string, t string) {
-	var objectMeta *kapi.ObjectMeta
+	var objectMeta *kapiv1.ObjectMeta
 	switch t {
 	case Secrets:
-		objectMeta = &o.(*kapi.Secret).ObjectMeta
+		objectMeta = &o.(*kapiv1.Secret).ObjectMeta
 	case ConfigMaps:
-		objectMeta = &o.(*kapi.ConfigMap).ObjectMeta
+		objectMeta = &o.(*kapiv1.ConfigMap).ObjectMeta
 	}
 	objectMeta.SetNamespace(namespace)
 	objectMeta.SetResourceVersion("")
@@ -49,7 +48,7 @@ func (h *NamespaceHandler) Handle(e *events.Event) {
 	if !e.EventType.IsAdded() {
 		return
 	}
-	ns, ok := e.RuntimeObj[0].(*api.Namespace)
+	ns, ok := e.RuntimeObj[0].(*apiv1.Namespace)
 	if ok {
 		h.ensureTypes(ns.Name)
 	}
@@ -92,7 +91,7 @@ func (h *NamespaceHandler) copyObjectFromKubeSystemNS(namespace string, t string
 		return
 	}
 	err = h.KubeClient.Core().RESTClient().Get().
-		Namespace(api.NamespaceSystem).
+		Namespace(apiv1.NamespaceSystem).
 		Resource(t).
 		Name(name).
 		Do().
