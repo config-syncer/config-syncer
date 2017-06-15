@@ -10,8 +10,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	clientset "k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/kubernetes/pkg/fields"
+	"k8s.io/apimachinery/pkg/fields"
 )
 
 type Watcher struct {
@@ -27,7 +30,7 @@ func (w *Watcher) Run() {
 }
 
 func (w *Watcher) watchNamespaces() {
-	lw := cache.NewListWatchFromClient(w.KubeClient.Core().RESTClient(), events.Namespace.String(), apiv1.NamespaceAll, fields.Everything())
+	lw := cache.NewListWatchFromClient(w.KubeClient.CoreV1().RESTClient(), events.Namespace.String(), metav1.NamespaceAll, fields.Everything())
 	_, controller := cache.NewInformer(lw, &apiv1.Namespace{}, w.SyncPeriod, eventHandlerFuncs(w))
 	go controller.Run(wait.NeverStop)
 }

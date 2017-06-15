@@ -1,6 +1,9 @@
 package handlers
 
 import (
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/appscode/errors"
 	"github.com/appscode/kubed/pkg/events"
 	"github.com/appscode/log"
@@ -25,20 +28,20 @@ type NamespaceHandler struct {
 func New(t string) (runtime.Object, error) {
 	switch t {
 	case Secrets:
-		return &kapiv1.Secret{}, nil
+		return &apiv1.Secret{}, nil
 	case ConfigMaps:
-		return &kapiv1.ConfigMap{}, nil
+		return &apiv1.ConfigMap{}, nil
 	}
 	return nil, errors.New("Resource type: " + t + " not found").Err()
 }
 
 func setObjectMeta(o interface{}, namespace string, t string) {
-	var objectMeta *kapiv1.ObjectMeta
+	var objectMeta *metav1.ObjectMeta
 	switch t {
 	case Secrets:
-		objectMeta = &o.(*kapiv1.Secret).ObjectMeta
+		objectMeta = &o.(*apiv1.Secret).ObjectMeta
 	case ConfigMaps:
-		objectMeta = &o.(*kapiv1.ConfigMap).ObjectMeta
+		objectMeta = &o.(*apiv1.ConfigMap).ObjectMeta
 	}
 	objectMeta.SetNamespace(namespace)
 	objectMeta.SetResourceVersion("")
@@ -90,8 +93,8 @@ func (h *NamespaceHandler) copyObjectFromKubeSystemNS(namespace string, t string
 		log.Errorln(err)
 		return
 	}
-	err = h.KubeClient.Core().RESTClient().Get().
-		Namespace(apiv1.NamespaceSystem).
+	err = h.KubeClient.CoreV1().RESTClient().Get().
+		Namespace(metav1.NamespaceSystem).
 		Resource(t).
 		Name(name).
 		Do().
@@ -101,7 +104,7 @@ func (h *NamespaceHandler) copyObjectFromKubeSystemNS(namespace string, t string
 		return
 	}
 	setObjectMeta(result, namespace, t)
-	err = h.KubeClient.Core().RESTClient().Post().
+	err = h.KubeClient.CoreV1().RESTClient().Post().
 		Namespace(namespace).
 		Resource(t).
 		Body(result).
