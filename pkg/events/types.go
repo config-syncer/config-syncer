@@ -6,9 +6,10 @@ import (
 	"time"
 
 	"github.com/appscode/log"
-	kapi "k8s.io/kubernetes/pkg/api"
-	"k8s.io/kubernetes/pkg/apis/apps"
-	"k8s.io/kubernetes/pkg/apis/extensions"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
+	apps "k8s.io/client-go/pkg/apis/apps/v1beta1"
+	extensions "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 )
 
 type EventType string
@@ -124,7 +125,7 @@ type Event struct {
 	RuntimeObj []interface{}
 
 	// kubernetes object metadata
-	MetaData kapi.ObjectMeta
+	MetaData metav1.ObjectMeta
 }
 
 func New(Type EventType, obj ...interface{}) *Event {
@@ -155,23 +156,23 @@ func composeKey(t ObjectType, uid string) string {
 func detectObjectType(o interface{}) ObjectType {
 	log.V(7).Infoln("got object type", reflect.TypeOf(o))
 	switch o.(type) {
-	case kapi.Pod, *kapi.Pod:
+	case apiv1.Pod, *apiv1.Pod:
 		return Pod
-	case kapi.Namespace, *kapi.Namespace:
+	case apiv1.Namespace, *apiv1.Namespace:
 		return Namespace
-	case kapi.Service, *kapi.Service:
+	case apiv1.Service, *apiv1.Service:
 		return Service
-	case kapi.ReplicationController, *kapi.ReplicationController:
+	case apiv1.ReplicationController, *apiv1.ReplicationController:
 		return RC
-	case kapi.Node, *kapi.Node:
+	case apiv1.Node, *apiv1.Node:
 		return Node
 	case extensions.Ingress, *extensions.Ingress:
 		return Ingress
-	case kapi.ConfigMap, *kapi.ConfigMap:
+	case apiv1.ConfigMap, *apiv1.ConfigMap:
 		return ConfigMap
-	case kapi.Endpoints, *kapi.Endpoints:
+	case apiv1.Endpoints, *apiv1.Endpoints:
 		return Endpoint
-	case kapi.Event, *kapi.Event:
+	case apiv1.Event, *apiv1.Event:
 		return AlertEvent
 	case extensions.ReplicaSet, *extensions.ReplicaSet:
 		return ReplicaSet
@@ -185,24 +186,24 @@ func detectObjectType(o interface{}) ObjectType {
 	return Unknown
 }
 
-func objectMetadata(o interface{}, t ObjectType) kapi.ObjectMeta {
+func objectMetadata(o interface{}, t ObjectType) metav1.ObjectMeta {
 	switch t {
 	case Pod:
-		return o.(*kapi.Pod).ObjectMeta
+		return o.(*apiv1.Pod).ObjectMeta
 	case Namespace:
-		return o.(*kapi.Namespace).ObjectMeta
+		return o.(*apiv1.Namespace).ObjectMeta
 	case Service:
-		return o.(*kapi.Service).ObjectMeta
+		return o.(*apiv1.Service).ObjectMeta
 	case RC:
-		return o.(*kapi.ReplicationController).ObjectMeta
+		return o.(*apiv1.ReplicationController).ObjectMeta
 	case Node:
-		return o.(*kapi.Node).ObjectMeta
+		return o.(*apiv1.Node).ObjectMeta
 	case Ingress:
 		return o.(*extensions.Ingress).ObjectMeta
 	case Endpoint:
-		return o.(*kapi.Endpoints).ObjectMeta
+		return o.(*apiv1.Endpoints).ObjectMeta
 	case AlertEvent:
-		return o.(*kapi.Event).ObjectMeta
+		return o.(*apiv1.Event).ObjectMeta
 	case ReplicaSet:
 		return o.(*extensions.ReplicaSet).ObjectMeta
 	case StatefulSet:
@@ -212,7 +213,7 @@ func objectMetadata(o interface{}, t ObjectType) kapi.ObjectMeta {
 	case Deployments:
 		return o.(*extensions.Deployment).ObjectMeta
 	}
-	return kapi.ObjectMeta{}
+	return metav1.ObjectMeta{}
 }
 
 func (e *Event) Ignorable() bool {

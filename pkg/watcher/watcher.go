@@ -7,11 +7,12 @@ import (
 
 	"github.com/appscode/kubed/pkg/events"
 	"github.com/appscode/kubed/pkg/handlers"
-	kapi "k8s.io/kubernetes/pkg/api"
-	"k8s.io/kubernetes/pkg/client/cache"
-	clientset "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
-	"k8s.io/kubernetes/pkg/fields"
-	"k8s.io/kubernetes/pkg/util/wait"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/fields"
+	"k8s.io/apimachinery/pkg/util/wait"
+	clientset "k8s.io/client-go/kubernetes"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/tools/cache"
 )
 
 type Watcher struct {
@@ -27,8 +28,8 @@ func (w *Watcher) Run() {
 }
 
 func (w *Watcher) watchNamespaces() {
-	lw := cache.NewListWatchFromClient(w.KubeClient.Core().RESTClient(), events.Namespace.String(), kapi.NamespaceAll, fields.Everything())
-	_, controller := cache.NewInformer(lw, &kapi.Namespace{}, w.SyncPeriod, eventHandlerFuncs(w))
+	lw := cache.NewListWatchFromClient(w.KubeClient.CoreV1().RESTClient(), events.Namespace.String(), metav1.NamespaceAll, fields.Everything())
+	_, controller := cache.NewInformer(lw, &apiv1.Namespace{}, w.SyncPeriod, eventHandlerFuncs(w))
 	go controller.Run(wait.NeverStop)
 }
 

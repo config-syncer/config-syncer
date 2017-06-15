@@ -18,8 +18,8 @@ import (
 	"github.com/appscode/log"
 	"github.com/appscode/searchlight/pkg/client/influxdb"
 	"github.com/spf13/cobra"
-	clientset "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
-	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
+	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 type RunOptions struct {

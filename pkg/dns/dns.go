@@ -5,8 +5,9 @@ import (
 	"os"
 	"strings"
 
-	kapi "k8s.io/kubernetes/pkg/api"
-	clientset "k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clientset "k8s.io/client-go/kubernetes"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 func GetServiceClusterIP(client clientset.Interface, prefix, hostname string) (string, error) {
@@ -14,7 +15,7 @@ func GetServiceClusterIP(client clientset.Interface, prefix, hostname string) (s
 	if err != nil {
 		return "", err
 	}
-	service, err := client.Core().Services(namespace).Get(serviceName)
+	service, err := client.CoreV1().Services(namespace).Get(serviceName, metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -29,7 +30,7 @@ func GetServiceClusterIP(client clientset.Interface, prefix, hostname string) (s
 func splitHostname(hostName string) (string, string, error) {
 	parts := strings.Split(hostName, ".")
 	if len(parts) == 1 {
-		return parts[0], kapi.NamespaceDefault, nil
+		return parts[0], apiv1.NamespaceDefault, nil
 	} else if len(parts) == 2 {
 		return parts[0], parts[1], nil
 	}
