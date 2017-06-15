@@ -96,6 +96,7 @@ func Run(opt RunOptions) {
 
 	// initializing kube janitor tasks
 	kubeJanitor := janitor.Janitor{
+		KubeClient:       clientset.NewForConfigOrDie(c),
 		ClusterName:      opt.ClusterName,
 		APIClientOptions: apiOptions,
 		ElasticConfig:    make(map[string]string),

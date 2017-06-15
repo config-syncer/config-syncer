@@ -4,19 +4,18 @@ import (
 	"fmt"
 	"time"
 
-	api "github.com/appscode/api/kubernetes/v1beta1"
 	"github.com/appscode/log"
 	elastic "gopkg.in/olivere/elastic.v3"
 )
 
-func DeleteIndices(esClient *elastic.Client, j *api.ClusterSettings) error {
+func DeleteIndices(esClient *elastic.Client, logIndexPrefix string, logStorageLifetime int64) error {
 	now := time.Now().UTC()
-	oldDate := now.Add(time.Duration(-(j.LogStorageLifetime)) * time.Second)
+	oldDate := now.Add(time.Duration(-(logStorageLifetime)) * time.Second)
 
 	// how many index should we check to delete? I set it to 7
 	for i := 1; i <= 7; i++ {
 		date := oldDate.AddDate(0, 0, -i)
-		prefix := fmt.Sprintf("%s%s", j.LogIndexPrefix, date.Format("2006.01.02"))
+		prefix := fmt.Sprintf("%s%s", logIndexPrefix, date.Format("2006.01.02"))
 
 		if _, err := esClient.Search(prefix).Do(); err == nil {
 			if _, err := esClient.DeleteIndex(prefix).Do(); err != nil {

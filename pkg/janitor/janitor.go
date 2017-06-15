@@ -1,10 +1,10 @@
 package janitor
 
 import (
+	"strconv"
 	"sync"
 	"time"
 
-	api "github.com/appscode/api/kubernetes/v1beta1"
 	"github.com/appscode/client"
 	es "github.com/appscode/kubed/pkg/janitor/elasticsearch"
 	influx "github.com/appscode/kubed/pkg/janitor/influxdb"
@@ -12,10 +12,14 @@ import (
 	"github.com/appscode/searchlight/pkg/client/icinga"
 	influxdb "github.com/influxdata/influxdb/client"
 	elastic "gopkg.in/olivere/elastic.v3"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clientset "k8s.io/client-go/kubernetes"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
-	ESEndpoint string = "es-endpoint"
+	ESEndpoint                   string = "es-endpoint"
+	KubeConfigMapClusterSettings string = "cluster-settings"
 )
 
 type Janitor struct {
@@ -23,6 +27,7 @@ type Janitor struct {
 	ElasticConfig map[string]string
 	InfluxConfig  influxdb.Config
 	IcingaConfig  map[string]string
+	KubeClient    clientset.Interface
 
 	// appscode api server client
 	APIClientOptions *client.ClientOption
@@ -33,45 +38,39 @@ type Janitor struct {
 	once sync.Once
 }
 
+type ClusterSettings struct {
+	LogIndexPrefix            string `json:"log_index_prefix"`
+	LogStorageLifetime        int64  `json:"log_storage_lifetime"`
+	MonitoringStorageLifetime int64  `json:"monitoring_storage_lifetime"`
+}
+
 func (j *Janitor) Run() {
 	j.once.Do(func() {
 		// wait for the first time for starting up the other pods
 		time.Sleep(time.Minute * 10)
 	})
 
-	conn, err := client.New(j.APIClientOptions)
+	clusterConf := &apiv1.ConfigMap{}
+	err := j.KubeClient.CoreV1().RESTClient().Get().
+		Namespace(metav1.NamespaceSystem).
+		Resource("configmaps").
+		Name(KubeConfigMapClusterSettings).
+		Do().
+		Into(clusterConf)
 	if err != nil {
 		log.Errorln(err)
 		return
 	}
-	defer conn.Close()
-
-	clusterDescribeReq := &api.ClusterDescribeRequest{
-		Uid: j.ClusterName,
-	}
-	clusterDescribeResp, err := conn.Kubernetes().V1beta1().Cluster().Describe(conn.Context(), clusterDescribeReq)
+	cs, err := ConfigMapToClusterSettings(*clusterConf)
 	if err != nil {
 		log.Errorln(err)
 		return
 	}
-
-	// This ensures not panic if there were some communication
-	// error with apiserver.
-	if clusterDescribeResp != nil {
-		if clusterDescribeResp.Cluster != nil {
-			if clusterDescribeResp.Cluster.Settings == nil {
-				log.Warningln("failed to get cluster settings informations")
-				return
-			}
-
-			j.cleanES(clusterDescribeResp.Cluster.Settings)
-			j.cleanInflux(clusterDescribeResp.Cluster.Settings)
-			//j.syncAlert(conn)
-		}
-	}
+	j.cleanES(cs)
+	j.cleanInflux(cs)
 }
 
-func (j *Janitor) cleanES(k *api.ClusterSettings) error {
+func (j *Janitor) cleanES(k ClusterSettings) error {
 	if value, ok := j.ElasticConfig[ESEndpoint]; ok {
 		esClient, err := elastic.NewClient(
 			// elastic.SetSniff(false),
@@ -81,18 +80,39 @@ func (j *Janitor) cleanES(k *api.ClusterSettings) error {
 			log.Errorln(err)
 			return err
 		}
-		return es.DeleteIndices(esClient, k)
+		return es.DeleteIndices(esClient, k.LogIndexPrefix, k.LogStorageLifetime)
 	} else {
 		log.Infoln("elastic config url not set, ignoring elastic clean")
 	}
 	return nil
 }
 
-func (j *Janitor) cleanInflux(k *api.ClusterSettings) error {
+func (j *Janitor) cleanInflux(k ClusterSettings) error {
 	influxClient, err := influxdb.NewClient(j.InfluxConfig)
 	if err != nil {
 		log.Errorln(err)
 		return err
 	}
-	return influx.UpdateRetentionPolicy(influxClient, k)
+	return influx.UpdateRetentionPolicy(influxClient, k.MonitoringStorageLifetime)
+}
+
+func ConfigMapToClusterSettings(cnf apiv1.ConfigMap) (ClusterSettings, error) {
+	cs := ClusterSettings{}
+	var err error
+	if d, ok := cnf.Data["log-index-prefix"]; ok {
+		cs.LogIndexPrefix = d
+	}
+	if d, ok := cnf.Data["log-storage-lifetime"]; ok {
+		cs.LogStorageLifetime, err = strconv.ParseInt(d, 10, 64)
+		if err != nil {
+			return cs, err
+		}
+	}
+	if d, ok := cnf.Data["monitoring-storage-lifetime"]; ok {
+		cs.MonitoringStorageLifetime, err = strconv.ParseInt(d, 10, 64)
+		if err != nil {
+			return cs, err
+		}
+	}
+	return cs, nil
 }
