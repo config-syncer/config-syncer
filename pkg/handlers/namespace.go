@@ -1,12 +1,10 @@
 package handlers
 
 import (
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"github.com/appscode/errors"
 	"github.com/appscode/kubed/pkg/events"
 	"github.com/appscode/log"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientset "k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"

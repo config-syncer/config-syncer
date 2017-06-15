@@ -7,14 +7,12 @@ import (
 
 	"github.com/appscode/kubed/pkg/events"
 	"github.com/appscode/kubed/pkg/handlers"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/util/wait"
 	clientset "k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/apimachinery/pkg/fields"
 )
 
 type Watcher struct {

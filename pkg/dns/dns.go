@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
@@ -14,7 +15,7 @@ func GetServiceClusterIP(client clientset.Interface, prefix, hostname string) (s
 	if err != nil {
 		return "", err
 	}
-	service, err := client.Core().Services(namespace).Get(serviceName)
+	service, err := client.CoreV1().Services(namespace).Get(serviceName, metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
