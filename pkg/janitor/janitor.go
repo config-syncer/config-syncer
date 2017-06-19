@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	ESEndpoint                   string = "es-endpoint"
-	KubeConfigMapClusterSettings string = "cluster-settings"
+	ESEndpoint                string = "es-endpoint"
+	KubeSecretClusterSettings string = "cluster-settings-secret"
 )
 
 type Janitor struct {
@@ -46,18 +46,18 @@ func (j *Janitor) Run() {
 		time.Sleep(time.Minute * 10)
 	})
 
-	clusterConf := &apiv1.ConfigMap{}
+	clusterConf := &apiv1.Secret{}
 	err := j.KubeClient.CoreV1().RESTClient().Get().
 		Namespace(metav1.NamespaceSystem).
-		Resource("configmaps").
-		Name(KubeConfigMapClusterSettings).
+		Resource("secrets").
+		Name(KubeSecretClusterSettings).
 		Do().
 		Into(clusterConf)
 	if err != nil {
 		log.Errorln(err)
 		return
 	}
-	cs, err := ConfigMapToClusterSettings(*clusterConf)
+	cs, err := SecretToClusterSettings(*clusterConf)
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -92,20 +92,20 @@ func (j *Janitor) cleanInflux(k ClusterSettings) error {
 	return influx.UpdateRetentionPolicy(influxClient, k.MonitoringStorageLifetime)
 }
 
-func ConfigMapToClusterSettings(cnf apiv1.ConfigMap) (ClusterSettings, error) {
+func SecretToClusterSettings(cnf apiv1.Secret) (ClusterSettings, error) {
 	cs := ClusterSettings{}
 	var err error
 	if d, ok := cnf.Data["log-index-prefix"]; ok {
-		cs.LogIndexPrefix = d
+		cs.LogIndexPrefix = string(d)
 	}
 	if d, ok := cnf.Data["log-storage-lifetime"]; ok {
-		cs.LogStorageLifetime, err = strconv.ParseInt(d, 10, 64)
+		cs.LogStorageLifetime, err = strconv.ParseInt(string(d), 10, 64)
 		if err != nil {
 			return cs, err
 		}
 	}
 	if d, ok := cnf.Data["monitoring-storage-lifetime"]; ok {
-		cs.MonitoringStorageLifetime, err = strconv.ParseInt(d, 10, 64)
+		cs.MonitoringStorageLifetime, err = strconv.ParseInt(string(d), 10, 64)
 		if err != nil {
 			return cs, err
 		}
