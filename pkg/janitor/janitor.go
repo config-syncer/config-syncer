@@ -17,17 +17,16 @@ import (
 )
 
 const (
-	ESEndpoint                string = "es-endpoint"
-	KubeSecretClusterSettings string = "cluster-settings-secret"
+	ESEndpoint string = "es-endpoint"
 )
 
 type Janitor struct {
-	ClusterName   string
-	ElasticConfig map[string]string
-	InfluxConfig  influxdb.Config
-	IcingaConfig  map[string]string
-	KubeClient    clientset.Interface
-
+	ClusterName                  string
+	ElasticConfig                map[string]string
+	InfluxConfig                 influxdb.Config
+	IcingaConfig                 map[string]string
+	KubeClient                   clientset.Interface
+	ClusterKubedConfigSecretName string
 	// Icinga Client
 	IcingaClient *icinga.IcingaClient
 
@@ -50,7 +49,7 @@ func (j *Janitor) Run() {
 	err := j.KubeClient.CoreV1().RESTClient().Get().
 		Namespace(metav1.NamespaceSystem).
 		Resource("secrets").
-		Name(KubeSecretClusterSettings).
+		Name(j.ClusterKubedConfigSecretName).
 		Do().
 		Into(clusterConf)
 	if err != nil {

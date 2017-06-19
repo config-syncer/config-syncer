@@ -20,18 +20,20 @@ import (
 )
 
 type RunOptions struct {
-	Master                string
-	KubeConfig            string
-	ESEndpoint            string
-	InfluxSecretName      string
-	InfluxSecretNamespace string
-	ClusterName           string
+	Master                       string
+	KubeConfig                   string
+	ESEndpoint                   string
+	InfluxSecretName             string
+	InfluxSecretNamespace        string
+	ClusterName                  string
+	ClusterKubedConfigSecretName string
 }
 
 func NewCmdRun() *cobra.Command {
 	opt := RunOptions{
-		InfluxSecretName:      "appscode-influx",
-		InfluxSecretNamespace: "kube-system",
+		InfluxSecretName:             "appscode-influx",
+		InfluxSecretNamespace:        "kube-system",
+		ClusterKubedConfigSecretName: "cluster-kubed-config",
 	}
 	cmd := &cobra.Command{
 		Use:   "run",
@@ -50,6 +52,7 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringVar(&opt.ClusterName, "cluster-name", opt.ClusterName, "Name of Kubernetes cluster")
 	cmd.Flags().StringVar(&opt.ESEndpoint, "es-endpoint", opt.ESEndpoint, "Endpoint of elasticsearch")
 	cmd.Flags().StringVar(&opt.InfluxSecretName, "influx-secret", opt.InfluxSecretName, "Influxdb secret name")
+	cmd.Flags().StringVar(&opt.ClusterKubedConfigSecretName, "kubed-config-secret", opt.ClusterKubedConfigSecretName, "Kubed configuration secret name")
 	cmd.Flags().StringVar(&opt.InfluxSecretNamespace, "influx-secret-namespace", opt.InfluxSecretNamespace, "Influxdb secret namespace")
 	cmd.Flags().StringVar(&opt.KubeConfig, "kubeconfig", opt.KubeConfig, "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
 	cmd.Flags().StringVar(&opt.Master, "master", opt.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
@@ -77,9 +80,10 @@ func Run(opt RunOptions) {
 
 	// initializing kube janitor tasks
 	kubeJanitor := janitor.Janitor{
-		KubeClient:    clientset.NewForConfigOrDie(c),
-		ClusterName:   opt.ClusterName,
-		ElasticConfig: make(map[string]string),
+		KubeClient:                   clientset.NewForConfigOrDie(c),
+		ClusterName:                  opt.ClusterName,
+		ElasticConfig:                make(map[string]string),
+		ClusterKubedConfigSecretName: opt.ClusterKubedConfigSecretName,
 	}
 
 	if opt.ESEndpoint != "" {
