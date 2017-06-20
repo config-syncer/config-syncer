@@ -11,9 +11,10 @@ import (
 	"github.com/appscode/searchlight/pkg/client/icinga"
 	influxdb "github.com/influxdata/influxdb/client"
 	elastic "gopkg.in/olivere/elastic.v3"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 )
 
 const (
@@ -45,18 +46,7 @@ func (j *Janitor) Run() {
 		time.Sleep(time.Minute * 10)
 	})
 
-	clusterConf := &apiv1.Secret{}
-	err := j.KubeClient.CoreV1().RESTClient().Get().
-		Namespace(metav1.NamespaceSystem).
-		Resource("secrets").
-		Name(j.ClusterKubedConfigSecretName).
-		Do().
-		Into(clusterConf)
-	if err != nil {
-		log.Errorln(err)
-		return
-	}
-	cs, err := SecretToClusterSettings(*clusterConf)
+	cs, err := getClusterSettings(j.KubeClient, j.ClusterKubedConfigSecretName)
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -89,6 +79,16 @@ func (j *Janitor) cleanInflux(k ClusterSettings) error {
 		return err
 	}
 	return influx.UpdateRetentionPolicy(influxClient, k.MonitoringStorageLifetime)
+}
+
+func getClusterSettings(client clientset.Interface, secretName string) (ClusterSettings, error) {
+	clusterConf, err := client.Core().
+		Secrets("kube-system").
+		Get(secretName, meta_v1.GetOptions{})
+	if err != nil {
+		return ClusterSettings{}, err
+	}
+	return SecretToClusterSettings(*clusterConf)
 }
 
 func SecretToClusterSettings(cnf apiv1.Secret) (ClusterSettings, error) {

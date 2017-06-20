@@ -1,9 +1,12 @@
 package janitor
 
 import (
+	"fmt"
 	"testing"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/appscode/vultr/Godeps/_workspace/src/github.com/stretchr/testify/assert"
+	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
@@ -33,4 +36,21 @@ func TestConfigMapToClusterSettings(t *testing.T) {
 	}
 	c, err = SecretToClusterSettings(cnf2)
 	assert.NotNil(t, err)
+}
+
+func TestGetClusterSettings(t *testing.T) {
+	s := apiv1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "mysecret",
+			Namespace: "kube-system",
+		},
+		Type: "Opaque",
+		Data: map[string][]byte{
+			"username": []byte("username"),
+			"password": []byte("password"),
+		},
+	}
+	client := fake.NewSimpleClientset(s)
+	fmt.Println(client)
+
 }

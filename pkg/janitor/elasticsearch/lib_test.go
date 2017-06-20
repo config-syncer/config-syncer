@@ -10,7 +10,6 @@ import (
 func TestEsJanitor(t *testing.T) {
 	// ElasticSearch client
 	esClient, err := elastic.NewClient(
-		//elastic.SetSniff(false),
 		elastic.SetURL(""),
 	)
 	assert.Nil(t, err)
