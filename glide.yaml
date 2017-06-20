@@ -1,4 +1,4 @@
-package: appscode.com/kubed
+package: github.com/appscode/kubed
 import:
 - package: github.com/appscode/api
   version: master
