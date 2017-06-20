@@ -59,10 +59,10 @@ func TestGetClusterSettings(t *testing.T) {
 			MonitoringStorageLifetime: []byte(fmt.Sprintf("%v", expected.MonitoringStorageLifetime)),
 		},
 	}
-	cs, err := getClusterSettings(fake.NewSimpleClientset(s), "mysecret")
+	cs, err := getClusterSettings(fake.NewSimpleClientset(s), s.Name, s.Namespace)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, cs)
 
-	_, err = getClusterSettings(fake.NewSimpleClientset(s), "notpresent")
+	_, err = getClusterSettings(fake.NewSimpleClientset(s), "notpresent", s.Namespace)
 	assert.NotNil(t, err)
 }

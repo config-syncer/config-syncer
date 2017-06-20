@@ -24,12 +24,14 @@ const (
 )
 
 type Janitor struct {
-	ClusterName                  string
-	ElasticConfig                map[string]string
-	InfluxConfig                 influxdb.Config
-	IcingaConfig                 map[string]string
-	KubeClient                   clientset.Interface
-	ClusterKubedConfigSecretName string
+	ClusterName                       string
+	ElasticConfig                     map[string]string
+	InfluxConfig                      influxdb.Config
+	IcingaConfig                      map[string]string
+	KubeClient                        clientset.Interface
+	ClusterKubedConfigSecretName      string
+	ClusterKubedConfigSecretNamespace string
+
 	// Icinga Client
 	IcingaClient *icinga.IcingaClient
 
@@ -48,12 +50,12 @@ func (j *Janitor) Run() {
 		time.Sleep(time.Minute * 10)
 	})
 
-	cs, err := getClusterSettings(j.KubeClient, j.ClusterKubedConfigSecretName)
+	cs, err := getClusterSettings(j.KubeClient, j.ClusterKubedConfigSecretName, j.ClusterKubedConfigSecretNamespace)
 	if err != nil {
 		log.Errorln(err)
 		return
 	}
-	log.Infof("Cluster settings: %+v",  cs)
+	log.Infof("Cluster settings: %+v", cs)
 	j.cleanES(cs)
 	j.cleanInflux(cs)
 }
@@ -84,9 +86,9 @@ func (j *Janitor) cleanInflux(k ClusterSettings) error {
 	return influx.UpdateRetentionPolicy(influxClient, k.MonitoringStorageLifetime)
 }
 
-func getClusterSettings(client clientset.Interface, secretName string) (ClusterSettings, error) {
+func getClusterSettings(client clientset.Interface, secretName string, secretNamespace string) (ClusterSettings, error) {
 	clusterConf, err := client.Core().
-		Secrets("kube-system").
+		Secrets(secretNamespace).
 		Get(secretName, meta_v1.GetOptions{})
 	if err != nil {
 		return ClusterSettings{}, err
