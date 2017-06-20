@@ -17,9 +17,7 @@ spec:
         - name: kubed
           image: docker.appscode.com/kubed:0.1
           imagePullPolicy: Always
-          command:
-            - /kubed-linux-amd64
-          args: ['--api-server=apiserver', '--api-port=50051']  
+          args: ['run', '--cluster-name=h505', '-v=10']
           volumeMounts:
             - mountPath: "/srv/appscode"
               name: kubed-file

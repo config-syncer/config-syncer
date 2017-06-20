@@ -39,17 +39,30 @@ func TestConfigMapToClusterSettings(t *testing.T) {
 }
 
 func TestGetClusterSettings(t *testing.T) {
-	s := apiv1.Secret{
+	expected := ClusterSettings{
+		MonitoringStorageLifetime: 2222,
+		LogStorageLifetime:        3333,
+		LogIndexPrefix:            "test-",
+	}
+
+	s := &apiv1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "mysecret",
 			Namespace: "kube-system",
 		},
 		Type: "Opaque",
 		Data: map[string][]byte{
-			"username": []byte("username"),
-			"password": []byte("password"),
+			"username":                []byte("username"),
+			"password":                []byte("password"),
+			LogIndexPrefix:            []byte(expected.LogIndexPrefix),
+			LogStorageLifetime:        []byte(fmt.Sprintf("%v", expected.LogStorageLifetime)),
+			MonitoringStorageLifetime: []byte(fmt.Sprintf("%v", expected.MonitoringStorageLifetime)),
 		},
 	}
-	client := fake.NewSimpleClientset(s)
-	fmt.Println(client)
+	cs, err := getClusterSettings(fake.NewSimpleClientset(s), "mysecret")
+	assert.Nil(t, err)
+	assert.Equal(t, expected, cs)
+
+	_, err = getClusterSettings(fake.NewSimpleClientset(s), "notpresent")
+	assert.NotNil(t, err)
 }

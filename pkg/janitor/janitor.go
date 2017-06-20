@@ -17,7 +17,10 @@ import (
 )
 
 const (
-	ESEndpoint string = "es-endpoint"
+	ESEndpoint                string = "es-endpoint"
+	LogIndexPrefix            string = "log-index-prefix"
+	LogStorageLifetime        string = "log-storage-lifetime"
+	MonitoringStorageLifetime string = "monitoring-storage-lifetime"
 )
 
 type Janitor struct {
@@ -50,6 +53,7 @@ func (j *Janitor) Run() {
 		log.Errorln(err)
 		return
 	}
+	log.Infof("Cluster settings: %+v",  cs)
 	j.cleanES(cs)
 	j.cleanInflux(cs)
 }
@@ -93,16 +97,16 @@ func getClusterSettings(client clientset.Interface, secretName string) (ClusterS
 func SecretToClusterSettings(cnf apiv1.Secret) (ClusterSettings, error) {
 	cs := ClusterSettings{}
 	var err error
-	if d, ok := cnf.Data["log-index-prefix"]; ok {
+	if d, ok := cnf.Data[LogIndexPrefix]; ok {
 		cs.LogIndexPrefix = string(d)
 	}
-	if d, ok := cnf.Data["log-storage-lifetime"]; ok {
+	if d, ok := cnf.Data[LogStorageLifetime]; ok {
 		cs.LogStorageLifetime, err = strconv.ParseInt(string(d), 10, 64)
 		if err != nil {
 			return cs, err
 		}
 	}
-	if d, ok := cnf.Data["monitoring-storage-lifetime"]; ok {
+	if d, ok := cnf.Data[MonitoringStorageLifetime]; ok {
 		cs.MonitoringStorageLifetime, err = strconv.ParseInt(string(d), 10, 64)
 		if err != nil {
 			return cs, err
