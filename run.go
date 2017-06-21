@@ -78,7 +78,7 @@ func Run(opt RunOptions) {
 		SyncPeriod: time.Minute * 2,
 	}
 
-	log.Infoln("configuration loadded, running kubed watcher")
+	log.Infoln("Running kubed watcher")
 	go kubeWatcher.Run()
 
 	// initializing kube janitor tasks
