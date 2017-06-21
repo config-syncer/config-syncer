@@ -1,14 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/appscode/client"
 	"github.com/appscode/go/hold"
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/go/wait"
@@ -23,33 +20,27 @@ import (
 )
 
 type RunOptions struct {
-	APITokenPath          string
-	APIEndpoint           string
-	Master                string
-	KubeConfig            string
-	ESEndpoint            string
-	InfluxSecretName      string
-	InfluxSecretNamespace string
-	ClusterName           string
+	Master                            string
+	KubeConfig                        string
+	ESEndpoint                        string
+	InfluxSecretName                  string
+	InfluxSecretNamespace             string
+	ClusterName                       string
+	ClusterKubedConfigSecretName      string
+	ClusterKubedConfigSecretNamespace string
 }
 
 func NewCmdRun() *cobra.Command {
 	opt := RunOptions{
-		APIEndpoint:           "https://api.appscode.com:3443",
-		APITokenPath:          "/var/run/secrets/appscode/api-token",
-		InfluxSecretName:      "appscode-influx",
-		InfluxSecretNamespace: "kube-system",
+		InfluxSecretName:                  "appscode-influx",
+		InfluxSecretNamespace:             "kube-system",
+		ClusterKubedConfigSecretName:      "cluster-kubed-config",
+		ClusterKubedConfigSecretNamespace: "kube-system",
 	}
 	cmd := &cobra.Command{
 		Use:   "run",
 		Short: "Run daemon",
 		Run: func(cmd *cobra.Command, args []string) {
-			if opt.APITokenPath == "" {
-				log.Fatalln("Missing required flag: --api-token")
-			}
-			if opt.APIEndpoint == "" {
-				log.Fatalln("Missing required flag: --api-endpoint")
-			}
 			if opt.ClusterName == "" {
 				log.Fatalln("Missing required flag: --cluster-name")
 			}
@@ -60,11 +51,11 @@ func NewCmdRun() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&opt.APIEndpoint, "api-endpoint", opt.APIEndpoint, "AppsCode api server address host:port")
-	cmd.Flags().StringVar(&opt.APITokenPath, "api-token", opt.APITokenPath, "File path for AppsCode api token.")
 	cmd.Flags().StringVar(&opt.ClusterName, "cluster-name", opt.ClusterName, "Name of Kubernetes cluster")
 	cmd.Flags().StringVar(&opt.ESEndpoint, "es-endpoint", opt.ESEndpoint, "Endpoint of elasticsearch")
 	cmd.Flags().StringVar(&opt.InfluxSecretName, "influx-secret", opt.InfluxSecretName, "Influxdb secret name")
+	cmd.Flags().StringVar(&opt.ClusterKubedConfigSecretName, "kubed-config-secret-name", opt.ClusterKubedConfigSecretName, "Kubed configuration secret name")
+	cmd.Flags().StringVar(&opt.ClusterKubedConfigSecretNamespace, "kubed-config-secret-namespace", opt.ClusterKubedConfigSecretNamespace, "Kubed configuration secret namespace")
 	cmd.Flags().StringVar(&opt.InfluxSecretNamespace, "influx-secret-namespace", opt.InfluxSecretNamespace, "Influxdb secret namespace")
 	cmd.Flags().StringVar(&opt.KubeConfig, "kubeconfig", opt.KubeConfig, "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
 	cmd.Flags().StringVar(&opt.Master, "master", opt.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
@@ -82,23 +73,21 @@ func Run(opt RunOptions) {
 		os.Exit(1)
 	}
 
-	apiOptions := client.NewOption(opt.APIEndpoint)
-	log.Infoln("api options", apiOptions)
-	apiOptions.BearerAuth(readAuth(opt.APITokenPath))
-
 	kubeWatcher := &watcher.Watcher{
 		KubeClient: clientset.NewForConfigOrDie(c),
 		SyncPeriod: time.Minute * 2,
 	}
 
-	log.Infoln("configuration loadded, running kubed watcher")
+	log.Infoln("Running kubed watcher")
 	go kubeWatcher.Run()
 
 	// initializing kube janitor tasks
 	kubeJanitor := janitor.Janitor{
-		ClusterName:      opt.ClusterName,
-		APIClientOptions: apiOptions,
-		ElasticConfig:    make(map[string]string),
+		KubeClient:                        clientset.NewForConfigOrDie(c),
+		ClusterName:                       opt.ClusterName,
+		ElasticConfig:                     make(map[string]string),
+		ClusterKubedConfigSecretName:      opt.ClusterKubedConfigSecretName,
+		ClusterKubedConfigSecretNamespace: opt.ClusterKubedConfigSecretNamespace,
 	}
 
 	if opt.ESEndpoint != "" {
@@ -129,24 +118,4 @@ func Run(opt RunOptions) {
 		}
 	}
 	go wait.Forever(kubeJanitor.Run, time.Hour*24)
-}
-
-func readAuth(path string) (string, string) {
-	data, err := ioutil.ReadFile(path)
-	if err != nil {
-		log.Fatalln("failed to read api token", err)
-	}
-
-	// trying to parse the api token.
-	type Token struct {
-		Namespace string `json:"namespace,omitempty"`
-		Token     string `json:"token,omitempty"`
-	}
-	a := &Token{}
-	err = json.Unmarshal(data, a)
-	if err != nil {
-		log.Fatalln("failed to masrshel auth data", err)
-	}
-	log.Debugln("got api credentials for", a.Namespace, "to", a.Token)
-	return a.Namespace, a.Token
 }

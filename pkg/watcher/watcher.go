@@ -1,7 +1,6 @@
 package watcher
 
 import (
-	"reflect"
 	"sync"
 	"time"
 
@@ -28,38 +27,27 @@ func (w *Watcher) Run() {
 }
 
 func (w *Watcher) watchNamespaces() {
-	lw := cache.NewListWatchFromClient(w.KubeClient.CoreV1().RESTClient(), events.Namespace.String(), metav1.NamespaceAll, fields.Everything())
+	lw := cache.NewListWatchFromClient(
+		w.KubeClient.CoreV1().RESTClient(),
+		events.Namespace.String(),
+		metav1.NamespaceAll,
+		fields.Everything())
 	_, controller := cache.NewInformer(lw, &apiv1.Namespace{}, w.SyncPeriod, eventHandlerFuncs(w))
 	go controller.Run(wait.NeverStop)
-}
-
-func (w *Watcher) Dispatch(e *events.Event) error {
-	if e.Ignorable() {
-		return nil
-	}
-	if e.ResourceType == events.Namespace && e.EventType == events.Added {
-		h := &handlers.NamespaceHandler{
-			KubeClient: w.KubeClient,
-		}
-		h.Handle(e)
-	}
-	return nil
 }
 
 func eventHandlerFuncs(k *Watcher) cache.ResourceEventHandlerFuncs {
 	return cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			e := events.New(events.Added, obj)
-			k.Dispatch(e)
-		},
-		DeleteFunc: func(obj interface{}) {
-			e := events.New(events.Deleted, obj)
-			k.Dispatch(e)
-		},
-		UpdateFunc: func(old, new interface{}) {
-			if !reflect.DeepEqual(old, new) {
-				e := events.New(events.Updated, old, new)
-				k.Dispatch(e)
+			if e.Ignorable() {
+				return
+			}
+			if e.ResourceType == events.Namespace && e.EventType == events.Added {
+				h := &handlers.NamespaceHandler{
+					KubeClient: k.KubeClient,
+				}
+				h.Handle(e)
 			}
 		},
 	}

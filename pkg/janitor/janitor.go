@@ -1,36 +1,47 @@
 package janitor
 
 import (
+	"strconv"
 	"sync"
 	"time"
 
-	api "github.com/appscode/api/kubernetes/v1beta1"
-	"github.com/appscode/client"
 	es "github.com/appscode/kubed/pkg/janitor/elasticsearch"
 	influx "github.com/appscode/kubed/pkg/janitor/influxdb"
 	"github.com/appscode/log"
 	"github.com/appscode/searchlight/pkg/client/icinga"
 	influxdb "github.com/influxdata/influxdb/client"
 	elastic "gopkg.in/olivere/elastic.v3"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clientset "k8s.io/client-go/kubernetes"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
-	ESEndpoint string = "es-endpoint"
+	ESEndpoint                string = "es-endpoint"
+	LogIndexPrefix            string = "log-index-prefix"
+	LogStorageLifetime        string = "log-storage-lifetime"
+	MonitoringStorageLifetime string = "monitoring-storage-lifetime"
 )
 
 type Janitor struct {
-	ClusterName   string
-	ElasticConfig map[string]string
-	InfluxConfig  influxdb.Config
-	IcingaConfig  map[string]string
-
-	// appscode api server client
-	APIClientOptions *client.ClientOption
+	ClusterName                       string
+	ElasticConfig                     map[string]string
+	InfluxConfig                      influxdb.Config
+	IcingaConfig                      map[string]string
+	KubeClient                        clientset.Interface
+	ClusterKubedConfigSecretName      string
+	ClusterKubedConfigSecretNamespace string
 
 	// Icinga Client
 	IcingaClient *icinga.IcingaClient
 
 	once sync.Once
+}
+
+type ClusterSettings struct {
+	LogIndexPrefix            string `json:"log_index_prefix"`
+	LogStorageLifetime        int64  `json:"log_storage_lifetime"`
+	MonitoringStorageLifetime int64  `json:"monitoring_storage_lifetime"`
 }
 
 func (j *Janitor) Run() {
@@ -39,39 +50,17 @@ func (j *Janitor) Run() {
 		time.Sleep(time.Minute * 10)
 	})
 
-	conn, err := client.New(j.APIClientOptions)
+	cs, err := getClusterSettings(j.KubeClient, j.ClusterKubedConfigSecretName, j.ClusterKubedConfigSecretNamespace)
 	if err != nil {
 		log.Errorln(err)
 		return
 	}
-	defer conn.Close()
-
-	clusterDescribeReq := &api.ClusterDescribeRequest{
-		Uid: j.ClusterName,
-	}
-	clusterDescribeResp, err := conn.Kubernetes().V1beta1().Cluster().Describe(conn.Context(), clusterDescribeReq)
-	if err != nil {
-		log.Errorln(err)
-		return
-	}
-
-	// This ensures not panic if there were some communication
-	// error with apiserver.
-	if clusterDescribeResp != nil {
-		if clusterDescribeResp.Cluster != nil {
-			if clusterDescribeResp.Cluster.Settings == nil {
-				log.Warningln("failed to get cluster settings informations")
-				return
-			}
-
-			j.cleanES(clusterDescribeResp.Cluster.Settings)
-			j.cleanInflux(clusterDescribeResp.Cluster.Settings)
-			//j.syncAlert(conn)
-		}
-	}
+	log.Infof("Cluster settings: %+v", cs)
+	j.cleanES(cs)
+	j.cleanInflux(cs)
 }
 
-func (j *Janitor) cleanES(k *api.ClusterSettings) error {
+func (j *Janitor) cleanES(k ClusterSettings) error {
 	if value, ok := j.ElasticConfig[ESEndpoint]; ok {
 		esClient, err := elastic.NewClient(
 			// elastic.SetSniff(false),
@@ -81,18 +70,49 @@ func (j *Janitor) cleanES(k *api.ClusterSettings) error {
 			log.Errorln(err)
 			return err
 		}
-		return es.DeleteIndices(esClient, k)
+		return es.DeleteIndices(esClient, k.LogIndexPrefix, k.LogStorageLifetime)
 	} else {
 		log.Infoln("elastic config url not set, ignoring elastic clean")
 	}
 	return nil
 }
 
-func (j *Janitor) cleanInflux(k *api.ClusterSettings) error {
+func (j *Janitor) cleanInflux(k ClusterSettings) error {
 	influxClient, err := influxdb.NewClient(j.InfluxConfig)
 	if err != nil {
 		log.Errorln(err)
 		return err
 	}
-	return influx.UpdateRetentionPolicy(influxClient, k)
+	return influx.UpdateRetentionPolicy(influxClient, k.MonitoringStorageLifetime)
+}
+
+func getClusterSettings(client clientset.Interface, secretName string, secretNamespace string) (ClusterSettings, error) {
+	clusterConf, err := client.Core().
+		Secrets(secretNamespace).
+		Get(secretName, meta_v1.GetOptions{})
+	if err != nil {
+		return ClusterSettings{}, err
+	}
+	return SecretToClusterSettings(*clusterConf)
+}
+
+func SecretToClusterSettings(cnf apiv1.Secret) (ClusterSettings, error) {
+	cs := ClusterSettings{}
+	var err error
+	if d, ok := cnf.Data[LogIndexPrefix]; ok {
+		cs.LogIndexPrefix = string(d)
+	}
+	if d, ok := cnf.Data[LogStorageLifetime]; ok {
+		cs.LogStorageLifetime, err = strconv.ParseInt(string(d), 10, 64)
+		if err != nil {
+			return cs, err
+		}
+	}
+	if d, ok := cnf.Data[MonitoringStorageLifetime]; ok {
+		cs.MonitoringStorageLifetime, err = strconv.ParseInt(string(d), 10, 64)
+		if err != nil {
+			return cs, err
+		}
+	}
+	return cs, nil
 }
