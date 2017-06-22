@@ -9,7 +9,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/prometheus/common/log"
+	"github.com/appscode/kubed/pkg/notifier"
+	"github.com/appscode/log"
+	clientset "k8s.io/client-go/kubernetes"
 )
 
 const (
@@ -19,16 +21,22 @@ const (
 )
 
 type CertWatcher struct {
-	CheckInterval        time.Duration
-	MinRemainingDuration time.Duration
-	CertPath             string
+	CheckInterval                     time.Duration
+	MinRemainingDuration              time.Duration
+	CertPath                          string
+	KubeClient                        clientset.Interface
+	ClusterKubedConfigSecretName      string
+	ClusterKubedConfigSecretNamespace string
 }
 
-func DefaultCertWatcher() *CertWatcher {
+func DefaultCertWatcher(c clientset.Interface, secretName string, secretNamespace string) *CertWatcher {
 	return &CertWatcher{
-		CheckInterval:        DefaultCheckInterval,
-		MinRemainingDuration: DefaultMinRemainingDays,
-		CertPath:             CaCertPath,
+		CheckInterval:                     DefaultCheckInterval,
+		MinRemainingDuration:              DefaultMinRemainingDays,
+		CertPath:                          CaCertPath,
+		KubeClient:                        c,
+		ClusterKubedConfigSecretName:      secretName,
+		ClusterKubedConfigSecretNamespace: secretNamespace,
 	}
 }
 
@@ -37,6 +45,7 @@ func (c CertWatcher) Run() {
 		f, err := os.Open(c.CertPath)
 		if err != nil {
 			//Notify admin that certificate not found
+			notifier.SendNotification("certificate  not found")
 			log.Errorln(err)
 		}
 		defer f.Close()

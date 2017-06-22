@@ -79,9 +79,9 @@ func Run(opt RunOptions) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-
+	client := clientset.NewForConfigOrDie(c)
 	kubeWatcher := &watcher.Watcher{
-		KubeClient: clientset.NewForConfigOrDie(c),
+		KubeClient: client,
 		SyncPeriod: time.Minute * 2,
 	}
 
@@ -90,7 +90,7 @@ func Run(opt RunOptions) {
 
 	// initializing kube janitor tasks
 	kubeJanitor := janitor.Janitor{
-		KubeClient:                        clientset.NewForConfigOrDie(c),
+		KubeClient:                        client,
 		ClusterName:                       opt.ClusterName,
 		ElasticConfig:                     make(map[string]string),
 		ClusterKubedConfigSecretName:      opt.ClusterKubedConfigSecretName,
@@ -126,8 +126,11 @@ func Run(opt RunOptions) {
 	}
 
 	if opt.NotifyOnCertSoonToBeExpeired {
-		go cert.DefaultCertWatcher().Run()
+		go cert.DefaultCertWatcher(
+			client,
+			opt.ClusterKubedConfigSecretName,
+			opt.ClusterKubedConfigSecretNamespace,
+		).Run()
 	}
-
 	go wait.Forever(kubeJanitor.Run, time.Hour*24)
 }

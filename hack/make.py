@@ -88,8 +88,11 @@ def lint():
     call('golint *.go')
     call('golint ./pkg/...')
 
+def gen_extpoints():
+    die(call('go-extpoints ./pkg/notifier/extpoints'))
 
 def gen():
+    gen_extpoints()
     return
 
 
