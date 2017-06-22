@@ -2,11 +2,13 @@ package indexers
 
 import (
 	"net/http"
+	"reflect"
 	"sync"
 	"time"
 
 	"github.com/appscode/log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	clientset "k8s.io/client-go/kubernetes"
@@ -118,17 +120,55 @@ func (ri *ReverseIndexer) newService(obj interface{}) {
 }
 
 func (ri *ReverseIndexer) removeService(obj interface{}) {
-	if _, ok := assertIsService(obj); ok {
+	if svc, ok := assertIsService(obj); ok {
+		pods, err := ri.listPodsForService(svc)
+		if err != nil {
+			log.Errorln("Failed to list Pods")
+			return
+		}
 
+		ri.cacheLock.Lock()
+		defer ri.cacheLock.Unlock()
+		for _, pod := range pods.Items {
+			key := namespacerKey(pod.ObjectMeta)
+			if val, ok := ri.reverseRecordMap[key]; ok {
+				for i, valueSvc := range val {
+					if equalService(svc, valueSvc) {
+						ri.reverseRecordMap[key] = append(val[:i], val[i+1:]...)
+					}
+				}
+			}
+		}
 	}
 }
 
 func (ri *ReverseIndexer) updateService(oldObj, newObj interface{}) {
-	if _, ok := assertIsService(newObj); ok {
-		if _, ok := assertIsService(oldObj); ok {
-
+	if old, ok := assertIsService(newObj); ok {
+		if new, ok := assertIsService(oldObj); ok {
+			if !reflect.DeepEqual(old.Spec.Selector, new.Spec.Selector) {
+				// Only update if selector changes
+				ri.removeService(old)
+				ri.newService(new)
+			}
 		}
 	}
+}
+
+func (ri *ReverseIndexer) listPodsForService(svc *apiv1.Service) (*apiv1.PodList, error) {
+	return ri.kubeClient.CoreV1().Pods(metav1.NamespaceAll).List(metav1.ListOptions{
+		LabelSelector: labels.SelectorFromSet(svc.Spec.Selector).String(),
+	})
+}
+
+func equalService(a, b *apiv1.Service) bool {
+	if a.Name == b.Name && a.Namespace == b.Namespace {
+		return true
+	}
+	return false
+}
+
+func namespacerKey(meta metav1.ObjectMeta) string {
+	return meta.Namespace + "/" + meta.Name
 }
 
 func assertIsService(obj interface{}) (*apiv1.Service, bool) {
