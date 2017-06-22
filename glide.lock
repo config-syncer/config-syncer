@@ -1,5 +1,5 @@
-hash: 1b618c94073b1b79586a777b47e6830f5dd527d02edabafa0c907d8eabeca6f1
-updated: 2017-06-19T22:46:08.943878173-07:00
+hash: 90af368a9998100492b5fc69ef52e93ec3325f04aff713ef1d01f1edff05249b
+updated: 2017-06-22T16:39:37.500661969+06:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -13,7 +13,7 @@ imports:
 - name: github.com/appscode/errors
   version: 748883e321a9f99fe901bd2663c7af3fcae43ea4
 - name: github.com/appscode/go
-  version: 5eabd32a8a0fe824b5e12c37dc53a0afea8507c9
+  version: 7ba1c0a441c6c319a501e54db6e93deaff5fe0dd
   subpackages:
   - env
   - hold
@@ -24,6 +24,8 @@ imports:
   version: 68e0e42e42c01371f3950571fc87c2298a51dd8f
   subpackages:
   - golog
+- name: github.com/appscode/pat
+  version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
   version: 9accfcb1b753457c45604406583867cbc46ac0c2
   subpackages:
@@ -128,7 +130,7 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/spf13/cobra
-  version: 99b5d838ca16c25cc4944e323684f8415e8b10ba
+  version: f62e98d28ab7ad31d707ba837a966378465c7b57
 - name: github.com/spf13/pflag
   version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
 - name: github.com/ugorji/go
@@ -353,7 +355,7 @@ imports:
   - util/homedir
   - util/integer
 - name: k8s.io/kubernetes
-  version: 8eb75a5810cba92ccad845ca360cf924f2385881
+  version: f07eea23494be1e7c11a8e2cf51bd96d1ec9fdf1
   subpackages:
   - pkg/api
   - pkg/api/errors

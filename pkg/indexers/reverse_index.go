@@ -11,7 +11,6 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	clientset "k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/pkg/util/wait"
 	kcache "k8s.io/client-go/tools/cache"
 )
 
@@ -44,6 +43,9 @@ type ReverseIndexer struct {
 	apiHandler http.Handler
 }
 
+// NeverStop may be passed to Until to make it never stop.
+var NeverStop <-chan struct{} = make(chan struct{})
+
 func NewReverseIndexer(client clientset.Interface, timeout time.Duration) *ReverseIndexer {
 	ri := &ReverseIndexer{
 		kubeClient:         client,
@@ -60,7 +62,7 @@ func NewReverseIndexer(client clientset.Interface, timeout time.Duration) *Rever
 
 func (ri *ReverseIndexer) Start() {
 	log.Infoln("Starting serviceController")
-	go ri.serviceController.Run(wait.NeverStop)
+	go ri.serviceController.Run(NeverStop)
 
 	// Wait synchronously for the initial list operations to be
 	// complete of endpoints and services from APIServer.
@@ -100,9 +102,42 @@ func (ri *ReverseIndexer) setServiceWatcher() {
 		&apiv1.Service{},
 		resyncPeriod,
 		kcache.ResourceEventHandlerFuncs{
-		// AddFunc:    ri.newService,
-		// DeleteFunc: ri.removeService,
-		// UpdateFunc: ri.updateService,
+			AddFunc:    ri.newService,
+			DeleteFunc: ri.removeService,
+			UpdateFunc: ri.updateService,
 		},
 	)
+}
+
+func (ri *ReverseIndexer) newService(obj interface{}) {
+	if service, ok := assertIsService(obj); ok {
+		log.Infof("New service: %v", service.Name)
+		log.V(5).Infof("Service details: %v", service)
+
+	}
+}
+
+func (ri *ReverseIndexer) removeService(obj interface{}) {
+	if _, ok := assertIsService(obj); ok {
+
+	}
+}
+
+func (ri *ReverseIndexer) updateService(oldObj, newObj interface{}) {
+	if _, ok := assertIsService(newObj); ok {
+		if _, ok := assertIsService(oldObj); ok {
+			// Remove old cache path only if changing type to/from ExternalName.
+			// In all other cases, we'll update records in place.
+
+		}
+	}
+}
+
+func assertIsService(obj interface{}) (*apiv1.Service, bool) {
+	if service, ok := obj.(*apiv1.Service); ok {
+		return service, ok
+	} else {
+		log.Errorf("Type assertion failed! Expected 'Service', got %T", service)
+		return nil, ok
+	}
 }
