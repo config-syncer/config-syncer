@@ -74,7 +74,7 @@ func (h *NamespaceHandler) isFound(namespace string, t string, name string) bool
 		log.Errorln(err)
 		return false
 	}
-	err = h.KubeClient.Core().RESTClient().Get().
+	err = h.KubeClient.CoreV1().RESTClient().Get().
 		Namespace(namespace).
 		Resource(t).
 		Name(name).
