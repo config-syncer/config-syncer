@@ -126,8 +126,6 @@ func (ri *ReverseIndexer) removeService(obj interface{}) {
 func (ri *ReverseIndexer) updateService(oldObj, newObj interface{}) {
 	if _, ok := assertIsService(newObj); ok {
 		if _, ok := assertIsService(oldObj); ok {
-			// Remove old cache path only if changing type to/from ExternalName.
-			// In all other cases, we'll update records in place.
 
 		}
 	}
