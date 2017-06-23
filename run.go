@@ -15,6 +15,7 @@ import (
 	"github.com/appscode/kubed/pkg/janitor"
 	"github.com/appscode/kubed/pkg/watcher"
 	"github.com/appscode/log"
+	"github.com/appscode/pat"
 	"github.com/appscode/searchlight/pkg/client/influxdb"
 	"github.com/spf13/cobra"
 	clientset "k8s.io/client-go/kubernetes"
@@ -88,9 +89,18 @@ func Run(opt RunOptions) {
 	log.Infoln("Running kubed watcher")
 	go kubeWatcher.Run()
 
+	// router is default HTTP request multiplexer for kubed. It matches the URL of each
+	// incoming request against a list of registered patterns with their associated
+	// methods and calls the handler for the pattern that most closely matches the
+	// URL.
+	//
+	// Pattern matching attempts each pattern in the order in which they were
+	// registered.
+	router := pat.New()
+
 	if opt.ReverseIndex {
 		ri := indexers.NewReverseIndexer(clientset.NewForConfigOrDie(c), time.Second*2)
-		http.Handle("/indexer", ri.Handlers())
+		ri.RegisterRouters(router)
 		go ri.Start()
 	}
 
@@ -133,6 +143,7 @@ func Run(opt RunOptions) {
 	go wait.Forever(kubeJanitor.Run, time.Hour*24)
 
 	if len(opt.ServerAddress) > 0 {
+		http.Handle("/", router)
 		go http.ListenAndServe(opt.ServerAddress, nil)
 	}
 }

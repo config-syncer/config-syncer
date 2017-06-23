@@ -1,13 +1,61 @@
 package indexers
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
+	"net/url"
 
-func (ri *ReverseIndexer) Handlers() http.Handler {
-	return ri.apiHandler
+	"github.com/appscode/log"
+	"github.com/appscode/pat"
+	"k8s.io/apimachinery/pkg/apis/meta/v1"
+)
+
+const (
+	// Default router prefix of indexers
+	httpRouterPrefix = "/index"
+)
+
+func (ri *ReverseIndexer) RegisterRouters(r *pat.PatternServeMux) {
+	r.Get(httpRouterPrefix+"/:resource/:namespace/:name", http.HandlerFunc(ri.ServeHTTP))
 }
 
-type reverseIndexAPIHandlers struct{}
+func (ri *ReverseIndexer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	log.Infoln("Request received at", req.URL.Path)
+	params, found := pat.FromContext(req.Context())
+	if !found {
+		http.Error(w, "Missing parameters", http.StatusBadRequest)
+		return
+	}
+	resource := params.Get(":resource")
 
-func (ri *reverseIndexAPIHandlers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// TODO (@sadlil) Use mapping
+	switch resource {
+	case "pod", "pods":
+		ri.serverPodIndex(w, req, params)
+		return
+	}
 
+	http.Error(w, "Resource not supported", http.StatusNotImplemented)
+}
+
+func (ri *ReverseIndexer) serverPodIndex(w http.ResponseWriter, req *http.Request, params url.Values) {
+	namespace, name := params.Get(":namespace"), params.Get(":name")
+	if len(namespace) > 0 && len(name) > 0 {
+		ri.cacheLock.Lock()
+		defer ri.cacheLock.Unlock()
+
+		key := namespacerKey(v1.ObjectMeta{Name: name, Namespace: namespace})
+		if val, ok := ri.reverseRecordMap[key]; ok {
+			if err := json.NewEncoder(w).Encode(val); err == nil {
+				w.Header().Set("Content-Type", "application/json")
+				return
+			} else {
+				http.Error(w, "Server error"+err.Error(), http.StatusInternalServerError)
+			}
+		} else {
+			http.NotFound(w, req)
+		}
+		return
+	}
+	http.Error(w, "Bad Request", http.StatusBadRequest)
 }

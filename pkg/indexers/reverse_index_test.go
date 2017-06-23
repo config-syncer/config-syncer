@@ -1,13 +1,14 @@
 package indexers
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/fake"
-	"k8s.io/client-go/pkg/api/v1"
+	"fmt"
 	"sync"
 	"testing"
 	"time"
-	"fmt"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/fake"
+	"k8s.io/client-go/pkg/api/v1"
 )
 
 func newTestReverseIndexer() *ReverseIndexer {
@@ -19,7 +20,6 @@ func newTestReverseIndexer() *ReverseIndexer {
 		cacheLock:          sync.RWMutex{},
 		reverseRecordMap:   make(map[string][]*v1.Service),
 		initialSyncTimeout: time.Minute * 5,
-		apiHandler:         &reverseIndexAPIHandlers{},
 	}
 }
 

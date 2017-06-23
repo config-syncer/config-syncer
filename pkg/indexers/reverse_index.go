@@ -1,7 +1,6 @@
 package indexers
 
 import (
-	"net/http"
 	"reflect"
 	"sync"
 	"time"
@@ -41,8 +40,6 @@ type ReverseIndexer struct {
 
 	// Initial timeout for endpoints and services to be synced from APIServer
 	initialSyncTimeout time.Duration
-
-	apiHandler http.Handler
 }
 
 // NeverStop may be passed to Until to make it never stop.
@@ -54,7 +51,6 @@ func NewReverseIndexer(client clientset.Interface, timeout time.Duration) *Rever
 		cacheLock:          sync.RWMutex{},
 		reverseRecordMap:   make(map[string][]*apiv1.Service),
 		initialSyncTimeout: timeout,
-		apiHandler:         &reverseIndexAPIHandlers{},
 	}
 
 	ri.setServiceWatcher()
