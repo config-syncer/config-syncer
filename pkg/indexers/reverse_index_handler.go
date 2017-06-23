@@ -31,14 +31,14 @@ func (ri *ReverseIndexer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// TODO (@sadlil) Use mapping
 	switch resource {
 	case "pod", "pods":
-		ri.serverPodIndex(w, req, params)
+		ri.servePodIndex(w, req, params)
 		return
 	}
 
 	http.Error(w, "Resource not supported", http.StatusNotImplemented)
 }
 
-func (ri *ReverseIndexer) serverPodIndex(w http.ResponseWriter, req *http.Request, params url.Values) {
+func (ri *ReverseIndexer) servePodIndex(w http.ResponseWriter, req *http.Request, params url.Values) {
 	namespace, name := params.Get(":namespace"), params.Get(":name")
 	if len(namespace) > 0 && len(name) > 0 {
 		ri.cacheLock.Lock()
