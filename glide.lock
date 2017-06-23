@@ -1,5 +1,5 @@
 hash: 90af368a9998100492b5fc69ef52e93ec3325f04aff713ef1d01f1edff05249b
-updated: 2017-06-22T16:39:37.500661969+06:00
+updated: 2017-06-23T03:04:44.090269117-07:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -13,7 +13,7 @@ imports:
 - name: github.com/appscode/errors
   version: 748883e321a9f99fe901bd2663c7af3fcae43ea4
 - name: github.com/appscode/go
-  version: 7ba1c0a441c6c319a501e54db6e93deaff5fe0dd
+  version: 5eabd32a8a0fe824b5e12c37dc53a0afea8507c9
   subpackages:
   - env
   - hold
@@ -130,7 +130,7 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/spf13/cobra
-  version: f62e98d28ab7ad31d707ba837a966378465c7b57
+  version: 31694f19adeeaeb0a0e5fe95441b390d757753d2
 - name: github.com/spf13/pflag
   version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
 - name: github.com/ugorji/go
@@ -355,7 +355,7 @@ imports:
   - util/homedir
   - util/integer
 - name: k8s.io/kubernetes
-  version: f07eea23494be1e7c11a8e2cf51bd96d1ec9fdf1
+  version: 8eb75a5810cba92ccad845ca360cf924f2385881
   subpackages:
   - pkg/api
   - pkg/api/errors
