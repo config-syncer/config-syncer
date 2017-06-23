@@ -23,7 +23,7 @@ func TestGetOptions(t *testing.T) {
 	opts := map[string]string{
 		"plivo_auth_id":    expOpt.AuthID,
 		"plivo_auth_token": expOpt.AuthToken,
-		"plivo_to":         strings.Join(expOpt.To, ","),
+		"cluster_admin_phone":         strings.Join(expOpt.To, ","),
 		"plivo_from":       expOpt.From,
 	}
 	err := b.SetOptions(opts)

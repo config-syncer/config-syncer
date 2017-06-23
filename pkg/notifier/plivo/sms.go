@@ -30,13 +30,13 @@ func (b *biblio) SetOptions(opts map[string]string) error {
 	if _, found := opts["plivo_from"]; !found {
 		return errors.New("plivo_from not found")
 	}
-	if _, found := opts["plivo_to"]; !found {
-		return errors.New("plivo_to  not found")
+	if _, found := opts["cluster_admin_phone"]; !found {
+		return errors.New("cluster_admin_phone  not found")
 	}
 	b.opts = plivo.Options{
 		AuthID:    opts["plivo_auth_id"],
 		AuthToken: opts["plivo_auth_token"],
-		To:        strings.Split(opts["plivo_to"], ","),
+		To:        strings.Split(opts["cluster_admin_phone"], ","),
 		From:      opts["plivo_from"],
 	}
 	return nil

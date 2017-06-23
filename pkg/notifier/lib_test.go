@@ -5,64 +5,39 @@ import (
 
 	_ "github.com/appscode/kubed/pkg/notifier/plivo"
 	"github.com/stretchr/testify/assert"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/fake"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
-func TestNotifierDriver(t *testing.T) {
-	s := &apiv1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "mysecret",
-			Namespace: "kube-system",
-		},
-		Type: "Opaque",
-		Data: map[string][]byte{
-			"username":         []byte("username"),
-			"password":         []byte("password"),
-			"notify_via":       []byte("plivo"),
-			"plivo_auth_id":    []byte("auth_id"),
-			"plivo_auth_token": []byte("auth_token"),
-			"plivo_to":         []byte("admin,0111"),
-			"plivo_from":       []byte("server"),
-		},
+func TestNotificationDriver(t *testing.T) {
+	opts1 := map[string]string{
+		"notify_via":       "plivo",
+		"plivo_auth_id":    "auth_id",
+		"plivo_auth_token": "auth_token",
+		"plivo_to":         "admin,0111",
+		"plivo_from":       "server",
 	}
-	driver, err := notificationDriver(fake.NewSimpleClientset(s), s.ObjectMeta.Name, s.ObjectMeta.Namespace)
+	driver, err := New(opts1).notificationDriver()
 	assert.Nil(t, err)
 	assert.NotNil(t, driver)
 	assert.Equal(t, "plivo", driver.Uid())
-}
 
-func TestNotifierDriverFromConfiguration(t *testing.T) {
-	opts1 := map[string][]byte{
-		"notify_via":       []byte("plivo"),
-		"plivo_auth_id":    []byte("auth_id"),
-		"plivo_auth_token": []byte("auth_token"),
-		"plivo_to":         []byte("admin,0111"),
-		"plivo_from":       []byte("server"),
-	}
-	driver, err := notifierDriverFromConfiguration(opts1)
-	assert.Nil(t, err)
-	assert.NotNil(t, driver)
-
-	opts2 := map[string][]byte{
-		"notify_via":       []byte("unknown"),
-		"plivo_auth_id":    []byte("auth_id"),
-		"plivo_auth_token": []byte("auth_token"),
-		"plivo_to":         []byte("admin,0111"),
-		"plivo_from":       []byte("server"),
+	opts2 := map[string]string{
+		"notify_via":       "unknown",
+		"plivo_auth_id":    "auth_id",
+		"plivo_auth_token": "auth_token",
+		"plivo_to":         "admin,0111",
+		"plivo_from":       "server",
 	}
 
-	_, err = notifierDriverFromConfiguration(opts2)
+	_, err = New(opts2).notificationDriver()
 	assert.NotNil(t, err)
 
-	opts3 := map[string][]byte{
-		"notify_via":       []byte("plivo"),
-		"plivo_auth_token": []byte("auth_token"),
-		"plivo_to":         []byte("admin,0111"),
-		"plivo_from":       []byte("server"),
+	opts3 := map[string]string{
+		"notify_via":       "plivo",
+		"plivo_auth_token": "auth_token",
+		"plivo_to":         "admin,0111",
+		"plivo_from":       "server",
 	}
 
-	_, err = notifierDriverFromConfiguration(opts3)
+	driver, err = New(opts3).notificationDriver()
 	assert.NotNil(t, err)
 }
