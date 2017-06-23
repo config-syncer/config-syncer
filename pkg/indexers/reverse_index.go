@@ -116,12 +116,28 @@ func (ri *ReverseIndexer) newService(obj interface{}) {
 		log.Infof("New service: %v", service.Name)
 		log.V(5).Infof("Service details: %v", service)
 
+		pods, err := ri.podsForService(service)
+		if err != nil {
+			log.Errorln("Failed to list Pods")
+			return
+		}
+
+		ri.cacheLock.Lock()
+		defer ri.cacheLock.Unlock()
+		for _, pod := range pods.Items {
+			key := namespacerKey(pod.ObjectMeta)
+			val, _ := ri.reverseRecordMap[key]
+			if len(val) == 0 {
+				ri.reverseRecordMap[key] = make([]*apiv1.Service, 0)
+			}
+			ri.reverseRecordMap[key] = append(val, service)
+		}
 	}
 }
 
 func (ri *ReverseIndexer) removeService(obj interface{}) {
 	if svc, ok := assertIsService(obj); ok {
-		pods, err := ri.listPodsForService(svc)
+		pods, err := ri.podsForService(svc)
 		if err != nil {
 			log.Errorln("Failed to list Pods")
 			return
@@ -136,6 +152,10 @@ func (ri *ReverseIndexer) removeService(obj interface{}) {
 					if equalService(svc, valueSvc) {
 						ri.reverseRecordMap[key] = append(val[:i], val[i+1:]...)
 					}
+				}
+				if len(ri.reverseRecordMap[key]) == 0 {
+					// Remove unnecessary map index
+					delete(ri.reverseRecordMap, key)
 				}
 			}
 		}
@@ -154,7 +174,7 @@ func (ri *ReverseIndexer) updateService(oldObj, newObj interface{}) {
 	}
 }
 
-func (ri *ReverseIndexer) listPodsForService(svc *apiv1.Service) (*apiv1.PodList, error) {
+func (ri *ReverseIndexer) podsForService(svc *apiv1.Service) (*apiv1.PodList, error) {
 	return ri.kubeClient.CoreV1().Pods(metav1.NamespaceAll).List(metav1.ListOptions{
 		LabelSelector: labels.SelectorFromSet(svc.Spec.Selector).String(),
 	})

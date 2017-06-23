@@ -83,6 +83,8 @@ def fmt():
 def vet():
     call('go vet *.go ./pkg/...')
 
+def test():
+    call('go test -v *.go ./pkg/...')
 
 def lint():
     call('golint *.go')
