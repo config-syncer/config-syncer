@@ -1,8 +1,6 @@
 package indexers
 
 import (
-	"fmt"
-	"sync"
 	"testing"
 	"time"
 
@@ -17,7 +15,7 @@ func newTestReverseIndexer() *ReverseIndexer {
 			newPod("foo-pod-1"),
 			newPod("foo-pod-2"),
 		),
-		cacheLock:          sync.RWMutex{},
+		dataChan:           make(chan interface{}, 1),
 		reverseRecordMap:   make(map[string][]*v1.Service),
 		initialSyncTimeout: time.Minute * 5,
 	}
@@ -25,7 +23,8 @@ func newTestReverseIndexer() *ReverseIndexer {
 
 func TestNewService(t *testing.T) {
 	ri := newTestReverseIndexer()
-	ri.newService(newService())
+	ri.dataChan <- newService()
+	ri.newService()
 
 	pod := newPod("foo-pod-1")
 	if svc, ok := ri.reverseRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
@@ -55,7 +54,8 @@ func TestRemoveService(t *testing.T) {
 	ri := newTestReverseIndexer()
 
 	service := newService()
-	ri.newService(service)
+	ri.dataChan <- service
+	ri.newService()
 	pod := newPod("foo-pod-1")
 	if svc, ok := ri.reverseRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
 		if !equalService(svc[0], service) {
@@ -65,9 +65,8 @@ func TestRemoveService(t *testing.T) {
 		t.Errorf("Service did not found in cache")
 	}
 
-	ri.removeService(service)
-
-	fmt.Println(ri.reverseRecordMap)
+	ri.dataChan <- service
+	ri.removeService()
 
 	pod = newPod("foo-pod-1")
 	if _, ok := ri.reverseRecordMap[namespacerKey(pod.ObjectMeta)]; ok {

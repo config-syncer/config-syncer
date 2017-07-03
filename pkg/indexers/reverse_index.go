@@ -2,7 +2,6 @@ package indexers
 
 import (
 	"reflect"
-	"sync"
 	"time"
 
 	"github.com/appscode/log"
@@ -27,11 +26,8 @@ type ReverseIndexer struct {
 	// reverseRecordMap pod to service object.
 	reverseRecordMap map[string][]*apiv1.Service
 
-	// cacheLock protecting the cache. caller is responsible for using
-	// the cacheLock before invoking methods on cache the cache is not
-	// thread-safe, and the caller can guarantee thread safety by using
-	// the cacheLock
-	cacheLock sync.RWMutex
+	// Channel serializes event to protect cache
+	dataChan chan interface{}
 
 	// serviceController invokes registered callbacks when services change.
 	serviceController kcache.Controller
@@ -48,9 +44,9 @@ var NeverStop <-chan struct{} = make(chan struct{})
 func NewReverseIndexer(client clientset.Interface, timeout time.Duration) *ReverseIndexer {
 	ri := &ReverseIndexer{
 		kubeClient:         client,
-		cacheLock:          sync.RWMutex{},
 		reverseRecordMap:   make(map[string][]*apiv1.Service),
 		initialSyncTimeout: timeout,
+		dataChan:           make(chan interface{}, 1),
 	}
 
 	ri.setServiceWatcher()
@@ -100,14 +96,21 @@ func (ri *ReverseIndexer) setServiceWatcher() {
 		&apiv1.Service{},
 		resyncPeriod,
 		kcache.ResourceEventHandlerFuncs{
-			AddFunc:    ri.newService,
-			DeleteFunc: ri.removeService,
+			AddFunc: func(obj interface{}) {
+				ri.dataChan <- obj
+				ri.newService()
+			},
+			DeleteFunc: func(obj interface{}) {
+				ri.dataChan <- obj
+				ri.removeService()
+			},
 			UpdateFunc: ri.updateService,
 		},
 	)
 }
 
-func (ri *ReverseIndexer) newService(obj interface{}) {
+func (ri *ReverseIndexer) newService() {
+	obj := <-ri.dataChan
 	if service, ok := assertIsService(obj); ok {
 		log.Infof("New service: %v", service.Name)
 		log.V(5).Infof("Service details: %v", service)
@@ -118,8 +121,6 @@ func (ri *ReverseIndexer) newService(obj interface{}) {
 			return
 		}
 
-		ri.cacheLock.Lock()
-		defer ri.cacheLock.Unlock()
 		for _, pod := range pods.Items {
 			key := namespacerKey(pod.ObjectMeta)
 			val, _ := ri.reverseRecordMap[key]
@@ -131,7 +132,8 @@ func (ri *ReverseIndexer) newService(obj interface{}) {
 	}
 }
 
-func (ri *ReverseIndexer) removeService(obj interface{}) {
+func (ri *ReverseIndexer) removeService() {
+	obj := <-ri.dataChan
 	if svc, ok := assertIsService(obj); ok {
 		pods, err := ri.podsForService(svc)
 		if err != nil {
@@ -139,8 +141,6 @@ func (ri *ReverseIndexer) removeService(obj interface{}) {
 			return
 		}
 
-		ri.cacheLock.Lock()
-		defer ri.cacheLock.Unlock()
 		for _, pod := range pods.Items {
 			key := namespacerKey(pod.ObjectMeta)
 			if val, ok := ri.reverseRecordMap[key]; ok {
@@ -163,8 +163,11 @@ func (ri *ReverseIndexer) updateService(oldObj, newObj interface{}) {
 		if new, ok := assertIsService(oldObj); ok {
 			if !reflect.DeepEqual(old.Spec.Selector, new.Spec.Selector) {
 				// Only update if selector changes
-				ri.removeService(old)
-				ri.newService(new)
+				ri.dataChan <- oldObj
+				ri.removeService()
+
+				ri.dataChan <- newObj
+				ri.newService()
 			}
 		}
 	}
