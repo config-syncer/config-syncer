@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/appscode/go-notify/plivo"
-	"github.com/appscode/kubed/pkg/notifier"
+	"github.com/appscode/kubed/pkg/notifier/common"
 	"github.com/appscode/kubed/pkg/notifier/extpoints"
 )
 
@@ -27,7 +27,7 @@ func (b *biblio) SetOptions(opts map[string]string) error {
 		"plivo_from",
 		"cluster_admin_phone",
 	}
-	if err := notifier.EnsureRequiredKeys(opts, reqKeys); err != nil {
+	if err := common.EnsureRequiredKeys(opts, reqKeys); err != nil {
 		return err
 	}
 	b.opts = plivo.Options{

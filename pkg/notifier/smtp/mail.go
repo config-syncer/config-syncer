@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/appscode/go-notify/smtp"
-	"github.com/appscode/kubed/pkg/notifier"
+	"github.com/appscode/kubed/pkg/notifier/common"
 	"github.com/appscode/kubed/pkg/notifier/extpoints"
 )
 
@@ -33,7 +33,7 @@ func (b *biblio) SetOptions(opts map[string]string) error {
 		"smtp_from",
 		"cluster_admin_email",
 	}
-	if err := notifier.EnsureRequiredKeys(opts, reqKeys); err != nil {
+	if err := common.EnsureRequiredKeys(opts, reqKeys); err != nil {
 		return err
 	}
 	port, err := strconv.ParseInt(opts["smtp_port"], 10, 64)
