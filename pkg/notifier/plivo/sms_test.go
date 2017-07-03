@@ -8,10 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNotify(t *testing.T) {
-
-}
-
 func TestGetOptions(t *testing.T) {
 	b := biblio{}
 	expOpt := plivo.Options{
@@ -21,10 +17,10 @@ func TestGetOptions(t *testing.T) {
 		From:      "server",
 	}
 	opts := map[string]string{
-		"plivo_auth_id":    expOpt.AuthID,
-		"plivo_auth_token": expOpt.AuthToken,
-		"cluster_admin_phone":         strings.Join(expOpt.To, ","),
-		"plivo_from":       expOpt.From,
+		"plivo_auth_id":       expOpt.AuthID,
+		"plivo_auth_token":    expOpt.AuthToken,
+		"cluster_admin_phone": strings.Join(expOpt.To, ","),
+		"plivo_from":          expOpt.From,
 	}
 	err := b.SetOptions(opts)
 	assert.Nil(t, err)

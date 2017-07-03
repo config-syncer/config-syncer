@@ -3,7 +3,6 @@ package notifier
 import (
 	"testing"
 
-	_ "github.com/appscode/kubed/pkg/notifier/plivo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -37,7 +36,6 @@ func TestNotificationDriver(t *testing.T) {
 		"plivo_to":         "admin,0111",
 		"plivo_from":       "server",
 	}
-
 	driver, err = New(opts3).notificationDriver()
 	assert.NotNil(t, err)
 }

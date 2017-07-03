@@ -1,10 +1,10 @@
 package plivo
 
 import (
-	"errors"
 	"strings"
 
 	"github.com/appscode/go-notify/plivo"
+	"github.com/appscode/kubed/pkg/notifier"
 	"github.com/appscode/kubed/pkg/notifier/extpoints"
 )
 
@@ -21,17 +21,14 @@ func (b *biblio) Notify(body string) error {
 }
 
 func (b *biblio) SetOptions(opts map[string]string) error {
-	if _, found := opts["plivo_auth_id"]; !found {
-		return errors.New("plivo_auth_id not found")
+	reqKeys := []string{
+		"plivo_auth_id",
+		"plivo_auth_token",
+		"plivo_from",
+		"cluster_admin_phone",
 	}
-	if _, found := opts["plivo_auth_token"]; !found {
-		return errors.New("plivo_auth_token not found")
-	}
-	if _, found := opts["plivo_from"]; !found {
-		return errors.New("plivo_from not found")
-	}
-	if _, found := opts["cluster_admin_phone"]; !found {
-		return errors.New("cluster_admin_phone  not found")
+	if err := notifier.EnsureRequiredKeys(opts, reqKeys); err != nil {
+		return err
 	}
 	b.opts = plivo.Options{
 		AuthID:    opts["plivo_auth_id"],
