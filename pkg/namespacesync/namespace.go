@@ -1,4 +1,4 @@
-package handlers
+package namespacesync
 
 import (
 	"github.com/appscode/errors"
@@ -23,7 +23,13 @@ type NamespaceHandler struct {
 	KubeClient clientset.Interface
 }
 
-func New(t string) (runtime.Object, error) {
+func NewHandler(k clientset.Interface) *NamespaceHandler {
+	return &NamespaceHandler{
+		KubeClient: k,
+	}
+}
+
+func NewType(t string) (runtime.Object, error) {
 	switch t {
 	case Secrets:
 		return &apiv1.Secret{}, nil
@@ -69,7 +75,7 @@ func (h *NamespaceHandler) ensureTypes(namespace string) {
 
 func (h *NamespaceHandler) isFound(namespace string, t string, name string) bool {
 	var err error
-	obj, err := New(t)
+	obj, err := NewType(t)
 	if err != nil {
 		log.Errorln(err)
 		return false
@@ -86,7 +92,7 @@ func (h *NamespaceHandler) isFound(namespace string, t string, name string) bool
 }
 
 func (h *NamespaceHandler) copyObjectFromKubeSystemNS(namespace string, t string, name string) {
-	result, err := New(t)
+	result, err := NewType(t)
 	if err != nil {
 		log.Errorln(err)
 		return

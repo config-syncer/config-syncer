@@ -5,16 +5,12 @@ import (
 	"time"
 
 	"github.com/appscode/kubed/pkg/events"
-	"github.com/appscode/kubed/pkg/handlers"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
-	"k8s.io/apimachinery/pkg/util/wait"
+	"github.com/appscode/kubed/pkg/namespacesync"
 	clientset "k8s.io/client-go/kubernetes"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/cache"
 )
 
-type Watcher struct {
+type Controller struct {
 	// kubernetes client to apiserver
 	KubeClient clientset.Interface
 
@@ -22,33 +18,34 @@ type Watcher struct {
 	sync.Mutex
 }
 
-func (w *Watcher) Run() {
+func (w *Controller) Run() {
 	w.watchNamespaces()
 }
 
-func (w *Watcher) watchNamespaces() {
-	lw := cache.NewListWatchFromClient(
-		w.KubeClient.CoreV1().RESTClient(),
-		events.Namespace.String(),
-		metav1.NamespaceAll,
-		fields.Everything())
-	_, controller := cache.NewInformer(lw, &apiv1.Namespace{}, w.SyncPeriod, eventHandlerFuncs(w))
-	go controller.Run(wait.NeverStop)
-}
-
-func eventHandlerFuncs(k *Watcher) cache.ResourceEventHandlerFuncs {
+func eventHandlerFuncs(k *Controller) cache.ResourceEventHandlerFuncs {
 	return cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			e := events.New(events.Added, obj)
-			if e.Ignorable() {
-				return
-			}
-			if e.ResourceType == events.Namespace && e.EventType == events.Added {
-				h := &handlers.NamespaceHandler{
-					KubeClient: k.KubeClient,
-				}
-				h.Handle(e)
-			}
+			e := events.New(events.Added, k.KubeClient, obj)
+			k.Dispatch(e)
 		},
+		DeleteFunc: func(obj interface{}) {
+			e := events.New(events.Deleted, k.KubeClient, obj)
+			k.Dispatch(e)
+		},
+		UpdateFunc: func(old, new interface{}) {
+			e := events.New(events.Updated, k.KubeClient, old, new)
+			k.Dispatch(e)
+		},
+	}
+}
+
+func (w *Controller) Dispatch(e *events.Event) {
+	if e.Ignorable() {
+		return
+	}
+
+	if e.ResourceType == events.Namespace && e.EventType.IsAdded() {
+		ns := namespacesync.NewHandler(w.KubeClient)
+		ns.Handle(e)
 	}
 }

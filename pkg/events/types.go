@@ -7,6 +7,7 @@ import (
 
 	"github.com/appscode/log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clientset "k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	apps "k8s.io/client-go/pkg/apis/apps/v1beta1"
 	extensions "k8s.io/client-go/pkg/apis/extensions/v1beta1"
@@ -17,7 +18,7 @@ type EventType string
 const (
 	Added   EventType = "ADDED"
 	Deleted EventType = "DELETED"
-	Updated EventType = "UPDATETD"
+	Updated EventType = "UPDATED"
 	None    EventType = "NONE"
 )
 
@@ -57,26 +58,6 @@ func (e EventType) Is(event string) bool {
 	return strings.EqualFold(e.String(), event)
 }
 
-type EventReason string
-
-const (
-	EventReasonAlertAcknowledgement EventReason = "AlertAcknowledgement"
-)
-
-func (r EventReason) String() string {
-	return string(r)
-}
-
-type ObjectKind string
-
-const (
-	ObjectKindAlert ObjectKind = "Alert"
-)
-
-func (o ObjectKind) String() string {
-	return string(o)
-}
-
 type ObjectType string
 
 const (
@@ -86,6 +67,7 @@ const (
 	ConfigMap       ObjectType = "configmaps"
 	DaemonSet       ObjectType = "daemonsets"
 	Endpoint        ObjectType = "endpoints"
+	ResourceEvent   ObjectType = "events"
 	ExtendedIngress ObjectType = "extendedingresses"
 	Ingress         ObjectType = "ingresses"
 	Namespace       ObjectType = "namespaces"
@@ -97,7 +79,6 @@ const (
 	Deployments     ObjectType = "deployments"
 	Service         ObjectType = "services"
 	Unknown         ObjectType = "unknown"
-	AlertEvent      ObjectType = "alertevents"
 )
 
 func (o ObjectType) String() string {
@@ -126,9 +107,12 @@ type Event struct {
 
 	// kubernetes object metadata
 	MetaData metav1.ObjectMeta
+
+	// kubernetes client to apiserver
+	KubeClient clientset.Interface
 }
 
-func New(Type EventType, obj ...interface{}) *Event {
+func New(Type EventType, client clientset.Interface, obj ...interface{}) *Event {
 	if len(obj) <= 0 {
 		return &Event{
 			EventType: None,
@@ -142,6 +126,7 @@ func New(Type EventType, obj ...interface{}) *Event {
 	return &Event{
 		id:           id,
 		EventType:    Type,
+		KubeClient:   client,
 		ResourceType: objType,
 		MetaData:     metadata,
 		RuntimeObj:   obj,
@@ -173,7 +158,7 @@ func detectObjectType(o interface{}) ObjectType {
 	case apiv1.Endpoints, *apiv1.Endpoints:
 		return Endpoint
 	case apiv1.Event, *apiv1.Event:
-		return AlertEvent
+		return ResourceEvent
 	case extensions.ReplicaSet, *extensions.ReplicaSet:
 		return ReplicaSet
 	case apps.StatefulSet, *apps.StatefulSet:
@@ -202,7 +187,7 @@ func objectMetadata(o interface{}, t ObjectType) metav1.ObjectMeta {
 		return o.(*extensions.Ingress).ObjectMeta
 	case Endpoint:
 		return o.(*apiv1.Endpoints).ObjectMeta
-	case AlertEvent:
+	case ResourceEvent:
 		return o.(*apiv1.Event).ObjectMeta
 	case ReplicaSet:
 		return o.(*extensions.ReplicaSet).ObjectMeta

@@ -81,7 +81,7 @@ func Run(opt RunOptions) {
 		os.Exit(1)
 	}
 
-	kubeWatcher := &watcher.Watcher{
+	kubeWatcher := &watcher.Controller{
 		KubeClient: clientset.NewForConfigOrDie(c),
 		SyncPeriod: time.Minute * 2,
 	}
