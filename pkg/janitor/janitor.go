@@ -7,13 +7,11 @@ import (
 
 	es "github.com/appscode/kubed/pkg/janitor/elasticsearch"
 	influx "github.com/appscode/kubed/pkg/janitor/influxdb"
+	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
 	"github.com/appscode/searchlight/pkg/client/icinga"
 	influxdb "github.com/influxdata/influxdb/client"
 	elastic "gopkg.in/olivere/elastic.v3"
-	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	clientset "k8s.io/client-go/kubernetes"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
@@ -24,13 +22,11 @@ const (
 )
 
 type Janitor struct {
-	ClusterName                       string
-	ElasticConfig                     map[string]string
-	InfluxConfig                      influxdb.Config
-	IcingaConfig                      map[string]string
-	KubeClient                        clientset.Interface
-	ClusterKubedConfigSecretName      string
-	ClusterKubedConfigSecretNamespace string
+	ClusterName                         string
+	ElasticConfig                       map[string]string
+	InfluxConfig                        influxdb.Config
+	IcingaConfig                        map[string]string
+	ClusterKubedConfigSecretMountedPath string
 
 	// Icinga Client
 	IcingaClient *icinga.IcingaClient
@@ -50,7 +46,7 @@ func (j *Janitor) Run() {
 		time.Sleep(time.Minute * 10)
 	})
 
-	cs, err := getClusterSettings(j.KubeClient, j.ClusterKubedConfigSecretName, j.ClusterKubedConfigSecretNamespace)
+	cs, err := getClusterSettings(j.ClusterKubedConfigSecretMountedPath)
 	if err != nil {
 		log.Errorln(err)
 		return
@@ -86,33 +82,28 @@ func (j *Janitor) cleanInflux(k ClusterSettings) error {
 	return influx.UpdateRetentionPolicy(influxClient, k.MonitoringStorageLifetime)
 }
 
-func getClusterSettings(client clientset.Interface, secretName string, secretNamespace string) (ClusterSettings, error) {
-	clusterConf, err := client.Core().
-		Secrets(secretNamespace).
-		Get(secretName, meta_v1.GetOptions{})
-	if err != nil {
-		return ClusterSettings{}, err
-	}
-	return SecretToClusterSettings(*clusterConf)
-}
-
-func SecretToClusterSettings(cnf apiv1.Secret) (ClusterSettings, error) {
+func getClusterSettings(secretMountedPath string) (ClusterSettings, error) {
 	cs := ClusterSettings{}
 	var err error
-	if d, ok := cnf.Data[LogIndexPrefix]; ok {
+	m, err := util.MountedSecretToMap(secretMountedPath)
+	if err != nil {
+		return cs, err
+	}
+	if d, ok := m[LogIndexPrefix]; ok {
 		cs.LogIndexPrefix = string(d)
 	}
-	if d, ok := cnf.Data[LogStorageLifetime]; ok {
+	if d, ok := m[LogStorageLifetime]; ok {
 		cs.LogStorageLifetime, err = strconv.ParseInt(string(d), 10, 64)
 		if err != nil {
 			return cs, err
 		}
 	}
-	if d, ok := cnf.Data[MonitoringStorageLifetime]; ok {
+	if d, ok := m[MonitoringStorageLifetime]; ok {
 		cs.MonitoringStorageLifetime, err = strconv.ParseInt(string(d), 10, 64)
 		if err != nil {
 			return cs, err
 		}
 	}
 	return cs, nil
+
 }
