@@ -21,24 +21,26 @@ import (
 )
 
 type RunOptions struct {
-	Master                              string
-	KubeConfig                          string
-	ESEndpoint                          string
-	InfluxSecretName                    string
-	InfluxSecretNamespace               string
-	ClusterName                         string
-	ClusterKubedConfigSecretMountedPath string
-	NotifyOnCertSoonToBeExpeired        bool
-	NotifyVia                           string
+	Master                            string
+	KubeConfig                        string
+	ESEndpoint                        string
+	InfluxSecretName                  string
+	InfluxSecretNamespace             string
+	ClusterName                       string
+	ClusterKubedConfigSecretName      string
+	ClusterKubedConfigSecretNamespace string
+	NotifyOnCertSoonToBeExpeired      bool
+	NotifyVia                         string
 }
 
 func NewCmdRun() *cobra.Command {
 	opt := RunOptions{
-		InfluxSecretName:                    "appscode-influx",
-		InfluxSecretNamespace:               "kube-system",
-		ClusterKubedConfigSecretMountedPath: "/srv/appscode/cluster-kubed-config",
-		NotifyOnCertSoonToBeExpeired:        true,
-		NotifyVia:                           "plivo",
+		InfluxSecretName:                  "appscode-influx",
+		InfluxSecretNamespace:             "kube-system",
+		ClusterKubedConfigSecretName:      "cluster-kubed-config",
+		ClusterKubedConfigSecretNamespace: "kube-system",
+		NotifyOnCertSoonToBeExpeired:      true,
+		NotifyVia:                         "plivo",
 	}
 	cmd := &cobra.Command{
 		Use:   "run",
@@ -57,7 +59,8 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringVar(&opt.ClusterName, "cluster-name", opt.ClusterName, "Name of Kubernetes cluster")
 	cmd.Flags().StringVar(&opt.ESEndpoint, "es-endpoint", opt.ESEndpoint, "Endpoint of elasticsearch")
 	cmd.Flags().StringVar(&opt.InfluxSecretName, "influx-secret", opt.InfluxSecretName, "Influxdb secret name")
-	cmd.Flags().StringVar(&opt.ClusterKubedConfigSecretMountedPath, "kubed-config-secret-mounted-path", opt.ClusterKubedConfigSecretMountedPath, "Kubed configuration secret mounted path")
+	cmd.Flags().StringVar(&opt.ClusterKubedConfigSecretName, "kubed-config-secret-name", opt.ClusterKubedConfigSecretName, "Kubed configuration secret name")
+	cmd.Flags().StringVar(&opt.ClusterKubedConfigSecretNamespace, "kubed-config-secret-namespace", opt.ClusterKubedConfigSecretNamespace, "Kubed configuration secret namespace")
 	cmd.Flags().StringVar(&opt.InfluxSecretNamespace, "influx-secret-namespace", opt.InfluxSecretNamespace, "Influxdb secret namespace")
 	cmd.Flags().StringVar(&opt.KubeConfig, "kubeconfig", opt.KubeConfig, "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
 	cmd.Flags().StringVar(&opt.Master, "master", opt.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
@@ -87,9 +90,11 @@ func Run(opt RunOptions) {
 
 	// initializing kube janitor tasks
 	kubeJanitor := janitor.Janitor{
-		ClusterName:                         opt.ClusterName,
-		ElasticConfig:                       make(map[string]string),
-		ClusterKubedConfigSecretMountedPath: opt.ClusterKubedConfigSecretMountedPath,
+		KubeClient:                        client,
+		ClusterName:                       opt.ClusterName,
+		ElasticConfig:                     make(map[string]string),
+		ClusterKubedConfigSecretName:      opt.ClusterKubedConfigSecretName,
+		ClusterKubedConfigSecretNamespace: opt.ClusterKubedConfigSecretNamespace,
 	}
 
 	if opt.ESEndpoint != "" {
@@ -122,8 +127,10 @@ func Run(opt RunOptions) {
 
 	if opt.NotifyOnCertSoonToBeExpeired {
 		go cert.DefaultCertWatcher(
-			opt.ClusterKubedConfigSecretMountedPath,
-		).Run()
+			client,
+			opt.ClusterKubedConfigSecretName,
+			opt.ClusterKubedConfigSecretNamespace,
+		).RunAndHold()
 	}
 	go wait.Forever(kubeJanitor.Run, time.Hour*24)
 }

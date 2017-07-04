@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -18,33 +19,47 @@ import (
 	"github.com/appscode/go-notify/slack"
 	"github.com/appscode/go-notify/smtp"
 	"github.com/appscode/go-notify/twilio"
-	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clientset "k8s.io/client-go/kubernetes"
 )
 
 const (
 	DefaultCheckInterval    time.Duration = 24 * time.Hour
-	DefaultMinRemainingDays time.Duration = 24 * time.Hour * 7
+	DefaultMinRemainingDays int           = 7
 	CaCertPath              string        = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 )
 
+type ExpiratinStatus int
+
+const (
+	ExpiratinStatus_AleadyExpired ExpiratinStatus = 0
+	ExpiratinStatus_ExpiredSoon   ExpiratinStatus = 1
+	ExpiratinStatus_Fresh         ExpiratinStatus = 2
+)
+
 type CertWatcher struct {
-	CheckInterval                       time.Duration
-	MinRemainingDuration                time.Duration
-	CertPath                            string
-	ClusterKubedConfigSecretMountedPath string
+	CheckInterval                     time.Duration
+	MinRemainingDurationInDays        int
+	CertPath                          string
+	KubeClient                        clientset.Interface
+	ClusterKubedConfigSecretName      string
+	ClusterKubedConfigSecretNamespace string
 }
 
-func DefaultCertWatcher(clusterKubedSecretMountedPath string) *CertWatcher {
+func DefaultCertWatcher(c clientset.Interface, secretName string, secretNamespace string) *CertWatcher {
 	return &CertWatcher{
-		CheckInterval:        DefaultCheckInterval,
-		MinRemainingDuration: DefaultMinRemainingDays,
-		CertPath:             CaCertPath,
-		ClusterKubedConfigSecretMountedPath: clusterKubedSecretMountedPath,
+		CheckInterval:                     DefaultCheckInterval,
+		MinRemainingDurationInDays:        DefaultMinRemainingDays,
+		CertPath:                          CaCertPath,
+		KubeClient:                        c,
+		ClusterKubedConfigSecretName:      secretName,
+		ClusterKubedConfigSecretNamespace: secretNamespace,
 	}
 }
 
-func (c CertWatcher) Run() {
+//This will block executions
+func (c CertWatcher) RunAndHold() {
 	for range time.NewTicker(c.CheckInterval).C {
 		f, err := os.Open(c.CertPath)
 		if err != nil {
@@ -52,43 +67,60 @@ func (c CertWatcher) Run() {
 			f.Close()
 			continue
 		}
-		soonExp, days, err := c.isSoonExpired(f, c.MinRemainingDuration)
+		d, err := c.certLifetimeInDays(f)
 		f.Close()
 		if err != nil {
 			c.notify(fmt.Sprintf("Error while parsing certificate: %v", err))
 			continue
 		}
-		if soonExp {
-			c.notify(fmt.Sprintf("Certificate will expire within %v days, please renew.", days))
+		switch c.expirationStatus(d, c.MinRemainingDurationInDays) {
+		case ExpiratinStatus_AleadyExpired:
+			c.notify("certificate already expired, please renew")
+		case ExpiratinStatus_ExpiredSoon:
+			c.notify(fmt.Sprintf("Certificate will expire within %v days, please renew.", d))
 		}
 	}
 }
 
-func (c CertWatcher) isSoonExpired(r io.Reader, minDuration time.Duration) (bool, int, error) {
+func (c CertWatcher) expirationStatus(remD, minD int) ExpiratinStatus {
+	if remD <= 0 {
+		return ExpiratinStatus_AleadyExpired
+	} else if remD <= minD {
+		return ExpiratinStatus_ExpiredSoon
+	} else {
+		return ExpiratinStatus_Fresh
+	}
+}
+
+func (c CertWatcher) certLifetimeInDays(r io.Reader) (int, error) {
 	certData, err := ioutil.ReadAll(r)
 	if err != nil {
-		return false, 0, err
+		return 0, err
 	}
 
 	block, _ := pem.Decode(certData)
 	if block == nil {
-		return false, 0, errors.New("failed to parse certificate")
+		return 0, errors.New("failed to parse certificate")
 	}
 	cert, err := x509.ParseCertificate(block.Bytes)
 	if err != nil {
-		return false, 0, err
+		return 0, err
 	}
-	if int(cert.NotAfter.Sub(time.Now())) < 0 {
-		return false, 0, errors.New("certificate already expired")
-	}
-	if cert.NotAfter.Sub(time.Now()) < minDuration {
-		return true, int(cert.NotAfter.Sub(time.Now()) / (24 * time.Hour)), nil
-	}
-	return false, int(cert.NotAfter.Sub(time.Now()) / (24 * time.Hour)), nil
+	return int(math.Ceil(cert.NotAfter.Sub(time.Now()).Hours() / 24)), nil
 }
 
 func (c CertWatcher) configuration() (map[string]string, error) {
-	return util.MountedSecretToMap(c.ClusterKubedConfigSecretMountedPath)
+	clusterConf, err := c.KubeClient.Core().
+		Secrets(c.ClusterKubedConfigSecretNamespace).
+		Get(c.ClusterKubedConfigSecretName, meta_v1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	data := make(map[string]string, len(clusterConf.Data))
+	for key, val := range clusterConf.Data {
+		data[key] = string(val)
+	}
+	return data, nil
 }
 
 func (c CertWatcher) notify(msg string) {

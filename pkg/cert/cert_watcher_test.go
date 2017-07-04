@@ -8,49 +8,51 @@ import (
 	"log"
 	"math/big"
 	"net"
-	"os"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/appscode/kubed/pkg/util"
 	"github.com/google/certificate-transparency/go/x509"
 	"github.com/google/certificate-transparency/go/x509/pkix"
 	"github.com/stretchr/testify/assert"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/fake"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 var cw = CertWatcher{
-	MinRemainingDuration: time.Hour * 24 * 7,
+	MinRemainingDurationInDays: 7,
 }
 
 func TestInvalidCertificate(t *testing.T) {
-	_, _, err := cw.isSoonExpired(bytes.NewBuffer([]byte("an invalid ca certificate :)")), cw.MinRemainingDuration)
+	_, err := cw.certLifetimeInDays(bytes.NewBuffer([]byte("an invalid ca certificate :)")))
 	assert.NotNil(t, err)
 }
 
-func TestAlreadyExpiredCertificate(t *testing.T) {
+func TestCertLifetimeInDays(t *testing.T) {
 	now := time.Now()
-	_, _, err := cw.isSoonExpired(bytes.NewBuffer(fakeCert(now.Add(-time.Hour*24*2), now.Add(-time.Hour*24*1))), cw.MinRemainingDuration)
-	assert.NotNil(t, err)
-	assert.Equal(t, "certificate already expired", err.Error())
-}
-
-func TestSoonExpeiredCertificate(t *testing.T) {
-	now := time.Now()
-	soonExp, days, err := cw.isSoonExpired(bytes.NewBuffer(fakeCert(now, now.Add(time.Hour*24*7))), cw.MinRemainingDuration)
+	d, err := cw.certLifetimeInDays(bytes.NewBuffer(fakeCert(now, now.Add(time.Hour*24*7))))
 	assert.Nil(t, err)
-	assert.True(t, soonExp)
-	assert.Equal(t, 6, days)
-}
-
-func TestCertificateWithAvailabeExperition(t *testing.T) {
-	now := time.Now()
-	soonExp, _, err := cw.isSoonExpired(bytes.NewBuffer(fakeCert(now, now.Add(time.Hour*24*30))), cw.MinRemainingDuration)
-	assert.Nil(t, err)
-	assert.False(t, soonExp)
+	assert.Equal(t, 7, d)
 }
 
 func TestConfiguration(t *testing.T) {
+	s := &apiv1.Secret{
+		ObjectMeta: meta_v1.ObjectMeta{
+			Name:      "mysecret",
+			Namespace: "kube-system",
+		},
+		Type: "Opaque",
+		Data: map[string][]byte{
+			"username":         []byte("username"),
+			"password":         []byte("password"),
+			"notify_via":       []byte("plivo"),
+			"plivo_auth_id":    []byte("auth_id"),
+			"plivo_auth_token": []byte("auth_token"),
+			"plivo_to":         []byte("admin,0111"),
+			"plivo_from":       []byte("server"),
+		},
+	}
 	exp := map[string]string{
 		"username":         "username",
 		"password":         "password",
@@ -60,16 +62,14 @@ func TestConfiguration(t *testing.T) {
 		"plivo_to":         "admin,0111",
 		"plivo_from":       "server",
 	}
-
-	path := os.Getenv("HOME") + "/temp"
-	os.MkdirAll(path, 0777)
-	util.MapsToFiles(exp, path)
-	defer os.RemoveAll(path)
-
-	cw := DefaultCertWatcher(path)
+	cw := DefaultCertWatcher(fake.NewSimpleClientset(s), s.ObjectMeta.Name, s.ObjectMeta.Namespace)
 	m, err := cw.configuration()
 	assert.Nil(t, err)
 	assert.Equal(t, exp, m)
+	cw = DefaultCertWatcher(fake.NewSimpleClientset(s), "dd", s.ObjectMeta.Namespace)
+	_, err = cw.configuration()
+	assert.NotNil(t, err)
+
 }
 
 func fakeCert(notBefore, notAfter time.Time) []byte {
