@@ -1,7 +1,7 @@
 package watcher
 
 import (
-	"github.com/appscode/kubed/pkg/events"
+	"github.com/appscode/kubed/pkg/namespacesync"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -10,11 +10,20 @@ import (
 )
 
 func (w *Controller) watchNamespaces() {
-	lw := cache.NewListWatchFromClient(
-		w.KubeClient.CoreV1().RESTClient(),
-		events.Namespace.String(),
-		metav1.NamespaceAll,
-		fields.Everything())
-	_, controller := cache.NewInformer(lw, &apiv1.Namespace{}, w.SyncPeriod, eventHandlerFuncs(w))
+	_, controller := cache.NewInformer(
+		cache.NewListWatchFromClient(
+			w.KubeClient.CoreV1().RESTClient(),
+			"namespaces",
+			metav1.NamespaceAll,
+			fields.Everything()),
+		&apiv1.Namespace{},
+		w.SyncPeriod,
+		cache.ResourceEventHandlerFuncs{
+			AddFunc: func(obj interface{}) {
+				ns := namespacesync.NewHandler(w.KubeClient)
+				ns.Handle(obj)
+			},
+		},
+	)
 	go controller.Run(wait.NeverStop)
 }

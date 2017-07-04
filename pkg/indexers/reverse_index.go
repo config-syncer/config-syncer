@@ -3,7 +3,6 @@ package indexers
 import (
 	"reflect"
 
-	"github.com/appscode/kubed/pkg/events"
 	"github.com/appscode/log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -30,25 +29,25 @@ func NewReverseIndexer(cl clientset.Interface, dst string) (*ReverseIndexer, err
 	}, nil
 }
 
-func (ri *ReverseIndexer) Handle(e *events.Event) {
-	switch e.ResourceType {
-	case events.Service:
-		ri.handleService(e)
+func (ri *ReverseIndexer) Handle(events string, obj ...interface{}) {
+	switch obj[0].(type) {
+	case *apiv1.Service:
+		ri.handleService(events, obj...)
 	}
 }
 
-func (ri *ReverseIndexer) handleService(e *events.Event) {
-	switch e.EventType {
-	case events.Added:
-		ri.dataChan <- e.RuntimeObj[0]
+func (ri *ReverseIndexer) handleService(events string, obj ...interface{}) {
+	switch events {
+	case "added":
+		ri.dataChan <- obj[0]
 		ri.newService()
-	case events.Deleted:
-		ri.dataChan <- e.RuntimeObj[0]
+	case "deleted":
+		ri.dataChan <- obj[0]
 		ri.removeService()
-	case events.Updated:
-		ri.updateService(e.RuntimeObj[0], e.RuntimeObj[1])
+	case "updated":
+		ri.updateService(obj[0], obj[1])
 	default:
-		log.Errorln("Event type not recognize", e.EventType)
+		log.Errorln("Event type not recognize", events)
 	}
 }
 

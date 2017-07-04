@@ -2,7 +2,6 @@ package namespacesync
 
 import (
 	"github.com/appscode/errors"
-	"github.com/appscode/kubed/pkg/events"
 	"github.com/appscode/log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -51,11 +50,8 @@ func setObjectMeta(o interface{}, namespace string, t string) {
 	objectMeta.SetResourceVersion("")
 }
 
-func (h *NamespaceHandler) Handle(e *events.Event) {
-	if !e.EventType.IsAdded() {
-		return
-	}
-	ns, ok := e.RuntimeObj[0].(*apiv1.Namespace)
+func (h *NamespaceHandler) Handle(n interface{}) {
+	ns, ok := n.(*apiv1.Namespace)
 	if ok {
 		h.ensureTypes(ns.Name)
 	}
