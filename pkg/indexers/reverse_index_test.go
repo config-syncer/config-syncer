@@ -2,7 +2,6 @@ package indexers
 
 import (
 	"testing"
-	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -15,9 +14,8 @@ func newTestReverseIndexer() *ReverseIndexer {
 			newPod("foo-pod-1"),
 			newPod("foo-pod-2"),
 		),
-		dataChan:           make(chan interface{}, 1),
-		reverseRecordMap:   make(map[string][]*v1.Service),
-		initialSyncTimeout: time.Minute * 5,
+		dataChan:              make(chan interface{}, 1),
+		podToServiceRecordMap: make(map[string][]*v1.Service),
 	}
 }
 
@@ -27,7 +25,7 @@ func TestNewService(t *testing.T) {
 	ri.newService()
 
 	pod := newPod("foo-pod-1")
-	if svc, ok := ri.reverseRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
+	if svc, ok := ri.podToServiceRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
 		if !equalService(svc[0], newService()) {
 			t.Errorf("Service did not matched")
 		}
@@ -36,7 +34,7 @@ func TestNewService(t *testing.T) {
 	}
 
 	pod = newPod("foo-pod-2")
-	if svc, ok := ri.reverseRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
+	if svc, ok := ri.podToServiceRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
 		if !equalService(svc[0], newService()) {
 			t.Errorf("Service did not matched")
 		}
@@ -45,7 +43,7 @@ func TestNewService(t *testing.T) {
 	}
 
 	pod = newPod("foo-pod-3")
-	if _, ok := ri.reverseRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
+	if _, ok := ri.podToServiceRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
 		t.Errorf("Service Found, expected Not Found")
 	}
 }
@@ -57,7 +55,7 @@ func TestRemoveService(t *testing.T) {
 	ri.dataChan <- service
 	ri.newService()
 	pod := newPod("foo-pod-1")
-	if svc, ok := ri.reverseRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
+	if svc, ok := ri.podToServiceRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
 		if !equalService(svc[0], service) {
 			t.Errorf("Service did not matched")
 		}
@@ -69,12 +67,12 @@ func TestRemoveService(t *testing.T) {
 	ri.removeService()
 
 	pod = newPod("foo-pod-1")
-	if _, ok := ri.reverseRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
+	if _, ok := ri.podToServiceRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
 		t.Errorf("Service Found, expected Not Found")
 	}
 
 	pod = newPod("foo-pod-2")
-	if _, ok := ri.reverseRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
+	if _, ok := ri.podToServiceRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
 		t.Errorf("Service Found, expected Not Found")
 	}
 }

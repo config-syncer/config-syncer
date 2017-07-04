@@ -22,27 +22,15 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-type RunOptions struct {
-	Master                            string
-	KubeConfig                        string
-	ESEndpoint                        string
-	InfluxSecretName                  string
-	InfluxSecretNamespace             string
-	ClusterName                       string
-	ClusterKubedConfigSecretName      string
-	ClusterKubedConfigSecretNamespace string
-	ReverseIndex                      bool
-	ServerAddress                     string
-}
-
 func NewCmdRun() *cobra.Command {
-	opt := RunOptions{
+	opt := watcher.RunOptions{
 		InfluxSecretName:                  "appscode-influx",
 		InfluxSecretNamespace:             "kube-system",
 		ClusterKubedConfigSecretName:      "cluster-kubed-config",
 		ClusterKubedConfigSecretNamespace: "kube-system",
-		ReverseIndex:                      true,
-		ServerAddress:                     ":32600",
+		Indexer:            "indexers.bleve",
+		EnableReverseIndex: true,
+		ServerAddress:      ":32600",
 	}
 	cmd := &cobra.Command{
 		Use:   "run",
@@ -66,12 +54,13 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringVar(&opt.InfluxSecretNamespace, "influx-secret-namespace", opt.InfluxSecretNamespace, "Influxdb secret namespace")
 	cmd.Flags().StringVar(&opt.KubeConfig, "kubeconfig", opt.KubeConfig, "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
 	cmd.Flags().StringVar(&opt.Master, "master", opt.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
-	cmd.Flags().BoolVar(&opt.ReverseIndex, "reverse-index", opt.ReverseIndex, "Reverse indexing of pods to service and others")
+	cmd.Flags().StringVar(&opt.Indexer, "indexer", opt.Indexer, "Reverse indexing of pods to service and others")
+	cmd.Flags().BoolVar(&opt.EnableReverseIndex, "enable-reverse-index", opt.EnableReverseIndex, "Reverse indexing of pods to service and others")
 	cmd.Flags().StringVar(&opt.ServerAddress, "address", opt.ServerAddress, "The address of the Kubed API Server")
 	return cmd
 }
 
-func Run(opt RunOptions) {
+func Run(opt watcher.RunOptions) {
 	log.Infoln("configurations provided for kubed", opt)
 	defer runtime.HandleCrash()
 
@@ -84,10 +73,8 @@ func Run(opt RunOptions) {
 	kubeWatcher := &watcher.Controller{
 		KubeClient: clientset.NewForConfigOrDie(c),
 		SyncPeriod: time.Minute * 2,
+		RunOptions: opt,
 	}
-
-	log.Infoln("Running kubed watcher")
-	go kubeWatcher.Run()
 
 	// router is default HTTP request multiplexer for kubed. It matches the URL of each
 	// incoming request against a list of registered patterns with their associated
@@ -98,11 +85,20 @@ func Run(opt RunOptions) {
 	// registered.
 	router := pat.New()
 
-	if opt.ReverseIndex {
-		ri := indexers.NewReverseIndexer(clientset.NewForConfigOrDie(c), time.Second*2)
-		ri.RegisterRouters(router)
-		go ri.Start()
+	if len(opt.Indexer) > 0 {
+		if opt.EnableReverseIndex {
+			ri, err := indexers.NewReverseIndexer(kubeWatcher.KubeClient, opt.Indexer)
+			if err != nil {
+				log.Errorln("Failed to create indexer", err)
+			} else {
+				kubeWatcher.ReverseIndex = ri
+				ri.RegisterRouters(router)
+			}
+		}
 	}
+
+	log.Infoln("Running kubed watcher")
+	go kubeWatcher.Run()
 
 	// initializing kube janitor tasks
 	kubeJanitor := janitor.Janitor{

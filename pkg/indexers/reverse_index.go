@@ -2,111 +2,54 @@ package indexers
 
 import (
 	"reflect"
-	"time"
 
+	"github.com/appscode/kubed/pkg/events"
 	"github.com/appscode/log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/watch"
 	clientset "k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-	kcache "k8s.io/client-go/tools/cache"
-)
-
-const (
-	// Resync period for the kube controller loop.
-	resyncPeriod = 5 * time.Minute
 )
 
 type ReverseIndexer struct {
-	// kubeClient makes calls to API Server and registers calls with API Server
+	// kubeClient to access kube api server
 	kubeClient clientset.Interface
 
-	// reverseRecordMap pod to service object.
-	reverseRecordMap map[string][]*apiv1.Service
+	// podToServiceRecordMap pod to service object.
+	podToServiceRecordMap map[string][]*apiv1.Service
 
 	// Channel serializes event to protect cache
 	dataChan chan interface{}
-
-	// serviceController invokes registered callbacks when services change.
-	serviceController kcache.Controller
-	// servicesStore that contains all the services in the system.
-	servicesStore kcache.Store
-
-	// Initial timeout for endpoints and services to be synced from APIServer
-	initialSyncTimeout time.Duration
 }
 
-// NeverStop may be passed to Until to make it never stop.
-var NeverStop <-chan struct{} = make(chan struct{})
-
-func NewReverseIndexer(client clientset.Interface, timeout time.Duration) *ReverseIndexer {
-	ri := &ReverseIndexer{
-		kubeClient:         client,
-		reverseRecordMap:   make(map[string][]*apiv1.Service),
-		initialSyncTimeout: timeout,
-		dataChan:           make(chan interface{}, 1),
-	}
-
-	ri.setServiceWatcher()
-
-	return ri
+func NewReverseIndexer(cl clientset.Interface, dst string) (*ReverseIndexer, error) {
+	return &ReverseIndexer{
+		kubeClient:            cl,
+		podToServiceRecordMap: make(map[string][]*apiv1.Service),
+		dataChan:              make(chan interface{}, 1),
+	}, nil
 }
 
-func (ri *ReverseIndexer) Start() {
-	log.Infoln("Starting serviceController")
-	go ri.serviceController.Run(NeverStop)
-
-	// Wait synchronously for the initial list operations to be
-	// complete of endpoints and services from APIServer.
-	ri.waitForResourceSyncedOrDie()
-}
-
-func (ri *ReverseIndexer) waitForResourceSyncedOrDie() {
-	// Wait for both controllers have completed an initial resource listing
-	timeout := time.After(ri.initialSyncTimeout)
-	ticker := time.NewTicker(500 * time.Millisecond)
-	defer ticker.Stop()
-	for {
-		select {
-		case <-timeout:
-			log.Fatalf("Timeout waiting for initialization")
-		case <-ticker.C:
-			if ri.serviceController.HasSynced() {
-				log.Infoln("Initialized services from apiserver")
-				return
-			}
-			log.Infof("Waiting for services and endpoints to be initialized from apiserver...")
-		}
+func (ri *ReverseIndexer) Handle(e *events.Event) {
+	switch e.ResourceType {
+	case events.Service:
+		ri.handleService(e)
 	}
 }
 
-func (ri *ReverseIndexer) setServiceWatcher() {
-	// Returns a cache.ListWatch that gets all changes to services.
-	ri.servicesStore, ri.serviceController = kcache.NewInformer(
-		&kcache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return ri.kubeClient.CoreV1().Services(apiv1.NamespaceAll).List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return ri.kubeClient.CoreV1().Services(apiv1.NamespaceAll).Watch(options)
-			},
-		},
-		&apiv1.Service{},
-		resyncPeriod,
-		kcache.ResourceEventHandlerFuncs{
-			AddFunc: func(obj interface{}) {
-				ri.dataChan <- obj
-				ri.newService()
-			},
-			DeleteFunc: func(obj interface{}) {
-				ri.dataChan <- obj
-				ri.removeService()
-			},
-			UpdateFunc: ri.updateService,
-		},
-	)
+func (ri *ReverseIndexer) handleService(e *events.Event) {
+	switch e.EventType {
+	case events.Added:
+		ri.dataChan <- e.RuntimeObj[0]
+		ri.newService()
+	case events.Deleted:
+		ri.dataChan <- e.RuntimeObj[0]
+		ri.removeService()
+	case events.Updated:
+		ri.updateService(e.RuntimeObj[0], e.RuntimeObj[1])
+	default:
+		log.Errorln("Event type not recognize", e.EventType)
+	}
 }
 
 func (ri *ReverseIndexer) newService() {
@@ -123,11 +66,11 @@ func (ri *ReverseIndexer) newService() {
 
 		for _, pod := range pods.Items {
 			key := namespacerKey(pod.ObjectMeta)
-			val, _ := ri.reverseRecordMap[key]
+			val, _ := ri.podToServiceRecordMap[key]
 			if len(val) == 0 {
-				ri.reverseRecordMap[key] = make([]*apiv1.Service, 0)
+				ri.podToServiceRecordMap[key] = make([]*apiv1.Service, 0)
 			}
-			ri.reverseRecordMap[key] = append(val, service)
+			ri.podToServiceRecordMap[key] = append(val, service)
 		}
 	}
 }
@@ -143,15 +86,15 @@ func (ri *ReverseIndexer) removeService() {
 
 		for _, pod := range pods.Items {
 			key := namespacerKey(pod.ObjectMeta)
-			if val, ok := ri.reverseRecordMap[key]; ok {
+			if val, ok := ri.podToServiceRecordMap[key]; ok {
 				for i, valueSvc := range val {
 					if equalService(svc, valueSvc) {
-						ri.reverseRecordMap[key] = append(val[:i], val[i+1:]...)
+						ri.podToServiceRecordMap[key] = append(val[:i], val[i+1:]...)
 					}
 				}
-				if len(ri.reverseRecordMap[key]) == 0 {
+				if len(ri.podToServiceRecordMap[key]) == 0 {
 					// Remove unnecessary map index
-					delete(ri.reverseRecordMap, key)
+					delete(ri.podToServiceRecordMap, key)
 				}
 			}
 		}
@@ -174,6 +117,12 @@ func (ri *ReverseIndexer) updateService(oldObj, newObj interface{}) {
 }
 
 func (ri *ReverseIndexer) podsForService(svc *apiv1.Service) (*apiv1.PodList, error) {
+	// Service have an empty selector. Instead of getting all pod we
+	// try to ignore pods for it.
+	if len(svc.Spec.Selector) == 0 {
+		return &apiv1.PodList{}, nil
+	}
+
 	return ri.kubeClient.CoreV1().Pods(metav1.NamespaceAll).List(metav1.ListOptions{
 		LabelSelector: labels.SelectorFromSet(svc.Spec.Selector).String(),
 	})

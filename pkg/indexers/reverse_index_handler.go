@@ -43,7 +43,7 @@ func (ri *ReverseIndexer) servePodIndex(w http.ResponseWriter, req *http.Request
 	namespace, name := params.Get(":namespace"), params.Get(":name")
 	if len(namespace) > 0 && len(name) > 0 {
 		key := namespacerKey(v1.ObjectMeta{Name: name, Namespace: namespace})
-		if val, ok := ri.reverseRecordMap[key]; ok {
+		if val, ok := ri.podToServiceRecordMap[key]; ok {
 			if err := json.NewEncoder(w).Encode(val); err == nil {
 				w.Header().Set("Content-Type", "application/json")
 				return
