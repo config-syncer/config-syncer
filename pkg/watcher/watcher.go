@@ -12,6 +12,7 @@ type Controller struct {
 	// kubernetes client to apiserver
 	KubeClient   clientset.Interface
 	RunOptions   RunOptions
+	Indexer      *indexers.ResourceIndexer
 	ReverseIndex *indexers.ReverseIndexer
 	SyncPeriod   time.Duration
 	sync.Mutex
@@ -33,7 +34,7 @@ type RunOptions struct {
 
 func (w *Controller) Run() {
 	w.watchNamespaces()
-	if w.RunOptions.EnableReverseIndex {
+	if w.RunOptions.EnableReverseIndex || len(w.RunOptions.Indexer) > 0 {
 		w.watchService()
 	}
 }

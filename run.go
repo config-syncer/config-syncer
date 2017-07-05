@@ -85,15 +85,25 @@ func Run(opt watcher.RunOptions) {
 	// registered.
 	router := pat.New()
 
+	// Enable full text indexing to have search feature
 	if len(opt.Indexer) > 0 {
-		if opt.EnableReverseIndex {
-			ri, err := indexers.NewReverseIndexer(kubeWatcher.KubeClient, opt.Indexer)
-			if err != nil {
-				log.Errorln("Failed to create indexer", err)
-			} else {
-				kubeWatcher.ReverseIndex = ri
-				ri.RegisterRouters(router)
-			}
+		indexer, err := indexers.NewResourceIndexer(opt.Indexer)
+		if err != nil {
+			log.Errorln(err)
+		} else {
+			indexer.RegisterRouters(router)
+			kubeWatcher.Indexer = indexer
+		}
+	}
+
+	// Enable pod -> service, service -> serviceMonitor indexing
+	if opt.EnableReverseIndex {
+		ri, err := indexers.NewReverseIndexer(kubeWatcher.KubeClient, "")
+		if err != nil {
+			log.Errorln("Failed to create indexer", err)
+		} else {
+			kubeWatcher.ReverseIndex = ri
+			ri.RegisterRouters(router)
 		}
 	}
 

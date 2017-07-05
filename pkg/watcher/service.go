@@ -20,12 +20,15 @@ func (w *Controller) watchService() {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				w.ReverseIndex.Handle("added", obj)
+				w.Indexer.HandleAdd(obj)
 			},
 			DeleteFunc: func(obj interface{}) {
 				w.ReverseIndex.Handle("deleted", obj)
+				w.Indexer.HandleDelete(obj)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				w.ReverseIndex.Handle("updated", oldObj, newObj)
+				w.Indexer.HandleUpdate(oldObj, newObj)
 			},
 		},
 	)
