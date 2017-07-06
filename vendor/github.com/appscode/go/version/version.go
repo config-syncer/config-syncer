@@ -32,10 +32,18 @@ func (v *version) Print() {
 	fmt.Printf("GitTag = %v\n", v.GitTag)
 	fmt.Printf("CommitTimestamp = %v\n", v.CommitTimestamp)
 
-	fmt.Printf("BuildTimestamp = %v\n", v.BuildTimestamp)
-	fmt.Printf("BuildHost = %v\n", v.BuildHost)
-	fmt.Printf("BuildHostOs = %v\n", v.BuildHostOs)
-	fmt.Printf("BuildHostArch = %v\n", v.BuildHostArch)
+	if v.BuildTimestamp != "" {
+		fmt.Printf("BuildTimestamp = %v\n", v.BuildTimestamp)
+	}
+	if v.BuildHost != "" {
+		fmt.Printf("BuildHost = %v\n", v.BuildHost)
+	}
+	if v.BuildHostOs != "" {
+		fmt.Printf("BuildHostOs = %v\n", v.BuildHostOs)
+	}
+	if v.BuildHostArch != "" {
+		fmt.Printf("BuildHostArch = %v\n", v.BuildHostArch)
+	}
 }
 
 var Version version

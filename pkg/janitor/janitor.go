@@ -115,4 +115,5 @@ func SecretToClusterSettings(cnf apiv1.Secret) (ClusterSettings, error) {
 		}
 	}
 	return cs, nil
+
 }
