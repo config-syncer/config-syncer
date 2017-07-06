@@ -21,7 +21,7 @@ import (
 )
 
 var cw = CertWatcher{
-	MinRemainingDurationInDays: 7,
+	MinTTL: 7,
 }
 
 func TestInvalidCertificate(t *testing.T) {
