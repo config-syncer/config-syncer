@@ -2,6 +2,7 @@ package cert
 
 import (
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -9,16 +10,10 @@ import (
 	"io/ioutil"
 	"math"
 	"os"
-	"strconv"
-	"strings"
 	"time"
 
-	"github.com/appscode/go-notify/hipchat"
-	"github.com/appscode/go-notify/mailgun"
-	"github.com/appscode/go-notify/plivo"
-	"github.com/appscode/go-notify/slack"
-	"github.com/appscode/go-notify/smtp"
-	"github.com/appscode/go-notify/twilio"
+	"github.com/appscode/go-notify"
+	"github.com/appscode/go-notify/unified"
 	"github.com/appscode/log"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
@@ -73,11 +68,18 @@ func (c CertWatcher) RunAndHold() {
 			c.notify(fmt.Sprintf("Error while parsing certificate: %v", err))
 			continue
 		}
+
+		var msg string
 		switch c.expirationStatus(d, c.MinRemainingDurationInDays) {
 		case ExpiratinStatus_AleadyExpired:
-			c.notify("certificate already expired, please renew")
+			msg = "certificate already expired, please renew"
 		case ExpiratinStatus_ExpiredSoon:
-			c.notify(fmt.Sprintf("Certificate will expire within %v days, please renew.", d))
+			msg = fmt.Sprintf("Certificate will expire within %v days, please renew.", d)
+		}
+		if uid, err := c.notify(msg); err != nil {
+			log.Errorln(err)
+		} else {
+			log.Debugf("Notification successfully sent via %v.", uid)
 		}
 	}
 }
@@ -109,114 +111,59 @@ func (c CertWatcher) certLifetimeInDays(r io.Reader) (int, error) {
 	return int(math.Ceil(cert.NotAfter.Sub(time.Now()).Hours() / 24)), nil
 }
 
-func (c CertWatcher) configuration() (map[string]string, error) {
-	clusterConf, err := c.KubeClient.Core().
+func (c CertWatcher) getLoader() (func(string) (string, bool), error) {
+	cfg, err := c.KubeClient.CoreV1().
 		Secrets(c.ClusterKubedConfigSecretNamespace).
 		Get(c.ClusterKubedConfigSecretName, meta_v1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
-	data := make(map[string]string, len(clusterConf.Data))
-	for key, val := range clusterConf.Data {
-		data[key] = string(val)
-	}
-	return data, nil
+	return func(key string) (value string, found bool) {
+		var bytes []byte
+		bytes, found = cfg.Data[key]
+		value = string(bytes)
+		return
+	}, nil
 }
 
-func (c CertWatcher) notify(msg string) {
-	conf, err := c.configuration()
+func (c CertWatcher) notify(msg string) (string, error) {
+	loader, err := c.getLoader()
 	if err != nil {
-		log.Errorln(err)
-		return
+		return "", err
 	}
-	via, ok := conf["notify_via"]
-	if !ok {
-		log.Errorln("No notifier set")
-		return
+	notifier, err := unified.Load(loader)
+	if err != nil {
+		return "", err
 	}
-	switch via {
-	case plivo.UID:
-		opts := plivo.Options{
-			AuthID:    conf["plivo_auth_id"],
-			AuthToken: conf["plivo_auth_token"],
-			To:        strings.Split(conf["cluster_admin_phone"], ","),
-			From:      conf["plivo_from"],
+	switch n := notifier.(type) {
+	case notify.ByEmail:
+		receivers := getArray(loader, "CLUSTER_ADMIN_EMAIL")
+		if len(receivers) == 0 {
+			return n.UID(), errors.New("Missing / invalid cluster admin email(s)")
 		}
-		err := plivo.New(opts).WithBody(msg).Send()
-		if err != nil {
-			log.Errorln(err)
-		} else {
-			log.Debugf("Notification successfully sent via %v. Notification: `%v`", plivo.UID, msg)
+		n = n.To(receivers[0], receivers[1:]...)
+		return n.UID(), n.WithSubject("Cluster CA Certificate").WithBody(msg).Send()
+	case notify.BySMS:
+		receivers := getArray(loader, "CLUSTER_ADMIN_PHONE")
+		if len(receivers) == 0 {
+			return n.UID(), errors.New("Missing / invalid cluster admin phone number(s)")
 		}
-	case twilio.UID:
-		opts := twilio.Options{
-			AccountSid: conf["twilio_account_sid"],
-			AuthToken:  conf["twilio_auth_token"],
-			From:       conf["twilio_from"],
-			To:         strings.Split(conf["cluster_admin_phone"], ","),
-		}
-		err := twilio.New(opts).WithBody(msg).Send()
-		if err != nil {
-			log.Errorln(err)
-		} else {
-			log.Debugf("Notification successfully sent via %v. Notification: `%v`", twilio.UID, msg)
-		}
-	case smtp.UID:
-		port, err := strconv.ParseInt(conf["smtp_port"], 10, 64)
-		if err != nil {
-			log.Errorln(err)
-			return
-		}
-		opts := smtp.Options{
-			Host:     conf["smtp_host"],
-			Port:     int(port),
-			Username: conf["smtp_username"],
-			Password: conf["smtp_password"],
-			From:     conf["smtp_from"],
-			To:       strings.Split(conf["cluster_admin_email"], ","),
-		}
-		err = smtp.New(opts).WithSubject("kubed notification").WithBody(msg).SendHtml()
-		if err != nil {
-			log.Errorln(err)
-		} else {
-			log.Debugf("Notification successfully sent via %v. Notification: `%v`", smtp.UID, msg)
-		}
-	case mailgun.UID:
-		opts := mailgun.Options{
-			Domain:       conf["mailgun_domain"],
-			ApiKey:       conf["mailgun_api_key"],
-			PublicApiKey: conf["mailgun_public_api_key"],
-			From:         conf["mailgun_from"],
-			To:           strings.Split(conf["cluster_admin_email"], ","),
-		}
-		err := mailgun.New(opts).WithSubject("kubed notification").WithBody(msg).SendHtml()
-		if err != nil {
-			log.Errorln(err)
-		} else {
-			log.Debugf("Notification successfully sent via %v. Notification: `%v`", mailgun.UID, msg)
-		}
+		n = n.To(receivers[0], receivers[1:]...)
+		return n.UID(), n.WithBody(msg).Send()
+	case notify.ByChat:
+		return n.UID(), n.WithBody(msg).Send()
+	}
+	return "", errors.New("Unknown notifier")
+}
 
-	case hipchat.UID:
-		opts := hipchat.Options{
-			AuthToken: conf["hipchat_auth_token"],
-			To:        strings.Split(conf["hipchat_room"], ","),
-		}
-		err := hipchat.New(opts).WithBody(msg).Send()
+func getArray(loader func(string) (string, bool), key string) []string {
+	if v, ok := loader(key); ok {
+		vals := make([]string, 0)
+		err := json.Unmarshal([]byte(v), &vals)
 		if err != nil {
-			log.Errorln(err)
-		} else {
-			log.Debugf("Notification successfully sent via %v. Notification: `%v`", hipchat.UID, msg)
+			return []string{}
 		}
-	case slack.UID:
-		opts := slack.Options{
-			AuthToken: conf["slack_auth_token"],
-			Channel:   strings.Split(conf["slack_channel"], ","),
-		}
-		err := slack.New(opts).WithBody(msg).Send()
-		if err != nil {
-			log.Errorln(err)
-		} else {
-			log.Debugf("Notification successfully sent via %v. Notification: `%v`", slack.UID, msg)
-		}
+		return vals
 	}
+	return []string{}
 }
