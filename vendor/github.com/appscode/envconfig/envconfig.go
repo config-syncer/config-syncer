@@ -152,8 +152,13 @@ func MustProcess(prefix string, spec interface{}) {
 	MustLoad(prefix, spec, lookupEnv)
 }
 
+// LoaderFunc returns value for a given key
+type LoaderFunc func(key string) (value string, found bool)
+
+var _ LoaderFunc = lookupEnv
+
 // Load populates the specified struct based on loader function
-func Load(prefix string, spec interface{}, loader func(string) (string, bool)) error {
+func Load(prefix string, spec interface{}, loader LoaderFunc) error {
 	infos, err := gatherInfo(prefix, spec)
 
 	for _, info := range infos {
@@ -196,7 +201,7 @@ func Load(prefix string, spec interface{}, loader func(string) (string, bool)) e
 }
 
 // MustLoad is the same as Load but panics if an error occurs
-func MustLoad(prefix string, spec interface{}, loader func(string) (string, bool)) {
+func MustLoad(prefix string, spec interface{}, loader LoaderFunc) {
 	if err := Load(prefix, spec, loader); err != nil {
 		panic(err)
 	}

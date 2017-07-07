@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify/hipchat"
 	"github.com/appscode/go-notify/mailgun"
 	"github.com/appscode/go-notify/plivo"
@@ -13,8 +14,12 @@ import (
 	"github.com/appscode/go-notify/twilio"
 )
 
+const (
+	NotifyVia = "NOTIFY_VIA"
+)
+
 func Default() (interface{}, error) {
-	via, ok := os.LookupEnv("NOTIFY_VIA")
+	via, ok := os.LookupEnv(NotifyVia)
 	if !ok {
 		return nil, errors.New(`"NOTIFY_VIA" is not set.`)
 	}
@@ -35,8 +40,8 @@ func Default() (interface{}, error) {
 	return nil, fmt.Errorf("Unknown notifier %s", via)
 }
 
-func Load(loader func(string) (string, bool)) (interface{}, error) {
-	via, ok := loader("NOTIFY_VIA")
+func Load(loader envconfig.LoaderFunc) (interface{}, error) {
+	via, ok := loader(NotifyVia)
 	if !ok {
 		return nil, errors.New(`"NOTIFY_VIA" is not set.`)
 	}

@@ -1,5 +1,5 @@
 hash: 713452d73f06bce1581046720403a22c13840ec9350b794d9b3a95a1ea5d0404
-updated: 2017-07-06T13:35:56.884733111-07:00
+updated: 2017-07-07T07:05:50.514011909-07:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -11,7 +11,7 @@ imports:
 - name: github.com/appscode/client
   version: 9844500890e8cf3df84b3c86ddc17c220db38af1
 - name: github.com/appscode/envconfig
-  version: 0843a1a422fcfefedccf5ed433b0a23360055ca5
+  version: a74ef73ab982beb8f0c6060ac44da1c960fea414
 - name: github.com/appscode/errors
   version: 748883e321a9f99fe901bd2663c7af3fcae43ea4
 - name: github.com/appscode/go
@@ -23,7 +23,7 @@ imports:
   - version
   - wait
 - name: github.com/appscode/go-notify
-  version: 681b12f39636cb7fde044fc3890e64f4f3ce284b
+  version: 55715f5bccdb3e322e0ebd347e8026088b79bee7
   subpackages:
   - hipchat
   - mailgun

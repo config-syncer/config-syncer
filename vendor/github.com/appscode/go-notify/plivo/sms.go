@@ -44,7 +44,7 @@ func Default() (*client, error) {
 	return New(opt), nil
 }
 
-func Load(loader func(string) (string, bool)) (*client, error) {
+func Load(loader envconfig.LoaderFunc) (*client, error) {
 	var opt Options
 	err := envconfig.Load(UID, &opt, loader)
 	if err != nil {

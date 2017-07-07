@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"time"
 
+	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
 	"github.com/appscode/go-notify/unified"
 	"github.com/appscode/log"
@@ -80,7 +81,7 @@ func (c CertWatcher) loadCACert() (*x509.Certificate, error) {
 	return x509.ParseCertificate(block.Bytes)
 }
 
-func (c CertWatcher) getLoader() (func(string) (string, bool), error) {
+func (c CertWatcher) getLoader() (envconfig.LoaderFunc, error) {
 	cfg, err := c.KubeClient.CoreV1().
 		Secrets(c.SecretNamespace).
 		Get(c.SecretName, meta_v1.GetOptions{})
