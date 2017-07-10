@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -11,36 +12,28 @@ import (
 	"github.com/appscode/go/wait"
 	"github.com/appscode/kubed/pkg/cert"
 	"github.com/appscode/kubed/pkg/dns"
+	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/janitor"
 	"github.com/appscode/kubed/pkg/watcher"
 	"github.com/appscode/log"
+	"github.com/appscode/pat"
 	"github.com/appscode/searchlight/pkg/client/influxdb"
 	"github.com/spf13/cobra"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-type RunOptions struct {
-	Master                            string
-	KubeConfig                        string
-	ESEndpoint                        string
-	InfluxSecretName                  string
-	InfluxSecretNamespace             string
-	ClusterName                       string
-	ClusterKubedConfigSecretName      string
-	ClusterKubedConfigSecretNamespace string
-	NotifyOnCertSoonToBeExpeired      bool
-	NotifyVia                         string
-}
-
 func NewCmdRun() *cobra.Command {
-	opt := RunOptions{
+	opt := watcher.RunOptions{
 		InfluxSecretName:                  "appscode-influx",
 		InfluxSecretNamespace:             "kube-system",
 		ClusterKubedConfigSecretName:      "cluster-kubed-config",
 		ClusterKubedConfigSecretNamespace: "kube-system",
-		NotifyOnCertSoonToBeExpeired:      true,
-		NotifyVia:                         "plivo",
+		Indexer:                      "indexers.bleve",
+		EnableReverseIndex:           true,
+		ServerAddress:                ":32600",
+		NotifyOnCertSoonToBeExpeired: true,
+		NotifyVia:                    "plivo",
 	}
 	cmd := &cobra.Command{
 		Use:   "run",
@@ -66,11 +59,13 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringVar(&opt.Master, "master", opt.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
 	cmd.Flags().BoolVar(&opt.NotifyOnCertSoonToBeExpeired, "notify-on-cert-expired", opt.NotifyOnCertSoonToBeExpeired, "If enabled notify cluster admin wheen cert expired soon.")
 	cmd.Flags().StringVar(&opt.NotifyVia, "notify-via", opt.NotifyVia, "Default notification method (eg: hipchat, mailgun, smtp, twilio, slack, plivo)")
-
+	cmd.Flags().StringVar(&opt.Indexer, "indexer", opt.Indexer, "Reverse indexing of pods to service and others")
+	cmd.Flags().BoolVar(&opt.EnableReverseIndex, "enable-reverse-index", opt.EnableReverseIndex, "Reverse indexing of pods to service and others")
+	cmd.Flags().StringVar(&opt.ServerAddress, "address", opt.ServerAddress, "The address of the Kubed API Server")
 	return cmd
 }
 
-func Run(opt RunOptions) {
+func Run(opt watcher.RunOptions) {
 	log.Infoln("configurations provided for kubed", opt)
 	defer runtime.HandleCrash()
 
@@ -79,10 +74,42 @@ func Run(opt RunOptions) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	client := clientset.NewForConfigOrDie(c)
-	kubeWatcher := &watcher.Watcher{
-		KubeClient: client,
+
+	kubeWatcher := &watcher.Controller{
+		KubeClient: clientset.NewForConfigOrDie(c),
 		SyncPeriod: time.Minute * 2,
+		RunOptions: opt,
+	}
+
+	// router is default HTTP request multiplexer for kubed. It matches the URL of each
+	// incoming request against a list of registered patterns with their associated
+	// methods and calls the handler for the pattern that most closely matches the
+	// URL.
+	//
+	// Pattern matching attempts each pattern in the order in which they were
+	// registered.
+	router := pat.New()
+
+	// Enable full text indexing to have search feature
+	if len(opt.Indexer) > 0 {
+		indexer, err := indexers.NewResourceIndexer(opt.Indexer)
+		if err != nil {
+			log.Errorln(err)
+		} else {
+			indexer.RegisterRouters(router)
+			kubeWatcher.Indexer = indexer
+		}
+	}
+
+	// Enable pod -> service, service -> serviceMonitor indexing
+	if opt.EnableReverseIndex {
+		ri, err := indexers.NewReverseIndexer(kubeWatcher.KubeClient, opt.Indexer)
+		if err != nil {
+			log.Errorln("Failed to create indexer", err)
+		} else {
+			ri.RegisterRouters(router)
+			kubeWatcher.ReverseIndex = ri
+		}
 	}
 
 	log.Infoln("Running kubed watcher")
@@ -90,7 +117,7 @@ func Run(opt RunOptions) {
 
 	// initializing kube janitor tasks
 	kubeJanitor := janitor.Janitor{
-		KubeClient:                        client,
+		KubeClient:                        kubeWatcher.KubeClient,
 		ClusterName:                       opt.ClusterName,
 		ElasticConfig:                     make(map[string]string),
 		ClusterKubedConfigSecretName:      opt.ClusterKubedConfigSecretName,
@@ -127,10 +154,15 @@ func Run(opt RunOptions) {
 
 	if opt.NotifyOnCertSoonToBeExpeired {
 		go cert.DefaultCertWatcher(
-			client,
+			kubeWatcher.KubeClient,
 			opt.ClusterKubedConfigSecretName,
 			opt.ClusterKubedConfigSecretNamespace,
 		).RunAndHold()
 	}
 	go wait.Forever(kubeJanitor.Run, time.Hour*24)
+
+	if len(opt.ServerAddress) > 0 {
+		http.Handle("/", router)
+		go http.ListenAndServe(opt.ServerAddress, nil)
+	}
 }
