@@ -10,6 +10,7 @@ import (
 	"github.com/appscode/go/hold"
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/go/wait"
+	"github.com/appscode/kubed/pkg/cert"
 	"github.com/appscode/kubed/pkg/dns"
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/janitor"
@@ -28,9 +29,11 @@ func NewCmdRun() *cobra.Command {
 		InfluxSecretNamespace:             "kube-system",
 		ClusterKubedConfigSecretName:      "cluster-kubed-config",
 		ClusterKubedConfigSecretNamespace: "kube-system",
-		Indexer:            "indexers.bleve",
-		EnableReverseIndex: true,
-		ServerAddress:      ":32600",
+		Indexer:                      "indexers.bleve",
+		EnableReverseIndex:           true,
+		ServerAddress:                ":32600",
+		NotifyOnCertSoonToBeExpeired: true,
+		NotifyVia:                    "plivo",
 	}
 	cmd := &cobra.Command{
 		Use:   "run",
@@ -54,6 +57,8 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringVar(&opt.InfluxSecretNamespace, "influx-secret-namespace", opt.InfluxSecretNamespace, "Influxdb secret namespace")
 	cmd.Flags().StringVar(&opt.KubeConfig, "kubeconfig", opt.KubeConfig, "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
 	cmd.Flags().StringVar(&opt.Master, "master", opt.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
+	cmd.Flags().BoolVar(&opt.NotifyOnCertSoonToBeExpeired, "notify-on-cert-expired", opt.NotifyOnCertSoonToBeExpeired, "If enabled notify cluster admin wheen cert expired soon.")
+	cmd.Flags().StringVar(&opt.NotifyVia, "notify-via", opt.NotifyVia, "Default notification method (eg: hipchat, mailgun, smtp, twilio, slack, plivo)")
 	cmd.Flags().StringVar(&opt.Indexer, "indexer", opt.Indexer, "Reverse indexing of pods to service and others")
 	cmd.Flags().BoolVar(&opt.EnableReverseIndex, "enable-reverse-index", opt.EnableReverseIndex, "Reverse indexing of pods to service and others")
 	cmd.Flags().StringVar(&opt.ServerAddress, "address", opt.ServerAddress, "The address of the Kubed API Server")
@@ -112,7 +117,7 @@ func Run(opt watcher.RunOptions) {
 
 	// initializing kube janitor tasks
 	kubeJanitor := janitor.Janitor{
-		KubeClient:                        clientset.NewForConfigOrDie(c),
+		KubeClient:                        kubeWatcher.KubeClient,
 		ClusterName:                       opt.ClusterName,
 		ElasticConfig:                     make(map[string]string),
 		ClusterKubedConfigSecretName:      opt.ClusterKubedConfigSecretName,
@@ -145,6 +150,14 @@ func Run(opt watcher.RunOptions) {
 		} else {
 			kubeJanitor.InfluxConfig = *influxConfig
 		}
+	}
+
+	if opt.NotifyOnCertSoonToBeExpeired {
+		go cert.DefaultCertWatcher(
+			kubeWatcher.KubeClient,
+			opt.ClusterKubedConfigSecretName,
+			opt.ClusterKubedConfigSecretNamespace,
+		).RunAndHold()
 	}
 	go wait.Forever(kubeJanitor.Run, time.Hour*24)
 

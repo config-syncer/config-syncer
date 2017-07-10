@@ -1,5 +1,5 @@
-hash: 90af368a9998100492b5fc69ef52e93ec3325f04aff713ef1d01f1edff05249b
-updated: 2017-07-06T14:08:49.333217058-07:00
+hash: 713452d73f06bce1581046720403a22c13840ec9350b794d9b3a95a1ea5d0404
+updated: 2017-07-07T07:05:50.514011909-07:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -10,6 +10,8 @@ imports:
   version: b61754fd4d336573cfed5cf16bcbdfe6d30d078d
 - name: github.com/appscode/client
   version: 9844500890e8cf3df84b3c86ddc17c220db38af1
+- name: github.com/appscode/envconfig
+  version: a74ef73ab982beb8f0c6060ac44da1c960fea414
 - name: github.com/appscode/errors
   version: 748883e321a9f99fe901bd2663c7af3fcae43ea4
 - name: github.com/appscode/go
@@ -20,12 +22,20 @@ imports:
   - runtime
   - version
   - wait
+- name: github.com/appscode/go-notify
+  version: 55715f5bccdb3e322e0ebd347e8026088b79bee7
+  subpackages:
+  - hipchat
+  - mailgun
+  - plivo
+  - slack
+  - smtp
+  - twilio
+  - unified
 - name: github.com/appscode/log
   version: 68e0e42e42c01371f3950571fc87c2298a51dd8f
   subpackages:
   - golog
-- name: github.com/appscode/pat
-  version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
   version: 9accfcb1b753457c45604406583867cbc46ac0c2
   subpackages:
@@ -40,45 +50,6 @@ imports:
   version: 0984e0641ae43b89283223034574d6465be93bf4
 - name: github.com/blang/semver
   version: 31b736133b98f26d5e078ec9eb591666edfd091f
-- name: github.com/blevesearch/bleve
-  version: 174f8ed44a0bf65e7c8fb228b60b58de62654cd2
-  subpackages:
-  - analysis
-  - analysis/analyzer/standard
-  - analysis/datetime/flexible
-  - analysis/datetime/optional
-  - analysis/lang/en
-  - analysis/token/lowercase
-  - analysis/token/porter
-  - analysis/token/stop
-  - analysis/tokenizer/unicode
-  - document
-  - geo
-  - index
-  - index/store
-  - index/store/boltdb
-  - index/store/gtreap
-  - index/upsidedown
-  - mapping
-  - numeric
-  - registry
-  - search
-  - search/collector
-  - search/facet
-  - search/highlight
-  - search/highlight/format/html
-  - search/highlight/fragmenter/simple
-  - search/highlight/highlighter/html
-  - search/highlight/highlighter/simple
-  - search/query
-  - search/scorer
-  - search/searcher
-- name: github.com/blevesearch/go-porterstemmer
-  version: 23a2c8e5cf1f380f27722c6d2ae8896431dc7d0e
-- name: github.com/blevesearch/segment
-  version: 762005e7a34fd909a84586299f1dd457371d36ee
-- name: github.com/boltdb/bolt
-  version: 2f846c3551b76d7710f159be840d66c3d064abbe
 - name: github.com/coreos/go-oidc
   version: be73733bb8cc830d0205609b95d125215f8e9c70
   subpackages:
@@ -132,6 +103,10 @@ imports:
   version: 8ee79997227bf9b34611aee7946ae64735e6fd93
   subpackages:
   - proto
+- name: github.com/google/go-querystring
+  version: 547ef5ac979778feb2f760cdb5f4eae1a2207b86
+  subpackages:
+  - query
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/howeyc/gopass
@@ -146,10 +121,14 @@ imports:
   - client
   - models
   - pkg/escape
+- name: github.com/jaytaylor/html2text
+  version: 52d9b785554a1918cb09909b89a1509a98b853fd
 - name: github.com/jonboulle/clockwork
   version: 72f9bd7c4e0c2a40055ab3d0f09654f730cce982
 - name: github.com/juju/ratelimit
   version: 77ed1c8a01217656d2080ad51981f6e99adaa177
+- name: github.com/mailgun/mailgun-go
+  version: 369a1fa57ce6fb314e627087b9fff0db5c266c0f
 - name: github.com/mailru/easyjson
   version: d5b7844b561a7bc640052f1b935f7b800330d7e0
   subpackages:
@@ -162,6 +141,8 @@ imports:
   - autoinc
   - idgen
   - signal
+- name: github.com/nlopes/slack
+  version: ca8436d76f805ec1e682eaae2de3c3a9bc894b0f
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/PuerkitoBio/purell
@@ -172,8 +153,10 @@ imports:
   version: 8c6fa02d2225de0f9bdcb7ca912556f68d172d8c
 - name: github.com/spf13/pflag
   version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
-- name: github.com/steveyen/gtreap
-  version: 0abe01ef9be25c4aedc174758ec2d917314d6d70
+- name: github.com/tbruyelle/hipchat-go
+  version: 749fb9e14beb9995f677c101a754393cecb64b0f
+  subpackages:
+  - hipchat
 - name: github.com/ugorji/go
   version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
   subpackages:
@@ -193,10 +176,13 @@ imports:
   subpackages:
   - context
   - context/ctxhttp
+  - html
+  - html/atom
   - http2
   - http2/hpack
   - idna
   - lex/httplex
+  - websocket
 - name: golang.org/x/oauth2
   version: 3c3a985cb79f52a3190fbc056984415ca6763d01
   subpackages:
@@ -234,6 +220,10 @@ imports:
   - internal/remote_api
   - internal/urlfetch
   - urlfetch
+- name: gopkg.in/alexcesaro/quotedprintable.v3
+  version: 2caba252f4dc53eaf6b553000885530023f54623
+- name: gopkg.in/gomail.v2
+  version: 81ebce5c23dfd25c6c67194b37d3dd3f338c98b1
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/mgo.v2
@@ -515,6 +505,14 @@ imports:
   - third_party/forked/golang/reflect
   - third_party/forked/golang/template
 testImports:
+- name: github.com/google/certificate-transparency
+  version: af98904302724c29aa6659ca372d41c9687de2b7
+  subpackages:
+  - go
+  - go/asn1
+  - go/client
+  - go/x509
+  - go/x509/pkix
 - name: github.com/pmezard/go-difflib
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:

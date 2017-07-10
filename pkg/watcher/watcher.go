@@ -30,6 +30,8 @@ type RunOptions struct {
 	Indexer                           string
 	EnableReverseIndex                bool
 	ServerAddress                     string
+	NotifyOnCertSoonToBeExpeired      bool
+	NotifyVia                         string
 }
 
 func (w *Controller) Run() {
