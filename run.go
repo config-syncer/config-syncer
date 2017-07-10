@@ -103,12 +103,12 @@ func Run(opt watcher.RunOptions) {
 
 	// Enable pod -> service, service -> serviceMonitor indexing
 	if opt.EnableReverseIndex {
-		ri, err := indexers.NewReverseIndexer(kubeWatcher.KubeClient, "")
+		ri, err := indexers.NewReverseIndexer(kubeWatcher.KubeClient, opt.Indexer)
 		if err != nil {
 			log.Errorln("Failed to create indexer", err)
 		} else {
-			kubeWatcher.ReverseIndex = ri
 			ri.RegisterRouters(router)
+			kubeWatcher.ReverseIndex = ri
 		}
 	}
 

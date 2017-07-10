@@ -1,9 +1,12 @@
 package indexers
 
 import (
+	"encoding/json"
 	"reflect"
+	"strings"
 
 	"github.com/appscode/log"
+	"github.com/blevesearch/bleve"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	clientset "k8s.io/client-go/kubernetes"
@@ -14,18 +17,21 @@ type ReverseIndexer struct {
 	// kubeClient to access kube api server
 	kubeClient clientset.Interface
 
-	// podToServiceRecordMap pod to service object.
-	podToServiceRecordMap map[string][]*apiv1.Service
+	client bleve.Index
 
 	// Channel serializes event to protect cache
 	dataChan chan interface{}
 }
 
 func NewReverseIndexer(cl clientset.Interface, dst string) (*ReverseIndexer, error) {
+	c, err := ensureIndex(strings.TrimRight(dst, "/")+"/reverse.indexer", "indexer")
+	if err != nil {
+		return nil, err
+	}
 	return &ReverseIndexer{
-		kubeClient:            cl,
-		podToServiceRecordMap: make(map[string][]*apiv1.Service),
-		dataChan:              make(chan interface{}, 1),
+		kubeClient: cl,
+		client:     c,
+		dataChan:   make(chan interface{}, 1),
 	}, nil
 }
 
@@ -65,11 +71,30 @@ func (ri *ReverseIndexer) newService() {
 
 		for _, pod := range pods.Items {
 			key := namespacerKey(pod.ObjectMeta)
-			val, _ := ri.podToServiceRecordMap[key]
-			if len(val) == 0 {
-				ri.podToServiceRecordMap[key] = make([]*apiv1.Service, 0)
+			raw, err := ri.client.GetInternal(key)
+			if err != nil || len(raw) == 0 {
+				data := []*apiv1.Service{service}
+				raw, err := json.Marshal(data)
+				if err == nil {
+					err := ri.client.SetInternal(key, raw)
+					if err != nil {
+						log.Errorln("Failed to store internal document", err)
+					}
+				}
+			} else {
+				var data []*apiv1.Service
+				err := json.Unmarshal(raw, &data)
+				if err == nil {
+					data = append(data, service)
+					raw, err := json.Marshal(data)
+					if err == nil {
+						err = ri.client.SetInternal(key, raw)
+						if err != nil {
+							log.Errorln("Failed to store internal document", err)
+						}
+					}
+				}
 			}
-			ri.podToServiceRecordMap[key] = append(val, service)
 		}
 	}
 }
@@ -85,15 +110,27 @@ func (ri *ReverseIndexer) removeService() {
 
 		for _, pod := range pods.Items {
 			key := namespacerKey(pod.ObjectMeta)
-			if val, ok := ri.podToServiceRecordMap[key]; ok {
-				for i, valueSvc := range val {
-					if equalService(svc, valueSvc) {
-						ri.podToServiceRecordMap[key] = append(val[:i], val[i+1:]...)
+			raw, _ := ri.client.GetInternal(key)
+			if len(raw) > 0 {
+				var data []*apiv1.Service
+				err := json.Unmarshal(raw, &data)
+				if err == nil {
+					tempData := data
+					for i, valueSvc := range data {
+						if equalService(svc, valueSvc) {
+							tempData = append(data[:i], data[i+1:]...)
+						}
 					}
-				}
-				if len(ri.podToServiceRecordMap[key]) == 0 {
-					// Remove unnecessary map index
-					delete(ri.podToServiceRecordMap, key)
+
+					if len(tempData) == 0 {
+						// Remove unnecessary index
+						ri.client.DeleteInternal(key)
+					} else {
+						raw, err := json.Marshal(tempData)
+						if err == nil {
+							ri.client.SetInternal(key, raw)
+						}
+					}
 				}
 			}
 		}
@@ -134,8 +171,8 @@ func equalService(a, b *apiv1.Service) bool {
 	return false
 }
 
-func namespacerKey(meta metav1.ObjectMeta) string {
-	return meta.Namespace + "/" + meta.Name
+func namespacerKey(meta metav1.ObjectMeta) []byte {
+	return []byte(meta.Namespace + "/" + meta.Name)
 }
 
 func assertIsService(obj interface{}) (*apiv1.Service, bool) {

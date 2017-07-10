@@ -1,31 +1,46 @@
 package indexers
 
 import (
+	"encoding/json"
+	"fmt"
+	"os"
 	"testing"
 
+	"github.com/appscode/log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/pkg/api/v1"
 )
 
 func newTestReverseIndexer() *ReverseIndexer {
+	c, err := ensureIndex(os.TempDir()+"/index", "indexer")
+	if err != nil {
+		log.Fatal(err)
+	}
 	return &ReverseIndexer{
 		kubeClient: fake.NewSimpleClientset(
 			newPod("foo-pod-1"),
 			newPod("foo-pod-2"),
 		),
-		dataChan:              make(chan interface{}, 1),
-		podToServiceRecordMap: make(map[string][]*v1.Service),
+		dataChan: make(chan interface{}, 1),
+		client:   c,
 	}
 }
 
 func TestNewService(t *testing.T) {
+	defer os.RemoveAll(os.TempDir() + "/index")
+
 	ri := newTestReverseIndexer()
 	ri.dataChan <- newService()
 	ri.newService()
 
 	pod := newPod("foo-pod-1")
-	if svc, ok := ri.podToServiceRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
+	if rawdata, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
+		var svc []*v1.Service
+		err := json.Unmarshal(rawdata, &svc)
+		if err != nil {
+			t.Fatal(err)
+		}
 		if !equalService(svc[0], newService()) {
 			t.Errorf("Service did not matched")
 		}
@@ -34,7 +49,12 @@ func TestNewService(t *testing.T) {
 	}
 
 	pod = newPod("foo-pod-2")
-	if svc, ok := ri.podToServiceRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
+	if rawdata, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
+		var svc []*v1.Service
+		err := json.Unmarshal(rawdata, &svc)
+		if err != nil {
+			t.Fatal(err)
+		}
 		if !equalService(svc[0], newService()) {
 			t.Errorf("Service did not matched")
 		}
@@ -43,19 +63,28 @@ func TestNewService(t *testing.T) {
 	}
 
 	pod = newPod("foo-pod-3")
-	if _, ok := ri.podToServiceRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
-		t.Errorf("Service Found, expected Not Found")
+	if res, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
+		if len(res) > 0 {
+			t.Errorf("Service Found, expected Not Found")
+		}
 	}
 }
 
 func TestRemoveService(t *testing.T) {
+	defer os.RemoveAll(os.TempDir() + "/index")
+
 	ri := newTestReverseIndexer()
 
 	service := newService()
 	ri.dataChan <- service
 	ri.newService()
 	pod := newPod("foo-pod-1")
-	if svc, ok := ri.podToServiceRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
+	if rawdata, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
+		var svc []*v1.Service
+		err := json.Unmarshal(rawdata, &svc)
+		if err != nil {
+			t.Fatal(err)
+		}
 		if !equalService(svc[0], service) {
 			t.Errorf("Service did not matched")
 		}
@@ -67,13 +96,18 @@ func TestRemoveService(t *testing.T) {
 	ri.removeService()
 
 	pod = newPod("foo-pod-1")
-	if _, ok := ri.podToServiceRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
-		t.Errorf("Service Found, expected Not Found")
+	if res, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
+		if len(res) > 0 {
+			fmt.Println(string(res))
+			t.Errorf("Service Found, expected Not Found")
+		}
 	}
 
 	pod = newPod("foo-pod-2")
-	if _, ok := ri.podToServiceRecordMap[namespacerKey(pod.ObjectMeta)]; ok {
-		t.Errorf("Service Found, expected Not Found")
+	if res, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
+		if len(res) > 0 {
+			t.Errorf("Service Found, expected Not Found")
+		}
 	}
 }
 

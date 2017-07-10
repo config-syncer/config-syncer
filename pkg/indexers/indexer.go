@@ -2,6 +2,7 @@ package indexers
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/appscode/log"
 	"github.com/blevesearch/bleve"
@@ -14,7 +15,7 @@ type ResourceIndexer struct {
 }
 
 func NewResourceIndexer(dst string) (*ResourceIndexer, error) {
-	c, err := ensureIndex(dst)
+	c, err := ensureIndex(strings.TrimRight(dst, "/")+"/resource.indexer", "search")
 	if err != nil {
 		return nil, err
 	}
@@ -23,12 +24,12 @@ func NewResourceIndexer(dst string) (*ResourceIndexer, error) {
 	}, nil
 }
 
-func ensureIndex(dst string) (bleve.Index, error) {
+func ensureIndex(dst, doctype string) (bleve.Index, error) {
 	c, err := bleve.Open(dst)
 	if err != nil {
 		documentMapping := bleve.NewDocumentMapping()
 		mapping := bleve.NewIndexMapping()
-		mapping.AddDocumentMapping("search", documentMapping)
+		mapping.AddDocumentMapping(doctype, documentMapping)
 		c, err := bleve.New(dst, mapping)
 		if err != nil {
 			return nil, err
