@@ -42,10 +42,10 @@ build_docker() {
 
 	cat >Dockerfile <<EOL
 FROM alpine
+
 RUN set -x \
-  && apk update \
-  && apk add ca-certificates \
-  && rm -rf /var/cache/apk/*
+  && apk add --update --no-cache ca-certificates
+
 COPY kubed /kubed
 ENTRYPOINT ["/kubed"]
 EOL

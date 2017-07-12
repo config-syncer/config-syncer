@@ -1,0 +1,160 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: kubed-operator
+rules:
+- apiGroups:
+  - extensions
+  resources:
+  - thirdpartyresources
+  verbs: ["get", "create"]
+- apiGroups:
+  - kubed.appscode.com
+  resources:
+  - restics
+  verbs: ["*"]
+- apiGroups:
+  - extensions
+  resources:
+  - deployments
+  - replicasets
+  - daemonsets
+  verbs: ["list", "watch", "update"]
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs: ["list", "watch", "update"]
+- apiGroups: [""]
+  resources:
+  - namespaces
+  - replicationcontrollers
+  verbs: ["list", "watch", "update"]
+- apiGroups: [""]
+  resources:
+  - secrets
+  verbs: ["get"]
+- apiGroups: [""]
+  resources:
+  - events
+  verbs: ["create"]
+- apiGroups: [""]
+  resources:
+  - pods
+  verbs: ["list", delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: kubed-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubed-operator
+subjects:
+- kind: ServiceAccount
+  name: kubed-operator
+  namespace: kube-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubed-operator
+  namespace: kube-system
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: kubed
+  name: kubed-operator
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubed
+  template:
+    metadata:
+      labels:
+        app: kubed
+    spec:
+      serviceAccountName: kubed-operator
+      containers:
+      - name: operator
+        args:
+        - run
+        - --v=3
+        image: appscode/kubed:0.4.0
+        ports:
+        - containerPort: 56790
+          name: http
+          protocol: TCP
+      - name: pushgateway
+        args:
+        - -web.listen-address=:56789
+        - -persistence.file=/var/pv/pushgateway.dat
+        image: prom/pushgateway:v0.4.0
+        ports:
+        - containerPort: 56789
+          name: pushgateway
+          protocol: TCP
+        volumeMounts:
+          - mountPath: /var/pv
+            name: data-volume
+          - mountPath: /tmp
+            name: kubed-scratchdir
+      volumes:
+        - emptyDir: {}
+          name: data-volume
+        - emptyDir: {}
+          name: kubed-scratchdir
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kubed
+  name: kubed-operator
+  namespace: kube-system
+spec:
+  ports:
+  - name: pushgateway
+    port: 56789
+    targetPort: pushgateway
+  - name: http
+    port: 56790
+    targetPort: http
+  selector:
+    app: kubed
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: kubed-sidecar
+  labels:
+    app: kubed
+rules:
+- apiGroups:
+  - kubed.appscode.com
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups:
+  - extensions
+  resources:
+  - deployments
+  - daemonsets
+  - replicasets
+  verbs: ["get"]
+- apiGroups: [""]
+  resources:
+  - replicationcontrollers
+  verbs: ["*"]
+- apiGroups: [""]
+  resources:
+  - secrets
+  verbs: ["get"]
+- apiGroups: [""]
+  resources:
+  - events
+  verbs: ["create"]
