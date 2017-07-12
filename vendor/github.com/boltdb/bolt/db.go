@@ -93,7 +93,8 @@ type DB struct {
 
 	path     string
 	file     *os.File
-	dataref  []byte // mmap'ed readonly, write throws SEGV
+	lockfile *os.File // windows only
+	dataref  []byte   // mmap'ed readonly, write throws SEGV
 	data     *[maxMapSize]byte
 	datasz   int
 	filesz   int // current on disk file size
@@ -177,7 +178,7 @@ func Open(path string, mode os.FileMode, options *Options) (*DB, error) {
 	// if !options.ReadOnly.
 	// The database file is locked using the shared lock (more than one process may
 	// hold a lock at the same time) otherwise (options.ReadOnly is set).
-	if err := flock(db.file, !db.readOnly, options.Timeout); err != nil {
+	if err := flock(db, mode, !db.readOnly, options.Timeout); err != nil {
 		_ = db.close()
 		return nil, err
 	}
@@ -379,10 +380,13 @@ func (db *DB) Close() error {
 }
 
 func (db *DB) close() error {
+	if !db.opened {
+		return nil
+	}
+
 	db.opened = false
 
 	db.freelist = nil
-	db.path = ""
 
 	// Clear ops.
 	db.ops.writeAt = nil
@@ -397,7 +401,7 @@ func (db *DB) close() error {
 		// No need to unlock read-only file.
 		if !db.readOnly {
 			// Unlock the file.
-			if err := funlock(db.file); err != nil {
+			if err := funlock(db); err != nil {
 				log.Printf("bolt.Close(): funlock error: %s", err)
 			}
 		}
@@ -409,6 +413,7 @@ func (db *DB) close() error {
 		db.file = nil
 	}
 
+	db.path = ""
 	return nil
 }
 
@@ -824,8 +829,10 @@ func (db *DB) grow(sz int) error {
 	// Truncate and fsync to ensure file size metadata is flushed.
 	// https://github.com/boltdb/bolt/issues/284
 	if !db.NoGrowSync && !db.readOnly {
-		if err := db.file.Truncate(int64(sz)); err != nil {
-			return fmt.Errorf("file resize error: %s", err)
+		if runtime.GOOS != "windows" {
+			if err := db.file.Truncate(int64(sz)); err != nil {
+				return fmt.Errorf("file resize error: %s", err)
+			}
 		}
 		if err := db.file.Sync(); err != nil {
 			return fmt.Errorf("file sync error: %s", err)
