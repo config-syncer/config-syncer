@@ -12,7 +12,8 @@ import (
 )
 
 func NewCmdBackup() *cobra.Command {
-	opt := backup.Options{}
+	var opt backup.Options
+
 	cmd := &cobra.Command{
 		Use:     "backup",
 		Short:   "Takes backup of YAML files of cluster",
