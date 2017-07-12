@@ -1,7 +1,6 @@
 package util
 
 import (
-	sapi "github.com/appscode/stash/api"
 	clientset "k8s.io/client-go/kubernetes"
 )
 

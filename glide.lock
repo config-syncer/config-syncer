@@ -1,5 +1,5 @@
 hash: 713452d73f06bce1581046720403a22c13840ec9350b794d9b3a95a1ea5d0404
-updated: 2017-07-12T13:06:31.386717451-07:00
+updated: 2017-07-12T15:28:55.239427886-07:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -17,11 +17,14 @@ imports:
 - name: github.com/appscode/go
   version: 9fde097ebcef0add8325c8fbee63ae01e7da530e
   subpackages:
+  - encoding/json/types
   - env
   - flags
   - hold
   - net/httpclient
   - runtime
+  - strings
+  - types
   - version
   - wait
 - name: github.com/appscode/go-notify
@@ -54,6 +57,20 @@ imports:
   - pkg/client/influxdb
   - pkg/client/k8s
   - pkg/dns
+- name: github.com/appscode/stash
+  version: 42ccbccd76d98ecccc606a6345ac24c4019761dc
+  subpackages:
+  - api
+  - api/install
+  - client/clientset
+  - pkg/docker
+  - pkg/util
+- name: github.com/appscode/voyager
+  version: ec9ae6c0adfe5830d9f8e2a4cac391de493cf21f
+  subpackages:
+  - api
+  - api/install
+  - client/clientset
 - name: github.com/Azure/azure-sdk-for-go
   version: 0984e0641ae43b89283223034574d6465be93bf4
 - name: github.com/blang/semver
@@ -116,6 +133,10 @@ imports:
   - health
   - httputil
   - timeutil
+- name: github.com/coreos/prometheus-operator
+  version: 0d446f3052e47b5ad95989d9a8ffe4f6675e69b5
+  subpackages:
+  - pkg/client/monitoring/v1alpha1
 - name: github.com/cpuguy83/go-md2man
   version: 71acacd42f85e5e82f70a55327789582a5200a90
   subpackages:
@@ -127,8 +148,15 @@ imports:
 - name: github.com/docker/distribution
   version: cd27f179f2c10c5d300e6d09025b538c475b0d51
   subpackages:
+  - context
   - digest
+  - manifest
+  - manifest/schema1
+  - manifest/schema2
   - reference
+  - uuid
+- name: github.com/docker/libtrust
+  version: fa567046d9b14f6aa788882a950d69651d230b21
 - name: github.com/emicklei/go-restful
   version: 09691a3b6378b740595c1002f40c34dd5f218a22
   subpackages:
@@ -167,6 +195,14 @@ imports:
   - query
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
+- name: github.com/gorilla/context
+  version: 215affda49addc4c8ef7e2534915df2c8c35c6cd
+- name: github.com/gorilla/mux
+  version: 8096f47503459bcc74d1f4c487b7e6e42e5746b5
+- name: github.com/heroku/docker-registry-client
+  version: 95467b6cacee2a06f112a3cf7e47a70fad6000cf
+  subpackages:
+  - registry
 - name: github.com/howeyc/gopass
   version: 3ca23474a7c7203e0a0a070fd33508f6efdb9b3d
 - name: github.com/imdario/mergo
@@ -185,6 +221,12 @@ imports:
   version: 72f9bd7c4e0c2a40055ab3d0f09654f730cce982
 - name: github.com/juju/ratelimit
   version: 77ed1c8a01217656d2080ad51981f6e99adaa177
+- name: github.com/k8sdb/apimachinery
+  version: 9077c836cdd9913a61b2e9e38b5ab0c081f390f0
+  subpackages:
+  - api
+  - api/install
+  - client/clientset
 - name: github.com/mailgun/mailgun-go
   version: 369a1fa57ce6fb314e627087b9fff0db5c266c0f
 - name: github.com/mailru/easyjson
@@ -215,6 +257,8 @@ imports:
   version: 300106c228d52c8941d4b3de6054a6062a86dda3
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
+- name: github.com/Sirupsen/logrus
+  version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
 - name: github.com/spf13/cobra
   version: c46add8a652801b61513ad36c56759f302fbb028
   subpackages:
