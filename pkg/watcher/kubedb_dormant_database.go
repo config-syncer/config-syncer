@@ -2,6 +2,7 @@ package watcher
 
 import (
 	"errors"
+	"fmt"
 
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/log"
@@ -32,6 +33,7 @@ func (c *Controller) WatchDormantDatabases() {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.DormantDatabase); ok {
+					fmt.Println(alert)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
@@ -45,10 +47,11 @@ func (c *Controller) WatchDormantDatabases() {
 					log.Errorln(errors.New("Invalid DormantDatabase object"))
 					return
 				}
+				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.DormantDatabase); ok {
-
+					fmt.Println(alert)
 				}
 			},
 		},

@@ -2,6 +2,7 @@ package watcher
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 
 	acrt "github.com/appscode/go/runtime"
@@ -33,6 +34,7 @@ func (c *Controller) WatchClusterAlerts() {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.ClusterAlert); ok {
+					fmt.Println(alert)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
@@ -48,10 +50,11 @@ func (c *Controller) WatchClusterAlerts() {
 				}
 				if !reflect.DeepEqual(oldAlert.Spec, newAlert.Spec) {
 				}
+				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.ClusterAlert); ok {
-
+					fmt.Println(alert)
 				}
 			},
 		},

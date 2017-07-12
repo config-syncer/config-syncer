@@ -2,6 +2,7 @@ package watcher
 
 import (
 	"errors"
+	"fmt"
 
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/log"
@@ -32,6 +33,7 @@ func (c *Controller) WatchRestics() {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if restic, ok := obj.(*tapi.Restic); ok {
+					fmt.Println(restic)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
@@ -45,10 +47,11 @@ func (c *Controller) WatchRestics() {
 					log.Errorln(errors.New("Invalid Restic object"))
 					return
 				}
+				fmt.Println(oldRestic, newRestic)
 			},
 			DeleteFunc: func(obj interface{}) {
 				if restic, ok := obj.(*tapi.Restic); ok {
-
+					fmt.Println(restic)
 				}
 			},
 		},

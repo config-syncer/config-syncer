@@ -2,6 +2,7 @@ package watcher
 
 import (
 	"errors"
+	"fmt"
 
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/log"
@@ -32,6 +33,7 @@ func (c *Controller) WatchPostgreses() {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.Postgres); ok {
+					fmt.Println(alert)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
@@ -45,10 +47,11 @@ func (c *Controller) WatchPostgreses() {
 					log.Errorln(errors.New("Invalid Postgres object"))
 					return
 				}
+				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.Postgres); ok {
-
+					fmt.Println(alert)
 				}
 			},
 		},

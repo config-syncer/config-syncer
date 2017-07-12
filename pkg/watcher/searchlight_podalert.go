@@ -2,6 +2,7 @@ package watcher
 
 import (
 	"errors"
+	"fmt"
 
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/log"
@@ -32,6 +33,7 @@ func (c *Controller) WatchPodAlerts() {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.PodAlert); ok {
+					fmt.Println(alert)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
@@ -45,10 +47,11 @@ func (c *Controller) WatchPodAlerts() {
 					log.Errorln(errors.New("Invalid PodAlert object"))
 					return
 				}
+				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.PodAlert); ok {
-
+					fmt.Println(alert)
 				}
 			},
 		},

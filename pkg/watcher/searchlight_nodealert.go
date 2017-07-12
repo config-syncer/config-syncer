@@ -2,6 +2,7 @@ package watcher
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 
 	acrt "github.com/appscode/go/runtime"
@@ -33,6 +34,7 @@ func (c *Controller) WatchNodeAlerts() {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.NodeAlert); ok {
+					fmt.Println(alert)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
@@ -51,7 +53,7 @@ func (c *Controller) WatchNodeAlerts() {
 			},
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.NodeAlert); ok {
-
+					fmt.Println(alert)
 				}
 			},
 		},
