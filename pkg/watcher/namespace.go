@@ -20,7 +20,7 @@ func (w *Controller) watchNamespaces() {
 		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				ns := namespacesync.NewHandler(w.KubeClient)
+				ns := configsync.NewHandler(w.KubeClient)
 				ns.Handle(obj)
 			},
 		},
