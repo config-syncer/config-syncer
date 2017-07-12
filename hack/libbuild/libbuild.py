@@ -38,6 +38,7 @@ def _goenv():
 
 
 GOENV = _goenv()
+GOPATH = GOENV["GOPATH"]
 GOHOSTOS = GOENV["GOHOSTOS"]
 GOHOSTARCH = GOENV["GOHOSTARCH"]
 GOC = 'go'
@@ -153,7 +154,6 @@ def go_build(name, goos, goarch, main):
     if BIN_MATRIX[name].get('go_version', False):
         md = metadata(REPO_ROOT, goos, goarch)
         if md['version_strategy'] == 'tag':
-            del md['commit_timestamp']
             del md['build_timestamp']
             del md['build_host']
             del md['build_host_os']
