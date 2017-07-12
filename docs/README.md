@@ -1,18 +1,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/appscode/kubed)](https://goreportcard.com/report/github.com/appscode/kubed)
 
 # Kubed
- Kubed by AppsCode is a Kubernetes operator for [restic](https://github.com/restic/restic). If you are running production workloads in Kubernetes, you might want to take backup of your disks. Traditional tools are too complex to setup and maintain in a dynamic compute environment like Kubernetes. `restic` is a backup program that is fast, efficient and secure with few moving parts. Kubed is a TPR controller for Kubernetes built around `restic` to address these issues. Using Kubed, you can backup Kubernetes volumes mounted in following types of workloads:
-- Deployment
-- DaemonSet
-- ReplicaSet
-- ReplicationController
-- StatefulSet
-
-## Features
- - Fast, secure, efficient backup of any kubernetes [volumes](https://kubernetes.io/docs/concepts/storage/volumes/).
- - Automates configuration of `restic` for periodic backup.
- - Store backed up files in various cloud storage provider, including S3, GCS, Azure, OpenStack Swift etc.
- - Prometheus ready metrics for backup process.
+ Kubed by AppsCode is a Kubernetes daemon for running various cluster administration tasks.
 
 ## Supported Versions
 Kubernetes 1.5+
