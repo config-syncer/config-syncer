@@ -1,7 +1,7 @@
 package watcher
 
 import (
-	"github.com/appscode/kubed/pkg/namespacesync"
+	"github.com/appscode/kubed/pkg/configsync"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/util/wait"
