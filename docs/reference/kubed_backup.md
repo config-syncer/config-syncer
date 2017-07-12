@@ -1,17 +1,29 @@
-## kubed
+## kubed backup
 
-Kubed by AppsCode - Kubernetes Daemon
+Takes backup of YAML files of cluster
 
 ### Synopsis
 
 
-Kubed is a Kubernetes companion daemon to perform various supporting operations. For more information, visit here: https://github.com/appscode/kubed/tree/master/docs
+Takes backup of YAML files of cluster
+
+```
+kubed backup [flags]
+```
 
 ### Options
 
 ```
+      --backup-dir string   Directory where YAML files will be saved
+      --context string      The name of the kubeconfig context to use
+  -h, --help                help for backup
+      --sanitize             Sanitize fields in YAML
+```
+
+### Options inherited from parent commands
+
+```
       --alsologtostderr                  log to standard error as well as files
-  -h, --help                             help for kubed
       --log_backtrace_at traceLocation   when logging hits line file:N, emit a stack trace (default :0)
       --log_dir string                   If non-empty, write log files in this directory
       --logtostderr                      log to standard error instead of files
@@ -21,8 +33,6 @@ Kubed is a Kubernetes companion daemon to perform various supporting operations.
 ```
 
 ### SEE ALSO
-* [kubed backup](kubed_backup.md)	 - Takes backup of YAML files of cluster
-* [kubed run](kubed_run.md)	 - Run daemon
-* [kubed version](kubed_version.md)	 - Prints binary version number.
+* [kubed](kubed.md)	 - Kubed by AppsCode - Kubernetes Daemon
 
 

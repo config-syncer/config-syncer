@@ -26,6 +26,7 @@ func NewCmdKubed() *cobra.Command {
 	flag.CommandLine.Parse([]string{})
 
 	cmd.AddCommand(NewCmdRun())
+	cmd.AddCommand(NewCmdBackup())
 	cmd.AddCommand(v.NewCmdVersion())
 
 	return cmd

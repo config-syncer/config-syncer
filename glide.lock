@@ -1,5 +1,5 @@
 hash: 713452d73f06bce1581046720403a22c13840ec9350b794d9b3a95a1ea5d0404
-updated: 2017-07-12T12:26:54.797486008-07:00
+updated: 2017-07-12T13:06:31.386717451-07:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -18,6 +18,7 @@ imports:
   version: 9fde097ebcef0add8325c8fbee63ae01e7da530e
   subpackages:
   - env
+  - flags
   - hold
   - net/httpclient
   - runtime
@@ -35,6 +36,8 @@ imports:
   - twilio
   - unified
   - webhook
+- name: github.com/appscode/go-term
+  version: 620ebcf71e8e9dd59363149cd05ce8d3d57231e6
 - name: github.com/appscode/log
   version: 68e0e42e42c01371f3950571fc87c2298a51dd8f
   subpackages:
@@ -133,6 +136,8 @@ imports:
   - swagger
 - name: github.com/facebookgo/stack
   version: d9d227395bc3d7a635388c75b2e3b3a750e11888
+- name: github.com/fatih/color
+  version: 9aae6aaa22315390f03959adca2c4d395b02fcef
 - name: github.com/flosch/pongo2
   version: 58f1f3387f7c57843ff829d92a759d08abe5a63f
 - name: github.com/ghodss/yaml
@@ -188,6 +193,10 @@ imports:
   - buffer
   - jlexer
   - jwriter
+- name: github.com/mattn/go-colorable
+  version: 5411d3eea5978e6cdc258b30de592b60df6aba96
+- name: github.com/mattn/go-isatty
+  version: 56b76bdf51f7708750eac80fa38b952bb9f32639
 - name: github.com/mikespook/golib
   version: 38fe6917d34b267a79c3432369e7dcc379e2d5b3
   subpackages:
@@ -346,6 +355,7 @@ imports:
   subpackages:
   - discovery
   - discovery/fake
+  - dynamic
   - kubernetes
   - kubernetes/fake
   - kubernetes/scheme
@@ -430,9 +440,13 @@ imports:
   - pkg/util
   - pkg/util/parsers
   - pkg/version
+  - plugin/pkg/client/auth
+  - plugin/pkg/client/auth/gcp
+  - plugin/pkg/client/auth/oidc
   - rest
   - rest/watch
   - testing
+  - third_party/forked/golang/template
   - tools/auth
   - tools/cache
   - tools/clientcmd
@@ -446,6 +460,7 @@ imports:
   - util/flowcontrol
   - util/homedir
   - util/integer
+  - util/jsonpath
 - name: k8s.io/kubernetes
   version: 8eb75a5810cba92ccad845ca360cf924f2385881
   subpackages:
