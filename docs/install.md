@@ -17,7 +17,7 @@ $ curl https://raw.githubusercontent.com/appscode/kubed/0.4.0/hack/deploy/kubed-
 ```
 
 ## Using Helm
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](/chart/kubed) included in this repository or from official charts repository. To install the chart with the release name `my-release`:
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](/chart/kubed) included in this repository. To install the chart with the release name `my-release`:
 ```bash
 $ helm install chart/kubed --name my-release
 ```
