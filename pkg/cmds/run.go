@@ -17,7 +17,7 @@ import (
 	"github.com/appscode/kubed/pkg/watcher"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
-	"github.com/appscode/searchlight/pkg/client/influxdb"
+	"github.com/appscode/searchlight/pkg/influxdb"
 	"github.com/spf13/cobra"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"

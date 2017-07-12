@@ -3,9 +3,9 @@ package clientset
 import (
 	"fmt"
 
-	schema "k8s.io/kubernetes/pkg/api/unversioned"
-	"k8s.io/kubernetes/pkg/apimachinery/registered"
-	rest "k8s.io/kubernetes/pkg/client/restclient"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/pkg/api"
+	"k8s.io/client-go/rest"
 )
 
 const (
@@ -14,7 +14,9 @@ const (
 
 type ExtensionInterface interface {
 	RESTClient() rest.Interface
-	AlertNamespacer
+	PodAlertGetter
+	NodeAlertGetter
+	ClusterAlertGetter
 }
 
 // AppsCodeExtensionsClient is used to interact with experimental Kubernetes features.
@@ -26,8 +28,16 @@ type ExtensionClient struct {
 
 var _ ExtensionInterface = &ExtensionClient{}
 
-func (a *ExtensionClient) Alert(namespace string) AlertInterface {
-	return newAlert(a, namespace)
+func (c *ExtensionClient) PodAlerts(namespace string) PodAlertInterface {
+	return newPodAlert(c, namespace)
+}
+
+func (c *ExtensionClient) NodeAlerts(namespace string) NodeAlertInterface {
+	return newNodeAlert(c, namespace)
+}
+
+func (c *ExtensionClient) ClusterAlerts(namespace string) ClusterAlertInterface {
+	return newClusterAlert(c, namespace)
 }
 
 // NewForConfig creates a new ExtensionClient for the given config. This client
@@ -69,7 +79,7 @@ func setExtensionsDefaults(config *rest.Config) error {
 		return err
 	}
 	// if monitoring.appscode.com/v1alpha1 is not enabled, return an error
-	if !registered.IsEnabledVersion(gv) {
+	if !api.Registry.IsEnabledVersion(gv) {
 		return fmt.Errorf("monitoring.appscode.com/v1alpha1 is not enabled")
 	}
 	config.APIPath = defaultAPIPath
@@ -78,7 +88,7 @@ func setExtensionsDefaults(config *rest.Config) error {
 	}
 
 	if config.GroupVersion == nil || config.GroupVersion.Group != "monitoring.appscode.com" {
-		g, err := registered.Group("monitoring.appscode.com")
+		g, err := api.Registry.Group("monitoring.appscode.com")
 		if err != nil {
 			return err
 		}

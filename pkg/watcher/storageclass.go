@@ -1,36 +1,46 @@
 package watcher
 
 import (
+	acrt "github.com/appscode/go/runtime"
+	"github.com/appscode/log"
+	"github.com/appscode/stash/pkg/util"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
+	"k8s.io/apimachinery/pkg/watch"
+	extensions "k8s.io/client-go/pkg/apis/extensions/v1beta1"
+	storage "k8s.io/client-go/pkg/apis/storage/v1"
 	"k8s.io/client-go/tools/cache"
 )
 
-func (w *Controller) watchService() {
-	lw := cache.NewListWatchFromClient(
-		w.KubeClient.CoreV1().RESTClient(),
-		"services",
-		metav1.NamespaceAll,
-		fields.Everything())
-	_, controller := cache.NewInformer(lw,
-		&apiv1.Service{},
-		w.SyncPeriod,
+// Blocks caller. Intended to be called as a Go routine.
+func (c *Controller) WatchStorageClasss() {
+	if !util.IsPreferredAPIResource(c.KubeClient, extensions.SchemeGroupVersion.String(), "StorageClass") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "StorageClass")
+		return
+	}
+
+	defer acrt.HandleCrash()
+
+	lw := &cache.ListWatch{
+		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
+			return c.KubeClient.StorageV1().StorageClasses().List(metav1.ListOptions{})
+		},
+		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+			return c.KubeClient.StorageV1().StorageClasses().Watch(metav1.ListOptions{})
+		},
+	}
+	_, ctrl := cache.NewInformer(lw,
+		&storage.StorageClass{},
+		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
-			AddFunc: func(obj interface{}) {
-				w.ReverseIndex.Handle("added", obj)
-				w.Indexer.HandleAdd(obj)
-			},
 			DeleteFunc: func(obj interface{}) {
-				w.ReverseIndex.Handle("deleted", obj)
-				w.Indexer.HandleDelete(obj)
-			},
-			UpdateFunc: func(oldObj, newObj interface{}) {
-				w.ReverseIndex.Handle("updated", oldObj, newObj)
-				w.Indexer.HandleUpdate(oldObj, newObj)
+				if storage, ok := obj.(*storage.StorageClass); ok {
+					log.Infof("StorageClass %s@%s deleted", storage.Name, storage.Namespace)
+
+				}
 			},
 		},
 	)
-	go controller.Run(wait.NeverStop)
+	ctrl.Run(wait.NeverStop)
 }

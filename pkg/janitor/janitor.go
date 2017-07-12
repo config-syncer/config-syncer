@@ -8,7 +8,6 @@ import (
 	es "github.com/appscode/kubed/pkg/janitor/elasticsearch"
 	influx "github.com/appscode/kubed/pkg/janitor/influxdb"
 	"github.com/appscode/log"
-	"github.com/appscode/searchlight/pkg/client/icinga"
 	influxdb "github.com/influxdata/influxdb/client"
 	elastic "gopkg.in/olivere/elastic.v3"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,7 +32,7 @@ type Janitor struct {
 	ClusterKubedConfigSecretNamespace string
 
 	// Icinga Client
-	IcingaClient *icinga.IcingaClient
+	// IcingaClient *icinga.IcingaClient
 
 	once sync.Once
 }

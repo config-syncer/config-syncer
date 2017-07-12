@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/appscode/kubed/pkg/indexers"
+	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
@@ -13,11 +14,12 @@ import (
 )
 
 type Controller struct {
-	KubeClient    clientset.Interface
-	VoyagerClient vcs.ExtensionInterface
-	StashClient   scs.ExtensionInterface
-	PromClient    pcm.MonitoringV1alpha1Interface
-	KubeDBClient  kcs.ExtensionInterface
+	KubeClient        clientset.Interface
+	VoyagerClient     vcs.ExtensionInterface
+	SearchlightClient srch_cs.ExtensionInterface
+	StashClient       scs.ExtensionInterface
+	PromClient        pcm.MonitoringV1alpha1Interface
+	KubeDBClient      kcs.ExtensionInterface
 
 	RunOptions   RunOptions
 	Indexer      *indexers.ResourceIndexer

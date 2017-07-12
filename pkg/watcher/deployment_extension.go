@@ -35,8 +35,8 @@ func (c *Controller) WatchDeploymentExtensions() {
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if resource, ok := obj.(*extensions.Deployment); ok {
-					log.Infof("Deployment %s@%s deleted", resource.Name, resource.Namespace)
+				if deployment, ok := obj.(*extensions.Deployment); ok {
+					log.Infof("Deployment %s@%s deleted", deployment.Name, deployment.Namespace)
 
 				}
 			},
