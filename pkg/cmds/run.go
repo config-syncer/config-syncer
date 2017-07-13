@@ -2,7 +2,9 @@ package cmds
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/analytics"
@@ -15,18 +17,21 @@ import (
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
 	"github.com/spf13/cobra"
 	clientset "k8s.io/client-go/kubernetes"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml"
 func NewCmdRun(version string) *cobra.Command {
 	opt := operator.Options{
-		ConfigPath:         runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml",
+		ConfigPath:         "/srv/kubed/config.yaml",
 		Indexer:            "indexers.bleve",
 		EnableReverseIndex: true,
 		ServerAddress:      ":8081",
 		EnableAnalytics:    true,
 		EnableConfigSync:   true,
 		ScratchDir:         "/tmp",
+		OperatorNamespace:  namespace(),
 	}
 	cmd := &cobra.Command{
 		Use:   "run",
@@ -91,4 +96,16 @@ func Run(opt operator.Options) {
 
 	log.Infoln("Running kubed watcher")
 	op.RunAndHold()
+}
+
+func namespace() string {
+	if ns := os.Getenv("OPERATOR_NAMESPACE"); ns != "" {
+		return ns
+	}
+	if data, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace"); err == nil {
+		if ns := strings.TrimSpace(string(data)); len(ns) > 0 {
+			return ns
+		}
+	}
+	return apiv1.NamespaceDefault
 }

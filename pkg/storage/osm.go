@@ -64,7 +64,7 @@ func CheckBucketAccess(client clientset.Interface, spec tapi.Backend, namespace 
 		return err
 	}
 	r := bytes.NewReader([]byte("CheckBucketAccess"))
-	item, err := container.Put(".kubedb", r, r.Size(), nil)
+	item, err := container.Put(".kubed", r, r.Size(), nil)
 	if err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func NewOSMContext(client clientset.Interface, spec tapi.Backend, namespace stri
 	}
 
 	nc := &otx.Context{
-		Name:   "kubedb",
+		Name:   "kubed",
 		Config: stow.ConfigMap{},
 	}
 

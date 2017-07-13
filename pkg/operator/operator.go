@@ -13,16 +13,18 @@ import (
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/influxdb"
 	"github.com/appscode/kubed/pkg/recyclebin"
+	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
+	shell "github.com/codeskyblue/go-sh"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
 	"gopkg.in/robfig/cron.v2"
 	clientset "k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 type Options struct {
@@ -34,8 +36,9 @@ type Options struct {
 	Indexer            string
 	EnableReverseIndex bool
 
-	EnableConfigSync bool
-	ScratchDir       string
+	EnableConfigSync  bool
+	ScratchDir        string
+	OperatorNamespace string
 
 	EnableAnalytics bool
 }
@@ -67,6 +70,7 @@ func (op *Operator) Setup() error {
 	op.Config = *cfg
 
 	op.Cron = cron.New()
+	op.Cron.Start()
 	//Saver: &recyclebin.RecoverStuff{
 	//	Opt: *cfg.RecycleBin,
 	//},
@@ -143,8 +147,6 @@ func (op *Operator) ListenAndServe() {
 }
 
 func (op *Operator) StartCron() {
-	op.Cron.Start()
-
 	op.Cron.AddFunc("@every 24h", func() {
 		janitor := influx.Janitor{Config: op.Config}
 		janitor.CleanInflux()
@@ -163,12 +165,13 @@ func (op *Operator) StartCron() {
 		}
 		// expire saver
 	})
+
 	op.Cron.AddFunc(op.Config.ClusterSnapshot.Schedule, func() {
-		if config, err := rest.InClusterConfig(); err == nil {
-			err := backup.Backup(config, backup.Options{
-				BackupDir: "/tmp/abc",
-				Sanitize:  op.Config.ClusterSnapshot.Sanitize,
-			})
+		if config, err := clientcmd.BuildConfigFromFlags(op.Opt.Master, op.Opt.KubeConfig); err == nil {
+			t := time.Now().UTC()
+			backupDir := filepath.Join(op.Opt.ScratchDir, "snapshot", t.Format(time.RFC3339))
+
+			err := backup.SnapshotCluster(config, backupDir, op.Config.ClusterSnapshot.Sanitize)
 			if err != nil {
 				log.Errorln(err)
 			}
@@ -178,6 +181,57 @@ func (op *Operator) StartCron() {
 
 		// run backup
 	})
+}
+
+func (op *Operator) RunClusterSnapshotter() error {
+	if op.Config.ClusterSnapshot == nil {
+		return nil
+	}
+
+	osmconfigPath := filepath.Join(op.Opt.ScratchDir, "osm", "config.yaml")
+	err := storage.WriteOSMConfig(op.KubeClient, op.Config.ClusterSnapshot.Storage, op.Opt.OperatorNamespace, osmconfigPath)
+	if err != nil {
+		return err
+	}
+
+	sh := shell.NewSession()
+	sh.SetDir(op.Opt.ScratchDir)
+	sh.ShowCMD = true
+
+	container, err := op.Config.ClusterSnapshot.Storage.Container()
+	if err != nil {
+		return err
+	}
+
+	snapshotter := func() error {
+		config, err := clientcmd.BuildConfigFromFlags(op.Opt.Master, op.Opt.KubeConfig)
+		if err != nil {
+			return err
+		}
+
+		t := time.Now().UTC()
+		snapshotDir := filepath.Join(op.Opt.ScratchDir, "snapshot", t.Format(time.RFC3339))
+		err = backup.SnapshotCluster(config, snapshotDir, op.Config.ClusterSnapshot.Sanitize)
+		if err != nil {
+			return err
+		}
+
+		dest, err := op.Config.ClusterSnapshot.Storage.Location(t)
+		if err != nil {
+			return err
+		}
+
+		return sh.Command("osm", "push", "-c", container, snapshotDir, dest).Run()
+	}
+
+	_, err = op.Cron.AddFunc(op.Config.ClusterSnapshot.Schedule, func() {
+		err := snapshotter()
+		if err != nil {
+			log.Errorln(err)
+			return
+		}
+	})
+	return err
 }
 
 func (op *Operator) RunAndHold() {

@@ -11,30 +11,33 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func NewCmdBackup() *cobra.Command {
-	var opt backup.Options
+func NewCmdSnapshot() *cobra.Command {
+	var (
+		sanitize  bool
+		backupDir string
+		context   string
+	)
 
 	cmd := &cobra.Command{
-		Use:     "backup",
-		Short:   "Takes backup of YAML files of cluster",
-		Example: "",
+		Use:   "snapshot",
+		Short: "Takes a snapshot of Kubernetes api objects",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			flags.EnsureRequiredFlags(cmd, "context", "backup-dir")
 
-			err := os.MkdirAll(opt.BackupDir, 0777)
+			err := os.MkdirAll(backupDir, 0777)
 			if err != nil {
 				return err
 			}
-			restConfig, err := createKubeConfig(opt.Context)
+			restConfig, err := createKubeConfig(context)
 			if err != nil {
 				return err
 			}
-			return backup.Backup(restConfig, opt)
+			return backup.SnapshotCluster(restConfig, backupDir, sanitize)
 		},
 	}
-	cmd.Flags().BoolVar(&opt.Sanitize, "sanitize", false, " Sanitize fields in YAML")
-	cmd.Flags().StringVar(&opt.BackupDir, "backup-dir", "", "Directory where YAML files will be saved")
-	cmd.Flags().StringVar(&opt.Context, "context", "", "The name of the kubeconfig context to use")
+	cmd.Flags().BoolVar(&sanitize, "sanitize", false, " Sanitize fields in YAML")
+	cmd.Flags().StringVar(&backupDir, "backup-dir", "", "Directory where YAML files will be stored")
+	cmd.Flags().StringVar(&context, "context", "", "The name of the kubeconfig context to use")
 	return cmd
 }
 
