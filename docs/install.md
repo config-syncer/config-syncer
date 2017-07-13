@@ -7,12 +7,12 @@ Kubed can be installed using YAML files includes in the [/hack/deploy](/hack/dep
 
 ```sh
 # Install without RBAC roles
-$ curl https://raw.githubusercontent.com/appscode/kubed/0.4.0/hack/deploy/kubed-without-rbac.yaml \
+$ curl https://raw.githubusercontent.com/appscode/kubed/0.1.0/hack/deploy/kubed-without-rbac.yaml \
   | kubectl apply -f -
 
 
 # Install with RBAC roles
-$ curl https://raw.githubusercontent.com/appscode/kubed/0.4.0/hack/deploy/kubed-with-rbac.yaml \
+$ curl https://raw.githubusercontent.com/appscode/kubed/0.1.0/hack/deploy/kubed-with-rbac.yaml \
   | kubectl apply -f -
 ```
 
