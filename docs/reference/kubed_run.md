@@ -14,20 +14,14 @@ kubed run [flags]
 ### Options
 
 ```
-      --address string                         The address of the Kubed API Server (default ":32600")
-      --analytics                              Send analytical events to Google Analytics (default true)
-      --enable-reverse-index                   Reverse indexing of pods to service and others (default true)
-      --es-endpoint string                     Endpoint of elasticsearch
-  -h, --help                                   help for run
-      --indexer string                         Reverse indexing of pods to service and others (default "indexers.bleve")
-      --influx-secret string                   Influxdb secret name (default "appscode-influx")
-      --influx-secret-namespace string         Influxdb secret namespace (default "kube-system")
-      --kubeconfig string                      Path to kubeconfig file with authorization information (the master location is set by the master flag).
-      --kubed-config-secret-name string        Kubed configuration secret name (default "cluster-kubed-config")
-      --kubed-config-secret-namespace string   Kubed configuration secret namespace (default "kube-system")
-      --master string                          The address of the Kubernetes API server (overrides any value in kubeconfig)
-      --notify-on-cert-expired                 If enabled notify cluster admin wheen cert expired soon. (default true)
-      --notify-via string                      Default notification method (eg: hipchat, mailgun, smtp, twilio, slack, plivo) (default "plivo")
+      --address string         The address of the Kubed API Server (default ":32600")
+      --analytics              Send analytical events to Google Analytics (default true)
+      --clusterconfig string   Path to cluster config file (default "/home/tamal/go/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml")
+      --enable-reverse-index   Reverse indexing of pods to service and others (default true)
+  -h, --help                   help for run
+      --indexer string         Reverse indexing of pods to service and others (default "indexers.bleve")
+      --kubeconfig string      Path to kubeconfig file with authorization information (the master location is set by the master flag).
+      --master string          The address of the Kubernetes API server (overrides any value in kubeconfig)
 ```
 
 ### Options inherited from parent commands
