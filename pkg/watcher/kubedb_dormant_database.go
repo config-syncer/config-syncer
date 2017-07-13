@@ -52,7 +52,7 @@ func (c *Controller) WatchDormantDatabases() {
 			DeleteFunc: func(obj interface{}) {
 				if drmn, ok := obj.(*tapi.DormantDatabase); ok {
 					fmt.Println(drmn)
-					c.Saver.Save(obj)
+					c.Saver.Save(drmn.ObjectMeta, obj)
 				}
 			},
 		},

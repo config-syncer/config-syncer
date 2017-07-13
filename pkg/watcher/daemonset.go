@@ -37,7 +37,7 @@ func (c *Controller) WatchDaemonSets() {
 			DeleteFunc: func(obj interface{}) {
 				if daemon, ok := obj.(*extensions.DaemonSet); ok {
 					log.Infof("DaemonSet %s@%s deleted", daemon.Name, daemon.Namespace)
-					c.Saver.Save(obj)
+					c.Saver.Save(daemon.ObjectMeta, obj)
 				}
 			},
 		},

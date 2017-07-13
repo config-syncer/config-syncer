@@ -34,9 +34,9 @@ func (c *Controller) WatchSecrets() {
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if cfgmap, ok := obj.(*apiv1.Secret); ok {
-					log.Infof("Secret %s@%s deleted", cfgmap.Name, cfgmap.Namespace)
-					c.Saver.Save(obj)
+				if scrt, ok := obj.(*apiv1.Secret); ok {
+					log.Infof("Secret %s@%s deleted", scrt.Name, scrt.Namespace)
+					c.Saver.Save(scrt.ObjectMeta, obj)
 				}
 			},
 		},

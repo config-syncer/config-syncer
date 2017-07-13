@@ -50,9 +50,9 @@ func (c *Controller) WatchPostgreses() {
 				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.Postgres); ok {
-					fmt.Println(alert)
-					c.Saver.Save(obj)
+				if pg, ok := obj.(*tapi.Postgres); ok {
+					fmt.Println(pg)
+					c.Saver.Save(pg.ObjectMeta, obj)
 				}
 			},
 		},

@@ -35,9 +35,9 @@ func (c *Controller) WatchStorageClasss() {
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if storage, ok := obj.(*storage.StorageClass); ok {
-					log.Infof("StorageClass %s@%s deleted", storage.Name, storage.Namespace)
-					c.Saver.Save(obj)
+				if sc, ok := obj.(*storage.StorageClass); ok {
+					log.Infof("StorageClass %s@%s deleted", sc.Name, sc.Namespace)
+					c.Saver.Save(sc.ObjectMeta, obj)
 				}
 			},
 		},

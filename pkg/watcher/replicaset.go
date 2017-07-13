@@ -35,9 +35,9 @@ func (c *Controller) WatchReplicaSets() {
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if resource, ok := obj.(*extensions.ReplicaSet); ok {
-					log.Infof("ReplicaSet %s@%s deleted", resource.Name, resource.Namespace)
-					c.Saver.Save(obj)
+				if rs, ok := obj.(*extensions.ReplicaSet); ok {
+					log.Infof("ReplicaSet %s@%s deleted", rs.Name, rs.Namespace)
+					c.Saver.Save(rs.ObjectMeta, obj)
 				}
 			},
 		},

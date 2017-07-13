@@ -36,7 +36,7 @@ func (c *Controller) WatchPersistentVolumeClaims() {
 			DeleteFunc: func(obj interface{}) {
 				if pvc, ok := obj.(*apiv1.PersistentVolumeClaim); ok {
 					log.Infof("PersistentVolumeClaim %s@%s deleted", pvc.Name, pvc.Namespace)
-					c.Saver.Save(obj)
+					c.Saver.Save(pvc.ObjectMeta, obj)
 				}
 			},
 		},

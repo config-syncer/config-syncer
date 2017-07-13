@@ -37,7 +37,7 @@ func (c *Controller) WatchServiceMonitors() {
 			DeleteFunc: func(obj interface{}) {
 				if svcmon, ok := obj.(*prom.ServiceMonitor); ok {
 					log.Infof("ServiceMonitor %s@%s deleted", svcmon.Name, svcmon.Namespace)
-					c.Saver.Save(obj)
+					c.Saver.Save(svcmon.ObjectMeta, obj)
 				}
 			},
 		},

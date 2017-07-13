@@ -52,7 +52,7 @@ func (c *Controller) WatchElastics() {
 			DeleteFunc: func(obj interface{}) {
 				if elastic, ok := obj.(*tapi.Elastic); ok {
 					fmt.Println(elastic)
-					c.Saver.Save(obj)
+					c.Saver.Save(elastic.ObjectMeta, obj)
 				}
 			},
 		},

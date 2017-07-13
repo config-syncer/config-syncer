@@ -52,7 +52,7 @@ func (c *Controller) WatchRestics() {
 			DeleteFunc: func(obj interface{}) {
 				if restic, ok := obj.(*tapi.Restic); ok {
 					fmt.Println(restic)
-					c.Saver.Save(obj)
+					c.Saver.Save(restic.ObjectMeta, obj)
 				}
 			},
 		},

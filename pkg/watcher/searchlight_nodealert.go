@@ -54,7 +54,7 @@ func (c *Controller) WatchNodeAlerts() {
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.NodeAlert); ok {
 					fmt.Println(alert)
-					c.Saver.Save(obj)
+					c.Saver.Save(alert.ObjectMeta, obj)
 				}
 			},
 		},

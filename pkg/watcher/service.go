@@ -33,7 +33,7 @@ func (c *Controller) watchService() {
 				if len(c.RunOptions.Indexer) > 0 {
 					c.Indexer.HandleDelete(obj)
 				}
-				c.Saver.Save(obj)
+				c.Saver.Save(obj.(*apiv1.Service).ObjectMeta, obj)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				if c.RunOptions.EnableReverseIndex {

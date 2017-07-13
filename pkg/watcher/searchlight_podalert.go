@@ -52,7 +52,7 @@ func (c *Controller) WatchPodAlerts() {
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.PodAlert); ok {
 					fmt.Println(alert)
-					c.Saver.Save(obj)
+					c.Saver.Save(alert.ObjectMeta, obj)
 				}
 			},
 		},
