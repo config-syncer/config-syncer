@@ -37,7 +37,9 @@ func (op *Operator) WatchConfigMaps() {
 				if cfgmap, ok := obj.(*apiv1.ConfigMap); ok {
 					log.Infof("ConfigMap %s@%s deleted", cfgmap.Name, cfgmap.Namespace)
 
-					op.TrashCan.Save(cfgmap.ObjectMeta, obj)
+					if op.TrashCan != nil {
+						op.TrashCan.Save(cfgmap.ObjectMeta, obj)
+					}
 				}
 			},
 		},

@@ -46,7 +46,6 @@ func (op *Operator) watchService() {
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleDelete(obj)
 				}
-				op.TrashCan.Save(obj.(*apiv1.Service).ObjectMeta, obj)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				if op.Opt.EnableReverseIndex {

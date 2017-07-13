@@ -1,22 +1,22 @@
-## kubed backup
+## kubed snapshot
 
-Takes backup of YAML files of cluster
+Takes a snapshot of Kubernetes api objects
 
 ### Synopsis
 
 
-Takes backup of YAML files of cluster
+Takes a snapshot of Kubernetes api objects
 
 ```
-kubed backup [flags]
+kubed snapshot [flags]
 ```
 
 ### Options
 
 ```
-      --backup-dir string   Directory where YAML files will be saved
+      --backup-dir string   Directory where YAML files will be stored
       --context string      The name of the kubeconfig context to use
-  -h, --help                help for backup
+  -h, --help                help for snapshot
       --sanitize             Sanitize fields in YAML
 ```
 
