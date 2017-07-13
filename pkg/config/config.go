@@ -5,69 +5,63 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"time"
 
 	yc "github.com/appscode/go/encoding/yaml"
 	"github.com/ghodss/yaml"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type RecoverSpec struct {
-	Path              string
-	TTL               time.Duration
-	HandleSpecUpdates bool
-	EmailOneDelete    bool // Notify Via
-}
+const (
+	ConfigSyncKey = "kubernetes.appscode.com/sync-config"
+)
 
 type ClusterConfig struct {
-	ElasticSearch struct {
-		Endpoint           string
-		LogIndexPrefix     string `json:"log_index_prefix"`
-		LogStorageLifetime int64  `json:"log_storage_lifetime"`
-	}
+	Elasticsearch  *ElasticSearchSpec  `json:"elasticsearch,omitempty,omitempty"`
+	InfluxDB       *InfluxDBSpec       `json:"influxdb,omitempty"`
+	EventForwarder *EventForwarderSpec `json:"event_forwarder,omitempty"`
+	RecycleBin     *RecycleBinSpec     `json:"recycle_bin,omitempty"`
+	Backup         *BackupSpec         `json:"backup,omitempty"`
+}
 
-	InfluxDB struct {
-		Endpoint                  string
-		Username                  string
-		Password                  string
-		MonitoringStorageLifetime int64 `json:"monitoring_storage_lifetime"`
-	}
+type ElasticSearchSpec struct {
+	Endpoint       string          `json:"endpoint,omitempty"`
+	LogIndexPrefix string          `json:"log_index_prefix,omitempty"`
+	TTL            metav1.Duration `json:"ttl,omitempty"`
+}
 
-	// For periodic full cluster backup
-	// https://github.com/appscode/kubed/issues/16
-	Backup struct {
-		Schedule string `json:"schedule,omitempty"`
-		Sanitize bool
+type InfluxDBSpec struct {
+	Endpoint string          `json:"endpoint,omitempty"`
+	Username string          `json:"username,omitempty"`
+	Password string          `json:"password,omitempty"`
+	TTL      metav1.Duration `json:"ttl,omitempty"`
+}
 
-		Storage Backend
-	}
+type RecycleBinSpec struct {
+	Path         string          `json:"path,omitempty"`
+	TTL          metav1.Duration `json:"ttl,omitempty"`
+	HandleUpdate bool            `json:"handle_update,omitempty"`
+}
 
-	Recover RecoverSpec
+type EventForwarderSpec struct {
+	SkipForwardingStorageChange bool     `json:"skip_forwarding_storage_change,omitempty"`
+	SkipForwardingIngressChange bool     `json:"skip_forwarding_ingress_change,omitempty"`
+	SkipForwardingWarningEvents bool     `json:"skip_forwarding_warning_events,omitempty"`
+	ForwardingEventNamespaces   []string `json:"forwarding_event_namespace,omitempty"`
+	NotifyVia                   string   `json:"notify_via,omitempty"`
+}
 
-	// Email Warning events
-	EventLogger struct {
-		NotifyVia string
-		Namespace []string // only email for a fixed set of namespaces (Optional)
-	}
-
-	// Take ConfigMap/Secret with label to other namespaces
-	// kubernetes.appscode.com/sync-config: true
-
-	// Search
-	// Reverse Index
-
-	ESEndpoint                        string
-	InfluxSecretName                  string
-	InfluxSecretNamespace             string
-	ClusterKubedConfigSecretName      string
-	ClusterKubedConfigSecretNamespace string
-	NotifyOnCertSoonToBeExpired       bool
-	NotifyVia                         string
+// For periodic full cluster backup
+// https://github.com/appscode/kubed/issues/16
+type BackupSpec struct {
+	Schedule string  `json:"schedule,omitempty"`
+	Sanitize bool    `json:"sanitize,omitempty"`
+	Storage  Backend `json:",inline"`
 }
 
 type Backend struct {
 	StorageSecretName string `json:"storageSecretName,omitempty"`
 
-	Local *LocalSpec `json:"local"`
+	Local *LocalSpec `json:"local,omitempty"`
 	S3    *S3Spec    `json:"s3,omitempty"`
 	GCS   *GCSSpec   `json:"gcs,omitempty"`
 	Azure *AzureSpec `json:"azure,omitempty"`

@@ -16,19 +16,19 @@ type Janitor struct {
 func (j *Janitor) CleanES() error {
 	client, err := elastic.NewClient(
 		// elastic.SetSniff(false),
-		elastic.SetURL(j.Config.ElasticSearch.Endpoint),
+		elastic.SetURL(j.Config.Elasticsearch.Endpoint),
 	)
 	if err != nil {
 		return err
 	}
 
 	now := time.Now().UTC()
-	oldDate := now.Add(time.Duration(-(j.Config.ElasticSearch.LogStorageLifetime)) * time.Second)
+	oldDate := now.Add(-j.Config.Elasticsearch.TTL.Duration)
 
 	// how many index should we check to delete? I set it to 7
 	for i := 1; i <= 7; i++ {
 		date := oldDate.AddDate(0, 0, -i)
-		prefix := fmt.Sprintf("%s%s", j.Config.ElasticSearch.LogIndexPrefix, date.Format("2006.01.02"))
+		prefix := fmt.Sprintf("%s%s", j.Config.Elasticsearch.LogIndexPrefix, date.Format("2006.01.02"))
 
 		if _, err := client.Search(prefix).Do(); err == nil {
 			if _, err := client.DeleteIndex(prefix).Do(); err != nil {

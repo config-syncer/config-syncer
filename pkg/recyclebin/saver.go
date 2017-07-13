@@ -1,11 +1,10 @@
-package recover
+package recyclebin
 
 import (
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/ghodss/yaml"
@@ -13,7 +12,7 @@ import (
 )
 
 type RecoverStuff struct {
-	Opt config.RecoverSpec
+	Opt config.RecycleBinSpec
 }
 
 func (c *RecoverStuff) Save(meta metav1.ObjectMeta, v interface{}) error {
@@ -24,7 +23,7 @@ func (c *RecoverStuff) Save(meta metav1.ObjectMeta, v interface{}) error {
 		return err
 	}
 	name := filepath.Base(p)
-	fn := fmt.Sprintf("%s.%d.yaml", name, time.Now().UTC().Unix())
+	fn := fmt.Sprintf("%s.%d.yaml", name, meta.CreationTimestamp.Unix())
 
 	fullPath := filepath.Join(dir, fn)
 	bytes, err := yaml.Marshal(v)

@@ -28,7 +28,7 @@ func (j *Janitor) CleanInflux() error {
 	}
 
 	query := influxdb.Query{
-		Command:  fmt.Sprintf("ALTER RETENTION POLICY default ON k8s DURATION %vs", j.Config.InfluxDB.MonitoringStorageLifetime),
+		Command:  fmt.Sprintf("ALTER RETENTION POLICY default ON k8s DURATION %vs", j.Config.InfluxDB.TTL),
 		Database: "k8s",
 	}
 	_, err = client.Query(query)

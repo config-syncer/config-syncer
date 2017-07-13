@@ -10,7 +10,7 @@ import (
 	"github.com/appscode/kubed/pkg/analytics"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/indexers"
-	"github.com/appscode/kubed/pkg/recover"
+	"github.com/appscode/kubed/pkg/recyclebin"
 	"github.com/appscode/kubed/pkg/watcher"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
@@ -27,11 +27,13 @@ import (
 
 func NewCmdRun(version string) *cobra.Command {
 	opt := watcher.Options{
+		ConfigPath:         runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml",
 		Indexer:            "indexers.bleve",
 		EnableReverseIndex: true,
 		ServerAddress:      ":8081",
 		EnableAnalytics:    true,
-		ConfigPath:         runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml",
+		EnableConfigSync:   true,
+		ScratchDir:         "/tmp",
 	}
 	cmd := &cobra.Command{
 		Use:   "run",
@@ -91,8 +93,8 @@ func Run(opt watcher.Options) {
 		Cron:   cron.New(),
 		Opt:    opt,
 		Config: *cfg,
-		Saver: &recover.RecoverStuff{
-			Opt: cfg.Recover,
+		Saver: &recyclebin.RecoverStuff{
+			Opt: *cfg.RecycleBin,
 		},
 		SyncPeriod: time.Minute * 2,
 	}
