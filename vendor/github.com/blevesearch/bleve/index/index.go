@@ -1,16 +1,11 @@
 //  Copyright (c) 2014 Couchbase, Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// 		http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+//  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+//  except in compliance with the License. You may obtain a copy of the License at
+//    http://www.apache.org/licenses/LICENSE-2.0
+//  Unless required by applicable law or agreed to in writing, software distributed under the
+//  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+//  either express or implied. See the License for the specific language governing permissions
+//  and limitations under the License.
 
 package index
 
@@ -48,8 +43,6 @@ type Index interface {
 	Advanced() (store.KVStore, error)
 }
 
-type DocumentFieldTermVisitor func(field string, term []byte)
-
 type IndexReader interface {
 	TermFieldReader(term []byte, field string, includeFreq, includeNorm, includeTermVectors bool) (TermFieldReader, error)
 
@@ -66,7 +59,7 @@ type IndexReader interface {
 	FieldDictPrefix(field string, termPrefix []byte) (FieldDict, error)
 
 	Document(id string) (*document.Document, error)
-	DocumentVisitFieldTerms(id IndexInternalID, fields []string, visitor DocumentFieldTermVisitor) error
+	DocumentFieldTerms(id IndexInternalID, fields []string) (FieldTerms, error)
 
 	Fields() ([]string, error)
 
@@ -89,7 +82,7 @@ type FieldTerms map[string][]string
 
 // FieldsNotYetCached returns a list of fields not yet cached out of a larger list of fields
 func (f FieldTerms) FieldsNotYetCached(fields []string) []string {
-	rv := make([]string, 0, len(fields))
+	var rv []string
 	for _, field := range fields {
 		if _, ok := f[field]; !ok {
 			rv = append(rv, field)
@@ -177,7 +170,7 @@ type FieldDict interface {
 // Close the reader to release associated resources.
 type DocIDReader interface {
 	// Next returns the next document internal identifier in the natural
-	// index order, nil when the end of the sequence is reached.
+	// index order, or io.EOF when the end of the sequence is reached.
 	Next() (IndexInternalID, error)
 
 	// Advance resets the iteration to the first internal identifier greater than

@@ -16,16 +16,17 @@ const (
 )
 
 type ClusterConfig struct {
-	Elasticsearch  *ElasticSearchSpec  `json:"elasticsearch,omitempty,omitempty"`
-	InfluxDB       *InfluxDBSpec       `json:"influxdb,omitempty"`
-	EventForwarder *EventForwarderSpec `json:"event_forwarder,omitempty"`
-	RecycleBin     *RecycleBinSpec     `json:"recycle_bin,omitempty"`
-	Backup         *BackupSpec         `json:"backup,omitempty"`
+	Elasticsearch      *ElasticSearchSpec  `json:"elasticsearch,omitempty,omitempty"`
+	InfluxDB           *InfluxDBSpec       `json:"influxdb,omitempty"`
+	RecycleBin         *RecycleBinSpec     `json:"recycle_bin,omitempty"`
+	EventForwarder     *EventForwarderSpec `json:"event_forwarder,omitempty"`
+	Backup             *BackupSpec         `json:"backup,omitempty"`
+	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
 }
 
 type ElasticSearchSpec struct {
 	Endpoint       string          `json:"endpoint,omitempty"`
-	LogIndexPrefix string          `json:"log_index_prefix,omitempty"`
+	LogIndexPrefix string          `json:"logIndexPrefix,omitempty"`
 	TTL            metav1.Duration `json:"ttl,omitempty"`
 }
 
@@ -40,14 +41,15 @@ type RecycleBinSpec struct {
 	Path         string          `json:"path,omitempty"`
 	TTL          metav1.Duration `json:"ttl,omitempty"`
 	HandleUpdate bool            `json:"handle_update,omitempty"`
+	NotifyVia    string          `json:"notifyVia,omitempty"`
 }
 
 type EventForwarderSpec struct {
-	SkipForwardingStorageChange bool     `json:"skip_forwarding_storage_change,omitempty"`
-	SkipForwardingIngressChange bool     `json:"skip_forwarding_ingress_change,omitempty"`
-	SkipForwardingWarningEvents bool     `json:"skip_forwarding_warning_events,omitempty"`
-	ForwardedEventNamespaces    []string `json:"forwarded_event_namespace,omitempty"`
-	NotifyVia                   string   `json:"notify_via,omitempty"`
+	NotifyOnStorageAdd   bool     `json:"notifyOnStorageAdd,omitempty"`
+	NotifyOnIngressAdd   bool     `json:"notifyOnIngressAdd,omitempty"`
+	ForwardWarningEvents bool     `json:"forwardWarningEvents,omitempty"`
+	EventNamespaces      []string `json:"eventNamespaces,omitempty"`
+	NotifyVia            string   `json:"notifyVia,omitempty"`
 }
 
 // For periodic full cluster backup

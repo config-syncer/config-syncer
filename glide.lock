@@ -1,15 +1,11 @@
-hash: 10abff3848af7d40e61693d4e732063fe5a1f573b7774a334fabead30a0e4921
-updated: 2017-07-13T01:19:57.571087626-07:00
+hash: eb08c6bf9902f659b5e91c7c1e213b22711768eda4256954fb8f46c6d0fb0800
+updated: 2017-07-13T12:37:39.869536282-07:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
   subpackages:
   - compute/metadata
   - internal
-- name: github.com/appscode/api
-  version: b61754fd4d336573cfed5cf16bcbdfe6d30d078d
-- name: github.com/appscode/client
-  version: 9844500890e8cf3df84b3c86ddc17c220db38af1
 - name: github.com/appscode/envconfig
   version: a74ef73ab982beb8f0c6060ac44da1c960fea414
 - name: github.com/appscode/errors
@@ -18,14 +14,13 @@ imports:
   version: 9fde097ebcef0add8325c8fbee63ae01e7da530e
   subpackages:
   - encoding/json/types
+  - encoding/yaml
   - env
   - flags
-  - hold
   - net/httpclient
   - runtime
   - strings
   - version
-  - wait
 - name: github.com/appscode/go-notify
   version: 906bd4ab3891b6e3bb8730e6f03b12ff342a9fa6
   subpackages:
@@ -54,55 +49,48 @@ imports:
   - client/clientset
   - data
   - data/files
-  - pkg/influxdb
-  - pkg/util
 - name: github.com/appscode/stash
-  version: 7ac0a7a2e95864d5361428e4fe655a8d59be637f
+  version: 9ae078bb1406e2cb2d69c6dff793f7088567366c
   subpackages:
   - api
   - api/install
   - client/clientset
 - name: github.com/appscode/voyager
-  version: bc427ec17ce0aa674972b3369d8b1cd1aa04c307
+  version: 5c63b43f621ad3e08bb014a28b3d8aea98434089
   subpackages:
   - api
   - api/install
   - client/clientset
-- name: github.com/Azure/azure-sdk-for-go
-  version: 0984e0641ae43b89283223034574d6465be93bf4
 - name: github.com/blevesearch/bleve
-  version: 174f8ed44a0bf65e7c8fb228b60b58de62654cd2
+  version: 97393d027342f43b17da2f02c090a4e728ac929f
   subpackages:
   - analysis
-  - analysis/analyzer/standard
-  - analysis/datetime/flexible
-  - analysis/datetime/optional
-  - analysis/lang/en
-  - analysis/token/lowercase
-  - analysis/token/porter
-  - analysis/token/stop
-  - analysis/tokenizer/unicode
+  - analysis/analyzers/standard_analyzer
+  - analysis/datetime_parsers/datetime_optional
+  - analysis/datetime_parsers/flexible_go
+  - analysis/language/en
+  - analysis/token_filters/lower_case_filter
+  - analysis/token_filters/porter
+  - analysis/token_filters/stop_tokens_filter
+  - analysis/tokenizers/unicode
   - document
-  - geo
   - index
   - index/store
   - index/store/boltdb
   - index/store/gtreap
-  - index/upsidedown
-  - mapping
-  - numeric
+  - index/upside_down
+  - numeric_util
   - registry
   - search
-  - search/collector
-  - search/facet
+  - search/collectors
+  - search/facets
   - search/highlight
-  - search/highlight/format/html
-  - search/highlight/fragmenter/simple
-  - search/highlight/highlighter/html
-  - search/highlight/highlighter/simple
-  - search/query
-  - search/scorer
-  - search/searcher
+  - search/highlight/fragment_formatters/html
+  - search/highlight/fragmenters/simple
+  - search/highlight/highlighters/html
+  - search/highlight/highlighters/simple
+  - search/scorers
+  - search/searchers
 - name: github.com/blevesearch/go-porterstemmer
   version: 23a2c8e5cf1f380f27722c6d2ae8896431dc7d0e
   repo: https://github.com/blevesearch/go-porterstemmer
@@ -129,7 +117,7 @@ imports:
   - httputil
   - timeutil
 - name: github.com/coreos/prometheus-operator
-  version: 0d446f3052e47b5ad95989d9a8ffe4f6675e69b5
+  version: 397e8809782909bb41862ff1f79fef4d61f45608
   subpackages:
   - pkg/client/monitoring/v1alpha1
 - name: github.com/cpuguy83/go-md2man
@@ -154,10 +142,8 @@ imports:
   version: d9d227395bc3d7a635388c75b2e3b3a750e11888
 - name: github.com/fatih/color
   version: 9aae6aaa22315390f03959adca2c4d395b02fcef
-- name: github.com/flosch/pongo2
-  version: 58f1f3387f7c57843ff829d92a759d08abe5a63f
 - name: github.com/ghodss/yaml
-  version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
+  version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -221,12 +207,6 @@ imports:
   version: 5411d3eea5978e6cdc258b30de592b60df6aba96
 - name: github.com/mattn/go-isatty
   version: 56b76bdf51f7708750eac80fa38b952bb9f32639
-- name: github.com/mikespook/golib
-  version: 38fe6917d34b267a79c3432369e7dcc379e2d5b3
-  subpackages:
-  - autoinc
-  - idgen
-  - signal
 - name: github.com/nlopes/slack
   version: ca8436d76f805ec1e682eaae2de3c3a9bc894b0f
 - name: github.com/PuerkitoBio/purell
@@ -254,12 +234,6 @@ imports:
   version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
   subpackages:
   - codec
-- name: github.com/vaughan0/go-ini
-  version: a98ad7ee00ec53921f08832bc06ecf7fd600e6a1
-- name: github.com/xenolf/lego
-  version: e1e824640f726118b9d74d43b7c50a024e7a26af
-  repo: https://github.com/appscode/lego.git
-  vcs: git
 - name: golang.org/x/crypto
   version: d172538b2cfce0c13cee31e647d0367aa8cd2486
   subpackages:
@@ -318,16 +292,13 @@ imports:
   version: 81ebce5c23dfd25c6c67194b37d3dd3f338c98b1
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
-- name: gopkg.in/mgo.v2
-  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
-  subpackages:
-  - bson
-  - internal/json
 - name: gopkg.in/olivere/elastic.v3
   version: 060365a7e27c56c938b234824ef7f9a3a7834b99
   subpackages:
   - backoff
   - uritemplates
+- name: gopkg.in/robfig/cron.v2
+  version: be2e0b0deed5a68ffee390b4583a13aff8321535
 - name: gopkg.in/yaml.v2
   version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/apimachinery

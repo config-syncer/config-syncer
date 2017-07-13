@@ -1,16 +1,11 @@
 //  Copyright (c) 2014 Couchbase, Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// 		http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+//  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+//  except in compliance with the License. You may obtain a copy of the License at
+//    http://www.apache.org/licenses/LICENSE-2.0
+//  Unless required by applicable law or agreed to in writing, software distributed under the
+//  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+//  either express or implied. See the License for the specific language governing permissions
+//  and limitations under the License.
 
 package search
 
@@ -21,30 +16,25 @@ import (
 	"github.com/blevesearch/bleve/index"
 )
 
-type ArrayPositions []uint64
+type Location struct {
+	Pos            float64   `json:"pos"`
+	Start          float64   `json:"start"`
+	End            float64   `json:"end"`
+	ArrayPositions []float64 `json:"array_positions"`
+}
 
-func (ap ArrayPositions) Equals(other ArrayPositions) bool {
-	if len(ap) != len(other) {
+// SameArrayElement returns true if two locations are point to
+// the same array element
+func (l *Location) SameArrayElement(other *Location) bool {
+	if len(l.ArrayPositions) != len(other.ArrayPositions) {
 		return false
 	}
-	for i := range ap {
-		if ap[i] != other[i] {
+	for i, elem := range l.ArrayPositions {
+		if other.ArrayPositions[i] != elem {
 			return false
 		}
 	}
 	return true
-}
-
-type Location struct {
-	// Pos is the position of the term within the field, starting at 1
-	Pos            uint64         `json:"pos"`
-	
-	// Start and End are the byte offsets of the term in the field
-	Start          uint64         `json:"start"`
-	End            uint64         `json:"end"`
-	
-	// ArrayPositions contains the positions of the term within any elements.
-	ArrayPositions ArrayPositions `json:"array_positions"`
 }
 
 type Locations []*Location
@@ -52,7 +42,15 @@ type Locations []*Location
 type TermLocationMap map[string]Locations
 
 func (t TermLocationMap) AddLocation(term string, location *Location) {
-	t[term] = append(t[term], location)
+	existingLocations, exists := t[term]
+	if exists {
+		existingLocations = append(existingLocations, location)
+		t[term] = existingLocations
+	} else {
+		locations := make(Locations, 1)
+		locations[0] = location
+		t[term] = locations
+	}
 }
 
 type FieldTermLocationMap map[string]TermLocationMap
@@ -73,6 +71,10 @@ type DocumentMatch struct {
 	// SearchRequest.Fields. Text fields are returned as strings, numeric
 	// fields as float64s and date fields as time.RFC3339 formatted strings.
 	Fields map[string]interface{} `json:"fields,omitempty"`
+
+	// as we learn field terms, we can cache important ones for later use
+	// for example, sorting and building facets need these values
+	CachedFieldTerms index.FieldTerms `json:"-"`
 
 	// if we load the document for this hit, remember it so we dont load again
 	Document *document.Document `json:"-"`
@@ -137,11 +139,6 @@ type Searcher interface {
 	Min() int
 
 	DocumentMatchPoolSize() int
-}
-
-type SearcherOptions struct {
-	Explain            bool
-	IncludeTermVectors bool
 }
 
 // SearchContext represents the context around a single search

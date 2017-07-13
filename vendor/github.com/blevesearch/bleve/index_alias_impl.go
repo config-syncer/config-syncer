@@ -1,16 +1,11 @@
 //  Copyright (c) 2014 Couchbase, Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// 		http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+//  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+//  except in compliance with the License. You may obtain a copy of the License at
+//    http://www.apache.org/licenses/LICENSE-2.0
+//  Unless required by applicable law or agreed to in writing, software distributed under the
+//  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+//  either express or implied. See the License for the specific language governing permissions
+//  and limitations under the License.
 
 package bleve
 
@@ -24,7 +19,6 @@ import (
 	"github.com/blevesearch/bleve/document"
 	"github.com/blevesearch/bleve/index"
 	"github.com/blevesearch/bleve/index/store"
-	"github.com/blevesearch/bleve/mapping"
 	"github.com/blevesearch/bleve/search"
 )
 
@@ -265,7 +259,7 @@ func (i *indexAliasImpl) Close() error {
 	return nil
 }
 
-func (i *indexAliasImpl) Mapping() mapping.IndexMapping {
+func (i *indexAliasImpl) Mapping() *IndexMapping {
 	i.mutex.RLock()
 	defer i.mutex.RUnlock()
 
@@ -425,15 +419,14 @@ func (i *indexAliasImpl) Swap(in, out []Index) {
 // could be slower in remote usages.
 func createChildSearchRequest(req *SearchRequest) *SearchRequest {
 	rv := SearchRequest{
-		Query:            req.Query,
-		Size:             req.Size + req.From,
-		From:             0,
-		Highlight:        req.Highlight,
-		Fields:           req.Fields,
-		Facets:           req.Facets,
-		Explain:          req.Explain,
-		Sort:             req.Sort.Copy(),
-		IncludeLocations: req.IncludeLocations,
+		Query:     req.Query,
+		Size:      req.Size + req.From,
+		From:      0,
+		Highlight: req.Highlight,
+		Fields:    req.Fields,
+		Facets:    req.Facets,
+		Explain:   req.Explain,
+		Sort:      req.Sort,
 	}
 	return &rv
 }
@@ -444,26 +437,53 @@ type asyncSearchResult struct {
 	Err    error
 }
 
-// MultiSearch executes a SearchRequest across multiple Index objects,
-// then merges the results.  The indexes must honor any ctx deadline.
+func wrapSearch(ctx context.Context, in Index, req *SearchRequest) *asyncSearchResult {
+	rv := asyncSearchResult{Name: in.Name()}
+	rv.Result, rv.Err = in.SearchInContext(ctx, req)
+	return &rv
+}
+
+func wrapSearchTimeout(ctx context.Context, in Index, req *SearchRequest) *asyncSearchResult {
+	reschan := make(chan *asyncSearchResult)
+	go func() { reschan <- wrapSearch(ctx, in, req) }()
+	select {
+	case res := <-reschan:
+		return res
+	case <-ctx.Done():
+		return &asyncSearchResult{Name: in.Name(), Err: ctx.Err()}
+	}
+}
+
+// MultiSearch executes a SearchRequest across multiple
+// Index objects, then merges the results.
 func MultiSearch(ctx context.Context, req *SearchRequest, indexes ...Index) (*SearchResult, error) {
 
 	searchStart := time.Now()
-	asyncResults := make(chan *asyncSearchResult, len(indexes))
+	asyncResults := make(chan *asyncSearchResult)
 
 	// run search on each index in separate go routine
 	var waitGroup sync.WaitGroup
 
-	var searchChildIndex = func(in Index, childReq *SearchRequest) {
-		rv := asyncSearchResult{Name: in.Name()}
-		rv.Result, rv.Err = in.SearchInContext(ctx, childReq)
-		asyncResults <- &rv
-		waitGroup.Done()
+	var searchChildIndex = func(waitGroup *sync.WaitGroup, in Index, asyncResults chan *asyncSearchResult) {
+		childReq := createChildSearchRequest(req)
+		if ia, ok := in.(IndexAlias); ok {
+			// if the child index is another alias, trust it returns promptly on timeout/cancel
+			go func() {
+				defer waitGroup.Done()
+				asyncResults <- wrapSearch(ctx, ia, childReq)
+			}()
+		} else {
+			// if the child index is not an alias, enforce timeout here
+			go func() {
+				defer waitGroup.Done()
+				asyncResults <- wrapSearchTimeout(ctx, in, childReq)
+			}()
+		}
 	}
 
-	waitGroup.Add(len(indexes))
 	for _, in := range indexes {
-		go searchChildIndex(in, createChildSearchRequest(req))
+		waitGroup.Add(1)
+		searchChildIndex(&waitGroup, in, asyncResults)
 	}
 
 	// on another go routine, close after finished

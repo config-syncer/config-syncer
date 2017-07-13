@@ -1,36 +1,49 @@
 package: github.com/appscode/kubed
 import:
-- package: github.com/appscode/api
-  version: master
-- package: github.com/appscode/client
+- package: github.com/appscode/envconfig
   version: master
 - package: github.com/appscode/errors
   version: v2
+- package: github.com/appscode/go-notify
+  version: master
+- package: github.com/appscode/go-term
+  version: master
 - package: github.com/appscode/go
+  version: master
 - package: github.com/appscode/log
+  version: master
+- package: github.com/appscode/pat
+  version: master
 - package: github.com/appscode/searchlight
   version: master
+- package: github.com/appscode/stash
+  version: master
+- package: github.com/appscode/voyager
+  version: master
+- package: github.com/blevesearch/bleve
+  version: v0.5.0
+- package: github.com/coreos/prometheus-operator
+  version: v0.10.2
+- package: github.com/ghodss/yaml
+  version: v1.0.0
 - package: github.com/influxdata/influxdb
   version: v0.11.0
+- package: github.com/jpillora/go-ogle-analytics
+- package: github.com/k8sdb/apimachinery
+  version: master
+- package: github.com/spf13/cobra
+  version: master
 - package: github.com/spf13/pflag
-- package: github.com/flosch/pongo2
   version: master
 - package: gopkg.in/olivere/elastic.v3
   version: v3.0.59
-- package: github.com/Azure/azure-sdk-for-go
-  version: v7.0.1-beta
+- package: gopkg.in/robfig/cron.v2
+  version: v2
 - package: k8s.io/apimachinery
   version: 75b8dd260ef0469d96d578705a87cffd0e09dab8
 - package: k8s.io/client-go
   version: v3.0.0-beta.0
-- package: github.com/mikespook/golib
-- package: github.com/xenolf/lego
-  repo: https://github.com/appscode/lego.git
-  vcs: git
-  version: master
-- package: github.com/appscode/go-notify
-  version: master
-- package: github.com/coreos/go-oidc
 testImport:
+- package: github.com/google/certificate-transparency
 - package: github.com/stretchr/testify
   version: v1.1.4

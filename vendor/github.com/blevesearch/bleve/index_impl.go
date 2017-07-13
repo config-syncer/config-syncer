@@ -1,16 +1,11 @@
 //  Copyright (c) 2014 Couchbase, Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// 		http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+//  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+//  except in compliance with the License. You may obtain a copy of the License at
+//    http://www.apache.org/licenses/LICENSE-2.0
+//  Unless required by applicable law or agreed to in writing, software distributed under the
+//  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+//  either express or implied. See the License for the specific language governing permissions
+//  and limitations under the License.
 
 package bleve
 
@@ -27,12 +22,11 @@ import (
 	"github.com/blevesearch/bleve/document"
 	"github.com/blevesearch/bleve/index"
 	"github.com/blevesearch/bleve/index/store"
-	"github.com/blevesearch/bleve/index/upsidedown"
-	"github.com/blevesearch/bleve/mapping"
+	"github.com/blevesearch/bleve/index/upside_down"
 	"github.com/blevesearch/bleve/registry"
 	"github.com/blevesearch/bleve/search"
-	"github.com/blevesearch/bleve/search/collector"
-	"github.com/blevesearch/bleve/search/facet"
+	"github.com/blevesearch/bleve/search/collectors"
+	"github.com/blevesearch/bleve/search/facets"
 	"github.com/blevesearch/bleve/search/highlight"
 )
 
@@ -41,7 +35,7 @@ type indexImpl struct {
 	name  string
 	meta  *indexMeta
 	i     index.Index
-	m     mapping.IndexMapping
+	m     *IndexMapping
 	mutex sync.RWMutex
 	open  bool
 	stats *IndexStat
@@ -55,7 +49,7 @@ func indexStorePath(path string) string {
 	return path + string(os.PathSeparator) + storePath
 }
 
-func newIndexUsing(path string, mapping mapping.IndexMapping, indexType string, kvstore string, kvconfig map[string]interface{}) (*indexImpl, error) {
+func newIndexUsing(path string, mapping *IndexMapping, indexType string, kvstore string, kvconfig map[string]interface{}) (*indexImpl, error) {
 	// first validate the mapping
 	err := mapping.Validate()
 	if err != nil {
@@ -140,7 +134,7 @@ func openIndexUsing(path string, runtimeConfig map[string]interface{}) (rv *inde
 
 	// backwards compatibility if index type is missing
 	if rv.meta.IndexType == "" {
-		rv.meta.IndexType = upsidedown.Name
+		rv.meta.IndexType = upside_down.Name
 	}
 
 	storeConfig := rv.meta.Config
@@ -189,7 +183,7 @@ func openIndexUsing(path string, runtimeConfig map[string]interface{}) (rv *inde
 		return nil, err
 	}
 
-	var im *mapping.IndexMappingImpl
+	var im IndexMapping
 	err = json.Unmarshal(mappingBytes, &im)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing mapping JSON: %v\nmapping contents:\n%s", err, string(mappingBytes))
@@ -208,7 +202,7 @@ func openIndexUsing(path string, runtimeConfig map[string]interface{}) (rv *inde
 		return rv, err
 	}
 
-	rv.m = im
+	rv.m = &im
 	indexStats.Register(rv)
 	return rv, err
 }
@@ -225,7 +219,7 @@ func (i *indexImpl) Advanced() (index.Index, store.KVStore, error) {
 
 // Mapping returns the IndexMapping in use by this
 // Index.
-func (i *indexImpl) Mapping() mapping.IndexMapping {
+func (i *indexImpl) Mapping() *IndexMapping {
 	return i.m
 }
 
@@ -245,28 +239,10 @@ func (i *indexImpl) Index(id string, data interface{}) (err error) {
 	}
 
 	doc := document.NewDocument(id)
-	err = i.m.MapDocument(doc, data)
+	err = i.m.mapDocument(doc, data)
 	if err != nil {
 		return
 	}
-	err = i.i.Update(doc)
-	return
-}
-
-// IndexAdvanced takes a document.Document object
-// skips the mapping and indexes it.
-func (i *indexImpl) IndexAdvanced(doc *document.Document) (err error) {
-	if doc.ID == "" {
-		return ErrorEmptyID
-	}
-
-	i.mutex.RLock()
-	defer i.mutex.RUnlock()
-
-	if !i.open {
-		return ErrorIndexClosed
-	}
-
 	err = i.i.Update(doc)
 	return
 }
@@ -375,7 +351,7 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 		return nil, ErrorIndexClosed
 	}
 
-	collector := collector.NewTopNCollector(req.Size, req.From, req.Sort)
+	collector := collectors.NewTopNCollector(req.Size, req.From, req.Sort)
 
 	// open a reader for this search
 	indexReader, err := i.i.Reader()
@@ -388,10 +364,7 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 		}
 	}()
 
-	searcher, err := req.Query.Searcher(indexReader, i.m, search.SearcherOptions{
-		Explain:            req.Explain,
-		IncludeTermVectors: req.IncludeLocations || req.Highlight != nil,
-	})
+	searcher, err := req.Query.Searcher(indexReader, i.m, req.Explain)
 	if err != nil {
 		return nil, err
 	}
@@ -406,23 +379,23 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 		for facetName, facetRequest := range req.Facets {
 			if facetRequest.NumericRanges != nil {
 				// build numeric range facet
-				facetBuilder := facet.NewNumericFacetBuilder(facetRequest.Field, facetRequest.Size)
+				facetBuilder := facets.NewNumericFacetBuilder(facetRequest.Field, facetRequest.Size)
 				for _, nr := range facetRequest.NumericRanges {
 					facetBuilder.AddRange(nr.Name, nr.Min, nr.Max)
 				}
 				facetsBuilder.Add(facetName, facetBuilder)
 			} else if facetRequest.DateTimeRanges != nil {
 				// build date range facet
-				facetBuilder := facet.NewDateTimeFacetBuilder(facetRequest.Field, facetRequest.Size)
-				dateTimeParser := i.m.DateTimeParserNamed("")
+				facetBuilder := facets.NewDateTimeFacetBuilder(facetRequest.Field, facetRequest.Size)
+				dateTimeParser := i.m.dateTimeParserNamed(i.m.DefaultDateTimeParser)
 				for _, dr := range facetRequest.DateTimeRanges {
-					start, end := dr.ParseDates(dateTimeParser)
-					facetBuilder.AddRange(dr.Name, start, end)
+					dr.ParseDates(dateTimeParser)
+					facetBuilder.AddRange(dr.Name, dr.Start, dr.End)
 				}
 				facetsBuilder.Add(facetName, facetBuilder)
 			} else {
 				// build terms facet
-				facetBuilder := facet.NewTermsFacetBuilder(facetRequest.Field, facetRequest.Size)
+				facetBuilder := facets.NewTermsFacetBuilder(facetRequest.Field, facetRequest.Size)
 				facetsBuilder.Add(facetName, facetBuilder)
 			}
 		}
@@ -482,14 +455,6 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 									if err == nil {
 										value = boolean
 									}
-								case *document.GeoPointField:
-									lon, err := docF.Lon()
-									if err == nil {
-										lat, err := docF.Lat()
-										if err == nil {
-											value = []float64{lon, lat}
-										}
-									}
 								}
 								if value != nil {
 									hit.AddFieldValue(docF.Name(), value)
@@ -526,8 +491,7 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 	searchDuration := time.Since(searchStart)
 	atomic.AddUint64(&i.stats.searchTime, uint64(searchDuration))
 
-	if Config.SlowSearchLogThreshold > 0 &&
-		searchDuration > Config.SlowSearchLogThreshold {
+	if searchDuration > Config.SlowSearchLogThreshold {
 		logger.Printf("slow search took %s - %v", searchDuration, req)
 	}
 
