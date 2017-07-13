@@ -1,5 +1,5 @@
-hash: ed967d73f7e32dae73e9ddd37d39912bb1deba21ad2f8adecd300d9de702ab74
-updated: 2017-07-13T13:54:13.964093283-07:00
+hash: c460d8b8b49f8132992649d23a0241a81598f4b664f5825e0421510819f5f572
+updated: 2017-07-13T16:17:33.570534993-07:00
 imports:
 - name: cloud.google.com/go
   version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
@@ -143,6 +143,10 @@ imports:
   repo: https://github.com/boltdb/bolt
 - name: github.com/cenkalti/backoff
   version: 32cd0c5b3aef12c76ed64aaf678f6c79736be7dc
+- name: github.com/codegangsta/inject
+  version: 33e0aa1cb7c019ccc3fbe049a8262a6403d30504
+- name: github.com/codeskyblue/go-sh
+  version: b097669b1569203c3ce05a6b8717d43140fdb3d5
 - name: github.com/coreos/go-oidc
   version: be73733bb8cc830d0205609b95d125215f8e9c70
   subpackages:
@@ -259,9 +263,11 @@ imports:
   - jlexer
   - jwriter
 - name: github.com/mattn/go-colorable
-  version: 5411d3eea5978e6cdc258b30de592b60df6aba96
+  version: ed8eb9e318d7a84ce5915b495b7d35e0cfe7b5a8
+  repo: https://github.com/mattn/go-colorable
 - name: github.com/mattn/go-isatty
-  version: 56b76bdf51f7708750eac80fa38b952bb9f32639
+  version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
+  repo: https://github.com/mattn/go-isatty
 - name: github.com/ncw/swift
   version: 9e6fdb8957a022d5780a78b58d6181c3580bb01f
 - name: github.com/nlopes/slack
@@ -274,6 +280,11 @@ imports:
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/russross/blackfriday
   version: 300106c228d52c8941d4b3de6054a6062a86dda3
+- name: github.com/sergi/go-diff
+  version: 24e2351369ec4949b2ed0dc5c477afdd4c4034e8
+  repo: https://github.com/sergi/go-diff
+  subpackages:
+  - diffmatchpatch
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/spf13/cobra
@@ -293,6 +304,13 @@ imports:
   version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
   subpackages:
   - codec
+- name: github.com/yudai/gojsondiff
+  version: 081cda2ee95045a2c26da52c2ba80860838549de
+  subpackages:
+  - formatter
+- name: github.com/yudai/golcs
+  version: d1c525dea8ce39ea9a783d33cf08932305373f2c
+  repo: https://github.com/yudai/golcs
 - name: golang.org/x/crypto
   version: d172538b2cfce0c13cee31e647d0367aa8cd2486
   subpackages:
@@ -334,7 +352,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: bb4e0b1b53539118e8d3a704d31cb69a81a9c140
+  version: e665075b5ff79143ba49c58fab02df9dc122afd5
   subpackages:
   - gensupport
   - googleapi

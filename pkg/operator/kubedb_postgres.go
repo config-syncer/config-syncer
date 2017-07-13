@@ -58,7 +58,7 @@ func (op *Operator) WatchPostgreses() {
 			DeleteFunc: func(obj interface{}) {
 				if pg, ok := obj.(*tapi.Postgres); ok {
 					fmt.Println(pg)
-					op.TrashCan.Save(pg.ObjectMeta, obj)
+					op.TrashCan.Delete(pg.ObjectMeta, obj)
 				}
 			},
 		},

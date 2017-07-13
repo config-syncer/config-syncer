@@ -36,7 +36,7 @@ func (op *Operator) WatchPersistentVolumes() {
 			DeleteFunc: func(obj interface{}) {
 				if pv, ok := obj.(*apiv1.PersistentVolume); ok {
 					log.Infof("PersistentVolume %s@%s deleted", pv.Name, pv.Namespace)
-					op.TrashCan.Save(pv.ObjectMeta, obj)
+					op.TrashCan.Delete(pv.ObjectMeta, obj)
 				}
 			},
 		},

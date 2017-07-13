@@ -37,7 +37,7 @@ func (op *Operator) WatchServiceMonitors() {
 			DeleteFunc: func(obj interface{}) {
 				if svcmon, ok := obj.(*prom.ServiceMonitor); ok {
 					log.Infof("ServiceMonitor %s@%s deleted", svcmon.Name, svcmon.Namespace)
-					op.TrashCan.Save(svcmon.ObjectMeta, obj)
+					op.TrashCan.Delete(svcmon.ObjectMeta, obj)
 				}
 			},
 		},

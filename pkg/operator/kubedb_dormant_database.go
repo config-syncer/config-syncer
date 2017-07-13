@@ -58,7 +58,7 @@ func (op *Operator) WatchDormantDatabases() {
 			DeleteFunc: func(obj interface{}) {
 				if drmn, ok := obj.(*tapi.DormantDatabase); ok {
 					fmt.Println(drmn)
-					op.TrashCan.Save(drmn.ObjectMeta, obj)
+					op.TrashCan.Delete(drmn.ObjectMeta, obj)
 				}
 			},
 		},

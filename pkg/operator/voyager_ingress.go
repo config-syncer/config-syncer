@@ -36,7 +36,7 @@ func (op *Operator) WatchVoyagerIngresses() {
 			DeleteFunc: func(obj interface{}) {
 				if ingress, ok := obj.(*tapi.Ingress); ok {
 					log.Infof("Ingress %s@%s deleted", ingress.Name, ingress.Namespace)
-					op.TrashCan.Save(ingress.ObjectMeta, obj)
+					op.TrashCan.Delete(ingress.ObjectMeta, obj)
 				}
 			},
 		},

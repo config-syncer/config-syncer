@@ -37,7 +37,7 @@ func (op *Operator) WatchAlertmanagers() {
 			DeleteFunc: func(obj interface{}) {
 				if mgr, ok := obj.(*prom.Alertmanager); ok {
 					log.Infof("Alertmanager %s@%s deleted", mgr.Name, mgr.Namespace)
-					op.TrashCan.Save(mgr.ObjectMeta, obj)
+					op.TrashCan.Delete(mgr.ObjectMeta, obj)
 				}
 			},
 		},

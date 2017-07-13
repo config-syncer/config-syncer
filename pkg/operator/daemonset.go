@@ -37,7 +37,7 @@ func (op *Operator) WatchDaemonSets() {
 			DeleteFunc: func(obj interface{}) {
 				if daemon, ok := obj.(*extensions.DaemonSet); ok {
 					log.Infof("DaemonSet %s@%s deleted", daemon.Name, daemon.Namespace)
-					op.TrashCan.Save(daemon.ObjectMeta, obj)
+					op.TrashCan.Delete(daemon.ObjectMeta, obj)
 				}
 			},
 		},

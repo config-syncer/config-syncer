@@ -60,7 +60,7 @@ func (op *Operator) WatchNodeAlerts() {
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.NodeAlert); ok {
 					fmt.Println(alert)
-					op.TrashCan.Save(alert.ObjectMeta, obj)
+					op.TrashCan.Delete(alert.ObjectMeta, obj)
 				}
 			},
 		},

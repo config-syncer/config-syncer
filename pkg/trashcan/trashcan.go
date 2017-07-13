@@ -16,7 +16,25 @@ type TrashCan struct {
 	Spec config.TrashCanSpec
 }
 
-func (c *TrashCan) Save(meta metav1.ObjectMeta, v interface{}) error {
+func (c *TrashCan) Update(meta metav1.ObjectMeta, old, new interface{}) error {
+	p := filepath.Join(c.Spec.Path, meta.SelfLink)
+	dir := filepath.Dir(p)
+	err := os.MkdirAll(dir, 0755)
+	if err != nil {
+		return err
+	}
+	name := filepath.Base(p)
+	fn := fmt.Sprintf("%s.%s.yaml", name, meta.CreationTimestamp.UTC().Format(time.RFC3339))
+
+	fullPath := filepath.Join(dir, fn)
+	bytes, err := yaml.Marshal(new)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(fullPath, bytes, 0644)
+}
+
+func (c *TrashCan) Delete(meta metav1.ObjectMeta, v interface{}) error {
 	p := filepath.Join(c.Spec.Path, meta.SelfLink)
 	dir := filepath.Dir(p)
 	err := os.MkdirAll(dir, 0755)

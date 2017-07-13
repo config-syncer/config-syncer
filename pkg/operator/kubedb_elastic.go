@@ -58,7 +58,7 @@ func (op *Operator) WatchElastics() {
 			DeleteFunc: func(obj interface{}) {
 				if elastic, ok := obj.(*tapi.Elastic); ok {
 					fmt.Println(elastic)
-					op.TrashCan.Save(elastic.ObjectMeta, obj)
+					op.TrashCan.Delete(elastic.ObjectMeta, obj)
 				}
 			},
 		},

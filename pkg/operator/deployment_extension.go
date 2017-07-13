@@ -37,7 +37,7 @@ func (op *Operator) WatchDeploymentExtensions() {
 			DeleteFunc: func(obj interface{}) {
 				if deployment, ok := obj.(*extensions.Deployment); ok {
 					log.Infof("Deployment %s@%s deleted", deployment.Name, deployment.Namespace)
-					op.TrashCan.Save(deployment.ObjectMeta, obj)
+					op.TrashCan.Delete(deployment.ObjectMeta, obj)
 				}
 			},
 		},

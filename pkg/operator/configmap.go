@@ -36,9 +36,14 @@ func (op *Operator) WatchConfigMaps() {
 			DeleteFunc: func(obj interface{}) {
 				if cfgmap, ok := obj.(*apiv1.ConfigMap); ok {
 					log.Infof("ConfigMap %s@%s deleted", cfgmap.Name, cfgmap.Namespace)
-
+					if op.Opt.EnableReverseIndex {
+						op.ReverseIndex.Handle("deleted", obj)
+					}
+					if op.Opt.EnableSearchIndex {
+						op.SearchIndex.HandleDelete(obj)
+					}
 					if op.TrashCan != nil {
-						op.TrashCan.Save(cfgmap.ObjectMeta, obj)
+						op.TrashCan.Delete(cfgmap.ObjectMeta, obj)
 					}
 				}
 			},

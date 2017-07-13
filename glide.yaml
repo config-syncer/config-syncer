@@ -62,6 +62,8 @@ import:
   version: v1.6.10
 - package: github.com/ncw/swift
   version: master
+- package: github.com/yudai/gojsondiff
+  version: master
 testImport:
 - package: github.com/google/certificate-transparency
 - package: github.com/stretchr/testify

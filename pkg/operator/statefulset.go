@@ -37,7 +37,7 @@ func (op *Operator) WatchStatefulSets() {
 			DeleteFunc: func(obj interface{}) {
 				if deployment, ok := obj.(*apps.StatefulSet); ok {
 					log.Infof("StatefulSet %s@%s deleted", deployment.Name, deployment.Namespace)
-					op.TrashCan.Save(deployment.ObjectMeta, obj)
+					op.TrashCan.Delete(deployment.ObjectMeta, obj)
 				}
 			},
 		},

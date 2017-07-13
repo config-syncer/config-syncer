@@ -36,7 +36,7 @@ func (op *Operator) WatchStorageClasss() {
 			DeleteFunc: func(obj interface{}) {
 				if sc, ok := obj.(*storage.StorageClass); ok {
 					log.Infof("StorageClass %s@%s deleted", sc.Name, sc.Namespace)
-					op.TrashCan.Save(sc.ObjectMeta, obj)
+					op.TrashCan.Delete(sc.ObjectMeta, obj)
 				}
 			},
 		},

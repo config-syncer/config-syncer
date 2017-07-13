@@ -57,7 +57,7 @@ func (op *Operator) WatchRestics() {
 			DeleteFunc: func(obj interface{}) {
 				if restic, ok := obj.(*tapi.Restic); ok {
 					fmt.Println(restic)
-					op.TrashCan.Save(restic.ObjectMeta, obj)
+					op.TrashCan.Delete(restic.ObjectMeta, obj)
 				}
 			},
 		},

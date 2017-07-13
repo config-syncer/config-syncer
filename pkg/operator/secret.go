@@ -36,7 +36,7 @@ func (op *Operator) WatchSecrets() {
 			DeleteFunc: func(obj interface{}) {
 				if scrt, ok := obj.(*apiv1.Secret); ok {
 					log.Infof("Secret %s@%s deleted", scrt.Name, scrt.Namespace)
-					op.TrashCan.Save(scrt.ObjectMeta, obj)
+					op.TrashCan.Delete(scrt.ObjectMeta, obj)
 				}
 			},
 		},

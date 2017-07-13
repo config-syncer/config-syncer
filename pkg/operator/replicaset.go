@@ -37,7 +37,7 @@ func (op *Operator) WatchReplicaSets() {
 			AddFunc: func(obj interface{}) {
 				if rs, ok := obj.(*extensions.ReplicaSet); ok {
 					log.Infof("ReplicaSet %s@%s deleted", rs.Name, rs.Namespace)
-					op.TrashCan.Save(rs.ObjectMeta, obj)
+					op.TrashCan.Delete(rs.ObjectMeta, obj)
 				}
 			},
 		},

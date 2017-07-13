@@ -37,7 +37,7 @@ func (op *Operator) WatchPrometheuss() {
 			DeleteFunc: func(obj interface{}) {
 				if pdb, ok := obj.(*prom.Prometheus); ok {
 					log.Infof("Prometheus %s@%s deleted", pdb.Name, pdb.Namespace)
-					op.TrashCan.Save(pdb.ObjectMeta, obj)
+					op.TrashCan.Delete(pdb.ObjectMeta, obj)
 				}
 			},
 		},

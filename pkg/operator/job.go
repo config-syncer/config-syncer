@@ -38,7 +38,7 @@ func (op *Operator) WatchJobs() {
 			DeleteFunc: func(obj interface{}) {
 				if job, ok := obj.(*batch.Job); ok {
 					log.Infof("Job %s@%s deleted", job.Name, job.Namespace)
-					op.TrashCan.Save(job.ObjectMeta, obj)
+					op.TrashCan.Delete(job.ObjectMeta, obj)
 				}
 			},
 		},

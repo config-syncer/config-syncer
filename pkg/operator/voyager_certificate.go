@@ -36,7 +36,7 @@ func (op *Operator) WatchVoyagerCertificates() {
 			DeleteFunc: func(obj interface{}) {
 				if cert, ok := obj.(*tapi.Certificate); ok {
 					log.Infof("Certificate %s@%s deleted", cert.Name, cert.Namespace)
-					op.TrashCan.Save(cert.ObjectMeta, obj)
+					op.TrashCan.Delete(cert.ObjectMeta, obj)
 				}
 			},
 		},

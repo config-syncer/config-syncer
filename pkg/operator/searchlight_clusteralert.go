@@ -61,7 +61,7 @@ func (op *Operator) WatchClusterAlerts() {
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.ClusterAlert); ok {
 					fmt.Println(alert)
-					op.TrashCan.Save(alert.ObjectMeta, obj)
+					op.TrashCan.Delete(alert.ObjectMeta, obj)
 				}
 			},
 		},
