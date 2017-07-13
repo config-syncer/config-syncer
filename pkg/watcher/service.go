@@ -8,27 +8,40 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-func (w *Controller) watchService() {
+func (c *Controller) watchService() {
 	lw := cache.NewListWatchFromClient(
-		w.KubeClient.CoreV1().RESTClient(),
+		c.KubeClient.CoreV1().RESTClient(),
 		"services",
 		metav1.NamespaceAll,
 		fields.Everything())
 	_, controller := cache.NewInformer(lw,
 		&apiv1.Service{},
-		w.SyncPeriod,
+		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				w.ReverseIndex.Handle("added", obj)
-				w.Indexer.HandleAdd(obj)
+				if c.RunOptions.EnableReverseIndex {
+					c.ReverseIndex.Handle("added", obj)
+				}
+				if len(c.RunOptions.Indexer) > 0 {
+					c.Indexer.HandleAdd(obj)
+				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				w.ReverseIndex.Handle("deleted", obj)
-				w.Indexer.HandleDelete(obj)
+				if c.RunOptions.EnableReverseIndex {
+					c.ReverseIndex.Handle("deleted", obj)
+				}
+				if len(c.RunOptions.Indexer) > 0 {
+					c.Indexer.HandleDelete(obj)
+				}
+				c.Saver.Save(obj.(*apiv1.Service).ObjectMeta, obj)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
-				w.ReverseIndex.Handle("updated", oldObj, newObj)
-				w.Indexer.HandleUpdate(oldObj, newObj)
+				if c.RunOptions.EnableReverseIndex {
+					c.ReverseIndex.Handle("updated", oldObj, newObj)
+				}
+				if len(c.RunOptions.Indexer) > 0 {
+					c.Indexer.HandleUpdate(oldObj, newObj)
+				}
 			},
 		},
 	)

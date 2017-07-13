@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/appscode/kubed/pkg/config"
 	es "github.com/appscode/kubed/pkg/janitor/elasticsearch"
 	influx "github.com/appscode/kubed/pkg/janitor/influxdb"
 	"github.com/appscode/log"
@@ -31,16 +32,7 @@ type Janitor struct {
 	ClusterKubedConfigSecretName      string
 	ClusterKubedConfigSecretNamespace string
 
-	// Icinga Client
-	// IcingaClient *icinga.IcingaClient
-
 	once sync.Once
-}
-
-type ClusterSettings struct {
-	LogIndexPrefix            string `json:"log_index_prefix"`
-	LogStorageLifetime        int64  `json:"log_storage_lifetime"`
-	MonitoringStorageLifetime int64  `json:"monitoring_storage_lifetime"`
 }
 
 func (j *Janitor) Run() {
@@ -59,7 +51,7 @@ func (j *Janitor) Run() {
 	j.cleanInflux(cs)
 }
 
-func (j *Janitor) cleanES(k ClusterSettings) error {
+func (j *Janitor) cleanES(k config.ClusterSettings) error {
 	if value, ok := j.ElasticConfig[ESEndpoint]; ok {
 		esClient, err := elastic.NewClient(
 			// elastic.SetSniff(false),
@@ -76,7 +68,7 @@ func (j *Janitor) cleanES(k ClusterSettings) error {
 	return nil
 }
 
-func (j *Janitor) cleanInflux(k ClusterSettings) error {
+func (j *Janitor) cleanInflux(k config.ClusterSettings) error {
 	influxClient, err := influxdb.NewClient(j.InfluxConfig)
 	if err != nil {
 		log.Errorln(err)
@@ -85,18 +77,18 @@ func (j *Janitor) cleanInflux(k ClusterSettings) error {
 	return influx.UpdateRetentionPolicy(influxClient, k.MonitoringStorageLifetime)
 }
 
-func getClusterSettings(client clientset.Interface, secretName string, secretNamespace string) (ClusterSettings, error) {
+func getClusterSettings(client clientset.Interface, secretName string, secretNamespace string) (config.ClusterSettings, error) {
 	clusterConf, err := client.Core().
 		Secrets(secretNamespace).
 		Get(secretName, meta_v1.GetOptions{})
 	if err != nil {
-		return ClusterSettings{}, err
+		return config.ClusterSettings{}, err
 	}
 	return SecretToClusterSettings(*clusterConf)
 }
 
-func SecretToClusterSettings(cnf apiv1.Secret) (ClusterSettings, error) {
-	cs := ClusterSettings{}
+func SecretToClusterSettings(cnf apiv1.Secret) (config.ClusterSettings, error) {
+	cs := config.ClusterSettings{}
 	var err error
 	if d, ok := cnf.Data[LogIndexPrefix]; ok {
 		cs.LogIndexPrefix = string(d)

@@ -37,7 +37,7 @@ func (c *Controller) WatchIngresss() {
 			DeleteFunc: func(obj interface{}) {
 				if ingress, ok := obj.(*extensions.Ingress); ok {
 					log.Infof("Ingress %s@%s deleted", ingress.Name, ingress.Namespace)
-
+					c.Saver.Save(ingress.ObjectMeta, obj)
 				}
 			},
 		},

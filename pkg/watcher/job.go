@@ -38,7 +38,7 @@ func (c *Controller) WatchJobs() {
 			DeleteFunc: func(obj interface{}) {
 				if job, ok := obj.(*batch.Job); ok {
 					log.Infof("Job %s@%s deleted", job.Name, job.Namespace)
-
+					c.Saver.Save(job.ObjectMeta, obj)
 				}
 			},
 		},

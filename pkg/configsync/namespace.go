@@ -1,4 +1,4 @@
-package namespacesync
+package configsync
 
 import (
 	"github.com/appscode/errors"

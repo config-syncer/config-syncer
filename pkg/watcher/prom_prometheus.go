@@ -35,8 +35,9 @@ func (c *Controller) WatchPrometheuss() {
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if svcmon, ok := obj.(*prom.Prometheus); ok {
-					log.Infof("Prometheus %s@%s deleted", svcmon.Name, svcmon.Namespace)
+				if pdb, ok := obj.(*prom.Prometheus); ok {
+					log.Infof("Prometheus %s@%s deleted", pdb.Name, pdb.Namespace)
+					c.Saver.Save(pdb.ObjectMeta, obj)
 				}
 			},
 		},

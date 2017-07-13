@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/appscode/kubed/pkg/indexers"
+	"github.com/appscode/kubed/pkg/recover"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
@@ -21,6 +22,7 @@ type Controller struct {
 	PromClient        pcm.MonitoringV1alpha1Interface
 	KubeDBClient      kcs.ExtensionInterface
 
+	Saver        *recover.RecoverStuff
 	RunOptions   RunOptions
 	Indexer      *indexers.ResourceIndexer
 	ReverseIndex *indexers.ReverseIndexer
@@ -34,19 +36,42 @@ type RunOptions struct {
 	ESEndpoint                        string
 	InfluxSecretName                  string
 	InfluxSecretNamespace             string
-	ClusterName                       string
 	ClusterKubedConfigSecretName      string
 	ClusterKubedConfigSecretNamespace string
 	Indexer                           string
 	EnableReverseIndex                bool
 	ServerAddress                     string
-	NotifyOnCertSoonToBeExpeired      bool
+	NotifyOnCertSoonToBeExpired       bool
 	NotifyVia                         string
 }
 
-func (w *Controller) Run() {
-	w.watchNamespaces()
-	if w.RunOptions.EnableReverseIndex || len(w.RunOptions.Indexer) > 0 {
-		w.watchService()
-	}
+func (c *Controller) Run() {
+	go c.WatchAlertmanagers()
+	go c.WatchClusterAlerts()
+	go c.WatchConfigMaps()
+	go c.WatchDaemonSets()
+	go c.WatchDeploymentApps()
+	go c.WatchDeploymentExtensions()
+	go c.WatchDormantDatabases()
+	go c.WatchElastics()
+	go c.WatchEvents()
+	go c.WatchIngresss()
+	go c.WatchJobs()
+	go c.watchNamespaces()
+	go c.WatchNodeAlerts()
+	go c.WatchPersistentVolumeClaims()
+	go c.WatchPersistentVolumes()
+	go c.WatchPodAlerts()
+	go c.WatchPostgreses()
+	go c.WatchPrometheuss()
+	go c.WatchReplicaSets()
+	go c.WatchReplicationControllers()
+	go c.WatchRestics()
+	go c.WatchSecrets()
+	go c.watchService()
+	go c.WatchServiceMonitors()
+	go c.WatchStatefulSets()
+	go c.WatchStorageClasss()
+	go c.WatchVoyagerCertificates()
+	go c.WatchVoyagerIngresses()
 }
