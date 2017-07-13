@@ -15,8 +15,7 @@ type RecoverStuff struct {
 	Opt config.RecoverSpec
 }
 
-func (c *RecoverStuff) Save(v interface{}) error {
-	meta := v.(metav1.ObjectMeta)
+func (c *RecoverStuff) Save(meta metav1.ObjectMeta, v interface{}) error {
 	p := filepath.Join(c.Opt.Path, meta.SelfLink)
 	dir := filepath.Dir(p)
 	err := os.MkdirAll(dir, 0755)
