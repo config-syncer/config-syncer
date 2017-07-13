@@ -17,9 +17,10 @@ APPSCODE_ENV=${APPSCODE_ENV:-dev}
 IMG=kubed
 OSM_VER=${OSM_VER:-0.5.0}
 
-mkdir -p $REPO_ROOT/dist
-if [ -f "$REPO_ROOT/dist/.tag" ]; then
-	export $(cat $REPO_ROOT/dist/.tag | xargs)
+DIST=$REPO_ROOT/dist
+mkdir -p $DIST
+if [ -f "$DIST/.tag" ]; then
+	export $(cat $DIST/.tag | xargs)
 fi
 
 clean() {
@@ -44,8 +45,8 @@ build_binary() {
 
 build_docker() {
 	pushd $REPO_ROOT/hack/docker
-	cp $REPO_ROOT/dist/kubed/kubed-linux-amd64 kubed
-	cp $REPO_ROOT/dist/osm/osm-linux-amd64 osm
+	cp $DIST/kubed/kubed-linux-amd64 kubed
+	cp $DIST/osm/osm-linux-amd64 osm
 	chmod 755 kubed
 
 	cat >Dockerfile <<EOL
