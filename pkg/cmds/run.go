@@ -10,6 +10,7 @@ import (
 	"github.com/appscode/go/hold"
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/go/wait"
+	"github.com/appscode/kubed/pkg/analytics"
 	"github.com/appscode/kubed/pkg/cert"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/dns"
@@ -30,7 +31,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func NewCmdRun() *cobra.Command {
+func NewCmdRun(version string) *cobra.Command {
 	opt := watcher.RunOptions{
 		InfluxSecretName:                  "appscode-influx",
 		InfluxSecretNamespace:             "kube-system",
@@ -41,10 +42,20 @@ func NewCmdRun() *cobra.Command {
 		ServerAddress:               ":32600",
 		NotifyOnCertSoonToBeExpired: true,
 		NotifyVia:                   "plivo",
+		EnableAnalytics:             true,
 	}
 	cmd := &cobra.Command{
 		Use:   "run",
 		Short: "Run daemon",
+		PreRun: func(cmd *cobra.Command, args []string) {
+			if opt.EnableAnalytics {
+				analytics.Enable()
+			}
+			analytics.SendEvent("operator", "started", version)
+		},
+		PostRun: func(cmd *cobra.Command, args []string) {
+			analytics.SendEvent("operator", "stopped", version)
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			log.Infoln("Starting kubed...")
 			go Run(opt)
@@ -65,6 +76,7 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringVar(&opt.Indexer, "indexer", opt.Indexer, "Reverse indexing of pods to service and others")
 	cmd.Flags().BoolVar(&opt.EnableReverseIndex, "enable-reverse-index", opt.EnableReverseIndex, "Reverse indexing of pods to service and others")
 	cmd.Flags().StringVar(&opt.ServerAddress, "address", opt.ServerAddress, "The address of the Kubed API Server")
+	cmd.Flags().BoolVar(&opt.EnableAnalytics, "analytics", opt.EnableAnalytics, "Send analytical events to Google Analytics")
 	return cmd
 }
 

@@ -43,6 +43,7 @@ type RunOptions struct {
 	ServerAddress                     string
 	NotifyOnCertSoonToBeExpired       bool
 	NotifyVia                         string
+	EnableAnalytics                   bool
 }
 
 func (c *Controller) Run() {

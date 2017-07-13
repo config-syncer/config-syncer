@@ -15,7 +15,7 @@ kubed run [flags]
 
 ```
       --address string                         The address of the Kubed API Server (default ":32600")
-      --cluster-name string                    Name of Kubernetes cluster
+      --analytics                              Send analytical events to Google Analytics (default true)
       --enable-reverse-index                   Reverse indexing of pods to service and others (default true)
       --es-endpoint string                     Endpoint of elasticsearch
   -h, --help                                   help for run

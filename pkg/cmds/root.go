@@ -10,7 +10,7 @@ import (
 	_ "k8s.io/client-go/kubernetes/fake"
 )
 
-func NewCmdKubed() *cobra.Command {
+func NewCmdKubed(version string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "kubed",
 		Short: `Kubed by AppsCode - Kubernetes Daemon`,
@@ -25,7 +25,7 @@ func NewCmdKubed() *cobra.Command {
 	// ref: https://github.com/kubernetes/kubernetes/issues/17162#issuecomment-225596212
 	flag.CommandLine.Parse([]string{})
 
-	cmd.AddCommand(NewCmdRun())
+	cmd.AddCommand(NewCmdRun(version))
 	cmd.AddCommand(NewCmdBackup())
 	cmd.AddCommand(v.NewCmdVersion())
 

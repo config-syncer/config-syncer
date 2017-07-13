@@ -12,7 +12,7 @@ import (
 
 // ref: https://github.com/spf13/cobra/blob/master/doc/md_docs.md
 func main() {
-	rootCmd := cmds.NewCmdKubed()
+	rootCmd := cmds.NewCmdKubed("")
 	dir := runtime.GOPath() + "/src/github.com/appscode/kubed/docs/reference"
 	fmt.Printf("Generating cli markdown tree in: %v\n", dir)
 	err := os.MkdirAll(dir, 0755)

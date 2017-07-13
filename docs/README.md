@@ -24,9 +24,6 @@ Wondering what features are coming next? Please visit [here](/ROADMAP.md).
 
 ---
 
-## Acknowledgement
- - Many thanks to [Alexander Neumann](https://github.com/fd0) for [Restic](https://github.com/restic/restic) project.
-
 ## Support
 If you have any questions, you can reach out to us.
 * [Slack](https://slack.appscode.com)
