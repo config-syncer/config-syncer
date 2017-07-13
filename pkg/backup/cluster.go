@@ -17,17 +17,11 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-type Options struct {
-	Sanitize  bool
-	BackupDir string
-	Context   string
-}
-
 type ItemList struct {
 	Items []map[string]interface{} `json:"items,omitempty"`
 }
 
-func Backup(kubeConfig *rest.Config, opt Options) error {
+func SnapshotCluster(kubeConfig *rest.Config, backupDir string, sanitize bool) error {
 	discoveryClient := discovery.NewDiscoveryClientForConfigOrDie(kubeConfig)
 	rs, err := discoveryClient.ServerResources()
 	if err != nil {
@@ -35,7 +29,7 @@ func Backup(kubeConfig *rest.Config, opt Options) error {
 	}
 
 	resBytes, _ := yaml.Marshal(rs)
-	ioutil.WriteFile(filepath.Join(opt.BackupDir, "api_resources.yaml"), resBytes, 0755)
+	ioutil.WriteFile(filepath.Join(backupDir, "api_resources.yaml"), resBytes, 0755)
 
 	for _, v := range rs {
 		gv, err := schema.ParseGroupVersion(v.GroupVersion)
@@ -86,7 +80,7 @@ func Backup(kubeConfig *rest.Config, opt Options) error {
 					log.Errorln("Metadata not found")
 					continue
 				}
-				if opt.Sanitize {
+				if sanitize {
 					cleanUpObjectMeta(i)
 					spec, ok := ob["spec"].(map[string]interface{})
 					if ok {
@@ -108,7 +102,7 @@ func Backup(kubeConfig *rest.Config, opt Options) error {
 					log.Errorln(err)
 					break
 				}
-				path := filepath.Dir(filepath.Join(opt.BackupDir, selfLink))
+				path := filepath.Dir(filepath.Join(backupDir, selfLink))
 				obName := filepath.Base(selfLink)
 				err = os.MkdirAll(path, 0777)
 				if err != nil {

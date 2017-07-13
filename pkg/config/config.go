@@ -1,13 +1,6 @@
 package config
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-
-	yc "github.com/appscode/go/encoding/yaml"
-	"github.com/ghodss/yaml"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -18,9 +11,9 @@ const (
 type ClusterConfig struct {
 	Elasticsearch      *ElasticSearchSpec  `json:"elasticsearch,omitempty,omitempty"`
 	InfluxDB           *InfluxDBSpec       `json:"influxdb,omitempty"`
-	RecycleBin         *RecycleBinSpec     `json:"recycle_bin,omitempty"`
-	EventForwarder     *EventForwarderSpec `json:"event_forwarder,omitempty"`
-	Backup             *BackupSpec         `json:"backup,omitempty"`
+	RecycleBin         *RecycleBinSpec     `json:"recycleBin,omitempty"`
+	EventForwarder     *EventForwarderSpec `json:"eventForwarder,omitempty"`
+	ClusterSnapshot    *SnapshotSpec       `json:"clusterSnapshot,omitempty"`
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
 }
 
@@ -54,11 +47,46 @@ type EventForwarderSpec struct {
 
 // For periodic full cluster backup
 // https://github.com/appscode/kubed/issues/16
-type BackupSpec struct {
+type SnapshotSpec struct {
 	Schedule string  `json:"schedule,omitempty"`
 	Sanitize bool    `json:"sanitize,omitempty"`
 	Storage  Backend `json:",inline"`
 }
+
+const (
+	AWS_ACCESS_KEY_ID     = "AWS_ACCESS_KEY_ID"
+	AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
+
+	GOOGLE_PROJECT_ID               = "GOOGLE_PROJECT_ID"
+	GOOGLE_SERVICE_ACCOUNT_JSON_KEY = "GOOGLE_SERVICE_ACCOUNT_JSON_KEY"
+
+	AZURE_ACCOUNT_NAME = "AZURE_ACCOUNT_NAME"
+	AZURE_ACCOUNT_KEY  = "AZURE_ACCOUNT_KEY"
+
+	// swift
+	OS_USERNAME    = "OS_USERNAME"
+	OS_PASSWORD    = "OS_PASSWORD"
+	OS_REGION_NAME = "OS_REGION_NAME"
+	OS_AUTH_URL    = "OS_AUTH_URL"
+
+	// v3 specific
+	OS_USER_DOMAIN_NAME    = "OS_USER_DOMAIN_NAME"
+	OS_PROJECT_NAME        = "OS_PROJECT_NAME"
+	OS_PROJECT_DOMAIN_NAME = "OS_PROJECT_DOMAIN_NAME"
+
+	// v2 specific
+	OS_TENANT_ID   = "OS_TENANT_ID"
+	OS_TENANT_NAME = "OS_TENANT_NAME"
+
+	// v1 specific
+	ST_AUTH = "ST_AUTH"
+	ST_USER = "ST_USER"
+	ST_KEY  = "ST_KEY"
+
+	// Manual authentication
+	OS_STORAGE_URL = "OS_STORAGE_URL"
+	OS_AUTH_TOKEN  = "OS_AUTH_TOKEN"
+)
 
 type Backend struct {
 	StorageSecretName string `json:"storageSecretName,omitempty"`
@@ -93,35 +121,4 @@ type AzureSpec struct {
 type SwiftSpec struct {
 	Container string `json:"container,omitempty"`
 	Prefix    string `json:"prefix,omitempty"`
-}
-
-func LoadConfig(configPath string) (*ClusterConfig, error) {
-	if _, err := os.Stat(configPath); err != nil {
-		return nil, err
-	}
-	os.Chmod(configPath, 0600)
-
-	cfg := &ClusterConfig{}
-	bytes, err := ioutil.ReadFile(configPath)
-	if err != nil {
-		return nil, err
-	}
-	jsonData, err := yc.ToJSON(bytes)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(jsonData, cfg)
-	return cfg, err
-}
-
-func (cfg *ClusterConfig) Save(configPath string) error {
-	data, err := yaml.Marshal(cfg)
-	if err != nil {
-		return err
-	}
-	os.MkdirAll(filepath.Dir(configPath), 0755)
-	if err := ioutil.WriteFile(configPath, data, 0600); err != nil {
-		return err
-	}
-	return nil
 }

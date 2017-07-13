@@ -2,38 +2,36 @@ package cmds
 
 import (
 	"fmt"
-	"net/http"
+	"io/ioutil"
 	"os"
-	"time"
+	"strings"
 
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/analytics"
-	"github.com/appscode/kubed/pkg/config"
-	"github.com/appscode/kubed/pkg/indexers"
-	"github.com/appscode/kubed/pkg/recyclebin"
-	"github.com/appscode/kubed/pkg/watcher"
+	"github.com/appscode/kubed/pkg/operator"
 	"github.com/appscode/log"
-	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
 	"github.com/spf13/cobra"
-	"gopkg.in/robfig/cron.v2"
 	clientset "k8s.io/client-go/kubernetes"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml"
 func NewCmdRun(version string) *cobra.Command {
-	opt := watcher.Options{
-		ConfigPath:         runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml",
+	opt := operator.Options{
+		ConfigPath:         "/srv/kubed/config.yaml",
 		Indexer:            "indexers.bleve",
 		EnableReverseIndex: true,
 		ServerAddress:      ":8081",
 		EnableAnalytics:    true,
 		EnableConfigSync:   true,
 		ScratchDir:         "/tmp",
+		OperatorNamespace:  namespace(),
 	}
 	cmd := &cobra.Command{
 		Use:   "run",
@@ -67,7 +65,7 @@ func NewCmdRun(version string) *cobra.Command {
 	return cmd
 }
 
-func Run(opt watcher.Options) {
+func Run(opt operator.Options) {
 	log.Infoln("configurations provided for kubed", opt)
 	defer runtime.HandleCrash()
 
@@ -77,70 +75,37 @@ func Run(opt watcher.Options) {
 		os.Exit(1)
 	}
 
-	cfg, err := config.LoadConfig(opt.ConfigPath)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-
-	w := &watcher.Watchers{
+	op := &operator.Operator{
 		KubeClient:        clientset.NewForConfigOrDie(c),
 		VoyagerClient:     vcs.NewForConfigOrDie(c),
 		SearchlightClient: srch_cs.NewForConfigOrDie(c),
 		StashClient:       scs.NewForConfigOrDie(c),
 		KubeDBClient:      kcs.NewForConfigOrDie(c),
-
-		Cron:   cron.New(),
-		Opt:    opt,
-		Config: *cfg,
-		Saver: &recyclebin.RecoverStuff{
-			Opt: *cfg.RecycleBin,
-		},
-		SyncPeriod: time.Minute * 2,
+		Opt:               opt,
 	}
-	w.PromClient, err = pcm.NewForConfig(c)
+	op.PromClient, err = pcm.NewForConfig(c)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	// router is default HTTP request multiplexer for kubed. It matches the URL of each
-	// incoming request against a list of registered patterns with their associated
-	// methods and calls the handler for the pattern that most closely matches the
-	// URL.
-	//
-	// Pattern matching attempts each pattern in the order in which they were
-	// registered.
-	router := pat.New()
-
-	// Enable full text indexing to have search feature
-	if len(opt.Indexer) > 0 {
-		indexer, err := indexers.NewResourceIndexer(opt.Indexer)
-		if err != nil {
-			log.Errorln(err)
-		} else {
-			indexer.RegisterRouters(router)
-			w.Indexer = indexer
-		}
-	}
-
-	// Enable pod -> service, service -> serviceMonitor indexing
-	if opt.EnableReverseIndex {
-		ri, err := indexers.NewReverseIndexer(w.KubeClient, opt.Indexer)
-		if err != nil {
-			log.Errorln("Failed to create indexer", err)
-		} else {
-			ri.RegisterRouters(router)
-			w.ReverseIndex = ri
-		}
+	err = op.Setup()
+	if err != nil {
+		log.Fatalln(err)
 	}
 
 	log.Infoln("Running kubed watcher")
-	go w.Run()
+	op.RunAndHold()
+}
 
-	// TODO: periodic backup
-	// TODO: janitor
-
-	http.Handle("/", router)
-	log.Fatalln(http.ListenAndServe(opt.ServerAddress, nil))
+func namespace() string {
+	if ns := os.Getenv("OPERATOR_NAMESPACE"); ns != "" {
+		return ns
+	}
+	if data, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace"); err == nil {
+		if ns := strings.TrimSpace(string(data)); len(ns) > 0 {
+			return ns
+		}
+	}
+	return apiv1.NamespaceDefault
 }
