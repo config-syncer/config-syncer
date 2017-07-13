@@ -32,12 +32,12 @@ func (op *Operator) WatchReplicaSets() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&extensions.ReplicaSet{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if rs, ok := obj.(*extensions.ReplicaSet); ok {
 					log.Infof("ReplicaSet %s@%s deleted", rs.Name, rs.Namespace)
-					op.Saver.Save(rs.ObjectMeta, obj)
+					op.TrashCan.Save(rs.ObjectMeta, obj)
 				}
 			},
 		},

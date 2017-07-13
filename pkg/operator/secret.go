@@ -31,12 +31,12 @@ func (op *Operator) WatchSecrets() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.Secret{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if scrt, ok := obj.(*apiv1.Secret); ok {
 					log.Infof("Secret %s@%s deleted", scrt.Name, scrt.Namespace)
-					op.Saver.Save(scrt.ObjectMeta, obj)
+					op.TrashCan.Save(scrt.ObjectMeta, obj)
 				}
 			},
 		},

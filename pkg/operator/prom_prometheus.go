@@ -32,12 +32,12 @@ func (op *Operator) WatchPrometheuss() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&prom.Prometheus{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if pdb, ok := obj.(*prom.Prometheus); ok {
 					log.Infof("Prometheus %s@%s deleted", pdb.Name, pdb.Namespace)
-					op.Saver.Save(pdb.ObjectMeta, obj)
+					op.TrashCan.Save(pdb.ObjectMeta, obj)
 				}
 			},
 		},

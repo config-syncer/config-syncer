@@ -31,12 +31,12 @@ func (op *Operator) WatchReplicationControllers() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.ReplicationController{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if rc, ok := obj.(*apiv1.ReplicationController); ok {
 					log.Infof("ReplicationController %s@%s deleted", rc.Name, rc.Namespace)
-					op.Saver.Save(rc.ObjectMeta, obj)
+					op.TrashCan.Save(rc.ObjectMeta, obj)
 				}
 			},
 		},

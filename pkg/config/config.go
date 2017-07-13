@@ -11,7 +11,7 @@ const (
 type ClusterConfig struct {
 	Elasticsearch      *ElasticSearchSpec  `json:"elasticsearch,omitempty,omitempty"`
 	InfluxDB           *InfluxDBSpec       `json:"influxdb,omitempty"`
-	RecycleBin         *RecycleBinSpec     `json:"recycleBin,omitempty"`
+	TrashCan           *TrashCanSpec       `json:"recycleBin,omitempty"`
 	EventForwarder     *EventForwarderSpec `json:"eventForwarder,omitempty"`
 	ClusterSnapshot    *SnapshotSpec       `json:"clusterSnapshot,omitempty"`
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
@@ -30,7 +30,7 @@ type InfluxDBSpec struct {
 	TTL      metav1.Duration `json:"ttl,omitempty"`
 }
 
-type RecycleBinSpec struct {
+type TrashCanSpec struct {
 	Path         string          `json:"path,omitempty"`
 	TTL          metav1.Duration `json:"ttl,omitempty"`
 	HandleUpdate bool            `json:"handle_update,omitempty"`

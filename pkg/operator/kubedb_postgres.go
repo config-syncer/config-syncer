@@ -35,7 +35,7 @@ func (op *Operator) WatchPostgreses() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Postgres{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.Postgres); ok {
@@ -58,7 +58,7 @@ func (op *Operator) WatchPostgreses() {
 			DeleteFunc: func(obj interface{}) {
 				if pg, ok := obj.(*tapi.Postgres); ok {
 					fmt.Println(pg)
-					op.Saver.Save(pg.ObjectMeta, obj)
+					op.TrashCan.Save(pg.ObjectMeta, obj)
 				}
 			},
 		},

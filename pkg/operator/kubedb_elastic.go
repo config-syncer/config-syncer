@@ -35,7 +35,7 @@ func (op *Operator) WatchElastics() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Elastic{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if elastic, ok := obj.(*tapi.Elastic); ok {
@@ -58,7 +58,7 @@ func (op *Operator) WatchElastics() {
 			DeleteFunc: func(obj interface{}) {
 				if elastic, ok := obj.(*tapi.Elastic); ok {
 					fmt.Println(elastic)
-					op.Saver.Save(elastic.ObjectMeta, obj)
+					op.TrashCan.Save(elastic.ObjectMeta, obj)
 				}
 			},
 		},

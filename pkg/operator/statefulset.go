@@ -32,12 +32,12 @@ func (op *Operator) WatchStatefulSets() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apps.StatefulSet{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if deployment, ok := obj.(*apps.StatefulSet); ok {
 					log.Infof("StatefulSet %s@%s deleted", deployment.Name, deployment.Namespace)
-					op.Saver.Save(deployment.ObjectMeta, obj)
+					op.TrashCan.Save(deployment.ObjectMeta, obj)
 				}
 			},
 		},

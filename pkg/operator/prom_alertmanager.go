@@ -32,12 +32,12 @@ func (op *Operator) WatchAlertmanagers() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&prom.Alertmanager{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if mgr, ok := obj.(*prom.Alertmanager); ok {
 					log.Infof("Alertmanager %s@%s deleted", mgr.Name, mgr.Namespace)
-					op.Saver.Save(mgr.ObjectMeta, obj)
+					op.TrashCan.Save(mgr.ObjectMeta, obj)
 				}
 			},
 		},

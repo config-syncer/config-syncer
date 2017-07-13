@@ -31,13 +31,13 @@ func (op *Operator) WatchConfigMaps() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.ConfigMap{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if cfgmap, ok := obj.(*apiv1.ConfigMap); ok {
 					log.Infof("ConfigMap %s@%s deleted", cfgmap.Name, cfgmap.Namespace)
 
-					op.Saver.Save(cfgmap.ObjectMeta, obj)
+					op.TrashCan.Save(cfgmap.ObjectMeta, obj)
 				}
 			},
 		},

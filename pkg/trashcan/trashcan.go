@@ -1,4 +1,4 @@
-package recyclebin
+package trashcan
 
 import (
 	"fmt"
@@ -12,12 +12,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type RecoverStuff struct {
-	Opt config.RecycleBinSpec
+type TrashCan struct {
+	Spec config.TrashCanSpec
 }
 
-func (c *RecoverStuff) Save(meta metav1.ObjectMeta, v interface{}) error {
-	p := filepath.Join(c.Opt.Path, meta.SelfLink)
+func (c *TrashCan) Save(meta metav1.ObjectMeta, v interface{}) error {
+	p := filepath.Join(c.Spec.Path, meta.SelfLink)
 	dir := filepath.Dir(p)
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
@@ -32,4 +32,16 @@ func (c *RecoverStuff) Save(meta metav1.ObjectMeta, v interface{}) error {
 		return err
 	}
 	return ioutil.WriteFile(fullPath, bytes, 0644)
+}
+
+func (c *TrashCan) Cleanup() error {
+	now := time.Now()
+	return filepath.Walk(c.Spec.Path, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			if info.ModTime().Add(c.Spec.TTL.Duration).Before(now) {
+				os.Remove(path)
+			}
+		}
+		return nil
+	})
 }

@@ -33,12 +33,12 @@ func (op *Operator) WatchJobs() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&batch.Job{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if job, ok := obj.(*batch.Job); ok {
 					log.Infof("Job %s@%s deleted", job.Name, job.Namespace)
-					op.Saver.Save(job.ObjectMeta, obj)
+					op.TrashCan.Save(job.ObjectMeta, obj)
 				}
 			},
 		},

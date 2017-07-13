@@ -32,12 +32,12 @@ func (op *Operator) WatchServiceMonitors() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&prom.ServiceMonitor{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if svcmon, ok := obj.(*prom.ServiceMonitor); ok {
 					log.Infof("ServiceMonitor %s@%s deleted", svcmon.Name, svcmon.Namespace)
-					op.Saver.Save(svcmon.ObjectMeta, obj)
+					op.TrashCan.Save(svcmon.ObjectMeta, obj)
 				}
 			},
 		},

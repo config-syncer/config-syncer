@@ -32,12 +32,12 @@ func (op *Operator) WatchDeploymentApps() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apps.Deployment{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if deployment, ok := obj.(*apps.Deployment); ok {
 					log.Infof("Deployment %s@%s deleted", deployment.Name, deployment.Namespace)
-					op.Saver.Save(deployment.ObjectMeta, obj)
+					op.TrashCan.Save(deployment.ObjectMeta, obj)
 				}
 			},
 		},

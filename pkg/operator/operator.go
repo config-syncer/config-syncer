@@ -2,7 +2,6 @@ package operator
 
 import (
 	"net/http"
-	"os"
 	"path/filepath"
 	"sync"
 	"time"
@@ -12,8 +11,8 @@ import (
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/influxdb"
-	"github.com/appscode/kubed/pkg/recyclebin"
 	"github.com/appscode/kubed/pkg/storage"
+	"github.com/appscode/kubed/pkg/trashcan"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
@@ -51,14 +50,15 @@ type Operator struct {
 	PromClient        pcm.MonitoringV1alpha1Interface
 	KubeDBClient      kcs.ExtensionInterface
 
-	Opt          Options
-	Config       config.ClusterConfig
-	Saver        *recyclebin.RecoverStuff
+	Opt    Options
+	Config config.ClusterConfig
+
 	SearchIndex  *indexers.ResourceIndexer
 	ReverseIndex *indexers.ReverseIndexer
+	TrashCan     *trashcan.TrashCan
+	Cron         *cron.Cron
 
-	Cron       *cron.Cron
-	SyncPeriod time.Duration
+	syncPeriod time.Duration
 	sync.Mutex
 }
 
@@ -69,13 +69,25 @@ func (op *Operator) Setup() error {
 	}
 	op.Config = *cfg
 
+	if op.Config.TrashCan != nil {
+		if op.Config.TrashCan.Path == "" {
+			op.Config.TrashCan.Path = filepath.Join(op.Opt.ScratchDir, "transhcan")
+		}
+		op.TrashCan = &trashcan.TrashCan{Spec: *op.Config.TrashCan}
+	}
+
 	op.Cron = cron.New()
 	op.Cron.Start()
-	//Saver: &recyclebin.RecoverStuff{
-	//	Opt: *cfg.RecycleBin,
-	//},
-	op.SyncPeriod = time.Minute * 2
 
+	if op.Config.InfluxDB != nil {
+		janitor := influx.Janitor{Spec: *op.Config.InfluxDB}
+		err = janitor.Cleanup()
+		if err != nil {
+			return err
+		}
+	}
+
+	op.syncPeriod = time.Minute * 2
 	return nil
 }
 
@@ -148,41 +160,37 @@ func (op *Operator) ListenAndServe() {
 	log.Fatalln(http.ListenAndServe(op.Opt.Address, nil))
 }
 
-func (op *Operator) StartCron() {
-	op.Cron.AddFunc("@every 24h", func() {
-		janitor := influx.Janitor{Config: op.Config}
-		janitor.CleanInflux()
-	})
-	op.Cron.AddFunc("@every 24h", func() {
-		janitor := es.Janitor{Config: op.Config}
-		janitor.CleanES()
-	})
-	op.Cron.AddFunc("@every 24h", func() {
-		err := filepath.Walk(op.Config.RecycleBin.Path, func(path string, info os.FileInfo, err error) error {
-			// delete old objects
-			return nil
-		})
+func (op *Operator) RunElasticsearchCleaner() error {
+	if op.Config.Elasticsearch == nil {
+		return nil
+	}
+
+	janitor := es.Janitor{Spec: *op.Config.Elasticsearch}
+	err := janitor.Cleanup()
+	if err != nil {
+		return err
+	}
+	op.Cron.AddFunc("@every 6h", func() {
+		err := janitor.Cleanup()
 		if err != nil {
 			log.Errorln(err)
 		}
-		// expire saver
 	})
+	return nil
+}
 
-	op.Cron.AddFunc(op.Config.ClusterSnapshot.Schedule, func() {
-		if config, err := clientcmd.BuildConfigFromFlags(op.Opt.Master, op.Opt.KubeConfig); err == nil {
-			t := time.Now().UTC()
-			backupDir := filepath.Join(op.Opt.ScratchDir, "snapshot", t.Format(time.RFC3339))
+func (op *Operator) RunTrashCanCleaner() error {
+	if op.TrashCan == nil {
+		return nil
+	}
 
-			err := backup.SnapshotCluster(config, backupDir, op.Config.ClusterSnapshot.Sanitize)
-			if err != nil {
-				log.Errorln(err)
-			}
-
-			// upload to cloud
+	_, err := op.Cron.AddFunc("@every 6h", func() {
+		err := op.TrashCan.Cleanup()
+		if err != nil {
+			log.Errorln(err)
 		}
-
-		// run backup
 	})
+	return err
 }
 
 func (op *Operator) RunSnapshotter() error {
@@ -240,6 +248,8 @@ func (op *Operator) RunSnapshotter() error {
 }
 
 func (op *Operator) RunAndHold() {
+	op.RunElasticsearchCleaner()
+	op.RunTrashCanCleaner()
 	op.RunSnapshotter()
 	op.RunWatchers()
 	op.ListenAndServe()

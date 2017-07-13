@@ -32,12 +32,12 @@ func (op *Operator) WatchDaemonSets() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&extensions.DaemonSet{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if daemon, ok := obj.(*extensions.DaemonSet); ok {
 					log.Infof("DaemonSet %s@%s deleted", daemon.Name, daemon.Namespace)
-					op.Saver.Save(daemon.ObjectMeta, obj)
+					op.TrashCan.Save(daemon.ObjectMeta, obj)
 				}
 			},
 		},

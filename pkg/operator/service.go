@@ -25,7 +25,7 @@ func (op *Operator) watchService() {
 		fields.Everything())
 	_, controller := cache.NewInformer(lw,
 		&apiv1.Service{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if op.Opt.EnableReverseIndex {
@@ -42,7 +42,7 @@ func (op *Operator) watchService() {
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleDelete(obj)
 				}
-				op.Saver.Save(obj.(*apiv1.Service).ObjectMeta, obj)
+				op.TrashCan.Save(obj.(*apiv1.Service).ObjectMeta, obj)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				if op.Opt.EnableReverseIndex {

@@ -31,12 +31,12 @@ func (op *Operator) WatchStorageClasss() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&storage.StorageClass{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if sc, ok := obj.(*storage.StorageClass); ok {
 					log.Infof("StorageClass %s@%s deleted", sc.Name, sc.Namespace)
-					op.Saver.Save(sc.ObjectMeta, obj)
+					op.TrashCan.Save(sc.ObjectMeta, obj)
 				}
 			},
 		},

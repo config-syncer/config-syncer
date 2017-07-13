@@ -17,7 +17,7 @@ func (op *Operator) watchNamespaces() {
 			metav1.NamespaceAll,
 			fields.Everything()),
 		&apiv1.Namespace{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				ns := configsync.NewHandler(op.KubeClient)

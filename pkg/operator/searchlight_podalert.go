@@ -35,7 +35,7 @@ func (op *Operator) WatchPodAlerts() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.PodAlert{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.PodAlert); ok {
@@ -58,7 +58,7 @@ func (op *Operator) WatchPodAlerts() {
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.PodAlert); ok {
 					fmt.Println(alert)
-					op.Saver.Save(alert.ObjectMeta, obj)
+					op.TrashCan.Save(alert.ObjectMeta, obj)
 				}
 			},
 		},

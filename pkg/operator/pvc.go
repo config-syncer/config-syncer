@@ -31,12 +31,12 @@ func (op *Operator) WatchPersistentVolumeClaims() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.PersistentVolumeClaim{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if pvc, ok := obj.(*apiv1.PersistentVolumeClaim); ok {
 					log.Infof("PersistentVolumeClaim %s@%s deleted", pvc.Name, pvc.Namespace)
-					op.Saver.Save(pvc.ObjectMeta, obj)
+					op.TrashCan.Save(pvc.ObjectMeta, obj)
 				}
 			},
 		},

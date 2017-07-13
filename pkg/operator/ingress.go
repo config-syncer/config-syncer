@@ -32,12 +32,12 @@ func (op *Operator) WatchIngresss() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&extensions.Ingress{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if ingress, ok := obj.(*extensions.Ingress); ok {
 					log.Infof("Ingress %s@%s deleted", ingress.Name, ingress.Namespace)
-					op.Saver.Save(ingress.ObjectMeta, obj)
+					op.TrashCan.Save(ingress.ObjectMeta, obj)
 				}
 			},
 		},

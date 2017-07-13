@@ -31,12 +31,12 @@ func (op *Operator) WatchVoyagerCertificates() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Certificate{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if cert, ok := obj.(*tapi.Certificate); ok {
 					log.Infof("Certificate %s@%s deleted", cert.Name, cert.Namespace)
-					op.Saver.Save(cert.ObjectMeta, obj)
+					op.TrashCan.Save(cert.ObjectMeta, obj)
 				}
 			},
 		},
