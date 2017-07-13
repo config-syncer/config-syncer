@@ -142,50 +142,7 @@ func Run(opt controller.Options) {
 	log.Infoln("Running kubed watcher")
 	go w.Run()
 
-	// initializing kube janitor tasks
-	kubeJanitor := janitor.Janitor{
-		KubeClient:                        w.KubeClient,
-		ElasticConfig:                     make(map[string]string),
-		ClusterKubedConfigSecretName:      opt.ClusterKubedConfigSecretName,
-		ClusterKubedConfigSecretNamespace: opt.ClusterKubedConfigSecretNamespace,
-	}
-
-	if opt.ESEndpoint != "" {
-		endpoint := opt.ESEndpoint
-		if strings.HasPrefix(opt.ESEndpoint, "http") {
-			endpoint = opt.ESEndpoint[7:]
-		}
-		parts := strings.Split(endpoint, ":")
-		if len(parts) == 2 {
-			esServiceClusterIP, err := dns.GetServiceClusterIP(w.KubeClient, "ES", parts[0])
-			if err != nil {
-				log.Errorln(err)
-			} else {
-				kubeJanitor.ElasticConfig[janitor.ESEndpoint] = fmt.Sprintf("http://%v:%v", esServiceClusterIP, parts[1])
-			}
-		} else {
-			log.Errorln("es-endpoint should contain host_name & host_port")
-		}
-	}
-
-	if opt.InfluxSecretName != "" {
-		// InfluxDB client
-		influxConfig, err := influxdb.GetInfluxDBConfig(opt.InfluxSecretName, opt.InfluxSecretNamespace)
-		if err != nil {
-			log.Errorln(err)
-		} else {
-			kubeJanitor.InfluxConfig = *influxConfig
-		}
-	}
-
-	if opt.NotifyOnCertSoonToBeExpired {
-		go cert.DefaultCertWatcher(
-			w.KubeClient,
-			opt.ClusterKubedConfigSecretName,
-			opt.ClusterKubedConfigSecretNamespace,
-		).RunAndHold()
-	}
-	go wait.Forever(kubeJanitor.Run, time.Hour*24)
+	// janitor
 
 	if len(opt.ServerAddress) > 0 {
 		http.Handle("/", router)
