@@ -1,20 +1,39 @@
 package watcher
 
 import (
+	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
+	"github.com/appscode/kubed/pkg/backup"
+	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/indexers"
+	"github.com/appscode/kubed/pkg/influxdb"
 	"github.com/appscode/kubed/pkg/recover"
+	"github.com/appscode/log"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
+	"gopkg.in/robfig/cron.v2"
 	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
-type Controller struct {
+type Options struct {
+	Master             string
+	KubeConfig         string
+	EnableAnalytics    bool
+	Indexer            string
+	EnableReverseIndex bool
+	ServerAddress      string
+	ConfigPath         string
+}
+
+type Watchers struct {
 	KubeClient        clientset.Interface
 	VoyagerClient     vcs.ExtensionInterface
 	SearchlightClient srch_cs.ExtensionInterface
@@ -22,57 +41,84 @@ type Controller struct {
 	PromClient        pcm.MonitoringV1alpha1Interface
 	KubeDBClient      kcs.ExtensionInterface
 
+	Opt          Options
+	Config       config.ClusterConfig
 	Saver        *recover.RecoverStuff
-	RunOptions   RunOptions
 	Indexer      *indexers.ResourceIndexer
 	ReverseIndex *indexers.ReverseIndexer
-	SyncPeriod   time.Duration
+
+	Cron       *cron.Cron
+	SyncPeriod time.Duration
 	sync.Mutex
 }
 
-type RunOptions struct {
-	Master                            string
-	KubeConfig                        string
-	ESEndpoint                        string
-	InfluxSecretName                  string
-	InfluxSecretNamespace             string
-	ClusterKubedConfigSecretName      string
-	ClusterKubedConfigSecretNamespace string
-	Indexer                           string
-	EnableReverseIndex                bool
-	ServerAddress                     string
-	NotifyOnCertSoonToBeExpired       bool
-	NotifyVia                         string
-	EnableAnalytics                   bool
+func (w *Watchers) Run() {
+	go w.WatchAlertmanagers()
+	go w.WatchClusterAlerts()
+	go w.WatchConfigMaps()
+	go w.WatchDaemonSets()
+	go w.WatchDeploymentApps()
+	go w.WatchDeploymentExtensions()
+	go w.WatchDormantDatabases()
+	go w.WatchElastics()
+	go w.WatchEvents()
+	go w.WatchIngresss()
+	go w.WatchJobs()
+	go w.watchNamespaces()
+	go w.WatchNodeAlerts()
+	go w.WatchPersistentVolumeClaims()
+	go w.WatchPersistentVolumes()
+	go w.WatchPodAlerts()
+	go w.WatchPostgreses()
+	go w.WatchPrometheuss()
+	go w.WatchReplicaSets()
+	go w.WatchReplicationControllers()
+	go w.WatchRestics()
+	go w.WatchSecrets()
+	go w.watchService()
+	go w.WatchServiceMonitors()
+	go w.WatchStatefulSets()
+	go w.WatchStorageClasss()
+	go w.WatchVoyagerCertificates()
+	go w.WatchVoyagerIngresses()
+
+	go w.StartCron()
 }
 
-func (c *Controller) Run() {
-	go c.WatchAlertmanagers()
-	go c.WatchClusterAlerts()
-	go c.WatchConfigMaps()
-	go c.WatchDaemonSets()
-	go c.WatchDeploymentApps()
-	go c.WatchDeploymentExtensions()
-	go c.WatchDormantDatabases()
-	go c.WatchElastics()
-	go c.WatchEvents()
-	go c.WatchIngresss()
-	go c.WatchJobs()
-	go c.watchNamespaces()
-	go c.WatchNodeAlerts()
-	go c.WatchPersistentVolumeClaims()
-	go c.WatchPersistentVolumes()
-	go c.WatchPodAlerts()
-	go c.WatchPostgreses()
-	go c.WatchPrometheuss()
-	go c.WatchReplicaSets()
-	go c.WatchReplicationControllers()
-	go c.WatchRestics()
-	go c.WatchSecrets()
-	go c.watchService()
-	go c.WatchServiceMonitors()
-	go c.WatchStatefulSets()
-	go c.WatchStorageClasss()
-	go c.WatchVoyagerCertificates()
-	go c.WatchVoyagerIngresses()
+func (w *Watchers) StartCron() {
+	w.Cron.Start()
+
+	w.Cron.AddFunc("@every 24h", func() {
+		janitor := influx.Janitor{Config: w.Config}
+		janitor.CleanInflux()
+	})
+	w.Cron.AddFunc("@every 24h", func() {
+		janitor := es.Janitor{Config: w.Config}
+		janitor.CleanES()
+	})
+	w.Cron.AddFunc("@every 24h", func() {
+		err := filepath.Walk(w.Config.Recover.Path, func(path string, info os.FileInfo, err error) error {
+			// delete old objects
+			return nil
+		})
+		if err != nil {
+			log.Errorln(err)
+		}
+		// expire saver
+	})
+	w.Cron.AddFunc(w.Config.Backup.Schedule, func() {
+		if config, err := rest.InClusterConfig(); err == nil {
+			err := backup.Backup(config, backup.Options{
+				BackupDir: "/tmp/abc",
+				Sanitize:  w.Config.Backup.Sanitize,
+			})
+			if err != nil {
+				log.Errorln(err)
+			}
+
+			// upload to cloud
+		}
+
+		// run backup
+	})
 }

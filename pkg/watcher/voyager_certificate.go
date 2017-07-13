@@ -14,8 +14,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchVoyagerCertificates() {
-	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindCertificate) {
+func (w *Watchers) WatchVoyagerCertificates() {
+	if !util.IsPreferredAPIResource(w.KubeClient, tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindCertificate) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindCertificate)
 		return
 	}
@@ -23,20 +23,20 @@ func (c *Controller) WatchVoyagerCertificates() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.VoyagerClient.Certificates(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.VoyagerClient.Certificates(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.VoyagerClient.Certificates(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.VoyagerClient.Certificates(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Certificate{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if cert, ok := obj.(*tapi.Certificate); ok {
 					log.Infof("Certificate %s@%s deleted", cert.Name, cert.Namespace)
-					c.Saver.Save(cert.ObjectMeta, obj)
+					w.Saver.Save(cert.ObjectMeta, obj)
 				}
 			},
 		},

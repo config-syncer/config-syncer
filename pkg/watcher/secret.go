@@ -13,8 +13,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchSecrets() {
-	if !util.IsPreferredAPIResource(c.KubeClient, apiv1.SchemeGroupVersion.String(), "Secret") {
+func (w *Watchers) WatchSecrets() {
+	if !util.IsPreferredAPIResource(w.KubeClient, apiv1.SchemeGroupVersion.String(), "Secret") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Secret")
 		return
 	}
@@ -23,20 +23,20 @@ func (c *Controller) WatchSecrets() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeClient.CoreV1().Secrets(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.KubeClient.CoreV1().Secrets(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeClient.CoreV1().Secrets(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.KubeClient.CoreV1().Secrets(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.Secret{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if scrt, ok := obj.(*apiv1.Secret); ok {
 					log.Infof("Secret %s@%s deleted", scrt.Name, scrt.Namespace)
-					c.Saver.Save(scrt.ObjectMeta, obj)
+					w.Saver.Save(scrt.ObjectMeta, obj)
 				}
 			},
 		},

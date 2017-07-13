@@ -14,8 +14,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchAlertmanagers() {
-	if !util.IsPreferredAPIResource(c.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRAlertmanagersKind) {
+func (w *Watchers) WatchAlertmanagers() {
+	if !util.IsPreferredAPIResource(w.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRAlertmanagersKind) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRAlertmanagersKind)
 		return
 	}
@@ -24,20 +24,20 @@ func (c *Controller) WatchAlertmanagers() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.PromClient.Alertmanagers(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.PromClient.Alertmanagers(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.PromClient.Alertmanagers(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.PromClient.Alertmanagers(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&prom.Alertmanager{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if mgr, ok := obj.(*prom.Alertmanager); ok {
 					log.Infof("Alertmanager %s@%s deleted", mgr.Name, mgr.Namespace)
-					c.Saver.Save(mgr.ObjectMeta, obj)
+					w.Saver.Save(mgr.ObjectMeta, obj)
 				}
 			},
 		},

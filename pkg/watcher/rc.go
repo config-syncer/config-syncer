@@ -13,8 +13,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchReplicationControllers() {
-	if !util.IsPreferredAPIResource(c.KubeClient, apiv1.SchemeGroupVersion.String(), "ReplicationController") {
+func (w *Watchers) WatchReplicationControllers() {
+	if !util.IsPreferredAPIResource(w.KubeClient, apiv1.SchemeGroupVersion.String(), "ReplicationController") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ReplicationController")
 		return
 	}
@@ -23,20 +23,20 @@ func (c *Controller) WatchReplicationControllers() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeClient.CoreV1().ReplicationControllers(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.KubeClient.CoreV1().ReplicationControllers(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeClient.CoreV1().ReplicationControllers(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.KubeClient.CoreV1().ReplicationControllers(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.ReplicationController{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if rc, ok := obj.(*apiv1.ReplicationController); ok {
 					log.Infof("ReplicationController %s@%s deleted", rc.Name, rc.Namespace)
-					c.Saver.Save(rc.ObjectMeta, obj)
+					w.Saver.Save(rc.ObjectMeta, obj)
 				}
 			},
 		},

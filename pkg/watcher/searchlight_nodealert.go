@@ -18,8 +18,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchNodeAlerts() {
-	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindNodeAlert) {
+func (w *Watchers) WatchNodeAlerts() {
+	if !util.IsPreferredAPIResource(w.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindNodeAlert) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindNodeAlert)
 		return
 	}
@@ -28,15 +28,15 @@ func (c *Controller) WatchNodeAlerts() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.SearchlightClient.NodeAlerts(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.SearchlightClient.NodeAlerts(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.SearchlightClient.NodeAlerts(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.SearchlightClient.NodeAlerts(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.NodeAlert{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.NodeAlert); ok {
@@ -60,7 +60,7 @@ func (c *Controller) WatchNodeAlerts() {
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.NodeAlert); ok {
 					fmt.Println(alert)
-					c.Saver.Save(alert.ObjectMeta, obj)
+					w.Saver.Save(alert.ObjectMeta, obj)
 				}
 			},
 		},

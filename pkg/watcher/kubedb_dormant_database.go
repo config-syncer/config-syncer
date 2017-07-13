@@ -17,8 +17,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchDormantDatabases() {
-	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindDormantDatabase) {
+func (w *Watchers) WatchDormantDatabases() {
+	if !util.IsPreferredAPIResource(w.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindDormantDatabase) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindDormantDatabase)
 		return
 	}
@@ -27,15 +27,15 @@ func (c *Controller) WatchDormantDatabases() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeDBClient.DormantDatabases(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.KubeDBClient.DormantDatabases(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeDBClient.DormantDatabases(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.KubeDBClient.DormantDatabases(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.DormantDatabase{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if drmn, ok := obj.(*tapi.DormantDatabase); ok {
@@ -58,7 +58,7 @@ func (c *Controller) WatchDormantDatabases() {
 			DeleteFunc: func(obj interface{}) {
 				if drmn, ok := obj.(*tapi.DormantDatabase); ok {
 					fmt.Println(drmn)
-					c.Saver.Save(drmn.ObjectMeta, obj)
+					w.Saver.Save(drmn.ObjectMeta, obj)
 				}
 			},
 		},

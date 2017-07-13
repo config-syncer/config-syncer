@@ -18,8 +18,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchClusterAlerts() {
-	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindClusterAlert) {
+func (w *Watchers) WatchClusterAlerts() {
+	if !util.IsPreferredAPIResource(w.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindClusterAlert) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindClusterAlert)
 		return
 	}
@@ -28,15 +28,15 @@ func (c *Controller) WatchClusterAlerts() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.SearchlightClient.ClusterAlerts(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.SearchlightClient.ClusterAlerts(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.SearchlightClient.ClusterAlerts(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.SearchlightClient.ClusterAlerts(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.ClusterAlert{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.ClusterAlert); ok {
@@ -61,7 +61,7 @@ func (c *Controller) WatchClusterAlerts() {
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.ClusterAlert); ok {
 					fmt.Println(alert)
-					c.Saver.Save(alert.ObjectMeta, obj)
+					w.Saver.Save(alert.ObjectMeta, obj)
 				}
 			},
 		},

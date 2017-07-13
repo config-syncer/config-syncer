@@ -14,8 +14,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchStatefulSets() {
-	if !util.IsPreferredAPIResource(c.KubeClient, apps.SchemeGroupVersion.String(), "StatefulSet") {
+func (w *Watchers) WatchStatefulSets() {
+	if !util.IsPreferredAPIResource(w.KubeClient, apps.SchemeGroupVersion.String(), "StatefulSet") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "StatefulSet")
 		return
 	}
@@ -24,20 +24,20 @@ func (c *Controller) WatchStatefulSets() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeClient.AppsV1beta1().StatefulSets(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.KubeClient.AppsV1beta1().StatefulSets(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeClient.AppsV1beta1().StatefulSets(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.KubeClient.AppsV1beta1().StatefulSets(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apps.StatefulSet{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if deployment, ok := obj.(*apps.StatefulSet); ok {
 					log.Infof("StatefulSet %s@%s deleted", deployment.Name, deployment.Namespace)
-					c.Saver.Save(deployment.ObjectMeta, obj)
+					w.Saver.Save(deployment.ObjectMeta, obj)
 				}
 			},
 		},

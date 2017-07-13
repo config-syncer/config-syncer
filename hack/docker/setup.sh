@@ -15,10 +15,12 @@ source "$REPO_ROOT/hack/libbuild/common/public_image.sh"
 
 APPSCODE_ENV=${APPSCODE_ENV:-dev}
 IMG=kubed
+OSM_VER=${OSM_VER:-0.5.0}
 
-mkdir -p $REPO_ROOT/dist
-if [ -f "$REPO_ROOT/dist/.tag" ]; then
-	export $(cat $REPO_ROOT/dist/.tag | xargs)
+DIST=$REPO_ROOT/dist
+mkdir -p $DIST
+if [ -f "$DIST/.tag" ]; then
+	export $(cat $DIST/.tag | xargs)
 fi
 
 clean() {
@@ -32,12 +34,19 @@ build_binary() {
 	./hack/builddeps.sh
     ./hack/make.py build kubed
 	detect_tag $REPO_ROOT/dist/.tag
+
+    # Download restic
+    rm -rf $DIST/osm
+    mkdir $DIST/osm
+    cd $DIST/osm
+    wget https://cdn.appscode.com/binaries/osm/${OSM_VER}/osm-linux-amd64
 	popd
 }
 
 build_docker() {
 	pushd $REPO_ROOT/hack/docker
-	cp $REPO_ROOT/dist/kubed/kubed-linux-amd64 kubed
+	cp $DIST/kubed/kubed-linux-amd64 kubed
+	cp $DIST/osm/osm-linux-amd64 osm
 	chmod 755 kubed
 
 	cat >Dockerfile <<EOL
@@ -47,6 +56,7 @@ RUN set -x \
   && apk add --update --no-cache ca-certificates
 
 COPY kubed /kubed
+COPY osm /osm
 ENTRYPOINT ["/kubed"]
 EOL
 	local cmd="docker build -t appscode/$IMG:$TAG ."

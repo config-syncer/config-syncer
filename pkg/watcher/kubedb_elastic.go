@@ -17,8 +17,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchElastics() {
-	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic) {
+func (w *Watchers) WatchElastics() {
+	if !util.IsPreferredAPIResource(w.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic)
 		return
 	}
@@ -27,15 +27,15 @@ func (c *Controller) WatchElastics() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeDBClient.Elastics(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.KubeDBClient.Elastics(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeDBClient.Elastics(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.KubeDBClient.Elastics(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Elastic{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if elastic, ok := obj.(*tapi.Elastic); ok {
@@ -58,7 +58,7 @@ func (c *Controller) WatchElastics() {
 			DeleteFunc: func(obj interface{}) {
 				if elastic, ok := obj.(*tapi.Elastic); ok {
 					fmt.Println(elastic)
-					c.Saver.Save(elastic.ObjectMeta, obj)
+					w.Saver.Save(elastic.ObjectMeta, obj)
 				}
 			},
 		},

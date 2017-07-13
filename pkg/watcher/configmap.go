@@ -13,8 +13,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchConfigMaps() {
-	if !util.IsPreferredAPIResource(c.KubeClient, apiv1.SchemeGroupVersion.String(), "ConfigMap") {
+func (w *Watchers) WatchConfigMaps() {
+	if !util.IsPreferredAPIResource(w.KubeClient, apiv1.SchemeGroupVersion.String(), "ConfigMap") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ConfigMap")
 		return
 	}
@@ -23,21 +23,21 @@ func (c *Controller) WatchConfigMaps() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeClient.CoreV1().ConfigMaps(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.KubeClient.CoreV1().ConfigMaps(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeClient.CoreV1().ConfigMaps(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.KubeClient.CoreV1().ConfigMaps(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.ConfigMap{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if cfgmap, ok := obj.(*apiv1.ConfigMap); ok {
 					log.Infof("ConfigMap %s@%s deleted", cfgmap.Name, cfgmap.Namespace)
 
-					c.Saver.Save(cfgmap.ObjectMeta, obj)
+					w.Saver.Save(cfgmap.ObjectMeta, obj)
 				}
 			},
 		},

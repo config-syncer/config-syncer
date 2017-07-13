@@ -13,8 +13,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchPersistentVolumes() {
-	if !util.IsPreferredAPIResource(c.KubeClient, apiv1.SchemeGroupVersion.String(), "PersistentVolume") {
+func (w *Watchers) WatchPersistentVolumes() {
+	if !util.IsPreferredAPIResource(w.KubeClient, apiv1.SchemeGroupVersion.String(), "PersistentVolume") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "PersistentVolume")
 		return
 	}
@@ -23,20 +23,20 @@ func (c *Controller) WatchPersistentVolumes() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeClient.CoreV1().PersistentVolumes().List(metav1.ListOptions{})
+			return w.KubeClient.CoreV1().PersistentVolumes().List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeClient.CoreV1().PersistentVolumes().Watch(metav1.ListOptions{})
+			return w.KubeClient.CoreV1().PersistentVolumes().Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.PersistentVolume{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if pv, ok := obj.(*apiv1.PersistentVolume); ok {
 					log.Infof("PersistentVolume %s@%s deleted", pv.Name, pv.Namespace)
-					c.Saver.Save(pv.ObjectMeta, obj)
+					w.Saver.Save(pv.ObjectMeta, obj)
 				}
 			},
 		},

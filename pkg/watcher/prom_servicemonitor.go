@@ -14,8 +14,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchServiceMonitors() {
-	if !util.IsPreferredAPIResource(c.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind) {
+func (w *Watchers) WatchServiceMonitors() {
+	if !util.IsPreferredAPIResource(w.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind)
 		return
 	}
@@ -24,20 +24,20 @@ func (c *Controller) WatchServiceMonitors() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.PromClient.ServiceMonitors(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.PromClient.ServiceMonitors(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.PromClient.ServiceMonitors(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.PromClient.ServiceMonitors(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&prom.ServiceMonitor{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if svcmon, ok := obj.(*prom.ServiceMonitor); ok {
 					log.Infof("ServiceMonitor %s@%s deleted", svcmon.Name, svcmon.Namespace)
-					c.Saver.Save(svcmon.ObjectMeta, obj)
+					w.Saver.Save(svcmon.ObjectMeta, obj)
 				}
 			},
 		},

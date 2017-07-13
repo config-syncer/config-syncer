@@ -13,8 +13,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchEvents() {
-	if !util.IsPreferredAPIResource(c.KubeClient, apiv1.SchemeGroupVersion.String(), "Event") {
+func (w *Watchers) WatchEvents() {
+	if !util.IsPreferredAPIResource(w.KubeClient, apiv1.SchemeGroupVersion.String(), "Event") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Event")
 		return
 	}
@@ -23,15 +23,15 @@ func (c *Controller) WatchEvents() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeClient.CoreV1().Events(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.KubeClient.CoreV1().Events(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeClient.CoreV1().Events(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.KubeClient.CoreV1().Events(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.Event{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if cfgmap, ok := obj.(*apiv1.Event); ok {
