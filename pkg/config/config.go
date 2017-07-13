@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	ConfigSyncKey = "kubernetes.appscode.com/sync-config"
+	ConfigSyncKey = "kubernetes.appscode.com/sync"
 )
 
 type ClusterConfig struct {
@@ -46,7 +46,7 @@ type EventForwarderSpec struct {
 	SkipForwardingStorageChange bool     `json:"skip_forwarding_storage_change,omitempty"`
 	SkipForwardingIngressChange bool     `json:"skip_forwarding_ingress_change,omitempty"`
 	SkipForwardingWarningEvents bool     `json:"skip_forwarding_warning_events,omitempty"`
-	ForwardingEventNamespaces   []string `json:"forwarding_event_namespace,omitempty"`
+	ForwardedEventNamespaces    []string `json:"forwarded_event_namespace,omitempty"`
 	NotifyVia                   string   `json:"notify_via,omitempty"`
 }
 
