@@ -183,7 +183,7 @@ func (op *Operator) StartCron() {
 	})
 }
 
-func (op *Operator) RunClusterSnapshotter() error {
+func (op *Operator) RunSnapshotter() error {
 	if op.Config.ClusterSnapshot == nil {
 		return nil
 	}
@@ -194,24 +194,20 @@ func (op *Operator) RunClusterSnapshotter() error {
 		return err
 	}
 
-	sh := shell.NewSession()
-	sh.SetDir(op.Opt.ScratchDir)
-	sh.ShowCMD = true
-
 	container, err := op.Config.ClusterSnapshot.Storage.Container()
 	if err != nil {
 		return err
 	}
 
 	snapshotter := func() error {
-		config, err := clientcmd.BuildConfigFromFlags(op.Opt.Master, op.Opt.KubeConfig)
+		cfg, err := clientcmd.BuildConfigFromFlags(op.Opt.Master, op.Opt.KubeConfig)
 		if err != nil {
 			return err
 		}
 
 		t := time.Now().UTC()
 		snapshotDir := filepath.Join(op.Opt.ScratchDir, "snapshot", t.Format(time.RFC3339))
-		err = backup.SnapshotCluster(config, snapshotDir, op.Config.ClusterSnapshot.Sanitize)
+		err = backup.SnapshotCluster(cfg, snapshotDir, op.Config.ClusterSnapshot.Sanitize)
 		if err != nil {
 			return err
 		}
@@ -221,21 +217,28 @@ func (op *Operator) RunClusterSnapshotter() error {
 			return err
 		}
 
+		sh := shell.NewSession()
+		sh.SetDir(op.Opt.ScratchDir)
+		sh.ShowCMD = true
 		return sh.Command("osm", "push", "-c", container, snapshotDir, dest).Run()
+	}
+
+	err = snapshotter()
+	if err != nil {
+		return err
 	}
 
 	_, err = op.Cron.AddFunc(op.Config.ClusterSnapshot.Schedule, func() {
 		err := snapshotter()
 		if err != nil {
 			log.Errorln(err)
-			return
 		}
 	})
 	return err
 }
 
 func (op *Operator) RunAndHold() {
-	op.StartCron()
+	op.RunSnapshotter()
 	op.RunWatchers()
 	op.ListenAndServe()
 }
