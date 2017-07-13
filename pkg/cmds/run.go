@@ -27,11 +27,13 @@ import (
 
 func NewCmdRun(version string) *cobra.Command {
 	opt := watcher.Options{
+		ConfigPath:         runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml",
 		Indexer:            "indexers.bleve",
 		EnableReverseIndex: true,
 		ServerAddress:      ":8081",
 		EnableAnalytics:    true,
-		ConfigPath:         runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml",
+		EnableConfigSync:   true,
+		ScratchDir:         "/tmp",
 	}
 	cmd := &cobra.Command{
 		Use:   "run",

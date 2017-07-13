@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/ghodss/yaml"
@@ -24,7 +23,7 @@ func (c *RecoverStuff) Save(meta metav1.ObjectMeta, v interface{}) error {
 		return err
 	}
 	name := filepath.Base(p)
-	fn := fmt.Sprintf("%s.%d.yaml", name, time.Now().UTC().Unix())
+	fn := fmt.Sprintf("%s.%d.yaml", name, meta.CreationTimestamp.Unix())
 
 	fullPath := filepath.Join(dir, fn)
 	bytes, err := yaml.Marshal(v)

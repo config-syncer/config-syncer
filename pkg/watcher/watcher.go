@@ -24,13 +24,18 @@ import (
 )
 
 type Options struct {
-	Master             string
-	KubeConfig         string
-	EnableAnalytics    bool
+	Master     string
+	KubeConfig string
+
+	ConfigPath         string
+	ServerAddress      string
 	Indexer            string
 	EnableReverseIndex bool
-	ServerAddress      string
-	ConfigPath         string
+
+	EnableConfigSync bool
+	ScratchDir       string
+
+	EnableAnalytics bool
 }
 
 type Watchers struct {
