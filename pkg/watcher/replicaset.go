@@ -1,4 +1,4 @@
-package controller
+package watcher
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -14,9 +14,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchDeploymentExtensions() {
-	if !util.IsPreferredAPIResource(c.KubeClient, extensions.SchemeGroupVersion.String(), "Deployment") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "Deployment")
+func (w *Watchers) WatchReplicaSets() {
+	if !util.IsPreferredAPIResource(w.KubeClient, extensions.SchemeGroupVersion.String(), "ReplicaSet") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "ReplicaSet")
 		return
 	}
 
@@ -24,20 +24,20 @@ func (c *Controller) WatchDeploymentExtensions() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeClient.ExtensionsV1beta1().Deployments(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.KubeClient.ExtensionsV1beta1().ReplicaSets(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeClient.ExtensionsV1beta1().Deployments(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.KubeClient.ExtensionsV1beta1().ReplicaSets(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&extensions.Deployment{},
-		c.SyncPeriod,
+		&extensions.ReplicaSet{},
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
-			DeleteFunc: func(obj interface{}) {
-				if deployment, ok := obj.(*extensions.Deployment); ok {
-					log.Infof("Deployment %s@%s deleted", deployment.Name, deployment.Namespace)
-					c.Saver.Save(deployment.ObjectMeta, obj)
+			AddFunc: func(obj interface{}) {
+				if rs, ok := obj.(*extensions.ReplicaSet); ok {
+					log.Infof("ReplicaSet %s@%s deleted", rs.Name, rs.Namespace)
+					w.Saver.Save(rs.ObjectMeta, obj)
 				}
 			},
 		},

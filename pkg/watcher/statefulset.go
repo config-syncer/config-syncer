@@ -1,42 +1,43 @@
-package controller
+package watcher
 
 import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
-	tapi "github.com/appscode/voyager/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+	apps "k8s.io/client-go/pkg/apis/apps/v1beta1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchVoyagerIngresses() {
-	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindIngress) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindIngress)
+func (w *Watchers) WatchStatefulSets() {
+	if !util.IsPreferredAPIResource(w.KubeClient, apps.SchemeGroupVersion.String(), "StatefulSet") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "StatefulSet")
 		return
 	}
+
 	defer acrt.HandleCrash()
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.VoyagerClient.Ingresses(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.KubeClient.AppsV1beta1().StatefulSets(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.VoyagerClient.Ingresses(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.KubeClient.AppsV1beta1().StatefulSets(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&tapi.Ingress{},
-		c.SyncPeriod,
+		&apps.StatefulSet{},
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if ingress, ok := obj.(*tapi.Ingress); ok {
-					log.Infof("Ingress %s@%s deleted", ingress.Name, ingress.Namespace)
-					c.Saver.Save(ingress.ObjectMeta, obj)
+				if deployment, ok := obj.(*apps.StatefulSet); ok {
+					log.Infof("StatefulSet %s@%s deleted", deployment.Name, deployment.Namespace)
+					w.Saver.Save(deployment.ObjectMeta, obj)
 				}
 			},
 		},

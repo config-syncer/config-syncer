@@ -1,4 +1,4 @@
-package controller
+package watcher
 
 import (
 	"github.com/appscode/kubed/pkg/configsync"
@@ -9,18 +9,18 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-func (c *Controller) watchNamespaces() {
+func (w *Watchers) watchNamespaces() {
 	_, controller := cache.NewInformer(
 		cache.NewListWatchFromClient(
-			c.KubeClient.CoreV1().RESTClient(),
+			w.KubeClient.CoreV1().RESTClient(),
 			"namespaces",
 			metav1.NamespaceAll,
 			fields.Everything()),
 		&apiv1.Namespace{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				ns := configsync.NewHandler(c.KubeClient)
+				ns := configsync.NewHandler(w.KubeClient)
 				ns.Handle(obj)
 			},
 		},

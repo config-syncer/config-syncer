@@ -1,4 +1,4 @@
-package controller
+package watcher
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -14,9 +14,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchAlertmanagers() {
-	if !util.IsPreferredAPIResource(c.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRAlertmanagersKind) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRAlertmanagersKind)
+func (w *Watchers) WatchPrometheuss() {
+	if !util.IsPreferredAPIResource(w.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRPrometheusesKind) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRPrometheusesKind)
 		return
 	}
 
@@ -24,20 +24,20 @@ func (c *Controller) WatchAlertmanagers() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.PromClient.Alertmanagers(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.PromClient.Prometheuses(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.PromClient.Alertmanagers(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.PromClient.Prometheuses(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&prom.Alertmanager{},
-		c.SyncPeriod,
+		&prom.Prometheus{},
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if mgr, ok := obj.(*prom.Alertmanager); ok {
-					log.Infof("Alertmanager %s@%s deleted", mgr.Name, mgr.Namespace)
-					c.Saver.Save(mgr.ObjectMeta, obj)
+				if pdb, ok := obj.(*prom.Prometheus); ok {
+					log.Infof("Prometheus %s@%s deleted", pdb.Name, pdb.Namespace)
+					w.Saver.Save(pdb.ObjectMeta, obj)
 				}
 			},
 		},

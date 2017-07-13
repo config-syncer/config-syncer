@@ -4,24 +4,17 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
-	"github.com/appscode/go/hold"
 	"github.com/appscode/go/runtime"
-	"github.com/appscode/go/wait"
 	"github.com/appscode/kubed/pkg/analytics"
-	"github.com/appscode/kubed/pkg/cert"
 	"github.com/appscode/kubed/pkg/config"
-	"github.com/appscode/kubed/pkg/controller"
-	"github.com/appscode/kubed/pkg/dns"
 	"github.com/appscode/kubed/pkg/indexers"
-	"github.com/appscode/kubed/pkg/janitor"
 	"github.com/appscode/kubed/pkg/recover"
+	"github.com/appscode/kubed/pkg/watcher"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
-	"github.com/appscode/searchlight/pkg/influxdb"
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
@@ -32,7 +25,7 @@ import (
 )
 
 func NewCmdRun(version string) *cobra.Command {
-	opt := controller.Options{
+	opt := watcher.Options{
 		Indexer:            "indexers.bleve",
 		EnableReverseIndex: true,
 		ServerAddress:      ":32600",
@@ -53,9 +46,8 @@ func NewCmdRun(version string) *cobra.Command {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			log.Infoln("Starting kubed...")
-			go Run(opt)
 
-			hold.Hold()
+			Run(opt)
 		},
 	}
 
@@ -72,7 +64,7 @@ func NewCmdRun(version string) *cobra.Command {
 	return cmd
 }
 
-func Run(opt controller.Options) {
+func Run(opt watcher.Options) {
 	log.Infoln("configurations provided for kubed", opt)
 	defer runtime.HandleCrash()
 
@@ -88,7 +80,7 @@ func Run(opt controller.Options) {
 		os.Exit(1)
 	}
 
-	w := &controller.Controller{
+	w := &watcher.Watchers{
 		KubeClient:        clientset.NewForConfigOrDie(c),
 		VoyagerClient:     vcs.NewForConfigOrDie(c),
 		SearchlightClient: srch_cs.NewForConfigOrDie(c),
@@ -142,10 +134,9 @@ func Run(opt controller.Options) {
 	log.Infoln("Running kubed watcher")
 	go w.Run()
 
-	// janitor
+	// TODO: periodic backup
+	// TODO: janitor
 
-	if len(opt.ServerAddress) > 0 {
-		http.Handle("/", router)
-		go http.ListenAndServe(opt.ServerAddress, nil)
-	}
+	http.Handle("/", router)
+	log.Fatalln(http.ListenAndServe(opt.ServerAddress, nil))
 }

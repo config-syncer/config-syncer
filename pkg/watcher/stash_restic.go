@@ -1,4 +1,4 @@
-package controller
+package watcher
 
 import (
 	"errors"
@@ -17,8 +17,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchRestics() {
-	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindRestic) {
+func (w *Watchers) WatchRestics() {
+	if !util.IsPreferredAPIResource(w.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindRestic) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindRestic)
 		return
 	}
@@ -26,15 +26,15 @@ func (c *Controller) WatchRestics() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.StashClient.Restics(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.StashClient.Restics(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.StashClient.Restics(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.StashClient.Restics(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Restic{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if restic, ok := obj.(*tapi.Restic); ok {
@@ -57,7 +57,7 @@ func (c *Controller) WatchRestics() {
 			DeleteFunc: func(obj interface{}) {
 				if restic, ok := obj.(*tapi.Restic); ok {
 					fmt.Println(restic)
-					c.Saver.Save(restic.ObjectMeta, obj)
+					w.Saver.Save(restic.ObjectMeta, obj)
 				}
 			},
 		},

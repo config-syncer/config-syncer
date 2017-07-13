@@ -1,4 +1,4 @@
-package controller
+package watcher
 
 import (
 	"errors"
@@ -17,8 +17,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchPostgreses() {
-	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPostgres) {
+func (w *Watchers) WatchPostgreses() {
+	if !util.IsPreferredAPIResource(w.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPostgres) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPostgres)
 		return
 	}
@@ -27,15 +27,15 @@ func (c *Controller) WatchPostgreses() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeDBClient.Postgreses(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return w.KubeDBClient.Postgreses(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeDBClient.Postgreses(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return w.KubeDBClient.Postgreses(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Postgres{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.Postgres); ok {
@@ -58,7 +58,7 @@ func (c *Controller) WatchPostgreses() {
 			DeleteFunc: func(obj interface{}) {
 				if pg, ok := obj.(*tapi.Postgres); ok {
 					fmt.Println(pg)
-					c.Saver.Save(pg.ObjectMeta, obj)
+					w.Saver.Save(pg.ObjectMeta, obj)
 				}
 			},
 		},

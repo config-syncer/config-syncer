@@ -1,4 +1,4 @@
-package controller
+package watcher
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -11,45 +11,45 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-func (c *Controller) watchService() {
-	if !util.IsPreferredAPIResource(c.KubeClient, apiv1.SchemeGroupVersion.String(), "Service") {
+func (w *Watchers) watchService() {
+	if !util.IsPreferredAPIResource(w.KubeClient, apiv1.SchemeGroupVersion.String(), "Service") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Service")
 		return
 	}
 
 	defer acrt.HandleCrash()
 	lw := cache.NewListWatchFromClient(
-		c.KubeClient.CoreV1().RESTClient(),
+		w.KubeClient.CoreV1().RESTClient(),
 		"services",
 		metav1.NamespaceAll,
 		fields.Everything())
 	_, controller := cache.NewInformer(lw,
 		&apiv1.Service{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if c.Opt.EnableReverseIndex {
-					c.ReverseIndex.Handle("added", obj)
+				if w.Opt.EnableReverseIndex {
+					w.ReverseIndex.Handle("added", obj)
 				}
-				if len(c.Opt.Indexer) > 0 {
-					c.Indexer.HandleAdd(obj)
+				if len(w.Opt.Indexer) > 0 {
+					w.Indexer.HandleAdd(obj)
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				if c.Opt.EnableReverseIndex {
-					c.ReverseIndex.Handle("deleted", obj)
+				if w.Opt.EnableReverseIndex {
+					w.ReverseIndex.Handle("deleted", obj)
 				}
-				if len(c.Opt.Indexer) > 0 {
-					c.Indexer.HandleDelete(obj)
+				if len(w.Opt.Indexer) > 0 {
+					w.Indexer.HandleDelete(obj)
 				}
-				c.Saver.Save(obj.(*apiv1.Service).ObjectMeta, obj)
+				w.Saver.Save(obj.(*apiv1.Service).ObjectMeta, obj)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
-				if c.Opt.EnableReverseIndex {
-					c.ReverseIndex.Handle("updated", oldObj, newObj)
+				if w.Opt.EnableReverseIndex {
+					w.ReverseIndex.Handle("updated", oldObj, newObj)
 				}
-				if len(c.Opt.Indexer) > 0 {
-					c.Indexer.HandleUpdate(oldObj, newObj)
+				if len(w.Opt.Indexer) > 0 {
+					w.Indexer.HandleUpdate(oldObj, newObj)
 				}
 			},
 		},

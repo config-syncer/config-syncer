@@ -1,4 +1,4 @@
-package controller
+package watcher
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -9,13 +9,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+	apps "k8s.io/client-go/pkg/apis/apps/v1beta1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchPersistentVolumes() {
-	if !util.IsPreferredAPIResource(c.KubeClient, apiv1.SchemeGroupVersion.String(), "PersistentVolume") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "PersistentVolume")
+func (w *Watchers) WatchDeploymentApps() {
+	if !util.IsPreferredAPIResource(w.KubeClient, apps.SchemeGroupVersion.String(), "Deployment") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "Deployment")
 		return
 	}
 
@@ -23,20 +24,20 @@ func (c *Controller) WatchPersistentVolumes() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeClient.CoreV1().PersistentVolumes().List(metav1.ListOptions{})
+			return w.KubeClient.AppsV1beta1().Deployments(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeClient.CoreV1().PersistentVolumes().Watch(metav1.ListOptions{})
+			return w.KubeClient.AppsV1beta1().Deployments(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.PersistentVolume{},
-		c.SyncPeriod,
+		&apps.Deployment{},
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if pv, ok := obj.(*apiv1.PersistentVolume); ok {
-					log.Infof("PersistentVolume %s@%s deleted", pv.Name, pv.Namespace)
-					c.Saver.Save(pv.ObjectMeta, obj)
+				if deployment, ok := obj.(*apps.Deployment); ok {
+					log.Infof("Deployment %s@%s deleted", deployment.Name, deployment.Namespace)
+					w.Saver.Save(deployment.ObjectMeta, obj)
 				}
 			},
 		},

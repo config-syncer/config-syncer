@@ -1,4 +1,4 @@
-package controller
+package watcher
 
 import (
 	"sync"
@@ -25,7 +25,7 @@ type Options struct {
 	ConfigPath         string
 }
 
-type Controller struct {
+type Watchers struct {
 	KubeClient        clientset.Interface
 	VoyagerClient     vcs.ExtensionInterface
 	SearchlightClient srch_cs.ExtensionInterface
@@ -42,33 +42,33 @@ type Controller struct {
 	sync.Mutex
 }
 
-func (c *Controller) Run() {
-	go c.WatchAlertmanagers()
-	go c.WatchClusterAlerts()
-	go c.WatchConfigMaps()
-	go c.WatchDaemonSets()
-	go c.WatchDeploymentApps()
-	go c.WatchDeploymentExtensions()
-	go c.WatchDormantDatabases()
-	go c.WatchElastics()
-	go c.WatchEvents()
-	go c.WatchIngresss()
-	go c.WatchJobs()
-	go c.watchNamespaces()
-	go c.WatchNodeAlerts()
-	go c.WatchPersistentVolumeClaims()
-	go c.WatchPersistentVolumes()
-	go c.WatchPodAlerts()
-	go c.WatchPostgreses()
-	go c.WatchPrometheuss()
-	go c.WatchReplicaSets()
-	go c.WatchReplicationControllers()
-	go c.WatchRestics()
-	go c.WatchSecrets()
-	go c.watchService()
-	go c.WatchServiceMonitors()
-	go c.WatchStatefulSets()
-	go c.WatchStorageClasss()
-	go c.WatchVoyagerCertificates()
-	go c.WatchVoyagerIngresses()
+func (w *Watchers) Run() {
+	go w.WatchAlertmanagers()
+	go w.WatchClusterAlerts()
+	go w.WatchConfigMaps()
+	go w.WatchDaemonSets()
+	go w.WatchDeploymentApps()
+	go w.WatchDeploymentExtensions()
+	go w.WatchDormantDatabases()
+	go w.WatchElastics()
+	go w.WatchEvents()
+	go w.WatchIngresss()
+	go w.WatchJobs()
+	go w.watchNamespaces()
+	go w.WatchNodeAlerts()
+	go w.WatchPersistentVolumeClaims()
+	go w.WatchPersistentVolumes()
+	go w.WatchPodAlerts()
+	go w.WatchPostgreses()
+	go w.WatchPrometheuss()
+	go w.WatchReplicaSets()
+	go w.WatchReplicationControllers()
+	go w.WatchRestics()
+	go w.WatchSecrets()
+	go w.watchService()
+	go w.WatchServiceMonitors()
+	go w.WatchStatefulSets()
+	go w.WatchStorageClasss()
+	go w.WatchVoyagerCertificates()
+	go w.WatchVoyagerIngresses()
 }

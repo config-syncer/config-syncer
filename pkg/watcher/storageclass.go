@@ -1,4 +1,4 @@
-package controller
+package watcher
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -13,8 +13,8 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchStorageClasss() {
-	if !util.IsPreferredAPIResource(c.KubeClient, storage.SchemeGroupVersion.String(), "StorageClass") {
+func (w *Watchers) WatchStorageClasss() {
+	if !util.IsPreferredAPIResource(w.KubeClient, storage.SchemeGroupVersion.String(), "StorageClass") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", storage.SchemeGroupVersion.String(), "StorageClass")
 		return
 	}
@@ -23,20 +23,20 @@ func (c *Controller) WatchStorageClasss() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeClient.StorageV1().StorageClasses().List(metav1.ListOptions{})
+			return w.KubeClient.StorageV1().StorageClasses().List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeClient.StorageV1().StorageClasses().Watch(metav1.ListOptions{})
+			return w.KubeClient.StorageV1().StorageClasses().Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&storage.StorageClass{},
-		c.SyncPeriod,
+		w.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if sc, ok := obj.(*storage.StorageClass); ok {
 					log.Infof("StorageClass %s@%s deleted", sc.Name, sc.Namespace)
-					c.Saver.Save(sc.ObjectMeta, obj)
+					w.Saver.Save(sc.ObjectMeta, obj)
 				}
 			},
 		},
