@@ -16,11 +16,11 @@ const (
 )
 
 type ClusterConfig struct {
-	ElasticSearch  *ElasticSearchSpec
-	InfluxDB       *InfluxDBSpec
-	EventForwarder *EventForwarderSpec
-	RecycleBin     *RecycleBinSpec
-	Backup         *BackupSpec
+	Elasticsearch  *ElasticSearchSpec  `json:"elasticsearch,omitempty,omitempty"`
+	InfluxDB       *InfluxDBSpec       `json:"influxdb,omitempty"`
+	EventForwarder *EventForwarderSpec `json:"event_forwarder,omitempty"`
+	RecycleBin     *RecycleBinSpec     `json:"recycle_bin,omitempty"`
+	Backup         *BackupSpec         `json:"backup,omitempty"`
 }
 
 type ElasticSearchSpec struct {
