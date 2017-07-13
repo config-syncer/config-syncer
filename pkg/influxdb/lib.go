@@ -18,7 +18,7 @@ func (j *Janitor) CleanInflux() error {
 		return err
 	}
 
-	client, err := influxdb.NewClient(&influxdb.Config{
+	client, err := influxdb.NewClient(influxdb.Config{
 		URL:      *u,
 		Username: j.Config.InfluxDB.Username,
 		Password: j.Config.InfluxDB.Password,
@@ -26,14 +26,11 @@ func (j *Janitor) CleanInflux() error {
 	if err != nil {
 		return err
 	}
-	return j.UpdateRetentionPolicy(client)
-}
 
-func (j *Janitor) UpdateRetentionPolicy(influxClient *influxdb.Client) error {
 	query := influxdb.Query{
 		Command:  fmt.Sprintf("ALTER RETENTION POLICY default ON k8s DURATION %vs", j.Config.InfluxDB.MonitoringStorageLifetime),
 		Database: "k8s",
 	}
-	_, err := influxClient.Query(query)
+	_, err = client.Query(query)
 	return err
 }

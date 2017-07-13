@@ -4,15 +4,23 @@ import (
 	"sync"
 	"time"
 
+	"github.com/appscode/kubed/pkg/backup"
 	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/indexers"
+	"github.com/appscode/kubed/pkg/influxdb"
 	"github.com/appscode/kubed/pkg/recover"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
+	"gopkg.in/robfig/cron.v2"
 	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"path/filepath"
+	"github.com/appscode/log"
+	"os"
 )
 
 type Options struct {
@@ -38,7 +46,9 @@ type Watchers struct {
 	Saver        *recover.RecoverStuff
 	Indexer      *indexers.ResourceIndexer
 	ReverseIndex *indexers.ReverseIndexer
-	SyncPeriod   time.Duration
+
+	Cron       *cron.Cron
+	SyncPeriod time.Duration
 	sync.Mutex
 }
 
@@ -71,4 +81,40 @@ func (w *Watchers) Run() {
 	go w.WatchStorageClasss()
 	go w.WatchVoyagerCertificates()
 	go w.WatchVoyagerIngresses()
+}
+
+func (w *Watchers) SetupCron() {
+	w.Cron.Start()
+
+	w.Cron.AddFunc("@every 24h", func() {
+		influx.Janitor{Config: w.Config}.CleanInflux()
+	})
+	w.Cron.AddFunc("@every 24h", func() {
+		es.Janitor{Config: w.Config}.CleanES()
+	})
+	w.Cron.AddFunc("@every 24h", func() {
+		err := filepath.Walk(w.Config.Recover.Path, func(path string, info os.FileInfo, err error) error {
+			// delete old objects
+
+		})
+		if err != nil {
+			log.Errorln(err)
+		}
+		// expire saver
+	})
+	w.Cron.AddFunc(w.Config.Backup.Schedule, func() {
+		if config, err := rest.InClusterConfig(); err == nil {
+			err := backup.Backup(config, backup.Options{
+				BackupDir: "/tmp/abc",
+				Sanitize:  w.Config.Backup.Sanitize,
+			})
+			if err != nil {
+				log.Errorln(err)
+			}
+
+			// upload to cloud
+		}
+
+		// run backup
+	})
 }

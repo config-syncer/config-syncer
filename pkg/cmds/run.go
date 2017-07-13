@@ -20,6 +20,7 @@ import (
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
 	"github.com/spf13/cobra"
+	"gopkg.in/robfig/cron.v2"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -28,7 +29,7 @@ func NewCmdRun(version string) *cobra.Command {
 	opt := watcher.Options{
 		Indexer:            "indexers.bleve",
 		EnableReverseIndex: true,
-		ServerAddress:      ":32600",
+		ServerAddress:      ":8081",
 		EnableAnalytics:    true,
 		ConfigPath:         runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml",
 	}
@@ -87,6 +88,7 @@ func Run(opt watcher.Options) {
 		StashClient:       scs.NewForConfigOrDie(c),
 		KubeDBClient:      kcs.NewForConfigOrDie(c),
 
+		Cron:   cron.New(),
 		Opt:    opt,
 		Config: *cfg,
 		Saver: &recover.RecoverStuff{

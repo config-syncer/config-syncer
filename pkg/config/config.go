@@ -19,7 +19,7 @@ type RecoverSpec struct {
 }
 
 type ClusterConfig struct {
-	ElsticSearch struct {
+	ElasticSearch struct {
 		Endpoint           string
 		LogIndexPrefix     string `json:"log_index_prefix"`
 		LogStorageLifetime int64  `json:"log_storage_lifetime"`
@@ -35,8 +35,10 @@ type ClusterConfig struct {
 	// For periodic full cluster backup
 	// https://github.com/appscode/kubed/issues/16
 	Backup struct {
-		Schedule string
-		Storage  Backend
+		Schedule string `json:"schedule,omitempty"`
+		Sanitize bool
+
+		Storage Backend
 	}
 
 	Recover RecoverSpec

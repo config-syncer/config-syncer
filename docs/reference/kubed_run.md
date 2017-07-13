@@ -14,7 +14,7 @@ kubed run [flags]
 ### Options
 
 ```
-      --address string         The address of the Kubed API Server (default ":32600")
+      --address string         The address of the Kubed API Server (default ":8081")
       --analytics              Send analytical events to Google Analytics (default true)
       --clusterconfig string   Path to cluster config file (default "/home/tamal/go/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml")
       --enable-reverse-index   Reverse indexing of pods to service and others (default true)
