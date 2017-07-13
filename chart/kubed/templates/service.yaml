@@ -9,10 +9,6 @@ metadata:
     heritage: "{{ .Release.Service }}"
 spec:
   ports:
-  - name: pushgateway
-    port: 56789
-    protocol: TCP
-    targetPort: pushgateway
   - name: http
     port: 56790
     protocol: TCP

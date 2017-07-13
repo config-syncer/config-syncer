@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
-  name: kubed-operator
+  name: kubed
 rules:
 - apiGroups:
   - extensions
@@ -46,20 +46,20 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: kubed-operator
+  name: kubed
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: kubed-operator
+  name: kubed
 subjects:
 - kind: ServiceAccount
-  name: kubed-operator
+  name: kubed
   namespace: kube-system
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kubed-operator
+  name: kubed
   namespace: kube-system
 ---
 apiVersion: extensions/v1beta1
@@ -67,7 +67,7 @@ kind: Deployment
 metadata:
   labels:
     app: kubed
-  name: kubed-operator
+  name: kubed
   namespace: kube-system
 spec:
   replicas: 1
@@ -79,82 +79,35 @@ spec:
       labels:
         app: kubed
     spec:
-      serviceAccountName: kubed-operator
+      serviceAccountName: kubed
       containers:
-      - name: operator
+      - name: kubed
         args:
         - run
         - --v=3
-        image: appscode/kubed:0.4.0
+        image: appscode/kubed:0.1.0
         ports:
         - containerPort: 56790
           name: http
           protocol: TCP
-      - name: pushgateway
-        args:
-        - -web.listen-address=:56789
-        - -persistence.file=/var/pv/pushgateway.dat
-        image: prom/pushgateway:v0.4.0
-        ports:
-        - containerPort: 56789
-          name: pushgateway
-          protocol: TCP
         volumeMounts:
-          - mountPath: /var/pv
-            name: data-volume
           - mountPath: /tmp
-            name: kubed-scratchdir
+            name: scratchdir
       volumes:
         - emptyDir: {}
-          name: data-volume
-        - emptyDir: {}
-          name: kubed-scratchdir
+          name: scratchdir
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
     app: kubed
-  name: kubed-operator
+  name: kubed
   namespace: kube-system
 spec:
   ports:
-  - name: pushgateway
-    port: 56789
-    targetPort: pushgateway
   - name: http
     port: 56790
     targetPort: http
   selector:
     app: kubed
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRole
-metadata:
-  name: kubed-sidecar
-  labels:
-    app: kubed
-rules:
-- apiGroups:
-  - kubed.appscode.com
-  resources: ["*"]
-  verbs: ["*"]
-- apiGroups:
-  - extensions
-  resources:
-  - deployments
-  - daemonsets
-  - replicasets
-  verbs: ["get"]
-- apiGroups: [""]
-  resources:
-  - replicationcontrollers
-  verbs: ["*"]
-- apiGroups: [""]
-  resources:
-  - secrets
-  verbs: ["get"]
-- apiGroups: [""]
-  resources:
-  - events
-  verbs: ["create"]

@@ -38,17 +38,14 @@ The command removes all the Kubernetes components associated with the chart and 
 The following tables lists the configurable parameters of the Kubed chart and their default values.
 
 
-| Parameter                | Description                                                       | Default            |
-| ------------------------ | ----------------------------------------------------------------- | ------------------ |
-| `replicaCount`           | Number of kubed operator replicas to create (only 1 is supported) | `1`                |
-| `operator.image`         | operator container image                                          | `appscode/kubed`   |
-| `operator.tag`           | operator container image tag                                      | `0.4.0`            |
-| `operator.pullPolicy`    | operator container image pull policy                              | `IfNotPresent`     |
-| `pushgateway.image`      | Prometheus pushgateway container image                            | `prom/pushgateway` |
-| `pushgateway.tag`        | Prometheus pushgateway container image tag                        | `v0.4.0`           |
-| `pushgateway.pullPolicy` | Prometheus pushgateway container image pull policy                | `IfNotPresent`     |
-| `rbac.install`           | install required rbac service account, roles and rolebindings     | `false`            |
-| `rbac.apiVersion`        | rbac api version v1alpha1\|v1beta1                                | `v1beta1`          |
+| Parameter         | Description                                                       | Default            |
+| ------------------| ------------------------------------------------------------------|--------------------|
+| `replicaCount`    | Number of kubed operator replicas to create (only 1 is supported) | `1`                |
+| `.image`          | container image                                                   | `appscode/kubed`   |
+| `tag`             | container image tag                                               | `0.1.0`            |
+| `pullPolicy`      | container image pull policy                                       | `IfNotPresent`     |
+| `rbac.install`    | install required rbac service account, roles and rolebindings     | `false`            |
+| `rbac.apiVersion` | rbac api version v1alpha1\|v1beta1                                | `v1beta1`          |
 
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:

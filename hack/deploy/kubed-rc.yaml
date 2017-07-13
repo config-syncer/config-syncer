@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: kubed
-          image: docker.appscode.com/kubed:0.1
+          image: docker.appscode.com/kubed:0.1.0
           imagePullPolicy: Always
           args: ['run', '--cluster-name=h505', '-v=10']
           volumeMounts:
