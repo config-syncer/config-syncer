@@ -1,5 +1,6 @@
 # Kubed
-[Kubed by AppsCode](https://github.com/appscode/kubed) - Kubernetes daemon
+[Kubed by AppsCode](https://github.com/appscode/kubed) - Kubernetes cluster manager daemon.
+
 ## TL;DR;
 
 ```bash
