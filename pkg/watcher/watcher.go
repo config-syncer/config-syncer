@@ -36,7 +36,6 @@ type RunOptions struct {
 	ESEndpoint                        string
 	InfluxSecretName                  string
 	InfluxSecretNamespace             string
-	ClusterName                       string
 	ClusterKubedConfigSecretName      string
 	ClusterKubedConfigSecretNamespace string
 	Indexer                           string
@@ -47,32 +46,32 @@ type RunOptions struct {
 }
 
 func (c *Controller) Run() {
-	c.WatchAlertmanagers()
-	c.WatchClusterAlerts()
-	c.WatchConfigMaps()
-	c.WatchDaemonSets()
-	c.WatchDeploymentApps()
-	c.WatchDeploymentExtensions()
-	c.WatchDormantDatabases()
-	c.WatchElastics()
-	c.WatchEvents()
-	c.WatchIngresss()
-	c.WatchJobs()
-	c.watchNamespaces()
-	c.WatchNodeAlerts()
-	c.WatchPersistentVolumeClaims()
-	c.WatchPersistentVolumes()
-	c.WatchPodAlerts()
-	c.WatchPostgreses()
-	c.WatchPrometheuss()
-	c.WatchReplicaSets()
-	c.WatchReplicationControllers()
-	c.WatchRestics()
-	c.WatchSecrets()
-	c.watchService()
-	c.WatchServiceMonitors()
-	c.WatchStatefulSets()
-	c.WatchStorageClasss()
-	c.WatchVoyagerCertificates()
-	c.WatchVoyagerIngresses()
+	go c.WatchAlertmanagers()
+	go c.WatchClusterAlerts()
+	go c.WatchConfigMaps()
+	go c.WatchDaemonSets()
+	go c.WatchDeploymentApps()
+	go c.WatchDeploymentExtensions()
+	go c.WatchDormantDatabases()
+	go c.WatchElastics()
+	go c.WatchEvents()
+	go c.WatchIngresss()
+	go c.WatchJobs()
+	go c.watchNamespaces()
+	go c.WatchNodeAlerts()
+	go c.WatchPersistentVolumeClaims()
+	go c.WatchPersistentVolumes()
+	go c.WatchPodAlerts()
+	go c.WatchPostgreses()
+	go c.WatchPrometheuss()
+	go c.WatchReplicaSets()
+	go c.WatchReplicationControllers()
+	go c.WatchRestics()
+	go c.WatchSecrets()
+	go c.watchService()
+	go c.WatchServiceMonitors()
+	go c.WatchStatefulSets()
+	go c.WatchStorageClasss()
+	go c.WatchVoyagerCertificates()
+	go c.WatchVoyagerIngresses()
 }

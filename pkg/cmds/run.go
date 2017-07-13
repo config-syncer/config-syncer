@@ -46,9 +46,6 @@ func NewCmdRun() *cobra.Command {
 		Use:   "run",
 		Short: "Run daemon",
 		Run: func(cmd *cobra.Command, args []string) {
-			if opt.ClusterName == "" {
-				log.Fatalln("Missing required flag: --cluster-name")
-			}
 			log.Infoln("Starting kubed...")
 			go Run(opt)
 
@@ -56,7 +53,6 @@ func NewCmdRun() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&opt.ClusterName, "cluster-name", opt.ClusterName, "Name of Kubernetes cluster")
 	cmd.Flags().StringVar(&opt.ESEndpoint, "es-endpoint", opt.ESEndpoint, "Endpoint of elasticsearch")
 	cmd.Flags().StringVar(&opt.InfluxSecretName, "influx-secret", opt.InfluxSecretName, "Influxdb secret name")
 	cmd.Flags().StringVar(&opt.ClusterKubedConfigSecretName, "kubed-config-secret-name", opt.ClusterKubedConfigSecretName, "Kubed configuration secret name")
@@ -141,7 +137,6 @@ func Run(opt watcher.RunOptions) {
 	// initializing kube janitor tasks
 	kubeJanitor := janitor.Janitor{
 		KubeClient:                        kubeWatcher.KubeClient,
-		ClusterName:                       opt.ClusterName,
 		ElasticConfig:                     make(map[string]string),
 		ClusterKubedConfigSecretName:      opt.ClusterKubedConfigSecretName,
 		ClusterKubedConfigSecretNamespace: opt.ClusterKubedConfigSecretNamespace,
