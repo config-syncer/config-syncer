@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
@@ -13,6 +14,7 @@ import (
 	"github.com/appscode/kubed/pkg/influxdb"
 	"github.com/appscode/kubed/pkg/recyclebin"
 	"github.com/appscode/log"
+	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
@@ -57,7 +59,23 @@ type Operator struct {
 	sync.Mutex
 }
 
-func (op *Operator) Run() {
+func (op *Operator) Setup() error {
+	cfg, err := config.LoadConfig(op.Opt.ConfigPath)
+	if err != nil {
+		return err
+	}
+	op.Config = *cfg
+
+	op.Cron = cron.New()
+	//Saver: &recyclebin.RecoverStuff{
+	//	Opt: *cfg.RecycleBin,
+	//},
+	op.SyncPeriod = time.Minute * 2
+
+	return nil
+}
+
+func (op *Operator) RunWatchers() {
 	go op.WatchAlertmanagers()
 	go op.WatchClusterAlerts()
 	go op.WatchConfigMaps()
@@ -86,8 +104,42 @@ func (op *Operator) Run() {
 	go op.WatchStorageClasss()
 	go op.WatchVoyagerCertificates()
 	go op.WatchVoyagerIngresses()
+}
 
-	go op.StartCron()
+func (op *Operator) ListenAndServe() {
+	// router is default HTTP request multiplexer for kubed. It matches the URL of each
+	// incoming request against a list of registered patterns with their associated
+	// methods and calls the handler for the pattern that most closely matches the
+	// URL.
+	//
+	// Pattern matching attempts each pattern in the order in which they were
+	// registered.
+	router := pat.New()
+
+	// Enable full text indexing to have search feature
+	if len(op.Opt.Indexer) > 0 {
+		indexer, err := indexers.NewResourceIndexer(op.Opt.Indexer)
+		if err != nil {
+			log.Errorln(err)
+		} else {
+			indexer.RegisterRouters(router)
+			op.Indexer = indexer
+		}
+	}
+
+	// Enable pod -> service, service -> serviceMonitor indexing
+	if op.Opt.EnableReverseIndex {
+		ri, err := indexers.NewReverseIndexer(op.KubeClient, op.Opt.Indexer)
+		if err != nil {
+			log.Errorln("Failed to create indexer", err)
+		} else {
+			ri.RegisterRouters(router)
+			op.ReverseIndex = ri
+		}
+	}
+
+	http.Handle("/", router)
+	log.Fatalln(http.ListenAndServe(op.Opt.ServerAddress, nil))
 }
 
 func (op *Operator) StartCron() {
@@ -126,4 +178,10 @@ func (op *Operator) StartCron() {
 
 		// run backup
 	})
+}
+
+func (op *Operator) RunAndHold() {
+	op.StartCron()
+	op.RunWatchers()
+	op.ListenAndServe()
 }
