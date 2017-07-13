@@ -43,6 +43,25 @@ import:
   version: 75b8dd260ef0469d96d578705a87cffd0e09dab8
 - package: k8s.io/client-go
   version: v3.0.0-beta.0
+- package: github.com/graymeta/stow
+  repo: https://github.com/appscode/stow.git
+  version: master
+  vcs: git
+- package: google.golang.org/api/storage/v1
+  version: master
+- package: cloud.google.com/go
+  version: v0.2.0
+- package: github.com/Azure/azure-sdk-for-go
+  vcs: git
+  version: v7.0.1-beta
+- package: github.com/Azure/go-autorest
+  version: v7.2.3
+- package: github.com/Azure/go-ansiterm
+  version: 70b2c90b260171e829f1ebd7c17f600c11858dbe
+- package: github.com/aws/aws-sdk-go
+  version: v1.6.10
+- package: github.com/ncw/swift
+  version: master
 testImport:
 - package: github.com/google/certificate-transparency
 - package: github.com/stretchr/testify
