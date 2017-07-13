@@ -1,4 +1,4 @@
-package watcher
+package controller
 
 import (
 	"errors"
@@ -17,9 +17,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchDormantDatabases() {
-	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindDormantDatabase) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindDormantDatabase)
+func (c *Controller) WatchPostgreses() {
+	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPostgres) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPostgres)
 		return
 	}
 
@@ -27,38 +27,38 @@ func (c *Controller) WatchDormantDatabases() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeDBClient.DormantDatabases(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return c.KubeDBClient.Postgreses(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeDBClient.DormantDatabases(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return c.KubeDBClient.Postgreses(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&tapi.DormantDatabase{},
+		&tapi.Postgres{},
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if drmn, ok := obj.(*tapi.DormantDatabase); ok {
-					fmt.Println(drmn)
+				if alert, ok := obj.(*tapi.Postgres); ok {
+					fmt.Println(alert)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldAlert, ok := old.(*tapi.DormantDatabase)
+				oldAlert, ok := old.(*tapi.Postgres)
 				if !ok {
-					log.Errorln(errors.New("Invalid DormantDatabase object"))
+					log.Errorln(errors.New("Invalid Postgres object"))
 					return
 				}
-				newAlert, ok := new.(*tapi.DormantDatabase)
+				newAlert, ok := new.(*tapi.Postgres)
 				if !ok {
-					log.Errorln(errors.New("Invalid DormantDatabase object"))
+					log.Errorln(errors.New("Invalid Postgres object"))
 					return
 				}
 				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
-				if drmn, ok := obj.(*tapi.DormantDatabase); ok {
-					fmt.Println(drmn)
-					c.Saver.Save(drmn.ObjectMeta, obj)
+				if pg, ok := obj.(*tapi.Postgres); ok {
+					fmt.Println(pg)
+					c.Saver.Save(pg.ObjectMeta, obj)
 				}
 			},
 		},

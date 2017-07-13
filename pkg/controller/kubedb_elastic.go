@@ -1,4 +1,4 @@
-package watcher
+package controller
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
-	tapi "github.com/appscode/stash/api"
+	tapi "github.com/k8sdb/apimachinery/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -17,47 +17,48 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchRestics() {
-	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindRestic) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindRestic)
+func (c *Controller) WatchElastics() {
+	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic)
 		return
 	}
+
 	defer acrt.HandleCrash()
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.StashClient.Restics(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return c.KubeDBClient.Elastics(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.StashClient.Restics(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return c.KubeDBClient.Elastics(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&tapi.Restic{},
+		&tapi.Elastic{},
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if restic, ok := obj.(*tapi.Restic); ok {
-					fmt.Println(restic)
+				if elastic, ok := obj.(*tapi.Elastic); ok {
+					fmt.Println(elastic)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldRestic, ok := old.(*tapi.Restic)
+				oldAlert, ok := old.(*tapi.Elastic)
 				if !ok {
-					log.Errorln(errors.New("Invalid Restic object"))
+					log.Errorln(errors.New("Invalid Elastic object"))
 					return
 				}
-				newRestic, ok := new.(*tapi.Restic)
+				newAlert, ok := new.(*tapi.Elastic)
 				if !ok {
-					log.Errorln(errors.New("Invalid Restic object"))
+					log.Errorln(errors.New("Invalid Elastic object"))
 					return
 				}
-				fmt.Println(oldRestic, newRestic)
+				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
-				if restic, ok := obj.(*tapi.Restic); ok {
-					fmt.Println(restic)
-					c.Saver.Save(restic.ObjectMeta, obj)
+				if elastic, ok := obj.(*tapi.Elastic); ok {
+					fmt.Println(elastic)
+					c.Saver.Save(elastic.ObjectMeta, obj)
 				}
 			},
 		},

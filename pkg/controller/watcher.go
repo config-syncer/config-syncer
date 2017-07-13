@@ -1,9 +1,10 @@
-package watcher
+package controller
 
 import (
 	"sync"
 	"time"
 
+	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/recover"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
@@ -14,6 +15,16 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 )
 
+type Options struct {
+	Master             string
+	KubeConfig         string
+	EnableAnalytics    bool
+	Indexer            string
+	EnableReverseIndex bool
+	ServerAddress      string
+	ConfigPath         string
+}
+
 type Controller struct {
 	KubeClient        clientset.Interface
 	VoyagerClient     vcs.ExtensionInterface
@@ -22,28 +33,13 @@ type Controller struct {
 	PromClient        pcm.MonitoringV1alpha1Interface
 	KubeDBClient      kcs.ExtensionInterface
 
-	Saver        *recover.RecoverStuff
-	RunOptions   RunOptions
-	Indexer      *indexers.ResourceIndexer
-	ReverseIndex *indexers.ReverseIndexer
-	SyncPeriod   time.Duration
+	Opt               Options
+	Config            config.ClusterConfig
+	Saver             *recover.RecoverStuff
+	Indexer           *indexers.ResourceIndexer
+	ReverseIndex      *indexers.ReverseIndexer
+	SyncPeriod        time.Duration
 	sync.Mutex
-}
-
-type RunOptions struct {
-	Master                            string
-	KubeConfig                        string
-	ESEndpoint                        string
-	InfluxSecretName                  string
-	InfluxSecretNamespace             string
-	ClusterKubedConfigSecretName      string
-	ClusterKubedConfigSecretNamespace string
-	Indexer                           string
-	EnableReverseIndex                bool
-	ServerAddress                     string
-	NotifyOnCertSoonToBeExpired       bool
-	NotifyVia                         string
-	EnableAnalytics                   bool
 }
 
 func (c *Controller) Run() {

@@ -1,6 +1,15 @@
 package config
 
-import "time"
+import (
+	"encoding/json"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"time"
+
+	yc "github.com/appscode/go/encoding/yaml"
+	"github.com/ghodss/yaml"
+)
 
 type RecoverSpec struct {
 	Path              string
@@ -9,7 +18,7 @@ type RecoverSpec struct {
 	EmailOneDelete    bool // Notify Via
 }
 
-type ClusterSettings struct {
+type ClusterConfig struct {
 	LogIndexPrefix            string `json:"log_index_prefix"`
 	LogStorageLifetime        int64  `json:"log_storage_lifetime"`
 	MonitoringStorageLifetime int64  `json:"monitoring_storage_lifetime"`
@@ -34,6 +43,14 @@ type ClusterSettings struct {
 
 	// Search
 	// Reverse Index
+
+	ESEndpoint                        string
+	InfluxSecretName                  string
+	InfluxSecretNamespace             string
+	ClusterKubedConfigSecretName      string
+	ClusterKubedConfigSecretNamespace string
+	NotifyOnCertSoonToBeExpired       bool
+	NotifyVia                         string
 }
 
 type Backend struct {
@@ -69,4 +86,35 @@ type AzureSpec struct {
 type SwiftSpec struct {
 	Container string `json:"container,omitempty"`
 	Prefix    string `json:"prefix,omitempty"`
+}
+
+func LoadConfig(configPath string) (*ClusterConfig, error) {
+	if _, err := os.Stat(configPath); err != nil {
+		return nil, err
+	}
+	os.Chmod(configPath, 0600)
+
+	cfg := &ClusterConfig{}
+	bytes, err := ioutil.ReadFile(configPath)
+	if err != nil {
+		return nil, err
+	}
+	jsonData, err := yc.ToJSON(bytes)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(jsonData, cfg)
+	return cfg, err
+}
+
+func (cfg *ClusterConfig) Save(configPath string) error {
+	data, err := yaml.Marshal(cfg)
+	if err != nil {
+		return err
+	}
+	os.MkdirAll(filepath.Dir(configPath), 0755)
+	if err := ioutil.WriteFile(configPath, data, 0600); err != nil {
+		return err
+	}
+	return nil
 }

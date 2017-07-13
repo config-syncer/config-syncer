@@ -1,4 +1,4 @@
-package watcher
+package controller
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -9,15 +9,13 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-	batch "k8s.io/client-go/pkg/apis/batch/v1"
-	extensions "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchJobs() {
-	if !util.IsPreferredAPIResource(c.KubeClient, batch.SchemeGroupVersion.String(), "Job") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "Job")
+func (c *Controller) WatchReplicationControllers() {
+	if !util.IsPreferredAPIResource(c.KubeClient, apiv1.SchemeGroupVersion.String(), "ReplicationController") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ReplicationController")
 		return
 	}
 
@@ -25,20 +23,20 @@ func (c *Controller) WatchJobs() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeClient.BatchV1().Jobs(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return c.KubeClient.CoreV1().ReplicationControllers(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeClient.BatchV1().Jobs(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return c.KubeClient.CoreV1().ReplicationControllers(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&batch.Job{},
+		&apiv1.ReplicationController{},
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if job, ok := obj.(*batch.Job); ok {
-					log.Infof("Job %s@%s deleted", job.Name, job.Namespace)
-					c.Saver.Save(job.ObjectMeta, obj)
+				if rc, ok := obj.(*apiv1.ReplicationController); ok {
+					log.Infof("ReplicationController %s@%s deleted", rc.Name, rc.Namespace)
+					c.Saver.Save(rc.ObjectMeta, obj)
 				}
 			},
 		},

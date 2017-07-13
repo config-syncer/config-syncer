@@ -1,9 +1,8 @@
-package watcher
+package controller
 
 import (
 	"errors"
 	"fmt"
-	"reflect"
 
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
@@ -18,9 +17,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchNodeAlerts() {
-	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindNodeAlert) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindNodeAlert)
+func (c *Controller) WatchPodAlerts() {
+	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPodAlert) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPodAlert)
 		return
 	}
 
@@ -28,37 +27,36 @@ func (c *Controller) WatchNodeAlerts() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.SearchlightClient.NodeAlerts(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return c.SearchlightClient.PodAlerts(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.SearchlightClient.NodeAlerts(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return c.SearchlightClient.PodAlerts(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&tapi.NodeAlert{},
+		&tapi.PodAlert{},
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.NodeAlert); ok {
+				if alert, ok := obj.(*tapi.PodAlert); ok {
 					fmt.Println(alert)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldAlert, ok := old.(*tapi.NodeAlert)
+				oldAlert, ok := old.(*tapi.PodAlert)
 				if !ok {
-					log.Errorln(errors.New("Invalid NodeAlert object"))
+					log.Errorln(errors.New("Invalid PodAlert object"))
 					return
 				}
-				newAlert, ok := new.(*tapi.NodeAlert)
+				newAlert, ok := new.(*tapi.PodAlert)
 				if !ok {
-					log.Errorln(errors.New("Invalid NodeAlert object"))
+					log.Errorln(errors.New("Invalid PodAlert object"))
 					return
 				}
-				if !reflect.DeepEqual(oldAlert.Spec, newAlert.Spec) {
-				}
+				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.NodeAlert); ok {
+				if alert, ok := obj.(*tapi.PodAlert); ok {
 					fmt.Println(alert)
 					c.Saver.Save(alert.ObjectMeta, obj)
 				}

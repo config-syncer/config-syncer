@@ -1,4 +1,4 @@
-package watcher
+package controller
 
 import (
 	acrt "github.com/appscode/go/runtime"

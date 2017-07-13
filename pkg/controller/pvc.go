@@ -1,4 +1,4 @@
-package watcher
+package controller
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -9,14 +9,13 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-	extensions "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchDeploymentExtensions() {
-	if !util.IsPreferredAPIResource(c.KubeClient, extensions.SchemeGroupVersion.String(), "Deployment") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "Deployment")
+func (c *Controller) WatchPersistentVolumeClaims() {
+	if !util.IsPreferredAPIResource(c.KubeClient, apiv1.SchemeGroupVersion.String(), "PersistentVolumeClaim") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "PersistentVolumeClaim")
 		return
 	}
 
@@ -24,20 +23,20 @@ func (c *Controller) WatchDeploymentExtensions() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeClient.ExtensionsV1beta1().Deployments(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return c.KubeClient.CoreV1().PersistentVolumeClaims(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeClient.ExtensionsV1beta1().Deployments(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return c.KubeClient.CoreV1().PersistentVolumeClaims(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&extensions.Deployment{},
+		&apiv1.PersistentVolumeClaim{},
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if deployment, ok := obj.(*extensions.Deployment); ok {
-					log.Infof("Deployment %s@%s deleted", deployment.Name, deployment.Namespace)
-					c.Saver.Save(deployment.ObjectMeta, obj)
+				if pvc, ok := obj.(*apiv1.PersistentVolumeClaim); ok {
+					log.Infof("PersistentVolumeClaim %s@%s deleted", pvc.Name, pvc.Namespace)
+					c.Saver.Save(pvc.ObjectMeta, obj)
 				}
 			},
 		},

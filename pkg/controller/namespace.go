@@ -1,4 +1,4 @@
-package watcher
+package controller
 
 import (
 	"github.com/appscode/kubed/pkg/configsync"

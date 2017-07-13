@@ -1,4 +1,4 @@
-package watcher
+package controller
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -28,27 +28,27 @@ func (c *Controller) watchService() {
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if c.RunOptions.EnableReverseIndex {
+				if c.Opt.EnableReverseIndex {
 					c.ReverseIndex.Handle("added", obj)
 				}
-				if len(c.RunOptions.Indexer) > 0 {
+				if len(c.Opt.Indexer) > 0 {
 					c.Indexer.HandleAdd(obj)
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				if c.RunOptions.EnableReverseIndex {
+				if c.Opt.EnableReverseIndex {
 					c.ReverseIndex.Handle("deleted", obj)
 				}
-				if len(c.RunOptions.Indexer) > 0 {
+				if len(c.Opt.Indexer) > 0 {
 					c.Indexer.HandleDelete(obj)
 				}
 				c.Saver.Save(obj.(*apiv1.Service).ObjectMeta, obj)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
-				if c.RunOptions.EnableReverseIndex {
+				if c.Opt.EnableReverseIndex {
 					c.ReverseIndex.Handle("updated", oldObj, newObj)
 				}
-				if len(c.RunOptions.Indexer) > 0 {
+				if len(c.Opt.Indexer) > 0 {
 					c.Indexer.HandleUpdate(oldObj, newObj)
 				}
 			},

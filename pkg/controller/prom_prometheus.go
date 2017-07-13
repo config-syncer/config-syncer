@@ -1,9 +1,10 @@
-package watcher
+package controller
 
 import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
+	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -13,9 +14,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchReplicationControllers() {
-	if !util.IsPreferredAPIResource(c.KubeClient, apiv1.SchemeGroupVersion.String(), "ReplicationController") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ReplicationController")
+func (c *Controller) WatchPrometheuss() {
+	if !util.IsPreferredAPIResource(c.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRPrometheusesKind) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRPrometheusesKind)
 		return
 	}
 
@@ -23,20 +24,20 @@ func (c *Controller) WatchReplicationControllers() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.KubeClient.CoreV1().ReplicationControllers(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return c.PromClient.Prometheuses(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.KubeClient.CoreV1().ReplicationControllers(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return c.PromClient.Prometheuses(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.ReplicationController{},
+		&prom.Prometheus{},
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if rc, ok := obj.(*apiv1.ReplicationController); ok {
-					log.Infof("ReplicationController %s@%s deleted", rc.Name, rc.Namespace)
-					c.Saver.Save(rc.ObjectMeta, obj)
+				if pdb, ok := obj.(*prom.Prometheus); ok {
+					log.Infof("Prometheus %s@%s deleted", pdb.Name, pdb.Namespace)
+					c.Saver.Save(pdb.ObjectMeta, obj)
 				}
 			},
 		},

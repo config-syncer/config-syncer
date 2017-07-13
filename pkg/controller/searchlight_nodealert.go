@@ -1,4 +1,4 @@
-package watcher
+package controller
 
 import (
 	"errors"
@@ -18,9 +18,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (c *Controller) WatchClusterAlerts() {
-	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindClusterAlert) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindClusterAlert)
+func (c *Controller) WatchNodeAlerts() {
+	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindNodeAlert) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindNodeAlert)
 		return
 	}
 
@@ -28,38 +28,37 @@ func (c *Controller) WatchClusterAlerts() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.SearchlightClient.ClusterAlerts(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return c.SearchlightClient.NodeAlerts(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.SearchlightClient.ClusterAlerts(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return c.SearchlightClient.NodeAlerts(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&tapi.ClusterAlert{},
+		&tapi.NodeAlert{},
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.ClusterAlert); ok {
+				if alert, ok := obj.(*tapi.NodeAlert); ok {
 					fmt.Println(alert)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldAlert, ok := old.(*tapi.ClusterAlert)
+				oldAlert, ok := old.(*tapi.NodeAlert)
 				if !ok {
-					log.Errorln(errors.New("Invalid ClusterAlert object"))
+					log.Errorln(errors.New("Invalid NodeAlert object"))
 					return
 				}
-				newAlert, ok := new.(*tapi.ClusterAlert)
+				newAlert, ok := new.(*tapi.NodeAlert)
 				if !ok {
-					log.Errorln(errors.New("Invalid ClusterAlert object"))
+					log.Errorln(errors.New("Invalid NodeAlert object"))
 					return
 				}
 				if !reflect.DeepEqual(oldAlert.Spec, newAlert.Spec) {
 				}
-				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.ClusterAlert); ok {
+				if alert, ok := obj.(*tapi.NodeAlert); ok {
 					fmt.Println(alert)
 					c.Saver.Save(alert.ObjectMeta, obj)
 				}
