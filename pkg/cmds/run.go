@@ -13,11 +13,11 @@ import (
 	"github.com/appscode/kubed/pkg/analytics"
 	"github.com/appscode/kubed/pkg/cert"
 	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/controller"
 	"github.com/appscode/kubed/pkg/dns"
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/janitor"
 	"github.com/appscode/kubed/pkg/recover"
-	"github.com/appscode/kubed/pkg/watcher"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
@@ -32,7 +32,7 @@ import (
 )
 
 func NewCmdRun(version string) *cobra.Command {
-	opt := watcher.Options{
+	opt := controller.Options{
 		Indexer:            "indexers.bleve",
 		EnableReverseIndex: true,
 		ServerAddress:      ":32600",
@@ -72,7 +72,7 @@ func NewCmdRun(version string) *cobra.Command {
 	return cmd
 }
 
-func Run(opt watcher.Options) {
+func Run(opt controller.Options) {
 	log.Infoln("configurations provided for kubed", opt)
 	defer runtime.HandleCrash()
 
@@ -88,14 +88,14 @@ func Run(opt watcher.Options) {
 		os.Exit(1)
 	}
 
-	w := &watcher.Controller{
+	w := &controller.Controller{
 		KubeClient:        clientset.NewForConfigOrDie(c),
 		VoyagerClient:     vcs.NewForConfigOrDie(c),
 		SearchlightClient: srch_cs.NewForConfigOrDie(c),
 		StashClient:       scs.NewForConfigOrDie(c),
 		KubeDBClient:      kcs.NewForConfigOrDie(c),
 
-		Opt:        opt,
+		Opt:    opt,
 		Config: *cfg,
 		Saver: &recover.RecoverStuff{
 			Opt: cfg.Recover,
@@ -107,7 +107,6 @@ func Run(opt watcher.Options) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-
 
 	// router is default HTTP request multiplexer for kubed. It matches the URL of each
 	// incoming request against a list of registered patterns with their associated

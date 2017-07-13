@@ -19,9 +19,18 @@ type RecoverSpec struct {
 }
 
 type ClusterConfig struct {
-	LogIndexPrefix            string `json:"log_index_prefix"`
-	LogStorageLifetime        int64  `json:"log_storage_lifetime"`
-	MonitoringStorageLifetime int64  `json:"monitoring_storage_lifetime"`
+	ElsticSearch struct {
+		Endpoint           string
+		LogIndexPrefix     string `json:"log_index_prefix"`
+		LogStorageLifetime int64  `json:"log_storage_lifetime"`
+	}
+
+	InfluxDB struct {
+		Endpoint                  string
+		Username                  string
+		Password                  string
+		MonitoringStorageLifetime int64 `json:"monitoring_storage_lifetime"`
+	}
 
 	// For periodic full cluster backup
 	// https://github.com/appscode/kubed/issues/16

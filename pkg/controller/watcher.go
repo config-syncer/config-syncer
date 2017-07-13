@@ -33,12 +33,12 @@ type Controller struct {
 	PromClient        pcm.MonitoringV1alpha1Interface
 	KubeDBClient      kcs.ExtensionInterface
 
-	Opt               Options
-	Config            config.ClusterConfig
-	Saver             *recover.RecoverStuff
-	Indexer           *indexers.ResourceIndexer
-	ReverseIndex      *indexers.ReverseIndexer
-	SyncPeriod        time.Duration
+	Opt          Options
+	Config       config.ClusterConfig
+	Saver        *recover.RecoverStuff
+	Indexer      *indexers.ResourceIndexer
+	ReverseIndex *indexers.ReverseIndexer
+	SyncPeriod   time.Duration
 	sync.Mutex
 }
 
