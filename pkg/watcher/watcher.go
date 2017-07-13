@@ -1,6 +1,8 @@
 package watcher
 
 import (
+	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -10,6 +12,7 @@ import (
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/influxdb"
 	"github.com/appscode/kubed/pkg/recover"
+	"github.com/appscode/log"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
@@ -18,9 +21,6 @@ import (
 	"gopkg.in/robfig/cron.v2"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"path/filepath"
-	"github.com/appscode/log"
-	"os"
 )
 
 type Options struct {
@@ -81,21 +81,25 @@ func (w *Watchers) Run() {
 	go w.WatchStorageClasss()
 	go w.WatchVoyagerCertificates()
 	go w.WatchVoyagerIngresses()
+
+	go w.StartCron()
 }
 
-func (w *Watchers) SetupCron() {
+func (w *Watchers) StartCron() {
 	w.Cron.Start()
 
 	w.Cron.AddFunc("@every 24h", func() {
-		influx.Janitor{Config: w.Config}.CleanInflux()
+		janitor := influx.Janitor{Config: w.Config}
+		janitor.CleanInflux()
 	})
 	w.Cron.AddFunc("@every 24h", func() {
-		es.Janitor{Config: w.Config}.CleanES()
+		janitor := es.Janitor{Config: w.Config}
+		janitor.CleanES()
 	})
 	w.Cron.AddFunc("@every 24h", func() {
 		err := filepath.Walk(w.Config.Recover.Path, func(path string, info os.FileInfo, err error) error {
 			// delete old objects
-
+			return nil
 		})
 		if err != nil {
 			log.Errorln(err)
