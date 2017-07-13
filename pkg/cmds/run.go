@@ -6,7 +6,14 @@ import (
 	"os"
 	"strings"
 	"time"
-
+	"github.com/appscode/kubed/pkg/indexers"
+	srch_cs "github.com/appscode/searchlight/client/clientset"
+	scs "github.com/appscode/stash/client/clientset"
+	vcs "github.com/appscode/voyager/client/clientset"
+	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
+	kcs "github.com/k8sdb/apimachinery/client/clientset"
+	clientset "k8s.io/client-go/kubernetes"
+	"github.com/appscode/kubed/pkg/recover"
 	"github.com/appscode/go/hold"
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/go/wait"
@@ -21,6 +28,7 @@ import (
 	"github.com/spf13/cobra"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	"github.com/appscode/kubed/pkg/config"
 )
 
 func NewCmdRun() *cobra.Command {
@@ -29,11 +37,11 @@ func NewCmdRun() *cobra.Command {
 		InfluxSecretNamespace:             "kube-system",
 		ClusterKubedConfigSecretName:      "cluster-kubed-config",
 		ClusterKubedConfigSecretNamespace: "kube-system",
-		Indexer:                      "indexers.bleve",
-		EnableReverseIndex:           true,
-		ServerAddress:                ":32600",
-		NotifyOnCertSoonToBeExpeired: true,
-		NotifyVia:                    "plivo",
+		Indexer:                           "indexers.bleve",
+		EnableReverseIndex:                true,
+		ServerAddress:                     ":32600",
+		NotifyOnCertSoonToBeExpired:       true,
+		NotifyVia:                         "plivo",
 	}
 	cmd := &cobra.Command{
 		Use:   "run",
@@ -57,7 +65,7 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringVar(&opt.InfluxSecretNamespace, "influx-secret-namespace", opt.InfluxSecretNamespace, "Influxdb secret namespace")
 	cmd.Flags().StringVar(&opt.KubeConfig, "kubeconfig", opt.KubeConfig, "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
 	cmd.Flags().StringVar(&opt.Master, "master", opt.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
-	cmd.Flags().BoolVar(&opt.NotifyOnCertSoonToBeExpeired, "notify-on-cert-expired", opt.NotifyOnCertSoonToBeExpeired, "If enabled notify cluster admin wheen cert expired soon.")
+	cmd.Flags().BoolVar(&opt.NotifyOnCertSoonToBeExpired, "notify-on-cert-expired", opt.NotifyOnCertSoonToBeExpired, "If enabled notify cluster admin wheen cert expired soon.")
 	cmd.Flags().StringVar(&opt.NotifyVia, "notify-via", opt.NotifyVia, "Default notification method (eg: hipchat, mailgun, smtp, twilio, slack, plivo)")
 	cmd.Flags().StringVar(&opt.Indexer, "indexer", opt.Indexer, "Reverse indexing of pods to service and others")
 	cmd.Flags().BoolVar(&opt.EnableReverseIndex, "enable-reverse-index", opt.EnableReverseIndex, "Reverse indexing of pods to service and others")
@@ -76,9 +84,25 @@ func Run(opt watcher.RunOptions) {
 	}
 
 	kubeWatcher := &watcher.Controller{
-		KubeClient: clientset.NewForConfigOrDie(c),
+		KubeClient:        clientset.NewForConfigOrDie(c),
+		VoyagerClient:     vcs.NewForConfigOrDie(c),
+		SearchlightClient: srch_cs.NewForConfigOrDie(c),
+		StashClient:       scs.NewForConfigOrDie(c),
+		KubeDBClient:      kcs.NewForConfigOrDie(c),
+		Saver: &recover.RecoverStuff{
+			Opt: config.RecoverSpec{
+				Path:              "/tmp/rk",
+				TTL:               7 * 24 * time.Hour,
+				HandleSpecUpdates: true,
+			},
+		},
 		SyncPeriod: time.Minute * 2,
 		RunOptions: opt,
+	}
+	kubeWatcher.PromClient, err = pcm.NewForConfig(c)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 
 	// router is default HTTP request multiplexer for kubed. It matches the URL of each
@@ -152,7 +176,7 @@ func Run(opt watcher.RunOptions) {
 		}
 	}
 
-	if opt.NotifyOnCertSoonToBeExpeired {
+	if opt.NotifyOnCertSoonToBeExpired {
 		go cert.DefaultCertWatcher(
 			kubeWatcher.KubeClient,
 			opt.ClusterKubedConfigSecretName,

@@ -11,6 +11,7 @@ import (
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
 	clientset "k8s.io/client-go/kubernetes"
+	"github.com/appscode/kubed/pkg/recover"
 )
 
 type Controller struct {
@@ -21,6 +22,7 @@ type Controller struct {
 	PromClient        pcm.MonitoringV1alpha1Interface
 	KubeDBClient      kcs.ExtensionInterface
 
+	Saver *recover.RecoverStuff
 	RunOptions   RunOptions
 	Indexer      *indexers.ResourceIndexer
 	ReverseIndex *indexers.ReverseIndexer
@@ -40,13 +42,37 @@ type RunOptions struct {
 	Indexer                           string
 	EnableReverseIndex                bool
 	ServerAddress                     string
-	NotifyOnCertSoonToBeExpeired      bool
+	NotifyOnCertSoonToBeExpired       bool
 	NotifyVia                         string
 }
 
-func (w *Controller) Run() {
-	w.watchNamespaces()
-	if w.RunOptions.EnableReverseIndex || len(w.RunOptions.Indexer) > 0 {
-		w.watchService()
-	}
+func (c *Controller) Run() {
+	c.WatchAlertmanagers()
+	c.WatchClusterAlerts()
+	c.WatchConfigMaps()
+	c.WatchDaemonSets()
+	c.WatchDeploymentApps()
+	c.WatchDeploymentExtensions()
+	c.WatchDormantDatabases()
+	c.WatchElastics()
+	c.WatchEvents()
+	c.WatchIngresss()
+	c.WatchJobs()
+	c.watchNamespaces()
+	c.WatchNodeAlerts()
+	c.WatchPersistentVolumeClaims()
+	c.WatchPersistentVolumes()
+	c.WatchPodAlerts()
+	c.WatchPostgreses()
+	c.WatchPrometheuss()
+	c.WatchReplicaSets()
+	c.WatchReplicationControllers()
+	c.WatchRestics()
+	c.WatchSecrets()
+	c.watchService()
+	c.WatchServiceMonitors()
+	c.WatchStatefulSets()
+	c.WatchStorageClasss()
+	c.WatchVoyagerCertificates()
+	c.WatchVoyagerIngresses()
 }

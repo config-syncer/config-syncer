@@ -9,18 +9,18 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-func (w *Controller) watchNamespaces() {
+func (c *Controller) watchNamespaces() {
 	_, controller := cache.NewInformer(
 		cache.NewListWatchFromClient(
-			w.KubeClient.CoreV1().RESTClient(),
+			c.KubeClient.CoreV1().RESTClient(),
 			"namespaces",
 			metav1.NamespaceAll,
 			fields.Everything()),
 		&apiv1.Namespace{},
-		w.SyncPeriod,
+		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				ns := configsync.NewHandler(w.KubeClient)
+				ns := configsync.NewHandler(c.KubeClient)
 				ns.Handle(obj)
 			},
 		},

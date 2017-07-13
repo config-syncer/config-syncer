@@ -2,6 +2,13 @@ package config
 
 import "time"
 
+type RecoverSpec struct {
+	Path              string
+	TTL               time.Duration
+	HandleSpecUpdates bool
+	EmailOneDelete    bool // Notify Via
+}
+
 type ClusterSettings struct {
 	LogIndexPrefix            string `json:"log_index_prefix"`
 	LogStorageLifetime        int64  `json:"log_storage_lifetime"`
@@ -14,18 +21,16 @@ type ClusterSettings struct {
 		Storage  Backend
 	}
 
-	Recover struct {
-		Path              string
-		TTL               time.Duration
-		HandleSpecUpdates bool
-		EmailOneDelete    string // Notify Via
-	}
+	Recover RecoverSpec
 
 	// Email Warning events
 	EventLogger struct {
 		NotifyVia string
 		Namespace []string // only email for a fixed set of namespaces (Optional)
 	}
+
+	// Take ConfigMap/Secret with label to other namespaces
+	// kubernetes.appscode.com/sync-config: true
 
 	// Search
 	// Reverse Index

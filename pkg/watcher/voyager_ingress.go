@@ -13,20 +13,20 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (op *Controller) WatchVoyagerIngresses() {
+func (c *Controller) WatchVoyagerIngresses() {
 	defer acrt.HandleCrash()
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return op.VoyagerClient.Ingresses(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return c.VoyagerClient.Ingresses(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return op.VoyagerClient.Ingresses(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return c.VoyagerClient.Ingresses(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Ingress{},
-		op.SyncPeriod,
+		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if ingress, ok := obj.(*tapi.Ingress); ok {
