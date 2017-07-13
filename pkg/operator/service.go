@@ -31,16 +31,16 @@ func (op *Operator) watchService() {
 				if op.Opt.EnableReverseIndex {
 					op.ReverseIndex.Handle("added", obj)
 				}
-				if len(op.Opt.Indexer) > 0 {
-					op.Indexer.HandleAdd(obj)
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleAdd(obj)
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
 				if op.Opt.EnableReverseIndex {
 					op.ReverseIndex.Handle("deleted", obj)
 				}
-				if len(op.Opt.Indexer) > 0 {
-					op.Indexer.HandleDelete(obj)
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleDelete(obj)
 				}
 				op.Saver.Save(obj.(*apiv1.Service).ObjectMeta, obj)
 			},
@@ -48,8 +48,8 @@ func (op *Operator) watchService() {
 				if op.Opt.EnableReverseIndex {
 					op.ReverseIndex.Handle("updated", oldObj, newObj)
 				}
-				if len(op.Opt.Indexer) > 0 {
-					op.Indexer.HandleUpdate(oldObj, newObj)
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleUpdate(oldObj, newObj)
 				}
 			},
 		},

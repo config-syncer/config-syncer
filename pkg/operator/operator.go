@@ -32,8 +32,8 @@ type Options struct {
 	KubeConfig string
 
 	ConfigPath         string
-	ServerAddress      string
-	Indexer            string
+	Address            string
+	EnableSearchIndex  bool
 	EnableReverseIndex bool
 
 	EnableConfigSync  bool
@@ -54,7 +54,7 @@ type Operator struct {
 	Opt          Options
 	Config       config.ClusterConfig
 	Saver        *recyclebin.RecoverStuff
-	Indexer      *indexers.ResourceIndexer
+	SearchIndex  *indexers.ResourceIndexer
 	ReverseIndex *indexers.ReverseIndexer
 
 	Cron       *cron.Cron
@@ -121,19 +121,21 @@ func (op *Operator) ListenAndServe() {
 	router := pat.New()
 
 	// Enable full text indexing to have search feature
-	if len(op.Opt.Indexer) > 0 {
-		indexer, err := indexers.NewResourceIndexer(op.Opt.Indexer)
+	indexDir := filepath.Join(op.Opt.ScratchDir, "bleve")
+
+	if op.Opt.EnableSearchIndex {
+		si, err := indexers.NewResourceIndexer(indexDir)
 		if err != nil {
 			log.Errorln(err)
 		} else {
-			indexer.RegisterRouters(router)
-			op.Indexer = indexer
+			si.RegisterRouters(router)
+			op.SearchIndex = si
 		}
 	}
 
 	// Enable pod -> service, service -> serviceMonitor indexing
 	if op.Opt.EnableReverseIndex {
-		ri, err := indexers.NewReverseIndexer(op.KubeClient, op.Opt.Indexer)
+		ri, err := indexers.NewReverseIndexer(op.KubeClient, indexDir)
 		if err != nil {
 			log.Errorln("Failed to create indexer", err)
 		} else {
@@ -143,7 +145,7 @@ func (op *Operator) ListenAndServe() {
 	}
 
 	http.Handle("/", router)
-	log.Fatalln(http.ListenAndServe(op.Opt.ServerAddress, nil))
+	log.Fatalln(http.ListenAndServe(op.Opt.Address, nil))
 }
 
 func (op *Operator) StartCron() {

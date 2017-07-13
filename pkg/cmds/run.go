@@ -25,13 +25,12 @@ import (
 func NewCmdRun(version string) *cobra.Command {
 	opt := operator.Options{
 		ConfigPath:         "/srv/kubed/config.yaml",
-		Indexer:            "indexers.bleve",
+		Address:            ":8081",
+		EnableSearchIndex:  true,
 		EnableReverseIndex: true,
-		ServerAddress:      ":8081",
-		EnableAnalytics:    true,
-		EnableConfigSync:   true,
 		ScratchDir:         "/tmp",
 		OperatorNamespace:  namespace(),
+		EnableAnalytics:    true,
 	}
 	cmd := &cobra.Command{
 		Use:   "run",
@@ -56,9 +55,9 @@ func NewCmdRun(version string) *cobra.Command {
 	cmd.Flags().StringVar(&opt.Master, "master", opt.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
 	cmd.Flags().StringVar(&opt.ConfigPath, "clusterconfig", opt.ConfigPath, "Path to cluster config file")
 
-	cmd.Flags().StringVar(&opt.Indexer, "indexer", opt.Indexer, "Reverse indexing of pods to service and others")
+	cmd.Flags().BoolVar(&opt.EnableSearchIndex, "enable-search-index", opt.EnableSearchIndex, "Generate search index for Kubernetes api objects")
 	cmd.Flags().BoolVar(&opt.EnableReverseIndex, "enable-reverse-index", opt.EnableReverseIndex, "Reverse indexing of pods to service and others")
-	cmd.Flags().StringVar(&opt.ServerAddress, "address", opt.ServerAddress, "The address of the Kubed API Server")
+	cmd.Flags().StringVar(&opt.Address, "address", opt.Address, "The address of the Kubed API Server")
 
 	cmd.Flags().BoolVar(&opt.EnableAnalytics, "analytics", opt.EnableAnalytics, "Send analytical events to Google Analytics")
 

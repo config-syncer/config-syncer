@@ -2,7 +2,7 @@ package indexers
 
 import (
 	"encoding/json"
-	"strings"
+	"path/filepath"
 
 	"github.com/appscode/log"
 	"github.com/blevesearch/bleve"
@@ -15,7 +15,7 @@ type ResourceIndexer struct {
 }
 
 func NewResourceIndexer(dst string) (*ResourceIndexer, error) {
-	c, err := ensureIndex(strings.TrimRight(dst, "/")+"/resource.indexer", "search")
+	c, err := ensureIndex(filepath.Join(dst, "resource.indexer"), "search")
 	if err != nil {
 		return nil, err
 	}
