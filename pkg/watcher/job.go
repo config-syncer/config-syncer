@@ -2,8 +2,8 @@ package watcher
 
 import (
 	acrt "github.com/appscode/go/runtime"
+	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
-	"github.com/appscode/stash/pkg/util"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -16,7 +16,7 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (c *Controller) WatchJobs() {
-	if !util.IsPreferredAPIResource(c.KubeClient, extensions.SchemeGroupVersion.String(), "Job") {
+	if !util.IsPreferredAPIResource(c.KubeClient, batch.SchemeGroupVersion.String(), "Job") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "Job")
 		return
 	}

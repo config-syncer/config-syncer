@@ -1,6 +1,9 @@
 package watcher
 
 import (
+	acrt "github.com/appscode/go/runtime"
+	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -9,6 +12,12 @@ import (
 )
 
 func (c *Controller) watchService() {
+	if !util.IsPreferredAPIResource(c.KubeClient, apiv1.SchemeGroupVersion.String(), "Service") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Service")
+		return
+	}
+
+	defer acrt.HandleCrash()
 	lw := cache.NewListWatchFromClient(
 		c.KubeClient.CoreV1().RESTClient(),
 		"services",

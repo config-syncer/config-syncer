@@ -105,3 +105,7 @@ func (a ClusterAlert) IsValid() (bool, error) {
 	}
 	return true, nil
 }
+
+func (a ClusterAlert) GetReceivers() []Receiver {
+	return a.Spec.Receivers
+}

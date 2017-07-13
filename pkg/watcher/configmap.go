@@ -2,8 +2,8 @@ package watcher
 
 import (
 	acrt "github.com/appscode/go/runtime"
+	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
-	"github.com/appscode/stash/pkg/util"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"

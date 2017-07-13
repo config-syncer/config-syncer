@@ -109,3 +109,7 @@ func (a PodAlert) IsValid() (bool, error) {
 	}
 	return true, nil
 }
+
+func (a PodAlert) GetReceivers() []Receiver {
+	return a.Spec.Receivers
+}

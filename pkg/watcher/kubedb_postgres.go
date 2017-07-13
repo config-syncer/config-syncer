@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	acrt "github.com/appscode/go/runtime"
+	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
 	tapi "github.com/k8sdb/apimachinery/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,6 +18,11 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (c *Controller) WatchPostgreses() {
+	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPostgres) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPostgres)
+		return
+	}
+
 	defer acrt.HandleCrash()
 
 	lw := &cache.ListWatch{

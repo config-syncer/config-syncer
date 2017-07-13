@@ -4,7 +4,7 @@ import (
 	"github.com/appscode/errors"
 	"github.com/appscode/log"
 	_ "github.com/appscode/searchlight/api/install"
-	acs "github.com/appscode/searchlight/client/clientset"
+	tcs "github.com/appscode/searchlight/client/clientset"
 	clientset "k8s.io/client-go/kubernetes"
 )
 
@@ -22,7 +22,7 @@ func NewClient() (*KubeClient, error) {
 		return nil, errors.FromErr(err).Err()
 	}
 
-	extClient, err := acs.NewForConfig(config)
+	extClient, err := tcs.NewForConfig(config)
 	if err != nil {
 		return nil, errors.FromErr(err).Err()
 	}

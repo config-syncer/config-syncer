@@ -2,8 +2,8 @@ package watcher
 
 import (
 	acrt "github.com/appscode/go/runtime"
+	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
-	"github.com/appscode/stash/pkg/util"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -15,8 +15,8 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (c *Controller) WatchAlertmanagers() {
-	if !util.IsPreferredAPIResource(c.KubeClient, apiv1.SchemeGroupVersion.String(), "Alertmanager") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Alertmanager")
+	if !util.IsPreferredAPIResource(c.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRAlertmanagersKind) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRAlertmanagersKind)
 		return
 	}
 

@@ -109,3 +109,7 @@ func (a NodeAlert) IsValid() (bool, error) {
 	}
 	return true, nil
 }
+
+func (a NodeAlert) GetReceivers() []Receiver {
+	return a.Spec.Receivers
+}

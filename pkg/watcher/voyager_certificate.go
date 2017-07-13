@@ -2,6 +2,7 @@ package watcher
 
 import (
 	acrt "github.com/appscode/go/runtime"
+	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
 	tapi "github.com/appscode/voyager/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -14,6 +15,10 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (c *Controller) WatchVoyagerCertificates() {
+	if !util.IsPreferredAPIResource(c.KubeClient, tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindCertificate) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindCertificate)
+		return
+	}
 	defer acrt.HandleCrash()
 
 	lw := &cache.ListWatch{
