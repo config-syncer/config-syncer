@@ -15,26 +15,18 @@ const (
 	ConfigSyncKey = "kubernetes.appscode.com/sync-config"
 )
 
-type EventForwarderSpec struct {
-	SkipForwardingStorageChange bool     `json:"skip_forwarding_storage_change,omitempty"`
-	SkipForwardingIngressChange bool     `json:"skip_forwarding_ingress_change,omitempty"`
-	SkipForwardingWarningEvents bool     `json:"skip_forwarding_warning_events,omitempty"`
-	ForwardingEventNamespaces   []string `json:"forwarding_event_namespace,omitempty"`
-	NotifyVia                   string   `json:"notify_via,omitempty"`
-}
-
-type RecoverSpec struct {
-	Path           string          `json:"path,omitempty"`
-	TTL            metav1.Duration `json:"endpoint,omitempty"`
-	HandleUpdate   bool            `json:"handle_update,omitempty"`
-	NotifyOnChange bool            `json:"notify_on_change,omitempty"`
-	NotifyVia      string          `json:"notify_via,omitempty"`
+type ClusterConfig struct {
+	ElasticSearch  *ElasticSearchSpec
+	InfluxDB       *InfluxDBSpec
+	EventForwarder *EventForwarderSpec
+	RecycleBin     *RecycleBinSpec
+	Backup         *BackupSpec
 }
 
 type ElasticSearchSpec struct {
-	Endpoint           string `json:"endpoint,omitempty"`
-	LogIndexPrefix     string `json:"log_index_prefix,omitempty"`
-	LogStorageLifetime int64  `json:"log_storage_lifetime,omitempty"`
+	Endpoint       string          `json:"endpoint,omitempty"`
+	LogIndexPrefix string          `json:"log_index_prefix,omitempty"`
+	TTL            metav1.Duration `json:"ttl,omitempty"`
 }
 
 type InfluxDBSpec struct {
@@ -44,25 +36,26 @@ type InfluxDBSpec struct {
 	TTL      metav1.Duration `json:"ttl,omitempty"`
 }
 
+type RecycleBinSpec struct {
+	Path         string          `json:"path,omitempty"`
+	TTL          metav1.Duration `json:"ttl,omitempty"`
+	HandleUpdate bool            `json:"handle_update,omitempty"`
+}
+
+type EventForwarderSpec struct {
+	SkipForwardingStorageChange bool     `json:"skip_forwarding_storage_change,omitempty"`
+	SkipForwardingIngressChange bool     `json:"skip_forwarding_ingress_change,omitempty"`
+	SkipForwardingWarningEvents bool     `json:"skip_forwarding_warning_events,omitempty"`
+	ForwardingEventNamespaces   []string `json:"forwarding_event_namespace,omitempty"`
+	NotifyVia                   string   `json:"notify_via,omitempty"`
+}
+
 // For periodic full cluster backup
 // https://github.com/appscode/kubed/issues/16
 type BackupSpec struct {
 	Schedule string  `json:"schedule,omitempty"`
 	Sanitize bool    `json:"sanitize,omitempty"`
 	Storage  Backend `json:",inline"`
-}
-
-type ClusterConfig struct {
-	ElasticSearch *ElasticSearchSpec
-	InfluxDB      *InfluxDBSpec
-	Backup        *BackupSpec
-
-	Recover RecoverSpec
-
-	EventLogger struct {
-		NotifyVia string
-		Namespace []string // only email for a fixed set of namespaces (Optional)
-	}
 }
 
 type Backend struct {

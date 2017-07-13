@@ -1,4 +1,4 @@
-package recover
+package recyclebin
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 )
 
 type RecoverStuff struct {
-	Opt config.RecoverSpec
+	Opt config.RecycleBinSpec
 }
 
 func (c *RecoverStuff) Save(meta metav1.ObjectMeta, v interface{}) error {

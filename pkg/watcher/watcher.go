@@ -11,7 +11,7 @@ import (
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/influxdb"
-	"github.com/appscode/kubed/pkg/recover"
+	"github.com/appscode/kubed/pkg/recyclebin"
 	"github.com/appscode/log"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
@@ -48,7 +48,7 @@ type Watchers struct {
 
 	Opt          Options
 	Config       config.ClusterConfig
-	Saver        *recover.RecoverStuff
+	Saver        *recyclebin.RecoverStuff
 	Indexer      *indexers.ResourceIndexer
 	ReverseIndex *indexers.ReverseIndexer
 
@@ -102,7 +102,7 @@ func (w *Watchers) StartCron() {
 		janitor.CleanES()
 	})
 	w.Cron.AddFunc("@every 24h", func() {
-		err := filepath.Walk(w.Config.Recover.Path, func(path string, info os.FileInfo, err error) error {
+		err := filepath.Walk(w.Config.RecycleBin.Path, func(path string, info os.FileInfo, err error) error {
 			// delete old objects
 			return nil
 		})

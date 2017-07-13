@@ -23,7 +23,7 @@ func (j *Janitor) CleanES() error {
 	}
 
 	now := time.Now().UTC()
-	oldDate := now.Add(time.Duration(-(j.Config.ElasticSearch.LogStorageLifetime)) * time.Second)
+	oldDate := now.Add(-j.Config.ElasticSearch.TTL.Duration)
 
 	// how many index should we check to delete? I set it to 7
 	for i := 1; i <= 7; i++ {
