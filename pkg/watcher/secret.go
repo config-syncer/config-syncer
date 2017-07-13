@@ -36,6 +36,7 @@ func (c *Controller) WatchSecrets() {
 			DeleteFunc: func(obj interface{}) {
 				if cfgmap, ok := obj.(*apiv1.Secret); ok {
 					log.Infof("Secret %s@%s deleted", cfgmap.Name, cfgmap.Namespace)
+					c.Saver.Save(obj)
 				}
 			},
 		},

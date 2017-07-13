@@ -37,6 +37,7 @@ func (c *Controller) WatchAlertmanagers() {
 			DeleteFunc: func(obj interface{}) {
 				if svcmon, ok := obj.(*prom.Alertmanager); ok {
 					log.Infof("Alertmanager %s@%s deleted", svcmon.Name, svcmon.Namespace)
+					c.Saver.Save(obj)
 				}
 			},
 		},

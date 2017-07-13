@@ -37,7 +37,7 @@ func (c *Controller) WatchDeploymentApps() {
 			DeleteFunc: func(obj interface{}) {
 				if deployment, ok := obj.(*apps.Deployment); ok {
 					log.Infof("Deployment %s@%s deleted", deployment.Name, deployment.Namespace)
-
+					c.Saver.Save(obj)
 				}
 			},
 		},

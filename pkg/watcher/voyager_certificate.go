@@ -31,6 +31,7 @@ func (c *Controller) WatchVoyagerCertificates() {
 			DeleteFunc: func(obj interface{}) {
 				if cert, ok := obj.(*tapi.Certificate); ok {
 					log.Infof("Certificate %s@%s deleted", cert.Name, cert.Namespace)
+					c.Saver.Save(obj)
 				}
 			},
 		},

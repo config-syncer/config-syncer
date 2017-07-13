@@ -37,7 +37,7 @@ func (c *Controller) WatchStorageClasss() {
 			DeleteFunc: func(obj interface{}) {
 				if storage, ok := obj.(*storage.StorageClass); ok {
 					log.Infof("StorageClass %s@%s deleted", storage.Name, storage.Namespace)
-
+					c.Saver.Save(obj)
 				}
 			},
 		},

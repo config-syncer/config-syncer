@@ -36,6 +36,8 @@ func (c *Controller) WatchConfigMaps() {
 			DeleteFunc: func(obj interface{}) {
 				if cfgmap, ok := obj.(*apiv1.ConfigMap); ok {
 					log.Infof("ConfigMap %s@%s deleted", cfgmap.Name, cfgmap.Namespace)
+
+					c.Saver.Save(obj)
 				}
 			},
 		},

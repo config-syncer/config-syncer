@@ -36,6 +36,7 @@ func (c *Controller) WatchReplicationControllers() {
 			DeleteFunc: func(obj interface{}) {
 				if resource, ok := obj.(*apiv1.ReplicationController); ok {
 					log.Infof("ReplicationController %s@%s deleted", resource.Name, resource.Namespace)
+					c.Saver.Save(obj)
 				}
 			},
 		},

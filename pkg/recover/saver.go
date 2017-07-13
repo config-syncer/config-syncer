@@ -1,21 +1,21 @@
 package recover
 
 import (
-	"github.com/appscode/kubed/pkg/config"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"path/filepath"
-	"os"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
+
+	"github.com/appscode/kubed/pkg/config"
 	"github.com/ghodss/yaml"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type RecoverStuff struct {
 	Opt config.RecoverSpec
 }
 
-func (c * RecoverStuff) Save(v interface{}) error {
+func (c *RecoverStuff) Save(v interface{}) error {
 	meta := v.(metav1.ObjectMeta)
 	p := filepath.Join(c.Opt.Path, meta.SelfLink)
 	dir := filepath.Dir(p)
@@ -24,7 +24,7 @@ func (c * RecoverStuff) Save(v interface{}) error {
 		return err
 	}
 	name := filepath.Base(p)
-	fn := fmt.Sprintf("%s.%d.yaml", name, 	meta.CreationTimestamp.Unix())
+	fn := fmt.Sprintf("%s.%d.yaml", name, meta.CreationTimestamp.Unix())
 
 	fullPath := filepath.Join(dir, fn)
 	bytes, err := yaml.Marshal(v)

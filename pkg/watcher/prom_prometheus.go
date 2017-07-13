@@ -37,6 +37,7 @@ func (c *Controller) WatchPrometheuss() {
 			DeleteFunc: func(obj interface{}) {
 				if svcmon, ok := obj.(*prom.Prometheus); ok {
 					log.Infof("Prometheus %s@%s deleted", svcmon.Name, svcmon.Namespace)
+					c.Saver.Save(obj)
 				}
 			},
 		},

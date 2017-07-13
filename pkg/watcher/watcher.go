@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/appscode/kubed/pkg/indexers"
+	"github.com/appscode/kubed/pkg/recover"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
 	clientset "k8s.io/client-go/kubernetes"
-	"github.com/appscode/kubed/pkg/recover"
 )
 
 type Controller struct {
@@ -22,7 +22,7 @@ type Controller struct {
 	PromClient        pcm.MonitoringV1alpha1Interface
 	KubeDBClient      kcs.ExtensionInterface
 
-	Saver *recover.RecoverStuff
+	Saver        *recover.RecoverStuff
 	RunOptions   RunOptions
 	Indexer      *indexers.ResourceIndexer
 	ReverseIndex *indexers.ReverseIndexer

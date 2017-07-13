@@ -32,8 +32,8 @@ func (c *Controller) WatchDormantDatabases() {
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.DormantDatabase); ok {
-					fmt.Println(alert)
+				if drmn, ok := obj.(*tapi.DormantDatabase); ok {
+					fmt.Println(drmn)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
@@ -50,8 +50,9 @@ func (c *Controller) WatchDormantDatabases() {
 				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.DormantDatabase); ok {
-					fmt.Println(alert)
+				if drmn, ok := obj.(*tapi.DormantDatabase); ok {
+					fmt.Println(drmn)
+					c.Saver.Save(obj)
 				}
 			},
 		},

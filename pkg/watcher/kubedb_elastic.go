@@ -32,8 +32,8 @@ func (c *Controller) WatchElastics() {
 		c.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.Elastic); ok {
-					fmt.Println(alert)
+				if elastic, ok := obj.(*tapi.Elastic); ok {
+					fmt.Println(elastic)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
@@ -50,8 +50,9 @@ func (c *Controller) WatchElastics() {
 				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.Elastic); ok {
-					fmt.Println(alert)
+				if elastic, ok := obj.(*tapi.Elastic); ok {
+					fmt.Println(elastic)
+					c.Saver.Save(obj)
 				}
 			},
 		},

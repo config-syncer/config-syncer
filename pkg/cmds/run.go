@@ -6,29 +6,28 @@ import (
 	"os"
 	"strings"
 	"time"
-	"github.com/appscode/kubed/pkg/indexers"
-	srch_cs "github.com/appscode/searchlight/client/clientset"
-	scs "github.com/appscode/stash/client/clientset"
-	vcs "github.com/appscode/voyager/client/clientset"
-	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
-	kcs "github.com/k8sdb/apimachinery/client/clientset"
-	clientset "k8s.io/client-go/kubernetes"
-	"github.com/appscode/kubed/pkg/recover"
+
 	"github.com/appscode/go/hold"
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/go/wait"
 	"github.com/appscode/kubed/pkg/cert"
+	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/dns"
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/janitor"
+	"github.com/appscode/kubed/pkg/recover"
 	"github.com/appscode/kubed/pkg/watcher"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
+	srch_cs "github.com/appscode/searchlight/client/clientset"
 	"github.com/appscode/searchlight/pkg/influxdb"
+	scs "github.com/appscode/stash/client/clientset"
+	vcs "github.com/appscode/voyager/client/clientset"
+	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
+	kcs "github.com/k8sdb/apimachinery/client/clientset"
 	"github.com/spf13/cobra"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	"github.com/appscode/kubed/pkg/config"
 )
 
 func NewCmdRun() *cobra.Command {
@@ -37,11 +36,11 @@ func NewCmdRun() *cobra.Command {
 		InfluxSecretNamespace:             "kube-system",
 		ClusterKubedConfigSecretName:      "cluster-kubed-config",
 		ClusterKubedConfigSecretNamespace: "kube-system",
-		Indexer:                           "indexers.bleve",
-		EnableReverseIndex:                true,
-		ServerAddress:                     ":32600",
-		NotifyOnCertSoonToBeExpired:       true,
-		NotifyVia:                         "plivo",
+		Indexer:                     "indexers.bleve",
+		EnableReverseIndex:          true,
+		ServerAddress:               ":32600",
+		NotifyOnCertSoonToBeExpired: true,
+		NotifyVia:                   "plivo",
 	}
 	cmd := &cobra.Command{
 		Use:   "run",

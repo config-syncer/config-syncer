@@ -37,7 +37,7 @@ func (c *Controller) WatchReplicaSets() {
 			AddFunc: func(obj interface{}) {
 				if resource, ok := obj.(*extensions.ReplicaSet); ok {
 					log.Infof("ReplicaSet %s@%s deleted", resource.Name, resource.Namespace)
-
+					c.Saver.Save(obj)
 				}
 			},
 		},

@@ -55,6 +55,7 @@ func (c *Controller) WatchClusterAlerts() {
 			DeleteFunc: func(obj interface{}) {
 				if alert, ok := obj.(*tapi.ClusterAlert); ok {
 					fmt.Println(alert)
+					c.Saver.Save(obj)
 				}
 			},
 		},
