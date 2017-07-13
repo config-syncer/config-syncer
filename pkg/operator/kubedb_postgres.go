@@ -1,4 +1,4 @@
-package watcher
+package operator
 
 import (
 	"errors"
@@ -17,9 +17,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (w *Watchers) WatchElastics() {
-	if !util.IsPreferredAPIResource(w.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic)
+func (op *Operator) WatchPostgreses() {
+	if !util.IsPreferredAPIResource(op.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPostgres) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPostgres)
 		return
 	}
 
@@ -27,38 +27,38 @@ func (w *Watchers) WatchElastics() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return w.KubeDBClient.Elastics(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeDBClient.Postgreses(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return w.KubeDBClient.Elastics(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeDBClient.Postgreses(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&tapi.Elastic{},
-		w.SyncPeriod,
+		&tapi.Postgres{},
+		op.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if elastic, ok := obj.(*tapi.Elastic); ok {
-					fmt.Println(elastic)
+				if alert, ok := obj.(*tapi.Postgres); ok {
+					fmt.Println(alert)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldAlert, ok := old.(*tapi.Elastic)
+				oldAlert, ok := old.(*tapi.Postgres)
 				if !ok {
-					log.Errorln(errors.New("Invalid Elastic object"))
+					log.Errorln(errors.New("Invalid Postgres object"))
 					return
 				}
-				newAlert, ok := new.(*tapi.Elastic)
+				newAlert, ok := new.(*tapi.Postgres)
 				if !ok {
-					log.Errorln(errors.New("Invalid Elastic object"))
+					log.Errorln(errors.New("Invalid Postgres object"))
 					return
 				}
 				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
-				if elastic, ok := obj.(*tapi.Elastic); ok {
-					fmt.Println(elastic)
-					w.Saver.Save(elastic.ObjectMeta, obj)
+				if pg, ok := obj.(*tapi.Postgres); ok {
+					fmt.Println(pg)
+					op.Saver.Save(pg.ObjectMeta, obj)
 				}
 			},
 		},

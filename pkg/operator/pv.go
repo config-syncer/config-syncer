@@ -1,10 +1,9 @@
-package watcher
+package operator
 
 import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
-	tapi "github.com/appscode/voyager/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -14,29 +13,30 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (w *Watchers) WatchVoyagerCertificates() {
-	if !util.IsPreferredAPIResource(w.KubeClient, tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindCertificate) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindCertificate)
+func (op *Operator) WatchPersistentVolumes() {
+	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "PersistentVolume") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "PersistentVolume")
 		return
 	}
+
 	defer acrt.HandleCrash()
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return w.VoyagerClient.Certificates(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().PersistentVolumes().List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return w.VoyagerClient.Certificates(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().PersistentVolumes().Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&tapi.Certificate{},
-		w.SyncPeriod,
+		&apiv1.PersistentVolume{},
+		op.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if cert, ok := obj.(*tapi.Certificate); ok {
-					log.Infof("Certificate %s@%s deleted", cert.Name, cert.Namespace)
-					w.Saver.Save(cert.ObjectMeta, obj)
+				if pv, ok := obj.(*apiv1.PersistentVolume); ok {
+					log.Infof("PersistentVolume %s@%s deleted", pv.Name, pv.Namespace)
+					op.Saver.Save(pv.ObjectMeta, obj)
 				}
 			},
 		},

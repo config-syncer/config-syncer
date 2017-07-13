@@ -1,4 +1,4 @@
-package watcher
+package operator
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -9,13 +9,15 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+	batch "k8s.io/client-go/pkg/apis/batch/v1"
+	extensions "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (w *Watchers) WatchPersistentVolumes() {
-	if !util.IsPreferredAPIResource(w.KubeClient, apiv1.SchemeGroupVersion.String(), "PersistentVolume") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "PersistentVolume")
+func (op *Operator) WatchJobs() {
+	if !util.IsPreferredAPIResource(op.KubeClient, batch.SchemeGroupVersion.String(), "Job") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "Job")
 		return
 	}
 
@@ -23,20 +25,20 @@ func (w *Watchers) WatchPersistentVolumes() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return w.KubeClient.CoreV1().PersistentVolumes().List(metav1.ListOptions{})
+			return op.KubeClient.BatchV1().Jobs(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return w.KubeClient.CoreV1().PersistentVolumes().Watch(metav1.ListOptions{})
+			return op.KubeClient.BatchV1().Jobs(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.PersistentVolume{},
-		w.SyncPeriod,
+		&batch.Job{},
+		op.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if pv, ok := obj.(*apiv1.PersistentVolume); ok {
-					log.Infof("PersistentVolume %s@%s deleted", pv.Name, pv.Namespace)
-					w.Saver.Save(pv.ObjectMeta, obj)
+				if job, ok := obj.(*batch.Job); ok {
+					log.Infof("Job %s@%s deleted", job.Name, job.Namespace)
+					op.Saver.Save(job.ObjectMeta, obj)
 				}
 			},
 		},

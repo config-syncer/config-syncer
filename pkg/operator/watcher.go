@@ -1,4 +1,4 @@
-package watcher
+package operator
 
 import (
 	"os"
@@ -38,7 +38,7 @@ type Options struct {
 	EnableAnalytics bool
 }
 
-type Watchers struct {
+type Operator struct {
 	KubeClient        clientset.Interface
 	VoyagerClient     vcs.ExtensionInterface
 	SearchlightClient srch_cs.ExtensionInterface
@@ -57,52 +57,52 @@ type Watchers struct {
 	sync.Mutex
 }
 
-func (w *Watchers) Run() {
-	go w.WatchAlertmanagers()
-	go w.WatchClusterAlerts()
-	go w.WatchConfigMaps()
-	go w.WatchDaemonSets()
-	go w.WatchDeploymentApps()
-	go w.WatchDeploymentExtensions()
-	go w.WatchDormantDatabases()
-	go w.WatchElastics()
-	go w.WatchEvents()
-	go w.WatchIngresss()
-	go w.WatchJobs()
-	go w.watchNamespaces()
-	go w.WatchNodeAlerts()
-	go w.WatchPersistentVolumeClaims()
-	go w.WatchPersistentVolumes()
-	go w.WatchPodAlerts()
-	go w.WatchPostgreses()
-	go w.WatchPrometheuss()
-	go w.WatchReplicaSets()
-	go w.WatchReplicationControllers()
-	go w.WatchRestics()
-	go w.WatchSecrets()
-	go w.watchService()
-	go w.WatchServiceMonitors()
-	go w.WatchStatefulSets()
-	go w.WatchStorageClasss()
-	go w.WatchVoyagerCertificates()
-	go w.WatchVoyagerIngresses()
+func (op *Operator) Run() {
+	go op.WatchAlertmanagers()
+	go op.WatchClusterAlerts()
+	go op.WatchConfigMaps()
+	go op.WatchDaemonSets()
+	go op.WatchDeploymentApps()
+	go op.WatchDeploymentExtensions()
+	go op.WatchDormantDatabases()
+	go op.WatchElastics()
+	go op.WatchEvents()
+	go op.WatchIngresss()
+	go op.WatchJobs()
+	go op.watchNamespaces()
+	go op.WatchNodeAlerts()
+	go op.WatchPersistentVolumeClaims()
+	go op.WatchPersistentVolumes()
+	go op.WatchPodAlerts()
+	go op.WatchPostgreses()
+	go op.WatchPrometheuss()
+	go op.WatchReplicaSets()
+	go op.WatchReplicationControllers()
+	go op.WatchRestics()
+	go op.WatchSecrets()
+	go op.watchService()
+	go op.WatchServiceMonitors()
+	go op.WatchStatefulSets()
+	go op.WatchStorageClasss()
+	go op.WatchVoyagerCertificates()
+	go op.WatchVoyagerIngresses()
 
-	go w.StartCron()
+	go op.StartCron()
 }
 
-func (w *Watchers) StartCron() {
-	w.Cron.Start()
+func (op *Operator) StartCron() {
+	op.Cron.Start()
 
-	w.Cron.AddFunc("@every 24h", func() {
-		janitor := influx.Janitor{Config: w.Config}
+	op.Cron.AddFunc("@every 24h", func() {
+		janitor := influx.Janitor{Config: op.Config}
 		janitor.CleanInflux()
 	})
-	w.Cron.AddFunc("@every 24h", func() {
-		janitor := es.Janitor{Config: w.Config}
+	op.Cron.AddFunc("@every 24h", func() {
+		janitor := es.Janitor{Config: op.Config}
 		janitor.CleanES()
 	})
-	w.Cron.AddFunc("@every 24h", func() {
-		err := filepath.Walk(w.Config.RecycleBin.Path, func(path string, info os.FileInfo, err error) error {
+	op.Cron.AddFunc("@every 24h", func() {
+		err := filepath.Walk(op.Config.RecycleBin.Path, func(path string, info os.FileInfo, err error) error {
 			// delete old objects
 			return nil
 		})
@@ -111,11 +111,11 @@ func (w *Watchers) StartCron() {
 		}
 		// expire saver
 	})
-	w.Cron.AddFunc(w.Config.Backup.Schedule, func() {
+	op.Cron.AddFunc(op.Config.ClusterSnapshot.Schedule, func() {
 		if config, err := rest.InClusterConfig(); err == nil {
 			err := backup.Backup(config, backup.Options{
 				BackupDir: "/tmp/abc",
-				Sanitize:  w.Config.Backup.Sanitize,
+				Sanitize:  op.Config.ClusterSnapshot.Sanitize,
 			})
 			if err != nil {
 				log.Errorln(err)

@@ -1,4 +1,4 @@
-package watcher
+package operator
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -9,14 +9,13 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-	apps "k8s.io/client-go/pkg/apis/apps/v1beta1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (w *Watchers) WatchStatefulSets() {
-	if !util.IsPreferredAPIResource(w.KubeClient, apps.SchemeGroupVersion.String(), "StatefulSet") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "StatefulSet")
+func (op *Operator) WatchSecrets() {
+	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "Secret") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Secret")
 		return
 	}
 
@@ -24,20 +23,20 @@ func (w *Watchers) WatchStatefulSets() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return w.KubeClient.AppsV1beta1().StatefulSets(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().Secrets(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return w.KubeClient.AppsV1beta1().StatefulSets(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().Secrets(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apps.StatefulSet{},
-		w.SyncPeriod,
+		&apiv1.Secret{},
+		op.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if deployment, ok := obj.(*apps.StatefulSet); ok {
-					log.Infof("StatefulSet %s@%s deleted", deployment.Name, deployment.Namespace)
-					w.Saver.Save(deployment.ObjectMeta, obj)
+				if scrt, ok := obj.(*apiv1.Secret); ok {
+					log.Infof("Secret %s@%s deleted", scrt.Name, scrt.Namespace)
+					op.Saver.Save(scrt.ObjectMeta, obj)
 				}
 			},
 		},

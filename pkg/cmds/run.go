@@ -83,7 +83,7 @@ func Run(opt watcher.Options) {
 		os.Exit(1)
 	}
 
-	w := &watcher.Watchers{
+	w := &watcher.Operator{
 		KubeClient:        clientset.NewForConfigOrDie(c),
 		VoyagerClient:     vcs.NewForConfigOrDie(c),
 		SearchlightClient: srch_cs.NewForConfigOrDie(c),

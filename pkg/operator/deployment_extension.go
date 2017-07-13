@@ -1,4 +1,4 @@
-package watcher
+package operator
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -14,9 +14,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (w *Watchers) WatchDaemonSets() {
-	if !util.IsPreferredAPIResource(w.KubeClient, extensions.SchemeGroupVersion.String(), "DaemonSet") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "DaemonSet")
+func (op *Operator) WatchDeploymentExtensions() {
+	if !util.IsPreferredAPIResource(op.KubeClient, extensions.SchemeGroupVersion.String(), "Deployment") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "Deployment")
 		return
 	}
 
@@ -24,20 +24,20 @@ func (w *Watchers) WatchDaemonSets() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return w.KubeClient.ExtensionsV1beta1().DaemonSets(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.ExtensionsV1beta1().Deployments(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return w.KubeClient.ExtensionsV1beta1().DaemonSets(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.ExtensionsV1beta1().Deployments(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&extensions.DaemonSet{},
-		w.SyncPeriod,
+		&extensions.Deployment{},
+		op.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if daemon, ok := obj.(*extensions.DaemonSet); ok {
-					log.Infof("DaemonSet %s@%s deleted", daemon.Name, daemon.Namespace)
-					w.Saver.Save(daemon.ObjectMeta, obj)
+				if deployment, ok := obj.(*extensions.Deployment); ok {
+					log.Infof("Deployment %s@%s deleted", deployment.Name, deployment.Namespace)
+					op.Saver.Save(deployment.ObjectMeta, obj)
 				}
 			},
 		},

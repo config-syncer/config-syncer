@@ -1,4 +1,4 @@
-package watcher
+package operator
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -14,9 +14,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (w *Watchers) WatchIngresss() {
-	if !util.IsPreferredAPIResource(w.KubeClient, extensions.SchemeGroupVersion.String(), "Ingress") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "Ingress")
+func (op *Operator) WatchReplicaSets() {
+	if !util.IsPreferredAPIResource(op.KubeClient, extensions.SchemeGroupVersion.String(), "ReplicaSet") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "ReplicaSet")
 		return
 	}
 
@@ -24,20 +24,20 @@ func (w *Watchers) WatchIngresss() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return w.KubeClient.ExtensionsV1beta1().Ingresses(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.ExtensionsV1beta1().ReplicaSets(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return w.KubeClient.ExtensionsV1beta1().Ingresses(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.ExtensionsV1beta1().ReplicaSets(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&extensions.Ingress{},
-		w.SyncPeriod,
+		&extensions.ReplicaSet{},
+		op.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
-			DeleteFunc: func(obj interface{}) {
-				if ingress, ok := obj.(*extensions.Ingress); ok {
-					log.Infof("Ingress %s@%s deleted", ingress.Name, ingress.Namespace)
-					w.Saver.Save(ingress.ObjectMeta, obj)
+			AddFunc: func(obj interface{}) {
+				if rs, ok := obj.(*extensions.ReplicaSet); ok {
+					log.Infof("ReplicaSet %s@%s deleted", rs.Name, rs.Namespace)
+					op.Saver.Save(rs.ObjectMeta, obj)
 				}
 			},
 		},

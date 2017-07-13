@@ -1,4 +1,4 @@
-package watcher
+package operator
 
 import (
 	"errors"
@@ -17,9 +17,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (w *Watchers) WatchDormantDatabases() {
-	if !util.IsPreferredAPIResource(w.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindDormantDatabase) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindDormantDatabase)
+func (op *Operator) WatchElastics() {
+	if !util.IsPreferredAPIResource(op.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic)
 		return
 	}
 
@@ -27,38 +27,38 @@ func (w *Watchers) WatchDormantDatabases() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return w.KubeDBClient.DormantDatabases(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeDBClient.Elastics(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return w.KubeDBClient.DormantDatabases(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeDBClient.Elastics(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&tapi.DormantDatabase{},
-		w.SyncPeriod,
+		&tapi.Elastic{},
+		op.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if drmn, ok := obj.(*tapi.DormantDatabase); ok {
-					fmt.Println(drmn)
+				if elastic, ok := obj.(*tapi.Elastic); ok {
+					fmt.Println(elastic)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldAlert, ok := old.(*tapi.DormantDatabase)
+				oldAlert, ok := old.(*tapi.Elastic)
 				if !ok {
-					log.Errorln(errors.New("Invalid DormantDatabase object"))
+					log.Errorln(errors.New("Invalid Elastic object"))
 					return
 				}
-				newAlert, ok := new.(*tapi.DormantDatabase)
+				newAlert, ok := new.(*tapi.Elastic)
 				if !ok {
-					log.Errorln(errors.New("Invalid DormantDatabase object"))
+					log.Errorln(errors.New("Invalid Elastic object"))
 					return
 				}
 				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
-				if drmn, ok := obj.(*tapi.DormantDatabase); ok {
-					fmt.Println(drmn)
-					w.Saver.Save(drmn.ObjectMeta, obj)
+				if elastic, ok := obj.(*tapi.Elastic); ok {
+					fmt.Println(elastic)
+					op.Saver.Save(elastic.ObjectMeta, obj)
 				}
 			},
 		},

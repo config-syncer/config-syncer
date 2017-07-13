@@ -1,4 +1,4 @@
-package watcher
+package operator
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -13,9 +13,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (w *Watchers) WatchPersistentVolumeClaims() {
-	if !util.IsPreferredAPIResource(w.KubeClient, apiv1.SchemeGroupVersion.String(), "PersistentVolumeClaim") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "PersistentVolumeClaim")
+func (op *Operator) WatchReplicationControllers() {
+	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "ReplicationController") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ReplicationController")
 		return
 	}
 
@@ -23,20 +23,20 @@ func (w *Watchers) WatchPersistentVolumeClaims() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return w.KubeClient.CoreV1().PersistentVolumeClaims(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().ReplicationControllers(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return w.KubeClient.CoreV1().PersistentVolumeClaims(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().ReplicationControllers(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.PersistentVolumeClaim{},
-		w.SyncPeriod,
+		&apiv1.ReplicationController{},
+		op.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if pvc, ok := obj.(*apiv1.PersistentVolumeClaim); ok {
-					log.Infof("PersistentVolumeClaim %s@%s deleted", pvc.Name, pvc.Namespace)
-					w.Saver.Save(pvc.ObjectMeta, obj)
+				if rc, ok := obj.(*apiv1.ReplicationController); ok {
+					log.Infof("ReplicationController %s@%s deleted", rc.Name, rc.Namespace)
+					op.Saver.Save(rc.ObjectMeta, obj)
 				}
 			},
 		},

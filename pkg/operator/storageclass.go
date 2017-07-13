@@ -1,4 +1,4 @@
-package watcher
+package operator
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -8,14 +8,14 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
+	storage "k8s.io/client-go/pkg/apis/storage/v1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (w *Watchers) WatchConfigMaps() {
-	if !util.IsPreferredAPIResource(w.KubeClient, apiv1.SchemeGroupVersion.String(), "ConfigMap") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ConfigMap")
+func (op *Operator) WatchStorageClasss() {
+	if !util.IsPreferredAPIResource(op.KubeClient, storage.SchemeGroupVersion.String(), "StorageClass") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", storage.SchemeGroupVersion.String(), "StorageClass")
 		return
 	}
 
@@ -23,21 +23,20 @@ func (w *Watchers) WatchConfigMaps() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return w.KubeClient.CoreV1().ConfigMaps(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.StorageV1().StorageClasses().List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return w.KubeClient.CoreV1().ConfigMaps(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.StorageV1().StorageClasses().Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.ConfigMap{},
-		w.SyncPeriod,
+		&storage.StorageClass{},
+		op.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if cfgmap, ok := obj.(*apiv1.ConfigMap); ok {
-					log.Infof("ConfigMap %s@%s deleted", cfgmap.Name, cfgmap.Namespace)
-
-					w.Saver.Save(cfgmap.ObjectMeta, obj)
+				if sc, ok := obj.(*storage.StorageClass); ok {
+					log.Infof("StorageClass %s@%s deleted", sc.Name, sc.Namespace)
+					op.Saver.Save(sc.ObjectMeta, obj)
 				}
 			},
 		},

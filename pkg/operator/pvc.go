@@ -1,4 +1,4 @@
-package watcher
+package operator
 
 import (
 	acrt "github.com/appscode/go/runtime"
@@ -13,9 +13,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (w *Watchers) WatchEvents() {
-	if !util.IsPreferredAPIResource(w.KubeClient, apiv1.SchemeGroupVersion.String(), "Event") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Event")
+func (op *Operator) WatchPersistentVolumeClaims() {
+	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "PersistentVolumeClaim") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "PersistentVolumeClaim")
 		return
 	}
 
@@ -23,19 +23,20 @@ func (w *Watchers) WatchEvents() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return w.KubeClient.CoreV1().Events(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().PersistentVolumeClaims(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return w.KubeClient.CoreV1().Events(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().PersistentVolumeClaims(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.Event{},
-		w.SyncPeriod,
+		&apiv1.PersistentVolumeClaim{},
+		op.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if cfgmap, ok := obj.(*apiv1.Event); ok {
-					log.Infof("Event %s@%s deleted", cfgmap.Name, cfgmap.Namespace)
+				if pvc, ok := obj.(*apiv1.PersistentVolumeClaim); ok {
+					log.Infof("PersistentVolumeClaim %s@%s deleted", pvc.Name, pvc.Namespace)
+					op.Saver.Save(pvc.ObjectMeta, obj)
 				}
 			},
 		},

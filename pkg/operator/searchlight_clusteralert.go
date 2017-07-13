@@ -1,8 +1,9 @@
-package watcher
+package operator
 
 import (
 	"errors"
 	"fmt"
+	"reflect"
 
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
@@ -17,9 +18,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (w *Watchers) WatchPodAlerts() {
-	if !util.IsPreferredAPIResource(w.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPodAlert) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindPodAlert)
+func (op *Operator) WatchClusterAlerts() {
+	if !util.IsPreferredAPIResource(op.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindClusterAlert) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindClusterAlert)
 		return
 	}
 
@@ -27,38 +28,40 @@ func (w *Watchers) WatchPodAlerts() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return w.SearchlightClient.PodAlerts(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.SearchlightClient.ClusterAlerts(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return w.SearchlightClient.PodAlerts(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.SearchlightClient.ClusterAlerts(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&tapi.PodAlert{},
-		w.SyncPeriod,
+		&tapi.ClusterAlert{},
+		op.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.PodAlert); ok {
+				if alert, ok := obj.(*tapi.ClusterAlert); ok {
 					fmt.Println(alert)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldAlert, ok := old.(*tapi.PodAlert)
+				oldAlert, ok := old.(*tapi.ClusterAlert)
 				if !ok {
-					log.Errorln(errors.New("Invalid PodAlert object"))
+					log.Errorln(errors.New("Invalid ClusterAlert object"))
 					return
 				}
-				newAlert, ok := new.(*tapi.PodAlert)
+				newAlert, ok := new.(*tapi.ClusterAlert)
 				if !ok {
-					log.Errorln(errors.New("Invalid PodAlert object"))
+					log.Errorln(errors.New("Invalid ClusterAlert object"))
 					return
+				}
+				if !reflect.DeepEqual(oldAlert.Spec, newAlert.Spec) {
 				}
 				fmt.Println(oldAlert, newAlert)
 			},
 			DeleteFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.PodAlert); ok {
+				if alert, ok := obj.(*tapi.ClusterAlert); ok {
 					fmt.Println(alert)
-					w.Saver.Save(alert.ObjectMeta, obj)
+					op.Saver.Save(alert.ObjectMeta, obj)
 				}
 			},
 		},

@@ -1,10 +1,9 @@
-package watcher
+package operator
 
 import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
-	tapi "github.com/appscode/voyager/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -14,29 +13,29 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (w *Watchers) WatchVoyagerIngresses() {
-	if !util.IsPreferredAPIResource(w.KubeClient, tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindIngress) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindIngress)
+func (op *Operator) WatchEvents() {
+	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "Event") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Event")
 		return
 	}
+
 	defer acrt.HandleCrash()
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return w.VoyagerClient.Ingresses(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().Events(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return w.VoyagerClient.Ingresses(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().Events(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&tapi.Ingress{},
-		w.SyncPeriod,
+		&apiv1.Event{},
+		op.SyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
-				if ingress, ok := obj.(*tapi.Ingress); ok {
-					log.Infof("Ingress %s@%s deleted", ingress.Name, ingress.Namespace)
-					w.Saver.Save(ingress.ObjectMeta, obj)
+				if cfgmap, ok := obj.(*apiv1.Event); ok {
+					log.Infof("Event %s@%s deleted", cfgmap.Name, cfgmap.Namespace)
 				}
 			},
 		},

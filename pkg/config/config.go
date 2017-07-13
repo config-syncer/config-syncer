@@ -18,9 +18,9 @@ const (
 type ClusterConfig struct {
 	Elasticsearch      *ElasticSearchSpec  `json:"elasticsearch,omitempty,omitempty"`
 	InfluxDB           *InfluxDBSpec       `json:"influxdb,omitempty"`
-	RecycleBin         *RecycleBinSpec     `json:"recycle_bin,omitempty"`
-	EventForwarder     *EventForwarderSpec `json:"event_forwarder,omitempty"`
-	Backup             *BackupSpec         `json:"backup,omitempty"`
+	RecycleBin         *RecycleBinSpec     `json:"recycleBin,omitempty"`
+	EventForwarder     *EventForwarderSpec `json:"eventForwarder,omitempty"`
+	ClusterSnapshot    *SnapshotSpec       `json:"clusterSnapshot,omitempty"`
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
 }
 
@@ -54,7 +54,7 @@ type EventForwarderSpec struct {
 
 // For periodic full cluster backup
 // https://github.com/appscode/kubed/issues/16
-type BackupSpec struct {
+type SnapshotSpec struct {
 	Schedule string  `json:"schedule,omitempty"`
 	Sanitize bool    `json:"sanitize,omitempty"`
 	Storage  Backend `json:",inline"`
