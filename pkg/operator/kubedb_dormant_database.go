@@ -2,7 +2,7 @@ package operator
 
 import (
 	"errors"
-	"fmt"
+	"reflect"
 
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
@@ -35,30 +35,52 @@ func (op *Operator) WatchDormantDatabases() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.DormantDatabase{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if drmn, ok := obj.(*tapi.DormantDatabase); ok {
-					fmt.Println(drmn)
+				if res, ok := obj.(*tapi.DormantDatabase); ok {
+					log.Infof("DormantDatabase %s@%s added", res.Name, res.Namespace)
+
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleAdd(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+				}
+			},
+			DeleteFunc: func(obj interface{}) {
+				if res, ok := obj.(*tapi.DormantDatabase); ok {
+					log.Infof("DormantDatabase %s@%s deleted", res.Name, res.Namespace)
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleDelete(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+					if op.TrashCan != nil {
+						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
+					}
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldAlert, ok := old.(*tapi.DormantDatabase)
+				oldRes, ok := old.(*tapi.DormantDatabase)
 				if !ok {
 					log.Errorln(errors.New("Invalid DormantDatabase object"))
 					return
 				}
-				newAlert, ok := new.(*tapi.DormantDatabase)
+				newRes, ok := new.(*tapi.DormantDatabase)
 				if !ok {
 					log.Errorln(errors.New("Invalid DormantDatabase object"))
 					return
 				}
-				fmt.Println(oldAlert, newAlert)
-			},
-			DeleteFunc: func(obj interface{}) {
-				if drmn, ok := obj.(*tapi.DormantDatabase); ok {
-					fmt.Println(drmn)
-					op.Saver.Save(drmn.ObjectMeta, obj)
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleUpdate(old, new)
+				}
+				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
+					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
+						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
+						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
+						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
+					}
 				}
 			},
 		},

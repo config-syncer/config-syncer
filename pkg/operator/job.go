@@ -1,6 +1,9 @@
 package operator
 
 import (
+	"errors"
+	"reflect"
+
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
@@ -33,12 +36,52 @@ func (op *Operator) WatchJobs() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&batch.Job{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
+			AddFunc: func(obj interface{}) {
+				if res, ok := obj.(*batch.Job); ok {
+					log.Infof("Job %s@%s added", res.Name, res.Namespace)
+
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleAdd(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+				}
+			},
 			DeleteFunc: func(obj interface{}) {
-				if job, ok := obj.(*batch.Job); ok {
-					log.Infof("Job %s@%s deleted", job.Name, job.Namespace)
-					op.Saver.Save(job.ObjectMeta, obj)
+				if res, ok := obj.(*batch.Job); ok {
+					log.Infof("Job %s@%s deleted", res.Name, res.Namespace)
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleDelete(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+					if op.TrashCan != nil {
+						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
+					}
+				}
+			},
+			UpdateFunc: func(old, new interface{}) {
+				oldRes, ok := old.(*batch.Job)
+				if !ok {
+					log.Errorln(errors.New("Invalid Job object"))
+					return
+				}
+				newRes, ok := new.(*batch.Job)
+				if !ok {
+					log.Errorln(errors.New("Invalid Job object"))
+					return
+				}
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleUpdate(old, new)
+				}
+				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
+					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
+						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
+						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
+						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
+					}
 				}
 			},
 		},

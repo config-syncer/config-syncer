@@ -21,8 +21,8 @@ Kubed is a Kubernetes companion daemon to perform various supporting operations.
 ```
 
 ### SEE ALSO
-* [kubed backup](kubed_backup.md)	 - Takes backup of YAML files of cluster
 * [kubed run](kubed_run.md)	 - Run daemon
+* [kubed snapshot](kubed_snapshot.md)	 - Takes a snapshot of Kubernetes api objects
 * [kubed version](kubed_version.md)	 - Prints binary version number.
 
 

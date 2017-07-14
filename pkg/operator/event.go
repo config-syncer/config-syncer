@@ -31,7 +31,7 @@ func (op *Operator) WatchEvents() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.Event{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			DeleteFunc: func(obj interface{}) {
 				if cfgmap, ok := obj.(*apiv1.Event); ok {

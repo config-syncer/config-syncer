@@ -1,6 +1,9 @@
 package operator
 
 import (
+	"errors"
+	"reflect"
+
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
@@ -31,12 +34,52 @@ func (op *Operator) WatchReplicationControllers() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.ReplicationController{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
+			AddFunc: func(obj interface{}) {
+				if res, ok := obj.(*apiv1.ReplicationController); ok {
+					log.Infof("ReplicationController %s@%s added", res.Name, res.Namespace)
+
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleAdd(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+				}
+			},
 			DeleteFunc: func(obj interface{}) {
-				if rc, ok := obj.(*apiv1.ReplicationController); ok {
-					log.Infof("ReplicationController %s@%s deleted", rc.Name, rc.Namespace)
-					op.Saver.Save(rc.ObjectMeta, obj)
+				if res, ok := obj.(*apiv1.ReplicationController); ok {
+					log.Infof("ReplicationController %s@%s deleted", res.Name, res.Namespace)
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleDelete(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+					if op.TrashCan != nil {
+						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
+					}
+				}
+			},
+			UpdateFunc: func(old, new interface{}) {
+				oldRes, ok := old.(*apiv1.ReplicationController)
+				if !ok {
+					log.Errorln(errors.New("Invalid ReplicationController object"))
+					return
+				}
+				newRes, ok := new.(*apiv1.ReplicationController)
+				if !ok {
+					log.Errorln(errors.New("Invalid ReplicationController object"))
+					return
+				}
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleUpdate(old, new)
+				}
+				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
+					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
+						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
+						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
+						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
+					}
 				}
 			},
 		},

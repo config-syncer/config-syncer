@@ -2,7 +2,7 @@ package operator
 
 import (
 	"errors"
-	"fmt"
+	"reflect"
 
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
@@ -35,30 +35,52 @@ func (op *Operator) WatchElastics() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Elastic{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if elastic, ok := obj.(*tapi.Elastic); ok {
-					fmt.Println(elastic)
+				if res, ok := obj.(*tapi.Elastic); ok {
+					log.Infof("Elastic %s@%s added", res.Name, res.Namespace)
+
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleAdd(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+				}
+			},
+			DeleteFunc: func(obj interface{}) {
+				if res, ok := obj.(*tapi.Elastic); ok {
+					log.Infof("Elastic %s@%s deleted", res.Name, res.Namespace)
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleDelete(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+					if op.TrashCan != nil {
+						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
+					}
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldAlert, ok := old.(*tapi.Elastic)
+				oldRes, ok := old.(*tapi.Elastic)
 				if !ok {
 					log.Errorln(errors.New("Invalid Elastic object"))
 					return
 				}
-				newAlert, ok := new.(*tapi.Elastic)
+				newRes, ok := new.(*tapi.Elastic)
 				if !ok {
 					log.Errorln(errors.New("Invalid Elastic object"))
 					return
 				}
-				fmt.Println(oldAlert, newAlert)
-			},
-			DeleteFunc: func(obj interface{}) {
-				if elastic, ok := obj.(*tapi.Elastic); ok {
-					fmt.Println(elastic)
-					op.Saver.Save(elastic.ObjectMeta, obj)
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleUpdate(old, new)
+				}
+				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
+					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
+						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
+						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
+						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
+					}
 				}
 			},
 		},

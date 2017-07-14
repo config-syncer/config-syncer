@@ -32,9 +32,4 @@ $ kubectl get pods --all-namespaces -l app=kubed --watch
 
 Once the operator pods are running, you can cancel the above command by typing `Ctrl+C`.
 
-Now, to confirm TPR groups have been registered by the operator, run the following command:
-```sh
-$ kubectl get thirdpartyresources -l app=kubed
-```
-
-Now, you are ready to [take your first backup](/docs/tutorial.md) using Kubed.
+Now, you are ready to [start managing your cluster](/docs/tutorial.md) using Kubed.

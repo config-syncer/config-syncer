@@ -27,13 +27,13 @@ check_antipackage()
 
 # ref: https://github.com/ellisonbg/antipackage
 import antipackage
-from github.appscode.libbuild import libbuild
+from github.appscode.libbuild import libbuild, pydotenv
 
 import os
 import os.path
 import subprocess
 import sys
-from os.path import expandvars
+from os.path import expandvars, join, dirname
 
 libbuild.REPO_ROOT = expandvars('$GOPATH') + '/src/github.com/appscode/kubed'
 BUILD_METADATA = libbuild.metadata(libbuild.REPO_ROOT)
@@ -83,12 +83,11 @@ def fmt():
 def vet():
     call('go vet *.go ./pkg/...')
 
-def test():
-    call('go test -v *.go ./pkg/...')
 
 def lint():
     call('golint *.go')
     call('golint ./pkg/...')
+    call('golint ./test/...')
 
 
 def gen():
@@ -154,6 +153,15 @@ def default():
     gen()
     fmt()
     die(call('GO15VENDOREXPERIMENT=1 ' + libbuild.GOC + ' install .'))
+
+def test(type, *args):
+    pydotenv.load_dotenv(join(libbuild.REPO_ROOT, 'hack/config/.env'))
+    if type == 'unit':
+        die(call(libbuild.GOC + ' test -v ./pkg/...'))
+    elif type == 'e2e':
+        die(call('ginkgo -r --v --progress --trace -- --v=3'))
+    else:
+        print '{test unit|e2e}'
 
 
 if __name__ == "__main__":

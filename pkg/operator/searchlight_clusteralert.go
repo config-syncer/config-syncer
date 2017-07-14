@@ -2,7 +2,6 @@ package operator
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 
 	acrt "github.com/appscode/go/runtime"
@@ -36,32 +35,52 @@ func (op *Operator) WatchClusterAlerts() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.ClusterAlert{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.ClusterAlert); ok {
-					fmt.Println(alert)
+				if res, ok := obj.(*tapi.ClusterAlert); ok {
+					log.Infof("ClusterAlert %s@%s added", res.Name, res.Namespace)
+
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleAdd(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+				}
+			},
+			DeleteFunc: func(obj interface{}) {
+				if res, ok := obj.(*tapi.ClusterAlert); ok {
+					log.Infof("ClusterAlert %s@%s deleted", res.Name, res.Namespace)
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleDelete(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+					if op.TrashCan != nil {
+						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
+					}
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldAlert, ok := old.(*tapi.ClusterAlert)
+				oldRes, ok := old.(*tapi.ClusterAlert)
 				if !ok {
 					log.Errorln(errors.New("Invalid ClusterAlert object"))
 					return
 				}
-				newAlert, ok := new.(*tapi.ClusterAlert)
+				newRes, ok := new.(*tapi.ClusterAlert)
 				if !ok {
 					log.Errorln(errors.New("Invalid ClusterAlert object"))
 					return
 				}
-				if !reflect.DeepEqual(oldAlert.Spec, newAlert.Spec) {
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleUpdate(old, new)
 				}
-				fmt.Println(oldAlert, newAlert)
-			},
-			DeleteFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.ClusterAlert); ok {
-					fmt.Println(alert)
-					op.Saver.Save(alert.ObjectMeta, obj)
+				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
+					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
+						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
+						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
+						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
+					}
 				}
 			},
 		},

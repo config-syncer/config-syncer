@@ -2,8 +2,8 @@ package indexers
 
 import (
 	"encoding/json"
+	"path/filepath"
 	"reflect"
-	"strings"
 
 	"github.com/appscode/log"
 	"github.com/blevesearch/bleve"
@@ -24,7 +24,7 @@ type ReverseIndexer struct {
 }
 
 func NewReverseIndexer(cl clientset.Interface, dst string) (*ReverseIndexer, error) {
-	c, err := ensureIndex(strings.TrimRight(dst, "/")+"/reverse.indexer", "indexer")
+	c, err := ensureIndex(filepath.Join(dst, "reverse.indexer"), "indexer")
 	if err != nil {
 		return nil, err
 	}

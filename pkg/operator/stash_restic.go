@@ -2,7 +2,7 @@ package operator
 
 import (
 	"errors"
-	"fmt"
+	"reflect"
 
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
@@ -34,30 +34,52 @@ func (op *Operator) WatchRestics() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Restic{},
-		op.SyncPeriod,
+		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if restic, ok := obj.(*tapi.Restic); ok {
-					fmt.Println(restic)
+				if res, ok := obj.(*tapi.Restic); ok {
+					log.Infof("Restic %s@%s added", res.Name, res.Namespace)
+
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleAdd(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+				}
+			},
+			DeleteFunc: func(obj interface{}) {
+				if res, ok := obj.(*tapi.Restic); ok {
+					log.Infof("Restic %s@%s deleted", res.Name, res.Namespace)
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleDelete(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+					if op.TrashCan != nil {
+						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
+					}
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldRestic, ok := old.(*tapi.Restic)
+				oldRes, ok := old.(*tapi.Restic)
 				if !ok {
 					log.Errorln(errors.New("Invalid Restic object"))
 					return
 				}
-				newRestic, ok := new.(*tapi.Restic)
+				newRes, ok := new.(*tapi.Restic)
 				if !ok {
 					log.Errorln(errors.New("Invalid Restic object"))
 					return
 				}
-				fmt.Println(oldRestic, newRestic)
-			},
-			DeleteFunc: func(obj interface{}) {
-				if restic, ok := obj.(*tapi.Restic); ok {
-					fmt.Println(restic)
-					op.Saver.Save(restic.ObjectMeta, obj)
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleUpdate(old, new)
+				}
+				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
+					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
+						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
+						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
+						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
+					}
 				}
 			},
 		},

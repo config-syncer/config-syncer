@@ -9,26 +9,26 @@ import (
 )
 
 type Janitor struct {
-	Config config.ClusterConfig
+	Spec config.InfluxDBSpec
 }
 
-func (j *Janitor) CleanInflux() error {
-	u, err := url.Parse(j.Config.InfluxDB.Endpoint)
+func (j *Janitor) Cleanup() error {
+	u, err := url.Parse(j.Spec.Endpoint)
 	if err != nil {
 		return err
 	}
 
 	client, err := influxdb.NewClient(influxdb.Config{
 		URL:      *u,
-		Username: j.Config.InfluxDB.Username,
-		Password: j.Config.InfluxDB.Password,
+		Username: j.Spec.Username,
+		Password: j.Spec.Password,
 	})
 	if err != nil {
 		return err
 	}
 
 	query := influxdb.Query{
-		Command:  fmt.Sprintf("ALTER RETENTION POLICY default ON k8s DURATION %vs", j.Config.InfluxDB.TTL),
+		Command:  fmt.Sprintf("ALTER RETENTION POLICY default ON k8s DURATION %vs", int(j.Spec.TTL.Seconds())),
 		Database: "k8s",
 	}
 	_, err = client.Query(query)
