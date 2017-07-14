@@ -31,7 +31,7 @@ func main() {
 			Namespace: "kube-system",
 		},
 		Data: map[string]string{
-			"config": string(bytes),
+			"config.yaml": string(bytes),
 		},
 	}
 	bytes, err = yaml.Marshal(cfgmap)
