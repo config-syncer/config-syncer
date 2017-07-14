@@ -1,0 +1,26 @@
+apiVersion: v1
+data:
+  config: |
+    clusterSnapshot:
+      Storage:
+        local:
+          path: /tmp/csnap
+      sanitize: true
+      schedule: '@every 5m'
+    eventForwarder:
+      eventNamespaces:
+      - kube-system
+      forwardWarningEvents: true
+      notifyOnIngressAdd: true
+      notifyOnStorageAdd: true
+      notifyVia: mailgun
+    recycleBin:
+      handle_update: true
+      notifyVia: mailgun
+      path: /tmp/kubed
+      ttl: 168h0m0s
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: kubed
+  namespace: default
