@@ -45,6 +45,10 @@ func (op *Operator) WatchPersistentVolumeClaims() {
 							log.Errorln(err)
 						}
 					}
+
+					if op.Eventer != nil && op.Config.EventForwarder.NotifyOnStorageAdd {
+						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
+					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {

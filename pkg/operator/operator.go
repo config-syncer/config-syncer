@@ -6,9 +6,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/appscode/envconfig"
 	"github.com/appscode/kubed/pkg/backup"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/elasticsearch"
+	"github.com/appscode/kubed/pkg/eventer"
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/influxdb"
 	"github.com/appscode/kubed/pkg/storage"
@@ -22,6 +24,7 @@ import (
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
 	"gopkg.in/robfig/cron.v2"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -53,10 +56,12 @@ type Operator struct {
 	Opt    Options
 	Config config.ClusterConfig
 
-	SearchIndex  *indexers.ResourceIndexer
-	ReverseIndex *indexers.ReverseIndexer
-	TrashCan     *trashcan.TrashCan
-	Cron         *cron.Cron
+	SearchIndex    *indexers.ResourceIndexer
+	ReverseIndex   *indexers.ReverseIndexer
+	TrashCan       *trashcan.TrashCan
+	Eventer        *eventer.EventForwarder
+	Cron           *cron.Cron
+	NotifierLoader envconfig.LoaderFunc
 
 	syncPeriod time.Duration
 	sync.Mutex
@@ -69,11 +74,26 @@ func (op *Operator) Setup() error {
 	}
 	op.Config = *cfg
 
+	op.NotifierLoader, err = op.getLoader()
+	if err != nil {
+		return err
+	}
+
 	if op.Config.TrashCan != nil {
 		if op.Config.TrashCan.Path == "" {
 			op.Config.TrashCan.Path = filepath.Join(op.Opt.ScratchDir, "transhcan")
 		}
-		op.TrashCan = &trashcan.TrashCan{Spec: *op.Config.TrashCan}
+		op.TrashCan = &trashcan.TrashCan{
+			Spec:   *op.Config.TrashCan,
+			Loader: op.NotifierLoader,
+		}
+	}
+
+	if op.Config.EventForwarder != nil {
+		op.Eventer = &eventer.EventForwarder{
+			Spec:   *op.Config.EventForwarder,
+			Loader: op.NotifierLoader,
+		}
 	}
 
 	op.Cron = cron.New()
@@ -89,6 +109,21 @@ func (op *Operator) Setup() error {
 
 	op.syncPeriod = time.Minute * 2
 	return nil
+}
+
+func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {
+	cfg, err := op.KubeClient.CoreV1().
+		Secrets(op.Opt.OperatorNamespace).
+		Get(op.Config.NotifierSecretName, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return func(key string) (value string, found bool) {
+		var bytes []byte
+		bytes, found = cfg.Data[key]
+		value = string(bytes)
+		return
+	}, nil
 }
 
 func (op *Operator) RunWatchers() {

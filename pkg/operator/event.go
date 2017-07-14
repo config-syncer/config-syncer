@@ -33,9 +33,11 @@ func (op *Operator) WatchEvents() {
 		&apiv1.Event{},
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
-			DeleteFunc: func(obj interface{}) {
-				if cfgmap, ok := obj.(*apiv1.Event); ok {
-					log.Infof("Event %s@%s deleted", cfgmap.Name, cfgmap.Namespace)
+			AddFunc: func(obj interface{}) {
+				if res, ok := obj.(*apiv1.Event); ok {
+					if op.Eventer != nil && op.Config.EventForwarder.ForwardWarningEvents {
+						op.Eventer.ForwardEvent(res)
+					}
 				}
 			},
 		},
