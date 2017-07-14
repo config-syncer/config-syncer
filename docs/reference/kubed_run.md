@@ -22,6 +22,7 @@ kubed run [flags]
   -h, --help                   help for run
       --kubeconfig string      Path to kubeconfig file with authorization information (the master location is set by the master flag).
       --master string          The address of the Kubernetes API server (overrides any value in kubeconfig)
+      --scratch-dir emptyDir   Directory used to store temporary files. Use an emptyDir in Kubernetes. (default "/tmp")
 ```
 
 ### Options inherited from parent commands
