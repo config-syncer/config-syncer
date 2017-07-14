@@ -1,6 +1,9 @@
 package operator
 
 import (
+	"errors"
+	"reflect"
+
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
@@ -11,8 +14,6 @@ import (
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensions "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/tools/cache"
-	"errors"
-	"reflect"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
@@ -74,7 +75,7 @@ func (op *Operator) WatchDaemonSets() {
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
-				if op.TrashCan!= nil && op.Config.TrashCan.HandleUpdate {
+				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
 					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
 						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {

@@ -1,6 +1,9 @@
 package operator
 
 import (
+	"errors"
+	"reflect"
+
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
@@ -34,10 +37,50 @@ func (op *Operator) WatchPrometheuss() {
 		&prom.Prometheus{},
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
+			AddFunc: func(obj interface{}) {
+				if res, ok := obj.(*prom.Prometheus); ok {
+					log.Infof("Prometheus %s@%s added", res.Name, res.Namespace)
+
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleAdd(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+				}
+			},
 			DeleteFunc: func(obj interface{}) {
-				if pdb, ok := obj.(*prom.Prometheus); ok {
-					log.Infof("Prometheus %s@%s deleted", pdb.Name, pdb.Namespace)
-					op.TrashCan.Delete(pdb.ObjectMeta, obj)
+				if res, ok := obj.(*prom.Prometheus); ok {
+					log.Infof("Prometheus %s@%s deleted", res.Name, res.Namespace)
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleDelete(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+					if op.TrashCan != nil {
+						op.TrashCan.Delete(res.ObjectMeta, obj)
+					}
+				}
+			},
+			UpdateFunc: func(old, new interface{}) {
+				oldRes, ok := old.(*prom.Prometheus)
+				if !ok {
+					log.Errorln(errors.New("Invalid Prometheus object"))
+					return
+				}
+				newRes, ok := new.(*prom.Prometheus)
+				if !ok {
+					log.Errorln(errors.New("Invalid Prometheus object"))
+					return
+				}
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleUpdate(old, new)
+				}
+				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
+					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
+						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
+						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
+						op.TrashCan.Update(newRes.ObjectMeta, old, new)
+					}
 				}
 			},
 		},

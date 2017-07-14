@@ -1,6 +1,9 @@
 package operator
 
 import (
+	"errors"
+	"reflect"
+
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
@@ -34,10 +37,50 @@ func (op *Operator) WatchIngresss() {
 		&extensions.Ingress{},
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
+			AddFunc: func(obj interface{}) {
+				if res, ok := obj.(*extensions.Ingress); ok {
+					log.Infof("Ingress %s@%s added", res.Name, res.Namespace)
+
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleAdd(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+				}
+			},
 			DeleteFunc: func(obj interface{}) {
-				if ingress, ok := obj.(*extensions.Ingress); ok {
-					log.Infof("Ingress %s@%s deleted", ingress.Name, ingress.Namespace)
-					op.TrashCan.Delete(ingress.ObjectMeta, obj)
+				if res, ok := obj.(*extensions.Ingress); ok {
+					log.Infof("Ingress %s@%s deleted", res.Name, res.Namespace)
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleDelete(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+					if op.TrashCan != nil {
+						op.TrashCan.Delete(res.ObjectMeta, obj)
+					}
+				}
+			},
+			UpdateFunc: func(old, new interface{}) {
+				oldRes, ok := old.(*extensions.Ingress)
+				if !ok {
+					log.Errorln(errors.New("Invalid Ingress object"))
+					return
+				}
+				newRes, ok := new.(*extensions.Ingress)
+				if !ok {
+					log.Errorln(errors.New("Invalid Ingress object"))
+					return
+				}
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleUpdate(old, new)
+				}
+				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
+					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
+						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
+						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
+						op.TrashCan.Update(newRes.ObjectMeta, old, new)
+					}
 				}
 			},
 		},

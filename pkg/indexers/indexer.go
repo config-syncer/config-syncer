@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	"github.com/appscode/log"
+	"github.com/appscode/errors"
 	"github.com/blevesearch/bleve"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/appscode/errors"
 )
 
 type ResourceIndexer struct {
@@ -64,15 +63,16 @@ func (ri *ResourceIndexer) indexDocument(obj interface{}) error {
 		return errors.FromErr(err).WithMessage("Failed to index document").Err()
 	}
 
-	internalData, err := json.Marshal(obj)
+	data, err := json.Marshal(obj)
 	if err != nil {
 		return errors.FromErr(err).WithMessage("Failed to marshal internal document").Err()
 	}
 
-	err = ri.client.SetInternal([]byte(key), internalData)
+	err = ri.client.SetInternal([]byte(key), data)
 	if err != nil {
 		return errors.FromErr(err).WithMessage("Failed store internal document").Err()
 	}
+	return nil
 }
 
 func keyFunction(obj interface{}) string {

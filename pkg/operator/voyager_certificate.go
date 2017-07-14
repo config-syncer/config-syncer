@@ -1,6 +1,9 @@
 package operator
 
 import (
+	"errors"
+	"reflect"
+
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
@@ -33,10 +36,50 @@ func (op *Operator) WatchVoyagerCertificates() {
 		&tapi.Certificate{},
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
+			AddFunc: func(obj interface{}) {
+				if res, ok := obj.(*tapi.Certificate); ok {
+					log.Infof("Certificate %s@%s added", res.Name, res.Namespace)
+
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleAdd(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+				}
+			},
 			DeleteFunc: func(obj interface{}) {
-				if cert, ok := obj.(*tapi.Certificate); ok {
-					log.Infof("Certificate %s@%s deleted", cert.Name, cert.Namespace)
-					op.TrashCan.Delete(cert.ObjectMeta, obj)
+				if res, ok := obj.(*tapi.Certificate); ok {
+					log.Infof("Certificate %s@%s deleted", res.Name, res.Namespace)
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleDelete(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+					if op.TrashCan != nil {
+						op.TrashCan.Delete(res.ObjectMeta, obj)
+					}
+				}
+			},
+			UpdateFunc: func(old, new interface{}) {
+				oldRes, ok := old.(*tapi.Certificate)
+				if !ok {
+					log.Errorln(errors.New("Invalid Certificate object"))
+					return
+				}
+				newRes, ok := new.(*tapi.Certificate)
+				if !ok {
+					log.Errorln(errors.New("Invalid Certificate object"))
+					return
+				}
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleUpdate(old, new)
+				}
+				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
+					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
+						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
+						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
+						op.TrashCan.Update(newRes.ObjectMeta, old, new)
+					}
 				}
 			},
 		},
