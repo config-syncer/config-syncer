@@ -1,6 +1,9 @@
 package operator
 
 import (
+	"errors"
+	"reflect"
+
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
@@ -27,35 +30,66 @@ func (op *Operator) watchService() {
 			return op.KubeClient.CoreV1().ConfigMaps(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
-	_, controller := cache.NewInformer(lw,
+	_, ctrl := cache.NewInformer(lw,
 		&apiv1.Service{},
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if op.Opt.EnableReverseIndex {
-					op.ReverseIndex.Handle("added", obj)
-				}
-				if op.Opt.EnableSearchIndex {
-					op.SearchIndex.HandleAdd(obj)
+				if res, ok := obj.(*apiv1.Service); ok {
+					log.Infof("Service %s@%s added", res.Name, res.Namespace)
+
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleAdd(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+					if op.Opt.EnableReverseIndex {
+						op.ReverseIndex.Handle("added", obj)
+					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				if op.Opt.EnableReverseIndex {
-					op.ReverseIndex.Handle("deleted", obj)
-				}
-				if op.Opt.EnableSearchIndex {
-					op.SearchIndex.HandleDelete(obj)
+				if res, ok := obj.(*apiv1.Service); ok {
+					log.Infof("Service %s@%s deleted", res.Name, res.Namespace)
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleDelete(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+					if op.Opt.EnableReverseIndex {
+						op.ReverseIndex.Handle("deleted", obj)
+					}
+					if op.TrashCan != nil {
+						op.TrashCan.Delete(res.ObjectMeta, obj)
+					}
 				}
 			},
-			UpdateFunc: func(oldObj, newObj interface{}) {
-				if op.Opt.EnableReverseIndex {
-					op.ReverseIndex.Handle("updated", oldObj, newObj)
+			UpdateFunc: func(old, new interface{}) {
+				oldRes, ok := old.(*apiv1.Service)
+				if !ok {
+					log.Errorln(errors.New("Invalid Service object"))
+					return
+				}
+				newRes, ok := new.(*apiv1.Service)
+				if !ok {
+					log.Errorln(errors.New("Invalid Service object"))
+					return
 				}
 				if op.Opt.EnableSearchIndex {
-					op.SearchIndex.HandleUpdate(oldObj, newObj)
+					op.SearchIndex.HandleUpdate(old, new)
+				}
+				if op.Opt.EnableReverseIndex {
+					op.ReverseIndex.Handle("updated", old, new)
+				}
+				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
+					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
+						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
+						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
+						op.TrashCan.Update(newRes.ObjectMeta, old, new)
+					}
 				}
 			},
 		},
 	)
-	go controller.Run(wait.NeverStop)
+	ctrl.Run(wait.NeverStop)
 }

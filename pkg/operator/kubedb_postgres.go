@@ -2,7 +2,7 @@ package operator
 
 import (
 	"errors"
-	"fmt"
+	"reflect"
 
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
@@ -38,27 +38,49 @@ func (op *Operator) WatchPostgreses() {
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if alert, ok := obj.(*tapi.Postgres); ok {
-					fmt.Println(alert)
+				if res, ok := obj.(*tapi.Postgres); ok {
+					log.Infof("Postgres %s@%s added", res.Name, res.Namespace)
+
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleAdd(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+				}
+			},
+			DeleteFunc: func(obj interface{}) {
+				if res, ok := obj.(*tapi.Postgres); ok {
+					log.Infof("Postgres %s@%s deleted", res.Name, res.Namespace)
+					if op.Opt.EnableSearchIndex {
+						if err := op.SearchIndex.HandleDelete(obj); err != nil {
+							log.Errorln(err)
+						}
+					}
+					if op.TrashCan != nil {
+						op.TrashCan.Delete(res.ObjectMeta, obj)
+					}
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldAlert, ok := old.(*tapi.Postgres)
+				oldRes, ok := old.(*tapi.Postgres)
 				if !ok {
 					log.Errorln(errors.New("Invalid Postgres object"))
 					return
 				}
-				newAlert, ok := new.(*tapi.Postgres)
+				newRes, ok := new.(*tapi.Postgres)
 				if !ok {
 					log.Errorln(errors.New("Invalid Postgres object"))
 					return
 				}
-				fmt.Println(oldAlert, newAlert)
-			},
-			DeleteFunc: func(obj interface{}) {
-				if pg, ok := obj.(*tapi.Postgres); ok {
-					fmt.Println(pg)
-					op.TrashCan.Delete(pg.ObjectMeta, obj)
+				if op.Opt.EnableSearchIndex {
+					op.SearchIndex.HandleUpdate(old, new)
+				}
+				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
+					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
+						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
+						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
+						op.TrashCan.Update(newRes.ObjectMeta, old, new)
+					}
 				}
 			},
 		},
