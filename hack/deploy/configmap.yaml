@@ -23,4 +23,4 @@ kind: ConfigMap
 metadata:
   creationTimestamp: null
   name: kubed
-  namespace: default
+  namespace: kube-system

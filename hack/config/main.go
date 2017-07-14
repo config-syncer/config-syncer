@@ -15,7 +15,7 @@ import (
 
 func main() {
 	cfg := CreateClusterConfig()
-	cfg.Save(runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/kubed.yaml")
+	cfg.Save(runtime.GOPath() + "/src/github.com/appscode/kubed/hack/deploy/config.yaml")
 
 	bytes, err := yaml.Marshal(cfg)
 	if err != nil {
@@ -24,11 +24,11 @@ func main() {
 	cfgmap := apiv1.ConfigMap{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v1",
-			Kind: "ConfigMap",
+			Kind:       "ConfigMap",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "kubed",
-			Namespace: "default",
+			Namespace: "kube-system",
 		},
 		Data: map[string]string{
 			"config": string(bytes),
@@ -38,7 +38,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	p := runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/configmap.yaml"
+	p := runtime.GOPath() + "/src/github.com/appscode/kubed/hack/deploy/configmap.yaml"
 	ioutil.WriteFile(p, bytes, 0644)
 }
 
