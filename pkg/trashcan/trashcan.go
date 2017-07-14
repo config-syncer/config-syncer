@@ -1,22 +1,29 @@
 package trashcan
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
 
+	"github.com/appscode/envconfig"
+	"github.com/appscode/go-notify"
+	"github.com/appscode/go-notify/unified"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/ghodss/yaml"
+	diff "github.com/yudai/gojsondiff"
+	"github.com/yudai/gojsondiff/formatter"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type TrashCan struct {
-	Spec config.TrashCanSpec
+	Spec   config.TrashCanSpec
+	Loader envconfig.LoaderFunc
 }
 
-func (c *TrashCan) Update(meta metav1.ObjectMeta, old, new interface{}) error {
+func (c *TrashCan) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new interface{}) error {
 	p := filepath.Join(c.Spec.Path, meta.SelfLink)
 	dir := filepath.Dir(p)
 	err := os.MkdirAll(dir, 0755)
@@ -31,10 +38,29 @@ func (c *TrashCan) Update(meta metav1.ObjectMeta, old, new interface{}) error {
 	if err != nil {
 		return err
 	}
+
+	if c.Spec.NotifyVia != "" {
+		sub := fmt.Sprintf("%s %s@%s updated", t.String(), meta.Name, meta.Namespace)
+		if notifier, err := unified.LoadVia(c.Spec.NotifyVia, c.Loader); err == nil {
+			switch n := notifier.(type) {
+			case notify.ByEmail:
+				if diff, err := prepareDiff(old, new); err == nil {
+					n.WithSubject(sub).WithBody(diff).Send()
+				} else {
+					n.WithSubject(sub).WithBody(string(bytes)).Send()
+				}
+			case notify.BySMS:
+				n.WithBody(sub).Send()
+			case notify.ByChat:
+				n.WithBody(sub).Send()
+			}
+		}
+	}
+
 	return ioutil.WriteFile(fullPath, bytes, 0644)
 }
 
-func (c *TrashCan) Delete(meta metav1.ObjectMeta, v interface{}) error {
+func (c *TrashCan) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interface{}) error {
 	p := filepath.Join(c.Spec.Path, meta.SelfLink)
 	dir := filepath.Dir(p)
 	err := os.MkdirAll(dir, 0755)
@@ -49,6 +75,20 @@ func (c *TrashCan) Delete(meta metav1.ObjectMeta, v interface{}) error {
 	if err != nil {
 		return err
 	}
+
+	if c.Spec.NotifyVia != "" {
+		sub := fmt.Sprintf("%s %s@%s deleted", t.String(), meta.Name, meta.Namespace)
+		if notifier, err := unified.LoadVia(c.Spec.NotifyVia, c.Loader); err == nil {
+			switch n := notifier.(type) {
+			case notify.ByEmail:
+				n.WithSubject(sub).WithBody(string(bytes)).Send()
+			case notify.BySMS:
+				n.WithBody(sub).Send()
+			case notify.ByChat:
+				n.WithBody(sub).Send()
+			}
+		}
+	}
 	return ioutil.WriteFile(fullPath, bytes, 0644)
 }
 
@@ -62,4 +102,34 @@ func (c *TrashCan) Cleanup() error {
 		}
 		return nil
 	})
+}
+
+func prepareDiff(old, new interface{}) (string, error) {
+	oldBytes, err := json.Marshal(old)
+	if err != nil {
+		return "", err
+	}
+
+	newBytes, err := json.Marshal(new)
+	if err != nil {
+		return "", err
+	}
+
+	// Then, compare them
+	differ := diff.New()
+	d, err := differ.Compare(oldBytes, newBytes)
+	if err != nil {
+		return "", err
+	}
+
+	var aJson map[string]interface{}
+	if err := json.Unmarshal(oldBytes, &aJson); err != nil {
+		return "", err
+	}
+
+	format := formatter.NewAsciiFormatter(aJson, formatter.AsciiFormatterConfig{
+		ShowArrayIndex: true,
+		Coloring:       false,
+	})
+	return format.Format(d)
 }

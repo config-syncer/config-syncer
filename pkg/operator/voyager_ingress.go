@@ -56,7 +56,7 @@ func (op *Operator) WatchVoyagerIngresses() {
 						}
 					}
 					if op.TrashCan != nil {
-						op.TrashCan.Delete(res.ObjectMeta, obj)
+						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
 					}
 				}
 			},
@@ -78,7 +78,7 @@ func (op *Operator) WatchVoyagerIngresses() {
 					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
 						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
-						op.TrashCan.Update(newRes.ObjectMeta, old, new)
+						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
 					}
 				}
 			},
