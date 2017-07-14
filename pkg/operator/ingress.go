@@ -46,6 +46,10 @@ func (op *Operator) WatchIngresss() {
 							log.Errorln(err)
 						}
 					}
+
+					if op.Eventer != nil && op.Config.EventForwarder.NotifyOnIngressAdd {
+						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
+					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
