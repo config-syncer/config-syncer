@@ -112,7 +112,7 @@ func (c CertWatcher) notify(msg string) (string, error) {
 			return n.UID(), errors.New("Missing / invalid cluster admin email(s)")
 		}
 		n = n.To(receivers[0], receivers[1:]...)
-		return n.UID(), n.WithSubject("Cluster CA Certificate").WithBody(msg).Send()
+		return n.UID(), n.WithSubject("Cluster CA Certificate").WithBody(msg).WithNoTracking().Send()
 	case notify.BySMS:
 		receivers := getArray(loader, "CLUSTER_ADMIN_PHONE")
 		if len(receivers) == 0 {

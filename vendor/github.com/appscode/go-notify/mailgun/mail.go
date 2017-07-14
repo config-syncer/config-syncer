@@ -10,32 +10,26 @@ import (
 const UID = "mailgun"
 
 type Options struct {
-	Domain       string   `json:"domain" envconfig:"DOMAIN" required:"true" form:"mailgun_domain"`
-	ApiKey       string   `json:"api_key" envconfig:"API_KEY" required:"true" form:"mailgun_api_key"`
-	PublicApiKey string   `json:"public_api_key" envconfig:"PUBLIC_API_KEY" form:"mailgun_public_api_key"`
-	From         string   `json:"from" envconfig:"FROM" required:"true" form:"mailgun_from"`
-	To           []string `json:"to" envconfig:"TO" required:"true" form:"mailgun_to"`
+	Domain          string   `json:"domain" envconfig:"DOMAIN" required:"true" form:"mailgun_domain"`
+	ApiKey          string   `json:"api_key" envconfig:"API_KEY" required:"true" form:"mailgun_api_key"`
+	PublicApiKey    string   `json:"public_api_key" envconfig:"PUBLIC_API_KEY" form:"mailgun_public_api_key"`
+	From            string   `json:"from" envconfig:"FROM" required:"true" form:"mailgun_from"`
+	To              []string `json:"to" envconfig:"TO" required:"true" form:"mailgun_to"`
+	DisableTracking bool     `json:"disable_tracking" envconfig:"DISABLE_TRACKING" from:"disable_tracking"`
 }
 
 type client struct {
-	to      []string
-	from    string
+	opt     Options
 	subject string
 	body    string
 	html    bool
 	tag     string
-
-	mg mailgun.Mailgun
 }
 
 var _ notify.ByEmail = &client{}
 
 func New(opt Options) *client {
-	return &client{
-		mg:   mailgun.NewMailgun(opt.Domain, opt.ApiKey, opt.PublicApiKey),
-		from: opt.From,
-		to:   opt.To,
-	}
+	return &client{opt: opt}
 }
 
 func Default() (*client, error) {
@@ -61,7 +55,7 @@ func (c client) UID() string {
 }
 
 func (c client) From(from string) notify.ByEmail {
-	c.from = from
+	c.opt.From = from
 	return &c
 }
 
@@ -80,29 +74,36 @@ func (c client) WithTag(tag string) notify.ByEmail {
 	return &c
 }
 
+func (c client) WithNoTracking() notify.ByEmail {
+	c.opt.DisableTracking = true
+	return &c
+}
+
 func (c client) To(to string, cc ...string) notify.ByEmail {
-	c.to = append([]string{to}, cc...)
+	c.opt.To = append([]string{to}, cc...)
 	return &c
 }
 
 func (c *client) Send() error {
+	mg := mailgun.NewMailgun(c.opt.Domain, c.opt.ApiKey, c.opt.PublicApiKey)
+
 	text := c.body
 	if c.html {
 		if t, err := h2t.FromString(c.body); err == nil {
 			text = t
 		}
 	}
-	msg := c.mg.NewMessage(c.from, c.subject, text, c.to...)
+	msg := mg.NewMessage(c.opt.From, c.subject, text, c.opt.To...)
 	if c.html {
 		msg.SetHtml(c.body)
 	}
 	if c.tag != "" {
 		msg.AddTag(c.tag)
 	}
-	msg.SetTracking(true)
-	msg.SetTrackingClicks(true)
-	msg.SetTrackingOpens(true)
-	_, _, err := c.mg.Send(msg)
+	msg.SetTracking(!c.opt.DisableTracking)
+	msg.SetTrackingClicks(!c.opt.DisableTracking)
+	msg.SetTrackingOpens(!c.opt.DisableTracking)
+	_, _, err := mg.Send(msg)
 	return err
 }
 

@@ -31,7 +31,7 @@ func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
 					if err != nil {
 						return err
 					}
-					n.WithSubject(sub).WithBody(string(bytes)).Send()
+					n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
 				case notify.BySMS:
 					n.WithBody(sub).Send()
 				case notify.ByChat:
@@ -53,7 +53,7 @@ func (f *EventForwarder) Forward(t metav1.TypeMeta, meta metav1.ObjectMeta, v in
 		if notifier, err := unified.LoadVia(f.Spec.NotifyVia, f.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
-				n.WithSubject(sub).WithBody(string(bytes)).Send()
+				n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
 			case notify.BySMS:
 				n.WithBody(sub).Send()
 			case notify.ByChat:

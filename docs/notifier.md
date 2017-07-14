@@ -12,3 +12,14 @@ $ kubectl create secret generic kubed-notifier \
     --from-file=./MAILGUN_PUBLIC_API_KEY
 secret "kubed-notifier" created
 ```
+
+
+```sh
+$ echo -n 'changeit' > RESTIC_PASSWORD
+$ echo -n '<your-project-id>' > GOOGLE_PROJECT_ID
+$ mv downloaded-sa-json.key > GOOGLE_SERVICE_ACCOUNT_JSON_KEY
+kubectl create secret generic snap-secret \
+    --from-file=./GOOGLE_PROJECT_ID \
+    --from-file=./GOOGLE_SERVICE_ACCOUNT_JSON_KEY
+secret "snap-secret" created
+```

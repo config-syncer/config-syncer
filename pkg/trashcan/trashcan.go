@@ -45,9 +45,9 @@ func (c *TrashCan) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new in
 			switch n := notifier.(type) {
 			case notify.ByEmail:
 				if diff, err := prepareDiff(old, new); err == nil {
-					n.WithSubject(sub).WithBody(diff).Send()
+					n.WithSubject(sub).WithBody(diff).WithNoTracking().Send()
 				} else {
-					n.WithSubject(sub).WithBody(string(bytes)).Send()
+					n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
 				}
 			case notify.BySMS:
 				n.WithBody(sub).Send()
@@ -81,7 +81,7 @@ func (c *TrashCan) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interface
 		if notifier, err := unified.LoadVia(c.Spec.NotifyVia, c.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
-				n.WithSubject(sub).WithBody(string(bytes)).Send()
+				n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
 			case notify.BySMS:
 				n.WithBody(sub).Send()
 			case notify.ByChat:

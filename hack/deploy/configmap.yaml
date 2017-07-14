@@ -3,8 +3,10 @@ data:
   config.yaml: |
     clusterSnapshot:
       Storage:
-        local:
-          path: /tmp/csnap
+        gcs:
+          bucket: restic
+          prefix: a/b/c
+        storageSecretName: snap-secret
       sanitize: true
       schedule: '@every 5m'
     eventForwarder:

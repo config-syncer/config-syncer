@@ -61,9 +61,10 @@ func CreateClusterConfig() config.ClusterConfig {
 			Schedule: "@every 5m",
 			Sanitize: true,
 			Storage: config.Backend{
-				StorageSecretName: "",
-				Local: &config.LocalSpec{
-					Path: "/tmp/csnap",
+				StorageSecretName: "snap-secret",
+				GCS: &config.GCSSpec{
+					Bucket: "restic",
+					Prefix: "a/b/c",
 				},
 			},
 		},
