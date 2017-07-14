@@ -31,7 +31,7 @@ func (c *TrashCan) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new in
 		return err
 	}
 	name := filepath.Base(p)
-	fn := fmt.Sprintf("%s.%s.yaml", name, meta.CreationTimestamp.UTC().Format(time.RFC3339))
+	fn := fmt.Sprintf("%s.%s.yaml", name, meta.CreationTimestamp.UTC().Format(config.TimestampFormat))
 
 	fullPath := filepath.Join(dir, fn)
 	bytes, err := yaml.Marshal(new)
@@ -68,7 +68,7 @@ func (c *TrashCan) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interface
 		return err
 	}
 	name := filepath.Base(p)
-	fn := fmt.Sprintf("%s.%s.yaml", name, meta.CreationTimestamp.UTC().Format(time.RFC3339))
+	fn := fmt.Sprintf("%s.%s.yaml", name, meta.CreationTimestamp.UTC().Format(config.TimestampFormat))
 
 	fullPath := filepath.Join(dir, fn)
 	bytes, err := yaml.Marshal(v)
