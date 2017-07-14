@@ -15,7 +15,7 @@ spec:
       labels:
         app: kubed
       annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ''        
+        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
       containers:
       - name: kubed

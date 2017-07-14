@@ -87,11 +87,11 @@ func Run(opt operator.Options) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-
-	err = op.Setup()
-	if err != nil {
-		log.Fatalln(err)
-	}
+	//
+	//err = op.Setup()
+	//if err != nil {
+	//	log.Fatalln(err)
+	//}
 
 	log.Infoln("Running kubed watcher")
 	op.RunAndHold()
