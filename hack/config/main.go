@@ -67,6 +67,6 @@ func CreateClusterConfig() config.ClusterConfig {
 				},
 			},
 		},
-		NotifierSecretName: "",
+		NotifierSecretName: "kubed-notifier",
 	}
 }

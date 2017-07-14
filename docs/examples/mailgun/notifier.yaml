@@ -1,0 +1,16 @@
+apiVersion: v1
+data:
+  MAILGUN_API_KEY: a2V3YzFh
+  MAILGUN_DOMAIN: bsfsfsdfafasfv
+  MAILGUN_FROM: cGsfsfsfmZv
+  MAILGUN_PUBLIC_API_KEY: a2Vdsfdsfsfdsfsfh
+  MAILGUN_TO: b3Bdfsdfsdfdsfjb20=
+kind: Secret
+metadata:
+  creationTimestamp: 2017-07-14T08:23:24Z
+  name: kubed-notifier
+  namespace: default
+  resourceVersion: "39301"
+  selfLink: /api/v1/namespaces/default/secrets/kubed-notifier
+  uid: b46dc5d8-686d-11e7-92ea-080027c104ce
+type: Opaque

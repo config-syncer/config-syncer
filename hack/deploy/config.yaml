@@ -11,6 +11,7 @@ eventForwarder:
   notifyOnIngressAdd: true
   notifyOnStorageAdd: true
   notifyVia: mailgun
+notifierSecretName: kubed-notifier
 recycleBin:
   handle_update: true
   notifyVia: mailgun

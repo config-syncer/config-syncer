@@ -40,7 +40,7 @@ func (c *TrashCan) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new in
 	}
 
 	if c.Spec.NotifyVia != "" {
-		sub := fmt.Sprintf("%s %s@%s updated", t.String(), meta.Name, meta.Namespace)
+		sub := fmt.Sprintf("%s %s %s/%s updated", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
 		if notifier, err := unified.LoadVia(c.Spec.NotifyVia, c.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
@@ -77,7 +77,7 @@ func (c *TrashCan) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interface
 	}
 
 	if c.Spec.NotifyVia != "" {
-		sub := fmt.Sprintf("%s %s@%s deleted", t.String(), meta.Name, meta.Namespace)
+		sub := fmt.Sprintf("%s %s %s/%s deleted", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
 		if notifier, err := unified.LoadVia(c.Spec.NotifyVia, c.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
