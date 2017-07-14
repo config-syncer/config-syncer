@@ -265,7 +265,7 @@ func (op *Operator) RunSnapshotter() error {
 		sh := shell.NewSession()
 		sh.SetDir(op.Opt.ScratchDir)
 		sh.ShowCMD = true
-		return sh.Command("osm", "push", "-c", container, snapshotDir, dest).Run()
+		return sh.Command("osm", "push", "--osmconfig", osmconfigPath, "-c", container, snapshotDir, dest).Run()
 	}
 
 	err = snapshotter()
