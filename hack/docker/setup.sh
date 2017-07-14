@@ -20,36 +20,37 @@ OSM_VER=${OSM_VER:-0.5.0}
 DIST=$REPO_ROOT/dist
 mkdir -p $DIST
 if [ -f "$DIST/.tag" ]; then
-	export $(cat $DIST/.tag | xargs)
+    export $(cat $DIST/.tag | xargs)
 fi
 
 clean() {
     pushd $REPO_ROOT/hack/docker
-	rm -rf kubed
-	popd
+    rm -rf kubed
+    popd
 }
 
 build_binary() {
-	pushd $REPO_ROOT
-	./hack/builddeps.sh
+    pushd $REPO_ROOT
+    ./hack/builddeps.sh
     ./hack/make.py build kubed
-	detect_tag $REPO_ROOT/dist/.tag
+    detect_tag $REPO_ROOT/dist/.tag
 
     # Download restic
     rm -rf $DIST/osm
     mkdir $DIST/osm
     cd $DIST/osm
     wget https://cdn.appscode.com/binaries/osm/${OSM_VER}/osm-linux-amd64
-	popd
+    chmod +x osm-linux-amd64
+    popd
 }
 
 build_docker() {
-	pushd $REPO_ROOT/hack/docker
-	cp $DIST/kubed/kubed-linux-amd64 kubed
-	cp $DIST/osm/osm-linux-amd64 osm
-	chmod 755 kubed
+    pushd $REPO_ROOT/hack/docker
+    cp $DIST/kubed/kubed-linux-amd64 kubed
+    cp $DIST/osm/osm-linux-amd64 osm
+    chmod 755 kubed
 
-	cat >Dockerfile <<EOL
+    cat >Dockerfile <<EOL
 FROM alpine
 
 RUN set -x \
@@ -59,16 +60,16 @@ COPY kubed /kubed
 COPY osm /osm
 ENTRYPOINT ["/kubed"]
 EOL
-	local cmd="docker build -t appscode/$IMG:$TAG ."
-	echo $cmd; $cmd
+    local cmd="docker build -t appscode/$IMG:$TAG ."
+    echo $cmd; $cmd
 
-	rm kubed Dockerfile
-	popd
+    rm kubed Dockerfile
+    popd
 }
 
 build() {
-	build_binary
-	build_docker
+    build_binary
+    build_docker
 }
 
 
