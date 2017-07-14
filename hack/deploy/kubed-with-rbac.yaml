@@ -65,10 +65,10 @@ metadata:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  labels:
-    app: kubed
   name: kubed
   namespace: kube-system
+  labels:
+    app: kubed
 spec:
   replicas: 1
   selector:
@@ -78,6 +78,8 @@ spec:
     metadata:
       labels:
         app: kubed
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
       serviceAccountName: kubed
       containers:
@@ -93,6 +95,9 @@ spec:
         volumeMounts:
           - mountPath: /tmp
             name: scratchdir
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
       volumes:
         - emptyDir: {}
           name: scratchdir
