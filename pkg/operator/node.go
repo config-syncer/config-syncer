@@ -16,9 +16,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (op *Operator) WatchPersistentVolumeClaims() {
-	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "PersistentVolumeClaim") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "PersistentVolumeClaim")
+func (op *Operator) WatchNodes() {
+	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "Node") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Node")
 		return
 	}
 
@@ -26,19 +26,19 @@ func (op *Operator) WatchPersistentVolumeClaims() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return op.KubeClient.CoreV1().PersistentVolumeClaims(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().Nodes().List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return op.KubeClient.CoreV1().PersistentVolumeClaims(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().Nodes().Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.PersistentVolumeClaim{},
+		&apiv1.Node{},
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.PersistentVolumeClaim); ok {
-					log.Infof("PersistentVolumeClaim %s@%s added", res.Name, res.Namespace)
+				if res, ok := obj.(*apiv1.Node); ok {
+					log.Infof("Node %s@%s added", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
@@ -53,8 +53,8 @@ func (op *Operator) WatchPersistentVolumeClaims() {
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.PersistentVolumeClaim); ok {
-					log.Infof("PersistentVolumeClaim %s@%s deleted", res.Name, res.Namespace)
+				if res, ok := obj.(*apiv1.Node); ok {
+					log.Infof("Node %s@%s deleted", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
@@ -68,14 +68,14 @@ func (op *Operator) WatchPersistentVolumeClaims() {
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldRes, ok := old.(*apiv1.PersistentVolumeClaim)
+				oldRes, ok := old.(*apiv1.Node)
 				if !ok {
-					log.Errorln(errors.New("Invalid PersistentVolumeClaim object"))
+					log.Errorln(errors.New("Invalid Node object"))
 					return
 				}
-				newRes, ok := new.(*apiv1.PersistentVolumeClaim)
+				newRes, ok := new.(*apiv1.Node)
 				if !ok {
-					log.Errorln(errors.New("Invalid PersistentVolumeClaim object"))
+					log.Errorln(errors.New("Invalid Node object"))
 					return
 				}
 				util.AssignTypeKind(oldRes)

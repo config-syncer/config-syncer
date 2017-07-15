@@ -18,8 +18,8 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchDeploymentApps() {
-	if !util.IsSupportedAPIResource(op.KubeClient, apps.SchemeGroupVersion.String(), "Deployment") {
-		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "Deployment")
+	if !util.IsPreferredAPIResource(op.KubeClient, apps.SchemeGroupVersion.String(), "Deployment") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "Deployment")
 		return
 	}
 
@@ -40,6 +40,7 @@ func (op *Operator) WatchDeploymentApps() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apps.Deployment); ok {
 					log.Infof("Deployment %s@%s added", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -51,6 +52,8 @@ func (op *Operator) WatchDeploymentApps() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*apps.Deployment); ok {
 					log.Infof("Deployment %s@%s deleted", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
+
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -72,6 +75,9 @@ func (op *Operator) WatchDeploymentApps() {
 					log.Errorln(errors.New("Invalid Deployment object"))
 					return
 				}
+				util.AssignTypeKind(oldRes)
+				util.AssignTypeKind(newRes)
+
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}

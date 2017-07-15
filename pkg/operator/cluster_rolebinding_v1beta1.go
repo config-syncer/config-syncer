@@ -11,14 +11,15 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	storage "k8s.io/client-go/pkg/apis/storage/v1"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
+	rbac "k8s.io/client-go/pkg/apis/rbac/v1beta1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (op *Operator) WatchStorageClasss() {
-	if !util.IsSupportedAPIResource(op.KubeClient, storage.SchemeGroupVersion.String(), "StorageClass") {
-		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", storage.SchemeGroupVersion.String(), "StorageClass")
+func (op *Operator) WatchClusterRoleBindingV1beta1() {
+	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "ClusterRoleBinding") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ClusterRoleBinding")
 		return
 	}
 
@@ -26,34 +27,33 @@ func (op *Operator) WatchStorageClasss() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return op.KubeClient.StorageV1().StorageClasses().List(metav1.ListOptions{})
+			return op.KubeClient.RbacV1beta1().ClusterRoleBindings().List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return op.KubeClient.StorageV1().StorageClasses().Watch(metav1.ListOptions{})
+			return op.KubeClient.RbacV1beta1().ClusterRoleBindings().Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&storage.StorageClass{},
+		&rbac.ClusterRoleBinding{},
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if res, ok := obj.(*storage.StorageClass); ok {
-					log.Infof("StorageClass %s@%s added", res.Name, res.Namespace)
+				if res, ok := obj.(*rbac.ClusterRoleBinding); ok {
+					log.Infof("ClusterRoleBinding %s@%s added", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
 							log.Errorln(err)
 						}
 					}
-
-					if op.Eventer != nil && op.Config.EventForwarder.NotifyOnStorageAdd {
-						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
-					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				if res, ok := obj.(*storage.StorageClass); ok {
-					log.Infof("StorageClass %s@%s deleted", res.Name, res.Namespace)
+				if res, ok := obj.(*rbac.ClusterRoleBinding); ok {
+					log.Infof("ClusterRoleBinding %s@%s deleted", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
+
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -65,23 +65,27 @@ func (op *Operator) WatchStorageClasss() {
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldRes, ok := old.(*storage.StorageClass)
+				oldRes, ok := old.(*rbac.ClusterRoleBinding)
 				if !ok {
-					log.Errorln(errors.New("Invalid StorageClass object"))
+					log.Errorln(errors.New("Invalid ClusterRoleBinding object"))
 					return
 				}
-				newRes, ok := new.(*storage.StorageClass)
+				newRes, ok := new.(*rbac.ClusterRoleBinding)
 				if !ok {
-					log.Errorln(errors.New("Invalid StorageClass object"))
+					log.Errorln(errors.New("Invalid ClusterRoleBinding object"))
 					return
 				}
+				util.AssignTypeKind(oldRes)
+				util.AssignTypeKind(newRes)
+
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
 				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
 					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
-						!reflect.DeepEqual(oldRes.Parameters, newRes.Parameters) {
+						!reflect.DeepEqual(oldRes.RoleRef, newRes.RoleRef) ||
+						!reflect.DeepEqual(oldRes.Subjects, newRes.Subjects) {
 						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
 					}
 				}

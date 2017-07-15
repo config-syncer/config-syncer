@@ -18,8 +18,8 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchVoyagerIngresses() {
-	if !util.IsSupportedAPIResource(op.KubeClient, tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindIngress) {
-		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindIngress)
+	if !util.IsPreferredAPIResource(op.KubeClient, tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindIngress) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindIngress)
 		return
 	}
 	defer acrt.HandleCrash()
@@ -39,6 +39,7 @@ func (op *Operator) WatchVoyagerIngresses() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Ingress); ok {
 					log.Infof("Ingress %s@%s added", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -54,6 +55,8 @@ func (op *Operator) WatchVoyagerIngresses() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Ingress); ok {
 					log.Infof("Ingress %s@%s deleted", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
+
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -75,6 +78,9 @@ func (op *Operator) WatchVoyagerIngresses() {
 					log.Errorln(errors.New("Invalid Ingress object"))
 					return
 				}
+				util.AssignTypeKind(oldRes)
+				util.AssignTypeKind(newRes)
+
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}

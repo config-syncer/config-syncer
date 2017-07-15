@@ -16,8 +16,8 @@ import (
 )
 
 func (op *Operator) watchService() {
-	if !util.IsSupportedAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "Service") {
-		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Service")
+	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "Service") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Service")
 		return
 	}
 
@@ -37,6 +37,7 @@ func (op *Operator) watchService() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.Service); ok {
 					log.Infof("Service %s@%s added", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -51,6 +52,8 @@ func (op *Operator) watchService() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.Service); ok {
 					log.Infof("Service %s@%s deleted", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
+
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -75,6 +78,9 @@ func (op *Operator) watchService() {
 					log.Errorln(errors.New("Invalid Service object"))
 					return
 				}
+				util.AssignTypeKind(oldRes)
+				util.AssignTypeKind(newRes)
+
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}

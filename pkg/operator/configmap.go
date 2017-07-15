@@ -17,8 +17,8 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchConfigMaps() {
-	if !util.IsSupportedAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "ConfigMap") {
-		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ConfigMap")
+	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "ConfigMap") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ConfigMap")
 		return
 	}
 
@@ -39,6 +39,7 @@ func (op *Operator) WatchConfigMaps() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.ConfigMap); ok {
 					log.Infof("ConfigMap %s@%s added", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -53,6 +54,8 @@ func (op *Operator) WatchConfigMaps() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.ConfigMap); ok {
 					log.Infof("ConfigMap %s@%s deleted", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
+
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -77,6 +80,9 @@ func (op *Operator) WatchConfigMaps() {
 					log.Errorln(errors.New("Invalid ConfigMap object"))
 					return
 				}
+				util.AssignTypeKind(oldRes)
+				util.AssignTypeKind(newRes)
+
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}

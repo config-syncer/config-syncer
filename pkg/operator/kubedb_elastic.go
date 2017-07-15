@@ -18,8 +18,8 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchElastics() {
-	if !util.IsSupportedAPIResource(op.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic) {
-		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic)
+	if !util.IsPreferredAPIResource(op.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic)
 		return
 	}
 
@@ -40,6 +40,7 @@ func (op *Operator) WatchElastics() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Elastic); ok {
 					log.Infof("Elastic %s@%s added", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -51,6 +52,8 @@ func (op *Operator) WatchElastics() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Elastic); ok {
 					log.Infof("Elastic %s@%s deleted", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
+
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -72,6 +75,9 @@ func (op *Operator) WatchElastics() {
 					log.Errorln(errors.New("Invalid Elastic object"))
 					return
 				}
+				util.AssignTypeKind(oldRes)
+				util.AssignTypeKind(newRes)
+
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}

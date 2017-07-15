@@ -18,8 +18,8 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchServiceMonitors() {
-	if !util.IsSupportedAPIResource(op.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind) {
-		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind)
+	if !util.IsPreferredAPIResource(op.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind)
 		return
 	}
 
@@ -40,6 +40,7 @@ func (op *Operator) WatchServiceMonitors() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*prom.ServiceMonitor); ok {
 					log.Infof("ServiceMonitor %s@%s added", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -51,6 +52,8 @@ func (op *Operator) WatchServiceMonitors() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*prom.ServiceMonitor); ok {
 					log.Infof("ServiceMonitor %s@%s deleted", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
+
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -72,6 +75,9 @@ func (op *Operator) WatchServiceMonitors() {
 					log.Errorln(errors.New("Invalid ServiceMonitor object"))
 					return
 				}
+				util.AssignTypeKind(oldRes)
+				util.AssignTypeKind(newRes)
+
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}

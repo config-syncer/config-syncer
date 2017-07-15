@@ -18,8 +18,8 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchRestics() {
-	if !util.IsSupportedAPIResource(op.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindRestic) {
-		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindRestic)
+	if !util.IsPreferredAPIResource(op.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindRestic) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindRestic)
 		return
 	}
 	defer acrt.HandleCrash()
@@ -39,6 +39,7 @@ func (op *Operator) WatchRestics() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Restic); ok {
 					log.Infof("Restic %s@%s added", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -50,6 +51,8 @@ func (op *Operator) WatchRestics() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Restic); ok {
 					log.Infof("Restic %s@%s deleted", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
+
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -71,6 +74,9 @@ func (op *Operator) WatchRestics() {
 					log.Errorln(errors.New("Invalid Restic object"))
 					return
 				}
+				util.AssignTypeKind(oldRes)
+				util.AssignTypeKind(newRes)
+
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}

@@ -18,8 +18,8 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchStatefulSets() {
-	if !util.IsSupportedAPIResource(op.KubeClient, apps.SchemeGroupVersion.String(), "StatefulSet") {
-		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "StatefulSet")
+	if !util.IsPreferredAPIResource(op.KubeClient, apps.SchemeGroupVersion.String(), "StatefulSet") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "StatefulSet")
 		return
 	}
 
@@ -40,6 +40,7 @@ func (op *Operator) WatchStatefulSets() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apps.StatefulSet); ok {
 					log.Infof("StatefulSet %s@%s added", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -51,6 +52,8 @@ func (op *Operator) WatchStatefulSets() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*apps.StatefulSet); ok {
 					log.Infof("StatefulSet %s@%s deleted", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
+
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -72,6 +75,9 @@ func (op *Operator) WatchStatefulSets() {
 					log.Errorln(errors.New("Invalid StatefulSet object"))
 					return
 				}
+				util.AssignTypeKind(oldRes)
+				util.AssignTypeKind(newRes)
+
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}

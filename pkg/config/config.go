@@ -40,6 +40,7 @@ type TrashCanSpec struct {
 }
 
 type EventForwarderSpec struct {
+	NotifyOnNodeAdd      bool     `json:"notifyOnNodeAdd,omitempty"`
 	NotifyOnStorageAdd   bool     `json:"notifyOnStorageAdd,omitempty"`
 	NotifyOnIngressAdd   bool     `json:"notifyOnIngressAdd,omitempty"`
 	ForwardWarningEvents bool     `json:"forwardWarningEvents,omitempty"`
