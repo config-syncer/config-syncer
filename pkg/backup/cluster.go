@@ -28,6 +28,10 @@ func SnapshotCluster(kubeConfig *rest.Config, backupDir string, sanitize bool) e
 		return err
 	}
 
+	err = os.MkdirAll(backupDir, 0755)
+	if err != nil {
+		return err
+	}
 	resBytes, err := yaml.Marshal(rs)
 	if err != nil {
 		return err
