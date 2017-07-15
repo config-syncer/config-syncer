@@ -45,8 +45,9 @@ func (op *Operator) WatchSecrets() {
 							log.Errorln(err)
 						}
 					}
-
-					// TODO: Sync configmap
+					if op.ConfigSyncer != nil {
+						op.ConfigSyncer.SyncSecret(nil, res)
+					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
@@ -59,6 +60,9 @@ func (op *Operator) WatchSecrets() {
 					}
 					if op.TrashCan != nil {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
+					}
+					if op.ConfigSyncer != nil {
+						op.ConfigSyncer.SyncSecret(res, nil)
 					}
 				}
 			},
@@ -81,9 +85,10 @@ func (op *Operator) WatchSecrets() {
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
 						!reflect.DeepEqual(oldRes.Data, newRes.Data) {
 						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
-
-						// sync configmap
 					}
+				}
+				if op.ConfigSyncer != nil {
+					op.ConfigSyncer.SyncSecret(oldRes, newRes)
 				}
 			},
 		},

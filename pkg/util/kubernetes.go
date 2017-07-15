@@ -1,6 +1,8 @@
 package util
 
 import (
+	"strconv"
+
 	clientset "k8s.io/client-go/kubernetes"
 )
 
@@ -18,4 +20,18 @@ func IsPreferredAPIResource(kubeClient clientset.Interface, groupVersion, kind s
 		}
 	}
 	return false
+}
+
+func GetBool(m map[string]string, key string) (bool, error) {
+	if m == nil {
+		return false, nil
+	}
+	return strconv.ParseBool(m[key])
+}
+
+func GetString(m map[string]string, key string) string {
+	if m == nil {
+		return ""
+	}
+	return m[key]
 }

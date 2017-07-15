@@ -2,7 +2,7 @@ package operator
 
 import (
 	acrt "github.com/appscode/go/runtime"
-	"github.com/appscode/kubed/pkg/configsync"
+	"github.com/appscode/log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -27,8 +27,13 @@ func (op *Operator) watchNamespaces() {
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				ns := configsync.NewHandler(op.KubeClient)
-				ns.Handle(obj)
+				if res, ok := obj.(*apiv1.Namespace); ok {
+					log.Infof("Namespace %s@%s added", res.Name)
+
+					if op.ConfigSyncer != nil {
+						op.ConfigSyncer.SyncIntoNamespace(res.Name)
+					}
+				}
 			},
 		},
 	)
