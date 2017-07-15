@@ -58,13 +58,13 @@ func CreateClusterConfig() config.ClusterConfig {
 			NotifyVia:            mailgun.UID,
 		},
 		ClusterSnapshot: &config.SnapshotSpec{
-			Schedule: "@every 5m",
+			Schedule: "@every 6h",
 			Sanitize: true,
 			Storage: config.Backend{
 				StorageSecretName: "snap-secret",
 				GCS: &config.GCSSpec{
 					Bucket: "restic",
-					Prefix: "a/b/c",
+					Prefix: "minikube",
 				},
 			},
 		},

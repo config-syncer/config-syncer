@@ -2,10 +2,10 @@ clusterSnapshot:
   Storage:
     gcs:
       bucket: restic
-      prefix: a/b/c
+      prefix: minikube
     storageSecretName: snap-secret
   sanitize: true
-  schedule: '@every 5m'
+  schedule: '@every 6h'
 eventForwarder:
   eventNamespaces:
   - kube-system
