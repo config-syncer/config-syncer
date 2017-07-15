@@ -28,7 +28,7 @@ func (op *Operator) watchNamespaces() {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.Namespace); ok {
-					log.Infof("Namespace %s@%s added", res.Name)
+					log.Infof("Namespace %s added", res.Name)
 
 					if op.ConfigSyncer != nil {
 						op.ConfigSyncer.SyncIntoNamespace(res.Name)

@@ -16,7 +16,7 @@ import (
 )
 
 func (op *Operator) watchService() {
-	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "Service") {
+	if !util.IsSupportedAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "Service") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Service")
 		return
 	}

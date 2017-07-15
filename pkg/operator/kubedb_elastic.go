@@ -18,7 +18,7 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchElastics() {
-	if !util.IsPreferredAPIResource(op.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic) {
+	if !util.IsSupportedAPIResource(op.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic)
 		return
 	}

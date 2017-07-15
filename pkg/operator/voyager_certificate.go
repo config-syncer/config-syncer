@@ -18,7 +18,7 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchVoyagerCertificates() {
-	if !util.IsPreferredAPIResource(op.KubeClient, tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindCertificate) {
+	if !util.IsSupportedAPIResource(op.KubeClient, tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindCertificate) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindCertificate)
 		return
 	}

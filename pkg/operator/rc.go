@@ -17,7 +17,7 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchReplicationControllers() {
-	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "ReplicationController") {
+	if !util.IsSupportedAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "ReplicationController") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ReplicationController")
 		return
 	}

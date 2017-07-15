@@ -6,8 +6,8 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 )
 
-func IsPreferredAPIResource(kubeClient clientset.Interface, groupVersion, kind string) bool {
-	if resourceList, err := kubeClient.Discovery().ServerPreferredResources(); err == nil {
+func IsSupportedAPIResource(kubeClient clientset.Interface, groupVersion, kind string) bool {
+	if resourceList, err := kubeClient.Discovery().ServerResources(); err == nil {
 		for _, resources := range resourceList {
 			if resources.GroupVersion != groupVersion {
 				continue

@@ -18,7 +18,7 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchReplicaSets() {
-	if !util.IsPreferredAPIResource(op.KubeClient, extensions.SchemeGroupVersion.String(), "ReplicaSet") {
+	if !util.IsSupportedAPIResource(op.KubeClient, extensions.SchemeGroupVersion.String(), "ReplicaSet") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "ReplicaSet")
 		return
 	}
