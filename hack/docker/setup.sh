@@ -15,7 +15,7 @@ source "$REPO_ROOT/hack/libbuild/common/public_image.sh"
 
 APPSCODE_ENV=${APPSCODE_ENV:-dev}
 IMG=kubed
-OSM_VER=${OSM_VER:-0.5.0}
+OSM_VER=${OSM_VER:-0.5.1}
 
 DIST=$REPO_ROOT/dist
 mkdir -p $DIST
@@ -39,15 +39,15 @@ build_binary() {
     rm -rf $DIST/osm
     mkdir $DIST/osm
     cd $DIST/osm
-    wget https://cdn.appscode.com/binaries/osm/${OSM_VER}/osm-linux-amd64
-    chmod +x osm-linux-amd64
+    wget https://cdn.appscode.com/binaries/osm/${OSM_VER}/osm-alpine-amd64
+    chmod +x osm-alpine-amd64
     popd
 }
 
 build_docker() {
     pushd $REPO_ROOT/hack/docker
     cp $DIST/kubed/kubed-linux-amd64 kubed
-    cp $DIST/osm/osm-linux-amd64 osm
+    cp $DIST/osm/osm-alpine-amd64 osm
     chmod 755 kubed
 
     cat >Dockerfile <<EOL
