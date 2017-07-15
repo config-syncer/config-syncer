@@ -12,13 +12,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+	rbac "k8s.io/client-go/pkg/apis/rbac/v1alpha1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (op *Operator) WatchConfigMaps() {
-	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "ConfigMap") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ConfigMap")
+func (op *Operator) WatchRoleBindingV1alpha1() {
+	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "RoleBinding") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "RoleBinding")
 		return
 	}
 
@@ -26,36 +27,30 @@ func (op *Operator) WatchConfigMaps() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return op.KubeClient.CoreV1().ConfigMaps(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.RbacV1alpha1().RoleBindings(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return op.KubeClient.CoreV1().ConfigMaps(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.RbacV1alpha1().RoleBindings(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.ConfigMap{},
+		&rbac.RoleBinding{},
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.ConfigMap); ok {
-					log.Infof("ConfigMap %s@%s added", res.Name, res.Namespace)
-					util.AssignTypeKind(res)
+				if res, ok := obj.(*rbac.RoleBinding); ok {
+					log.Infof("RoleBinding %s@%s added", res.Name, res.Namespace)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
 							log.Errorln(err)
 						}
 					}
-					if op.ConfigSyncer != nil {
-						op.ConfigSyncer.SyncConfigMap(nil, res)
-					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.ConfigMap); ok {
-					log.Infof("ConfigMap %s@%s deleted", res.Name, res.Namespace)
-					util.AssignTypeKind(res)
-
+				if res, ok := obj.(*rbac.RoleBinding); ok {
+					log.Infof("RoleBinding %s@%s deleted", res.Name, res.Namespace)
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -64,37 +59,29 @@ func (op *Operator) WatchConfigMaps() {
 					if op.TrashCan != nil {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
 					}
-					if op.ConfigSyncer != nil {
-						op.ConfigSyncer.SyncConfigMap(res, nil)
-					}
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldRes, ok := old.(*apiv1.ConfigMap)
+				oldRes, ok := old.(*rbac.RoleBinding)
 				if !ok {
-					log.Errorln(errors.New("Invalid ConfigMap object"))
+					log.Errorln(errors.New("Invalid RoleBinding object"))
 					return
 				}
-				newRes, ok := new.(*apiv1.ConfigMap)
+				newRes, ok := new.(*rbac.RoleBinding)
 				if !ok {
-					log.Errorln(errors.New("Invalid ConfigMap object"))
+					log.Errorln(errors.New("Invalid RoleBinding object"))
 					return
 				}
-				util.AssignTypeKind(oldRes)
-				util.AssignTypeKind(newRes)
-
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
 				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
 					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
-						!reflect.DeepEqual(oldRes.Data, newRes.Data) {
+						!reflect.DeepEqual(oldRes.RoleRef, newRes.RoleRef) ||
+						!reflect.DeepEqual(oldRes.Subjects, newRes.Subjects) {
 						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
 					}
-				}
-				if op.ConfigSyncer != nil {
-					op.ConfigSyncer.SyncConfigMap(oldRes, newRes)
 				}
 			},
 		},

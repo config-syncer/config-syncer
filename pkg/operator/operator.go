@@ -156,7 +156,8 @@ func (op *Operator) RunWatchers() {
 	go op.watchService()
 	go op.WatchServiceMonitors()
 	go op.WatchStatefulSets()
-	go op.WatchStorageClasss()
+	go op.WatchStorageClassV1()
+	go op.WatchStorageClassV1beta1()
 	go op.WatchVoyagerCertificates()
 	go op.WatchVoyagerIngresses()
 }

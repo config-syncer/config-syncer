@@ -1,6 +1,7 @@
 package util
 
 import (
+	"errors"
 	"strconv"
 
 	searchlight "github.com/appscode/searchlight/api"
@@ -144,4 +145,185 @@ func GetGroupVersionKind(v interface{}) schema.GroupVersionKind {
 	default:
 		return schema.GroupVersionKind{}
 	}
+}
+
+func AssignTypeKind(v interface{}) error {
+	switch u := v.(type) {
+	case *metav1.APIResourceList:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "APIResourceList"
+	case *apiv1.Pod:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "Pod"
+		return nil
+	case *apiv1.ReplicationController:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "ReplicationController"
+		return nil
+	case *apiv1.ConfigMap:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "ConfigMap"
+		return nil
+	case *apiv1.Secret:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "Secret"
+		return nil
+	case *apiv1.Service:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "Service"
+		return nil
+	case *apiv1.PersistentVolumeClaim:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "PersistentVolumeClaim"
+		return nil
+	case *apiv1.PersistentVolume:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "PersistentVolume"
+		return nil
+	case *apiv1.Node:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "Node"
+		return nil
+	case *apiv1.ServiceAccount:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "ServiceAccount"
+		return nil
+	case *apiv1.Namespace:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "Namespace"
+		return nil
+	case *apiv1.Endpoints:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "Endpoints"
+		return nil
+	case *apiv1.ComponentStatus:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "ComponentStatus"
+		return nil
+	case *apiv1.LimitRange:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "LimitRange"
+		return nil
+	case *apiv1.Event:
+		u.APIVersion = apiv1.SchemeGroupVersion.String()
+		u.Kind = "Event"
+		return nil
+	case *extensions.Ingress:
+		u.APIVersion = extensions.SchemeGroupVersion.String()
+		u.Kind = "Ingress"
+		return nil
+	case *extensions.DaemonSet:
+		u.APIVersion = extensions.SchemeGroupVersion.String()
+		u.Kind = "DaemonSet"
+		return nil
+	case *extensions.ReplicaSet:
+		u.APIVersion = extensions.SchemeGroupVersion.String()
+		u.Kind = "ReplicaSet"
+		return nil
+	case *extensions.Deployment:
+		u.APIVersion = extensions.SchemeGroupVersion.String()
+		u.Kind = "Deployment"
+		return nil
+	case *extensions.ThirdPartyResource:
+		u.APIVersion = extensions.SchemeGroupVersion.String()
+		u.Kind = "ThirdPartyResource"
+		return nil
+	case *apps.StatefulSet:
+		u.APIVersion = apps.SchemeGroupVersion.String()
+		u.Kind = "StatefulSet"
+		return nil
+	case *apps.Deployment:
+		u.APIVersion = apps.SchemeGroupVersion.String()
+		u.Kind = "Deployment"
+		return nil
+	case *storagev1beta1.StorageClass:
+		u.APIVersion = storagev1beta1.SchemeGroupVersion.String()
+		u.Kind = "StorageClass"
+		return nil
+	case *storagev1.StorageClass:
+		u.APIVersion = storagev1.SchemeGroupVersion.String()
+		u.Kind = "StorageClass"
+		return nil
+	case *rbacv1alpha1.Role:
+		u.APIVersion = rbacv1alpha1.SchemeGroupVersion.String()
+		u.Kind = "Role"
+		return nil
+	case *rbacv1alpha1.RoleBinding:
+		u.APIVersion = rbacv1alpha1.SchemeGroupVersion.String()
+		u.Kind = "RoleBinding"
+		return nil
+	case *rbacv1alpha1.ClusterRole:
+		u.APIVersion = rbacv1alpha1.SchemeGroupVersion.String()
+		u.Kind = "ClusterRole"
+		return nil
+	case *rbacv1alpha1.ClusterRoleBinding:
+		u.APIVersion = rbacv1alpha1.SchemeGroupVersion.String()
+		u.Kind = "ClusterRoleBinding"
+		return nil
+	case *rbacv1beta1.Role:
+		u.APIVersion = rbacv1beta1.SchemeGroupVersion.String()
+		u.Kind = "Role"
+		return nil
+	case *rbacv1beta1.RoleBinding:
+		u.APIVersion = rbacv1beta1.SchemeGroupVersion.String()
+		u.Kind = "RoleBinding"
+		return nil
+	case *rbacv1beta1.ClusterRole:
+		u.APIVersion = rbacv1beta1.SchemeGroupVersion.String()
+		u.Kind = "ClusterRole"
+		return nil
+	case *rbacv1beta1.ClusterRoleBinding:
+		u.APIVersion = rbacv1beta1.SchemeGroupVersion.String()
+		u.Kind = "ClusterRoleBinding"
+		return nil
+	case *batchv2alpha1.CronJob:
+		u.APIVersion = batchv2alpha1.SchemeGroupVersion.String()
+		u.Kind = "CronJob"
+		return nil
+	case *batchv1.Job:
+		u.APIVersion = batchv1.SchemeGroupVersion.String()
+		u.Kind = "Job"
+		return nil
+	case *searchlight.ClusterAlert:
+		u.APIVersion = searchlight.V1alpha1SchemeGroupVersion.String()
+		u.Kind = "ClusterAlert"
+		return nil
+	case *searchlight.NodeAlert:
+		u.APIVersion = searchlight.V1alpha1SchemeGroupVersion.String()
+		u.Kind = "NodeAlert"
+		return nil
+	case *searchlight.PodAlert:
+		u.APIVersion = searchlight.V1alpha1SchemeGroupVersion.String()
+		u.Kind = "PodAlert"
+		return nil
+	case *voyager.Ingress:
+		u.APIVersion = voyager.V1beta1SchemeGroupVersion.String()
+		u.Kind = "Ingress"
+		return nil
+	case *voyager.Certificate:
+		u.APIVersion = voyager.V1beta1SchemeGroupVersion.String()
+		u.Kind = "Certificate"
+		return nil
+	case *kubedb.Postgres:
+		u.APIVersion = kubedb.V1alpha1SchemeGroupVersion.String()
+		u.Kind = "Postgres"
+		return nil
+	case *kubedb.Elastic:
+		u.APIVersion = kubedb.V1alpha1SchemeGroupVersion.String()
+		u.Kind = "Elastic"
+		return nil
+	case *kubedb.Snapshot:
+		u.APIVersion = kubedb.V1alpha1SchemeGroupVersion.String()
+		u.Kind = "Snapshot"
+		return nil
+	case *kubedb.DormantDatabase:
+		u.APIVersion = kubedb.V1alpha1SchemeGroupVersion.String()
+		u.Kind = "DormantDatabase"
+		return nil
+	case *stash.Restic:
+		u.APIVersion = stash.V1alpha1SchemeGroupVersion.String()
+		u.Kind = "Restic"
+		return nil
+	}
+	return errors.New("Unknown api object type")
 }

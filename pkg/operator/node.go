@@ -16,9 +16,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (op *Operator) WatchConfigMaps() {
-	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "ConfigMap") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ConfigMap")
+func (op *Operator) WatchNodes() {
+	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "Node") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Node")
 		return
 	}
 
@@ -26,19 +26,19 @@ func (op *Operator) WatchConfigMaps() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return op.KubeClient.CoreV1().ConfigMaps(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().Nodes().List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return op.KubeClient.CoreV1().ConfigMaps(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.CoreV1().Nodes().Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.ConfigMap{},
+		&apiv1.Node{},
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.ConfigMap); ok {
-					log.Infof("ConfigMap %s@%s added", res.Name, res.Namespace)
+				if res, ok := obj.(*apiv1.Node); ok {
+					log.Infof("Node %s@%s added", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
@@ -46,14 +46,11 @@ func (op *Operator) WatchConfigMaps() {
 							log.Errorln(err)
 						}
 					}
-					if op.ConfigSyncer != nil {
-						op.ConfigSyncer.SyncConfigMap(nil, res)
-					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.ConfigMap); ok {
-					log.Infof("ConfigMap %s@%s deleted", res.Name, res.Namespace)
+				if res, ok := obj.(*apiv1.Node); ok {
+					log.Infof("Node %s@%s deleted", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
@@ -64,20 +61,17 @@ func (op *Operator) WatchConfigMaps() {
 					if op.TrashCan != nil {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
 					}
-					if op.ConfigSyncer != nil {
-						op.ConfigSyncer.SyncConfigMap(res, nil)
-					}
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldRes, ok := old.(*apiv1.ConfigMap)
+				oldRes, ok := old.(*apiv1.Node)
 				if !ok {
-					log.Errorln(errors.New("Invalid ConfigMap object"))
+					log.Errorln(errors.New("Invalid Node object"))
 					return
 				}
-				newRes, ok := new.(*apiv1.ConfigMap)
+				newRes, ok := new.(*apiv1.Node)
 				if !ok {
-					log.Errorln(errors.New("Invalid ConfigMap object"))
+					log.Errorln(errors.New("Invalid Node object"))
 					return
 				}
 				util.AssignTypeKind(oldRes)
@@ -89,12 +83,9 @@ func (op *Operator) WatchConfigMaps() {
 				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
 					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
-						!reflect.DeepEqual(oldRes.Data, newRes.Data) {
+						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
 						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
 					}
-				}
-				if op.ConfigSyncer != nil {
-					op.ConfigSyncer.SyncConfigMap(oldRes, newRes)
 				}
 			},
 		},
