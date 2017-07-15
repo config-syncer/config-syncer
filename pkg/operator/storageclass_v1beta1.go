@@ -39,6 +39,7 @@ func (op *Operator) WatchStorageClassV1beta1() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*storage.StorageClass); ok {
 					log.Infof("StorageClass %s@%s added", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -54,6 +55,8 @@ func (op *Operator) WatchStorageClassV1beta1() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*storage.StorageClass); ok {
 					log.Infof("StorageClass %s@%s deleted", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
+
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -75,6 +78,9 @@ func (op *Operator) WatchStorageClassV1beta1() {
 					log.Errorln(errors.New("Invalid StorageClass object"))
 					return
 				}
+				util.AssignTypeKind(oldRes)
+				util.AssignTypeKind(newRes)
+
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
