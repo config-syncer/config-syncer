@@ -11,7 +11,7 @@ import (
 
 type ResourceIndexer struct {
 	// Full text indexer client
-	client bleve.Index
+	index bleve.Index
 }
 
 func NewResourceIndexer(dst string) (*ResourceIndexer, error) {
@@ -20,7 +20,7 @@ func NewResourceIndexer(dst string) (*ResourceIndexer, error) {
 		return nil, err
 	}
 	return &ResourceIndexer{
-		client: c,
+		index: c,
 	}, nil
 }
 
@@ -45,11 +45,11 @@ func (ri *ResourceIndexer) HandleAdd(obj interface{}) error {
 
 func (ri *ResourceIndexer) HandleDelete(obj interface{}) error {
 	key := keyFunction(obj)
-	err := ri.client.Delete(key)
+	err := ri.index.Delete(key)
 	if err != nil {
 		return err
 	}
-	return ri.client.DeleteInternal([]byte(key))
+	return ri.index.DeleteInternal([]byte(key))
 }
 
 func (ri *ResourceIndexer) HandleUpdate(oldObj, newObj interface{}) error {
@@ -58,7 +58,7 @@ func (ri *ResourceIndexer) HandleUpdate(oldObj, newObj interface{}) error {
 
 func (ri *ResourceIndexer) indexDocument(obj interface{}) error {
 	key := keyFunction(obj)
-	err := ri.client.Index(key, obj)
+	err := ri.index.Index(key, obj)
 	if err != nil {
 		return errors.FromErr(err).WithMessage("Failed to index document").Err()
 	}
@@ -68,7 +68,7 @@ func (ri *ResourceIndexer) indexDocument(obj interface{}) error {
 		return errors.FromErr(err).WithMessage("Failed to marshal internal document").Err()
 	}
 
-	err = ri.client.SetInternal([]byte(key), data)
+	err = ri.index.SetInternal([]byte(key), data)
 	if err != nil {
 		return errors.FromErr(err).WithMessage("Failed store internal document").Err()
 	}

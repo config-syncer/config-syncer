@@ -32,7 +32,7 @@ func (ri *ResourceIndexer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		log.Infoln("Query received", queryString)
 		q := bleve.NewMatchQuery(queryString)
 		search := bleve.NewSearchRequest(q)
-		result, err := ri.client.Search(search)
+		result, err := ri.index.Search(search)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -40,7 +40,7 @@ func (ri *ResourceIndexer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 		searchResult := &SearchResults{SearchResult: result, Results: make([]json.RawMessage, 0)}
 		for _, hit := range result.Hits {
-			raw, err := ri.client.GetInternal([]byte(hit.ID))
+			raw, err := ri.index.GetInternal([]byte(hit.ID))
 			if err != nil {
 				log.Errorln("Failed to get internal result", err)
 				continue
