@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	clientset "k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+	"github.com/appscode/kubed/pkg/util"
 )
 
 type ServiceIndexer interface {
@@ -134,7 +135,7 @@ func (ri *ServiceIndexerImpl) equal(a, b *apiv1.Service) bool {
 }
 
 func (ri *ServiceIndexerImpl) Key(meta metav1.ObjectMeta) []byte {
-	return []byte(meta.Namespace + "/" + meta.Name)
+	return []byte(util.GetGroupVersionKind(&apiv1.Pod{}).String() + "/" + meta.Namespace + "/" + meta.Name)
 }
 
 func (ri *ServiceIndexerImpl) ServeHTTP(w http.ResponseWriter, req *http.Request) {
