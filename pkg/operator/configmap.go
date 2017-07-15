@@ -17,8 +17,8 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchConfigMaps() {
-	if !util.IsSupportedAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "ConfigMap") {
-		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ConfigMap")
+	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "ConfigMap") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ConfigMap")
 		return
 	}
 

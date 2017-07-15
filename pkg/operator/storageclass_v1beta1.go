@@ -11,14 +11,14 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	storage "k8s.io/client-go/pkg/apis/storage/v1"
+	storage "k8s.io/client-go/pkg/apis/storage/v1beta1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (op *Operator) WatchStorageClasss() {
-	if !util.IsSupportedAPIResource(op.KubeClient, storage.SchemeGroupVersion.String(), "StorageClass") {
-		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", storage.SchemeGroupVersion.String(), "StorageClass")
+func (op *Operator) WatchStorageClassV1beta1() {
+	if !util.IsPreferredAPIResource(op.KubeClient, storage.SchemeGroupVersion.String(), "StorageClass") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", storage.SchemeGroupVersion.String(), "StorageClass")
 		return
 	}
 
@@ -26,10 +26,10 @@ func (op *Operator) WatchStorageClasss() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return op.KubeClient.StorageV1().StorageClasses().List(metav1.ListOptions{})
+			return op.KubeClient.StorageV1beta1().StorageClasses().List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return op.KubeClient.StorageV1().StorageClasses().Watch(metav1.ListOptions{})
+			return op.KubeClient.StorageV1beta1().StorageClasses().Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,

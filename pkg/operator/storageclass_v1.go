@@ -11,14 +11,14 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
+	storage "k8s.io/client-go/pkg/apis/storage/v1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (op *Operator) WatchReplicationControllers() {
-	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "ReplicationController") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ReplicationController")
+func (op *Operator) WatchStorageClassV1() {
+	if !util.IsPreferredAPIResource(op.KubeClient, storage.SchemeGroupVersion.String(), "StorageClass") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", storage.SchemeGroupVersion.String(), "StorageClass")
 		return
 	}
 
@@ -26,30 +26,34 @@ func (op *Operator) WatchReplicationControllers() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return op.KubeClient.CoreV1().ReplicationControllers(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.StorageV1().StorageClasses().List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return op.KubeClient.CoreV1().ReplicationControllers(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.StorageV1().StorageClasses().Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.ReplicationController{},
+		&storage.StorageClass{},
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.ReplicationController); ok {
-					log.Infof("ReplicationController %s@%s added", res.Name, res.Namespace)
+				if res, ok := obj.(*storage.StorageClass); ok {
+					log.Infof("StorageClass %s@%s added", res.Name, res.Namespace)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
 							log.Errorln(err)
 						}
 					}
+
+					if op.Eventer != nil && op.Config.EventForwarder.NotifyOnStorageAdd {
+						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
+					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.ReplicationController); ok {
-					log.Infof("ReplicationController %s@%s deleted", res.Name, res.Namespace)
+				if res, ok := obj.(*storage.StorageClass); ok {
+					log.Infof("StorageClass %s@%s deleted", res.Name, res.Namespace)
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -61,14 +65,14 @@ func (op *Operator) WatchReplicationControllers() {
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldRes, ok := old.(*apiv1.ReplicationController)
+				oldRes, ok := old.(*storage.StorageClass)
 				if !ok {
-					log.Errorln(errors.New("Invalid ReplicationController object"))
+					log.Errorln(errors.New("Invalid StorageClass object"))
 					return
 				}
-				newRes, ok := new.(*apiv1.ReplicationController)
+				newRes, ok := new.(*storage.StorageClass)
 				if !ok {
-					log.Errorln(errors.New("Invalid ReplicationController object"))
+					log.Errorln(errors.New("Invalid StorageClass object"))
 					return
 				}
 				if op.Opt.EnableSearchIndex {
@@ -77,7 +81,7 @@ func (op *Operator) WatchReplicationControllers() {
 				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
 					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
-						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
+						!reflect.DeepEqual(oldRes.Parameters, newRes.Parameters) {
 						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
 					}
 				}

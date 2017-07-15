@@ -19,8 +19,8 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchJobs() {
-	if !util.IsSupportedAPIResource(op.KubeClient, batch.SchemeGroupVersion.String(), "Job") {
-		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "Job")
+	if !util.IsPreferredAPIResource(op.KubeClient, batch.SchemeGroupVersion.String(), "Job") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "Job")
 		return
 	}
 
