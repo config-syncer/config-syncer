@@ -19,7 +19,7 @@ func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *apiv1.ConfigMap) error {
 		oldSynced, _ = util.GetBool(oldSrc.Annotations, config.ConfigSyncKey)
 	}
 	if newSrc != nil {
-		if ok, err := util.GetBool(oldSrc.Annotations, config.ConfigSyncKey); err != nil {
+		if ok, err := util.GetBool(newSrc.Annotations, config.ConfigSyncKey); err != nil {
 			return err // Don't remove by mistake
 		} else {
 			newSynced = ok
@@ -90,7 +90,7 @@ func (s *ConfigSyncer) SyncSecret(oldSrc, newSrc *apiv1.Secret) error {
 		oldSynced, _ = util.GetBool(oldSrc.Annotations, config.ConfigSyncKey)
 	}
 	if newSrc != nil {
-		if ok, err := util.GetBool(oldSrc.Annotations, config.ConfigSyncKey); err != nil {
+		if ok, err := util.GetBool(newSrc.Annotations, config.ConfigSyncKey); err != nil {
 			return err // Don't remove by mistake
 		} else {
 			newSynced = ok
