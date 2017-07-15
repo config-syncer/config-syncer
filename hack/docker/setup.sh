@@ -64,7 +64,7 @@ EOL
     local cmd="docker build -t appscode/$IMG:$TAG ."
     echo $cmd; $cmd
 
-    rm kubed Dockerfile
+    rm kubed osm Dockerfile
     popd
 }
 
