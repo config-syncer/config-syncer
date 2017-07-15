@@ -32,7 +32,7 @@ func TestNewService(t *testing.T) {
 
 	ri := newTestReverseIndexer()
 	ri.dataChan <- newService()
-	ri.newService()
+	ri.AddService()
 
 	pod := newPod("foo-pod-1")
 	if rawdata, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
@@ -77,7 +77,7 @@ func TestRemoveService(t *testing.T) {
 
 	service := newService()
 	ri.dataChan <- service
-	ri.newService()
+	ri.AddService()
 	pod := newPod("foo-pod-1")
 	if rawdata, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
 		var svc []*v1.Service
@@ -93,7 +93,7 @@ func TestRemoveService(t *testing.T) {
 	}
 
 	ri.dataChan <- service
-	ri.removeService()
+	ri.RemoveService()
 
 	pod = newPod("foo-pod-1")
 	if res, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {

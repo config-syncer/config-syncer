@@ -41,50 +41,83 @@ func (ri *ReverseIndexer) Handle(events string, obj ...interface{}) {
 func (ri *ReverseIndexer) handleService(events string, obj ...interface{}) {
 	switch events {
 	case "added":
-		ri.newService(obj[0])
+		ri.AddService(obj[0])
 	case "deleted":
-		ri.removeService(obj[0])
+		ri.RemoveService(obj[0])
 	case "updated":
-		ri.updateService(obj[0], obj[1])
+		ri.UpdateService(obj[0], obj[1])
 	default:
 		log.Errorln("Event type not recognize", events)
 	}
 }
 
-func (ri *ReverseIndexer) newService(obj interface{}) {
-	if service, ok := assertIsService(obj); ok {
-		log.Infof("New service: %v", service.Name)
-		log.V(5).Infof("Service details: %v", service)
+func (ri *ReverseIndexer) AddService(svc *apiv1.Service) {
+	log.Infof("New service: %v", svc.Name)
+	log.V(5).Infof("Service details: %v", svc)
 
-		pods, err := ri.podsForService(service)
-		if err != nil {
-			log.Errorln("Failed to list Pods")
-			return
-		}
+	pods, err := ri.podsForService(svc)
+	if err != nil {
+		log.Errorln("Failed to list Pods")
+		return
+	}
 
-		for _, pod := range pods.Items {
-			key := namespacerKey(pod.ObjectMeta)
-			raw, err := ri.client.GetInternal(key)
-			if err != nil || len(raw) == 0 {
-				data := []*apiv1.Service{service}
+	for _, pod := range pods.Items {
+		key := namespacerKey(pod.ObjectMeta)
+		raw, err := ri.client.GetInternal(key)
+		if err != nil || len(raw) == 0 {
+			data := []*apiv1.Service{svc}
+			raw, err := json.Marshal(data)
+			if err == nil {
+				err := ri.client.SetInternal(key, raw)
+				if err != nil {
+					log.Errorln("Failed to store internal document", err)
+				}
+			}
+		} else {
+			var data []*apiv1.Service
+			err := json.Unmarshal(raw, &data)
+			if err == nil {
+				data = append(data, svc)
 				raw, err := json.Marshal(data)
 				if err == nil {
-					err := ri.client.SetInternal(key, raw)
+					err = ri.client.SetInternal(key, raw)
 					if err != nil {
 						log.Errorln("Failed to store internal document", err)
 					}
 				}
-			} else {
-				var data []*apiv1.Service
-				err := json.Unmarshal(raw, &data)
-				if err == nil {
-					data = append(data, service)
-					raw, err := json.Marshal(data)
+			}
+		}
+	}
+}
+
+func (ri *ReverseIndexer) RemoveService(svc *apiv1.Service) {
+	pods, err := ri.podsForService(svc)
+	if err != nil {
+		log.Errorln("Failed to list Pods")
+		return
+	}
+
+	for _, pod := range pods.Items {
+		key := namespacerKey(pod.ObjectMeta)
+		raw, _ := ri.client.GetInternal(key)
+		if len(raw) > 0 {
+			var data []*apiv1.Service
+			err := json.Unmarshal(raw, &data)
+			if err == nil {
+				tempData := data
+				for i, valueSvc := range data {
+					if equalService(svc, valueSvc) {
+						tempData = append(data[:i], data[i+1:]...)
+					}
+				}
+
+				if len(tempData) == 0 {
+					// Remove unnecessary index
+					ri.client.DeleteInternal(key)
+				} else {
+					raw, err := json.Marshal(tempData)
 					if err == nil {
-						err = ri.client.SetInternal(key, raw)
-						if err != nil {
-							log.Errorln("Failed to store internal document", err)
-						}
+						ri.client.SetInternal(key, raw)
 					}
 				}
 			}
@@ -92,52 +125,11 @@ func (ri *ReverseIndexer) newService(obj interface{}) {
 	}
 }
 
-func (ri *ReverseIndexer) removeService(obj interface{}) {
-	if svc, ok := assertIsService(obj); ok {
-		pods, err := ri.podsForService(svc)
-		if err != nil {
-			log.Errorln("Failed to list Pods")
-			return
-		}
-
-		for _, pod := range pods.Items {
-			key := namespacerKey(pod.ObjectMeta)
-			raw, _ := ri.client.GetInternal(key)
-			if len(raw) > 0 {
-				var data []*apiv1.Service
-				err := json.Unmarshal(raw, &data)
-				if err == nil {
-					tempData := data
-					for i, valueSvc := range data {
-						if equalService(svc, valueSvc) {
-							tempData = append(data[:i], data[i+1:]...)
-						}
-					}
-
-					if len(tempData) == 0 {
-						// Remove unnecessary index
-						ri.client.DeleteInternal(key)
-					} else {
-						raw, err := json.Marshal(tempData)
-						if err == nil {
-							ri.client.SetInternal(key, raw)
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-func (ri *ReverseIndexer) updateService(oldObj, newObj interface{}) {
-	if old, ok := assertIsService(newObj); ok {
-		if new, ok := assertIsService(oldObj); ok {
-			if !reflect.DeepEqual(old.Spec.Selector, new.Spec.Selector) {
-				// Only update if selector changes
-				ri.removeService(oldObj)
-				ri.newService(newObj)
-			}
-		}
+func (ri *ReverseIndexer) UpdateService(old, new *apiv1.Service) {
+	if !reflect.DeepEqual(old.Spec.Selector, new.Spec.Selector) {
+		// Only update if selector changes
+		ri.RemoveService(old)
+		ri.AddService(new)
 	}
 }
 
@@ -162,13 +154,4 @@ func equalService(a, b *apiv1.Service) bool {
 
 func namespacerKey(meta metav1.ObjectMeta) []byte {
 	return []byte(meta.Namespace + "/" + meta.Name)
-}
-
-func assertIsService(obj interface{}) (*apiv1.Service, bool) {
-	if service, ok := obj.(*apiv1.Service); ok {
-		return service, ok
-	} else {
-		log.Errorf("Type assertion failed! Expected 'Service', got %T", service)
-		return nil, ok
-	}
 }
