@@ -14,6 +14,7 @@ import (
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/influxdb"
 	"github.com/appscode/kubed/pkg/storage"
+	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kubed/pkg/trashcan"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
@@ -62,6 +63,7 @@ type Operator struct {
 	Eventer        *eventer.EventForwarder
 	Cron           *cron.Cron
 	NotifierLoader envconfig.LoaderFunc
+	ConfigSyncer   *syncer.ConfigSyncer
 
 	syncPeriod time.Duration
 	sync.Mutex
@@ -95,6 +97,8 @@ func (op *Operator) Setup() error {
 			Loader: op.NotifierLoader,
 		}
 	}
+
+	op.ConfigSyncer = &syncer.ConfigSyncer{KubeClient: op.KubeClient}
 
 	op.Cron = cron.New()
 	op.Cron.Start()

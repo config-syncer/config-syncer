@@ -45,10 +45,9 @@ func (op *Operator) WatchConfigMaps() {
 							log.Errorln(err)
 						}
 					}
-
-					//res.TypeMeta.String()
-
-					// TODO: Sync configmap
+					if op.ConfigSyncer != nil {
+						op.ConfigSyncer.SyncConfigMap(nil, res)
+					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
@@ -61,6 +60,9 @@ func (op *Operator) WatchConfigMaps() {
 					}
 					if op.TrashCan != nil {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
+					}
+					if op.ConfigSyncer != nil {
+						op.ConfigSyncer.SyncConfigMap(res, nil)
 					}
 				}
 			},
@@ -83,9 +85,10 @@ func (op *Operator) WatchConfigMaps() {
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
 						!reflect.DeepEqual(oldRes.Data, newRes.Data) {
 						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
-
-						// sync configmap
 					}
+				}
+				if op.ConfigSyncer != nil {
+					op.ConfigSyncer.SyncConfigMap(oldRes, newRes)
 				}
 			},
 		},
