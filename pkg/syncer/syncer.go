@@ -68,7 +68,7 @@ func (s *ConfigSyncer) upsertConfigMap(src *apiv1.ConfigMap, namespace string) e
 		n.UID = ""
 		n.ResourceVersion = ""
 		n.Annotations = map[string]string{}
-		for k,v := range src.Annotations {
+		for k, v := range src.Annotations {
 			if k != config.ConfigSyncKey {
 				n.Annotations[k] = v
 			}
@@ -79,9 +79,11 @@ func (s *ConfigSyncer) upsertConfigMap(src *apiv1.ConfigMap, namespace string) e
 	// update
 	nu.Data = src.Data
 	nu.Labels = src.Labels
-	nu.Annotations = src.Annotations
-	if nu.Annotations != nil {
-		delete(nu.Annotations, config.ConfigSyncKey)
+	nu.Annotations = map[string]string{}
+	for k, v := range src.Annotations {
+		if k != config.ConfigSyncKey {
+			nu.Annotations[k] = v
+		}
 	}
 	_, err = s.KubeClient.CoreV1().ConfigMaps(namespace).Update(nu)
 	return err
@@ -142,7 +144,7 @@ func (s *ConfigSyncer) upsertSecret(src *apiv1.Secret, namespace string) error {
 		n.UID = ""
 		n.ResourceVersion = ""
 		n.Annotations = map[string]string{}
-		for k,v := range src.Annotations {
+		for k, v := range src.Annotations {
 			if k != config.ConfigSyncKey {
 				n.Annotations[k] = v
 			}
@@ -154,9 +156,11 @@ func (s *ConfigSyncer) upsertSecret(src *apiv1.Secret, namespace string) error {
 	// update
 	nu.Data = src.Data
 	nu.Labels = src.Labels
-	nu.Annotations = src.Annotations
-	if nu.Annotations != nil {
-		delete(nu.Annotations, config.ConfigSyncKey)
+	nu.Annotations = map[string]string{}
+	for k, v := range src.Annotations {
+		if k != config.ConfigSyncKey {
+			nu.Annotations[k] = v
+		}
 	}
 	_, err = s.KubeClient.CoreV1().Secrets(namespace).Update(nu)
 	return err
