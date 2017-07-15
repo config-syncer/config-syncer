@@ -287,9 +287,23 @@ func (op *Operator) RunSnapshotter() error {
 }
 
 func (op *Operator) RunAndHold() {
-	op.RunElasticsearchCleaner()
-	op.RunTrashCanCleaner()
-	op.RunSnapshotter()
+	var err error
+
+	err = op.RunElasticsearchCleaner()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = op.RunTrashCanCleaner()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = op.RunSnapshotter()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	op.RunWatchers()
 	op.ListenAndServe()
 }
