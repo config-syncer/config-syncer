@@ -28,8 +28,14 @@ func SnapshotCluster(kubeConfig *rest.Config, backupDir string, sanitize bool) e
 		return err
 	}
 
-	resBytes, _ := yaml.Marshal(rs)
-	ioutil.WriteFile(filepath.Join(backupDir, "api_resources.yaml"), resBytes, 0755)
+	resBytes, err := yaml.Marshal(rs)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(filepath.Join(backupDir, "api_resources.yaml"), resBytes, 0755)
+	if err != nil {
+		return err
+	}
 
 	for _, v := range rs {
 		gv, err := schema.ParseGroupVersion(v.GroupVersion)
