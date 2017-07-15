@@ -31,3 +31,4 @@ _testmain.go
 .idea/
 dist/
 .vscode/
+hack/docker/osm

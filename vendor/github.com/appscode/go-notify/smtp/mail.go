@@ -74,6 +74,10 @@ func (c client) WithTag(tag string) notify.ByEmail {
 	return &c
 }
 
+func (c client) WithNoTracking() notify.ByEmail {
+	return &c
+}
+
 func (c client) To(to string, cc ...string) notify.ByEmail {
 	c.opt.To = append([]string{to}, cc...)
 	return &c

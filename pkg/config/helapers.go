@@ -44,7 +44,7 @@ func (cfg ClusterConfig) Save(configPath string) error {
 }
 
 func (b Backend) Location(timestamp time.Time) (string, error) {
-	ts := timestamp.UTC().Format(time.RFC3339)
+	ts := timestamp.UTC().Format(TimestampFormat)
 	if b.S3 != nil {
 		return filepath.Join(b.S3.Prefix, ts), nil
 	} else if b.GCS != nil {

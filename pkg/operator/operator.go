@@ -251,7 +251,7 @@ func (op *Operator) RunSnapshotter() error {
 		}
 
 		t := time.Now().UTC()
-		snapshotDir := filepath.Join(op.Opt.ScratchDir, "snapshot", t.Format(time.RFC3339))
+		snapshotDir := filepath.Join(op.Opt.ScratchDir, "snapshot", t.Format(config.TimestampFormat))
 		err = backup.SnapshotCluster(cfg, snapshotDir, op.Config.ClusterSnapshot.Sanitize)
 		if err != nil {
 			return err
@@ -265,7 +265,7 @@ func (op *Operator) RunSnapshotter() error {
 		sh := shell.NewSession()
 		sh.SetDir(op.Opt.ScratchDir)
 		sh.ShowCMD = true
-		return sh.Command("osm", "push", "-c", container, snapshotDir, dest).Run()
+		return sh.Command("osm", "push", "--osmconfig", osmconfigPath, "-c", container, snapshotDir, dest).Run()
 	}
 
 	err = snapshotter()

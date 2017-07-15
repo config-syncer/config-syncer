@@ -6,6 +6,7 @@ type ByEmail interface {
 	WithSubject(subject string) ByEmail
 	WithBody(body string) ByEmail
 	WithTag(tag string) ByEmail
+	WithNoTracking() ByEmail
 	To(to string, cc ...string) ByEmail
 	Send() error
 	SendHtml() error

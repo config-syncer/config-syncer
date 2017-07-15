@@ -1,10 +1,12 @@
 apiVersion: v1
 data:
-  config: |
+  config.yaml: |
     clusterSnapshot:
       Storage:
-        local:
-          path: /tmp/csnap
+        gcs:
+          bucket: restic
+          prefix: a/b/c
+        storageSecretName: snap-secret
       sanitize: true
       schedule: '@every 5m'
     eventForwarder:
@@ -14,6 +16,7 @@ data:
       notifyOnIngressAdd: true
       notifyOnStorageAdd: true
       notifyVia: mailgun
+    notifierSecretName: kubed-notifier
     recycleBin:
       handle_update: true
       notifyVia: mailgun
@@ -23,4 +26,4 @@ kind: ConfigMap
 metadata:
   creationTimestamp: null
   name: kubed
-  namespace: default
+  namespace: kube-system

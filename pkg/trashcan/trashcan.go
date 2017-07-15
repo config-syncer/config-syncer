@@ -31,7 +31,7 @@ func (c *TrashCan) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new in
 		return err
 	}
 	name := filepath.Base(p)
-	fn := fmt.Sprintf("%s.%s.yaml", name, meta.CreationTimestamp.UTC().Format(time.RFC3339))
+	fn := fmt.Sprintf("%s.%s.yaml", name, meta.CreationTimestamp.UTC().Format(config.TimestampFormat))
 
 	fullPath := filepath.Join(dir, fn)
 	bytes, err := yaml.Marshal(new)
@@ -40,14 +40,14 @@ func (c *TrashCan) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new in
 	}
 
 	if c.Spec.NotifyVia != "" {
-		sub := fmt.Sprintf("%s %s@%s updated", t.String(), meta.Name, meta.Namespace)
+		sub := fmt.Sprintf("%s %s %s/%s updated", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
 		if notifier, err := unified.LoadVia(c.Spec.NotifyVia, c.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
 				if diff, err := prepareDiff(old, new); err == nil {
-					n.WithSubject(sub).WithBody(diff).Send()
+					n.WithSubject(sub).WithBody(diff).WithNoTracking().Send()
 				} else {
-					n.WithSubject(sub).WithBody(string(bytes)).Send()
+					n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
 				}
 			case notify.BySMS:
 				n.WithBody(sub).Send()
@@ -68,7 +68,7 @@ func (c *TrashCan) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interface
 		return err
 	}
 	name := filepath.Base(p)
-	fn := fmt.Sprintf("%s.%s.yaml", name, meta.CreationTimestamp.UTC().Format(time.RFC3339))
+	fn := fmt.Sprintf("%s.%s.yaml", name, meta.CreationTimestamp.UTC().Format(config.TimestampFormat))
 
 	fullPath := filepath.Join(dir, fn)
 	bytes, err := yaml.Marshal(v)
@@ -77,11 +77,11 @@ func (c *TrashCan) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interface
 	}
 
 	if c.Spec.NotifyVia != "" {
-		sub := fmt.Sprintf("%s %s@%s deleted", t.String(), meta.Name, meta.Namespace)
+		sub := fmt.Sprintf("%s %s %s/%s deleted", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
 		if notifier, err := unified.LoadVia(c.Spec.NotifyVia, c.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
-				n.WithSubject(sub).WithBody(string(bytes)).Send()
+				n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
 			case notify.BySMS:
 				n.WithBody(sub).Send()
 			case notify.ByChat:
