@@ -67,8 +67,11 @@ func (s *ConfigSyncer) upsertConfigMap(src *apiv1.ConfigMap, namespace string) e
 		n.Namespace = namespace
 		n.UID = ""
 		n.ResourceVersion = ""
-		if n.Annotations != nil {
-			delete(n.Annotations, config.ConfigSyncKey)
+		n.Annotations = map[string]string{}
+		for k,v := range src.Annotations {
+			if k != config.ConfigSyncKey {
+				n.Annotations[k] = v
+			}
 		}
 		_, err := s.KubeClient.CoreV1().ConfigMaps(namespace).Create(&n)
 		return err
@@ -138,8 +141,11 @@ func (s *ConfigSyncer) upsertSecret(src *apiv1.Secret, namespace string) error {
 		n.Namespace = namespace
 		n.UID = ""
 		n.ResourceVersion = ""
-		if n.Annotations != nil {
-			delete(n.Annotations, config.ConfigSyncKey)
+		n.Annotations = map[string]string{}
+		for k,v := range src.Annotations {
+			if k != config.ConfigSyncKey {
+				n.Annotations[k] = v
+			}
 		}
 		_, err := s.KubeClient.CoreV1().Secrets(namespace).Create(&n)
 		return err
