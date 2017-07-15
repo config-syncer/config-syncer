@@ -200,7 +200,7 @@ func (op *Operator) ListenAndServe() {
 		if err != nil {
 			log.Errorln("Failed to create indexer", err)
 		} else {
-			ri.RegisterRouters(router)
+			router.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(ri.Service.ServeHTTP))
 			op.ReverseIndex = ri
 		}
 	}
