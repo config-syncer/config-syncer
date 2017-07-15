@@ -18,9 +18,6 @@ type ReverseIndexer struct {
 	kubeClient clientset.Interface
 
 	client bleve.Index
-
-	// Channel serializes event to protect cache
-	dataChan chan interface{}
 }
 
 func NewReverseIndexer(cl clientset.Interface, dst string) (*ReverseIndexer, error) {
@@ -31,7 +28,6 @@ func NewReverseIndexer(cl clientset.Interface, dst string) (*ReverseIndexer, err
 	return &ReverseIndexer{
 		kubeClient: cl,
 		client:     c,
-		dataChan:   make(chan interface{}, 1),
 	}, nil
 }
 
@@ -45,11 +41,9 @@ func (ri *ReverseIndexer) Handle(events string, obj ...interface{}) {
 func (ri *ReverseIndexer) handleService(events string, obj ...interface{}) {
 	switch events {
 	case "added":
-		ri.dataChan <- obj[0]
-		ri.newService()
+		ri.newService(obj[0])
 	case "deleted":
-		ri.dataChan <- obj[0]
-		ri.removeService()
+		ri.removeService(obj[0])
 	case "updated":
 		ri.updateService(obj[0], obj[1])
 	default:
@@ -57,8 +51,7 @@ func (ri *ReverseIndexer) handleService(events string, obj ...interface{}) {
 	}
 }
 
-func (ri *ReverseIndexer) newService() {
-	obj := <-ri.dataChan
+func (ri *ReverseIndexer) newService(obj interface{}) {
 	if service, ok := assertIsService(obj); ok {
 		log.Infof("New service: %v", service.Name)
 		log.V(5).Infof("Service details: %v", service)
@@ -99,8 +92,7 @@ func (ri *ReverseIndexer) newService() {
 	}
 }
 
-func (ri *ReverseIndexer) removeService() {
-	obj := <-ri.dataChan
+func (ri *ReverseIndexer) removeService(obj interface{}) {
 	if svc, ok := assertIsService(obj); ok {
 		pods, err := ri.podsForService(svc)
 		if err != nil {
@@ -142,11 +134,8 @@ func (ri *ReverseIndexer) updateService(oldObj, newObj interface{}) {
 		if new, ok := assertIsService(oldObj); ok {
 			if !reflect.DeepEqual(old.Spec.Selector, new.Spec.Selector) {
 				// Only update if selector changes
-				ri.dataChan <- oldObj
-				ri.removeService()
-
-				ri.dataChan <- newObj
-				ri.newService()
+				ri.removeService(oldObj)
+				ri.newService(newObj)
 			}
 		}
 	}

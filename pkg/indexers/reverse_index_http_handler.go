@@ -16,8 +16,8 @@ const (
 )
 
 func (ri *ReverseIndexer) RegisterRouters(r *pat.PatternServeMux) {
-	// Example format /index/namespaces/kube-system/pods/kube-dns
-	r.Get(httpRouterPrefix+"/namespaces/:namespace/:resource/:name", http.HandlerFunc(ri.ServeHTTP))
+	// Example format /api/v1/namespaces/default/pods/p1/services
+	r.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(ri.ServeHTTP))
 }
 
 func (ri *ReverseIndexer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
