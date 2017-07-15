@@ -41,9 +41,8 @@ libbuild.BIN_MATRIX = {
     'kubed': {
         'type': 'go',
         'go_version': True,
-        'use_cgo': True,
         'distro': {
-            'linux': ['amd64']
+            'alpine': ['amd64']
         }
     }
 }

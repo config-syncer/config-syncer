@@ -46,7 +46,7 @@ build_binary() {
 
 build_docker() {
     pushd $REPO_ROOT/hack/docker
-    cp $DIST/kubed/kubed-linux-amd64 kubed
+    cp $DIST/kubed/kubed-alpine-amd64 kubed
     cp $DIST/osm/osm-alpine-amd64 osm
     chmod 755 kubed
 
