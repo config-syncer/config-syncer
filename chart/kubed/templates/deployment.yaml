@@ -14,24 +14,34 @@ spec:
       labels:
         app: "{{ template "name" . }}"
         release: "{{ .Release.Name }}"
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
 {{- if .Values.rbac.install }}
       serviceAccountName: {{ template "fullname" . }}
 {{- end }}
       containers:
-      - args:
+      - name: kubed
+        args:
         - run
         - --v=3
         image: '{{ .Values.kubed.image }}:{{ .Values.kubed.tag }}'
         imagePullPolicy: '{{ .Values.kubed.pullPolicy }}'
-        name: kubed
         ports:
         - containerPort: 56790
           name: http
           protocol: TCP
         volumeMounts:
-          - mountPath: /tmp
-            name: scratchdir
+          - name: config
+            mountPath: /srv/kubed
+          - name: scratchdir
+            mountPath: /tmp
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
       volumes:
-        - emptyDir: {}
-          name: scratchdir
+        - name: config
+          configMap:
+            name: kubed
+        - name: scratchdir
+          emptyDir: {}

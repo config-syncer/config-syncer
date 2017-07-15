@@ -92,9 +92,6 @@ metadata:
     app: kubed
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: kubed
   template:
     metadata:
       labels:
