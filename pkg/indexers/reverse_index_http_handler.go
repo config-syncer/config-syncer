@@ -42,8 +42,8 @@ func (ri *ReverseIndexer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 func (ri *ReverseIndexer) servePodIndex(w http.ResponseWriter, req *http.Request, params url.Values) {
 	namespace, name := params.Get(":namespace"), params.Get(":name")
 	if len(namespace) > 0 && len(name) > 0 {
-		key := namespacerKey(v1.ObjectMeta{Name: name, Namespace: namespace})
-		if val, err := ri.client.GetInternal(key); err == nil && len(val) > 0 {
+		key := ri.Service.Key(v1.ObjectMeta{Name: name, Namespace: namespace})
+		if val, err := ri.index.GetInternal(key); err == nil && len(val) > 0 {
 			if err := json.NewEncoder(w).Encode(json.RawMessage(val)); err == nil {
 				w.Header().Set("Content-Type", "application/json")
 				return

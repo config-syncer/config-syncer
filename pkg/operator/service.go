@@ -45,7 +45,7 @@ func (op *Operator) watchService() {
 						}
 					}
 					if op.Opt.EnableReverseIndex {
-						op.ReverseIndex.Handle("added", obj)
+						op.ReverseIndex.Service.Add(res)
 					}
 				}
 			},
@@ -60,7 +60,7 @@ func (op *Operator) watchService() {
 						}
 					}
 					if op.Opt.EnableReverseIndex {
-						op.ReverseIndex.Handle("deleted", obj)
+						op.ReverseIndex.Service.Delete(res)
 					}
 					if op.TrashCan != nil {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
@@ -85,7 +85,7 @@ func (op *Operator) watchService() {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
 				if op.Opt.EnableReverseIndex {
-					op.ReverseIndex.Handle("updated", old, new)
+					op.ReverseIndex.Service.Update(oldRes, newRes)
 				}
 				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
 					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||

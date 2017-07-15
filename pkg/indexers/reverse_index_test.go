@@ -23,7 +23,7 @@ func newTestReverseIndexer() *ReverseIndexer {
 			newPod("foo-pod-2"),
 		),
 		dataChan: make(chan interface{}, 1),
-		client:   c,
+		index:    c,
 	}
 }
 
@@ -35,7 +35,7 @@ func TestNewService(t *testing.T) {
 	ri.AddService()
 
 	pod := newPod("foo-pod-1")
-	if rawdata, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
+	if rawdata, err := ri.index.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
 		var svc []*v1.Service
 		err := json.Unmarshal(rawdata, &svc)
 		if err != nil {
@@ -49,7 +49,7 @@ func TestNewService(t *testing.T) {
 	}
 
 	pod = newPod("foo-pod-2")
-	if rawdata, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
+	if rawdata, err := ri.index.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
 		var svc []*v1.Service
 		err := json.Unmarshal(rawdata, &svc)
 		if err != nil {
@@ -63,7 +63,7 @@ func TestNewService(t *testing.T) {
 	}
 
 	pod = newPod("foo-pod-3")
-	if res, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
+	if res, err := ri.index.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
 		if len(res) > 0 {
 			t.Errorf("Service Found, expected Not Found")
 		}
@@ -79,7 +79,7 @@ func TestRemoveService(t *testing.T) {
 	ri.dataChan <- service
 	ri.AddService()
 	pod := newPod("foo-pod-1")
-	if rawdata, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
+	if rawdata, err := ri.index.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
 		var svc []*v1.Service
 		err := json.Unmarshal(rawdata, &svc)
 		if err != nil {
@@ -96,7 +96,7 @@ func TestRemoveService(t *testing.T) {
 	ri.RemoveService()
 
 	pod = newPod("foo-pod-1")
-	if res, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
+	if res, err := ri.index.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
 		if len(res) > 0 {
 			fmt.Println(string(res))
 			t.Errorf("Service Found, expected Not Found")
@@ -104,7 +104,7 @@ func TestRemoveService(t *testing.T) {
 	}
 
 	pod = newPod("foo-pod-2")
-	if res, err := ri.client.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
+	if res, err := ri.index.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
 		if len(res) > 0 {
 			t.Errorf("Service Found, expected Not Found")
 		}
