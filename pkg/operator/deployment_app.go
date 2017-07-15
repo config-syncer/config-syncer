@@ -19,7 +19,7 @@ import (
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchDeploymentApps() {
 	if !util.IsSupportedAPIResource(op.KubeClient, apps.SchemeGroupVersion.String(), "Deployment") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "Deployment")
+		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "Deployment")
 		return
 	}
 

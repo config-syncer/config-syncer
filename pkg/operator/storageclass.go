@@ -18,7 +18,7 @@ import (
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchStorageClasss() {
 	if !util.IsSupportedAPIResource(op.KubeClient, storage.SchemeGroupVersion.String(), "StorageClass") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", storage.SchemeGroupVersion.String(), "StorageClass")
+		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", storage.SchemeGroupVersion.String(), "StorageClass")
 		return
 	}
 

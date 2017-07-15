@@ -19,7 +19,7 @@ import (
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchDormantDatabases() {
 	if !util.IsSupportedAPIResource(op.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindDormantDatabase) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindDormantDatabase)
+		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindDormantDatabase)
 		return
 	}
 

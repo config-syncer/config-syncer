@@ -19,7 +19,7 @@ import (
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchStatefulSets() {
 	if !util.IsSupportedAPIResource(op.KubeClient, apps.SchemeGroupVersion.String(), "StatefulSet") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "StatefulSet")
+		log.Warningf("Skipping watching unsupported GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "StatefulSet")
 		return
 	}
 
