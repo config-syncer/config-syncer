@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	ConfigSyncKey = "kubernetes.appscode.com/sync"
+	ConfigSyncKey = "kubed.appscode.com/sync"
 
 	TimestampFormat = "20060102T150405"
 )
