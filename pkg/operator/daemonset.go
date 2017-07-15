@@ -40,6 +40,7 @@ func (op *Operator) WatchDaemonSets() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*extensions.DaemonSet); ok {
 					log.Infof("DaemonSet %s@%s added", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -51,6 +52,8 @@ func (op *Operator) WatchDaemonSets() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*extensions.DaemonSet); ok {
 					log.Infof("DaemonSet %s@%s deleted", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
+
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -72,6 +75,9 @@ func (op *Operator) WatchDaemonSets() {
 					log.Errorln(errors.New("Invalid DaemonSet object"))
 					return
 				}
+				util.AssignTypeKind(oldRes)
+				util.AssignTypeKind(newRes)
+
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}

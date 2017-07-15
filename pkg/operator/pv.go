@@ -39,6 +39,7 @@ func (op *Operator) WatchPersistentVolumes() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.PersistentVolume); ok {
 					log.Infof("PersistentVolume %s@%s added", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -54,6 +55,8 @@ func (op *Operator) WatchPersistentVolumes() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.PersistentVolume); ok {
 					log.Infof("PersistentVolume %s@%s deleted", res.Name, res.Namespace)
+					util.AssignTypeKind(res)
+
 					if op.Opt.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
@@ -75,6 +78,9 @@ func (op *Operator) WatchPersistentVolumes() {
 					log.Errorln(errors.New("Invalid PersistentVolume object"))
 					return
 				}
+				util.AssignTypeKind(oldRes)
+				util.AssignTypeKind(oldRes)
+
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
