@@ -17,9 +17,9 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (op *Operator) WatchElastics() {
-	if !util.IsPreferredAPIResource(op.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElastic)
+func (op *Operator) WatchElasticsearches() {
+	if !util.IsPreferredAPIResource(op.KubeClient, tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElasticsearch) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1alpha1SchemeGroupVersion.String(), tapi.ResourceKindElasticsearch)
 		return
 	}
 
@@ -27,19 +27,19 @@ func (op *Operator) WatchElastics() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return op.KubeDBClient.Elastics(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeDBClient.Elasticsearches(apiv1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return op.KubeDBClient.Elastics(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeDBClient.Elasticsearches(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&tapi.Elastic{},
+		&tapi.Elasticsearch{},
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if res, ok := obj.(*tapi.Elastic); ok {
-					log.Infof("Elastic %s@%s added", res.Name, res.Namespace)
+				if res, ok := obj.(*tapi.Elasticsearch); ok {
+					log.Infof("Elasticsearch %s@%s added", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
@@ -50,8 +50,8 @@ func (op *Operator) WatchElastics() {
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				if res, ok := obj.(*tapi.Elastic); ok {
-					log.Infof("Elastic %s@%s deleted", res.Name, res.Namespace)
+				if res, ok := obj.(*tapi.Elasticsearch); ok {
+					log.Infof("Elasticsearch %s@%s deleted", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
 					if op.Opt.EnableSearchIndex {
@@ -65,14 +65,14 @@ func (op *Operator) WatchElastics() {
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldRes, ok := old.(*tapi.Elastic)
+				oldRes, ok := old.(*tapi.Elasticsearch)
 				if !ok {
-					log.Errorln(errors.New("Invalid Elastic object"))
+					log.Errorln(errors.New("Invalid Elasticsearch object"))
 					return
 				}
-				newRes, ok := new.(*tapi.Elastic)
+				newRes, ok := new.(*tapi.Elasticsearch)
 				if !ok {
-					log.Errorln(errors.New("Invalid Elastic object"))
+					log.Errorln(errors.New("Invalid Elasticsearch object"))
 					return
 				}
 				util.AssignTypeKind(oldRes)

@@ -23,9 +23,9 @@ func v1addKnownTypes(scheme *runtime.Scheme) error {
 		// DormantDatabase
 		&DormantDatabase{},
 		&DormantDatabaseList{},
-		// kubedb Elastic
-		&Elastic{},
-		&ElasticList{},
+		// kubedb Elasticsearch
+		&Elasticsearch{},
+		&ElasticsearchList{},
 		// kubedb Postgres
 		&Postgres{},
 		&PostgresList{},

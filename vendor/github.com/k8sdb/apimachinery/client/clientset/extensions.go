@@ -16,7 +16,7 @@ type ExtensionInterface interface {
 	RESTClient() rest.Interface
 	SnapshotNamespacer
 	DormantDatabaseNamespacer
-	ElasticNamespacer
+	ElasticsearchNamespacer
 	PostgresNamespacer
 }
 
@@ -37,7 +37,7 @@ func (c *ExtensionClient) DormantDatabases(namespace string) DormantDatabaseInte
 	return newDormantDatabase(c, namespace)
 }
 
-func (c *ExtensionClient) Elastics(namespace string) ElasticInterface {
+func (c *ExtensionClient) Elasticsearches(namespace string) ElasticsearchInterface {
 	return newElastic(c, namespace)
 }
 

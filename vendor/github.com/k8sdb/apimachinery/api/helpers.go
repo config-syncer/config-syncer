@@ -18,7 +18,7 @@ const (
 	PostgresKey             = ResourceNamePostgres + "." + GenericKey
 	PostgresDatabaseVersion = PostgresKey + "/version"
 
-	ElasticKey             = ResourceNameElastic + ".kubedb.com"
+	ElasticKey             = ResourceNameElasticsearch + ".kubedb.com"
 	ElasticDatabaseVersion = ElasticKey + "/version"
 
 	SnapshotKey         = ResourceNameSnapshot + "s.kubedb.com"
@@ -57,18 +57,18 @@ func (p Postgres) StatefulSetAnnotations() map[string]string {
 	return annotations
 }
 
-func (e Elastic) OffshootName() string {
+func (e Elasticsearch) OffshootName() string {
 	return e.Name
 }
 
-func (e Elastic) OffshootLabels() map[string]string {
+func (e Elasticsearch) OffshootLabels() map[string]string {
 	return map[string]string{
-		LabelDatabaseKind: ResourceKindElastic,
+		LabelDatabaseKind: ResourceKindElasticsearch,
 		LabelDatabaseName: e.Name,
 	}
 }
 
-func (e Elastic) StatefulSetLabels() map[string]string {
+func (e Elasticsearch) StatefulSetLabels() map[string]string {
 	labels := e.OffshootLabels()
 	for key, val := range e.Labels {
 		if !strings.HasPrefix(key, GenericKey+"/") && !strings.HasPrefix(key, ElasticKey+"/") {
@@ -78,7 +78,7 @@ func (e Elastic) StatefulSetLabels() map[string]string {
 	return labels
 }
 
-func (e Elastic) StatefulSetAnnotations() map[string]string {
+func (e Elasticsearch) StatefulSetAnnotations() map[string]string {
 	annotations := make(map[string]string)
 	for key, val := range e.Annotations {
 		if !strings.HasPrefix(key, GenericKey+"/") && !strings.HasPrefix(key, ElasticKey+"/") {

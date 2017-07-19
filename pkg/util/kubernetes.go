@@ -134,8 +134,8 @@ func GetGroupVersionKind(v interface{}) schema.GroupVersionKind {
 		return voyager.V1beta1SchemeGroupVersion.WithKind("Certificate")
 	case *kubedb.Postgres:
 		return kubedb.V1alpha1SchemeGroupVersion.WithKind("Postgres")
-	case *kubedb.Elastic:
-		return kubedb.V1alpha1SchemeGroupVersion.WithKind("Elastic")
+	case *kubedb.Elasticsearch:
+		return kubedb.V1alpha1SchemeGroupVersion.WithKind("Elasticsearch")
 	case *kubedb.Snapshot:
 		return kubedb.V1alpha1SchemeGroupVersion.WithKind("Snapshot")
 	case *kubedb.DormantDatabase:
@@ -308,9 +308,9 @@ func AssignTypeKind(v interface{}) error {
 		u.APIVersion = kubedb.V1alpha1SchemeGroupVersion.String()
 		u.Kind = "Postgres"
 		return nil
-	case *kubedb.Elastic:
+	case *kubedb.Elasticsearch:
 		u.APIVersion = kubedb.V1alpha1SchemeGroupVersion.String()
-		u.Kind = "Elastic"
+		u.Kind = "Elasticsearch"
 		return nil
 	case *kubedb.Snapshot:
 		u.APIVersion = kubedb.V1alpha1SchemeGroupVersion.String()

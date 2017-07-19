@@ -12,8 +12,8 @@ type Report struct {
 }
 
 type ReportSummary struct {
-	Postgres map[string]*PostgresSummary `json:"postgres,omitempty"`
-	Elastic  map[string]*ElasticSummary  `json:"elastic,omitempty"`
+	Postgres      map[string]*PostgresSummary      `json:"postgres,omitempty"`
+	Elasticsearch map[string]*ElasticsearchSummary `json:"elastic,omitempty"`
 }
 
 type ReportStatus struct {

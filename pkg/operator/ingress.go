@@ -17,7 +17,7 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (op *Operator) WatchIngresss() {
+func (op *Operator) WatchIngresses() {
 	if !util.IsPreferredAPIResource(op.KubeClient, extensions.SchemeGroupVersion.String(), "Ingress") {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", extensions.SchemeGroupVersion.String(), "Ingress")
 		return
