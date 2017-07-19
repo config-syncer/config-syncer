@@ -1,5 +1,5 @@
-hash: c460d8b8b49f8132992649d23a0241a81598f4b664f5825e0421510819f5f572
-updated: 2017-07-14T12:51:01.837187747-07:00
+hash: c503a73a28c41c3283d643f020fb6a5ce4337f36ca59b0d079f284cd6c52eb6e
+updated: 2017-07-18T18:04:27.045788308-07:00
 imports:
 - name: cloud.google.com/go
   version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
@@ -40,7 +40,7 @@ imports:
   subpackages:
   - golog
 - name: github.com/appscode/osm
-  version: c5e36f4aa99900641c2b592fc41d80556fa7f195
+  version: ec38ac9497280b0acb4742d02154ba5f18d8a994
   subpackages:
   - pkg/context
 - name: github.com/appscode/pat
@@ -60,7 +60,7 @@ imports:
   - api/install
   - client/clientset
 - name: github.com/appscode/voyager
-  version: 5c63b43f621ad3e08bb014a28b3d8aea98434089
+  version: 23e8b266839f81ecd2613dd059e63c85b0976bf0
   subpackages:
   - api
   - api/install
@@ -146,7 +146,7 @@ imports:
 - name: github.com/codegangsta/inject
   version: 33e0aa1cb7c019ccc3fbe049a8262a6403d30504
 - name: github.com/codeskyblue/go-sh
-  version: b097669b1569203c3ce05a6b8717d43140fdb3d5
+  version: 3d593d477915b4d2f2e74b2e041495345647a46b
 - name: github.com/coreos/go-oidc
   version: be73733bb8cc830d0205609b95d125215f8e9c70
   subpackages:
@@ -190,7 +190,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-ini/ini
-  version: 2e44421e256d82ebbf3d4d4fcabe8930b905eff3
+  version: d3de07a94d22b4a0972deb4b96d790c2c0ce8333
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -249,7 +249,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 77ed1c8a01217656d2080ad51981f6e99adaa177
 - name: github.com/k8sdb/apimachinery
-  version: 9e41703f899609de8613909ec6d6d8ca7803fb82
+  version: 7e66ca4d52d6ca74107203388d6154257ef3cd3b
   subpackages:
   - api
   - api/install
@@ -288,7 +288,7 @@ imports:
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/spf13/cobra
-  version: c46add8a652801b61513ad36c56759f302fbb028
+  version: 715f41bd7a70b5111f898b71ab484da52ee6266d
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -352,7 +352,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: e665075b5ff79143ba49c58fab02df9dc122afd5
+  version: 295e4bb0ade057ae2cfb9876ab0b54635dbfcea4
   subpackages:
   - gensupport
   - googleapi
@@ -382,7 +382,9 @@ imports:
   - backoff
   - uritemplates
 - name: gopkg.in/robfig/cron.v2
-  version: be2e0b0deed5a68ffee390b4583a13aff8321535
+  version: ca60c6d796d4b1f7bb2a8fd5271d8a59aeffb4bf
+  repo: https://github.com/appscode/cron.git
+  vcs: git
 - name: gopkg.in/yaml.v2
   version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/apimachinery

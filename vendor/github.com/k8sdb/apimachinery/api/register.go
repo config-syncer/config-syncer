@@ -35,9 +35,9 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		// DormantDatabase
 		&DormantDatabase{},
 		&DormantDatabaseList{},
-		// kubedb Elastic
-		&Elastic{},
-		&ElasticList{},
+		// kubedb Elasticsearch
+		&Elasticsearch{},
+		&ElasticsearchList{},
 		// kubedb Postgres
 		&Postgres{},
 		&PostgresList{},
@@ -51,8 +51,8 @@ func (obj *SnapshotList) GetObjectKind() schema.ObjectKind { return &obj.TypeMet
 func (d *DormantDatabase) GetObjectKind() schema.ObjectKind       { return &d.TypeMeta }
 func (obj *DormantDatabaseList) GetObjectKind() schema.ObjectKind { return &obj.TypeMeta }
 
-func (e *Elastic) GetObjectKind() schema.ObjectKind       { return &e.TypeMeta }
-func (obj *ElasticList) GetObjectKind() schema.ObjectKind { return &obj.TypeMeta }
+func (e *Elasticsearch) GetObjectKind() schema.ObjectKind       { return &e.TypeMeta }
+func (obj *ElasticsearchList) GetObjectKind() schema.ObjectKind { return &obj.TypeMeta }
 
 func (p *Postgres) GetObjectKind() schema.ObjectKind       { return &p.TypeMeta }
 func (obj *PostgresList) GetObjectKind() schema.ObjectKind { return &obj.TypeMeta }

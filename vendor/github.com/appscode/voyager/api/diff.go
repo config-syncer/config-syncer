@@ -80,7 +80,7 @@ func (r Ingress) IsPortChanged(o Ingress) bool {
 	var newPort80Open, newPort443Open bool
 	for _, rs := range o.Spec.Rules {
 		if rs.HTTP != nil {
-			for _, tls := range r.Spec.TLS {
+			for _, tls := range o.Spec.TLS {
 				if stringz.Contains(tls.Hosts, rs.Host) {
 					newPort443Open = true
 				} else {
@@ -160,6 +160,10 @@ func (r Ingress) IsStatsChanged(o Ingress) bool {
 		isMapKeyChanged(r.Annotations, o.Annotations, StatsPort) ||
 		isMapKeyChanged(r.Annotations, o.Annotations, StatsServiceName) ||
 		isMapKeyChanged(r.Annotations, o.Annotations, StatsSecret)
+}
+
+func (r Ingress) IsStatsSecretChanged(o Ingress) bool {
+	return isMapKeyChanged(r.Annotations, o.Annotations, StatsSecret)
 }
 
 func (r Ingress) IsKeepSourceChanged(o Ingress, cloudProvider string) bool {

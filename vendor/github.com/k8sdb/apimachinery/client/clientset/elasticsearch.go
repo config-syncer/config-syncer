@@ -7,69 +7,69 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-type ElasticNamespacer interface {
-	Elastics(namespace string) ElasticInterface
+type ElasticsearchNamespacer interface {
+	Elasticsearches(namespace string) ElasticsearchInterface
 }
 
-type ElasticInterface interface {
-	List(opts metav1.ListOptions) (*aci.ElasticList, error)
-	Get(name string) (*aci.Elastic, error)
-	Create(elastic *aci.Elastic) (*aci.Elastic, error)
-	Update(elastic *aci.Elastic) (*aci.Elastic, error)
+type ElasticsearchInterface interface {
+	List(opts metav1.ListOptions) (*aci.ElasticsearchList, error)
+	Get(name string) (*aci.Elasticsearch, error)
+	Create(elastic *aci.Elasticsearch) (*aci.Elasticsearch, error)
+	Update(elastic *aci.Elasticsearch) (*aci.Elasticsearch, error)
 	Delete(name string) error
 	Watch(opts metav1.ListOptions) (watch.Interface, error)
-	UpdateStatus(elastic *aci.Elastic) (*aci.Elastic, error)
+	UpdateStatus(elastic *aci.Elasticsearch) (*aci.Elasticsearch, error)
 }
 
-type ElasticImpl struct {
+type ElasticsearchImpl struct {
 	r  rest.Interface
 	ns string
 }
 
-var _ ElasticInterface = &ElasticImpl{}
+var _ ElasticsearchInterface = &ElasticsearchImpl{}
 
-func newElastic(c *ExtensionClient, namespace string) *ElasticImpl {
-	return &ElasticImpl{c.restClient, namespace}
+func newElastic(c *ExtensionClient, namespace string) *ElasticsearchImpl {
+	return &ElasticsearchImpl{c.restClient, namespace}
 }
 
-func (c *ElasticImpl) List(opts metav1.ListOptions) (result *aci.ElasticList, err error) {
-	result = &aci.ElasticList{}
+func (c *ElasticsearchImpl) List(opts metav1.ListOptions) (result *aci.ElasticsearchList, err error) {
+	result = &aci.ElasticsearchList{}
 	err = c.r.Get().
 		Namespace(c.ns).
-		Resource(aci.ResourceTypeElastic).
+		Resource(aci.ResourceTypeElasticsearch).
 		VersionedParams(&opts, ExtendedCodec).
 		Do().
 		Into(result)
 	return
 }
 
-func (c *ElasticImpl) Get(name string) (result *aci.Elastic, err error) {
-	result = &aci.Elastic{}
+func (c *ElasticsearchImpl) Get(name string) (result *aci.Elasticsearch, err error) {
+	result = &aci.Elasticsearch{}
 	err = c.r.Get().
 		Namespace(c.ns).
-		Resource(aci.ResourceTypeElastic).
+		Resource(aci.ResourceTypeElasticsearch).
 		Name(name).
 		Do().
 		Into(result)
 	return
 }
 
-func (c *ElasticImpl) Create(elastic *aci.Elastic) (result *aci.Elastic, err error) {
-	result = &aci.Elastic{}
+func (c *ElasticsearchImpl) Create(elastic *aci.Elasticsearch) (result *aci.Elasticsearch, err error) {
+	result = &aci.Elasticsearch{}
 	err = c.r.Post().
 		Namespace(c.ns).
-		Resource(aci.ResourceTypeElastic).
+		Resource(aci.ResourceTypeElasticsearch).
 		Body(elastic).
 		Do().
 		Into(result)
 	return
 }
 
-func (c *ElasticImpl) Update(elastic *aci.Elastic) (result *aci.Elastic, err error) {
-	result = &aci.Elastic{}
+func (c *ElasticsearchImpl) Update(elastic *aci.Elasticsearch) (result *aci.Elasticsearch, err error) {
+	result = &aci.Elasticsearch{}
 	err = c.r.Put().
 		Namespace(c.ns).
-		Resource(aci.ResourceTypeElastic).
+		Resource(aci.ResourceTypeElasticsearch).
 		Name(elastic.Name).
 		Body(elastic).
 		Do().
@@ -77,29 +77,29 @@ func (c *ElasticImpl) Update(elastic *aci.Elastic) (result *aci.Elastic, err err
 	return
 }
 
-func (c *ElasticImpl) Delete(name string) (err error) {
+func (c *ElasticsearchImpl) Delete(name string) (err error) {
 	return c.r.Delete().
 		Namespace(c.ns).
-		Resource(aci.ResourceTypeElastic).
+		Resource(aci.ResourceTypeElasticsearch).
 		Name(name).
 		Do().
 		Error()
 }
 
-func (c *ElasticImpl) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+func (c *ElasticsearchImpl) Watch(opts metav1.ListOptions) (watch.Interface, error) {
 	return c.r.Get().
 		Prefix("watch").
 		Namespace(c.ns).
-		Resource(aci.ResourceTypeElastic).
+		Resource(aci.ResourceTypeElasticsearch).
 		VersionedParams(&opts, ExtendedCodec).
 		Watch()
 }
 
-func (c *ElasticImpl) UpdateStatus(elastic *aci.Elastic) (result *aci.Elastic, err error) {
-	result = &aci.Elastic{}
+func (c *ElasticsearchImpl) UpdateStatus(elastic *aci.Elasticsearch) (result *aci.Elasticsearch, err error) {
+	result = &aci.Elasticsearch{}
 	err = c.r.Put().
 		Namespace(c.ns).
-		Resource(aci.ResourceTypeElastic).
+		Resource(aci.ResourceTypeElasticsearch).
 		Name(elastic.Name).
 		SubResource("status").
 		Body(elastic).
