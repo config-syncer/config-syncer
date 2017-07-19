@@ -165,6 +165,7 @@ func (op *Operator) RunWatchers() {
 	go op.WatchRoleV1beta1()
 	go op.WatchSecrets()
 	go op.watchService()
+	go op.WatchEndpoints()
 	go op.WatchServiceMonitors()
 	go op.WatchStatefulSets()
 	go op.WatchStorageClassV1()
