@@ -5,48 +5,47 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/appscode/errors"
 	"github.com/appscode/go/arrays"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
 	"github.com/blevesearch/bleve"
+	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	clientset "k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
-type ServiceIndexer interface {
-	Add(svc *apiv1.Service) error
-	Delete(svc *apiv1.Service) error
-	Update(old, new *apiv1.Service) error
+type ServiceMonitorIndexer interface {
+	Add(svcMonitor *prom.ServiceMonitor) error
+	Delete(svcMonitor *prom.ServiceMonitor) error
+	Update(old, new *prom.ServiceMonitor) error
 	Key(meta metav1.ObjectMeta) []byte
 	ServeHTTP(w http.ResponseWriter, req *http.Request)
 }
 
-var _ ServiceIndexer = &ServiceIndexerImpl{}
+var _ ServiceMonitorIndexer = &ServiceMonitorIndexerImpl{}
 
-type ServiceIndexerImpl struct {
+type ServiceMonitorIndexerImpl struct {
 	kubeClient clientset.Interface
 	index      bleve.Index
 }
 
-func (ri *ServiceIndexerImpl) Add(svc *apiv1.Service) error {
-	log.Infof("New service: %v", svc.Name)
-	log.V(5).Infof("Service details: %v", svc)
+func (ri *ServiceMonitorIndexerImpl) Add(svcMonitor *prom.ServiceMonitor) error {
+	log.Infof("New service: %v", svcMonitor.Name)
+	log.V(5).Infof("Service details: %v", svcMonitor)
 
-	pods, err := ri.podsForService(svc)
+	svc, err := ri.serviceForServiceMonitors(svcMonitor)
 	if err != nil {
 		return err
 	}
 
-	for _, pod := range pods.Items {
+	for _, pod := range svc.Items {
 		key := ri.Key(pod.ObjectMeta)
 		raw, err := ri.index.GetInternal(key)
 		if err != nil || len(raw) == 0 {
-			data := apiv1.ServiceList{Items: []apiv1.Service{*svc}}
+			data := prom.ServiceMonitorList{Items: []*prom.ServiceMonitor{svcMonitor}}
 			raw, err := json.Marshal(data)
 			if err != nil {
 				return err
@@ -56,21 +55,21 @@ func (ri *ServiceIndexerImpl) Add(svc *apiv1.Service) error {
 				return err
 			}
 		} else {
-			var data apiv1.ServiceList
+			var data prom.ServiceMonitorList
 			err := json.Unmarshal(raw, &data)
 			if err != nil {
 				return err
 			}
 
-			if found, _ := arrays.Contains(data.Items, *svc); !found {
-				data.Items = append(data.Items, *svc)
+			if found, _ := arrays.Contains(data.Items, svcMonitor); !found {
+				data.Items = append(data.Items, svcMonitor)
 				raw, err := json.Marshal(data)
 				if err != nil {
 					return err
 				}
 				err = ri.index.SetInternal(key, raw)
 				if err != nil {
-					return errors.FromErr(err).WithMessage("Failed to store internal document").Err()
+					return err
 				}
 			}
 		}
@@ -78,40 +77,40 @@ func (ri *ServiceIndexerImpl) Add(svc *apiv1.Service) error {
 	return nil
 }
 
-func (ri *ServiceIndexerImpl) Delete(svc *apiv1.Service) error {
-	pods, err := ri.podsForService(svc)
+func (ri *ServiceMonitorIndexerImpl) Delete(svcMonitor *prom.ServiceMonitor) error {
+	svc, err := ri.serviceForServiceMonitors(svcMonitor)
 	if err != nil {
 		return err
 	}
 
-	for _, pod := range pods.Items {
+	for _, pod := range svc.Items {
 		key := ri.Key(pod.ObjectMeta)
 		raw, err := ri.index.GetInternal(key)
 		if err != nil {
 			return err
 		}
 		if len(raw) > 0 {
-			var data apiv1.ServiceList
+			var data prom.ServiceMonitorList
 			err := json.Unmarshal(raw, &data)
 			if err != nil {
 				return err
 			}
-			var ni []apiv1.Service
+			var monitors []*prom.ServiceMonitor
 			for i, valueSvc := range data.Items {
-				if ri.equal(svc, &valueSvc) {
-					ni = append(data.Items[:i], data.Items[i+1:]...)
+				if ri.equal(svcMonitor, valueSvc) {
+					monitors = append(data.Items[:i], data.Items[i+1:]...)
 					break
 				}
 			}
 
-			if len(ni) == 0 {
+			if len(monitors) == 0 {
 				// Remove unnecessary index
 				err = ri.index.DeleteInternal(key)
 				if err != nil {
 					return err
 				}
 			} else {
-				raw, err := json.Marshal(apiv1.ServiceList{Items: ni})
+				raw, err := json.Marshal(prom.ServiceMonitorList{Items: monitors})
 				if err != nil {
 					return err
 				}
@@ -125,7 +124,7 @@ func (ri *ServiceIndexerImpl) Delete(svc *apiv1.Service) error {
 	return nil
 }
 
-func (ri *ServiceIndexerImpl) Update(old, new *apiv1.Service) error {
+func (ri *ServiceMonitorIndexerImpl) Update(old, new *prom.ServiceMonitor) error {
 	if !reflect.DeepEqual(old.Spec.Selector, new.Spec.Selector) {
 		// Only update if selector changes
 		err := ri.Delete(old)
@@ -140,30 +139,41 @@ func (ri *ServiceIndexerImpl) Update(old, new *apiv1.Service) error {
 	return nil
 }
 
-func (ri *ServiceIndexerImpl) podsForService(svc *apiv1.Service) (*apiv1.PodList, error) {
-	// Service have an empty selector. Instead of getting all pod we
-	// try to ignore pods for it.
-	if len(svc.Spec.Selector) == 0 {
-		return &apiv1.PodList{}, nil
+func (ri *ServiceMonitorIndexerImpl) serviceForServiceMonitors(svcMonitor *prom.ServiceMonitor) (*apiv1.ServiceList, error) {
+	selector, err := metav1.LabelSelectorAsSelector(&svcMonitor.Spec.Selector)
+	if err != nil {
+		return &apiv1.ServiceList{}, err
+	}
+	if svcMonitor.Spec.NamespaceSelector.Any {
+		return ri.kubeClient.CoreV1().Services(metav1.NamespaceAll).List(metav1.ListOptions{
+			LabelSelector: selector.String(),
+		})
 	}
 
-	return ri.kubeClient.CoreV1().Pods(metav1.NamespaceAll).List(metav1.ListOptions{
-		LabelSelector: labels.SelectorFromSet(svc.Spec.Selector).String(),
-	})
+	list := &apiv1.ServiceList{Items: make([]apiv1.Service, 0)}
+	for _, ns := range svcMonitor.Spec.NamespaceSelector.MatchNames {
+		pods, err := ri.kubeClient.CoreV1().Services(ns).List(metav1.ListOptions{
+			LabelSelector: selector.String(),
+		})
+		if err == nil {
+			list.Items = append(list.Items, pods.Items...)
+		}
+	}
+	return list, nil
 }
 
-func (ri *ServiceIndexerImpl) equal(a, b *apiv1.Service) bool {
+func (ri *ServiceMonitorIndexerImpl) equal(a, b *prom.ServiceMonitor) bool {
 	if a.Name == b.Name && a.Namespace == b.Namespace {
 		return true
 	}
 	return false
 }
 
-func (ri *ServiceIndexerImpl) Key(meta metav1.ObjectMeta) []byte {
-	return []byte(util.GetGroupVersionKind(&apiv1.Pod{}).String() + "/" + meta.Namespace + "/" + meta.Name)
+func (ri *ServiceMonitorIndexerImpl) Key(meta metav1.ObjectMeta) []byte {
+	return []byte(util.GetGroupVersionKind(&apiv1.Service{}).String() + "/" + meta.Namespace + "/" + meta.Name)
 }
 
-func (ri *ServiceIndexerImpl) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (ri *ServiceMonitorIndexerImpl) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	log.Infoln("Request received at", req.URL.Path)
 	params, found := pat.FromContext(req.Context())
 	if !found {
