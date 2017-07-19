@@ -15,19 +15,19 @@ development environment, please follow [these instructions](https://golang.org/d
 
 #### Download Source
 
-```sh
+```console
 $ go get github.com/appscode/kubed
 $ cd $(go env GOPATH)/src/github.com/appscode/kubed
 ```
 
 #### Install Dev tools
 To install various dev tools for Kubed, run the following command:
-```sh
+```console
 $ ./hack/builddeps.sh
 ```
 
 #### Build Binary
-```
+```console
 $ ./hack/make.py
 $ kubed version
 ```
@@ -35,14 +35,14 @@ $ kubed version
 #### Dependency management
 Kubed uses [Glide](https://github.com/Masterminds/glide) to manage dependencies. Dependencies are already checked in the `vendor` folder.
 If you want to update/add dependencies, run:
-```sh
+```console
 $ glide slow
 ```
 
 #### Build Docker images
 To build and push your custom Docker image, follow the steps below. To release a new version of Kubed, please follow the [release guide](/docs/developer-guide/release.md).
 
-```sh
+```console
 # Build Docker image
 $ ./hack/docker/kubed/setup.sh; ./hack/docker/kubed/setup.sh push
 
@@ -54,19 +54,19 @@ $ docker push <image>:<tag>
 ```
 
 #### Generate CLI Reference Docs
-```sh
+```console
 $ ./hack/gendocs/make.sh
 ```
 
 ### Testing Kubed
 #### Unit tests
-```sh
+```console
 $ ./hack/make.py test unit
 ```
 
 #### Run e2e tests
 Kubed uses [Ginkgo](http://onsi.github.io/ginkgo/) to run e2e tests.
-```sh
+```console
 $ ./hack/make.py test e2e
 ```
 

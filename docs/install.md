@@ -5,7 +5,7 @@
 ## Using YAML
 Kubed can be installed using YAML files includes in the [/hack/deploy](/hack/deploy) folder.
 
-```sh
+```console
 # Install without RBAC roles
 $ curl https://raw.githubusercontent.com/appscode/kubed/0.1.0/hack/deploy/kubed-without-rbac.yaml \
   | kubectl apply -f -
@@ -26,7 +26,7 @@ To see the detailed configuration options, visit [here](/chart/kubed/README.md).
 
 ## Verify installation
 To check if Kubed operator pods have started, run the following command:
-```sh
+```console
 $ kubectl get pods --all-namespaces -l app=kubed --watch
 ```
 

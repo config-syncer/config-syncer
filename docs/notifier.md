@@ -1,4 +1,4 @@
-```sh
+```console
 $ echo -n 'your-mailgun-domain' > MAILGUN_DOMAIN
 $ echo -n 'mailgun-from' > MAILGUN_FROM
 $ echo -n 'mailgun-to' > MAILGUN_TO
@@ -14,7 +14,7 @@ secret "kubed-notifier" created
 ```
 
 
-```sh
+```console
 $ echo -n 'changeit' > RESTIC_PASSWORD
 $ echo -n '<your-project-id>' > GOOGLE_PROJECT_ID
 $ mv downloaded-sa-json.key > GOOGLE_SERVICE_ACCOUNT_JSON_KEY
