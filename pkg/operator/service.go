@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	acrt "github.com/appscode/go/runtime"
-	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
@@ -48,7 +47,16 @@ func (op *Operator) watchService() {
 					}
 					if op.Opt.EnableReverseIndex {
 						op.ReverseIndex.Service.Add(res)
-						updateServiceMonitorIndex(op.PromClient, op.ReverseIndex.ServiceMonitor)
+						if op.ReverseIndex.ServiceMonitor != nil {
+							serviceMonitors, err := op.PromClient.ServiceMonitors(apiv1.NamespaceAll).List(metav1.ListOptions{})
+							if err != nil {
+								log.Errorln(err)
+								return
+							}
+							if serviceMonitorList, ok := serviceMonitors.(*pcm.ServiceMonitorList); ok {
+								op.ReverseIndex.ServiceMonitor.AddService(res, serviceMonitorList.Items)
+							}
+						}
 					}
 				}
 			},
@@ -64,7 +72,9 @@ func (op *Operator) watchService() {
 					}
 					if op.Opt.EnableReverseIndex {
 						op.ReverseIndex.Service.Delete(res)
-						updateServiceMonitorIndex(op.PromClient, op.ReverseIndex.ServiceMonitor)
+						if op.ReverseIndex.ServiceMonitor != nil {
+							op.ReverseIndex.ServiceMonitor.DeleteService(res)
+						}
 					}
 					if op.TrashCan != nil {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
@@ -102,22 +112,4 @@ func (op *Operator) watchService() {
 		},
 	)
 	ctrl.Run(wait.NeverStop)
-}
-
-func updateServiceMonitorIndex(promClient pcm.MonitoringV1alpha1Interface, idx indexers.ServiceMonitorIndexer) error {
-	// Check if ServiceMonitor Indexer is activated
-	if idx == nil {
-		return nil
-	}
-
-	serviceMonitors, err := promClient.ServiceMonitors(apiv1.NamespaceAll).List(metav1.ListOptions{})
-	if err != nil {
-		return err
-	}
-	if serviceMonitorList, ok := serviceMonitors.(*pcm.ServiceMonitorList); ok {
-		for _, m := range serviceMonitorList.Items {
-			idx.Add(m)
-		}
-	}
-	return nil
 }
