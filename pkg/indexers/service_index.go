@@ -21,8 +21,8 @@ import (
 type ServiceIndexer interface {
 	Add(svc *apiv1.Service) error
 	Delete(svc *apiv1.Service) error
-	AddPod(pod *apiv1.Pod, svc *apiv1.Service) error
-	DeletePod(pod *apiv1.Pod, svc *apiv1.Service) error
+	AddPodForService(svc *apiv1.Service, pod *apiv1.Pod) error
+	DeletePodForService(svc *apiv1.Service, pod *apiv1.Pod) error
 	Update(old, new *apiv1.Service) error
 	Key(meta metav1.ObjectMeta) []byte
 	ServeHTTP(w http.ResponseWriter, req *http.Request)
@@ -79,12 +79,12 @@ func (ri *ServiceIndexerImpl) Update(old, new *apiv1.Service) error {
 	return nil
 }
 
-func (ri *ServiceIndexerImpl) AddPod(pod *apiv1.Pod, svc *apiv1.Service) error {
+func (ri *ServiceIndexerImpl) AddPodForService(svc *apiv1.Service, pod *apiv1.Pod) error {
 	key := ri.Key(svc.ObjectMeta)
 	return ri.insert(key, svc)
 }
 
-func (ri *ServiceIndexerImpl) DeletePod(pod *apiv1.Pod, svc *apiv1.Service) error {
+func (ri *ServiceIndexerImpl) DeletePodForService(svc *apiv1.Service, pod *apiv1.Pod) error {
 	return ri.remove(ri.Key(pod.ObjectMeta), svc)
 }
 

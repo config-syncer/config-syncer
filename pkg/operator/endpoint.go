@@ -36,46 +36,56 @@ func (op *Operator) WatchEndpoints() {
 		op.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			UpdateFunc: func(oldObj, newObj interface{}) {
-				if oldRes, ok := oldObj.(*apiv1.Endpoints); ok {
-					if newRes, ok := newObj.(*apiv1.Endpoints); ok {
-						if !reflect.DeepEqual(oldRes.Subsets, newRes.Subsets) && op.ReverseIndex.Service != nil {
-							svc, err := op.KubeClient.CoreV1().Services(newRes.Namespace).Get(newRes.Name, metav1.GetOptions{})
-							if err != nil {
-								log.Errorln(err)
-								return
-							}
+				oldRes, ok := oldObj.(*apiv1.Endpoints)
+				if !ok {
+					log.Errorln("Invalid Endpoint object")
+					return
+				}
 
-							oldPods := make(map[string]*apiv1.Pod)
-							for _, oldEPSubsets := range oldRes.Subsets {
-								for _, oldEPPods := range oldEPSubsets.Addresses {
-									if podRef := oldEPPods.TargetRef; podRef != nil {
-										pod := &apiv1.Pod{ObjectMeta: metav1.ObjectMeta{Name: podRef.Name, Namespace: podRef.Namespace}}
-										oldPods[podRef.String()] = pod
-									}
-								}
-							}
+				newRes, ok := newObj.(*apiv1.Endpoints)
+				if !ok {
+					log.Errorln("Invalid Endpoint object")
+					return
+				}
 
-							newPods := make(map[string]*apiv1.Pod)
-							for _, newEPSubsets := range newRes.Subsets {
-								for _, newEPPods := range newEPSubsets.Addresses {
-									if podRef := newEPPods.TargetRef; podRef != nil {
-										pod := &apiv1.Pod{ObjectMeta: metav1.ObjectMeta{Name: podRef.Name, Namespace: podRef.Namespace}}
-										newPods[podRef.String()] = pod
-										if _, ok := oldPods[podRef.String()]; !ok {
-											// This Pod reference is in update Endpoint, New Pod Added
-											op.ReverseIndex.Service.AddPod(pod, svc)
-										}
-									}
-								}
-							}
+				if reflect.DeepEqual(oldRes.Subsets, newRes.Subsets) || op.ReverseIndex.Service == nil {
+					return
+				}
 
-							for ref, pod := range oldPods {
-								if _, ok := newPods[ref]; !ok {
-									// Pod ref not found in New Endpoint, Removed
-									op.ReverseIndex.Service.DeletePod(pod, svc)
-								}
+				svc, err := op.KubeClient.CoreV1().Services(newRes.Namespace).Get(newRes.Name, metav1.GetOptions{})
+				if err != nil {
+					log.Errorln(err)
+					return
+				}
+
+				oldPods := make(map[string]*apiv1.Pod)
+				for _, oldEPSubsets := range oldRes.Subsets {
+					for _, oldEPPods := range oldEPSubsets.Addresses {
+						if podRef := oldEPPods.TargetRef; podRef != nil {
+							pod := &apiv1.Pod{ObjectMeta: metav1.ObjectMeta{Name: podRef.Name, Namespace: podRef.Namespace}}
+							oldPods[podRef.String()] = pod
+						}
+					}
+				}
+
+				newPods := make(map[string]*apiv1.Pod)
+				for _, newEPSubsets := range newRes.Subsets {
+					for _, newEPPods := range newEPSubsets.Addresses {
+						if podRef := newEPPods.TargetRef; podRef != nil {
+							pod := &apiv1.Pod{ObjectMeta: metav1.ObjectMeta{Name: podRef.Name, Namespace: podRef.Namespace}}
+							newPods[podRef.String()] = pod
+							if _, ok := oldPods[podRef.String()]; !ok {
+								// This Pod reference is in update Endpoint, New Pod Added
+								op.ReverseIndex.Service.AddPodForService(svc, pod)
 							}
 						}
+					}
+				}
+
+				for ref, pod := range oldPods {
+					if _, ok := newPods[ref]; !ok {
+						// Pod ref not found in New Endpoint, Removed
+						op.ReverseIndex.Service.DeletePodForService(svc, pod)
 					}
 				}
 			},
