@@ -16,6 +16,7 @@ import (
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kubed/pkg/trashcan"
+	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
@@ -23,6 +24,7 @@ import (
 	vcs "github.com/appscode/voyager/client/clientset"
 	shell "github.com/codeskyblue/go-sh"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
+	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
 	"gopkg.in/robfig/cron.v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -163,6 +165,7 @@ func (op *Operator) RunWatchers() {
 	go op.WatchRoleV1beta1()
 	go op.WatchSecrets()
 	go op.watchService()
+	go op.WatchEndpoints()
 	go op.WatchServiceMonitors()
 	go op.WatchStatefulSets()
 	go op.WatchStorageClassV1()
@@ -201,6 +204,10 @@ func (op *Operator) ListenAndServe() {
 			log.Errorln("Failed to create indexer", err)
 		} else {
 			router.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(ri.Service.ServeHTTP))
+			if util.IsPreferredAPIResource(op.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind) {
+				// Add Indexer only if Server support this resource
+				router.Get("/apis/"+prom.TPRGroup+"/"+prom.TPRVersion+"/namespaces/:namespace/:resource/:name/servicemonitors", http.HandlerFunc(ri.ServiceMonitor.ServeHTTP))
+			}
 			op.ReverseIndex = ri
 		}
 	}

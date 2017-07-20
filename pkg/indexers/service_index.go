@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/appscode/errors"
+	"github.com/appscode/go/arrays"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
@@ -20,6 +21,8 @@ import (
 type ServiceIndexer interface {
 	Add(svc *apiv1.Service) error
 	Delete(svc *apiv1.Service) error
+	AddPodForService(svc *apiv1.Service, pod *apiv1.Pod) error
+	DeletePodForService(svc *apiv1.Service, pod *apiv1.Pod) error
 	Update(old, new *apiv1.Service) error
 	Key(meta metav1.ObjectMeta) []byte
 	ServeHTTP(w http.ResponseWriter, req *http.Request)
@@ -43,33 +46,7 @@ func (ri *ServiceIndexerImpl) Add(svc *apiv1.Service) error {
 
 	for _, pod := range pods.Items {
 		key := ri.Key(pod.ObjectMeta)
-		raw, err := ri.index.GetInternal(key)
-		if err != nil || len(raw) == 0 {
-			data := apiv1.ServiceList{Items: []apiv1.Service{*svc}}
-			raw, err := json.Marshal(data)
-			if err != nil {
-				return err
-			}
-			err = ri.index.SetInternal(key, raw)
-			if err != nil {
-				return err
-			}
-		} else {
-			var data apiv1.ServiceList
-			err := json.Unmarshal(raw, &data)
-			if err != nil {
-				return err
-			}
-			data.Items = append(data.Items, *svc)
-			raw, err := json.Marshal(data)
-			if err != nil {
-				return err
-			}
-			err = ri.index.SetInternal(key, raw)
-			if err != nil {
-				return errors.FromErr(err).WithMessage("Failed to store internal document").Err()
-			}
-		}
+		ri.insert(key, svc)
 	}
 	return nil
 }
@@ -82,41 +59,7 @@ func (ri *ServiceIndexerImpl) Delete(svc *apiv1.Service) error {
 
 	for _, pod := range pods.Items {
 		key := ri.Key(pod.ObjectMeta)
-		raw, err := ri.index.GetInternal(key)
-		if err != nil {
-			return err
-		}
-		if len(raw) > 0 {
-			var data apiv1.ServiceList
-			err := json.Unmarshal(raw, &data)
-			if err != nil {
-				return err
-			}
-			var ni []apiv1.Service
-			for i, valueSvc := range data.Items {
-				if ri.equal(svc, &valueSvc) {
-					ni = append(data.Items[:i], data.Items[i+1:]...)
-					break
-				}
-			}
-
-			if len(ni) == 0 {
-				// Remove unnecessary index
-				err = ri.index.DeleteInternal(key)
-				if err != nil {
-					return err
-				}
-			} else {
-				raw, err := json.Marshal(apiv1.ServiceList{Items: ni})
-				if err != nil {
-					return err
-				}
-				err = ri.index.SetInternal(key, raw)
-				if err != nil {
-					return err
-				}
-			}
-		}
+		ri.remove(key, svc)
 	}
 	return nil
 }
@@ -131,6 +74,88 @@ func (ri *ServiceIndexerImpl) Update(old, new *apiv1.Service) error {
 		err = ri.Add(new)
 		if err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+func (ri *ServiceIndexerImpl) AddPodForService(svc *apiv1.Service, pod *apiv1.Pod) error {
+	key := ri.Key(svc.ObjectMeta)
+	return ri.insert(key, svc)
+}
+
+func (ri *ServiceIndexerImpl) DeletePodForService(svc *apiv1.Service, pod *apiv1.Pod) error {
+	return ri.remove(ri.Key(pod.ObjectMeta), svc)
+}
+
+func (ri *ServiceIndexerImpl) insert(key []byte, svc *apiv1.Service) error {
+	raw, err := ri.index.GetInternal(key)
+	if err != nil || len(raw) == 0 {
+		data := apiv1.ServiceList{Items: []apiv1.Service{*svc}}
+		raw, err := json.Marshal(data)
+		if err != nil {
+			return err
+		}
+		err = ri.index.SetInternal(key, raw)
+		if err != nil {
+			return err
+		}
+	} else {
+		var data apiv1.ServiceList
+		err := json.Unmarshal(raw, &data)
+		if err != nil {
+			return err
+		}
+
+		if found, _ := arrays.Contains(data.Items, *svc); !found {
+			data.Items = append(data.Items, *svc)
+			raw, err := json.Marshal(data)
+			if err != nil {
+				return err
+			}
+			err = ri.index.SetInternal(key, raw)
+			if err != nil {
+				return errors.FromErr(err).WithMessage("Failed to store internal document").Err()
+			}
+		}
+	}
+	return nil
+}
+
+func (ri ServiceIndexerImpl) remove(key []byte, svc *apiv1.Service) error {
+	raw, err := ri.index.GetInternal(key)
+	if err != nil {
+		return err
+	}
+	if len(raw) > 0 {
+		var data apiv1.ServiceList
+		err := json.Unmarshal(raw, &data)
+		if err != nil {
+			return err
+		}
+		var ni []apiv1.Service
+		for i, valueSvc := range data.Items {
+			if ri.equal(svc, &valueSvc) {
+				ni = append(data.Items[:i], data.Items[i+1:]...)
+				break
+			}
+		}
+
+		if len(ni) == 0 {
+			// Remove unnecessary index
+			err = ri.index.DeleteInternal(key)
+			if err != nil {
+				return err
+			}
+		} else {
+			raw, err := json.Marshal(apiv1.ServiceList{Items: ni})
+			if err != nil {
+				return err
+			}
+			err = ri.index.SetInternal(key, raw)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -173,6 +198,7 @@ func (ri *ServiceIndexerImpl) ServeHTTP(w http.ResponseWriter, req *http.Request
 		if val, err := ri.index.GetInternal(key); err == nil && len(val) > 0 {
 			if err := json.NewEncoder(w).Encode(json.RawMessage(val)); err == nil {
 				w.Header().Set("Content-Type", "application/json")
+				w.Header().Set("x-content-type-options", "nosniff")
 				return
 			} else {
 				http.Error(w, "Server error"+err.Error(), http.StatusInternalServerError)

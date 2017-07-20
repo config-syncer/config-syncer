@@ -47,6 +47,12 @@ func (op *Operator) WatchServiceMonitors() {
 							log.Errorln(err)
 						}
 					}
+
+					if op.Opt.EnableReverseIndex {
+						if err := op.ReverseIndex.ServiceMonitor.Add(res); err != nil {
+							log.Errorln(err)
+						}
+					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
@@ -61,6 +67,12 @@ func (op *Operator) WatchServiceMonitors() {
 					}
 					if op.TrashCan != nil {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
+					}
+
+					if op.Opt.EnableReverseIndex {
+						if err := op.ReverseIndex.ServiceMonitor.Delete(res); err != nil {
+							log.Errorln(err)
+						}
 					}
 				}
 			},
@@ -86,6 +98,12 @@ func (op *Operator) WatchServiceMonitors() {
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
 						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {
 						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
+					}
+				}
+
+				if op.Opt.EnableReverseIndex {
+					if err := op.ReverseIndex.ServiceMonitor.Update(oldRes, newRes); err != nil {
+						log.Errorln(err)
 					}
 				}
 			},

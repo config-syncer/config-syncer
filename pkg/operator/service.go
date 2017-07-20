@@ -7,6 +7,7 @@ import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
+	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -46,6 +47,16 @@ func (op *Operator) watchService() {
 					}
 					if op.Opt.EnableReverseIndex {
 						op.ReverseIndex.Service.Add(res)
+						if op.ReverseIndex.ServiceMonitor != nil {
+							serviceMonitors, err := op.PromClient.ServiceMonitors(apiv1.NamespaceAll).List(metav1.ListOptions{})
+							if err != nil {
+								log.Errorln(err)
+								return
+							}
+							if serviceMonitorList, ok := serviceMonitors.(*pcm.ServiceMonitorList); ok {
+								op.ReverseIndex.ServiceMonitor.AddService(res, serviceMonitorList.Items)
+							}
+						}
 					}
 				}
 			},
@@ -61,6 +72,9 @@ func (op *Operator) watchService() {
 					}
 					if op.Opt.EnableReverseIndex {
 						op.ReverseIndex.Service.Delete(res)
+						if op.ReverseIndex.ServiceMonitor != nil {
+							op.ReverseIndex.ServiceMonitor.DeleteService(res)
+						}
 					}
 					if op.TrashCan != nil {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
