@@ -13,9 +13,9 @@ import (
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	clientset "k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-	"k8s.io/kubernetes/pkg/labels"
 )
 
 type ServiceMonitorIndexer interface {
@@ -36,8 +36,8 @@ type ServiceMonitorIndexerImpl struct {
 }
 
 func (ri *ServiceMonitorIndexerImpl) Add(svcMonitor *prom.ServiceMonitor) error {
-	log.Infof("New service: %v", svcMonitor.Name)
-	log.V(5).Infof("Service details: %v", svcMonitor)
+	log.Infof("New svcMonitor: %v", svcMonitor.Name)
+	log.V(5).Infof("svcMonitor details: %v", svcMonitor)
 
 	svc, err := ri.serviceForServiceMonitors(svcMonitor)
 	if err != nil {
@@ -185,11 +185,11 @@ func (ri *ServiceMonitorIndexerImpl) serviceForServiceMonitors(svcMonitor *prom.
 
 	list := &apiv1.ServiceList{Items: make([]apiv1.Service, 0)}
 	for _, ns := range svcMonitor.Spec.NamespaceSelector.MatchNames {
-		pods, err := ri.kubeClient.CoreV1().Services(ns).List(metav1.ListOptions{
+		svc, err := ri.kubeClient.CoreV1().Services(ns).List(metav1.ListOptions{
 			LabelSelector: selector.String(),
 		})
 		if err == nil {
-			list.Items = append(list.Items, pods.Items...)
+			list.Items = append(list.Items, svc.Items...)
 		}
 	}
 	return list, nil

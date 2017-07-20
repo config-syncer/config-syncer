@@ -199,14 +199,18 @@ func (op *Operator) ListenAndServe() {
 
 	// Enable pod -> service, service -> serviceMonitor indexing
 	if op.Opt.EnableReverseIndex {
-		ri, err := indexers.NewReverseIndexer(op.KubeClient, indexDir)
+		ri, err := indexers.NewReverseIndexer(op.KubeClient, op.PromClient, indexDir)
 		if err != nil {
 			log.Errorln("Failed to create indexer", err)
 		} else {
 			router.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(ri.Service.ServeHTTP))
 			if util.IsPreferredAPIResource(op.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind) {
 				// Add Indexer only if Server support this resource
-				router.Get("/apis/"+prom.TPRGroup+"/"+prom.TPRVersion+"/namespaces/:namespace/:resource/:name/servicemonitors", http.HandlerFunc(ri.ServiceMonitor.ServeHTTP))
+				router.Get("/apis/"+prom.TPRGroup+"/"+prom.TPRVersion+"/namespaces/:namespace/:resource/:name/"+prom.TPRServiceMonitorName, http.HandlerFunc(ri.ServiceMonitor.ServeHTTP))
+			}
+			if util.IsPreferredAPIResource(op.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRPrometheusesKind) {
+				// Add Indexer only if Server support this resource
+				router.Get("/apis/"+prom.TPRGroup+"/"+prom.TPRVersion+"/namespaces/:namespace/:resource/:name/"+prom.TPRPrometheusName, http.HandlerFunc(ri.Prometheus.ServeHTTP))
 			}
 			op.ReverseIndex = ri
 		}

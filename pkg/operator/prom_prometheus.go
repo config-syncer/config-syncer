@@ -47,6 +47,12 @@ func (op *Operator) WatchPrometheuss() {
 							log.Errorln(err)
 						}
 					}
+
+					if op.Opt.EnableReverseIndex {
+						if err := op.ReverseIndex.Prometheus.Add(res); err != nil {
+							log.Errorln(err)
+						}
+					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
@@ -59,6 +65,13 @@ func (op *Operator) WatchPrometheuss() {
 							log.Errorln(err)
 						}
 					}
+
+					if op.Opt.EnableReverseIndex {
+						if err := op.ReverseIndex.Prometheus.Delete(res); err != nil {
+							log.Errorln(err)
+						}
+					}
+
 					if op.TrashCan != nil {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
 					}
@@ -81,6 +94,13 @@ func (op *Operator) WatchPrometheuss() {
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
+
+				if op.Opt.EnableReverseIndex {
+					if err := op.ReverseIndex.Prometheus.Update(oldRes, newRes); err != nil {
+						log.Errorln(err)
+					}
+				}
+
 				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
 					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
