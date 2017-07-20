@@ -52,6 +52,16 @@ func (op *Operator) WatchServiceMonitors() {
 						if err := op.ReverseIndex.ServiceMonitor.Add(res); err != nil {
 							log.Errorln(err)
 						}
+						if op.ReverseIndex.Prometheus != nil {
+							proms, err := op.PromClient.Prometheuses(apiv1.NamespaceAll).List(metav1.ListOptions{})
+							if err != nil {
+								log.Errorln(err)
+								return
+							}
+							if promList, ok := proms.(*prom.PrometheusList); ok {
+								op.ReverseIndex.Prometheus.AddServiceMonitor(res, promList.Items)
+							}
+						}
 					}
 				}
 			},
@@ -72,6 +82,9 @@ func (op *Operator) WatchServiceMonitors() {
 					if op.Opt.EnableReverseIndex {
 						if err := op.ReverseIndex.ServiceMonitor.Delete(res); err != nil {
 							log.Errorln(err)
+						}
+						if op.ReverseIndex.Prometheus != nil {
+							op.ReverseIndex.Prometheus.DeleteServiceMonitor(res)
 						}
 					}
 				}

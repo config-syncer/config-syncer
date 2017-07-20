@@ -7,6 +7,7 @@ import (
 	searchlight "github.com/appscode/searchlight/api"
 	stash "github.com/appscode/stash/api"
 	voyager "github.com/appscode/voyager/api"
+	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kubedb "github.com/k8sdb/apimachinery/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -142,6 +143,10 @@ func GetGroupVersionKind(v interface{}) schema.GroupVersionKind {
 		return kubedb.V1alpha1SchemeGroupVersion.WithKind("DormantDatabase")
 	case *stash.Restic:
 		return stash.V1alpha1SchemeGroupVersion.WithKind("Restic")
+	case *prom.ServiceMonitor:
+		return schema.GroupVersionKind{Group: prom.TPRGroup, Version: prom.TPRVersion, Kind: prom.TPRServiceMonitorsKind}
+	case *prom.Prometheus:
+		return schema.GroupVersionKind{Group: prom.TPRGroup, Version: prom.TPRVersion, Kind: prom.TPRPrometheusesKind}
 	default:
 		return schema.GroupVersionKind{}
 	}
@@ -323,6 +328,14 @@ func AssignTypeKind(v interface{}) error {
 	case *stash.Restic:
 		u.APIVersion = stash.V1alpha1SchemeGroupVersion.String()
 		u.Kind = "Restic"
+		return nil
+	case *prom.ServiceMonitor:
+		u.APIVersion = schema.GroupVersion{Group: prom.TPRGroup, Version: prom.TPRVersion}.String()
+		u.Kind = prom.TPRServiceMonitorsKind
+		return nil
+	case *prom.Prometheus:
+		u.APIVersion = schema.GroupVersion{Group: prom.TPRGroup, Version: prom.TPRVersion}.String()
+		u.Kind = prom.TPRPrometheusesKind
 		return nil
 	}
 	return errors.New("Unknown api object type")
