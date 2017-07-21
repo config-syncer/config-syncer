@@ -1,5 +1,5 @@
 hash: c503a73a28c41c3283d643f020fb6a5ce4337f36ca59b0d079f284cd6c52eb6e
-updated: 2017-07-18T18:04:27.045788308-07:00
+updated: 2017-07-21T15:55:06.694439118-07:00
 imports:
 - name: cloud.google.com/go
   version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
@@ -13,6 +13,7 @@ imports:
 - name: github.com/appscode/go
   version: 9fde097ebcef0add8325c8fbee63ae01e7da530e
   subpackages:
+  - arrays
   - encoding/json/types
   - encoding/yaml
   - env
@@ -40,13 +41,13 @@ imports:
   subpackages:
   - golog
 - name: github.com/appscode/osm
-  version: ec38ac9497280b0acb4742d02154ba5f18d8a994
+  version: 07b50a45d8de2a67fb6353a256a0d1cb15cac4ce
   subpackages:
   - pkg/context
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 52a4f53f7225a77672f4495e1e7cc3f464f43e01
+  version: 17b2231ab9c8ec821463fb926bc3c97412ed9f6e
   subpackages:
   - api
   - api/install
@@ -54,13 +55,13 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: 5e34ea69fbd7fb5f79cc4b427472606ade9e86cd
+  version: 15deeba01210a846cdca622c9e48894fcd888b69
   subpackages:
   - api
   - api/install
   - client/clientset
 - name: github.com/appscode/voyager
-  version: 23e8b266839f81ecd2613dd059e63c85b0976bf0
+  version: b7fb1cf47b6529ddffb478fe5dbe4301b88ef982
   subpackages:
   - api
   - api/install
@@ -146,7 +147,7 @@ imports:
 - name: github.com/codegangsta/inject
   version: 33e0aa1cb7c019ccc3fbe049a8262a6403d30504
 - name: github.com/codeskyblue/go-sh
-  version: 3d593d477915b4d2f2e74b2e041495345647a46b
+  version: b097669b1569203c3ce05a6b8717d43140fdb3d5
 - name: github.com/coreos/go-oidc
   version: be73733bb8cc830d0205609b95d125215f8e9c70
   subpackages:
@@ -190,7 +191,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-ini/ini
-  version: d3de07a94d22b4a0972deb4b96d790c2c0ce8333
+  version: 2e44421e256d82ebbf3d4d4fcabe8930b905eff3
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -249,7 +250,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 77ed1c8a01217656d2080ad51981f6e99adaa177
 - name: github.com/k8sdb/apimachinery
-  version: 7e66ca4d52d6ca74107203388d6154257ef3cd3b
+  version: 2e43e4ef109e25050aaccc29cf94d1f061456ec1
   subpackages:
   - api
   - api/install
@@ -269,7 +270,7 @@ imports:
   version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
   repo: https://github.com/mattn/go-isatty
 - name: github.com/ncw/swift
-  version: 9e6fdb8957a022d5780a78b58d6181c3580bb01f
+  version: 5068c3506cf003c630c94b92a64e978115394f26
 - name: github.com/nlopes/slack
   version: ca8436d76f805ec1e682eaae2de3c3a9bc894b0f
 - name: github.com/pkg/errors

@@ -10,11 +10,10 @@ import (
 type CheckPod string
 
 const (
-	CheckPodInfluxQuery      CheckPod = "influx_query"
-	CheckPodStatus           CheckPod = "pod_status"
-	CheckPodPrometheusMetric CheckPod = "prometheus_metric"
-	CheckVolume              CheckPod = "volume"
-	CheckPodExec             CheckPod = "kube_exec"
+	CheckPodInfluxQuery CheckPod = "influx_query"
+	CheckPodStatus      CheckPod = "pod_status"
+	CheckVolume         CheckPod = "volume"
+	CheckPodExec        CheckPod = "kube_exec"
 )
 
 func (c CheckPod) IsValid() bool {
@@ -33,10 +32,9 @@ func ParseCheckPod(s string) (*CheckPod, error) {
 type CheckNode string
 
 const (
-	CheckNodeInfluxQuery      CheckNode = "influx_query"
-	CheckNodeDisk             CheckNode = "node_disk"
-	CheckNodeStatus           CheckNode = "node_status"
-	CheckNodePrometheusMetric CheckNode = "prometheus_metric"
+	CheckNodeInfluxQuery CheckNode = "influx_query"
+	CheckNodeDisk        CheckNode = "node_disk"
+	CheckNodeStatus      CheckNode = "node_status"
 )
 
 func (c CheckNode) IsValid() bool {
@@ -55,18 +53,18 @@ func ParseCheckNode(s string) (*CheckNode, error) {
 type CheckCluster string
 
 const (
-	CheckHttp             CheckCluster = "any_http"
-	CheckComponentStatus  CheckCluster = "component_status"
-	CheckJsonPath         CheckCluster = "json_path"
-	CheckNodeCount        CheckCluster = "node_count"
-	CheckPodExists        CheckCluster = "pod_exists"
-	CheckPrometheusMetric CheckCluster = "prometheus_metric"
-	CheckClusterEvent     CheckCluster = "kube_event"
-	CheckHelloIcinga      CheckCluster = "hello_icinga"
-	CheckDIG              CheckCluster = "dig"
-	CheckDNS              CheckCluster = "dns"
-	CheckDummy            CheckCluster = "dummy"
-	CheckICMP             CheckCluster = "icmp"
+	CheckHttp              CheckCluster = "any_http"
+	CheckComponentStatus   CheckCluster = "component_status"
+	CheckJsonPath          CheckCluster = "json_path"
+	CheckNodeExists        CheckCluster = "node_exists"
+	CheckPodExists         CheckCluster = "pod_exists"
+	CheckClusterEvent      CheckCluster = "kube_event"
+	CheckCertificateExpiry CheckCluster = "certificate_expiry"
+	CheckHelloIcinga       CheckCluster = "hello_icinga"
+	CheckDIG               CheckCluster = "dig"
+	CheckDNS               CheckCluster = "dns"
+	CheckDummy             CheckCluster = "dummy"
+	CheckICMP              CheckCluster = "icmp"
 )
 
 func (c CheckCluster) IsValid() bool {
@@ -113,30 +111,29 @@ func init() {
 			Vars:   vars,
 			States: cmd.States,
 		}
-		if c.Name == "influx_query" ||
-			c.Name == "pod_status" ||
-			c.Name == "prometheus_metric" ||
-			c.Name == "volume" ||
-			c.Name == "kube_exec" {
+		if c.Name == string(CheckPodInfluxQuery) ||
+			c.Name == string(CheckPodStatus) ||
+			c.Name == string(CheckVolume) ||
+			c.Name == string(CheckPodExec) {
 			PodCommands[CheckPod(c.Name)] = c
 		}
-		if c.Name == "influx_query" ||
-			c.Name == "node_disk" ||
-			c.Name == "node_status" ||
-			c.Name == "prometheus_metric" {
+		if c.Name == string(CheckNodeInfluxQuery) ||
+			c.Name == string(CheckNodeDisk) ||
+			c.Name == string(CheckNodeStatus) {
 			NodeCommands[CheckNode(c.Name)] = c
 		}
-		if c.Name == "any_http" ||
-			c.Name == "component_status" ||
-			c.Name == "json_path" ||
-			c.Name == "node_exists" ||
-			c.Name == "pod_exists" ||
-			c.Name == "kube_event" ||
-			c.Name == "hello_icinga" ||
-			c.Name == "dig" ||
-			c.Name == "dns" ||
-			c.Name == "dummy" ||
-			c.Name == "icmp" {
+		if c.Name == string(CheckHttp) ||
+			c.Name == string(CheckComponentStatus) ||
+			c.Name == string(CheckJsonPath) ||
+			c.Name == string(CheckNodeExists) ||
+			c.Name == string(CheckPodExists) ||
+			c.Name == string(CheckClusterEvent) ||
+			c.Name == string(CheckCertificateExpiry) ||
+			c.Name == string(CheckHelloIcinga) ||
+			c.Name == string(CheckDIG) ||
+			c.Name == string(CheckDNS) ||
+			c.Name == string(CheckDummy) ||
+			c.Name == string(CheckICMP) {
 			ClusterCommands[CheckCluster(c.Name)] = c
 		}
 	}
