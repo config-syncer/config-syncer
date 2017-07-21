@@ -8,7 +8,8 @@ The following steps must be done from a Linux x64 bit machine.
 - Build and push kubed docker image:
 ```console
 $ cd ~/go/src/github.com/appscode/kubed
-./hack/docker/setup.sh; env APPSCODE_ENV=prod ./hack/docker/setup.sh release
+$ env APPSCODE_ENV=prod ./hack/make.py build
+$ ./hack/docker/setup.sh; env APPSCODE_ENV=prod ./hack/docker/setup.sh release
 ```
 
 - Now, update the release notes in Github. See previous release notes to get an idea what to include there.

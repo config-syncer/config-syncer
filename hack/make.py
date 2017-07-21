@@ -40,12 +40,21 @@ BUILD_METADATA = libbuild.metadata(libbuild.REPO_ROOT)
 libbuild.BIN_MATRIX = {
     'kubed': {
         'type': 'go',
+        'release': True,
         'go_version': True,
         'distro': {
-            'alpine': ['amd64']
+            'alpine': ['amd64'],
+            'darwin': ['386', 'amd64'],
+            'linux': ['arm', '386', 'amd64'],
+            'windows': ['386', 'amd64'],
         }
     }
 }
+if libbuild.ENV not in ['prod']:
+    libbuild.BIN_MATRIX['kubed']['distro'] = {
+        libbuild.GOHOSTOS: [libbuild.GOHOSTARCH]
+    }
+
 libbuild.BUCKET_MATRIX = {
     'prod': 'gs://appscode-cdn',
     'dev': 'gs://appscode-dev'
