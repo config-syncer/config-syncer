@@ -30,6 +30,6 @@ kubed version [flags]
 ```
 
 ### SEE ALSO
-* [kubed](kubed.md)	 - Kubed by AppsCode - Kubernetes Daemon
+* [kubed](kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Manager Daemon
 
 

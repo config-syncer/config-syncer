@@ -1,11 +1,11 @@
 ## kubed
 
-Kubed by AppsCode - Kubernetes Daemon
+Kubed by AppsCode - A Kubernetes Cluster Manager Daemon
 
 ### Synopsis
 
 
-Kubed is a Kubernetes companion daemon to perform various supporting operations. For more information, visit here: https://github.com/appscode/kubed/tree/master/docs
+Kubed is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/appscode/kubed/tree/master/docs
 
 ### Options
 

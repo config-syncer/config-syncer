@@ -1,7 +1,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/appscode/kubed)](https://goreportcard.com/report/github.com/appscode/kubed)
 
 # Kubed
-Kubed by AppsCode is a Kubernetes cluster manager daemon.
+Kubed by AppsCode is a Kubernetes Cluster Manager Daemon.
 
 ## Supported Versions
 Kubernetes 1.5+
