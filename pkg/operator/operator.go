@@ -83,12 +83,12 @@ func (op *Operator) Setup() error {
 		return err
 	}
 
-	if op.Config.TrashCan != nil {
-		if op.Config.TrashCan.Path == "" {
-			op.Config.TrashCan.Path = filepath.Join(op.Opt.ScratchDir, "transhcan")
+	if op.Config.RecycleBin != nil {
+		if op.Config.RecycleBin.Path == "" {
+			op.Config.RecycleBin.Path = filepath.Join(op.Opt.ScratchDir, "transhcan")
 		}
 		op.TrashCan = &rbin.RecycleBin{
-			Spec:   *op.Config.TrashCan,
+			Spec:   *op.Config.RecycleBin,
 			Loader: op.NotifierLoader,
 		}
 	}
@@ -105,8 +105,8 @@ func (op *Operator) Setup() error {
 	op.Cron = cron.New()
 	op.Cron.Start()
 
-	if op.Config.InfluxDB != nil {
-		janitor := influx.Janitor{Spec: *op.Config.InfluxDB}
+	if op.Config.Janitor.InfluxDB != nil {
+		janitor := influx.Janitor{Spec: *op.Config.Janitor.InfluxDB}
 		err = janitor.Cleanup()
 		if err != nil {
 			return err
@@ -221,11 +221,11 @@ func (op *Operator) ListenAndServe() {
 }
 
 func (op *Operator) RunElasticsearchCleaner() error {
-	if op.Config.Elasticsearch == nil {
+	if op.Config.Janitor.Elasticsearch == nil {
 		return nil
 	}
 
-	janitor := es.Janitor{Spec: *op.Config.Elasticsearch}
+	janitor := es.Janitor{Spec: *op.Config.Janitor.Elasticsearch}
 	err := janitor.Cleanup()
 	if err != nil {
 		return err

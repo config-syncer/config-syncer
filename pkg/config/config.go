@@ -11,9 +11,11 @@ const (
 )
 
 type ClusterConfig struct {
-	Elasticsearch      *ElasticSearchSpec  `json:"elasticsearch,omitempty,omitempty"`
-	InfluxDB           *InfluxDBSpec       `json:"influxdb,omitempty"`
-	TrashCan           *RecycleBinSpec     `json:"recycleBin,omitempty"`
+	Janitor struct {
+		Elasticsearch *ElasticSearchSpec `json:"elasticsearch,omitempty,omitempty"`
+		InfluxDB      *InfluxDBSpec      `json:"influxdb,omitempty"`
+	} `json:"janitors,omitempty"`
+	RecycleBin         *RecycleBinSpec     `json:"recycleBin,omitempty"`
 	EventForwarder     *EventForwarderSpec `json:"eventForwarder,omitempty"`
 	ClusterSnapshot    *SnapshotSpec       `json:"clusterSnapshot,omitempty"`
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
