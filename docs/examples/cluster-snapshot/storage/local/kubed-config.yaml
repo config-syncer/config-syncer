@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubed-config
+  namespace: kube-system
+  labels:
+    app: kubed
+data:
+  config.yaml: |
+    clusterSnapshot:
+      Storage:
+        gcs:
+          bucket: bucket-for-snapshot
+          prefix: minikube
+        storageSecretName: gcs-secret
+      sanitize: true
+      schedule: '@every 6h'
