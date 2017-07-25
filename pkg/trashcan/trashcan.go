@@ -39,20 +39,25 @@ func (c *TrashCan) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new in
 		return err
 	}
 
-	if c.Spec.NotifyVia != "" {
+	if c.Spec.Receiver != nil && len(c.Spec.Receiver.To) > 0 {
 		sub := fmt.Sprintf("%s %s %s/%s updated", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
-		if notifier, err := unified.LoadVia(c.Spec.NotifyVia, c.Loader); err == nil {
+		if notifier, err := unified.LoadVia(c.Spec.Receiver.NotifyVia, c.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
+				n = n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...)
 				if diff, err := prepareDiff(old, new); err == nil {
 					n.WithSubject(sub).WithBody(diff).WithNoTracking().Send()
 				} else {
 					n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
 				}
 			case notify.BySMS:
-				n.WithBody(sub).Send()
+				n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...).
+					WithBody(sub).
+					Send()
 			case notify.ByChat:
-				n.WithBody(sub).Send()
+				n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...).
+					WithBody(sub).
+					Send()
 			}
 		}
 	}
@@ -76,16 +81,24 @@ func (c *TrashCan) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interface
 		return err
 	}
 
-	if c.Spec.NotifyVia != "" {
+	if c.Spec.Receiver != nil && len(c.Spec.Receiver.To) > 0 {
 		sub := fmt.Sprintf("%s %s %s/%s deleted", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
-		if notifier, err := unified.LoadVia(c.Spec.NotifyVia, c.Loader); err == nil {
+		if notifier, err := unified.LoadVia(c.Spec.Receiver.NotifyVia, c.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
-				n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
+				n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...).
+					WithSubject(sub).
+					WithBody(string(bytes)).
+					WithNoTracking().
+					Send()
 			case notify.BySMS:
-				n.WithBody(sub).Send()
+				n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...).
+					WithBody(sub).
+					Send()
 			case notify.ByChat:
-				n.WithBody(sub).Send()
+				n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...).
+					WithBody(sub).
+					Send()
 			}
 		}
 	}

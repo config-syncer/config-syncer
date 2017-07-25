@@ -36,16 +36,24 @@ type TrashCanSpec struct {
 	Path         string          `json:"path,omitempty"`
 	TTL          metav1.Duration `json:"ttl,omitempty"`
 	HandleUpdate bool            `json:"handle_update,omitempty"`
-	NotifyVia    string          `json:"notifyVia,omitempty"`
+	Receiver     *Receiver       `json:"receiver,omitempty"`
 }
 
 type EventForwarderSpec struct {
-	NotifyOnNodeAdd      bool     `json:"notifyOnNodeAdd,omitempty"`
-	NotifyOnStorageAdd   bool     `json:"notifyOnStorageAdd,omitempty"`
-	NotifyOnIngressAdd   bool     `json:"notifyOnIngressAdd,omitempty"`
-	ForwardWarningEvents bool     `json:"forwardWarningEvents,omitempty"`
-	EventNamespaces      []string `json:"eventNamespaces,omitempty"`
-	NotifyVia            string   `json:"notifyVia,omitempty"`
+	NotifyOnNodeAdd      bool      `json:"notifyOnNodeAdd,omitempty"`
+	NotifyOnStorageAdd   bool      `json:"notifyOnStorageAdd,omitempty"`
+	NotifyOnIngressAdd   bool      `json:"notifyOnIngressAdd,omitempty"`
+	ForwardWarningEvents bool      `json:"forwardWarningEvents,omitempty"`
+	EventNamespaces      []string  `json:"eventNamespaces,omitempty"`
+	Receiver             *Receiver `json:"receiver,omitempty"`
+}
+
+type Receiver struct {
+	// To whom notification will be sent
+	To []string `json:"to,omitempty"`
+
+	// How this notification will be sent
+	NotifyVia string `json:"notifyVia,omitempty"`
 }
 
 // For periodic full cluster backup
