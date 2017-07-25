@@ -1,44 +1,59 @@
-- ClusterRole
-- ClusterRoleBinding
-- ComponentStatus
-- ConfigMap
-- CronJob
-- DaemonSet
-- Deployment
-- Endpoints
-- Event
-- Ingress
-- Job
-- LimitRange
-- Namespace
-- Node
-- PersistentVolume
-- PersistentVolumeClaim
-- ReplicaSet
-- ReplicationController
-- Role
-- RoleBinding
-- Secret
-- Service
-- ServiceAccount
-- StatefulSet
-- StorageClass
-- ThirdPartyResource
-- Voyager
-  - Certificate
+- v1:
+  - ComponentStatus
+  - ConfigMap
+  - Endpoints
+  - Event
+  - LimitRange
+  - Namespace
+  - Node
+  - PersistentVolume
+  - PersistentVolumeClaim
+  - Pod
+  - ReplicationController
+  - Secret
+  - Service
+  - ServiceAccount
+- apps/v1beta1:
+  - Deployment
+  - StatefulSet
+- batch/v1:
+  - Job
+- batch/v2alpha1:
+  - CronJob
+- extensions/v1beta1:
+  - DaemonSet
+  - Deployment
   - Ingress
-- Searchlight
+  - ReplicaSet
+  - ThirdPartyResource
+- kubedb/v1alpha1:
+  - DormantDatabase
+  - Elasticsearch
+  - Postgres
+  - Snapshot
+- monitoring.coreos.com:
+  - Prometheus
+  - ServiceMonitor
+- rbac/v1alpha1:
+  - ClusterRole
+  - ClusterRoleBinding
+  - Role
+  - RoleBinding
+- rbac/v1beta1:
+  - ClusterRole
+  - ClusterRoleBinding
+  - Role
+  - RoleBinding
+- monitoring.appscode.com:
   - ClusterAlert
   - NodeAlert
   - PodAlert
-- Stash
+- stash.appscode.com:
   - Restic
-KubeDB
-  - Postgres
-  - Elasticsearch
-  - Snapshot
-  - DormantDatabase
-- Prometheus Operator
-  - Prometheus
-  - ServiceMonitor
-  - Alertmanager
+- storage/v1:
+  - StorageClass
+- storage/v1beta1:
+  - StorageClass
+- voyager.appscode.com:
+  - Certificate
+  - Ingress
