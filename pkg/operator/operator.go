@@ -13,9 +13,9 @@ import (
 	"github.com/appscode/kubed/pkg/eventer"
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/influxdb"
+	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
-	"github.com/appscode/kubed/pkg/trashcan"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
@@ -61,7 +61,7 @@ type Operator struct {
 
 	SearchIndex    *indexers.ResourceIndexer
 	ReverseIndex   *indexers.ReverseIndexer
-	TrashCan       *trashcan.TrashCan
+	TrashCan       *rbin.RecycleBin
 	Eventer        *eventer.EventForwarder
 	Cron           *cron.Cron
 	NotifierLoader envconfig.LoaderFunc
@@ -87,7 +87,7 @@ func (op *Operator) Setup() error {
 		if op.Config.TrashCan.Path == "" {
 			op.Config.TrashCan.Path = filepath.Join(op.Opt.ScratchDir, "transhcan")
 		}
-		op.TrashCan = &trashcan.TrashCan{
+		op.TrashCan = &rbin.RecycleBin{
 			Spec:   *op.Config.TrashCan,
 			Loader: op.NotifierLoader,
 		}

@@ -1,4 +1,4 @@
-package trashcan
+package recyclebin
 
 import (
 	"encoding/json"
@@ -18,12 +18,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type TrashCan struct {
-	Spec   config.TrashCanSpec
+type RecycleBin struct {
+	Spec   config.RecycleBinSpec
 	Loader envconfig.LoaderFunc
 }
 
-func (c *TrashCan) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new interface{}) error {
+func (c *RecycleBin) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new interface{}) error {
 	p := filepath.Join(c.Spec.Path, meta.SelfLink)
 	dir := filepath.Dir(p)
 	err := os.MkdirAll(dir, 0755)
@@ -65,7 +65,7 @@ func (c *TrashCan) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new in
 	return ioutil.WriteFile(fullPath, bytes, 0644)
 }
 
-func (c *TrashCan) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interface{}) error {
+func (c *RecycleBin) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interface{}) error {
 	p := filepath.Join(c.Spec.Path, meta.SelfLink)
 	dir := filepath.Dir(p)
 	err := os.MkdirAll(dir, 0755)
@@ -105,7 +105,7 @@ func (c *TrashCan) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interface
 	return ioutil.WriteFile(fullPath, bytes, 0644)
 }
 
-func (c *TrashCan) Cleanup() error {
+func (c *RecycleBin) Cleanup() error {
 	now := time.Now()
 	return filepath.Walk(c.Spec.Path, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
