@@ -1,4 +1,4 @@
-> New to Kubed? Please start [here](/docs/tutorial.md).
+> New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 # Uninstall Kubed
 Please follow the steps below to uninstall Kubed:
