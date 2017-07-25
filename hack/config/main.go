@@ -27,8 +27,11 @@ func main() {
 			Kind:       "ConfigMap",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "kubed",
+			Name:      "kubed-config",
 			Namespace: "kube-system",
+			Labels: map[string]string{
+				"app": "kubed",
+			},
 		},
 		Data: map[string]string{
 			"config.yaml": string(bytes),

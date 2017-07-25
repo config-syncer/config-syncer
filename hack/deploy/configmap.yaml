@@ -32,5 +32,7 @@ data:
 kind: ConfigMap
 metadata:
   creationTimestamp: null
-  name: kubed
+  labels:
+    app: kubed
+  name: kubed-config
   namespace: kube-system
