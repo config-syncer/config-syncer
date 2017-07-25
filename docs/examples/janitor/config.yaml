@@ -25,4 +25,4 @@ recycleBin:
     notifier: mailgun
     to:
     - ops@example.com
-  ttl: 168h0m0s
+  ttl: 168h

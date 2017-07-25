@@ -10,8 +10,8 @@ data:
     clusterSnapshot:
       Storage:
         gcs:
-          bucket: restic
+          bucket: bucket-for-snapshot
           prefix: minikube
-        storageSecretName: snap-secret
+        storageSecretName: gcs-secret
       sanitize: true
       schedule: '@every 6h'
