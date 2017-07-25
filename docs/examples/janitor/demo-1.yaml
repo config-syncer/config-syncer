@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubed-config
+  namespace: kube-system
+  labels:
+    app: kubed
+data:
+  config.yaml: |
+    clusterSnapshot:
+      Storage:
+        gcs:
+          bucket: restic
+          prefix: minikube
+        storageSecretName: snap-secret
+      sanitize: true
+      schedule: '@every 6h'
+    eventForwarder:
+      eventNamespaces:
+      - kube-system
+      forwardWarningEvents: true
+      notifyOnIngressAdd: true
+      notifyOnStorageAdd: true
+      receiver:
+        notifier: mailgun
+        to:
+        - ops@example.com
+    janitors: {}
+    notifierSecretName: kubed-notifier
+    recycleBin:
+      handle_update: true
+      path: /tmp/kubed
+      receiver:
+        notifier: mailgun
+        to:
+        - ops@example.com
+      ttl: 168h0m0s

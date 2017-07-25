@@ -118,6 +118,11 @@ func (op *Operator) Setup() error {
 }
 
 func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {
+	if op.Config.NotifierSecretName == "" {
+		return func(key string) (string, bool) {
+			return "", false
+		}, nil
+	}
 	cfg, err := op.KubeClient.CoreV1().
 		Secrets(op.Opt.OperatorNamespace).
 		Get(op.Config.NotifierSecretName, metav1.GetOptions{})
