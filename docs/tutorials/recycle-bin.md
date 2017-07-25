@@ -1,0 +1,59 @@
+- __v1:__
+  - ComponentStatus
+  - ConfigMap
+  - Endpoints
+  - Event
+  - LimitRange
+  - Namespace
+  - Node
+  - PersistentVolume
+  - PersistentVolumeClaim
+  - Pod
+  - ReplicationController
+  - Secret
+  - Service
+  - ServiceAccount
+- __apps/v1beta1:__
+  - Deployment
+  - StatefulSet
+- __batch/v1:__
+  - Job
+- __batch/v2alpha1:__
+  - CronJob
+- __extensions/v1beta1:__
+  - DaemonSet
+  - Deployment
+  - Ingress
+  - ReplicaSet
+  - ThirdPartyResource
+- __kubedb/v1alpha1:__
+  - DormantDatabase
+  - Elasticsearch
+  - Postgres
+  - Snapshot
+- __monitoring.coreos.com:__
+  - Prometheus
+  - ServiceMonitor
+- __rbac/v1alpha1:__
+  - ClusterRole
+  - ClusterRoleBinding
+  - Role
+  - RoleBinding
+- __rbac/v1beta1:__
+  - ClusterRole
+  - ClusterRoleBinding
+  - Role
+  - RoleBinding
+- __monitoring.appscode.com/v1alpha1:__
+  - ClusterAlert
+  - NodeAlert
+  - PodAlert
+- __stash.appscode.com/v1alpha1:__
+  - Restic
+- __storage/v1:__
+  - StorageClass
+- __storage/v1beta1:__
+  - StorageClass
+- __voyager.appscode.com/v1beta1:__
+  - Certificate
+  - Ingress
