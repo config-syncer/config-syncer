@@ -13,7 +13,7 @@ eventForwarder:
   notifyOnIngressAdd: true
   notifyOnStorageAdd: true
   receiver:
-    notifyVia: mailgun
+    notifiers: mailgun
     to:
     - ops@example.com
 janitors: {}
@@ -22,7 +22,7 @@ recycleBin:
   handle_update: true
   path: /tmp/kubed
   receiver:
-    notifyVia: mailgun
+    notifiers: mailgun
     to:
     - ops@example.com
   ttl: 168h0m0s
