@@ -52,6 +52,7 @@ libbuild.BIN_MATRIX = {
 }
 if libbuild.ENV not in ['prod']:
     libbuild.BIN_MATRIX['kubed']['distro'] = {
+        'alpine': ['amd64'],
         libbuild.GOHOSTOS: [libbuild.GOHOSTARCH]
     }
 
