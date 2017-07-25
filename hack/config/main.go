@@ -50,7 +50,7 @@ func CreateClusterConfig() config.ClusterConfig {
 			HandleUpdate: true,
 			Receiver: &config.Receiver{
 				To:        []string{"ops@example.com"},
-				NotifyVia: mailgun.UID,
+				Notifiers: mailgun.UID,
 			},
 		},
 		EventForwarder: &config.EventForwarderSpec{
@@ -60,7 +60,7 @@ func CreateClusterConfig() config.ClusterConfig {
 			EventNamespaces:      []string{"kube-system"},
 			Receiver: &config.Receiver{
 				To:        []string{"ops@example.com"},
-				NotifyVia: mailgun.UID,
+				Notifiers: mailgun.UID,
 			},
 		},
 		ClusterSnapshot: &config.SnapshotSpec{

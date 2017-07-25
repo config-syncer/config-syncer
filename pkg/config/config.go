@@ -55,7 +55,7 @@ type Receiver struct {
 	To []string `json:"to,omitempty"`
 
 	// How this notification will be sent
-	NotifyVia string `json:"notifyVia,omitempty"`
+	Notifiers string `json:"notifiers,omitempty"`
 }
 
 // For periodic full cluster backup
