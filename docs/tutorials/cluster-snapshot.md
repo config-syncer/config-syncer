@@ -1,47 +1,44 @@
-
-- Certificate
-- ClusterAlert
 - ClusterRole
-- ClusterRole
-- ClusterRoleBinding
 - ClusterRoleBinding
 - ComponentStatus
 - ConfigMap
 - CronJob
 - DaemonSet
 - Deployment
-- Deployment
-- DormantDatabase
-- Elasticsearch
 - Endpoints
 - Event
-- Ingress
 - Ingress
 - Job
 - LimitRange
 - Namespace
 - Node
-- NodeAlert
-- od
 - PersistentVolume
 - PersistentVolumeClaim
-- PodAlert
-- Postgres
-- Prometheus
 - ReplicaSet
 - ReplicationController
-- Restic
 - Role
-- Role
-- RoleBinding
 - RoleBinding
 - Secret
 - Service
 - ServiceAccount
-- ServiceMonitor
-- Snapshot
 - StatefulSet
 - StorageClass
-- StorageClass
 - ThirdPartyResource
-
+- Voyager
+  - Certificate
+  - Ingress
+- Searchlight
+  - ClusterAlert
+  - NodeAlert
+  - PodAlert
+- Stash
+  - Restic
+KubeDB
+  - Postgres
+  - Elasticsearch
+  - Snapshot
+  - DormantDatabase
+- Prometheus Operator
+  - Prometheus
+  - ServiceMonitor
+  - Alertmanager
