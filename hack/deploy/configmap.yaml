@@ -15,12 +15,18 @@ data:
       forwardWarningEvents: true
       notifyOnIngressAdd: true
       notifyOnStorageAdd: true
-      notifyVia: mailgun
+      receiver:
+        notifyVia: mailgun
+        to:
+        - ops@example.com
     notifierSecretName: kubed-notifier
     recycleBin:
       handle_update: true
-      notifyVia: mailgun
       path: /tmp/kubed
+      receiver:
+        notifyVia: mailgun
+        to:
+        - ops@example.com
       ttl: 168h0m0s
 kind: ConfigMap
 metadata:

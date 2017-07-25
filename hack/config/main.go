@@ -48,14 +48,20 @@ func CreateClusterConfig() config.ClusterConfig {
 			Path:         "/tmp/kubed",
 			TTL:          metav1.Duration{7 * 24 * time.Hour},
 			HandleUpdate: true,
-			NotifyVia:    mailgun.UID,
+			Receiver: &config.Receiver{
+				To:        []string{"ops@example.com"},
+				NotifyVia: mailgun.UID,
+			},
 		},
 		EventForwarder: &config.EventForwarderSpec{
 			NotifyOnStorageAdd:   true,
 			NotifyOnIngressAdd:   true,
 			ForwardWarningEvents: true,
 			EventNamespaces:      []string{"kube-system"},
-			NotifyVia:            mailgun.UID,
+			Receiver: &config.Receiver{
+				To:        []string{"ops@example.com"},
+				NotifyVia: mailgun.UID,
+			},
 		},
 		ClusterSnapshot: &config.SnapshotSpec{
 			Schedule: "@every 6h",

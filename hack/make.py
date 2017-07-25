@@ -83,9 +83,9 @@ def version():
 
 
 def fmt():
-    libbuild.ungroup_go_imports('pkg', '*.go')
-    die(call('goimports -w *.go pkg'))
-    call('gofmt -s -w *.go pkg')
+    libbuild.ungroup_go_imports('pkg', '*.go', 'hack/config')
+    die(call('goimports -w *.go pkg hack/config'))
+    call('gofmt -s -w *.go pkg hack/config')
 
 
 def vet():

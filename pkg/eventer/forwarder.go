@@ -22,20 +22,28 @@ func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
 	if e.Type == apiv1.EventTypeWarning &&
 		(len(f.Spec.EventNamespaces) == 0 || stringz.Contains(f.Spec.EventNamespaces, e.Namespace)) {
 
-		if f.Spec.NotifyVia != "" {
+		if f.Spec.Receiver != nil && len(f.Spec.Receiver.To) > 0 {
 			sub := fmt.Sprintf("%s %s/%s: %s", e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason)
-			if notifier, err := unified.LoadVia(f.Spec.NotifyVia, f.Loader); err == nil {
+			if notifier, err := unified.LoadVia(f.Spec.Receiver.NotifyVia, f.Loader); err == nil {
 				switch n := notifier.(type) {
 				case notify.ByEmail:
 					bytes, err := yaml.Marshal(e)
 					if err != nil {
 						return err
 					}
-					n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
+					n.To(f.Spec.Receiver.To[0], f.Spec.Receiver.To[1:]...).
+						WithSubject(sub).
+						WithBody(string(bytes)).
+						WithNoTracking().
+						Send()
 				case notify.BySMS:
-					n.WithBody(sub).Send()
+					n.To(f.Spec.Receiver.To[0], f.Spec.Receiver.To[1:]...).
+						WithBody(sub).
+						Send()
 				case notify.ByChat:
-					n.WithBody(sub).Send()
+					n.To(f.Spec.Receiver.To[0], f.Spec.Receiver.To[1:]...).
+						WithBody(sub).
+						Send()
 				}
 			}
 		}
@@ -48,16 +56,24 @@ func (f *EventForwarder) Forward(t metav1.TypeMeta, meta metav1.ObjectMeta, v in
 	if err != nil {
 		return err
 	}
-	if f.Spec.NotifyVia != "" {
+	if f.Spec.Receiver != nil && len(f.Spec.Receiver.To) > 0 {
 		sub := fmt.Sprintf("%s %s %s/%s added", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
-		if notifier, err := unified.LoadVia(f.Spec.NotifyVia, f.Loader); err == nil {
+		if notifier, err := unified.LoadVia(f.Spec.Receiver.NotifyVia, f.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
-				n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
+				n.To(f.Spec.Receiver.To[0], f.Spec.Receiver.To[1:]...).
+					WithSubject(sub).
+					WithBody(string(bytes)).
+					WithNoTracking().
+					Send()
 			case notify.BySMS:
-				n.WithBody(sub).Send()
+				n.To(f.Spec.Receiver.To[0], f.Spec.Receiver.To[1:]...).
+					WithBody(sub).
+					Send()
 			case notify.ByChat:
-				n.WithBody(sub).Send()
+				n.To(f.Spec.Receiver.To[0], f.Spec.Receiver.To[1:]...).
+					WithBody(sub).
+					Send()
 			}
 		}
 	}
