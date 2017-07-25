@@ -62,14 +62,14 @@ func (c client) To(to string, cc ...string) notify.ByChat {
 }
 
 func (c *client) Send() error {
-	log := struct {
+	msg := struct {
 		To   []string `json:"to,omitempty"`
 		Body string   `json:"body,omitempty"`
 	}{
 		c.opt.To,
 		c.body,
 	}
-	bytes, err := json.MarshalIndent(&log, "", "  ")
+	bytes, err := json.MarshalIndent(&msg, "", "  ")
 	if err != nil {
 		return err
 	}

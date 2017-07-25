@@ -105,8 +105,8 @@ func (op *Operator) Setup() error {
 	op.Cron = cron.New()
 	op.Cron.Start()
 
-	if op.Config.Janitor.InfluxDB != nil {
-		janitor := influx.Janitor{Spec: *op.Config.Janitor.InfluxDB}
+	if op.Config.Janitors.InfluxDB != nil {
+		janitor := influx.Janitor{Spec: *op.Config.Janitors.InfluxDB}
 		err = janitor.Cleanup()
 		if err != nil {
 			return err
@@ -221,11 +221,11 @@ func (op *Operator) ListenAndServe() {
 }
 
 func (op *Operator) RunElasticsearchCleaner() error {
-	if op.Config.Janitor.Elasticsearch == nil {
+	if op.Config.Janitors.Elasticsearch == nil {
 		return nil
 	}
 
-	janitor := es.Janitor{Spec: *op.Config.Janitor.Elasticsearch}
+	janitor := es.Janitor{Spec: *op.Config.Janitors.Elasticsearch}
 	err := janitor.Cleanup()
 	if err != nil {
 		return err

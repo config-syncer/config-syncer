@@ -19,6 +19,7 @@ data:
         notifyVia: mailgun
         to:
         - ops@example.com
+    janitors: {}
     notifierSecretName: kubed-notifier
     recycleBin:
       handle_update: true

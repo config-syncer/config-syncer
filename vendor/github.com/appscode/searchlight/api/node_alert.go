@@ -26,7 +26,7 @@ type NodeAlert struct {
 
 	// Status is the current state of the NodeAlert.
 	// More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status
-	Status AlertStatus `json:"status,omitempty"`
+	// Status AlertStatus `json:"status,omitempty"`
 }
 
 // NodeAlertList is a collection of NodeAlert.

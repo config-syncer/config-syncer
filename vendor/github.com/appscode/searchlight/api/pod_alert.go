@@ -26,7 +26,7 @@ type PodAlert struct {
 
 	// Status is the current state of the PodAlert.
 	// More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status
-	Status AlertStatus `json:"status,omitempty"`
+	// Status AlertStatus `json:"status,omitempty"`
 }
 
 // PodAlertList is a collection of PodAlert.

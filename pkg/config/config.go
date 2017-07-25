@@ -11,7 +11,7 @@ const (
 )
 
 type ClusterConfig struct {
-	Janitor struct {
+	Janitors struct {
 		Elasticsearch *ElasticSearchSpec `json:"elasticsearch,omitempty,omitempty"`
 		InfluxDB      *InfluxDBSpec      `json:"influxdb,omitempty"`
 	} `json:"janitors,omitempty"`
