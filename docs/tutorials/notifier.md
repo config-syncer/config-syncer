@@ -24,7 +24,6 @@ secret "kubed-notifier" created
 | MAILGUN_API_KEY         | Set mailgun API Key                                                            |
 | MAILGUN_PUBLIC_API_KEY  | Set mailgun public API Key                                                     |
 | MAILGUN_FROM            | Set sender address for notification                                            |
-| MAILGUN_TO              | Set recipient address. For multiple receipents, set comma separated addresses. |
 
 
 These environment variables will be set using `searchlight-icinga` Secret.
@@ -44,7 +43,6 @@ secret "kubed-notifier" created
 | Name                | Description                                                       |
 | :---                | :---                                                              |
 | HIPCHAT_AUTH_TOKEN  | Set hipchat authentication token                                  |
-| HIPCHAT_TO          | Set hipchat room ID. For multiple rooms, set comma separated IDs. |
 
 
 These environment variables will be set using `searchlight-icinga` Secret.
@@ -80,7 +78,6 @@ secret "kubed-notifier" created
 | SMTP_USERNAME             | Set username                                                                   |
 | SMTP_PASSWORD             | Set password                                                                   |
 | SMTP_FROM                 | Set sender address for notification                                            |
-| SMTP_TO                   | Set receipent address. For multiple receipents, set comma separated addresses. |
 
 
 These environment variables will be set using `searchlight-icinga` Secret.
@@ -109,7 +106,6 @@ secret "kubed-notifier" created
 | TWILIO_ACCOUNT_SID  | Set twilio account SID                                                             |
 | TWILIO_AUTH_TOKEN   | Set twilio authentication token                                                    |
 | TWILIO_FROM         | Set sender mobile number for notification                                          |
-| TWILIO_TO           | Set receipent mobile number. For multiple receipents, set comma separated numbers. |
 
 
 
@@ -171,7 +167,6 @@ secret "kubed-notifier" created
 | PLIVO_AUTH_ID     | Set plivo auth ID                                                                  |
 | PLIVO_AUTH_TOKEN  | Set plivo authentication token                                                     |
 | PLIVO_FROM        | Set sender mobile number for notification                                          |
-| PLIVO_TO          | Set receipent mobile number. For multiple receipents, set comma separated numbers. |
 
 
 
