@@ -1,3 +1,4 @@
+enableConfigSyncer: true
 eventForwarder:
   eventNamespaces:
   - kube-system

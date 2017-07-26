@@ -56,6 +56,7 @@ func CreateClusterConfig() config.ClusterConfig {
 				Notifier: mailgun.UID,
 			},
 		},
+		EnableConfigSyncer: true,
 		EventForwarder: &config.EventForwarderSpec{
 			NotifyOnStorageAdd:   true,
 			NotifyOnIngressAdd:   true,
