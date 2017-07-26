@@ -1,11 +1,12 @@
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
 
-# Cluster Snapshots
-Kubed supports taking periodic snapshot of a Kubernetes cluster objects. The snapshot data can be stored in various cloud providers, eg, [Amazon S3](#aws-s3), [Google Cloud Storage](#google-cloud-storage-gcs), [Microsoft Azure](#microsoft-azure-storage), [OpenStack Swift](#openstack-swift) and any [locally mounted volumes](#local-backend) like NFS, GlusterFS, etc. Kubed uses Kubernetes discovery api to find all available resources in a cluster and stores them in a file matching the `selfLink` URL for an object. This tutorial will show you how to use Kubed to take periodic snapshots of a Kubernetes cluster objects.
+# Kubernetes Recycle Bin
+Kubed provides a recycle bin for deleted and/or updated Kubernetes objects. Once activated, any deleted and/or updated object is stored in YAML format in folder mounted inside Kubed pod. This tutorial will show you how to use Kubed to setup a recycle bin for Kubernetes cluster objects.
 
 
 ## Before You Begin
 At first, you need to have a Kubernetes cluster, and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [Minikube](https://github.com/kubernetes/minikube).
+
 
 ## Deploy Kubed
 To enable config syncer, you need a cluster config like below.
@@ -35,7 +36,7 @@ Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
 ```yaml
 $ kubectl create secret generic kubed-config -n kube-system \
-    --from-file=./docs/examples/config-syncer/config.yaml
+    --from-file=./docs/examples/recycle-bin/config.yaml
 secret "kubed-config" created
 
 # apply app=kubed label to easily cleanup later
@@ -45,17 +46,17 @@ secret "kubed-config" labeled
 $ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
-  config.yaml: ZW5hYmxlQ29uZmlnU3luY2VyOiB0cnVlCg==
+  config.yaml: bm90aWZpZXJTZWNyZXROYW1lOiBrdWJlZC1ub3RpZmllcgpyZWN5Y2xlQmluOgogIGhhbmRsZV91cGRhdGU6IGZhbHNlCiAgcGF0aDogL3RtcC9rdWJlZAogIHJlY2VpdmVyOgogICAgbm90aWZpZXI6IG1haWxndW4KICAgIHRvOgogICAgLSBvcHNAZXhhbXBsZS5jb20KICB0dGw6IDE2OGgK
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-26T10:25:33Z
+  creationTimestamp: 2017-07-26T18:55:54Z
   labels:
     app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "25114"
+  resourceVersion: "32920"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: c207c236-71ec-11e7-a5ec-0800273df5f2
+  uid: 0d3aa21b-7234-11e7-af79-08002738e55e
 type: Opaque
 ```
 
