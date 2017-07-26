@@ -1,8 +1,8 @@
 snapshotter:
   Storage:
-    azure:
+    swift:
       container: bucket-for-snapshot
       prefix: minikube
-    storageSecretName: azure-secret
+    storageSecretName: snap-secret
   sanitize: true
   schedule: '@every 6h'

@@ -9,9 +9,8 @@ data:
   config.yaml: |
     snapshotter:
       Storage:
-        gcs:
-          bucket: bucket-for-snapshot
-          prefix: minikube
+        local:
+          path: /var/data
         storageSecretName: gcs-secret
       sanitize: true
       schedule: '@every 6h'

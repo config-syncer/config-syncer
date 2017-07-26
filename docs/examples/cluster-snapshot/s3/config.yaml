@@ -1,8 +1,9 @@
 snapshotter:
   Storage:
-    azure:
-      container: bucket-for-snapshot
+    s3:
+      endpoint: 's3.amazonaws.com'
+      bucket: kubedb-qa
       prefix: minikube
-    storageSecretName: azure-secret
+    storageSecretName: snap-secret
   sanitize: true
   schedule: '@every 6h'

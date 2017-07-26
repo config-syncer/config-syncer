@@ -1,8 +1,6 @@
 snapshotter:
   Storage:
-    azure:
-      container: bucket-for-snapshot
-      prefix: minikube
-    storageSecretName: azure-secret
+    local:
+      path: /var/data
   sanitize: true
   schedule: '@every 6h'
