@@ -195,6 +195,6 @@ $ kubectl delete ns demo
 namespace "demo" deleted
 ```
 
-TO uninstall Kubed operator, please follow the steps [here](/docs/uninstall.md).
+To uninstall Kubed operator, please follow the steps [here](/docs/uninstall.md).
 
 ## Next Steps
