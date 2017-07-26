@@ -43,7 +43,11 @@ func GetBool(m map[string]string, key string) (bool, error) {
 	if m == nil {
 		return false, nil
 	}
-	return strconv.ParseBool(m[key])
+	v, ok := m[key]
+	if !ok || v == "" {
+		return false, nil
+	}
+	return strconv.ParseBool(v)
 }
 
 func GetString(m map[string]string, key string) string {
