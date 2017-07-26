@@ -4,7 +4,7 @@
 Kubed can send notifications via Email, SMS or Chat for various operations using [appscode/go-notify](https://github.com/appscode/go-notify) library. To connect to these services, you need to create a Secret with the appropriate keys. Then pass the secret name to Kubed by setting `notifierSecretName` field in Kubed cluster config.
 
 ## Hipchat
-To configure Hipchat, create a Secret with the following key:
+To receive chat notifications in Hipchat, create a Secret with the following key:
 
 | Name                | Description                               |
 |---------------------|-------------------------------------------|
@@ -48,7 +48,7 @@ recycleBin:
 
 
 ## Mailgun
-To configure Mailgun, create a Secret with the following keys:
+To receive email notifications via Mailgun, create a Secret with the following keys:
 
 | Name                    | Description                                  |
 |-------------------------|----------------------------------------------|
@@ -104,7 +104,7 @@ recycleBin:
 
 
 ## SMTP
-To configure any email provider, use SMTP notifier. To configure a SMTP service, create a Secret with the following keys:
+To configure any email provider, use SMTP notifier. To receive email notifications via SMTP services, create a Secret with the following keys:
 
 | Name                      | Description                                           |
 |---------------------------|-------------------------------------------------------|
@@ -133,16 +133,39 @@ $ kubectl create secret generic kubed-notifier -n kube-system \
 secret "kubed-notifier" created
 ```
 
+To configure Kubed to send email notifications using a GMail account, set the Secrets like below:
+```
+$ echo -n 'smtp.gmail.com' > SMTP_HOST
+$ echo -n '587' > SMTP_PORT
+$ echo -n 'your-gmail-adress' > SMTP_USERNAME
+$ echo -n 'your-gmail-password' > SMTP_PASSWORD
+$ echo -n 'your-gmail-address' > SMTP_FROM
+```
 
-These environment variables will be set using `searchlight-icinga` Secret.
+Now, to receiver notifications via SMTP, configure receiver as below:
+ - notifier: `smtp`
+ - to: a list of email addresses
 
-> Set `NOTIFY_VIA` to `smtp`
+```yaml
+recycleBin:
+  handle_update: false
+  path: /tmp/kubed
+  receiver:
+    notifier: smtp
+    to:
+    - ops-alerts@example.com
+  ttl: 168h
+```
 
 
+## Twilio
+To receive SMS notifications via Twilio, create a Secret with the following keys:
 
-
-
-
+| Name                | Description                                        |
+|---------------------|----------------------------------------------------|
+| TWILIO_ACCOUNT_SID  | `Required` Twilio account SID                      |
+| TWILIO_AUTH_TOKEN   | `Required` Twilio authentication token             |
+| TWILIO_FROM         | `Required` Sender mobile number                    |
 
 ```console
 $ echo -n 'your-twilio-account-sid' > TWILIO_ACCOUNT_SID
@@ -154,23 +177,46 @@ $ kubectl create secret generic kubed-notifier -n kube-system \
     --from-file=./TWILIO_FROM
 secret "kubed-notifier" created
 ```
+```yaml
+apiVersion: v1
+data:
+  TWILIO_ACCOUNT_SID: eW91ci10d2lsaW8tYWNjb3VudC1zaWQ=
+  TWILIO_AUTH_TOKEN: eW91ci10d2lsaW8tYXV0aC10b2tlbg==
+  TWILIO_FROM: eW91ci10d2lsaW8tZnJvbQ==
+kind: Secret
+metadata:
+  creationTimestamp: 2017-07-26T17:38:38Z
+  name: kubed-notifier
+  namespace: kube-system
+  resourceVersion: "27787"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-notifier
+  uid: 41f57a61-7229-11e7-af79-08002738e55e
+type: Opaque
+```
 
-| Name                | Description                                                                        |
-| :---                | :---                                                                               |
-| TWILIO_ACCOUNT_SID  | Set twilio account SID                                                             |
-| TWILIO_AUTH_TOKEN   | Set twilio authentication token                                                    |
-| TWILIO_FROM         | Set sender mobile number for notification                                          |
+Now, to receiver notifications via SMTP, configure receiver as below:
+ - notifier: `twilio`
+ - to: a list of receiver mobile numbers
+
+```yaml
+recycleBin:
+  handle_update: false
+  path: /tmp/kubed
+  receiver:
+    notifier: twilio
+    to:
+    - +1-999-888-1234
+  ttl: 168h
+```
 
 
+## Slack
+To receive chat notifications in Slack, create a Secret with the following keys:
 
-These environment variables will be set using `searchlight-icinga` Secret.
-
-> Set `NOTIFY_VIA` to `twilio`
-
-
-
-
-
+| Name             | Description                      |
+|------------------|----------------------------------|
+| SLACK_AUTH_TOKEN | `Required` Slack auth token      |
+| SLACK_CHANNEL    | `Required` Slack channel name.   |
 
 ```console
 $ echo -n 'your-slack-auth-token' > SLACK_AUTH_TOKEN
@@ -180,30 +226,46 @@ $ kubectl create secret generic kubed-notifier -n kube-system \
     --from-file=./SLACK_CHANNEL
 secret "kubed-notifier" created
 ```
+```yaml
+apiVersion: v1
+data:
+  SLACK_AUTH_TOKEN: eW91ci1zbGFjay1hdXRoLXRva2Vu
+  SLACK_CHANNEL: eW91ci1zbGFjay1jaGFubmVs
+kind: Secret
+metadata:
+  creationTimestamp: 2017-07-25T01:58:58Z
+  name: kubed-notifier
+  namespace: kube-system
+  resourceVersion: "2534"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-notifier
+  uid: d2571817-70dc-11e7-9b0b-080027503732
+type: Opaque
+```
 
-##### envconfig for `slack`
+Now, to receiver notifications via Hipchat, configure receiver as below:
+ - notifier: `slack`
+ - to: a list of chat room names
 
-| Name             | Description                                                               |
-| :---             | :---                                                                      |
-| SLACK_AUTH_TOKEN | Set slack access authentication token                                     |
-| SLACK_CHANNEL    | Set slack channel name. For multiple channels, set comma separated names. |
-
-
-#### Add Searchlight app
-Add Searchlight app in your slack channel and use provided `bot_access_token`.
-
-<a href="https://slack.com/oauth/authorize?scope=bot&client_id=31843174386.143405120770"><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>
-
-#### Set Environment Variables
-
-These environment variables will be set using `searchlight-icinga` Secret.
-
-> Set `NOTIFY_VIA` to `slack`
+```yaml
+recycleBin:
+  handle_update: false
+  path: /tmp/kubed
+  receiver:
+    notifier: slack
+    to:
+    - ops-alerts
+  ttl: 168h
+```
 
 
+## Plivo
+To receive SMS notifications via Plivo, create a Secret with the following keys:
 
-
-
+| Name              | Description                             |
+|-------------------|-----------------------------------------|
+| PLIVO_AUTH_ID     | `Required` Plivo auth ID                |
+| PLIVO_AUTH_TOKEN  | `Required` Plivo authentication token   |
+| PLIVO_FROM        | `Required` Sender mobile number         |
 
 ```console
 $ echo -n 'your-plivo-auth-id' > PLIVO_AUTH_ID
@@ -215,15 +277,34 @@ $ kubectl create secret generic kubed-notifier -n kube-system \
     --from-file=./PLIVO_FROM
 secret "kubed-notifier" created
 ```
+```yaml
+apiVersion: v1
+data:
+  PLIVO_AUTH_ID: eW91ci1wbGl2by1hdXRoLWlk
+  PLIVO_AUTH_TOKEN: eW91ci1wbGl2by1hdXRoLXRva2Vu
+  PLIVO_FROM: eW91ci1wbGl2by1mcm9t
+kind: Secret
+metadata:
+  creationTimestamp: 2017-07-25T02:00:02Z
+  name: kubed-notifier
+  namespace: kube-system
+  resourceVersion: "2606"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-notifier
+  uid: f8dade1c-70dc-11e7-9b0b-080027503732
+type: Opaque
+```
 
-| Name              | Description                                                                        |
-| :---              | :---                                                                               |
-| PLIVO_AUTH_ID     | Set plivo auth ID                                                                  |
-| PLIVO_AUTH_TOKEN  | Set plivo authentication token                                                     |
-| PLIVO_FROM        | Set sender mobile number for notification                                          |
+Now, to receiver notifications via SMTP, configure receiver as below:
+ - notifier: `plivo`
+ - to: a list of receiver mobile numbers
 
-
-
-These environment variables will be set using `searchlight-icinga` Secret.
-
-> Set `NOTIFY_VIA` to `plivo`
+```yaml
+recycleBin:
+  handle_update: false
+  path: /tmp/kubed
+  receiver:
+    notifier: plivo
+    to:
+    - +1-999-888-1234
+  ttl: 168h
+```

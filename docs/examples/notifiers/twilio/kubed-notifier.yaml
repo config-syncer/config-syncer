@@ -1,17 +1,14 @@
 apiVersion: v1
 data:
-  SMTP_FROM: eW91ci1zbXRwLWZyb20=
-  SMTP_HOST: eW91ci1zbXRwLWhvc3Q=
-  SMTP_INSECURE_SKIP_VERIFY: eW91ci1zbXRwLWluc2VjdXJlLXNraXAtdmVyaWZ5
-  SMTP_PASSWORD: eW91ci1zbXRwLXBhc3N3b3Jk
-  SMTP_PORT: eW91ci1zbXRwLXBvcnQ=
-  SMTP_USERNAME: eW91ci1zbXRwLXVzZXJuYW1l
+  TWILIO_ACCOUNT_SID: eW91ci10d2lsaW8tYWNjb3VudC1zaWQ=
+  TWILIO_AUTH_TOKEN: eW91ci10d2lsaW8tYXV0aC10b2tlbg==
+  TWILIO_FROM: eW91ci10d2lsaW8tZnJvbQ==
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-25T01:57:17Z
+  creationTimestamp: 2017-07-26T17:38:38Z
   name: kubed-notifier
   namespace: kube-system
-  resourceVersion: "2422"
+  resourceVersion: "27787"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-notifier
-  uid: 965cb1e8-70dc-11e7-9b0b-080027503732
+  uid: 41f57a61-7229-11e7-af79-08002738e55e
 type: Opaque
