@@ -4,7 +4,9 @@
 Kubed supports taking periodic snapshot of a Kubernetes cluster objects. The snapshot data can be stored in various cloud providers, eg, Amazon S3, Google Cloud Storage, Microsoft Azure, OpenStack Swift and any locally mounted volumes like NFS, GlusterFS, etc. Kubed uses Kubernetes discovery api to find all available resources in a cluster and stores them in a file matching the `selfLink` URL for an object. This tutorial will show you how to use Kubed to take periodic snapshots of a Kubernetes cluster objects.
 
 ----
+
 Kubed does not support the latest CustomResourceDefinition (CRD) yet. This is planned for [4.0.0 release](https://github.com/appscode/kubed/milestone/3).
+
 ----
 
 ## Before You Begin
@@ -368,6 +370,30 @@ metadata:
 type: Opaque
 ```
 
+Now, let's take a look at the cluster config. Here,
+
+```yaml
+$ cat ./docs/examples/cluster-snapshot/swift/config.yaml
+
+snapshotter:
+  Storage:
+    swift:
+      container: bucket-for-snapshot
+      prefix: minikube
+    storageSecretName: snap-secret
+  sanitize: true
+  schedule: '@every 6h'
+```
+
+| Key                                     | Description                                                                     |
+|-----------------------------------------|---------------------------------------------------------------------------------|
+| `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
+| `snapshotter.storage.swift.container`   | `Required`. Name of OpenStack Swift container                                   |
+| `snapshotter.storage.swift.prefix`      | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
+| `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
+
+
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
 ```yaml
@@ -396,103 +422,70 @@ metadata:
 type: Opaque
 ```
 
-Now, let's take a look at the cluster config. Here,
-
-| Key                                     | Description                                                                     |
-|-----------------------------------------|---------------------------------------------------------------------------------|
-| `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
-| `snapshotter.storage.swift.container`   | `Required`. Name of OpenStack Swift container                                   |
-| `snapshotter.storage.swift.prefix`      | `Optional`. Path prefix into bucket where snapshot will be stored               |
-| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up from snapshots |
-| `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
-
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your container. You should see the data from initial snapshot operation.
 
 
 ## Local Backend
-`Local` backend refers to a local path inside Kubed container. When running Kubed, mount any Kubernetes supported [persistent volume](https://kubernetes.io/docs/concepts/storage/volumes/) and configure kubed to store snapshot data in that volume. Some examples are: `emptyDir` for testing, NFS, Ceph, GlusterFS, etc. To configure this backend, no secret is needed. Following parameters are available for `Local` backend.
+`Local` backend refers to a local path inside Kubed container. When running Kubed, mount any Kubernetes supported [persistent volume](https://kubernetes.io/docs/concepts/storage/volumes/) and configure kubed to store snapshot data in that volume. Some examples are: `emptyDir` for testing, NFS, Ceph, GlusterFS, etc. Let's take a look at the cluster config. Here,
 
+```yaml
+$ cat ./docs/examples/cluster-snapshot/local/config.yaml
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+snapshotter:
+  Storage:
+    local:
+      path: /var/data
+  sanitize: true
+  schedule: '@every 6h'
+```
 
 | Key                                     | Description                                                                     |
 |-----------------------------------------|---------------------------------------------------------------------------------|
-| `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
-| `snapshotter.storage.azure.container`   | `Required`. Name of Azure container                                             |
-| `snapshotter.storage.azure.prefix`      | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.storage.local.path`        | `Optional`. Path where snapshot will be stored                                  |
 | `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
 | `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
 
-| Parameter                 | Description                                                                             |
-|---------------------------|-----------------------------------------------------------------------------------------|
-| `spec.local.path`         | `Required`. Path where this volume will be mounted in the job container. Example: /repo |
-| `spec.local.volumeSource` | `Required`. Any Kubernetes [volume](https://kubernetes.io/docs/concepts/storage/volumes/#types-of-volumes) |
-| `spec.resources`          | `Optional`. Compute resources required by Jobs used to take snapshot or initialize databases from snapshot.  To learn more, visit [here](http://kubernetes.io/docs/user-guide/compute-resources/). |
-
-```console
-$ kubectl create -f ./docs/examples/snapshot/local/local-snapshot.yaml
-snapshot "local-snapshot" created
-```
+Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
 ```yaml
-$ kubectl get snapshot local-snapshot -o yaml
-apiVersion: kubed.com/v1alpha1
-kind: Snapshot
+$ kubectl create secret generic kubed-config -n kube-system \
+    --from-file=./docs/examples/cluster-snapshot/local/kubed-config.yaml
+secret "kubed-config" created
+
+# apply app=kubed label to easily cleanup later
+$ kubectl label secret kubed-config app=kubed -n kube-system
+secret "kubed-config" labeled
+
+$ kubectl get secret kubed-config -n kube-system -o yaml
+apiVersion: v1
+data:
+  kubed-config.yaml: YXBpVmVyc2lvbjogdjEKa2luZDogQ29uZmlnTWFwCm1ldGFkYXRhOgogIG5hbWU6IGt1YmVkLWNvbmZpZwogIG5hbWVzcGFjZToga3ViZS1zeXN0ZW0KICBsYWJlbHM6CiAgICBhcHA6IGt1YmVkCmRhdGE6CiAgY29uZmlnLnlhbWw6IHwKICAgIHNuYXBzaG90dGVyOgogICAgICBTdG9yYWdlOgogICAgICAgIGxvY2FsOgogICAgICAgICAgcGF0aDogL3Zhci9kYXRhCiAgICAgICAgc3RvcmFnZVNlY3JldE5hbWU6IGdjcy1zZWNyZXQKICAgICAgc2FuaXRpemU6IHRydWUKICAgICAgc2NoZWR1bGU6ICdAZXZlcnkgNmgnCg==
+kind: Secret
 metadata:
-  creationTimestamp: 2017-06-28T12:14:48Z
-  name: local-snapshot
-  namespace: default
-  resourceVersion: "2000"
-  selfLink: /apis/kubed.com/v1alpha1/namespaces/kube-system/snapshots/local-snapshot
-  uid: 617e3487-5bfb-11e7-bb52-08002711f4aa
+  creationTimestamp: 2017-07-26T09:27:12Z
   labels:
-    kubed.com/kind: Postgres
-spec:
-  databaseName: postgres-db
-  local:
-    path: /repo
-    volumeSource:
-      emptyDir: {}
-  resources:
-    requests:
-      memory: "64Mi"
-      cpu: "250m"
-    limits:
-      memory: "128Mi"
-      cpu: "500m"
+    app: kubed
+  name: kubed-config
+  namespace: kube-system
+  resourceVersion: "21249"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
+  uid: 9b45594b-71e4-11e7-a5ec-0800273df5f2
+type: Opaque
 ```
 
-## instant backup
+Now, deploy Kubed operator in your cluster. Since, `snapshotter.storage.local.path` is set to `/var/data`, mount your local volume at that path. You can find example installation scripts below:
+ - [Without RBAC](./docs/examples/cluster-snapshot/local/without-rbac.yaml)
+ - [With RBAC](./docs/examples/cluster-snapshot/local/with-rbac.yaml)
 
+Once the operator pod is running, check your container. You should see the data from initial snapshot operation.
+
+## Instant Snapshot
+To take an instant snapshot of a cluster, you can use the `snapshot` command from kubed. Download the pre-built binary from 
 
 
 
 ## Cleaning up
 To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed operator. Please follow the steps [here](/docs/uninstall.md) to uninstall Kubed operator.
 
-
-
-
 ## Next Steps
-- Learn about the details of Postgres tpr [here](/docs/concepts/postgres.md).
-- See the list of supported storage providers for snapshots [here](/docs/concepts/snapshot.md).
-- Thinking about monitoring your database? Kubed works [out-of-the-box with Prometheus](/docs/tutorials/monitoring.md).
-- Learn how to use Kubed in a [RBAC](/docs/tutorials/rbac.md) enabled cluster.
-- Wondering what features are coming next? Please visit [here](/ROADMAP.md). 
-- Want to hack on Kubed? Check our [contribution guidelines](/CONTRIBUTING.md).
-
-
