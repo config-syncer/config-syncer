@@ -73,6 +73,10 @@ Now, create a ConfigMap called `omni` in the `demo` namespace. This will be our 
 $ kubectl apply -f ./docs/examples/config-syncer/demo-0.yaml
 configmap "omni" created
 
+$ kubectl get configmaps --all-namespaces | grep omni
+demo          omni                                 2         7m
+```
+```yaml
 $ kubectl get configmaps omni -n demo -o yaml
 apiVersion: v1
 data:
@@ -89,9 +93,6 @@ metadata:
   resourceVersion: "10598"
   selfLink: /api/v1/namespaces/demo/configmaps/omni
   uid: 2988e9d5-7205-11e7-af79-08002738e55e
-
-$ kubectl get configmaps --all-namespaces | grep omni
-demo          omni                                 2         7m
 ```
 
 Now, apply the `kubed.appscode.com/sync: true` annotaiotn to ConfigMap `omni`.
