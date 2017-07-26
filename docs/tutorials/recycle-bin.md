@@ -16,7 +16,7 @@ $ cat ./docs/examples/recycle-bin/config.yaml
 
 notifierSecretName: kubed-notifier
 recycleBin:
-  path: /tmp/kubed
+  path: /tmp/kubed/trash
   ttl: 168h
   handle_update: false
   receiver:
@@ -64,7 +64,72 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 
 
 ## Using Recycle Bin
+In this tutorial, a ConfigMap will be used to show how recycle bin feature can be used.
 
+To keep things isolated, this tutorial uses a separate namespace called `demo` throughout this tutorial. Run the following command to prepare your cluster for this tutorial:
+
+```console
+$ kubectl create namespace demo
+namespace "demo" created
+
+~ $ kubectl get namespaces
+NAME          STATUS    AGE
+default       Active    6h
+kube-public   Active    6h
+kube-system   Active    6h
+demo          Active    4m
+```
+
+Create a ConfigMap called `omni` in the `demo` namespace.
+
+```console
+$ kubectl create configmap omni -n demo --from-literal=hello=world
+configmap "omni" created
+```
+```yaml
+$ kubectl get configmaps omni -n demo -o yaml
+apiVersion: v1
+data:
+  hello: world
+kind: ConfigMap
+metadata:
+  creationTimestamp: 2017-07-26T19:18:40Z
+  name: omni
+  namespace: demo
+  resourceVersion: "34414"
+  selfLink: /api/v1/namespaces/demo/configmaps/omni
+  uid: 3b77f592-7237-11e7-af79-08002738e55e
+```
+
+Now, delete the ConfigMap `omni`. Kubed operator pod will notice this and stored the deleted object in YAML format in a file matching the `selfLink` for that object inside the `recycleBin.path` folder.
+
+```console
+# Exec into kubed operator pod
+$ kubectl exec -it $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system sh
+
+# running inside kubed operator pod
+/ # find /tmp/kubed/trash/
+/tmp/kubed/trash/
+/tmp/kubed/trash/api
+/tmp/kubed/trash/api/v1
+/tmp/kubed/trash/api/v1/namespaces
+/tmp/kubed/trash/api/v1/namespaces/demo
+/tmp/kubed/trash/api/v1/namespaces/demo/configmaps
+/tmp/kubed/trash/api/v1/namespaces/demo/configmaps/omni.20170726T193302.yaml
+
+/ # cat /tmp/kubed/trash/api/v1/namespaces/demo/configmaps/omni.20170726T193302.yaml
+apiVersion: v1
+data:
+  hello: world
+kind: ConfigMap
+metadata:
+  creationTimestamp: 2017-07-26T19:33:02Z
+  name: omni
+  namespace: demo
+  resourceVersion: "35481"
+  selfLink: /api/v1/namespaces/demo/configmaps/omni
+  uid: 3d50fba0-7239-11e7-af79-08002738e55e
+```
 
 ## Supported Kubernetes Objects
 Following Kubernetes objects are supported by recycle bin:
@@ -130,11 +195,22 @@ Following Kubernetes objects are supported by recycle bin:
 
 To add support for additional object types, please [file an issue](https://github.com/appscode/kubed/issues/new?title=Support+Object+Kind+[xyz]+in+RecycleBin). We are exploring ways to watch for any object deletion [here](https://github.com/appscode/kubed/issues/41).
 
+
+## Using Persistent Storage
+The installation scripts for Kubed mounts an `emptyDir` under `/tmp` path. This tutorial used `/tmp/kubed/trash` to store objects in recycle bin. If you want to use a [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) to recycle bin data, mount a PV and updated the `recycleBin.path` accordingly.
+
+
 ## Disable Recycle Bin
 If you would like to disable this feature, remove the `recyclebin` portion of your Kubed cluster config. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
 
 
 ## Cleaning up
-To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed operator following the steps [here](/docs/uninstall.md).
+To cleanup the Kubernetes resources created by this tutorial, run the following commands:
+```console
+$ kubectl delete ns demo
+namespace "demo" deleted
+```
+
+To uninstall Kubed operator, please follow the steps [here](/docs/uninstall.md).
 
 ## Next Steps
