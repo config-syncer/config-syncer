@@ -5,9 +5,10 @@ Kubed can send notifications via Email, SMS or Chat for various operations using
 
 ## Hipchat
 To configure Hipchat, create a Secret with the following key:
-| Name                | Description                                                       |
-|---------------------|-------------------------------------------------------------------|
-| HIPCHAT_AUTH_TOKEN  | `Required` Hipchat authentication token                           |
+
+| Name                | Description                               |
+|---------------------|-------------------------------------------|
+| HIPCHAT_AUTH_TOKEN  | `Required` Hipchat authentication token   |
 
 ```console
 $ echo -n 'your-hipchat-auth-token' > HIPCHAT_AUTH_TOKEN
@@ -30,7 +31,7 @@ metadata:
 type: Opaque
 ```
 
-Now, to receiver notifications via Hipchat rooms, set
+Now, to receiver notifications via Hipchat, configure receiver as below:
  - notifier: `hipchat`
  - to: a list of chat room names
 
