@@ -1,17 +1,14 @@
 apiVersion: v1
-kind: ConfigMap
+data:
+  config.yaml: c25hcHNob3R0ZXI6CiAgU3RvcmFnZToKICAgIGdjczoKICAgICAgYnVja2V0OiBidWNrZXQtZm9yLXNuYXBzaG90CiAgICAgIHByZWZpeDogbWluaWt1YmUKICAgIHN0b3JhZ2VTZWNyZXROYW1lOiBnY3Mtc2VjcmV0CiAgc2FuaXRpemU6IHRydWUKICBzY2hlZHVsZTogJ0BldmVyeSA2aCcK
+kind: Secret
 metadata:
-  name: kubed-config
-  namespace: kube-system
+  creationTimestamp: 2017-07-26T04:45:49Z
   labels:
     app: kubed
-data:
-  config.yaml: |
-    snapshotter:
-      Storage:
-        gcs:
-          bucket: bucket-for-snapshot
-          prefix: minikube
-        storageSecretName: gcs-secret
-      sanitize: true
-      schedule: '@every 6h'
+  name: kubed-config
+  namespace: kube-system
+  resourceVersion: "2187"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
+  uid: 4baa1554-71bd-11e7-a5ec-0800273df5f2
+type: Opaque

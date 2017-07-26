@@ -75,18 +75,24 @@ $ kubectl create secret generic kubed-config -n kube-system \
     --from-file=./docs/examples/cluster-snapshot/gcs/config.yaml
 secret "kubed-config" created
 
+# apply app=kubed label to easily cleanup later
+$ kubectl label secret kubed-config app=kubed -n kube-system
+secret "kubed-config" labeled
+
 $ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
-  config.yaml: c25hcHNob3R0ZXI6CiAgU3RvcmFnZToKICAgIGF6dXJlOgogICAgICBjb250YWluZXI6IGJ1Y2tldC1mb3Itc25hcHNob3QKICAgICAgcHJlZml4OiBtaW5pa3ViZQogICAgc3RvcmFnZVNlY3JldE5hbWU6IGF6dXJlLXNlY3JldAogIHNhbml0aXplOiB0cnVlCiAgc2NoZWR1bGU6ICdAZXZlcnkgNmgn
+  config.yaml: c25hcHNob3R0ZXI6CiAgU3RvcmFnZToKICAgIGdjczoKICAgICAgYnVja2V0OiBidWNrZXQtZm9yLXNuYXBzaG90CiAgICAgIHByZWZpeDogbWluaWt1YmUKICAgIHN0b3JhZ2VTZWNyZXROYW1lOiBnY3Mtc2VjcmV0CiAgc2FuaXRpemU6IHRydWUKICBzY2hlZHVsZTogJ0BldmVyeSA2aCcK
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-26T04:00:27Z
+  creationTimestamp: 2017-07-26T04:45:49Z
+  labels:
+    app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "8070"
+  resourceVersion: "2187"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: f58806a2-71b6-11e7-9891-0800270fb883
+  uid: 4baa1554-71bd-11e7-a5ec-0800273df5f2
 type: Opaque
 ```
 
