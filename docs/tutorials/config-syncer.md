@@ -111,8 +111,8 @@ kube-system   omni                                 2         1m
 $ kubectl get configmaps omni -n demo -o yaml
 apiVersion: v1
 data:
-  leave: once
   you: only
+  leave: once
 kind: ConfigMap
 metadata:
   annotations:
@@ -153,12 +153,13 @@ demo          omni                                 2         16m
 kube-public   omni                                 2         9m
 kube-system   omni                                 2         9m
 other         omni                                 2         5m
-
+```
+```yaml
 $ kubectl get configmaps omni -n other -o yaml
 apiVersion: v1
 data:
-  live: once
   you: only
+  live: once
 kind: ConfigMap
 metadata:
   annotations:
