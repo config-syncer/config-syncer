@@ -89,8 +89,41 @@ metadata:
   resourceVersion: "10598"
   selfLink: /api/v1/namespaces/demo/configmaps/omni
   uid: 2988e9d5-7205-11e7-af79-08002738e55e
+
+$ kubectl get configmaps --all-namespaces | grep omni
+demo          omni                                 2         7m
 ```
 
+Now, apply the `kubed.appscode.com/sync: true` annotaiotn to ConfigMap `omni`.
+
+```yaml
+$ kubectl annotate configmap omni kubed.appscode.com/sync=true -n demo
+configmap "omni" annotated
+
+$ kubectl get configmaps --all-namespaces | grep omni
+default       omni                                 2         1m
+demo          omni                                 2         8m
+kube-public   omni                                 2         1m
+kube-system   omni                                 2         1m
+
+$ kubectl get configmaps omni -n demo -o yaml
+apiVersion: v1
+data:
+  leave: once
+  you: only
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"leave":"once","you":"only"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"omni","namespace":"demo"}}
+    kubed.appscode.com/sync: "true"
+  creationTimestamp: 2017-07-26T13:20:15Z
+  name: omni
+  namespace: demo
+  resourceVersion: "11053"
+  selfLink: /api/v1/namespaces/demo/configmaps/omni
+  uid: 2988e9d5-7205-11e7-af79-08002738e55e
+```
 
 
 
