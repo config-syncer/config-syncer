@@ -11,15 +11,25 @@ At first, you need to have a Kubernetes cluster, and the kubectl command-line to
 To enable config syncer, you need a cluster config like below.
 
 ```yaml
-$ cat ./docs/examples/config-syncer/config.yaml
+$ cat ./docs/examples/recycle-bin/config.yaml
 
-enableConfigSyncer: true
+notifierSecretName: kubed-notifier
+recycleBin:
+  path: /tmp/kubed
+  ttl: 168h
+  handle_update: false
+  receiver:
+    notifier: mailgun
+    to:
+    - ops@example.com
 ```
 
-| Key                   | Description                                                                               |
-|-----------------------|-------------------------------------------------------------------------------------------|
-| `enableConfigSyncer`  | `Required`. If set to `true`, ConfigMap/Secret synchronization operation will be enabled. |
-
+| Key                        | Description                                                                               |
+|----------------------------|-------------------------------------------------------------------------------------------|
+| `recycleBin.path`          | `Required`. Path to folder where deleted and/or updated objects are stored. |
+| `recycleBin.ttl`           | `Required`. Duration for which deleted and/or updated objects are stored before purging. |
+| `recycleBin.handle_update` | `Optional`. If set to `true`, past version of supported objects are stored when updated. We recommend that you keep this set to `false` on an active cluster. |
+| `recycleBin.receiver`      | `Optional`. If set, a notification will be sent when any supported object is deleted and/or updated. To learn how to use various notifiers, please visit [here](./docs/tutorials/notifiers.md). |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
@@ -119,7 +129,7 @@ Following Kubernetes objects are supported by recycle bin:
 
 To add support for additional object types, please [file an issue](https://github.com/appscode/kubed/issues/new?title=Support+Object+Kind+[xyz]+in+RecycleBin). We are exploring ways to watch for any object deletion [here](https://github.com/appscode/kubed/issues/41).
 
-## Disable RecycleBin
+## Disable Recycle Bin
 If you would like to disable this feature, remove the `recyclebin` portion of your Kubed cluster config. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
 
 
