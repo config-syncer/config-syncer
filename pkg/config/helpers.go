@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -39,6 +40,24 @@ func (cfg ClusterConfig) Save(configPath string) error {
 	os.MkdirAll(filepath.Dir(configPath), 0755)
 	if err := ioutil.WriteFile(configPath, data, 0600); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (cfg ClusterConfig) Validate() error {
+	for _, j := range cfg.Janitors {
+		switch j.Kind {
+		case "Elasticsearch":
+			if j.Elasticsearch == nil {
+				return fmt.Errorf("Missing spec for janitor kind %s", j.Kind)
+			}
+		case "InfluxDB":
+			if j.InfluxDB == nil {
+				return fmt.Errorf("Missing spec for janitor kind %s", j.Kind)
+			}
+		default:
+			return fmt.Errorf("Unknown janitor kind %s", j.Kind)
+		}
 	}
 	return nil
 }

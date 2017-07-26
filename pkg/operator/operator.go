@@ -1,7 +1,6 @@
 package operator
 
 import (
-	"fmt"
 	"net/http"
 	"path/filepath"
 	"sync"
@@ -77,19 +76,9 @@ func (op *Operator) Setup() error {
 	if err != nil {
 		return err
 	}
-	for _, j := range cfg.Janitors {
-		switch j.Kind {
-		case es.Kind:
-			if j.Elasticsearch == nil {
-				return fmt.Errorf("Missing spec for janitor kind %s", j.Kind)
-			}
-		case influx.Kind:
-			if j.InfluxDB == nil {
-				return fmt.Errorf("Missing spec for janitor kind %s", j.Kind)
-			}
-		default:
-			return fmt.Errorf("Unknown janitor kind %s", j.Kind)
-		}
+	err = cfg.Validate()
+	if err != nil {
+		return err
 	}
 	op.Config = *cfg
 
