@@ -43,6 +43,7 @@ Now, let's take a look at the cluster config. Here,
 
 ```yaml
 $ cat ./docs/examples/cluster-snapshot/gcs/config.yaml
+
 snapshotter:
   Storage:
     azure:
@@ -50,7 +51,7 @@ snapshotter:
       prefix: minikube
     storageSecretName: azure-secret
   sanitize: true
-  schedule: '@every 6h'tamal@beast:~/go/src/github.com/appscode/kubed$ 
+  schedule: '@every 6h'
 ```
 
 | Key                                     | Description                                                                     |
