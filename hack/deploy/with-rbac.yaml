@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
-  name: kubed
+  name: kubed-operator
 rules:
 - apiGroups:
   - voyager.appscode.com
@@ -67,26 +67,26 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: kubed
+  name: kubed-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: kubed
+  name: kubed-operator
 subjects:
 - kind: ServiceAccount
-  name: kubed
+  name: kubed-operator
   namespace: kube-system
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kubed
+  name: kubed-operator
   namespace: kube-system
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: kubed
+  name: kubed-operator
   namespace: kube-system
   labels:
     app: kubed
@@ -120,8 +120,8 @@ spec:
         operator: "Exists"
       volumes:
         - name: config
-          configMap:
-            name: kubed
+          secret:
+            secretName: kubed-config
         - name: scratchdir
           emptyDir: {}          
 ---
@@ -130,7 +130,7 @@ kind: Service
 metadata:
   labels:
     app: kubed
-  name: kubed
+  name: kubed-operator
   namespace: kube-system
 spec:
   ports:

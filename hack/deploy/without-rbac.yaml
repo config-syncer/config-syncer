@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: kubed
+  name: kubed-operator
   namespace: kube-system
   labels:
     app: kubed
@@ -34,8 +34,8 @@ spec:
         operator: "Exists"
       volumes:
         - name: config
-          configMap:
-            name: kubed
+          secret:
+            secretName: kubed-config
         - name: scratchdir
           emptyDir: {}          
 ---
@@ -44,7 +44,7 @@ kind: Service
 metadata:
   labels:
     app: kubed
-  name: kubed
+  name: kubed-operator
   namespace: kube-system
 spec:
   ports:
