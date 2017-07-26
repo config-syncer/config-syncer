@@ -19,24 +19,28 @@ $ kubectl create secret generic gcs-secret -n kube-system \
     --from-file=./GOOGLE_PROJECT_ID \
     --from-file=./GOOGLE_SERVICE_ACCOUNT_JSON_KEY
 secret "gcs-secret" created
+$ kubectl label secret gcs-secret app=kubed -n kube-system
+secret "gcs-secret" labeled
 ```
 
 ```yaml
-$ kubectl get secret gcs-secret -o yaml
-
+$ kubectl get secret gcs-secret -n kube-system -o yaml
 apiVersion: v1
 data:
   GOOGLE_PROJECT_ID: PHlvdXItcHJvamVjdC1pZD4=
-  GOOGLE_SERVICE_ACCOUNT_JSON_KEY: ewogICJ0eXBlIjogInNlcnZpY2VfYWN...vbSIKfQo=
+  GOOGLE_SERVICE_ACCOUNT_JSON_KEY: ewogICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIsCiAgInB...tIgp9Cg==
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-26T02:00:20Z
+  creationTimestamp: 2017-07-26T04:37:44Z
+  labels:
+    app: kubed
   name: gcs-secret
   namespace: kube-system
-  resourceVersion: "6230"
+  resourceVersion: "1671"
   selfLink: /api/v1/namespaces/kube-system/secrets/gcs-secret
-  uid: 466c6b81-5c04-11e7-bb52-08002711f4aa
+  uid: 2aacabc8-71bc-11e7-a5ec-0800273df5f2
 type: Opaque
+tamal@beast:~/go/src/github.com/appscode/kubed/docs/examples/cluster-snapshot/gcs$ 
 ```
 
 Now, let's take a look at the cluster config. Here,
