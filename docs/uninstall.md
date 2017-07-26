@@ -7,6 +7,8 @@ Please follow the steps below to uninstall Kubed:
 ```console
 $ kubectl delete deployment -l app=kubed -n <operator-namespace>
 $ kubectl delete service -l app=kubed -n <operator-namespace>
+$ kubectl delete configmap -l app=kubed -n <operator-namespace>
+$ kubectl delete secret -l app=kubed -n <operator-namespace>
 
 # Delete RBAC objects, if --rbac flag was used.
 $ kubectl delete serviceaccount -l app=kubed -n <operator-namespace>
