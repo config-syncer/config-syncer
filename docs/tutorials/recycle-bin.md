@@ -182,10 +182,10 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
   - Certificate
   - Ingress
 
-
+To add support for additional object types, please [file an issue](https://github.com/appscode/kubed/issues/new?title=Support+Object+Kind+[xyz]+in+RecycleBin). We are exploring ways to watch for any object deletion [here](https://github.com/appscode/kubed/issues/41).
 
 ## Disable Snapshotter
-If you would like to disable this feature, remove the `snapshotter` portion of your Kubed cluster config. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
+If you would like to disable this feature, remove the `recyclebin` portion of your Kubed cluster config. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
 
 
 ## Cleaning up
