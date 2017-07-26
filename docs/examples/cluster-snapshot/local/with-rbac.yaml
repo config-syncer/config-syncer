@@ -120,12 +120,16 @@ spec:
             mountPath: /srv/kubed
           - name: scratch
             mountPath: /tmp
+          - name: snapshot
+            mountPath: /var/data
       volumes:
         - name: config
           secret:
             secretName: kubed-config
         - name: scratch
-          emptyDir: {}          
+          emptyDir: {}
+        - name: snapshot
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

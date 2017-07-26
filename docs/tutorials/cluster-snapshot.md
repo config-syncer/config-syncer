@@ -412,9 +412,33 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 ## Local Backend
 `Local` backend refers to a local path inside Kubed container. When running Kubed, mount any Kubernetes supported [persistent volume](https://kubernetes.io/docs/concepts/storage/volumes/) and configure kubed to store snapshot data in that volume. Some examples are: `emptyDir` for testing, NFS, Ceph, GlusterFS, etc. To configure this backend, no secret is needed. Following parameters are available for `Local` backend.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+| Key                                     | Description                                                                     |
+|-----------------------------------------|---------------------------------------------------------------------------------|
+| `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
+| `snapshotter.storage.azure.container`   | `Required`. Name of Azure container                                             |
+| `snapshotter.storage.azure.prefix`      | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
+| `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
+
+
 | Parameter                 | Description                                                                             |
 |---------------------------|-----------------------------------------------------------------------------------------|
-| `spec.databaseName`       | `Required`. Name of database                                                            |
 | `spec.local.path`         | `Required`. Path where this volume will be mounted in the job container. Example: /repo |
 | `spec.local.volumeSource` | `Required`. Any Kubernetes [volume](https://kubernetes.io/docs/concepts/storage/volumes/#types-of-volumes) |
 | `spec.resources`          | `Optional`. Compute resources required by Jobs used to take snapshot or initialize databases from snapshot.  To learn more, visit [here](http://kubernetes.io/docs/user-guide/compute-resources/). |
