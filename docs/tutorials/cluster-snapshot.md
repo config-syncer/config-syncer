@@ -100,6 +100,7 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 
 ![GCS Snapshot](/docs/images/cluster-snapshot/gcs-snapshot.png)
 
+
 ### AWS S3
 Kubed supports Amazon S3 or [Minio](https://minio.io/) servers as snapshot storage backend. To configure this backend, create a Secret with the following secret keys:
 
@@ -196,7 +197,7 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 
 
 ### Microsoft Azure Storage
-Kubed supports Microsoft Azure Storage as snapshot storage backend. To configure this backend, following secret keys are needed:
+Kubed supports Microsoft Azure Storage as snapshot storage backend. To configure this backend, create a Secret with the following secret keys:
 
 | Key                     | Description                                                |
 |-------------------------|------------------------------------------------------------|
@@ -210,10 +211,14 @@ $ kubectl create secret generic azure-secret -n kube-system \
     --from-file=./AZURE_ACCOUNT_NAME \
     --from-file=./AZURE_ACCOUNT_KEY
 secret "azure-secret" created
+
+# apply app=kubed label to easily cleanup later
+$ kubectl label secret azure-secret app=kubed -n kube-system
+secret "azure-secret" labeled
 ```
 
 ```yaml
-$ kubectl get secret azure-secret -o yaml
+$ kubectl get secret azure-secret -n kube-system -o yaml
 
 apiVersion: v1
 data:
@@ -221,47 +226,73 @@ data:
   AZURE_ACCOUNT_NAME: PHlvdXItYXp1cmUtc3RvcmFnZS1hY2NvdW50LW5hbWU+
 kind: Secret
 metadata:
-  creationTimestamp: 2017-06-28T13:27:16Z
+  creationTimestamp: 2017-07-26T05:58:21Z
+  labels:
+    app: kubed
   name: azure-secret
-  namespace: default
-  resourceVersion: "6809"
+  namespace: kube-system
+  resourceVersion: "7427"
   selfLink: /api/v1/namespaces/kube-system/secrets/azure-secret
-  uid: 80f658d1-5c05-11e7-bb52-08002711f4aa
+  uid: 6e197570-71c7-11e7-a5ec-0800273df5f2
 type: Opaque
 ```
+
+Now, let's take a look at the cluster config. Here,
+
+```yaml
+$ cat ./docs/examples/cluster-snapshot/azure/config.yaml
+
+snapshotter:
+  Storage:
+    azure:
+      container: bucket-for-snapshot
+      prefix: minikube
+    storageSecretName: azure-secret
+  sanitize: true
+  schedule: '@every 6h'
+```
+
+| Key                                     | Description                                                                     |
+|-----------------------------------------|---------------------------------------------------------------------------------|
+| `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
+| `snapshotter.storage.azure.container`   | `Required`. Name of Azure container                                             |
+| `snapshotter.storage.azure.prefix`      | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
+| `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
 ```yaml
-$ kubectl create -f ./docs/examples/cluster-snapshot/gcs/kubed-config.yaml
-configmap "kubed-config" created
+$ kubectl create secret generic kubed-config -n kube-system \
+    --from-file=./docs/examples/cluster-snapshot/azure/config.yaml
+secret "kubed-config" created
 
-$ kubectl get configmap kubed-config -n kube-system -o yaml
+# apply app=kubed label to easily cleanup later
+$ kubectl label secret kubed-config app=kubed -n kube-system
+secret "kubed-config" labeled
+
+$ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
-  config.yaml: |
-    snapshotter:
-      Storage:
-        gcs:
-          bucket: bucket-for-snapshot
-          prefix: minikube
-        storageSecretName: gcs-secret
-      sanitize: true
-      schedule: '@every 6h'
+  config.yaml: c25hcHNob3R0ZXI6CiAgU3RvcmFnZToKICAgIGF6dXJlOgogICAgICBjb250YWluZXI6IGJ1Y2tldC1mb3Itc25hcHNob3QKICAgICAgcHJlZml4OiBtaW5pa3ViZQogICAgc3RvcmFnZVNlY3JldE5hbWU6IGF6dXJlLXNlY3JldAogIHNhbml0aXplOiB0cnVlCiAgc2NoZWR1bGU6ICdAZXZlcnkgNmgn
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-26T02:00:22Z
+  creationTimestamp: 2017-07-26T06:01:42Z
   labels:
     app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "107"
-  selfLink: /api/v1/namespaces/kube-system/configmaps/kubed-config
-  uid: 2f4996d2-71a6-11e7-9891-0800270fb883
+  resourceVersion: "7555"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
+  uid: e5b8f78f-71c7-11e7-a5ec-0800273df5f2
+type: Opaque
 ```
 
-Now, let's take a look at the cluster config. Here,
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
+
+
+
 
 | Key                                     | Description                                                                     |
 |-----------------------------------------|---------------------------------------------------------------------------------|
@@ -278,7 +309,7 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 // TODO: Pic
 
 ### OpenStack Swift
-Kubed supports OpenStack Swift as snapshot storage backend. To configure this backend, following secret keys are needed:
+Kubed supports OpenStack Swift as snapshot storage backend. To configure this backend, create a Secret with the following secret keys:
 
 | Key                      | Description                                                |
 |--------------------------|------------------------------------------------------------|
