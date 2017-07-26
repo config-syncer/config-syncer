@@ -46,6 +46,17 @@ recycleBin:
   ttl: 168h
 ```
 
+
+## Mailgun
+To configure Mailgun, create a Secret with the following keys:
+
+| Name                    | Description                                  |
+|-------------------------|----------------------------------------------|
+| MAILGUN_DOMAIN          | `Required` domain name for Mailgun account   |
+| MAILGUN_API_KEY         | `Required` Mailgun API Key                   |
+| MAILGUN_FROM            | `Required` sender email address              |
+| MAILGUN_PUBLIC_API_KEY  | `Optional` Mailgun public API Key            |
+
 ```console
 $ echo -n 'your-mailgun-domain' > MAILGUN_DOMAIN
 $ echo -n 'no-reply@example.com' > MAILGUN_FROM
@@ -58,24 +69,51 @@ $ kubectl create secret generic kubed-notifier -n kube-system \
     --from-file=./MAILGUN_PUBLIC_API_KEY
 secret "kubed-notifier" created
 ```
+```yaml
+apiVersion: v1
+data:
+  MAILGUN_API_KEY: eW91ci1tYWlsZ3VuLWFwaS1rZXk=
+  MAILGUN_DOMAIN: eW91ci1tYWlsZ3VuLWRvbWFpbg==
+  MAILGUN_FROM: bm8tcmVwbHlAZXhhbXBsZS5jb20=
+  MAILGUN_PUBLIC_API_KEY: bWFpbGd1bi1wdWJsaWMtYXBpLWtleQ==
+kind: Secret
+metadata:
+  creationTimestamp: 2017-07-25T01:31:24Z
+  name: kubed-notifier
+  namespace: kube-system
+  resourceVersion: "714"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-notifier
+  uid: f8e91037-70d8-11e7-9b0b-080027503732
+type: Opaque
+```
+
+Now, to receiver notifications via Mailgun, configure receiver as below:
+ - notifier: `mailgun`
+ - to: a list of email addresses
+
+```yaml
+recycleBin:
+  handle_update: false
+  path: /tmp/kubed
+  receiver:
+    notifier: mailgun
+    to:
+    - ops-alerts@example.com
+  ttl: 168h
+```
 
 
-| Name                    | Description                                                                    |
-| :---                    | :---                                                                           |
-| MAILGUN_DOMAIN          | Set domain name for mailgun configuration                                      |
-| MAILGUN_API_KEY         | Set mailgun API Key                                                            |
-| MAILGUN_PUBLIC_API_KEY  | Set mailgun public API Key                                                     |
-| MAILGUN_FROM            | Set sender address for notification                                            |
+## SMTP
+To configure any email provider, use SMTP notifier. To configure a SMTP service, create a Secret with the following keys:
 
-
-These environment variables will be set using `searchlight-icinga` Secret.
-
-> Set `NOTIFY_VIA` to `mailgun`
-
-
-
-
-
+| Name                      | Description                                           |
+|---------------------------|-------------------------------------------------------|
+| SMTP_HOST                 | `Required` Host address of smtp server                |
+| SMTP_PORT                 | `Required` Port of smtp server                        |
+| SMTP_INSECURE_SKIP_VERIFY | `Required` If set to `true`, skips SSL verification   |
+| SMTP_USERNAME             | `Required` Username                                   |
+| SMTP_PASSWORD             | `Required` Password                                   |
+| SMTP_FROM                 | `Required` Sender email address                       |
 
 
 ```console
@@ -94,15 +132,6 @@ $ kubectl create secret generic kubed-notifier -n kube-system \
     --from-file=./SMTP_FROM
 secret "kubed-notifier" created
 ```
-
-| Name                      | Description                                                                    |
-| :---                      | :---                                                                           |
-| SMTP_HOST                 | Set host address of smtp server                                                |
-| SMTP_PORT                 | Set port of smtp server                                                        |
-| SMTP_INSECURE_SKIP_VERIFY | Set `true` to skip ssl verification                                            |
-| SMTP_USERNAME             | Set username                                                                   |
-| SMTP_PASSWORD             | Set password                                                                   |
-| SMTP_FROM                 | Set sender address for notification                                            |
 
 
 These environment variables will be set using `searchlight-icinga` Secret.
