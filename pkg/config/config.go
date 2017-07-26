@@ -52,7 +52,7 @@ type EventForwarderSpec struct {
 	NotifyOnIngressAdd   bool      `json:"notifyOnIngressAdd,omitempty"`
 	ForwardWarningEvents bool      `json:"forwardWarningEvents,omitempty"`
 	EventNamespaces      []string  `json:"eventNamespaces,omitempty"`
-	Receiver             *Receiver `json:"receiver,omitempty"`
+	Receiver             Receiver `json:"receiver,omitempty"`
 }
 
 type Receiver struct {
