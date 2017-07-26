@@ -185,53 +185,16 @@ demo          omni                                 2         18m
 ```
 
 
+## Cleaning up
+To cleanup the Kubernetes resources created by this tutorial, run the following commands:
+```console
+$ kubectl delete ns other
+namespace "other" deleted
 
+$ kubectl delete ns demo
+namespace "demo" deleted
+```
 
+TO uninstall Kubed operator, please follow the steps [here](/docs/uninstall.md).
 
-
-
-
-
-![GCS Snapshot](/docs/images/cluster-snapshot/gcs-snapshot.png)
-
-
-Now, install Kubed operator in your cluster following the steps [here](/docs/install.md).
-
-
-
-
-
-Sync ConfigMaps and Secrets
-
-
-kubectl create configmap omni -n demo --from-literal=special.how=very --from-literal=special.type=charm
-kubectl annotate configmap omni kubed.appscode.com/sync=true -n demo
-
-$ kubectl get configmaps --all-namespaces | grep omni
-default       omni                                 2         1m
-demo          omni                                 2         1m
-kube-public   omni                                 2         1m
-kube-system   omni                                 2         1m
-
-
-
-
-~ $ kubectl create configmap omni --from-literal=special.how=very --from-literal=special.type=charm
-configmap "omni" created
-~ $ kubectl delete configmap omni
-configmap "omni" deleted
-~ $ 
-~ $ 
-~ $ kubectl create configmap omni -n src --from-literal=special.how=very --from-literal=special.type=charm
-configmap "omni" created
-~ $ kubectl label configmap omni kubed.appscode.com/sync=true -n src
-configmap "omni" labeled
-~ $ 
-
-
-
-$ kubectl annotate configmap omni kubed.appscode.com/sync- -n demo
-configmap "omni" annotated
-
-$ kubectl get configmaps --all-namespaces | grep omni
-demo          omni                                 2         18m
+## Next Steps
