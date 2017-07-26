@@ -98,11 +98,7 @@ type: Opaque
 
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
 
-
-// TODO: Pic
-
-## 
-
+![GCS Snapshot](/docs/images/cluster-snapshot/gcs-snapshot.png)
 
 ### AWS S3
 Kubed supports Amazon S3 or [Minio](https://minio.io/) servers as snapshot storage backend. To configure this backend, create a Secret with the following secret keys:
