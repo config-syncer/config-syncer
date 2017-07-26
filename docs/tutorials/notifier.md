@@ -1,3 +1,5 @@
+> New to KubeDB? Please start [here](/docs/tutorials/README.md).
+
 ```console
 $ echo -n 'your-mailgun-domain' > MAILGUN_DOMAIN
 $ echo -n 'no-reply@example.com' > MAILGUN_FROM

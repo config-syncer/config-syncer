@@ -1,3 +1,5 @@
+> New to KubeDB? Please start [here](/docs/tutorials/README.md).
+
 - __v1:__
   - ComponentStatus
   - ConfigMap
