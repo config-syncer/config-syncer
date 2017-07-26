@@ -39,37 +39,19 @@ metadata:
 type: Opaque
 ```
 
-Now, create a ConfigMap with the Kubed cluster config under `config.yaml` key.
+Now, let's take a look at the cluster config. Here,
 
 ```yaml
-$ kubectl create -f ./docs/examples/cluster-snapshot/gcs/kubed-config.yaml
-configmap "kubed-config" created
-
-$ kubectl get configmap kubed-config -n kube-system -o yaml
-apiVersion: v1
-data:
-  config.yaml: |
-    snapshotter:
-      Storage:
-        gcs:
-          bucket: bucket-for-snapshot
-          prefix: minikube
-        storageSecretName: gcs-secret
-      sanitize: true
-      schedule: '@every 6h'
-kind: ConfigMap
-metadata:
-  creationTimestamp: 2017-07-26T02:00:22Z
-  labels:
-    app: kubed
-  name: kubed-config
-  namespace: kube-system
-  resourceVersion: "107"
-  selfLink: /api/v1/namespaces/kube-system/configmaps/kubed-config
-  uid: 2f4996d2-71a6-11e7-9891-0800270fb883
+$ cat ./docs/examples/cluster-snapshot/gcs/config.yaml
+snapshotter:
+  Storage:
+    azure:
+      container: bucket-for-snapshot
+      prefix: minikube
+    storageSecretName: azure-secret
+  sanitize: true
+  schedule: '@every 6h'tamal@beast:~/go/src/github.com/appscode/kubed$ 
 ```
-
-Now, let's take a look at the cluster config. Here,
 
 | Key                                     | Description                                                                     |
 |-----------------------------------------|---------------------------------------------------------------------------------|
@@ -79,6 +61,28 @@ Now, let's take a look at the cluster config. Here,
 | `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and PodSpec fields are cleaned up from snapshots |
 | `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
+
+Now, create a Secret with the Kubed cluster config under `config.yaml` key.
+
+```yaml
+$ kubectl create secret generic kubed-config -n kube-system \
+    --from-file=./docs/examples/cluster-snapshot/gcs/config.yaml
+secret "kubed-config" created
+
+$ kubectl get secret kubed-config -n kube-system -o yaml
+apiVersion: v1
+data:
+  config.yaml: c25hcHNob3R0ZXI6CiAgU3RvcmFnZToKICAgIGF6dXJlOgogICAgICBjb250YWluZXI6IGJ1Y2tldC1mb3Itc25hcHNob3QKICAgICAgcHJlZml4OiBtaW5pa3ViZQogICAgc3RvcmFnZVNlY3JldE5hbWU6IGF6dXJlLXNlY3JldAogIHNhbml0aXplOiB0cnVlCiAgc2NoZWR1bGU6ICdAZXZlcnkgNmgn
+kind: Secret
+metadata:
+  creationTimestamp: 2017-07-26T04:00:27Z
+  name: kubed-config
+  namespace: kube-system
+  resourceVersion: "8070"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
+  uid: f58806a2-71b6-11e7-9891-0800270fb883
+type: Opaque
+```
 
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
 
@@ -123,7 +127,7 @@ metadata:
 type: Opaque
 ```
 
-Now, create a ConfigMap with the Kubed cluster config under `config.yaml` key.
+Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
 ```yaml
 $ kubectl create -f ./docs/examples/cluster-snapshot/gcs/kubed-config.yaml
@@ -141,7 +145,7 @@ data:
         storageSecretName: gcs-secret
       sanitize: true
       schedule: '@every 6h'
-kind: ConfigMap
+kind: Secret
 metadata:
   creationTimestamp: 2017-07-26T02:00:22Z
   labels:
@@ -207,7 +211,7 @@ type: Opaque
 ```
 
 
-Now, create a ConfigMap with the Kubed cluster config under `config.yaml` key.
+Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
 ```yaml
 $ kubectl create -f ./docs/examples/cluster-snapshot/gcs/kubed-config.yaml
@@ -225,7 +229,7 @@ data:
         storageSecretName: gcs-secret
       sanitize: true
       schedule: '@every 6h'
-kind: ConfigMap
+kind: Secret
 metadata:
   creationTimestamp: 2017-07-26T02:00:22Z
   labels:
@@ -318,7 +322,7 @@ type: Opaque
 ```
 
 
-Now, create a ConfigMap with the Kubed cluster config under `config.yaml` key.
+Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
 ```yaml
 $ kubectl create -f ./docs/examples/cluster-snapshot/gcs/kubed-config.yaml
@@ -336,7 +340,7 @@ data:
         storageSecretName: gcs-secret
       sanitize: true
       schedule: '@every 6h'
-kind: ConfigMap
+kind: Secret
 metadata:
   creationTimestamp: 2017-07-26T02:00:22Z
   labels:
