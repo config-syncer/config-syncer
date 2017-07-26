@@ -9,8 +9,13 @@ import (
 	elastic "gopkg.in/olivere/elastic.v3"
 )
 
+const (
+	Kind = "Elasticsearch"
+)
+
 type Janitor struct {
 	Spec config.ElasticSearchSpec
+	TTL  time.Duration
 }
 
 func (j *Janitor) Cleanup() error {
@@ -23,7 +28,7 @@ func (j *Janitor) Cleanup() error {
 	}
 
 	now := time.Now().UTC()
-	oldDate := now.Add(-j.Spec.TTL.Duration)
+	oldDate := now.Add(-j.TTL)
 
 	// how many index should we check to delete? I set it to 7
 	for i := 1; i <= 7; i++ {

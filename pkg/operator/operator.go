@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"sync"
@@ -76,6 +77,20 @@ func (op *Operator) Setup() error {
 	if err != nil {
 		return err
 	}
+	for _, j := range cfg.Janitors {
+		switch j.Kind {
+		case es.Kind:
+			if j.Elasticsearch == nil {
+				return fmt.Errorf("Missing spec for janitor kind %s", j.Kind)
+			}
+		case influx.Kind:
+			if j.InfluxDB == nil {
+				return fmt.Errorf("Missing spec for janitor kind %s", j.Kind)
+			}
+		default:
+			return fmt.Errorf("Unknown janitor kind %s", j.Kind)
+		}
+	}
 	op.Config = *cfg
 
 	op.NotifierLoader, err = op.getLoader()
@@ -107,11 +122,13 @@ func (op *Operator) Setup() error {
 	op.Cron = cron.New()
 	op.Cron.Start()
 
-	if op.Config.Janitors.InfluxDB != nil {
-		janitor := influx.Janitor{Spec: *op.Config.Janitors.InfluxDB}
-		err = janitor.Cleanup()
-		if err != nil {
-			return err
+	for _, j := range cfg.Janitors {
+		if j.Kind == influx.Kind {
+			janitor := influx.Janitor{Spec: *j.InfluxDB, TTL: j.TTL.Duration}
+			err = janitor.Cleanup()
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -228,21 +245,21 @@ func (op *Operator) ListenAndServe() {
 }
 
 func (op *Operator) RunElasticsearchCleaner() error {
-	if op.Config.Janitors.Elasticsearch == nil {
-		return nil
-	}
-
-	janitor := es.Janitor{Spec: *op.Config.Janitors.Elasticsearch}
-	err := janitor.Cleanup()
-	if err != nil {
-		return err
-	}
-	op.Cron.AddFunc("@every 6h", func() {
-		err := janitor.Cleanup()
-		if err != nil {
-			log.Errorln(err)
+	for _, j := range op.Config.Janitors {
+		if j.Kind == es.Kind {
+			janitor := es.Janitor{Spec: *j.Elasticsearch, TTL: j.TTL.Duration}
+			err := janitor.Cleanup()
+			if err != nil {
+				return err
+			}
+			op.Cron.AddFunc("@every 6h", func() {
+				err := janitor.Cleanup()
+				if err != nil {
+					log.Errorln(err)
+				}
+			})
 		}
-	})
+	}
 	return nil
 }
 
