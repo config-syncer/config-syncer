@@ -174,7 +174,7 @@ metadata:
 
 Kubed operation notices that the source ConfigMap `omni` has been updated and propagated the change to all the copies in other namespaces.
 
-Now, lets' remove the annotation from source ConfigMap `omni`. Please note that `-` after `kubed.appscode.com/sync-`. This tells kubectl to remove this annotation from ConfigMap `omni`.
+Now, lets' remove the annotation from source ConfigMap `omni`. Please note that `-` after annotation key `kubed.appscode.com/sync-`. This tells kubectl to remove this annotation from ConfigMap `omni`.
 
 ```console
 $ kubectl annotate configmap omni kubed.appscode.com/sync- -n demo
