@@ -19,6 +19,8 @@ $ kubectl create secret generic gcs-secret -n kube-system \
     --from-file=./GOOGLE_PROJECT_ID \
     --from-file=./GOOGLE_SERVICE_ACCOUNT_JSON_KEY
 secret "gcs-secret" created
+
+# Apply app=kubed to easily cleanup later.
 $ kubectl label secret gcs-secret app=kubed -n kube-system
 secret "gcs-secret" labeled
 ```
