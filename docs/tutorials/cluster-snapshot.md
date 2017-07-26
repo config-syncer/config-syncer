@@ -475,15 +475,23 @@ type: Opaque
 ```
 
 Now, deploy Kubed operator in your cluster. Since, `snapshotter.storage.local.path` is set to `/var/data`, mount your local volume at that path. You can find example installation scripts below:
- - [Without RBAC](./docs/examples/cluster-snapshot/local/without-rbac.yaml)
- - [With RBAC](./docs/examples/cluster-snapshot/local/with-rbac.yaml)
+ - [Without RBAC](/docs/examples/cluster-snapshot/local/without-rbac.yaml)
+ - [With RBAC](/docs/examples/cluster-snapshot/local/with-rbac.yaml)
 
 Once the operator pod is running, check your container. You should see the data from initial snapshot operation.
 
 ## Instant Snapshot
-To take an instant snapshot of a cluster, you can use the `snapshot` command from kubed. Download the pre-built binary from 
+To take an instant snapshot of a cluster, you can use the `snapshot` command from kubed. Download the pre-built binary from [appscode/kubed Github releases](https://github.com/appscode/kubed/releases) and put the binary to some directory in your `PATH`.
 
+```console
+$ kubed snapshot --context=minikube --backup-dir=/tmp/minikube
 
+$ ls -l /tmp/minikube
+total 24
+drwxrwxr-x 3 tamal tamal  4096 Jul 26 02:42 api/
+-rwxr-xr-x 1 tamal tamal 15477 Jul 26 02:42 api_resources.yaml*
+drwxrwxr-x 5 tamal tamal  4096 Jul 26 02:42 apis/
+```
 
 ## Cleaning up
 To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed operator. Please follow the steps [here](/docs/uninstall.md) to uninstall Kubed operator.
