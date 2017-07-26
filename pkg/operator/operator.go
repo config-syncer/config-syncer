@@ -76,6 +76,10 @@ func (op *Operator) Setup() error {
 	if err != nil {
 		return err
 	}
+	err = cfg.Validate()
+	if err != nil {
+		return err
+	}
 	op.Config = *cfg
 
 	op.NotifierLoader, err = op.getLoader()
@@ -107,11 +111,13 @@ func (op *Operator) Setup() error {
 	op.Cron = cron.New()
 	op.Cron.Start()
 
-	if op.Config.Janitors.InfluxDB != nil {
-		janitor := influx.Janitor{Spec: *op.Config.Janitors.InfluxDB}
-		err = janitor.Cleanup()
-		if err != nil {
-			return err
+	for _, j := range cfg.Janitors {
+		if j.Kind == config.JanitorInfluxDB {
+			janitor := influx.Janitor{Spec: *j.InfluxDB, TTL: j.TTL.Duration}
+			err = janitor.Cleanup()
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -228,21 +234,21 @@ func (op *Operator) ListenAndServe() {
 }
 
 func (op *Operator) RunElasticsearchCleaner() error {
-	if op.Config.Janitors.Elasticsearch == nil {
-		return nil
-	}
-
-	janitor := es.Janitor{Spec: *op.Config.Janitors.Elasticsearch}
-	err := janitor.Cleanup()
-	if err != nil {
-		return err
-	}
-	op.Cron.AddFunc("@every 6h", func() {
-		err := janitor.Cleanup()
-		if err != nil {
-			log.Errorln(err)
+	for _, j := range op.Config.Janitors {
+		if j.Kind == config.JanitorElasticsearch {
+			janitor := es.Janitor{Spec: *j.Elasticsearch, TTL: j.TTL.Duration}
+			err := janitor.Cleanup()
+			if err != nil {
+				return err
+			}
+			op.Cron.AddFunc("@every 6h", func() {
+				err := janitor.Cleanup()
+				if err != nil {
+					log.Errorln(err)
+				}
+			})
 		}
-	})
+	}
 	return nil
 }
 

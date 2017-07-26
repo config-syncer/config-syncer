@@ -24,6 +24,10 @@ func NewCmdCheck() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			err = cfg.Validate()
+			if err != nil {
+				return err
+			}
 			data, err := yaml.Marshal(cfg)
 			if err != nil {
 				return err

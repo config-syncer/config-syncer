@@ -5,34 +5,38 @@ import (
 )
 
 const (
-	ConfigSyncKey = "kubed.appscode.com/sync"
-
 	TimestampFormat = "20060102T150405"
+	ConfigSyncKey   = "kubed.appscode.com/sync"
+
+	JanitorElasticsearch = "Elasticsearch"
+	JanitorInfluxDB      = "InfluxDB"
 )
 
 type ClusterConfig struct {
-	Janitors struct {
-		Elasticsearch *ElasticSearchSpec `json:"elasticsearch,omitempty,omitempty"`
-		InfluxDB      *InfluxDBSpec      `json:"influxdb,omitempty"`
-	} `json:"janitors,omitempty"`
+	Snapshotter        *SnapshotSpec       `json:"snapshotter,omitempty"`
 	RecycleBin         *RecycleBinSpec     `json:"recycleBin,omitempty"`
 	EventForwarder     *EventForwarderSpec `json:"eventForwarder,omitempty"`
-	Snapshotter        *SnapshotSpec       `json:"snapshotter,omitempty"`
 	EnableConfigSyncer bool                `json:"enableConfigSyncer"`
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
+	Janitors           []JanitorSpec       `json:"janitors,omitempty"`
+}
+
+type JanitorSpec struct {
+	Kind          string             `json:"kind"`
+	TTL           metav1.Duration    `json:"ttl"`
+	Elasticsearch *ElasticSearchSpec `json:"elasticsearch,omitempty,omitempty"`
+	InfluxDB      *InfluxDBSpec      `json:"influxdb,omitempty"`
 }
 
 type ElasticSearchSpec struct {
-	Endpoint       string          `json:"endpoint,omitempty"`
-	LogIndexPrefix string          `json:"logIndexPrefix,omitempty"`
-	TTL            metav1.Duration `json:"ttl,omitempty"`
+	Endpoint       string `json:"endpoint,omitempty"`
+	LogIndexPrefix string `json:"logIndexPrefix,omitempty"`
 }
 
 type InfluxDBSpec struct {
-	Endpoint string          `json:"endpoint,omitempty"`
-	Username string          `json:"username,omitempty"`
-	Password string          `json:"password,omitempty"`
-	TTL      metav1.Duration `json:"ttl,omitempty"`
+	Endpoint string `json:"endpoint,omitempty"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 type RecycleBinSpec struct {
