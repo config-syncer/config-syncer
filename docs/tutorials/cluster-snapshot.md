@@ -195,7 +195,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from S3 console. You should see the data from initial snapshot operation.
 
 
 ## Microsoft Azure Storage
@@ -291,7 +291,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your container from Azure portal. You should see the data from initial snapshot operation.
 
 
 ## OpenStack Swift
@@ -334,10 +334,14 @@ $ kubectl create secret generic swift-secret -n kube-system \
     --from-file=./OS_PASSWORD \
     --from-file=./OS_REGION_NAME
 secret "swift-secret" created
+
+# apply app=kubed label to easily cleanup later
+$ kubectl label secret swift-secret app=kubed -n kube-system
+secret "swift-secret" labeled
 ```
 
 ```yaml
-$ kubectl get secret azure-secret -o yaml
+$ kubectl get secret swift-secret -n kube-system -o yaml
 
 apiVersion: v1
 data:
@@ -349,44 +353,43 @@ data:
   OS_USERNAME: PHlvdXItdXNlcm5hbWU+
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-03T19:17:39Z
+  creationTimestamp: 2017-07-26T06:23:22Z
+  labels:
+    app: kubed
   name: swift-secret
-  namespace: default
-  resourceVersion: "36381"
+  namespace: kube-system
+  resourceVersion: "9134"
   selfLink: /api/v1/namespaces/kube-system/secrets/swift-secret
-  uid: 47b4bcab-6024-11e7-879a-080027726d6b
+  uid: ec735b2d-71ca-11e7-a5ec-0800273df5f2
 type: Opaque
 ```
-
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
 ```yaml
-$ kubectl create -f ./docs/examples/cluster-snapshot/gcs/kubed-config.yaml
-configmap "kubed-config" created
+$ kubectl create secret generic kubed-config -n kube-system \
+    --from-file=./docs/examples/cluster-snapshot/swift/kubed-config.yaml
+secret "kubed-config" created
 
-$ kubectl get configmap kubed-config -n kube-system -o yaml
+# apply app=kubed label to easily cleanup later
+$ kubectl label secret kubed-config app=kubed -n kube-system
+secret "kubed-config" labeled
+
+$ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
-  config.yaml: |
-    snapshotter:
-      Storage:
-        gcs:
-          bucket: bucket-for-snapshot
-          prefix: minikube
-        storageSecretName: gcs-secret
-      sanitize: true
-      schedule: '@every 6h'
+  kubed-config.yaml: YXBpVmVyc2lvbjogdjEKa2luZDogQ29uZmlnTWFwCm1ldGFkYXRhOgogIG5hbWU6IGt1YmVkLWNvbmZpZwogIG5hbWVzcGFjZToga3ViZS1zeXN0ZW0KICBsYWJlbHM6CiAgICBhcHA6IGt1YmVkCmRhdGE6CiAgY29uZmlnLnlhbWw6IHwKICAgIHNuYXBzaG90dGVyOgogICAgICBTdG9yYWdlOgogICAgICAgIHN3aWZ0OgogICAgICAgICAgY29udGFpbmVyOiBidWNrZXQtZm9yLXNuYXBzaG90CiAgICAgICAgICBwcmVmaXg6IG1pbmlrdWJlCiAgICAgICAgc3RvcmFnZVNlY3JldE5hbWU6IHNuYXAtc2VjcmV0CiAgICAgIHNhbml0aXplOiB0cnVlCiAgICAgIHNjaGVkdWxlOiAnQGV2ZXJ5IDZoJwo=
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-26T02:00:22Z
+  creationTimestamp: 2017-07-26T06:25:54Z
   labels:
     app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "107"
-  selfLink: /api/v1/namespaces/kube-system/configmaps/kubed-config
-  uid: 2f4996d2-71a6-11e7-9891-0800270fb883
+  resourceVersion: "9303"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
+  uid: 4777f28b-71cb-11e7-a5ec-0800273df5f2
+type: Opaque
 ```
 
 Now, let's take a look at the cluster config. Here,
@@ -394,19 +397,15 @@ Now, let's take a look at the cluster config. Here,
 | Key                                     | Description                                                                     |
 |-----------------------------------------|---------------------------------------------------------------------------------|
 | `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
-| `snapshotter.storage.s3.bucket`         | `Required`. Name of S3 Bucket                                                   |
-| `snapshotter.storage.s3.prefix`         | `Optional`. Path prefix into bucket where snapshot will be stored               |
-| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and PodSpec fields are cleaned up from snapshots |
+| `snapshotter.storage.swift.container`   | `Required`. Name of OpenStack Swift container                                   |
+| `snapshotter.storage.swift.prefix`      | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up from snapshots |
 | `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
-
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
-
-
-// TODO: Pic
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your container. You should see the data from initial snapshot operation.
 
 
-### Local
+## Local Backend
 `Local` backend refers to a local path inside snapshot job container. Any Kubernetes supported [persistent volume](https://kubernetes.io/docs/concepts/storage/volumes/) can be used here. Some examples are: `emptyDir` for testing, NFS, Ceph, GlusterFS, etc.
 To configure this backend, no secret is needed. Following parameters are available for `Local` backend.
 
