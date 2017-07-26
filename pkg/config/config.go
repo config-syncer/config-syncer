@@ -17,7 +17,7 @@ type ClusterConfig struct {
 	} `json:"janitors,omitempty"`
 	RecycleBin         *RecycleBinSpec     `json:"recycleBin,omitempty"`
 	EventForwarder     *EventForwarderSpec `json:"eventForwarder,omitempty"`
-	ClusterSnapshot    *SnapshotSpec       `json:"clusterSnapshot,omitempty"`
+	Snapshotter        *SnapshotSpec       `json:"snapshotter,omitempty"`
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
 }
 

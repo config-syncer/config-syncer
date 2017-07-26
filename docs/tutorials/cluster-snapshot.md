@@ -49,7 +49,7 @@ $ kubectl get configmap kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
   config.yaml: |
-    clusterSnapshot:
+    snapshotter:
       Storage:
         gcs:
           bucket: bucket-for-snapshot
@@ -72,7 +72,7 @@ metadata:
 Now, let's take a look at the cluster config. Here,
 
 ```yaml
-clusterSnapshot:
+snapshotter:
   Storage:
     gcs:
       bucket: bucket-for-snapshot

@@ -66,7 +66,7 @@ func CreateClusterConfig() config.ClusterConfig {
 				Notifier: mailgun.UID,
 			},
 		},
-		ClusterSnapshot: &config.SnapshotSpec{
+		Snapshotter: &config.SnapshotSpec{
 			Schedule: "@every 6h",
 			Sanitize: true,
 			Storage: config.Backend{

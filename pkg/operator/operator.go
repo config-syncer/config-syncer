@@ -259,17 +259,17 @@ func (op *Operator) RunTrashCanCleaner() error {
 }
 
 func (op *Operator) RunSnapshotter() error {
-	if op.Config.ClusterSnapshot == nil {
+	if op.Config.Snapshotter == nil {
 		return nil
 	}
 
 	osmconfigPath := filepath.Join(op.Opt.ScratchDir, "osm", "config.yaml")
-	err := storage.WriteOSMConfig(op.KubeClient, op.Config.ClusterSnapshot.Storage, op.Opt.OperatorNamespace, osmconfigPath)
+	err := storage.WriteOSMConfig(op.KubeClient, op.Config.Snapshotter.Storage, op.Opt.OperatorNamespace, osmconfigPath)
 	if err != nil {
 		return err
 	}
 
-	container, err := op.Config.ClusterSnapshot.Storage.Container()
+	container, err := op.Config.Snapshotter.Storage.Container()
 	if err != nil {
 		return err
 	}
@@ -282,12 +282,12 @@ func (op *Operator) RunSnapshotter() error {
 
 		t := time.Now().UTC()
 		snapshotDir := filepath.Join(op.Opt.ScratchDir, "snapshot", t.Format(config.TimestampFormat))
-		err = backup.SnapshotCluster(cfg, snapshotDir, op.Config.ClusterSnapshot.Sanitize)
+		err = backup.SnapshotCluster(cfg, snapshotDir, op.Config.Snapshotter.Sanitize)
 		if err != nil {
 			return err
 		}
 
-		dest, err := op.Config.ClusterSnapshot.Storage.Location(t)
+		dest, err := op.Config.Snapshotter.Storage.Location(t)
 		if err != nil {
 			return err
 		}
@@ -303,7 +303,7 @@ func (op *Operator) RunSnapshotter() error {
 		return err
 	}
 
-	_, err = op.Cron.AddFunc(op.Config.ClusterSnapshot.Schedule, func() {
+	_, err = op.Cron.AddFunc(op.Config.Snapshotter.Schedule, func() {
 		err := snapshotter()
 		if err != nil {
 			log.Errorln(err)
