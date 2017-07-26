@@ -84,11 +84,11 @@ snapshotter:
 
 | Key                                         | Description                                                                     |
 |---------------------------------------------|---------------------------------------------------------------------------------|
-| `clusterSnapshot.storage.storageSecretName` | `Required`. Name of storage secret                                              |
-| `clusterSnapshot.storage.gcs.bucket`        | `Required`. Name of GCS Bucket                                                  |
-| `clusterSnapshot.storage.gcs.prefix`        | `Optional`. Path prefix into bucket where snapshot will be stored               |
-| `clusterSnapshot.storage.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and PodSpec fields are cleaned up from snapshots |
-| `clusterSnapshot.storage.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for backup operations. |
+| `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
+| `snapshotter.storage.gcs.bucket`        | `Required`. Name of GCS Bucket                                                  |
+| `snapshotter.storage.gcs.prefix`        | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.storage.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and PodSpec fields are cleaned up from snapshots |
+| `snapshotter.storage.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for backup operations. |
 
 
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
