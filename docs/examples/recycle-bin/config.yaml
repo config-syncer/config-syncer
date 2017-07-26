@@ -1,6 +1,6 @@
 notifierSecretName: kubed-notifier
 recycleBin:
-  handle_update: true
+  handle_update: false
   path: /tmp/kubed
   receiver:
     notifier: mailgun

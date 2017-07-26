@@ -38,7 +38,7 @@ type InfluxDBSpec struct {
 type RecycleBinSpec struct {
 	Path         string          `json:"path,omitempty"`
 	TTL          metav1.Duration `json:"ttl,omitempty"`
-	HandleUpdate bool            `json:"handle_update,omitempty"`
+	HandleUpdate bool            `json:"handle_update"`
 	Receiver     *Receiver       `json:"receiver,omitempty"`
 }
 

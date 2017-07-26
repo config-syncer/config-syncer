@@ -50,7 +50,7 @@ func CreateClusterConfig() config.ClusterConfig {
 		RecycleBin: &config.RecycleBinSpec{
 			Path:         "/tmp/kubed",
 			TTL:          metav1.Duration{7 * 24 * time.Hour},
-			HandleUpdate: true,
+			HandleUpdate: false,
 			Receiver: &config.Receiver{
 				To:       []string{"ops@example.com"},
 				Notifier: mailgun.UID,
