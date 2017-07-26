@@ -1,5 +1,5 @@
 # Cluster Snapshots
-Kubed can store cluster snapshot data in various cloud provider, eg, Amazon S3, Google Cloud Storage, Microsoft Azure, OpenStack Swift and any locally mounted volumes like NFS, GlusterFS, etc. This tutorial will show you how to use Kubed to take periodic snapshots of a Kubernetes cluster objects.
+Kubed supports taking periodic snapshot of a Kubernetes cluster objects. The snapshot data can be stored in various cloud providers, eg, Amazon S3, Google Cloud Storage, Microsoft Azure, OpenStack Swift and any locally mounted volumes like NFS, GlusterFS, etc. Kubed uses Kubernetes discovery api to find all available resources in a cluster and stores them in a file matching the `selfLink` URL for an object. This tutorial will show you how to use Kubed to take periodic snapshots of a Kubernetes cluster objects.
 
 ## Before You Begin
 At first, you need to have a Kubernetes cluster, and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [Minikube](https://github.com/kubernetes/minikube).
@@ -111,14 +111,17 @@ Kubed supports Amazon S3 or [Minio](https://minio.io/) servers as snapshot stora
 ```console
 $ echo -n '<your-aws-access-key-id-here>' > AWS_ACCESS_KEY_ID
 $ echo -n '<your-aws-secret-access-key-here>' > AWS_SECRET_ACCESS_KEY
-$ kubectl create secret generic s3-secret -nn kube-system \
+$ kubectl create secret generic s3-secret -n kube-system \
     --from-file=./AWS_ACCESS_KEY_ID \
     --from-file=./AWS_SECRET_ACCESS_KEY
 secret "s3-secret" created
+
+$ kubectl label secret s3-secret app=kubed -n kube-system
+secret "s3-secret" labeled
 ```
 
 ```yaml
-$ kubectl get secret s3-secret -o yaml
+$ kubectl get secret s3-secret -n kube-system -o yaml
 
 apiVersion: v1
 data:
@@ -126,46 +129,31 @@ data:
   AWS_SECRET_ACCESS_KEY: PHlvdXItYXdzLXNlY3JldC1hY2Nlc3Mta2V5LWhlcmU+
 kind: Secret
 metadata:
-  creationTimestamp: 2017-06-28T12:22:33Z
-  name: s3-secret
-  namespace: default
-  resourceVersion: "2511"
-  selfLink: /api/v1/namespaces/kube-system/secrets/s3-secret
-  uid: 766d78bf-5bfc-11e7-bb52-08002711f4aa
-type: Opaque
-```
-
-Now, create a Secret with the Kubed cluster config under `config.yaml` key.
-
-```yaml
-$ kubectl create -f ./docs/examples/cluster-snapshot/gcs/kubed-config.yaml
-configmap "kubed-config" created
-
-$ kubectl get configmap kubed-config -n kube-system -o yaml
-apiVersion: v1
-data:
-  config.yaml: |
-    snapshotter:
-      Storage:
-        gcs:
-          bucket: bucket-for-snapshot
-          prefix: minikube
-        storageSecretName: gcs-secret
-      sanitize: true
-      schedule: '@every 6h'
-kind: Secret
-metadata:
-  creationTimestamp: 2017-07-26T02:00:22Z
+  creationTimestamp: 2017-07-26T05:26:19Z
   labels:
     app: kubed
-  name: kubed-config
+  name: s3-secret
   namespace: kube-system
-  resourceVersion: "107"
-  selfLink: /api/v1/namespaces/kube-system/configmaps/kubed-config
-  uid: 2f4996d2-71a6-11e7-9891-0800270fb883
+  resourceVersion: "5180"
+  selfLink: /api/v1/namespaces/kube-system/secrets/s3-secret
+  uid: f4353b86-71c2-11e7-a5ec-0800273df5f2
+type: Opaque
 ```
-
 Now, let's take a look at the cluster config. Here,
+
+```yaml
+$ cat ./docs/examples/cluster-snapshot/s3/config.yaml
+
+snapshotter:
+  Storage:
+    s3:
+      endpoint: 's3.amazonaws.com'
+      bucket: kubedb-qa
+      prefix: minikube
+    storageSecretName: snap-secret
+  sanitize: true
+  schedule: '@every 6h'
+```
 
 | Key                                     | Description                                                                     |
 |-----------------------------------------|---------------------------------------------------------------------------------|
@@ -175,6 +163,39 @@ Now, let's take a look at the cluster config. Here,
 | `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and PodSpec fields are cleaned up from snapshots |
 | `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
+Now, create a Secret with the Kubed cluster config under `config.yaml` key.
+
+```yaml
+$ kubectl create secret generic kubed-config -n kube-system \
+    --from-file=./docs/examples/cluster-snapshot/s3/config.yaml
+secret "kubed-config" created
+
+# apply app=kubed label to easily cleanup later
+$ kubectl label secret kubed-config app=kubed -n kube-system
+secret "kubed-config" labeled
+
+$ kubectl get secret kubed-config -n kube-system -o yaml
+apiVersion: v1
+data:
+  config.yaml: c25hcHNob3R0ZXI6CiAgU3RvcmFnZToKICAgIHMzOgogICAgICBlbmRwb2ludDogJ3MzLmFtYXpvbmF3cy5jb20nCiAgICAgIGJ1Y2tldDoga3ViZWRiLXFhCiAgICAgIHByZWZpeDogbWluaWt1YmUKICAgIHN0b3JhZ2VTZWNyZXROYW1lOiBzbmFwLXNlY3JldAogIHNhbml0aXplOiB0cnVlCiAgc2NoZWR1bGU6ICdAZXZlcnkgNmgn
+kind: Secret
+metadata:
+  creationTimestamp: 2017-07-26T05:32:09Z
+  labels:
+    app: kubed
+  name: kubed-config
+  namespace: kube-system
+  resourceVersion: "5572"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
+  uid: c4dc8215-71c3-11e7-a5ec-0800273df5f2
+type: Opaque
+```
+
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
+
+
+
+Now, let's take a look at the cluster config. Here,
 
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
 
@@ -421,9 +442,15 @@ spec:
       cpu: "500m"
 ```
 
+## instant backup
+
+
+
 
 ## Cleaning up
 To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed operator. Please follow the steps [here](/docs/uninstall.md) to uninstall Kubed operator.
+
+
 
 
 ## Next Steps
@@ -433,3 +460,5 @@ To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed op
 - Learn how to use Kubed in a [RBAC](/docs/tutorials/rbac.md) enabled cluster.
 - Wondering what features are coming next? Please visit [here](/ROADMAP.md). 
 - Want to hack on Kubed? Check our [contribution guidelines](/CONTRIBUTING.md).
+
+
