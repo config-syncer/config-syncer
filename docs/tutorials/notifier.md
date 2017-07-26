@@ -18,6 +18,21 @@ secret "kubed-notifier" created
 ```
 
 
+| Name                    | Description                                                                    |
+| :---                    | :---                                                                           |
+| MAILGUN_DOMAIN          | Set domain name for mailgun configuration                                      |
+| MAILGUN_API_KEY         | Set mailgun API Key                                                            |
+| MAILGUN_PUBLIC_API_KEY  | Set mailgun public API Key                                                     |
+| MAILGUN_FROM            | Set sender address for notification                                            |
+| MAILGUN_TO              | Set recipient address. For multiple receipents, set comma separated addresses. |
+
+
+These environment variables will be set using `searchlight-icinga` Secret.
+
+> Set `NOTIFY_VIA` to `mailgun`
+
+
+
 
 ```console
 $ echo -n 'your-hipchat-auth-token' > HIPCHAT_AUTH_TOKEN
@@ -25,6 +40,20 @@ $ kubectl create secret generic kubed-notifier \
     --from-file=./HIPCHAT_AUTH_TOKEN
 secret "kubed-notifier" created
 ```
+
+| Name                | Description                                                       |
+| :---                | :---                                                              |
+| HIPCHAT_AUTH_TOKEN  | Set hipchat authentication token                                  |
+| HIPCHAT_TO          | Set hipchat room ID. For multiple rooms, set comma separated IDs. |
+
+
+These environment variables will be set using `searchlight-icinga` Secret.
+
+> Set `NOTIFY_VIA` to `hipchat`
+
+
+
+
 
 ```console
 $ echo -n 'your-smtp-host' > SMTP_HOST
@@ -43,6 +72,27 @@ $ kubectl create secret generic kubed-notifier \
 secret "kubed-notifier" created
 ```
 
+| Name                      | Description                                                                    |
+| :---                      | :---                                                                           |
+| SMTP_HOST                 | Set host address of smtp server                                                |
+| SMTP_PORT                 | Set port of smtp server                                                        |
+| SMTP_INSECURE_SKIP_VERIFY | Set `true` to skip ssl verification                                            |
+| SMTP_USERNAME             | Set username                                                                   |
+| SMTP_PASSWORD             | Set password                                                                   |
+| SMTP_FROM                 | Set sender address for notification                                            |
+| SMTP_TO                   | Set receipent address. For multiple receipents, set comma separated addresses. |
+
+
+These environment variables will be set using `searchlight-icinga` Secret.
+
+> Set `NOTIFY_VIA` to `smtp`
+
+
+
+
+
+
+
 ```console
 $ echo -n 'your-twilio-account-sid' > TWILIO_ACCOUNT_SID
 $ echo -n 'your-twilio-auth-token' > TWILIO_AUTH_TOKEN
@@ -54,6 +104,23 @@ $ kubectl create secret generic kubed-notifier \
 secret "kubed-notifier" created
 ```
 
+| Name                | Description                                                                        |
+| :---                | :---                                                                               |
+| TWILIO_ACCOUNT_SID  | Set twilio account SID                                                             |
+| TWILIO_AUTH_TOKEN   | Set twilio authentication token                                                    |
+| TWILIO_FROM         | Set sender mobile number for notification                                          |
+| TWILIO_TO           | Set receipent mobile number. For multiple receipents, set comma separated numbers. |
+
+
+
+These environment variables will be set using `searchlight-icinga` Secret.
+
+> Set `NOTIFY_VIA` to `twilio`
+
+
+
+
+
 
 ```console
 $ echo -n 'your-slack-auth-token' > SLACK_AUTH_TOKEN
@@ -63,6 +130,29 @@ $ kubectl create secret generic kubed-notifier \
     --from-file=./SLACK_CHANNEL
 secret "kubed-notifier" created
 ```
+
+##### envconfig for `slack`
+
+| Name             | Description                                                               |
+| :---             | :---                                                                      |
+| SLACK_AUTH_TOKEN | Set slack access authentication token                                     |
+| SLACK_CHANNEL    | Set slack channel name. For multiple channels, set comma separated names. |
+
+
+#### Add Searchlight app
+Add Searchlight app in your slack channel and use provided `bot_access_token`.
+
+<a href="https://slack.com/oauth/authorize?scope=bot&client_id=31843174386.143405120770"><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>
+
+#### Set Environment Variables
+
+These environment variables will be set using `searchlight-icinga` Secret.
+
+> Set `NOTIFY_VIA` to `slack`
+
+
+
+
 
 
 ```console
@@ -75,3 +165,16 @@ $ kubectl create secret generic kubed-notifier \
     --from-file=./PLIVO_FROM
 secret "kubed-notifier" created
 ```
+
+| Name              | Description                                                                        |
+| :---              | :---                                                                               |
+| PLIVO_AUTH_ID     | Set plivo auth ID                                                                  |
+| PLIVO_AUTH_TOKEN  | Set plivo authentication token                                                     |
+| PLIVO_FROM        | Set sender mobile number for notification                                          |
+| PLIVO_TO          | Set receipent mobile number. For multiple receipents, set comma separated numbers. |
+
+
+
+These environment variables will be set using `searchlight-icinga` Secret.
+
+> Set `NOTIFY_VIA` to `plivo`
