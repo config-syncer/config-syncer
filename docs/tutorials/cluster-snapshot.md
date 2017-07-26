@@ -1,11 +1,11 @@
 # Cluster Snapshots
-This tutorial will show you how to use Kubed to take periodic snapshots of a Kubernetes cluster objects.
+Kubed can store cluster snapshot data in various cloud provider, eg, Amazon S3, Google Cloud Storage, Microsoft Azure, OpenStack Swift and any locally mounted volumes like NFS, GlusterFS, etc. This tutorial will show you how to use Kubed to take periodic snapshots of a Kubernetes cluster objects.
 
 ## Before You Begin
 At first, you need to have a Kubernetes cluster, and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [Minikube](https://github.com/kubernetes/minikube).
 
 ## Google Cloud Storage (GCS)
-Kubed can store cluster snapshot data in various cloud provider, eg, Amazon S3, Google Cloud Storage, Microsoft Azure, OpenStack Swift and any locally mounted volumes like NFS, GlusterFS, etc. In this tutorial, we are going to use Google Cloud Storage to store snapshot data. To configure this backend, a Kubertnetes Secret with the following keys is needed:
+In this section, we are going to use Google Cloud Storage to store snapshot data. To configure this backend, a Kubertnetes Secret with the following keys is needed:
 
 | Key                               | Description                                                |
 |-----------------------------------|------------------------------------------------------------|
