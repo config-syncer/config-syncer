@@ -2,7 +2,7 @@ snapshotter:
   Storage:
     s3:
       endpoint: 's3.amazonaws.com'
-      bucket: kubedb-qa
+      bucket: bucket-for-snapshot
       prefix: minikube
     storageSecretName: snap-secret
   sanitize: true
