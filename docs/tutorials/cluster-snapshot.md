@@ -498,6 +498,6 @@ If you would like to disable this feature, remove the `snapshotter` portion of y
 
 
 ## Cleaning up
-To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed operator. Please follow the steps [here](/docs/uninstall.md) to uninstall Kubed operator.
+To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed operator following the steps [here](/docs/uninstall.md).
 
 ## Next Steps

@@ -51,3 +51,12 @@ type: Opaque
 
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, go to the next section.
 
+
+## Disable Snapshotter
+If you would like to disable this feature, remove the `snapshotter` portion of your Kubed cluster config. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
+
+
+## Cleaning up
+To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed operator following the steps [here](/docs/uninstall.md).
+
+## Next Steps
