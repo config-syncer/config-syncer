@@ -1,4 +1,4 @@
-> New to KubeDB? Please start [here](/docs/tutorials/README.md).
+> New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 # Using RBAC with KubeDB
 This tutorial will show you how to use KubeDB in a [RBAC](https://kubernetes.io/docs/admin/authorization/rbac/) enabled cluster.
