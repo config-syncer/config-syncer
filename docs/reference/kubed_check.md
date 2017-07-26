@@ -1,17 +1,27 @@
-## kubed
+## kubed check
 
-Kubed by AppsCode - A Kubernetes Cluster Manager Daemon
+Check cluster config
 
 ### Synopsis
 
 
-Kubed is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/appscode/kubed/tree/master/docs
+Check cluster config
+
+```
+kubed check [flags]
+```
 
 ### Options
 
 ```
+      --clusterconfig string   Path to cluster config file
+  -h, --help                   help for check
+```
+
+### Options inherited from parent commands
+
+```
       --alsologtostderr                  log to standard error as well as files
-  -h, --help                             help for kubed
       --log_backtrace_at traceLocation   when logging hits line file:N, emit a stack trace (default :0)
       --log_dir string                   If non-empty, write log files in this directory
       --logtostderr                      log to standard error instead of files
@@ -21,9 +31,6 @@ Kubed is a Kubernetes daemon to perform cluster management tasks. For more infor
 ```
 
 ### SEE ALSO
-* [kubed check](kubed_check.md)	 - Check cluster config
-* [kubed run](kubed_run.md)	 - Run daemon
-* [kubed snapshot](kubed_snapshot.md)	 - Takes a snapshot of Kubernetes api objects
-* [kubed version](kubed_version.md)	 - Prints binary version number.
+* [kubed](kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Manager Daemon
 
 
