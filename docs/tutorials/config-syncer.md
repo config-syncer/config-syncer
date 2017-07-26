@@ -79,19 +79,32 @@ Now, install Kubed operator in your cluster following the steps [here](/docs/ins
 To keep things isolated, this tutorial uses a separate namespace called `demo` throughout this tutorial. Run the following command to prepare your cluster for this tutorial:
 
 ```console
-$ kubectl create -f ./docs/examples/elasticsearch/demo-0.yaml
+$ kubectl create namespace demo
 namespace "demo" created
-
-$ kubectl get ns
+~ $ kubectl get namespaces
 NAME          STATUS    AGE
-default       Active    3m
-demo          Active    5s
-kube-public   Active    3m
-kube-system   Active    3m
+default       Active    6h
+kube-public   Active    6h
+kube-system   Active    6h
+demo          Active    4m
 ```
 
 
 Sync ConfigMaps and Secrets
 
 
-kubectl create configmap special-config --from-literal=special.how=very --from-literal=special.type=charm
+kubectl create configmap global-config -n demo --from-literal=special.how=very --from-literal=special.type=charm
+kubectl label configmap global-config kubed.appscode.com/sync=true -n demo
+
+
+~ $ kubectl create configmap global-config --from-literal=special.how=very --from-literal=special.type=charm
+configmap "global-config" created
+~ $ kubectl delete configmap global-config
+configmap "global-config" deleted
+~ $ 
+~ $ 
+~ $ kubectl create configmap global-config -n src --from-literal=special.how=very --from-literal=special.type=charm
+configmap "global-config" created
+~ $ kubectl label configmap global-config kubed.appscode.com/sync=true -n src
+configmap "global-config" labeled
+~ $ 
