@@ -2,6 +2,8 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: kubed-operator
+  labels:
+    app: kubed
 rules:
 - apiGroups:
   - voyager.appscode.com
@@ -68,6 +70,8 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
   name: kubed-operator
+  labels:
+    app: kubed
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -82,6 +86,8 @@ kind: ServiceAccount
 metadata:
   name: kubed-operator
   namespace: kube-system
+  labels:
+    app: kubed
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -96,16 +102,15 @@ spec:
     metadata:
       labels:
         app: kubed
-      annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
       serviceAccountName: kubed
       containers:
       - name: kubed
+        image: appscode/kubed:0.1.0
+        imagePullPolicy: IfNotPresent
         args:
         - run
         - --v=3
-        image: appscode/kubed:0.1.0
         ports:
         - containerPort: 56790
           name: http
@@ -115,9 +120,6 @@ spec:
             mountPath: /srv/kubed
           - name: scratchdir
             mountPath: /tmp
-      tolerations:
-      - key: "CriticalAddonsOnly"
-        operator: "Exists"
       volumes:
         - name: config
           secret:
@@ -128,10 +130,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: kubed
   name: kubed-operator
   namespace: kube-system
+  labels:
+    app: kubed
 spec:
   ports:
   - name: http

@@ -51,10 +51,10 @@ $ cat ./docs/examples/cluster-snapshot/gcs/config.yaml
 
 snapshotter:
   Storage:
-    azure:
-      container: bucket-for-snapshot
+    gcs:
+      bucket: bucket-for-snapshot
       prefix: minikube
-    storageSecretName: azure-secret
+    storageSecretName: gcs-secret
   sanitize: true
   schedule: '@every 6h'
 ```

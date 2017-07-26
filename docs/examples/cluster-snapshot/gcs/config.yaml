@@ -1,7 +1,7 @@
 snapshotter:
   Storage:
     gcs:
-      bucket: bucket-for-snapshot
+      bucket: restic
       prefix: minikube
     storageSecretName: gcs-secret
   sanitize: true
