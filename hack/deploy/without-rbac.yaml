@@ -18,7 +18,7 @@ spec:
         imagePullPolicy: Always
         args:
         - run
-        - --v=8
+        - --v=3
         ports:
         - containerPort: 56790
           name: http
