@@ -96,7 +96,7 @@ demo          omni                                 2         7m
 
 Now, apply the `kubed.appscode.com/sync: true` annotaiotn to ConfigMap `omni`.
 
-```yaml
+```console
 $ kubectl annotate configmap omni kubed.appscode.com/sync=true -n demo
 configmap "omni" annotated
 
@@ -105,7 +105,8 @@ default       omni                                 2         1m
 demo          omni                                 2         8m
 kube-public   omni                                 2         1m
 kube-system   omni                                 2         1m
-
+```
+```yaml
 $ kubectl get configmaps omni -n demo -o yaml
 apiVersion: v1
 data:
