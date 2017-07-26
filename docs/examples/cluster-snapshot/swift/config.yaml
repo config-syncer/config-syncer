@@ -1,0 +1,8 @@
+snapshotter:
+  Storage:
+    swift:
+      container: bucket-for-snapshot
+      prefix: minikube
+    storageSecretName: snap-secret
+  sanitize: true
+  schedule: '@every 6h'

@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: kubed
+  name: kubed-operator
   namespace: kube-system
   labels:
     app: kubed
@@ -11,15 +11,14 @@ spec:
     metadata:
       labels:
         app: kubed
-      annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
       containers:
       - name: kubed
+        image: appscode/kubed:canary
+        imagePullPolicy: Always
         args:
         - run
         - --v=3
-        image: appscode/kubed:0.1.0
         ports:
         - containerPort: 56790
           name: http
@@ -27,25 +26,22 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /srv/kubed
-          - name: scratchdir
+          - name: scratch
             mountPath: /tmp
-      tolerations:
-      - key: "CriticalAddonsOnly"
-        operator: "Exists"
       volumes:
         - name: config
-          configMap:
-            name: kubed
-        - name: scratchdir
+          secret:
+            secretName: kubed-config
+        - name: scratch
           emptyDir: {}          
 ---
 apiVersion: v1
 kind: Service
 metadata:
+  name: kubed-operator
+  namespace: kube-system
   labels:
     app: kubed
-  name: kubed
-  namespace: kube-system
 spec:
   ports:
   - name: http

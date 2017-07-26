@@ -17,53 +17,57 @@ func main() {
 	cfg := CreateClusterConfig()
 	cfg.Save(runtime.GOPath() + "/src/github.com/appscode/kubed/hack/deploy/config.yaml")
 
-	bytes, err := yaml.Marshal(cfg)
+	cfgBytes, err := yaml.Marshal(cfg)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	cfgmap := apiv1.ConfigMap{
+	cfgmap := apiv1.Secret{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v1",
 			Kind:       "ConfigMap",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "kubed",
+			Name:      "kubed-config",
 			Namespace: "kube-system",
+			Labels: map[string]string{
+				"app": "kubed",
+			},
 		},
-		Data: map[string]string{
-			"config.yaml": string(bytes),
+		Data: map[string][]byte{
+			"config.yaml": cfgBytes,
 		},
 	}
-	bytes, err = yaml.Marshal(cfgmap)
+	bytes, err := yaml.Marshal(cfgmap)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	p := runtime.GOPath() + "/src/github.com/appscode/kubed/hack/deploy/configmap.yaml"
+	p := runtime.GOPath() + "/src/github.com/appscode/kubed/hack/deploy/kubed-config.yaml"
 	ioutil.WriteFile(p, bytes, 0644)
 }
 
 func CreateClusterConfig() config.ClusterConfig {
 	return config.ClusterConfig{
-		TrashCan: &config.TrashCanSpec{
+		RecycleBin: &config.RecycleBinSpec{
 			Path:         "/tmp/kubed",
 			TTL:          metav1.Duration{7 * 24 * time.Hour},
-			HandleUpdate: true,
+			HandleUpdate: false,
 			Receiver: &config.Receiver{
-				To:        []string{"ops@example.com"},
-				NotifyVia: mailgun.UID,
+				To:       []string{"ops@example.com"},
+				Notifier: mailgun.UID,
 			},
 		},
+		EnableConfigSyncer: true,
 		EventForwarder: &config.EventForwarderSpec{
 			NotifyOnStorageAdd:   true,
 			NotifyOnIngressAdd:   true,
 			ForwardWarningEvents: true,
 			EventNamespaces:      []string{"kube-system"},
 			Receiver: &config.Receiver{
-				To:        []string{"ops@example.com"},
-				NotifyVia: mailgun.UID,
+				To:       []string{"ops@example.com"},
+				Notifier: mailgun.UID,
 			},
 		},
-		ClusterSnapshot: &config.SnapshotSpec{
+		Snapshotter: &config.SnapshotSpec{
 			Schedule: "@every 6h",
 			Sanitize: true,
 			Storage: config.Backend{

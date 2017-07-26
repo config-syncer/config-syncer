@@ -18,8 +18,8 @@ const (
 	PostgresKey             = ResourceNamePostgres + "." + GenericKey
 	PostgresDatabaseVersion = PostgresKey + "/version"
 
-	ElasticKey             = ResourceNameElasticsearch + ".kubedb.com"
-	ElasticDatabaseVersion = ElasticKey + "/version"
+	ElasticsearchKey             = ResourceNameElasticsearch + ".kubedb.com"
+	ElasticsearchDatabaseVersion = ElasticsearchKey + "/version"
 
 	SnapshotKey         = ResourceNameSnapshot + "s.kubedb.com"
 	LabelSnapshotStatus = SnapshotKey + "/status"
@@ -71,7 +71,7 @@ func (e Elasticsearch) OffshootLabels() map[string]string {
 func (e Elasticsearch) StatefulSetLabels() map[string]string {
 	labels := e.OffshootLabels()
 	for key, val := range e.Labels {
-		if !strings.HasPrefix(key, GenericKey+"/") && !strings.HasPrefix(key, ElasticKey+"/") {
+		if !strings.HasPrefix(key, GenericKey+"/") && !strings.HasPrefix(key, ElasticsearchKey+"/") {
 			labels[key] = val
 		}
 	}
@@ -81,11 +81,11 @@ func (e Elasticsearch) StatefulSetLabels() map[string]string {
 func (e Elasticsearch) StatefulSetAnnotations() map[string]string {
 	annotations := make(map[string]string)
 	for key, val := range e.Annotations {
-		if !strings.HasPrefix(key, GenericKey+"/") && !strings.HasPrefix(key, ElasticKey+"/") {
+		if !strings.HasPrefix(key, GenericKey+"/") && !strings.HasPrefix(key, ElasticsearchKey+"/") {
 			annotations[key] = val
 		}
 	}
-	annotations[ElasticDatabaseVersion] = string(e.Spec.Version)
+	annotations[ElasticsearchDatabaseVersion] = string(e.Spec.Version)
 	return annotations
 }
 

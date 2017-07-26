@@ -11,11 +11,14 @@ const (
 )
 
 type ClusterConfig struct {
-	Elasticsearch      *ElasticSearchSpec  `json:"elasticsearch,omitempty,omitempty"`
-	InfluxDB           *InfluxDBSpec       `json:"influxdb,omitempty"`
-	TrashCan           *TrashCanSpec       `json:"recycleBin,omitempty"`
+	Janitors struct {
+		Elasticsearch *ElasticSearchSpec `json:"elasticsearch,omitempty,omitempty"`
+		InfluxDB      *InfluxDBSpec      `json:"influxdb,omitempty"`
+	} `json:"janitors,omitempty"`
+	RecycleBin         *RecycleBinSpec     `json:"recycleBin,omitempty"`
 	EventForwarder     *EventForwarderSpec `json:"eventForwarder,omitempty"`
-	ClusterSnapshot    *SnapshotSpec       `json:"clusterSnapshot,omitempty"`
+	Snapshotter        *SnapshotSpec       `json:"snapshotter,omitempty"`
+	EnableConfigSyncer bool                `json:"enableConfigSyncer"`
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
 }
 
@@ -32,10 +35,10 @@ type InfluxDBSpec struct {
 	TTL      metav1.Duration `json:"ttl,omitempty"`
 }
 
-type TrashCanSpec struct {
+type RecycleBinSpec struct {
 	Path         string          `json:"path,omitempty"`
 	TTL          metav1.Duration `json:"ttl,omitempty"`
-	HandleUpdate bool            `json:"handle_update,omitempty"`
+	HandleUpdate bool            `json:"handle_update"`
 	Receiver     *Receiver       `json:"receiver,omitempty"`
 }
 
@@ -53,7 +56,7 @@ type Receiver struct {
 	To []string `json:"to,omitempty"`
 
 	// How this notification will be sent
-	NotifyVia string `json:"notifyVia,omitempty"`
+	Notifier string `json:"notifier,omitempty"`
 }
 
 // For periodic full cluster backup

@@ -1,0 +1,55 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kubed-operator
+  namespace: kube-system
+  labels:
+    app: kubed
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kubed
+    spec:
+      containers:
+      - name: kubed
+        image: appscode/kubed:canary
+        imagePullPolicy: IfNotPresent
+        args:
+        - run
+        - --v=3
+        ports:
+        - containerPort: 56790
+          name: http
+          protocol: TCP
+        volumeMounts:
+          - name: config
+            mountPath: /srv/kubed
+          - name: scratch
+            mountPath: /tmp
+          - name: snapshot
+            mountPath: /var/data
+      volumes:
+        - name: config
+          secret:
+            secretName: kubed-config
+        - name: scratch
+          emptyDir: {}
+        - name: snapshot
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubed-operator
+  namespace: kube-system
+  labels:
+    app: kubed
+spec:
+  ports:
+  - name: http
+    port: 56790
+    targetPort: http
+  selector:
+    app: kubed

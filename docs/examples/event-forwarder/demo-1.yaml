@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubed-config
+  namespace: kube-system
+  labels:
+    app: kubed
+data:
+  config.yaml: |
+    eventForwarder:
+      eventNamespaces:
+      - kube-system
+      forwardWarningEvents: true
+      notifyOnIngressAdd: true
+      notifyOnStorageAdd: true
+      receiver:
+        notifier: mailgun
+        to:
+        - ops@example.com
+    notifierSecretName: kubed-notifier

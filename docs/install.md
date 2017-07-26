@@ -1,4 +1,4 @@
-> New to Kubed? Please start [here](/docs/tutorial.md).
+> New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 # Installation Guide
 
@@ -32,4 +32,4 @@ $ kubectl get pods --all-namespaces -l app=kubed --watch
 
 Once the operator pods are running, you can cancel the above command by typing `Ctrl+C`.
 
-Now, you are ready to [start managing your cluster](/docs/tutorial.md) using Kubed.
+Now, you are ready to [start managing your cluster](/docs/tutorials/README.md) using Kubed.

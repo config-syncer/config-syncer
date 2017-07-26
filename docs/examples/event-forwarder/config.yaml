@@ -1,0 +1,11 @@
+eventForwarder:
+  eventNamespaces:
+  - kube-system
+  forwardWarningEvents: true
+  notifyOnIngressAdd: true
+  notifyOnStorageAdd: true
+  receiver:
+    notifier: mailgun
+    to:
+    - ops@example.com
+notifierSecretName: kubed-notifier

@@ -1,0 +1,13 @@
+apiVersion: v1
+data:
+  SLACK_AUTH_TOKEN: eW91ci1zbGFjay1hdXRoLXRva2Vu
+  SLACK_CHANNEL: eW91ci1zbGFjay1jaGFubmVs
+kind: Secret
+metadata:
+  creationTimestamp: 2017-07-25T01:58:58Z
+  name: kubed-notifier
+  namespace: kube-system
+  resourceVersion: "2534"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-notifier
+  uid: d2571817-70dc-11e7-9b0b-080027503732
+type: Opaque

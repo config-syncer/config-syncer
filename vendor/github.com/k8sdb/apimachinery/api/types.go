@@ -4,14 +4,6 @@ import (
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
-// StorageSpec defines storage provisioning
-type StorageSpec struct {
-	// Name of the StorageClass to use when requesting storage provisioning.
-	Class string `json:"class"`
-	// Persistent Volume Claim
-	apiv1.PersistentVolumeClaimSpec `json:",inline,omitempty"`
-}
-
 type InitSpec struct {
 	ScriptSource   *ScriptSourceSpec   `json:"scriptSource,omitempty"`
 	SnapshotSource *SnapshotSourceSpec `json:"snapshotSource,omitempty"`

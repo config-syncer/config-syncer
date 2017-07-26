@@ -14,8 +14,6 @@ spec:
       labels:
         app: "{{ template "name" . }}"
         release: "{{ .Release.Name }}"
-      annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
 {{- if .Values.rbac.install }}
       serviceAccountName: {{ template "fullname" . }}
@@ -34,14 +32,11 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /srv/kubed
-          - name: scratchdir
+          - name: scratch
             mountPath: /tmp
-      tolerations:
-      - key: "CriticalAddonsOnly"
-        operator: "Exists"
       volumes:
         - name: config
           configMap:
             name: kubed
-        - name: scratchdir
+        - name: scratch
           emptyDir: {}

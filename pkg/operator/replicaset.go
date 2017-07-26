@@ -81,7 +81,7 @@ func (op *Operator) WatchReplicaSets() {
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
-				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
+				if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdate {
 					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
 						!reflect.DeepEqual(oldRes.Spec, newRes.Spec) {

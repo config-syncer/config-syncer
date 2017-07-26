@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  kubed-config.yaml: YXBpVmVyc2lvbjogdjEKa2luZDogQ29uZmlnTWFwCm1ldGFkYXRhOgogIG5hbWU6IGt1YmVkLWNvbmZpZwogIG5hbWVzcGFjZToga3ViZS1zeXN0ZW0KICBsYWJlbHM6CiAgICBhcHA6IGt1YmVkCmRhdGE6CiAgY29uZmlnLnlhbWw6IHwKICAgIHNuYXBzaG90dGVyOgogICAgICBTdG9yYWdlOgogICAgICAgIGxvY2FsOgogICAgICAgICAgcGF0aDogL3Zhci9kYXRhCiAgICAgICAgc3RvcmFnZVNlY3JldE5hbWU6IGdjcy1zZWNyZXQKICAgICAgc2FuaXRpemU6IHRydWUKICAgICAgc2NoZWR1bGU6ICdAZXZlcnkgNmgnCg==
+kind: Secret
+metadata:
+  creationTimestamp: 2017-07-26T09:27:12Z
+  labels:
+    app: kubed
+  name: kubed-config
+  namespace: kube-system
+  resourceVersion: "21249"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
+  uid: 9b45594b-71e4-11e7-a5ec-0800273df5f2
+type: Opaque

@@ -10,7 +10,7 @@ Kubernetes 1.5+
 To install Kubed, please follow the guide [here](/docs/install.md).
 
 ## Using Kubed
-Want to learn how to use Kubed? Please start [here](/docs/tutorial.md).
+Want to learn how to use Kubed? Please start [here](/docs/tutorials/README.md).
 
 ## Contribution guidelines
 Want to help improve Kubed? Please start [here](/CONTRIBUTING.md).

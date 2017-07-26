@@ -13,9 +13,9 @@ import (
 	"github.com/appscode/kubed/pkg/eventer"
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/influxdb"
+	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
-	"github.com/appscode/kubed/pkg/trashcan"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
@@ -61,7 +61,7 @@ type Operator struct {
 
 	SearchIndex    *indexers.ResourceIndexer
 	ReverseIndex   *indexers.ReverseIndexer
-	TrashCan       *trashcan.TrashCan
+	TrashCan       *rbin.RecycleBin
 	Eventer        *eventer.EventForwarder
 	Cron           *cron.Cron
 	NotifierLoader envconfig.LoaderFunc
@@ -83,12 +83,12 @@ func (op *Operator) Setup() error {
 		return err
 	}
 
-	if op.Config.TrashCan != nil {
-		if op.Config.TrashCan.Path == "" {
-			op.Config.TrashCan.Path = filepath.Join(op.Opt.ScratchDir, "transhcan")
+	if op.Config.RecycleBin != nil {
+		if op.Config.RecycleBin.Path == "" {
+			op.Config.RecycleBin.Path = filepath.Join(op.Opt.ScratchDir, "transhcan")
 		}
-		op.TrashCan = &trashcan.TrashCan{
-			Spec:   *op.Config.TrashCan,
+		op.TrashCan = &rbin.RecycleBin{
+			Spec:   *op.Config.RecycleBin,
 			Loader: op.NotifierLoader,
 		}
 	}
@@ -100,13 +100,15 @@ func (op *Operator) Setup() error {
 		}
 	}
 
-	op.ConfigSyncer = &syncer.ConfigSyncer{KubeClient: op.KubeClient}
+	if op.Config.EnableConfigSyncer {
+		op.ConfigSyncer = &syncer.ConfigSyncer{KubeClient: op.KubeClient}
+	}
 
 	op.Cron = cron.New()
 	op.Cron.Start()
 
-	if op.Config.InfluxDB != nil {
-		janitor := influx.Janitor{Spec: *op.Config.InfluxDB}
+	if op.Config.Janitors.InfluxDB != nil {
+		janitor := influx.Janitor{Spec: *op.Config.Janitors.InfluxDB}
 		err = janitor.Cleanup()
 		if err != nil {
 			return err
@@ -118,6 +120,11 @@ func (op *Operator) Setup() error {
 }
 
 func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {
+	if op.Config.NotifierSecretName == "" {
+		return func(key string) (string, bool) {
+			return "", false
+		}, nil
+	}
 	cfg, err := op.KubeClient.CoreV1().
 		Secrets(op.Opt.OperatorNamespace).
 		Get(op.Config.NotifierSecretName, metav1.GetOptions{})
@@ -221,11 +228,11 @@ func (op *Operator) ListenAndServe() {
 }
 
 func (op *Operator) RunElasticsearchCleaner() error {
-	if op.Config.Elasticsearch == nil {
+	if op.Config.Janitors.Elasticsearch == nil {
 		return nil
 	}
 
-	janitor := es.Janitor{Spec: *op.Config.Elasticsearch}
+	janitor := es.Janitor{Spec: *op.Config.Janitors.Elasticsearch}
 	err := janitor.Cleanup()
 	if err != nil {
 		return err
@@ -254,17 +261,17 @@ func (op *Operator) RunTrashCanCleaner() error {
 }
 
 func (op *Operator) RunSnapshotter() error {
-	if op.Config.ClusterSnapshot == nil {
+	if op.Config.Snapshotter == nil {
 		return nil
 	}
 
 	osmconfigPath := filepath.Join(op.Opt.ScratchDir, "osm", "config.yaml")
-	err := storage.WriteOSMConfig(op.KubeClient, op.Config.ClusterSnapshot.Storage, op.Opt.OperatorNamespace, osmconfigPath)
+	err := storage.WriteOSMConfig(op.KubeClient, op.Config.Snapshotter.Storage, op.Opt.OperatorNamespace, osmconfigPath)
 	if err != nil {
 		return err
 	}
 
-	container, err := op.Config.ClusterSnapshot.Storage.Container()
+	container, err := op.Config.Snapshotter.Storage.Container()
 	if err != nil {
 		return err
 	}
@@ -277,12 +284,12 @@ func (op *Operator) RunSnapshotter() error {
 
 		t := time.Now().UTC()
 		snapshotDir := filepath.Join(op.Opt.ScratchDir, "snapshot", t.Format(config.TimestampFormat))
-		err = backup.SnapshotCluster(cfg, snapshotDir, op.Config.ClusterSnapshot.Sanitize)
+		err = backup.SnapshotCluster(cfg, snapshotDir, op.Config.Snapshotter.Sanitize)
 		if err != nil {
 			return err
 		}
 
-		dest, err := op.Config.ClusterSnapshot.Storage.Location(t)
+		dest, err := op.Config.Snapshotter.Storage.Location(t)
 		if err != nil {
 			return err
 		}
@@ -298,7 +305,7 @@ func (op *Operator) RunSnapshotter() error {
 		return err
 	}
 
-	_, err = op.Cron.AddFunc(op.Config.ClusterSnapshot.Schedule, func() {
+	_, err = op.Cron.AddFunc(op.Config.Snapshotter.Schedule, func() {
 		err := snapshotter()
 		if err != nil {
 			log.Errorln(err)

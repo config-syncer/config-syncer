@@ -1,0 +1,9 @@
+notifierSecretName: kubed-notifier
+recycleBin:
+  handle_update: false
+  path: /tmp/kubed
+  receiver:
+    notifier: mailgun
+    to:
+    - ops@example.com
+  ttl: 168h

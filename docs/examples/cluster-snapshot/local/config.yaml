@@ -1,0 +1,6 @@
+snapshotter:
+  Storage:
+    local:
+      path: /var/data
+  sanitize: true
+  schedule: '@every 6h'

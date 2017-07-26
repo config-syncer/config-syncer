@@ -1,11 +1,4 @@
-clusterSnapshot:
-  Storage:
-    gcs:
-      bucket: restic
-      prefix: minikube
-    storageSecretName: snap-secret
-  sanitize: true
-  schedule: '@every 6h'
+enableConfigSyncer: true
 eventForwarder:
   eventNamespaces:
   - kube-system
@@ -13,15 +6,24 @@ eventForwarder:
   notifyOnIngressAdd: true
   notifyOnStorageAdd: true
   receiver:
-    notifyVia: mailgun
+    notifier: mailgun
     to:
     - ops@example.com
+janitors: {}
 notifierSecretName: kubed-notifier
 recycleBin:
-  handle_update: true
+  handle_update: false
   path: /tmp/kubed
   receiver:
-    notifyVia: mailgun
+    notifier: mailgun
     to:
     - ops@example.com
   ttl: 168h0m0s
+snapshotter:
+  Storage:
+    gcs:
+      bucket: restic
+      prefix: minikube
+    storageSecretName: snap-secret
+  sanitize: true
+  schedule: '@every 6h'

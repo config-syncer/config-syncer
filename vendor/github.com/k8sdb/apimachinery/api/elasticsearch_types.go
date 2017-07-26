@@ -26,8 +26,8 @@ type ElasticsearchSpec struct {
 	Version types.StrYo `json:"version,omitempty"`
 	// Number of instances to deploy for a Elasticsearch database.
 	Replicas int32 `json:"replicas,omitempty"`
-	// Storage spec to specify how storage shall be used.
-	Storage *StorageSpec `json:"storage,omitempty"`
+	// Storage to specify how storage shall be used.
+	Storage *apiv1.PersistentVolumeClaimSpec `json:"storage,omitempty"`
 	// NodeSelector is a selector which must be true for the pod to fit on a node
 	// +optional
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`

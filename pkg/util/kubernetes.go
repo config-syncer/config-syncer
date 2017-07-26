@@ -43,7 +43,11 @@ func GetBool(m map[string]string, key string) (bool, error) {
 	if m == nil {
 		return false, nil
 	}
-	return strconv.ParseBool(m[key])
+	v, ok := m[key]
+	if !ok || v == "" {
+		return false, nil
+	}
+	return strconv.ParseBool(v)
 }
 
 func GetString(m map[string]string, key string) string {
@@ -143,10 +147,12 @@ func GetGroupVersionKind(v interface{}) schema.GroupVersionKind {
 		return kubedb.V1alpha1SchemeGroupVersion.WithKind("DormantDatabase")
 	case *stash.Restic:
 		return stash.V1alpha1SchemeGroupVersion.WithKind("Restic")
-	case *prom.ServiceMonitor:
-		return schema.GroupVersionKind{Group: prom.TPRGroup, Version: prom.TPRVersion, Kind: prom.TPRServiceMonitorsKind}
 	case *prom.Prometheus:
 		return schema.GroupVersionKind{Group: prom.TPRGroup, Version: prom.TPRVersion, Kind: prom.TPRPrometheusesKind}
+	case *prom.ServiceMonitor:
+		return schema.GroupVersionKind{Group: prom.TPRGroup, Version: prom.TPRVersion, Kind: prom.TPRServiceMonitorsKind}
+	case *prom.Alertmanager:
+		return schema.GroupVersionKind{Group: prom.TPRGroup, Version: prom.TPRVersion, Kind: prom.TPRAlertmanagersKind}
 	default:
 		return schema.GroupVersionKind{}
 	}
@@ -329,13 +335,17 @@ func AssignTypeKind(v interface{}) error {
 		u.APIVersion = stash.V1alpha1SchemeGroupVersion.String()
 		u.Kind = "Restic"
 		return nil
+	case *prom.Prometheus:
+		u.APIVersion = schema.GroupVersion{Group: prom.TPRGroup, Version: prom.TPRVersion}.String()
+		u.Kind = prom.TPRPrometheusesKind
+		return nil
 	case *prom.ServiceMonitor:
 		u.APIVersion = schema.GroupVersion{Group: prom.TPRGroup, Version: prom.TPRVersion}.String()
 		u.Kind = prom.TPRServiceMonitorsKind
 		return nil
-	case *prom.Prometheus:
+	case *prom.Alertmanager:
 		u.APIVersion = schema.GroupVersion{Group: prom.TPRGroup, Version: prom.TPRVersion}.String()
-		u.Kind = prom.TPRPrometheusesKind
+		u.Kind = prom.TPRAlertmanagersKind
 		return nil
 	}
 	return errors.New("Unknown api object type")

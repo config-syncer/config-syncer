@@ -86,15 +86,16 @@ func (op *Operator) WatchConfigMaps() {
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
-				if op.TrashCan != nil && op.Config.TrashCan.HandleUpdate {
-					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
-						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
-						!reflect.DeepEqual(oldRes.Data, newRes.Data) {
+				if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
+					!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
+					!reflect.DeepEqual(oldRes.Data, newRes.Data) {
+					if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdate {
 						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
 					}
-				}
-				if op.ConfigSyncer != nil {
-					op.ConfigSyncer.SyncConfigMap(oldRes, newRes)
+
+					if op.ConfigSyncer != nil {
+						op.ConfigSyncer.SyncConfigMap(oldRes, newRes)
+					}
 				}
 			},
 		},
