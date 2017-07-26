@@ -185,6 +185,10 @@ demo          omni                                 2         18m
 ```
 
 
+## Disable Syncer
+If you would like to disable this feature, either remove the `enableConfigSyncer` field in your Kubed cluster config or set `enableConfigSyncer` to false. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
+
+
 ## Cleaning up
 To cleanup the Kubernetes resources created by this tutorial, run the following commands:
 ```console

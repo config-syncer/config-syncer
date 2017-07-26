@@ -493,6 +493,10 @@ drwxrwxr-x 3 tamal tamal  4096 Jul 26 02:42 api/
 drwxrwxr-x 5 tamal tamal  4096 Jul 26 02:42 apis/
 ```
 
+## Disable Snapshotter
+If you would like to disable this feature, remove the `snapshotter` portion of your Kubed cluster config. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
+
+
 ## Cleaning up
 To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed operator. Please follow the steps [here](/docs/uninstall.md) to uninstall Kubed operator.
 
