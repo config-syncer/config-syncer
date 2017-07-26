@@ -123,16 +123,35 @@ metadata:
 type: Opaque
 ```
 
-
 Now, create a ConfigMap with the Kubed cluster config under `config.yaml` key.
 
+```yaml
+$ kubectl create -f ./docs/examples/cluster-snapshot/gcs/kubed-config.yaml
+configmap "kubed-config" created
 
-
-
-
-
-
-
+$ kubectl get configmap kubed-config -n kube-system -o yaml
+apiVersion: v1
+data:
+  config.yaml: |
+    snapshotter:
+      Storage:
+        gcs:
+          bucket: bucket-for-snapshot
+          prefix: minikube
+        storageSecretName: gcs-secret
+      sanitize: true
+      schedule: '@every 6h'
+kind: ConfigMap
+metadata:
+  creationTimestamp: 2017-07-26T02:00:22Z
+  labels:
+    app: kubed
+  name: kubed-config
+  namespace: kube-system
+  resourceVersion: "107"
+  selfLink: /api/v1/namespaces/kube-system/configmaps/kubed-config
+  uid: 2f4996d2-71a6-11e7-9891-0800270fb883
+```
 
 Now, let's take a look at the cluster config. Here,
 
@@ -148,61 +167,7 @@ Now, let's take a look at the cluster config. Here,
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
 
 
-
-
-
-
-
-
-
-
-
-
-Now, you can create a Snapshot tpr using this secret. Following parameters are available for `S3` backend.
-
-| Parameter                | Description                                                                     |
-|--------------------------|---------------------------------------------------------------------------------|
-| `spec.databaseName`      | `Required`. Name of database                                                    |
-| `spec.storageSecretName` | `Required`. Name of storage secret                                              |
-| `spec.s3.endpoint`       | `Required`. For S3, use `s3.amazonaws.com`. If your bucket is in a different location, S3 server (s3.amazonaws.com) will redirect snapshot to the correct endpoint. For an S3-compatible server that is not Amazon (like Minio), or is only available via HTTP, you can specify the endpoint like this: `http://server:port`. |
-| `spec.s3.bucket`         | `Required`. Name of Bucket                                                      |
-| `spec.s3.prefix`         | `Optional`. Path prefix into bucket where snapshot will be store                |
-| `spec.resources`         | `Optional`. Compute resources required by Jobs used to take snapshot or initialize databases from snapshot.  To learn more, visit [here](http://kubernetes.io/docs/user-guide/compute-resources/). |
-
-```console
-$ kubectl create -f ./docs/examples/snapshot/s3/s3-snapshot.yaml
-snapshot "s3-snapshot" created
-```
-
-```yaml
-$ kubectl get snapshot s3-snapshot -o yaml
-
-apiVersion: kubed.com/v1alpha1
-kind: Snapshot
-metadata:
-  creationTimestamp: 2017-06-28T12:58:10Z
-  name: s3-snapshot
-  namespace: default
-  resourceVersion: "4889"
-  selfLink: /apis/kubed.com/v1alpha1/namespaces/kube-system/snapshots/s3-snapshot
-  uid: 7036ba69-5c01-11e7-bb52-08002711f4aa
-  labels:
-    kubed.com/kind: Postgres
-spec:
-  databaseName: postgres-db
-  storageSecretName: s3-secret
-  s3:
-    endpoint: 's3.amazonaws.com'
-    bucket: kubed-qa
-    prefix: demo
-  resources:
-    requests:
-      memory: "64Mi"
-      cpu: "250m"
-    limits:
-      memory: "128Mi"
-      cpu: "500m"
-```
+// TODO: Pic
 
 
 
@@ -217,7 +182,7 @@ Kubed supports Microsoft Azure Storage as snapshot storage backend. To configure
 ```console
 $ echo -n '<your-azure-storage-account-name>' > AZURE_ACCOUNT_NAME
 $ echo -n '<your-azure-storage-account-key>' > AZURE_ACCOUNT_KEY
-$ kubectl create secret generic azure-secret \
+$ kubectl create secret generic azure-secret -n kube-system \
     --from-file=./AZURE_ACCOUNT_NAME \
     --from-file=./AZURE_ACCOUNT_KEY
 secret "azure-secret" created
@@ -241,49 +206,52 @@ metadata:
 type: Opaque
 ```
 
-Now, you can create a Snapshot tpr using this secret. Following parameters are available for `Azure` backend.
 
-| Parameter                | Description                                                                     |
-|--------------------------|---------------------------------------------------------------------------------|
-| `spec.databaseName`      | `Required`. Name of database                                                    |
-| `spec.storageSecretName` | `Required`. Name of storage secret                                              |
-| `spec.azure.container`   | `Required`. Name of Storage container                                           |
-| `spec.azure.prefix`      | `Optional`. Path prefix into container where snapshot will be stored            |
-| `spec.resources`         | `Optional`. Compute resources required by Jobs used to take snapshot or initialize databases from snapshot.  To learn more, visit [here](http://kubernetes.io/docs/user-guide/compute-resources/). |
-
-```console
-$ kubectl create -f ./docs/examples/snapshot/azure/azure-snapshot.yaml
-snapshot "azure-snapshot" created
-```
+Now, create a ConfigMap with the Kubed cluster config under `config.yaml` key.
 
 ```yaml
-$ kubectl get snapshot azure-snapshot -o yaml
+$ kubectl create -f ./docs/examples/cluster-snapshot/gcs/kubed-config.yaml
+configmap "kubed-config" created
 
-apiVersion: kubed.com/v1alpha1
-kind: Snapshot
+$ kubectl get configmap kubed-config -n kube-system -o yaml
+apiVersion: v1
+data:
+  config.yaml: |
+    snapshotter:
+      Storage:
+        gcs:
+          bucket: bucket-for-snapshot
+          prefix: minikube
+        storageSecretName: gcs-secret
+      sanitize: true
+      schedule: '@every 6h'
+kind: ConfigMap
 metadata:
-  creationTimestamp: 2017-06-28T13:31:14Z
-  name: azure-snapshot
-  namespace: default
-  resourceVersion: "7070"
-  selfLink: /apis/kubed.com/v1alpha1/namespaces/kube-system/snapshots/azure-snapshot
-  uid: 0e8eb89b-5c06-11e7-bb52-08002711f4aa
+  creationTimestamp: 2017-07-26T02:00:22Z
   labels:
-    kubed.com/kind: Postgres
-spec:
-  databaseName: postgres-db
-  storageSecretName: azure-secret
-  azure:
-    container: bucket-for-snapshot
-    prefix: demo
-  resources:
-    requests:
-      memory: "64Mi"
-      cpu: "250m"
-    limits:
-      memory: "128Mi"
-      cpu: "500m"
+    app: kubed
+  name: kubed-config
+  namespace: kube-system
+  resourceVersion: "107"
+  selfLink: /api/v1/namespaces/kube-system/configmaps/kubed-config
+  uid: 2f4996d2-71a6-11e7-9891-0800270fb883
 ```
+
+Now, let's take a look at the cluster config. Here,
+
+| Key                                     | Description                                                                     |
+|-----------------------------------------|---------------------------------------------------------------------------------|
+| `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
+| `snapshotter.storage.s3.bucket`         | `Required`. Name of S3 Bucket                                                   |
+| `snapshotter.storage.s3.prefix`         | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and PodSpec fields are cleaned up from snapshots |
+| `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
+
+
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
+
+
+// TODO: Pic
 
 ### OpenStack Swift
 Kubed supports OpenStack Swift as snapshot storage backend. To configure this backend, following secret keys are needed:
@@ -317,7 +285,7 @@ $ echo -n '<your-tenant-name>' > OS_TENANT_NAME
 $ echo -n '<your-username>' > OS_USERNAME
 $ echo -n '<your-password>' > OS_PASSWORD
 $ echo -n '<your-region>' > OS_REGION_NAME
-$ kubectl create secret generic swift-secret \
+$ kubectl create secret generic swift-secret -n kube-system \
     --from-file=./OS_AUTH_URL \
     --from-file=./OS_TENANT_ID \
     --from-file=./OS_TENANT_NAME \
@@ -349,49 +317,52 @@ metadata:
 type: Opaque
 ```
 
-Now, you can create a Snapshot tpr using this secret. Following parameters are available for `Swift` backend.
 
-| Parameter                | Description                                                                     |
-|--------------------------|---------------------------------------------------------------------------------|
-| `spec.databaseName`      | `Required`. Name of database                                                    |
-| `spec.storageSecretName` | `Required`. Name of storage secret                                              |
-| `spec.swift.container`   | `Required`. Name of Storage container                                           |
-| `spec.swift.prefix`      | `Optional`. Path prefix into container where snapshot will be stored            |
-| `spec.resources`         | `Optional`. Compute resources required by Jobs used to take snapshot or initialize databases from snapshot.  To learn more, visit [here](http://kubernetes.io/docs/user-guide/compute-resources/). |
-
-```console
-$ kubectl create -f ./docs/examples/snapshot/swift/swift-snapshot.yaml
-snapshot "swift-snapshot" created
-```
+Now, create a ConfigMap with the Kubed cluster config under `config.yaml` key.
 
 ```yaml
-$ kubectl get snapshot swift-snapshot -o yaml
+$ kubectl create -f ./docs/examples/cluster-snapshot/gcs/kubed-config.yaml
+configmap "kubed-config" created
 
-apiVersion: kubed.com/v1alpha1
-kind: Snapshot
+$ kubectl get configmap kubed-config -n kube-system -o yaml
+apiVersion: v1
+data:
+  config.yaml: |
+    snapshotter:
+      Storage:
+        gcs:
+          bucket: bucket-for-snapshot
+          prefix: minikube
+        storageSecretName: gcs-secret
+      sanitize: true
+      schedule: '@every 6h'
+kind: ConfigMap
 metadata:
-  creationTimestamp: 2017-06-28T13:31:14Z
-  name: swift-snapshot
-  namespace: default
-  resourceVersion: "7070"
-  selfLink: /apis/kubed.com/v1alpha1/namespaces/kube-system/snapshots/swift-snapshot
-  uid: 0e8eb89b-5c06-11e7-bb52-08002711f4aa
+  creationTimestamp: 2017-07-26T02:00:22Z
   labels:
-    kubed.com/kind: Postgres
-spec:
-  databaseName: postgres-db
-  storageSecretName: swift-secret
-  swift:
-    container: bucket-for-snapshot
-    prefix: demo
-  resources:
-    requests:
-      memory: "64Mi"
-      cpu: "250m"
-    limits:
-      memory: "128Mi"
-      cpu: "500m"
+    app: kubed
+  name: kubed-config
+  namespace: kube-system
+  resourceVersion: "107"
+  selfLink: /api/v1/namespaces/kube-system/configmaps/kubed-config
+  uid: 2f4996d2-71a6-11e7-9891-0800270fb883
 ```
+
+Now, let's take a look at the cluster config. Here,
+
+| Key                                     | Description                                                                     |
+|-----------------------------------------|---------------------------------------------------------------------------------|
+| `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
+| `snapshotter.storage.s3.bucket`         | `Required`. Name of S3 Bucket                                                   |
+| `snapshotter.storage.s3.prefix`         | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and PodSpec fields are cleaned up from snapshots |
+| `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
+
+
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
+
+
+// TODO: Pic
 
 
 ### Local
