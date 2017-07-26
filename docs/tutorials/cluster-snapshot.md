@@ -40,7 +40,6 @@ metadata:
   selfLink: /api/v1/namespaces/kube-system/secrets/gcs-secret
   uid: 2aacabc8-71bc-11e7-a5ec-0800273df5f2
 type: Opaque
-tamal@beast:~/go/src/github.com/appscode/kubed/docs/examples/cluster-snapshot/gcs$ 
 ```
 
 Now, let's take a look at the cluster config. Here,
