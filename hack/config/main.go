@@ -48,7 +48,7 @@ func main() {
 func CreateClusterConfig() config.ClusterConfig {
 	return config.ClusterConfig{
 		RecycleBin: &config.RecycleBinSpec{
-			Path:         "/tmp/kubed",
+			Path:         "/tmp/kubed/trash",
 			TTL:          metav1.Duration{7 * 24 * time.Hour},
 			HandleUpdate: false,
 			Receiver: &config.Receiver{
