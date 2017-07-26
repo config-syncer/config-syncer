@@ -2,6 +2,7 @@ package eventer
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
@@ -22,9 +23,9 @@ func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
 	if e.Type == apiv1.EventTypeWarning &&
 		(len(f.Spec.EventNamespaces) == 0 || stringz.Contains(f.Spec.EventNamespaces, e.Namespace)) {
 
-		if f.Spec.Receiver != nil && len(f.Spec.Receiver.To) > 0 {
+		if len(f.Spec.Receiver.To) > 0 {
 			sub := fmt.Sprintf("%s %s/%s: %s", e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason)
-			if notifier, err := unified.LoadVia(f.Spec.Receiver.Notifier, f.Loader); err == nil {
+			if notifier, err := unified.LoadVia(strings.ToLower(f.Spec.Receiver.Notifier), f.Loader); err == nil {
 				switch n := notifier.(type) {
 				case notify.ByEmail:
 					bytes, err := yaml.Marshal(e)
@@ -56,9 +57,9 @@ func (f *EventForwarder) Forward(t metav1.TypeMeta, meta metav1.ObjectMeta, v in
 	if err != nil {
 		return err
 	}
-	if f.Spec.Receiver != nil && len(f.Spec.Receiver.To) > 0 {
+	if len(f.Spec.Receiver.To) > 0 {
 		sub := fmt.Sprintf("%s %s %s/%s added", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
-		if notifier, err := unified.LoadVia(f.Spec.Receiver.Notifier, f.Loader); err == nil {
+		if notifier, err := unified.LoadVia(strings.ToLower(f.Spec.Receiver.Notifier), f.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
 				n.To(f.Spec.Receiver.To[0], f.Spec.Receiver.To[1:]...).

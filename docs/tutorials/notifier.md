@@ -1,9 +1,40 @@
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 # Supported Notifiers
-Kubed can send notifications via Email, SMS or Chat for various operations. To connect to these services, you need to create a Secret with the appropriate keys. Then pass the secret name to Kubed by setting `notifierSecretName` field in Kubed cluster config.
+Kubed can send notifications via Email, SMS or Chat for various operations using [appscode/go-notify](https://github.com/appscode/go-notify) library. To connect to these services, you need to create a Secret with the appropriate keys. Then pass the secret name to Kubed by setting `notifierSecretName` field in Kubed cluster config.
 
-## Mailgun
+## Hipchat
+
+```console
+$ echo -n 'your-hipchat-auth-token' > HIPCHAT_AUTH_TOKEN
+$ kubectl create secret generic kubed-notifier -n kube-system \
+    --from-file=./HIPCHAT_AUTH_TOKEN
+secret "kubed-notifier" created
+```
+```yaml
+apiVersion: v1
+data:
+  HIPCHAT_AUTH_TOKEN: eW91ci1oaXBjaGF0LWF1dGgtdG9rZW4=
+kind: Secret
+metadata:
+  creationTimestamp: 2017-07-25T01:54:37Z
+  name: kubed-notifier
+  namespace: kube-system
+  resourceVersion: "2244"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-notifier
+  uid: 372bc159-70dc-11e7-9b0b-080027503732
+type: Opaque
+```
+
+| Name                | Description                                                       |
+| :---                | :---                                                              |
+| HIPCHAT_AUTH_TOKEN  | Set hipchat authentication token                                  |
+
+
+These environment variables will be set using `searchlight-icinga` Secret.
+
+> Set `NOTIFY_VIA` to `hipchat`
+
 
 
 
@@ -35,23 +66,6 @@ These environment variables will be set using `searchlight-icinga` Secret.
 > Set `NOTIFY_VIA` to `mailgun`
 
 
-
-
-```console
-$ echo -n 'your-hipchat-auth-token' > HIPCHAT_AUTH_TOKEN
-$ kubectl create secret generic kubed-notifier -n kube-system \
-    --from-file=./HIPCHAT_AUTH_TOKEN
-secret "kubed-notifier" created
-```
-
-| Name                | Description                                                       |
-| :---                | :---                                                              |
-| HIPCHAT_AUTH_TOKEN  | Set hipchat authentication token                                  |
-
-
-These environment variables will be set using `searchlight-icinga` Secret.
-
-> Set `NOTIFY_VIA` to `hipchat`
 
 
 

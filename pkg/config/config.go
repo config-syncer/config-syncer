@@ -47,11 +47,11 @@ type RecycleBinSpec struct {
 }
 
 type EventForwarderSpec struct {
-	NotifyOnNodeAdd      bool      `json:"notifyOnNodeAdd,omitempty"`
-	NotifyOnStorageAdd   bool      `json:"notifyOnStorageAdd,omitempty"`
-	NotifyOnIngressAdd   bool      `json:"notifyOnIngressAdd,omitempty"`
-	ForwardWarningEvents bool      `json:"forwardWarningEvents,omitempty"`
-	EventNamespaces      []string  `json:"eventNamespaces,omitempty"`
+	NotifyOnNodeAdd      bool     `json:"notifyOnNodeAdd,omitempty"`
+	NotifyOnStorageAdd   bool     `json:"notifyOnStorageAdd,omitempty"`
+	NotifyOnIngressAdd   bool     `json:"notifyOnIngressAdd,omitempty"`
+	ForwardWarningEvents bool     `json:"forwardWarningEvents,omitempty"`
+	EventNamespaces      []string `json:"eventNamespaces,omitempty"`
 	Receiver             Receiver `json:"receiver,omitempty"`
 }
 

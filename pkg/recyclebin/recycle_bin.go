@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/appscode/envconfig"
@@ -41,7 +42,7 @@ func (c *RecycleBin) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new 
 
 	if c.Spec.Receiver != nil && len(c.Spec.Receiver.To) > 0 {
 		sub := fmt.Sprintf("%s %s %s/%s updated", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
-		if notifier, err := unified.LoadVia(c.Spec.Receiver.Notifier, c.Loader); err == nil {
+		if notifier, err := unified.LoadVia(strings.ToLower(c.Spec.Receiver.Notifier), c.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
 				n = n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...)
@@ -83,7 +84,7 @@ func (c *RecycleBin) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interfa
 
 	if c.Spec.Receiver != nil && len(c.Spec.Receiver.To) > 0 {
 		sub := fmt.Sprintf("%s %s %s/%s deleted", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
-		if notifier, err := unified.LoadVia(c.Spec.Receiver.Notifier, c.Loader); err == nil {
+		if notifier, err := unified.LoadVia(strings.ToLower(c.Spec.Receiver.Notifier), c.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
 				n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...).
