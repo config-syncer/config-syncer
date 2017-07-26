@@ -64,7 +64,7 @@ snapshotter:
 | `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
 | `snapshotter.storage.gcs.bucket`        | `Required`. Name of GCS Bucket                                                  |
 | `snapshotter.storage.gcs.prefix`        | `Optional`. Path prefix into bucket where snapshot will be stored               |
-| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and PodSpec fields are cleaned up from snapshots |
+| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
 | `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
 
@@ -85,14 +85,14 @@ data:
   config.yaml: c25hcHNob3R0ZXI6CiAgU3RvcmFnZToKICAgIGdjczoKICAgICAgYnVja2V0OiBidWNrZXQtZm9yLXNuYXBzaG90CiAgICAgIHByZWZpeDogbWluaWt1YmUKICAgIHN0b3JhZ2VTZWNyZXROYW1lOiBnY3Mtc2VjcmV0CiAgc2FuaXRpemU6IHRydWUKICBzY2hlZHVsZTogJ0BldmVyeSA2aCcK
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-26T04:45:49Z
+  creationTimestamp: 2017-07-26T05:51:11Z
   labels:
     app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "2187"
+  resourceVersion: "6831"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: 4baa1554-71bd-11e7-a5ec-0800273df5f2
+  uid: 6d5babe7-71c6-11e7-a5ec-0800273df5f2
 type: Opaque
 ```
 
@@ -139,6 +139,7 @@ metadata:
   uid: f4353b86-71c2-11e7-a5ec-0800273df5f2
 type: Opaque
 ```
+
 Now, let's take a look at the cluster config. Here,
 
 ```yaml
@@ -160,7 +161,7 @@ snapshotter:
 | `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
 | `snapshotter.storage.s3.bucket`         | `Required`. Name of S3 Bucket                                                   |
 | `snapshotter.storage.s3.prefix`         | `Optional`. Path prefix into bucket where snapshot will be stored               |
-| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and PodSpec fields are cleaned up from snapshots |
+| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
 | `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
@@ -192,16 +193,6 @@ type: Opaque
 ```
 
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
-
-
-
-Now, let's take a look at the cluster config. Here,
-
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
-
-
-// TODO: Pic
-
 
 
 ### Microsoft Azure Storage
