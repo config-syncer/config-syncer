@@ -406,8 +406,7 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 
 
 ## Local Backend
-`Local` backend refers to a local path inside snapshot job container. Any Kubernetes supported [persistent volume](https://kubernetes.io/docs/concepts/storage/volumes/) can be used here. Some examples are: `emptyDir` for testing, NFS, Ceph, GlusterFS, etc.
-To configure this backend, no secret is needed. Following parameters are available for `Local` backend.
+`Local` backend refers to a local path inside Kubed container. When running Kubed, mount any Kubernetes supported [persistent volume](https://kubernetes.io/docs/concepts/storage/volumes/) and configure kubed to store snapshot data in that volume. Some examples are: `emptyDir` for testing, NFS, Ceph, GlusterFS, etc. To configure this backend, no secret is needed. Following parameters are available for `Local` backend.
 
 | Parameter                 | Description                                                                             |
 |---------------------------|-----------------------------------------------------------------------------------------|
