@@ -121,7 +121,8 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 
 
 
-
+## Supported Kubernetes Objects
+Following Kubernetes objects are supported by RecycleBin:
 - __v1:__
   - ComponentStatus
   - ConfigMap
