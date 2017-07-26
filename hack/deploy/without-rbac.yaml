@@ -15,9 +15,10 @@ spec:
       containers:
       - name: kubed
         image: appscode/kubed:canary
+        imagePullPolicy: Always
         args:
         - run
-        - --v=3
+        - --v=5
         ports:
         - containerPort: 56790
           name: http
