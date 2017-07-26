@@ -4,6 +4,10 @@
 Kubed can send notifications via Email, SMS or Chat for various operations using [appscode/go-notify](https://github.com/appscode/go-notify) library. To connect to these services, you need to create a Secret with the appropriate keys. Then pass the secret name to Kubed by setting `notifierSecretName` field in Kubed cluster config.
 
 ## Hipchat
+To configure Hipchat, create a Secret with the following key:
+| Name                | Description                                                       |
+|---------------------|-------------------------------------------------------------------|
+| HIPCHAT_AUTH_TOKEN  | `Required` Hipchat authentication token                           |
 
 ```console
 $ echo -n 'your-hipchat-auth-token' > HIPCHAT_AUTH_TOKEN
@@ -26,18 +30,20 @@ metadata:
 type: Opaque
 ```
 
-| Name                | Description                                                       |
-| :---                | :---                                                              |
-| HIPCHAT_AUTH_TOKEN  | Set hipchat authentication token                                  |
+Now, to receiver notifications via Hipchat rooms, set
+ - notifier: `hipchat`
+ - to: a list of chat room names
 
-
-These environment variables will be set using `searchlight-icinga` Secret.
-
-> Set `NOTIFY_VIA` to `hipchat`
-
-
-
-
+```yaml
+recycleBin:
+  handle_update: false
+  path: /tmp/kubed
+  receiver:
+    notifier: hipchat
+    to:
+    - ops-alerts
+  ttl: 168h
+```
 
 ```console
 $ echo -n 'your-mailgun-domain' > MAILGUN_DOMAIN
