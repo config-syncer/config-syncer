@@ -9,10 +9,6 @@ import (
 	elastic "gopkg.in/olivere/elastic.v3"
 )
 
-const (
-	Kind = "Elasticsearch"
-)
-
 type Janitor struct {
 	Spec config.ElasticSearchSpec
 	TTL  time.Duration

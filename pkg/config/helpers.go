@@ -47,11 +47,11 @@ func (cfg ClusterConfig) Save(configPath string) error {
 func (cfg ClusterConfig) Validate() error {
 	for _, j := range cfg.Janitors {
 		switch j.Kind {
-		case "Elasticsearch":
+		case JanitorElasticsearch:
 			if j.Elasticsearch == nil {
 				return fmt.Errorf("Missing spec for janitor kind %s", j.Kind)
 			}
-		case "InfluxDB":
+		case JanitorInfluxDB:
 			if j.InfluxDB == nil {
 				return fmt.Errorf("Missing spec for janitor kind %s", j.Kind)
 			}

@@ -112,7 +112,7 @@ func (op *Operator) Setup() error {
 	op.Cron.Start()
 
 	for _, j := range cfg.Janitors {
-		if j.Kind == influx.Kind {
+		if j.Kind == config.JanitorInfluxDB {
 			janitor := influx.Janitor{Spec: *j.InfluxDB, TTL: j.TTL.Duration}
 			err = janitor.Cleanup()
 			if err != nil {
@@ -235,7 +235,7 @@ func (op *Operator) ListenAndServe() {
 
 func (op *Operator) RunElasticsearchCleaner() error {
 	for _, j := range op.Config.Janitors {
-		if j.Kind == es.Kind {
+		if j.Kind == config.JanitorElasticsearch {
 			janitor := es.Janitor{Spec: *j.Elasticsearch, TTL: j.TTL.Duration}
 			err := janitor.Cleanup()
 			if err != nil {

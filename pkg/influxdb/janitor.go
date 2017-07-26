@@ -10,10 +10,6 @@ import (
 	influxdb "github.com/influxdata/influxdb/client"
 )
 
-const (
-	Kind = "InfluxDB"
-)
-
 type Janitor struct {
 	Spec config.InfluxDBSpec
 	TTL  time.Duration

@@ -5,9 +5,11 @@ import (
 )
 
 const (
-	ConfigSyncKey = "kubed.appscode.com/sync"
-
 	TimestampFormat = "20060102T150405"
+	ConfigSyncKey   = "kubed.appscode.com/sync"
+
+	JanitorElasticsearch = "Elasticsearch"
+	JanitorInfluxDB      = "InfluxDB"
 )
 
 type ClusterConfig struct {
