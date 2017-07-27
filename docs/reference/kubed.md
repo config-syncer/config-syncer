@@ -1,6 +1,6 @@
 ## kubed
 
-Kubed by AppsCode - A Kubernetes Cluster Manager Daemon
+Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
 
 ### Synopsis
 
