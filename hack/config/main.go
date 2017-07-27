@@ -47,6 +47,17 @@ func main() {
 
 func CreateClusterConfig() config.ClusterConfig {
 	return config.ClusterConfig{
+		Snapshotter: &config.SnapshotSpec{
+			Schedule: "@every 6h",
+			Sanitize: true,
+			Storage: config.Backend{
+				StorageSecretName: "snap-secret",
+				GCS: &config.GCSSpec{
+					Bucket: "restic",
+					Prefix: "minikube",
+				},
+			},
+		},
 		RecycleBin: &config.RecycleBinSpec{
 			Path:          "/tmp/kubed/trash",
 			TTL:           metav1.Duration{Duration: 7 * 24 * time.Hour},
@@ -77,14 +88,20 @@ func CreateClusterConfig() config.ClusterConfig {
 				Notifier: mailgun.UID,
 			},
 		},
-		Snapshotter: &config.SnapshotSpec{
-			Schedule: "@every 6h",
-			Sanitize: true,
-			Storage: config.Backend{
-				StorageSecretName: "snap-secret",
-				GCS: &config.GCSSpec{
-					Bucket: "restic",
-					Prefix: "minikube",
+		Janitors: []config.JanitorSpec{
+			{
+				Kind: config.JanitorElasticsearch,
+				TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
+				Elasticsearch: &config.ElasticSearchSpec{
+					Endpoint:       "http://elasticsearch-logging.kube-system:9200",
+					LogIndexPrefix: "logstash-",
+				},
+			},
+			{
+				Kind: config.JanitorInfluxDB,
+				TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
+				InfluxDB: &config.InfluxDBSpec{
+					Endpoint: "https://monitoring-influxdb.kube-system:8083",
 				},
 			},
 		},
