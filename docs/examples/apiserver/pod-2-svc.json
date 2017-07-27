@@ -1,0 +1,45 @@
+{
+    "metadata": {},
+    "items": [
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "kubernetes-dashboard",
+                "namespace": "kube-system",
+                "selfLink": "/api/v1/namespaces/kube-system/services/kubernetes-dashboard",
+                "uid": "a5a6e9d2-72b4-11e7-a1f7-080027df84b0",
+                "resourceVersion": "78",
+                "creationTimestamp": "2017-07-27T10:16:25Z",
+                "labels": {
+                    "addonmanager.kubernetes.io/mode": "Reconcile",
+                    "app": "kubernetes-dashboard",
+                    "kubernetes.io/minikube-addons": "dashboard",
+                    "kubernetes.io/minikube-addons-endpoint": "dashboard"
+                },
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"labels\":{\"addonmanager.kubernetes.io/mode\":\"Reconcile\",\"app\":\"kubernetes-dashboard\",\"kubernetes.io/minikube-addons\":\"dashboard\",\"kubernetes.io/minikube-addons-endpoint\":\"dashboard\"},\"name\":\"kubernetes-dashboard\",\"namespace\":\"kube-system\"},\"spec\":{\"ports\":[{\"nodePort\":30000,\"port\":80,\"targetPort\":9090}],\"selector\":{\"app\":\"kubernetes-dashboard\"},\"type\":\"NodePort\"}}\n"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "protocol": "TCP",
+                        "port": 80,
+                        "targetPort": 9090,
+                        "nodePort": 30000
+                    }
+                ],
+                "selector": {
+                    "app": "kubernetes-dashboard"
+                },
+                "clusterIP": "10.0.0.184",
+                "type": "NodePort",
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        }
+    ]
+}
