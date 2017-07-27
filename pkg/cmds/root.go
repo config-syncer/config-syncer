@@ -13,7 +13,7 @@ import (
 func NewCmdKubed(version string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "kubed",
-		Short: `Kubed by AppsCode - A Kubernetes Cluster Manager Daemon`,
+		Short: `Kubed by AppsCode - A Kubernetes Cluster Operator Daemon`,
 		Long:  `Kubed is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/appscode/kubed/tree/master/docs`,
 		PersistentPreRun: func(c *cobra.Command, args []string) {
 			c.Flags().VisitAll(func(flag *pflag.Flag) {

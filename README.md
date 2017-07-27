@@ -1,7 +1,15 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/appscode/kubed)](https://goreportcard.com/report/github.com/appscode/kubed)
 
 # Kubed
-Kubed by AppsCode is a Kubernetes Cluster Manager Daemon.
+Kubed by AppsCode is a Kubernetes Cluster Operator Daemon. Kubed can do the following things for you:
+
+ - Kubed can take periodic [snapshot](/docs/tutorials/cluster-snapshot.md) of a Kubernetes cluster objects.
+ - Kubed provides a [recycle bin](/docs/tutorials/recycle-bin.md) for deleted and/or updated Kubernetes objects.
+ - Kubed can [synchronize ConfigMap/Secret across Namespaces](/docs/tutorials/config-syncer.md).
+ - Kubed can [forward Cluster Events](/docs/tutorials/event-forwarder.md) to various destinations.
+ - Kubed can setup [janitors](/docs/tutorials/janitors.md) for Elasticsearch and InfluxDB.
+ - Kubed to [send notifications](/docs/tutorials/notifiers.md) via Email, SMS or Chat.
+ - Kubed includes a search engine(/docs/tutorials/apiserver.md) for your cluster objects built on top of [bleve](https://github.com/blevesearch/bleve).
 
 ## Supported Versions
 Kubernetes 1.5+
