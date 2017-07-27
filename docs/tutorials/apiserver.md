@@ -1,11 +1,13 @@
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 # Kubed API Server
-Kubed provides a recycle bin for deleted and/or updated Kubernetes objects. Once activated, any deleted and/or updated object is stored in YAML format in folder mounted inside Kubed pod. This tutorial will show you how to use Kubed to setup a recycle bin for Kubernetes cluster objects.
+Kubed includes an api server. It has 2 categories of endpoints:
+ - Search objects
+ - Reverse Lookup
 
 ---
 
-Kubed api server is under active development and expected to change in future.
+Kubed api server is under active development and expected to change in future. We are also [exploring](https://github.com/appscode/kubed/issues/19) the idea of turning this into a UAS.
 
 ---
 
@@ -63,9 +65,8 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 
 
 ## Using Kubed API Server
-Kubed api server has 2 categories of endpoints:
- - Search objects
- - Reverse Lookup
+In this section, we will show how you can use the kubed api server.
+
 
 ### Search Kubernetes objects
 To search for Kubernetes objects, use the `/search` URL of Kubed api server. 
