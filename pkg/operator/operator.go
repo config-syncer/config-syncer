@@ -1,16 +1,20 @@
 package operator
 
 import (
+	"encoding/json"
 	"net/http"
 	"path/filepath"
 	"sync"
 	"time"
 
+	apiver "github.com/appscode/api/version"
 	"github.com/appscode/envconfig"
+	v "github.com/appscode/go/version"
 	"github.com/appscode/kubed/pkg/backup"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
+	"github.com/appscode/kubed/pkg/health"
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/influxdb"
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
@@ -231,8 +235,40 @@ func (op *Operator) ListenAndServe() {
 		}
 	}
 
+	router.Get("/health", http.HandlerFunc(op.healthHandler))
+
 	http.Handle("/", router)
 	log.Fatalln(http.ListenAndServe(op.Opt.Address, nil))
+}
+
+func (op *Operator) healthHandler(w http.ResponseWriter, r *http.Request) {
+	resp := &health.KubedHealth{
+		AnalyticsEnabled:    op.Opt.EnableAnalytics,
+		OperatorNamespace:   op.Opt.OperatorNamespace,
+		SearchEnabled:       op.Opt.EnableSearchIndex,
+		ReverseIndexEnabled: op.Opt.EnableReverseIndex,
+		Version: &apiver.Version{
+			Version:         v.Version.Version,
+			VersionStrategy: v.Version.VersionStrategy,
+			Os:              v.Version.Os,
+			Arch:            v.Version.Arch,
+			CommitHash:      v.Version.CommitHash,
+			GitBranch:       v.Version.GitBranch,
+			GitTag:          v.Version.GitTag,
+			CommitTimestamp: v.Version.CommitTimestamp,
+			BuildTimestamp:  v.Version.BuildTimestamp,
+			BuildHost:       v.Version.BuildHost,
+			BuildHostOs:     v.Version.BuildHostOs,
+			BuildHostArch:   v.Version.BuildHostArch,
+		},
+	}
+	err := json.NewEncoder(w).Encode(resp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("x-content-type-options", "nosniff")
 }
 
 func (op *Operator) RunElasticsearchCleaner() error {
