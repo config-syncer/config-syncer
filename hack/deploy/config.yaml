@@ -1,17 +1,17 @@
 enableConfigSyncer: true
 eventForwarder:
   ingressAdded:
-    forwardEvent: true
+    handle: true
   nodeAdded:
-    forwardEvent: true
+    handle: true
   receiver:
     notifier: mailgun
     to:
     - ops@example.com
   storageAdded:
-    forwardEvent: true
+    handle: true
   warningEvents:
-    forwardEvent: true
+    handle: true
     namespaces:
     - kube-system
 notifierSecretName: kubed-notifier

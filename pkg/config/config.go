@@ -59,8 +59,8 @@ type NoNamespacedForwarderSpec struct {
 }
 
 type ForwarderSpec struct {
-	ForwardEvent bool     `json:"forwardEvent"`
-	Namespaces   []string `json:"namespaces,omitempty"`
+	Handle     bool     `json:"handle"`
+	Namespaces []string `json:"namespaces,omitempty"`
 }
 
 type Receiver struct {

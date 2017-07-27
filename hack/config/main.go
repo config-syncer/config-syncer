@@ -59,16 +59,16 @@ func CreateClusterConfig() config.ClusterConfig {
 		EnableConfigSyncer: true,
 		EventForwarder: &config.EventForwarderSpec{
 			NodeAdded: config.ForwarderSpec{
-				ForwardEvent: true,
+				Handle: true,
 			},
 			StorageAdded: config.ForwarderSpec{
-				ForwardEvent: true,
+				Handle: true,
 			},
 			IngressAdded: config.ForwarderSpec{
-				ForwardEvent: true,
+				Handle: true,
 			},
 			WarningEvents: config.ForwarderSpec{
-				ForwardEvent: true,
+				Handle: true,
 				Namespaces: []string{
 					"kube-system",
 				}},

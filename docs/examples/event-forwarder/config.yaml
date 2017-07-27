@@ -1,12 +1,12 @@
 eventForwarder:
   nodeAdded:
-    forwardEvent: true
+    handle: true
   storageAdded:
-    forwardEvent: true
+    handle: true
   ingressAdded:
-    forwardEvent: true
+    handle: true
   warningEvents:
-    forwardEvent: true
+    handle: true
     namespaces:
     - kube-system
   receiver:

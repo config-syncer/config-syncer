@@ -15,10 +15,16 @@ To enable config syncer, you need a cluster config like below.
 $ cat ./docs/examples/event-forwarder/config.yaml
 
 eventForwarder:
-  nodeAdded: {}
-  ingressAdded: {}
-  storageAdded: {}
-  warningEvents: {}
+  nodeAdded:
+    handle: true
+  storageAdded:
+    handle: true
+  ingressAdded:
+    handle: true
+  warningEvents:
+    handle: true
+    namespaces:
+    - kube-system
   receiver:
     notifier: mailgun
     to:

@@ -48,7 +48,7 @@ func (op *Operator) WatchNodes() {
 					}
 
 					if op.Eventer != nil &&
-						op.Config.EventForwarder.NodeAdded.ForwardEvent &&
+						op.Config.EventForwarder.NodeAdded.Handle &&
 						op.Eventer.IsAllowed(op.Config.EventForwarder.NodeAdded.Namespaces, res.Namespace) {
 						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
 					}
