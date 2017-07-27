@@ -1,12 +1,14 @@
 apiVersion: v1
 data:
-  config.yaml: ZXZlbnRGb3J3YXJkZXI6CiAgbm9kZUFkZGVkOiB7fQogIGluZ3Jlc3NBZGRlZDoge30KICBzdG9yYWdlQWRkZWQ6IHt9CiAgd2FybmluZ0V2ZW50czoge30KICByZWNlaXZlcjoKICAgIG5vdGlmaWVyOiBtYWlsZ3VuCiAgICB0bzoKICAgIC0gb3BzQGV4YW1wbGUuY29tCm5vdGlmaWVyU2VjcmV0TmFtZToga3ViZWQtbm90aWZpZXIK
+  config.yaml: ZXZlbnRGb3J3YXJkZXI6CiAgbm9kZUFkZGVkOgogICAgaGFuZGxlOiB0cnVlCiAgc3RvcmFnZUFkZGVkOgogICAgaGFuZGxlOiB0cnVlCiAgaW5ncmVzc0FkZGVkOgogICAgaGFuZGxlOiB0cnVlCiAgd2FybmluZ0V2ZW50czoKICAgIGhhbmRsZTogdHJ1ZQogICAgbmFtZXNwYWNlczoKICAgIC0ga3ViZS1zeXN0ZW0KICByZWNlaXZlcjoKICAgIG5vdGlmaWVyOiBtYWlsZ3VuCiAgICB0bzoKICAgIC0gb3BzQGV4YW1wbGUuY29tCm5vdGlmaWVyU2VjcmV0TmFtZToga3ViZWQtbm90aWZpZXIK
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-27T00:53:01Z
+  creationTimestamp: 2017-07-27T05:35:54Z
+  labels:
+    app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "56568"
+  resourceVersion: "70583"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: f0cb8f70-7265-11e7-af79-08002738e55e
+  uid: 753220c3-728d-11e7-87f5-08002738e55e
 type: Opaque
