@@ -63,6 +63,11 @@ type: Opaque
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, go to the next section.
 
 
+## Filter by Namespaces
+
+
+
+
 ## Using Recycle Bin
 In this tutorial, a ConfigMap will be used to show how recycle bin feature can be used.
 

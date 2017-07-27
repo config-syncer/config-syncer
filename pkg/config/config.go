@@ -54,6 +54,10 @@ type EventForwarderSpec struct {
 	Receiver      Receiver       `json:"receiver,omitempty"`
 }
 
+type NoNamespacedForwarderSpec struct {
+	Namespaces []string `json:"namespaces,omitempty"`
+}
+
 type ForwarderSpec struct {
 	Namespaces []string `json:"namespaces,omitempty"`
 }
