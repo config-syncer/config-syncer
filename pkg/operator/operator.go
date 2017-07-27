@@ -242,7 +242,7 @@ func (op *Operator) RunElasticsearchCleaner() error {
 			if err != nil {
 				return err
 			}
-			op.Cron.AddFunc("@every 6h", func() {
+			op.Cron.AddFunc("@every 1h", func() {
 				err := janitor.Cleanup()
 				if err != nil {
 					log.Errorln(err)
@@ -258,7 +258,7 @@ func (op *Operator) RunTrashCanCleaner() error {
 		return nil
 	}
 
-	_, err := op.Cron.AddFunc("@every 6h", func() {
+	_, err := op.Cron.AddFunc("@every 1h", func() {
 		err := op.TrashCan.Cleanup()
 		if err != nil {
 			log.Errorln(err)

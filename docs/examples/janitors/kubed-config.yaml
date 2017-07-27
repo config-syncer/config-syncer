@@ -4,9 +4,11 @@ data:
 kind: Secret
 metadata:
   creationTimestamp: 2017-07-27T07:43:32Z
+  labels:
+    app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "27758902"
+  resourceVersion: "27760846"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
   uid: 4a2eb872-729f-11e7-8b69-12f236046fba
 type: Opaque
