@@ -87,55 +87,42 @@ $ kubectl apply -f ./docs/examples/event-forwarder/demo-0.yaml
 persistentvolumeclaim "myclaim" configured
 ```
 ```yaml
-$ kubectl get configmaps omni -n demo -o yaml
+$ kubectl get pvc myclaim -n demo -o yaml
 apiVersion: v1
-data:
-  hello: world
-kind: ConfigMap
+kind: PersistentVolumeClaim
 metadata:
-  creationTimestamp: 2017-07-26T19:18:40Z
-  name: omni
+  annotations:
+    control-plane.alpha.kubernetes.io/leader: '{"holderIdentity":"a56b7269-71ef-11e7-af79-08002738e55e","leaseDurationSeconds":15,"acquireTime":"2017-07-27T01:24:08Z","renewTime":"2017-07-27T01:24:10Z","leaderTransitions":0}'
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"myclaim","namespace":"demo"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"50Mi"}},"storageClassName":"standard"}}
+    pv.kubernetes.io/bind-completed: "yes"
+    pv.kubernetes.io/bound-by-controller: "yes"
+    volume.beta.kubernetes.io/storage-provisioner: k8s.io/minikube-hostpath
+  creationTimestamp: 2017-07-27T01:24:08Z
+  name: myclaim
   namespace: demo
-  resourceVersion: "34414"
-  selfLink: /api/v1/namespaces/demo/configmaps/omni
-  uid: 3b77f592-7237-11e7-af79-08002738e55e
+  resourceVersion: "58641"
+  selfLink: /api/v1/namespaces/demo/persistentvolumeclaims/myclaim
+  uid: 49b9851c-726a-11e7-af79-08002738e55e
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+  storageClassName: standard
+  volumeName: pvc-49b9851c-726a-11e7-af79-08002738e55e
+status:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 50Mi
+  phase: Bound
 ```
 
-Now, delete the ConfigMap `omni`. Kubed operator pod will notice this and stored the deleted object in YAML format in a file matching the `selfLink` for that object inside the `recycleBin.path` folder.
-
-```console
-# Exec into kubed operator pod
-$ kubectl exec -it $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system sh
-
-# running inside kubed operator pod
-/ # find /tmp/kubed/trash/
-/tmp/kubed/trash/
-/tmp/kubed/trash/api
-/tmp/kubed/trash/api/v1
-/tmp/kubed/trash/api/v1/namespaces
-/tmp/kubed/trash/api/v1/namespaces/demo
-/tmp/kubed/trash/api/v1/namespaces/demo/configmaps
-/tmp/kubed/trash/api/v1/namespaces/demo/configmaps/omni.20170726T193302.yaml
-
-/ # cat /tmp/kubed/trash/api/v1/namespaces/demo/configmaps/omni.20170726T193302.yaml
-apiVersion: v1
-data:
-  hello: world
-kind: ConfigMap
-metadata:
-  creationTimestamp: 2017-07-26T19:33:02Z
-  name: omni
-  namespace: demo
-  resourceVersion: "35481"
-  selfLink: /api/v1/namespaces/demo/configmaps/omni
-  uid: 3d50fba0-7239-11e7-af79-08002738e55e
-```
+Now, assuming you configured a GMail account as the receiver for events, you should see an email like below:
 
 ![PVC Added Notification](/docs/images/event-forwarder/pvc-added-notification.png)
-
-
-
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, you should start to receive notifications when a Warning Event happens in your cluster.
 
 
 ## Filter by Namespaces
