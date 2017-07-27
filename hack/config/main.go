@@ -101,7 +101,7 @@ func CreateClusterConfig() config.ClusterConfig {
 				Kind: config.JanitorInfluxDB,
 				TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
 				InfluxDB: &config.InfluxDBSpec{
-					Endpoint: "https://monitoring-influxdb.kube-system:8083",
+					Endpoint: "https://monitoring-influxdb.kube-system:8086",
 				},
 			},
 		},
