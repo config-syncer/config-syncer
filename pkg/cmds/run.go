@@ -25,7 +25,8 @@ import (
 func NewCmdRun(version string) *cobra.Command {
 	opt := operator.Options{
 		ConfigPath:        "/srv/kubed/config.yaml",
-		Address:           ":8080",
+		APIAddress:        ":8080",
+		WebAddress:        ":56790",
 		ScratchDir:        "/tmp",
 		OperatorNamespace: namespace(),
 		EnableAnalytics:   true,
@@ -53,8 +54,8 @@ func NewCmdRun(version string) *cobra.Command {
 	cmd.Flags().StringVar(&opt.Master, "master", opt.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
 	cmd.Flags().StringVar(&opt.ConfigPath, "clusterconfig", opt.ConfigPath, "Path to cluster config file")
 	cmd.Flags().StringVar(&opt.ScratchDir, "scratch-dir", opt.ScratchDir, "Directory used to store temporary files. Use an `emptyDir` in Kubernetes.")
-	cmd.Flags().StringVar(&opt.Address, "address", opt.Address, "The address of the Kubed API Server (overrides any value in clusterconfig)")
-
+	cmd.Flags().StringVar(&opt.APIAddress, "api.address", opt.APIAddress, "The address of the Kubed API Server (overrides any value in clusterconfig)")
+	cmd.Flags().StringVar(&opt.WebAddress, "web.address", opt.WebAddress, "Address to listen on for web interface and telemetry.")
 	cmd.Flags().BoolVar(&opt.EnableAnalytics, "analytics", opt.EnableAnalytics, "Send analytical events to Google Analytics")
 
 	return cmd

@@ -39,7 +39,8 @@ type Options struct {
 	KubeConfig string
 
 	ConfigPath string
-	Address    string
+	APIAddress string
+	WebAddress string
 
 	EnableConfigSync  bool
 	ScratchDir        string
@@ -76,8 +77,8 @@ func (op *Operator) Setup() error {
 	if err != nil {
 		return err
 	}
-	if op.Opt.Address != "" {
-		cfg.APIServer.Address = op.Opt.Address
+	if op.Opt.APIAddress != "" {
+		cfg.APIServer.Address = op.Opt.APIAddress
 	}
 	err = cfg.Validate()
 	if err != nil {
@@ -236,7 +237,7 @@ func (op *Operator) ListenAndServe() {
 	router.Get("/health", http.HandlerFunc(op.healthHandler))
 
 	http.Handle("/", router)
-	log.Fatalln(http.ListenAndServe(op.Opt.Address, nil))
+	log.Fatalln(http.ListenAndServe(op.Opt.APIAddress, nil))
 }
 
 func (op *Operator) healthHandler(w http.ResponseWriter, r *http.Request) {
