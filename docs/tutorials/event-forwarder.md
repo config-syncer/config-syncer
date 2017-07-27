@@ -173,7 +173,8 @@ busybox   0/1       rpc error: code = 2 desc = failed to start container "bcc253
 
 
 
-
+![Pod Failed](/docs/images/event-forwarder/pod-fail-1.png)
+![Pod FailedSync](/docs/images/event-forwarder/pod-fail-2.png)
 
 
 
