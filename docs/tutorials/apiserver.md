@@ -98,6 +98,19 @@ Handling connection for 8080
 ^C⏎
 
 $ curl http://127.0.0.1:8080/search?q=dashboard > ./docs/examples/apiserver/search-result.json
+
+
+                                                                                                                                                             $ kubectl get pods -n kube-system
+NAME                              READY     STATUS    RESTARTS   AGE
+kube-addon-manager-minikube       1/1       Running   0          33m
+kube-dns-1301475494-hglm0         3/3       Running   0          33m
+kubed-operator-3234987584-sbgrf   1/1       Running   0          19s
+kubernetes-dashboard-l8vlj        1/1       Running   0          33m
+
+$ curl http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/kubernetes-dashboard-l8vlj/services > ./docs/examples/apiserver/pod-2-svc.json
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  1283  100  1283    0     0  89128      0 --:--:-- --:--:-- --:--:-- 91642
 ```
 
 
