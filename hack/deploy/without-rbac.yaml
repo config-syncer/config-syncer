@@ -20,6 +20,9 @@ spec:
         - run
         - --v=3
         ports:
+        - containerPort: 8080
+          name: api
+          protocol: TCP
         - containerPort: 56790
           name: http
           protocol: TCP
@@ -44,6 +47,9 @@ metadata:
     app: kubed
 spec:
   ports:
+  - name: api
+    port: 8080
+    targetPort: api
   - name: http
     port: 56790
     targetPort: http

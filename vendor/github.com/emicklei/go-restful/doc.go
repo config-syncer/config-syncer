@@ -45,7 +45,7 @@ The Default container of go-restful uses the http.DefaultServeMux.
 You can create your own Container and create a new http.Server for that particular container.
 
 	container := restful.NewContainer()
-	server := &http.Server{Addr: ":8081", Handler: container}
+	server := &http.Server{Addr: ":8080", Handler: container}
 
 Filters
 

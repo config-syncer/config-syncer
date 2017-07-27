@@ -9,6 +9,10 @@ metadata:
     heritage: "{{ .Release.Service }}"
 spec:
   ports:
+  - name: api
+    port: 8080
+    protocol: TCP
+    targetPort: api
   - name: http
     port: 56790
     protocol: TCP

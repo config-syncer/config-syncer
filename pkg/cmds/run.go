@@ -25,7 +25,7 @@ import (
 func NewCmdRun(version string) *cobra.Command {
 	opt := operator.Options{
 		ConfigPath:        "/srv/kubed/config.yaml",
-		Address:           ":8081",
+		Address:           ":8080",
 		ScratchDir:        "/tmp",
 		OperatorNamespace: namespace(),
 		EnableAnalytics:   true,

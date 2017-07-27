@@ -26,6 +26,9 @@ spec:
         image: '{{ .Values.kubed.image }}:{{ .Values.kubed.tag }}'
         imagePullPolicy: '{{ .Values.kubed.pullPolicy }}'
         ports:
+        - containerPort: 8080
+          name: api
+          protocol: TCP
         - containerPort: 56790
           name: http
           protocol: TCP

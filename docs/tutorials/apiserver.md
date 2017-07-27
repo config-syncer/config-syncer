@@ -20,7 +20,7 @@ To enable config syncer, you need a cluster config like below.
 $ cat ./docs/examples/apiserver/config.yaml
 
 apiServer:
-  address: :8081
+  address: :8080
   enableReverseIndex: true
   enableSearchIndex: true
 ```

@@ -14,7 +14,7 @@ kubed run [flags]
 ### Options
 
 ```
-      --address string         The address of the Kubed API Server (overrides any value in clusterconfig) (default ":8081")
+      --address string         The address of the Kubed API Server (overrides any value in clusterconfig) (default ":8080")
       --analytics              Send analytical events to Google Analytics (default true)
       --clusterconfig string   Path to cluster config file (default "/srv/kubed/config.yaml")
   -h, --help                   help for run

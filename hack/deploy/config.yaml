@@ -1,5 +1,5 @@
 apiServer:
-  address: :8081
+  address: :8080
   enableReverseIndex: true
   enableSearchIndex: true
 enableConfigSyncer: true
