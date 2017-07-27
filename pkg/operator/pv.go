@@ -48,7 +48,7 @@ func (op *Operator) WatchPersistentVolumes() {
 					}
 
 					if op.Eventer != nil &&
-						op.Config.EventForwarder.StorageAdded != nil &&
+						op.Config.EventForwarder.StorageAdded.ForwardEvent &&
 						op.Eventer.IsAllowed(op.Config.EventForwarder.StorageAdded.Namespaces, res.Namespace) {
 						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
 					}

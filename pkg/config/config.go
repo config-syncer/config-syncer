@@ -51,7 +51,7 @@ type EventForwarderSpec struct {
 	StorageAdded  ForwarderSpec `json:"storageAdded,omitempty"`
 	IngressAdded  ForwarderSpec `json:"ingressAdded,omitempty"`
 	WarningEvents ForwarderSpec `json:"warningEvents,omitempty"`
-	Receiver      Receiver       `json:"receiver,omitempty"`
+	Receiver      Receiver      `json:"receiver,omitempty"`
 }
 
 type NoNamespacedForwarderSpec struct {
@@ -59,8 +59,8 @@ type NoNamespacedForwarderSpec struct {
 }
 
 type ForwarderSpec struct {
-	ForwardEvent bool            `json:"forwardEvent"`
-	Namespaces []string `json:"namespaces,omitempty"`
+	ForwardEvent bool     `json:"forwardEvent"`
+	Namespaces   []string `json:"namespaces,omitempty"`
 }
 
 type Receiver struct {
