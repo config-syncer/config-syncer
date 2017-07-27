@@ -215,7 +215,7 @@ To receive chat notifications in Slack, create a Secret with the following keys:
 
 | Name             | Description                      |
 |------------------|----------------------------------|
-| SLACK_AUTH_TOKEN | `Required` Slack auth token      |
+| SLACK_AUTH_TOKEN | `Required` Slack [legacy auth token](https://api.slack.com/custom-integrations/legacy-tokens) |
 | SLACK_CHANNEL    | `Required` Slack channel name.   |
 
 ```console
