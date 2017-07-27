@@ -78,8 +78,26 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 
 
 
-```json
-$ curl http://127.0.0.1:8080/search?q=dashboard
+```console
+
+
+$ kubectl exec -it $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system sh
+
+
+$ kubectl port-forward $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system 56790
+Forwarding from 127.0.0.1:56790 -> 56790
+E0727 03:50:34.668103   22871 portforward.go:212] Unable to create listener: Error listen tcp6 [::1]:56790: bind: cannot assign requested address
+Handling connection for 56790
+^C⏎
+
+
+$ kubectl port-forward $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system 8080
+Forwarding from 127.0.0.1:8080 -> 8080
+E0727 03:51:10.186041   22995 portforward.go:212] Unable to create listener: Error listen tcp6 [::1]:8080: bind: cannot assign requested address
+Handling connection for 8080
+^C⏎
+
+$ curl http://127.0.0.1:8080/search?q=dashboard > ./docs/examples/apiserver/search-result.json
 ```
 
 
