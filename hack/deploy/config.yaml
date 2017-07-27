@@ -1,3 +1,7 @@
+apiServer:
+  address: :8081
+  enableReverseIndex: true
+  enableSearchIndex: true
 enableConfigSyncer: true
 eventForwarder:
   ingressAdded:
