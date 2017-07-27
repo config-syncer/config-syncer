@@ -131,6 +131,7 @@ metadata:
   uid: 3d50fba0-7239-11e7-af79-08002738e55e
 ```
 
+![PVC Added Notification](/docs/images/event-forwarder/pvc-added-notification.png)
 
 
 
