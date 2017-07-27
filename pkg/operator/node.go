@@ -47,7 +47,9 @@ func (op *Operator) WatchNodes() {
 						}
 					}
 
-					if op.Eventer != nil && op.Config.EventForwarder.NotifyOnStorageAdd {
+					if op.Eventer != nil &&
+						op.Config.EventForwarder.NodeAdded != nil &&
+						op.Eventer.IsAllowed(op.Config.EventForwarder.NodeAdded.Namespaces, res.Namespace) {
 						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
 					}
 				}

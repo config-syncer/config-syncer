@@ -30,7 +30,7 @@ recycleBin:
 | `recycleBin.path`          | `Required`. Path to folder where deleted and/or updated objects are stored. |
 | `recycleBin.ttl`           | `Required`. Duration for which deleted and/or updated objects are stored before purging. |
 | `recycleBin.handle_update` | `Optional`. If set to `true`, past version of supported objects are stored when updated. We recommend that you keep this set to `false` on an active cluster. |
-| `recycleBin.receiver`      | `Optional`. If set, a notification will be sent when any supported object is deleted and/or updated. To learn how to use various notifiers, please visit [here](./docs/tutorials/notifiers.md). |
+| `recycleBin.receiver`      | `Optional`. If set, a notification will be sent when any supported object is deleted and/or updated. To learn how to use various notifiers, please visit [here](/docs/tutorials/notifiers.md). |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 

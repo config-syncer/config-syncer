@@ -35,7 +35,9 @@ func (op *Operator) WatchEvents() {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.Event); ok {
-					if op.Eventer != nil && op.Config.EventForwarder.ForwardWarningEvents {
+					if op.Eventer != nil &&
+						op.Config.EventForwarder.WarningEvents != nil &&
+						op.Eventer.IsAllowed(op.Config.EventForwarder.WarningEvents.Namespaces, res.Namespace) {
 						op.Eventer.ForwardEvent(res)
 					}
 				}

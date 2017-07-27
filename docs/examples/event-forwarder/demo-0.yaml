@@ -1,7 +1,12 @@
+kind: PersistentVolumeClaim
 apiVersion: v1
-kind: Namespace
 metadata:
-  name: demo
+  name: myclaim
+  namespace: demo
 spec:
-  finalizers:
-  - kubernetes
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+  storageClassName: standard

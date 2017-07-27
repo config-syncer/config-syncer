@@ -45,6 +45,10 @@ func (cfg ClusterConfig) Save(configPath string) error {
 }
 
 func (cfg ClusterConfig) Validate() error {
+	if cfg.EventForwarder != nil && cfg.EventForwarder.NodeAdded != nil && len(cfg.EventForwarder.NodeAdded.Namespaces) > 0 {
+		return fmt.Errorf("Namespeces can't be defined for forwarding `nodeAdded` events.")
+	}
+
 	for _, j := range cfg.Janitors {
 		switch j.Kind {
 		case JanitorElasticsearch:
