@@ -50,7 +50,7 @@ func (op *Operator) WatchIngresses() {
 
 					if op.Eventer != nil &&
 						op.Config.EventForwarder.IngressAdded.Handle &&
-						op.Eventer.IsAllowed(op.Config.EventForwarder.IngressAdded.Namespaces, res.Namespace) &&
+						op.Config.EventForwarder.IngressAdded.IsAllowed(res.Namespace) &&
 						util.IsRecentlyAdded(res.ObjectMeta) {
 						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
 					}

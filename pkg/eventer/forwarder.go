@@ -7,7 +7,6 @@ import (
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
 	"github.com/appscode/go-notify/unified"
-	stringz "github.com/appscode/go/strings"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/ghodss/yaml"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,10 +16,6 @@ import (
 type EventForwarder struct {
 	Receiver config.Receiver
 	Loader   envconfig.LoaderFunc
-}
-
-func (f *EventForwarder) IsAllowed(namespaces []string, ns string) bool {
-	return len(namespaces) == 0 || stringz.Contains(namespaces, ns)
 }
 
 func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
