@@ -37,7 +37,7 @@ func (op *Operator) WatchEvents() {
 				if res, ok := obj.(*apiv1.Event); ok {
 					if op.Eventer != nil &&
 						op.Config.EventForwarder.WarningEvents.Handle &&
-						op.Eventer.IsAllowed(op.Config.EventForwarder.WarningEvents.Namespaces, res.Namespace) {
+						op.Config.EventForwarder.WarningEvents.IsAllowed(res.Namespace) {
 						op.Eventer.ForwardEvent(res)
 					}
 				}

@@ -1,6 +1,7 @@
 package config
 
 import (
+	stringz "github.com/appscode/go/strings"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -68,6 +69,10 @@ type NoNamespacedForwarderSpec struct {
 type ForwarderSpec struct {
 	Handle     bool     `json:"handle"`
 	Namespaces []string `json:"namespaces,omitempty"`
+}
+
+func (f ForwarderSpec) IsAllowed(ns string) bool {
+	return len(f.Namespaces) == 0 || stringz.Contains(f.Namespaces, ns)
 }
 
 type Receiver struct {
