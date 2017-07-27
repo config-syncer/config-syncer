@@ -2,7 +2,7 @@
 
 
 # Using Janitors
-Kubed includes janitors for Elasticsearch and InfluxDB. These janitors can delete data older than a configures TTL. Kubernetes supports storing cluster logs in Elasticsearch and cluster metrics in InfluxDB. You use these janitors to clean up old data from Elasticsearch and InfluxDB before those fill up your node disks.
+Kubed includes janitors for Elasticsearch and InfluxDB. These janitors can delete data older than a configured TTL. Kubernetes supports storing cluster logs in Elasticsearch and cluster metrics in InfluxDB. You use these janitors to clean up old data from Elasticsearch and InfluxDB before those fill up your node disks.
 
 ---
 
