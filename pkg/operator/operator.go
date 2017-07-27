@@ -36,10 +36,8 @@ type Options struct {
 	Master     string
 	KubeConfig string
 
-	ConfigPath         string
-	Address            string
-	EnableSearchIndex  bool
-	EnableReverseIndex bool
+	ConfigPath string
+	Address    string
 
 	EnableConfigSync  bool
 	ScratchDir        string
@@ -75,6 +73,9 @@ func (op *Operator) Setup() error {
 	cfg, err := config.LoadConfig(op.Opt.ConfigPath)
 	if err != nil {
 		return err
+	}
+	if op.Opt.Address != "" {
+		cfg.APIServer.Address = op.Opt.Address
 	}
 	err = cfg.Validate()
 	if err != nil {
@@ -123,7 +124,7 @@ func (op *Operator) Setup() error {
 
 	// Enable full text indexing to have search feature
 	indexDir := filepath.Join(op.Opt.ScratchDir, "bleve")
-	if op.Opt.EnableSearchIndex {
+	if op.Config.APIServer.EnableSearchIndex {
 		si, err := indexers.NewResourceIndexer(indexDir)
 		if err != nil {
 			return err
@@ -131,7 +132,7 @@ func (op *Operator) Setup() error {
 		op.SearchIndex = si
 	}
 	// Enable pod -> service, service -> serviceMonitor indexing
-	if op.Opt.EnableReverseIndex {
+	if op.Config.APIServer.EnableReverseIndex {
 		ri, err := indexers.NewReverseIndexer(op.KubeClient, op.PromClient, indexDir)
 		if err != nil {
 			return err
@@ -214,11 +215,11 @@ func (op *Operator) ListenAndServe() {
 	// Pattern matching attempts each pattern in the order in which they were
 	// registered.
 	router := pat.New()
-	if op.Opt.EnableSearchIndex {
+	if op.Config.APIServer.EnableSearchIndex {
 		op.SearchIndex.RegisterRouters(router)
 	}
 	// Enable pod -> service, service -> serviceMonitor indexing
-	if op.Opt.EnableReverseIndex {
+	if op.Config.APIServer.EnableReverseIndex {
 		router.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(op.ReverseIndex.Service.ServeHTTP))
 		if util.IsPreferredAPIResource(op.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind) {
 			// Add Indexer only if Server support this resource

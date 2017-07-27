@@ -42,7 +42,7 @@ func (op *Operator) WatchReplicaSets() {
 					log.Infof("ReplicaSet %s@%s added", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
-					if op.Opt.EnableSearchIndex {
+					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
 							log.Errorln(err)
 						}
@@ -54,7 +54,7 @@ func (op *Operator) WatchReplicaSets() {
 					log.Infof("ReplicaSet %s@%s deleted", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
-					if op.Opt.EnableSearchIndex {
+					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
 						}
@@ -78,7 +78,7 @@ func (op *Operator) WatchReplicaSets() {
 				util.AssignTypeKind(oldRes)
 				util.AssignTypeKind(newRes)
 
-				if op.Opt.EnableSearchIndex {
+				if op.Config.APIServer.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
 				if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdates {

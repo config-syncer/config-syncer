@@ -19,6 +19,13 @@ type ClusterConfig struct {
 	EnableConfigSyncer bool                `json:"enableConfigSyncer"`
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
 	Janitors           []JanitorSpec       `json:"janitors,omitempty"`
+	APIServer          APIServerSpec       `json:"apiServer,omitempty"`
+}
+
+type APIServerSpec struct {
+	Address            string `json:"address"`
+	EnableSearchIndex  bool   `json:"enableSearchIndex"`
+	EnableReverseIndex bool   `json:"enableReverseIndex"`
 }
 
 type JanitorSpec struct {

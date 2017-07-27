@@ -47,6 +47,11 @@ func main() {
 
 func CreateClusterConfig() config.ClusterConfig {
 	return config.ClusterConfig{
+		APIServer: config.APIServerSpec{
+			Address:            ":8081",
+			EnableSearchIndex:  true,
+			EnableReverseIndex: true,
+		},
 		Snapshotter: &config.SnapshotSpec{
 			Schedule: "@every 6h",
 			Sanitize: true,
