@@ -3,18 +3,17 @@ package operator
 import (
 	"encoding/json"
 	"net/http"
+	_ "net/http/pprof"
 	"path/filepath"
 	"sync"
 	"time"
 
-	apiver "github.com/appscode/api/version"
 	"github.com/appscode/envconfig"
 	v "github.com/appscode/go/version"
 	"github.com/appscode/kubed/pkg/backup"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
-	"github.com/appscode/kubed/pkg/health"
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/influxdb"
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
@@ -30,6 +29,7 @@ import (
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"gopkg.in/robfig/cron.v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
@@ -40,10 +40,9 @@ type Options struct {
 	Master     string
 	KubeConfig string
 
-	ConfigPath         string
-	Address            string
-	EnableSearchIndex  bool
-	EnableReverseIndex bool
+	ConfigPath string
+	APIAddress string
+	WebAddress string
 
 	EnableConfigSync  bool
 	ScratchDir        string
@@ -79,6 +78,9 @@ func (op *Operator) Setup() error {
 	cfg, err := config.LoadConfig(op.Opt.ConfigPath)
 	if err != nil {
 		return err
+	}
+	if op.Opt.APIAddress != "" {
+		cfg.APIServer.Address = op.Opt.APIAddress
 	}
 	err = cfg.Validate()
 	if err != nil {
@@ -127,7 +129,7 @@ func (op *Operator) Setup() error {
 
 	// Enable full text indexing to have search feature
 	indexDir := filepath.Join(op.Opt.ScratchDir, "bleve")
-	if op.Opt.EnableSearchIndex {
+	if op.Config.APIServer.EnableSearchIndex {
 		si, err := indexers.NewResourceIndexer(indexDir)
 		if err != nil {
 			return err
@@ -135,7 +137,7 @@ func (op *Operator) Setup() error {
 		op.SearchIndex = si
 	}
 	// Enable pod -> service, service -> serviceMonitor indexing
-	if op.Opt.EnableReverseIndex {
+	if op.Config.APIServer.EnableReverseIndex {
 		ri, err := indexers.NewReverseIndexer(op.KubeClient, op.PromClient, indexDir)
 		if err != nil {
 			return err
@@ -209,7 +211,7 @@ func (op *Operator) RunWatchers() {
 	go op.WatchVoyagerIngresses()
 }
 
-func (op *Operator) ListenAndServe() {
+func (op *Operator) RunAPIServer() {
 	// router is default HTTP request multiplexer for kubed. It matches the URL of each
 	// incoming request against a list of registered patterns with their associated
 	// methods and calls the handler for the pattern that most closely matches the
@@ -218,11 +220,11 @@ func (op *Operator) ListenAndServe() {
 	// Pattern matching attempts each pattern in the order in which they were
 	// registered.
 	router := pat.New()
-	if op.Opt.EnableSearchIndex {
+	if op.Config.APIServer.EnableSearchIndex {
 		op.SearchIndex.RegisterRouters(router)
 	}
 	// Enable pod -> service, service -> serviceMonitor indexing
-	if op.Opt.EnableReverseIndex {
+	if op.Config.APIServer.EnableReverseIndex {
 		router.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(op.ReverseIndex.Service.ServeHTTP))
 		if util.IsPreferredAPIResource(op.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind) {
 			// Add Indexer only if Server support this resource
@@ -235,31 +237,22 @@ func (op *Operator) ListenAndServe() {
 	}
 
 	router.Get("/health", http.HandlerFunc(op.healthHandler))
-
-	http.Handle("/", router)
-	log.Fatalln(http.ListenAndServe(op.Opt.Address, nil))
+	log.Fatalln(http.ListenAndServe(op.Config.APIServer.Address, router))
 }
 
 func (op *Operator) healthHandler(w http.ResponseWriter, r *http.Request) {
-	resp := &health.KubedHealth{
+	resp := struct {
+		OperatorNamespace   string      `json:"operatorNamespace,omitempty"`
+		SearchEnabled       bool        `json:"searchEnabled"`
+		ReverseIndexEnabled bool        `json:"reverseIndexEnabled"`
+		AnalyticsEnabled    bool        `json:"analyticsEnabled"`
+		Version             interface{} `json:"version,omitempty"`
+	}{
 		AnalyticsEnabled:    op.Opt.EnableAnalytics,
 		OperatorNamespace:   op.Opt.OperatorNamespace,
-		SearchEnabled:       op.Opt.EnableSearchIndex,
-		ReverseIndexEnabled: op.Opt.EnableReverseIndex,
-		Version: &apiver.Version{
-			Version:         v.Version.Version,
-			VersionStrategy: v.Version.VersionStrategy,
-			Os:              v.Version.Os,
-			Arch:            v.Version.Arch,
-			CommitHash:      v.Version.CommitHash,
-			GitBranch:       v.Version.GitBranch,
-			GitTag:          v.Version.GitTag,
-			CommitTimestamp: v.Version.CommitTimestamp,
-			BuildTimestamp:  v.Version.BuildTimestamp,
-			BuildHost:       v.Version.BuildHost,
-			BuildHostOs:     v.Version.BuildHostOs,
-			BuildHostArch:   v.Version.BuildHostArch,
-		},
+		SearchEnabled:       op.Config.APIServer.EnableSearchIndex,
+		ReverseIndexEnabled: op.Config.APIServer.EnableReverseIndex,
+		Version:             &v.Version,
 	}
 	err := json.NewEncoder(w).Encode(resp)
 	if err != nil {
@@ -376,5 +369,11 @@ func (op *Operator) RunAndHold() {
 	}
 
 	op.RunWatchers()
-	op.ListenAndServe()
+	go op.RunAPIServer()
+
+	m := pat.New()
+	m.Get("/metrics", promhttp.Handler())
+	http.Handle("/", m)
+	log.Infoln("Listening on", op.Opt.WebAddress)
+	log.Fatal(http.ListenAndServe(op.Opt.WebAddress, nil))
 }

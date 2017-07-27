@@ -14,15 +14,14 @@ kubed run [flags]
 ### Options
 
 ```
-      --address string         The address of the Kubed API Server (default ":8081")
       --analytics              Send analytical events to Google Analytics (default true)
+      --api.address string     The address of the Kubed API Server (overrides any value in clusterconfig) (default ":8080")
       --clusterconfig string   Path to cluster config file (default "/srv/kubed/config.yaml")
-      --enable-reverse-index   Reverse indexing of pods to service and others (default true)
-      --enable-search-index    Generate search index for Kubernetes api objects (default true)
   -h, --help                   help for run
       --kubeconfig string      Path to kubeconfig file with authorization information (the master location is set by the master flag).
       --master string          The address of the Kubernetes API server (overrides any value in kubeconfig)
       --scratch-dir emptyDir   Directory used to store temporary files. Use an emptyDir in Kubernetes. (default "/tmp")
+      --web.address string     Address to listen on for web interface and telemetry. (default ":56790")
 ```
 
 ### Options inherited from parent commands

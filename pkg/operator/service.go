@@ -40,12 +40,12 @@ func (op *Operator) watchService() {
 					log.Infof("Service %s@%s added", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
-					if op.Opt.EnableSearchIndex {
+					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
 							log.Errorln(err)
 						}
 					}
-					if op.Opt.EnableReverseIndex {
+					if op.Config.APIServer.EnableReverseIndex {
 						op.ReverseIndex.Service.Add(res)
 						if op.ReverseIndex.ServiceMonitor != nil {
 							serviceMonitors, err := op.PromClient.ServiceMonitors(apiv1.NamespaceAll).List(metav1.ListOptions{})
@@ -65,12 +65,12 @@ func (op *Operator) watchService() {
 					log.Infof("Service %s@%s deleted", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
-					if op.Opt.EnableSearchIndex {
+					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
 						}
 					}
-					if op.Opt.EnableReverseIndex {
+					if op.Config.APIServer.EnableReverseIndex {
 						op.ReverseIndex.Service.Delete(res)
 						if op.ReverseIndex.ServiceMonitor != nil {
 							op.ReverseIndex.ServiceMonitor.DeleteService(res)
@@ -95,10 +95,10 @@ func (op *Operator) watchService() {
 				util.AssignTypeKind(oldRes)
 				util.AssignTypeKind(newRes)
 
-				if op.Opt.EnableSearchIndex {
+				if op.Config.APIServer.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
-				if op.Opt.EnableReverseIndex {
+				if op.Config.APIServer.EnableReverseIndex {
 					op.ReverseIndex.Service.Update(oldRes, newRes)
 				}
 				if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdates {

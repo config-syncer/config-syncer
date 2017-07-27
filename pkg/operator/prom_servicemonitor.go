@@ -42,13 +42,13 @@ func (op *Operator) WatchServiceMonitors() {
 					log.Infof("ServiceMonitor %s@%s added", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
-					if op.Opt.EnableSearchIndex {
+					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
 							log.Errorln(err)
 						}
 					}
 
-					if op.Opt.EnableReverseIndex {
+					if op.Config.APIServer.EnableReverseIndex {
 						if err := op.ReverseIndex.ServiceMonitor.Add(res); err != nil {
 							log.Errorln(err)
 						}
@@ -70,7 +70,7 @@ func (op *Operator) WatchServiceMonitors() {
 					log.Infof("ServiceMonitor %s@%s deleted", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
-					if op.Opt.EnableSearchIndex {
+					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
 						}
@@ -79,7 +79,7 @@ func (op *Operator) WatchServiceMonitors() {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
 					}
 
-					if op.Opt.EnableReverseIndex {
+					if op.Config.APIServer.EnableReverseIndex {
 						if err := op.ReverseIndex.ServiceMonitor.Delete(res); err != nil {
 							log.Errorln(err)
 						}
@@ -103,7 +103,7 @@ func (op *Operator) WatchServiceMonitors() {
 				util.AssignTypeKind(oldRes)
 				util.AssignTypeKind(newRes)
 
-				if op.Opt.EnableSearchIndex {
+				if op.Config.APIServer.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
 				if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdates {
@@ -114,7 +114,7 @@ func (op *Operator) WatchServiceMonitors() {
 					}
 				}
 
-				if op.Opt.EnableReverseIndex {
+				if op.Config.APIServer.EnableReverseIndex {
 					if err := op.ReverseIndex.ServiceMonitor.Update(oldRes, newRes); err != nil {
 						log.Errorln(err)
 					}

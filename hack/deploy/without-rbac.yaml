@@ -19,9 +19,14 @@ spec:
         args:
         - run
         - --v=3
+        - --api.address=:8080
+        - --web.address=:56790
         ports:
+        - containerPort: 8080
+          name: api
+          protocol: TCP
         - containerPort: 56790
-          name: http
+          name: web
           protocol: TCP
         volumeMounts:
           - name: config
@@ -44,8 +49,11 @@ metadata:
     app: kubed
 spec:
   ports:
-  - name: http
+  - name: api
+    port: 8080
+    targetPort: api
+  - name: web
     port: 56790
-    targetPort: http
+    targetPort: web
   selector:
     app: kubed

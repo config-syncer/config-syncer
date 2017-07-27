@@ -42,13 +42,13 @@ func (op *Operator) WatchPrometheuss() {
 					log.Infof("Prometheus %s@%s added", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
-					if op.Opt.EnableSearchIndex {
+					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
 							log.Errorln(err)
 						}
 					}
 
-					if op.Opt.EnableReverseIndex {
+					if op.Config.APIServer.EnableReverseIndex {
 						if err := op.ReverseIndex.Prometheus.Add(res); err != nil {
 							log.Errorln(err)
 						}
@@ -60,13 +60,13 @@ func (op *Operator) WatchPrometheuss() {
 					log.Infof("Prometheus %s@%s deleted", res.Name, res.Namespace)
 					util.AssignTypeKind(res)
 
-					if op.Opt.EnableSearchIndex {
+					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
 							log.Errorln(err)
 						}
 					}
 
-					if op.Opt.EnableReverseIndex {
+					if op.Config.APIServer.EnableReverseIndex {
 						if err := op.ReverseIndex.Prometheus.Delete(res); err != nil {
 							log.Errorln(err)
 						}
@@ -91,11 +91,11 @@ func (op *Operator) WatchPrometheuss() {
 				util.AssignTypeKind(oldRes)
 				util.AssignTypeKind(newRes)
 
-				if op.Opt.EnableSearchIndex {
+				if op.Config.APIServer.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
 
-				if op.Opt.EnableReverseIndex {
+				if op.Config.APIServer.EnableReverseIndex {
 					if err := op.ReverseIndex.Prometheus.Update(oldRes, newRes); err != nil {
 						log.Errorln(err)
 					}

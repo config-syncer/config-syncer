@@ -23,11 +23,16 @@ spec:
         args:
         - run
         - --v=3
+        - --api.address=:8080
+        - --web.address=:56790
         image: '{{ .Values.kubed.image }}:{{ .Values.kubed.tag }}'
         imagePullPolicy: '{{ .Values.kubed.pullPolicy }}'
         ports:
+        - containerPort: 8080
+          name: api
+          protocol: TCP
         - containerPort: 56790
-          name: http
+          name: web
           protocol: TCP
         volumeMounts:
           - name: config
