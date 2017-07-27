@@ -63,19 +63,21 @@ snapshotter:
 
 
 
+### Generating Cluster Config using script
+If you are familiar with GO, you can use the [./hack/config/main.go](./hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config [./hack/deploy/config.yaml](./hack/deploy/config.yaml).
+
+```console
+go run ./hack/config/main.go
+```
 
 
+### Verifying Cluster Config
+Kubed includes a check command to verify a cluster config. Download the pre-built binary from [appscode/kubed Github releases](https://github.com/appscode/kubed/releases) and put the binary to some directory in your `PATH`.
 
-
-
-
-
-
-
-
-
-
-
+```console
+$ kubed check --clusterconfig=./hack/deploy/config.yaml
+Cluster config was parsed successfully.
+```
 
 
 
