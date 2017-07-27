@@ -284,6 +284,7 @@ type errorMap map[int]error
 
 var (
 	// Specific Errors you might want to check for equality
+	NotModified         = newError(304, "Not Modified")
 	BadRequest          = newError(400, "Bad Request")
 	AuthorizationFailed = newError(401, "Authorization Failed")
 	ContainerNotFound   = newError(404, "Container Not Found")
@@ -311,6 +312,7 @@ var (
 
 	// Mappings for object errors
 	objectErrorMap = errorMap{
+		304: NotModified,
 		400: BadRequest,
 		403: Forbidden,
 		404: ObjectNotFound,

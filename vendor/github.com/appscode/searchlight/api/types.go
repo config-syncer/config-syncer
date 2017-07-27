@@ -30,5 +30,5 @@ type Receiver struct {
 	To []string `json:"to,omitempty"`
 
 	// How this notification will be sent
-	Method string `json:"method,omitempty"`
+	Notifier string `json:"notifier,omitempty"`
 }

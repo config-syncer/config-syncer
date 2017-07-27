@@ -7,14 +7,12 @@ import (
 	"sync"
 	"time"
 
-	apiver "github.com/appscode/api/version"
 	"github.com/appscode/envconfig"
 	v "github.com/appscode/go/version"
 	"github.com/appscode/kubed/pkg/backup"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
-	"github.com/appscode/kubed/pkg/health"
 	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/influxdb"
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
@@ -242,25 +240,18 @@ func (op *Operator) ListenAndServe() {
 }
 
 func (op *Operator) healthHandler(w http.ResponseWriter, r *http.Request) {
-	resp := &health.KubedHealth{
+	resp := struct {
+		OperatorNamespace   string      `json:"operatorNamespace,omitempty"`
+		SearchEnabled       bool        `json:"searchEnabled"`
+		ReverseIndexEnabled bool        `json:"reverseIndexEnabled"`
+		AnalyticsEnabled    bool        `json:"analyticsEnabled"`
+		Version             interface{} `json:"version,omitempty"`
+	}{
 		AnalyticsEnabled:    op.Opt.EnableAnalytics,
 		OperatorNamespace:   op.Opt.OperatorNamespace,
-		SearchEnabled:       op.Opt.EnableSearchIndex,
-		ReverseIndexEnabled: op.Opt.EnableReverseIndex,
-		Version: &apiver.Version{
-			Version:         v.Version.Version,
-			VersionStrategy: v.Version.VersionStrategy,
-			Os:              v.Version.Os,
-			Arch:            v.Version.Arch,
-			CommitHash:      v.Version.CommitHash,
-			GitBranch:       v.Version.GitBranch,
-			GitTag:          v.Version.GitTag,
-			CommitTimestamp: v.Version.CommitTimestamp,
-			BuildTimestamp:  v.Version.BuildTimestamp,
-			BuildHost:       v.Version.BuildHost,
-			BuildHostOs:     v.Version.BuildHostOs,
-			BuildHostArch:   v.Version.BuildHostArch,
-		},
+		SearchEnabled:       op.Config.APIServer.EnableSearchIndex,
+		ReverseIndexEnabled: op.Config.APIServer.EnableReverseIndex,
+		Version:             &v.Version,
 	}
 	err := json.NewEncoder(w).Encode(resp)
 	if err != nil {
