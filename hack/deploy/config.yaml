@@ -1,13 +1,13 @@
 enableConfigSyncer: true
 eventForwarder:
-  ingressAdded: {}
   nodeAdded: {}
+  ingressAdded: {}
+  storageAdded: {}
+  warningEvents: {}
   receiver:
     notifier: mailgun
     to:
     - ops@example.com
-  storageAdded: {}
-  warningEvents: {}
 notifierSecretName: kubed-notifier
 recycleBin:
   handle_update: false

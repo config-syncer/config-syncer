@@ -1,13 +1,7 @@
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 # Forward Cluster Events
-Kubed can send notifications for various cluster events 
-Sometimes you have some configuration that you want to synchronize across all Kubernetes namespaces. Kubed can do that for you. If a ConfigMap or Secret has the annotation __`kubed.appscode.com/sync: true`__, Kubed will create a similar ConfigMap / Secret in all existing namespaces. Kubed will also create this ConfigMap/Secret, when you create a new namespace. If the data in the source ConfigMap/Secret is updated, all the copies will be updated. Either delete the source ConfigMap/Secret or remove the annotation from the source ConfigMap/Secret to purge the copies. If the namespace with the source ConfigMap/Secret is deleted, the copies are left intact.
-
-> New to Kubed? Please start [here](/docs/tutorials/README.md).
-
-# Kubernetes Recycle Bin
-Kubed provides a recycle bin for deleted and/or updated Kubernetes objects. Once activated, any deleted and/or updated object is stored in YAML format in folder mounted inside Kubed pod. This tutorial will show you how to use Kubed to setup a recycle bin for Kubernetes cluster objects.
+Kubed can send notifications via Email, SMS or Chat for various cluster events. This tutorial will show you how to use Kubed to setup an event forwarder.
 
 
 ## Before You Begin
@@ -21,11 +15,10 @@ To enable config syncer, you need a cluster config like below.
 $ cat ./docs/examples/event-forwarder/config.yaml
 
 eventForwarder:
-  eventNamespaces:
-  - kube-system
-  forwardWarningEvents: true
-  notifyOnIngressAdd: true
-  notifyOnStorageAdd: true
+  nodeAdded: {}
+  ingressAdded: {}
+  storageAdded: {}
+  warningEvents: {}
   receiver:
     notifier: mailgun
     to:
@@ -33,12 +26,13 @@ eventForwarder:
 notifierSecretName: kubed-notifier
 ```
 
-| Key                        | Description                                                                               |
-|----------------------------|-------------------------------------------------------------------------------------------|
-| `recycleBin.path`          | `Required`. Path to folder where deleted and/or updated objects are stored. |
-| `recycleBin.ttl`           | `Required`. Duration for which deleted and/or updated objects are stored before purging. |
-| `recycleBin.handle_update` | `Optional`. If set to `true`, past version of supported objects are stored when updated. We recommend that you keep this set to `false` on an active cluster. |
-| `recycleBin.receiver`      | `Optional`. If set, a notification will be sent when any supported object is deleted and/or updated. To learn how to use various notifiers, please visit [here](/docs/tutorials/notifiers.md). |
+| Key                            | Description                                                                       |
+|--------------------------------|-----------------------------------------------------------------------------------|
+| `eventForwarder.nodeAdded`     | `Optional`. If set, notifications are sent when a Node is added.                  |
+| `eventForwarder.ingressAdded`  | `Optional`. If set, notifications are sent when an Ingress is added.              |
+| `eventForwarder.storageAdded`  | `Optional`. If set, notifications are sent when a StorageClass/PV/PVC is added.   |
+| `eventForwarder.warningEvents` | `Optional`. If set, notifications are sent when a `Warning` Event is added.       |
+| `eventForwarder.receiver`      | `Required`. To learn how to use various notifiers, please visit [here](/docs/tutorials/notifiers.md). |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
@@ -54,17 +48,15 @@ secret "kubed-config" labeled
 $ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
-  config.yaml: bm90aWZpZXJTZWNyZXROYW1lOiBrdWJlZC1ub3RpZmllcgpyZWN5Y2xlQmluOgogIGhhbmRsZV91cGRhdGU6IGZhbHNlCiAgcGF0aDogL3RtcC9rdWJlZAogIHJlY2VpdmVyOgogICAgbm90aWZpZXI6IG1haWxndW4KICAgIHRvOgogICAgLSBvcHNAZXhhbXBsZS5jb20KICB0dGw6IDE2OGgK
+  config.yaml: ZXZlbnRGb3J3YXJkZXI6CiAgbm9kZUFkZGVkOiB7fQogIGluZ3Jlc3NBZGRlZDoge30KICBzdG9yYWdlQWRkZWQ6IHt9CiAgd2FybmluZ0V2ZW50czoge30KICByZWNlaXZlcjoKICAgIG5vdGlmaWVyOiBtYWlsZ3VuCiAgICB0bzoKICAgIC0gb3BzQGV4YW1wbGUuY29tCm5vdGlmaWVyU2VjcmV0TmFtZToga3ViZWQtbm90aWZpZXIK
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-26T18:55:54Z
-  labels:
-    app: kubed
+  creationTimestamp: 2017-07-27T00:53:01Z
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "32920"
+  resourceVersion: "56568"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: 0d3aa21b-7234-11e7-af79-08002738e55e
+  uid: f0cb8f70-7265-11e7-af79-08002738e55e
 type: Opaque
 ```
 
@@ -204,12 +196,8 @@ Following Kubernetes objects are supported by recycle bin:
 To add support for additional object types, please [file an issue](https://github.com/appscode/kubed/issues/new?title=Support+Object+Kind+[xyz]+in+RecycleBin). We are exploring ways to watch for any object deletion [here](https://github.com/appscode/kubed/issues/41).
 
 
-## Using Persistent Storage
-The installation scripts for Kubed mounts an `emptyDir` under `/tmp` path. This tutorial used `/tmp/kubed/trash` to store objects in recycle bin. If you want to use a [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) to recycle bin data, mount a PV and updated the `recycleBin.path` accordingly.
-
-
 ## Disable Recycle Bin
-If you would like to disable this feature, remove the `recyclebin` portion of your Kubed cluster config. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
+If you would like to disable this feature, remove the `eventForwarder` portion of your Kubed cluster config. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
 
 
 ## Cleaning up
