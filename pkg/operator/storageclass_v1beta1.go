@@ -48,7 +48,8 @@ func (op *Operator) WatchStorageClassV1beta1() {
 					}
 
 					if op.Eventer != nil &&
-						op.Config.EventForwarder.StorageAdded.Handle {
+						op.Config.EventForwarder.StorageAdded.Handle &&
+						util.IsRecentlyAdded(res.ObjectMeta) {
 						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
 					}
 				}

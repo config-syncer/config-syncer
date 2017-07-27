@@ -3,6 +3,7 @@ package util
 import (
 	"errors"
 	"strconv"
+	"time"
 
 	searchlight "github.com/appscode/searchlight/api"
 	stash "github.com/appscode/stash/api"
@@ -37,6 +38,14 @@ func IsPreferredAPIResource(kubeClient clientset.Interface, groupVersion, kind s
 		}
 	}
 	return false
+}
+
+const (
+	maxSyncInterval = 5 * time.Minute
+)
+
+func IsRecentlyAdded(meta metav1.ObjectMeta) bool {
+	return time.Now().Sub(meta.CreationTimestamp.Time) < maxSyncInterval
 }
 
 func GetBool(m map[string]string, key string) (bool, error) {
