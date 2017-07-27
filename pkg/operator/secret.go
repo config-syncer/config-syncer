@@ -42,7 +42,7 @@ func (op *Operator) WatchSecrets() {
 					util.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
-						if err := op.SearchIndex.HandleAdd(obj); err != nil {
+						if err := op.SearchIndex.HandleAdd(util.ObfuscateSecret(*res)); err != nil {
 							log.Errorln(err)
 						}
 					}
@@ -57,12 +57,12 @@ func (op *Operator) WatchSecrets() {
 					util.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
-						if err := op.SearchIndex.HandleDelete(obj); err != nil {
+						if err := op.SearchIndex.HandleDelete(util.ObfuscateSecret(*res)); err != nil {
 							log.Errorln(err)
 						}
 					}
 					if op.TrashCan != nil {
-						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
+						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, util.ObfuscateSecret(*res))
 					}
 					if op.ConfigSyncer != nil {
 						op.ConfigSyncer.SyncSecret(res, nil)
@@ -84,13 +84,13 @@ func (op *Operator) WatchSecrets() {
 				util.AssignTypeKind(newRes)
 
 				if op.Config.APIServer.EnableSearchIndex {
-					op.SearchIndex.HandleUpdate(old, new)
+					op.SearchIndex.HandleUpdate(util.ObfuscateSecret(*oldRes), util.ObfuscateSecret(*newRes))
 				}
 				if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 					!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
 					!reflect.DeepEqual(oldRes.Data, newRes.Data) {
 					if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdates {
-						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
+						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, util.ObfuscateSecret(*oldRes), util.ObfuscateSecret(*newRes))
 					}
 
 					if op.ConfigSyncer != nil {
