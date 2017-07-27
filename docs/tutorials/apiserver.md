@@ -45,19 +45,54 @@ secret "kubed-config" labeled
 $ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
-  config.yaml: YXBpU2VydmVyOgogIGFkZHJlc3M6IDo4MDgxCiAgZW5hYmxlUmV2ZXJzZUluZGV4OiB0cnVlCiAgZW5hYmxlU2VhcmNoSW5kZXg6IHRydWUK
+  config.yaml: YXBpU2VydmVyOgogIGFkZHJlc3M6IDo4MDgwCiAgZW5hYmxlUmV2ZXJzZUluZGV4OiB0cnVlCiAgZW5hYmxlU2VhcmNoSW5kZXg6IHRydWUK
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-27T10:07:49Z
+  creationTimestamp: 2017-07-27T10:47:41Z
+  labels:
+    app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "27771685"
+  resourceVersion: "2187"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: 71d5f538-72b3-11e7-8b69-12f236046fba
+  uid: 039ab470-72b9-11e7-a1f7-080027df84b0
 type: Opaque
 ```
 
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, go to the next section.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```json
+$ curl http://127.0.0.1:8080/search?q=dashboard
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Using Kubed API Server
