@@ -125,6 +125,63 @@ Now, assuming you configured a GMail account as the receiver for events, you sho
 ![PVC Added Notification](/docs/images/event-forwarder/pvc-added-notification.png)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```yaml
+$ cat ./docs/examples/event-forwarder/demo-1.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  namespace: demo
+spec:
+  restartPolicy: Never
+  containers:
+  - name: busybox
+    image: busybox
+    imagePullPolicy: IfNotPresent
+    command:
+      - bad
+      - "3600"
+```
+```console
+$ kubectl apply -f ./docs/examples/event-forwarder/demo-1.yaml
+pod "busybox" created
+
+$ kubectl get pods -n demo --show-all
+NAME      READY     STATUS                                                                                                                                                                                                      RESTARTS   AGE
+busybox   0/1       rpc error: code = 2 desc = failed to start container "bcc25386c0c9421b04ce9c574405917fc4940a0b324a2b062f02978c46463f07": Error response from daemon: Container command 'bad' not found or does not exist.   0          10m
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Filter by Namespaces
 You can configure Kubed to forward events for a subset of namespaces. You can also disable sending events for a particular type. Here is an example `config.yaml`:
 ```yaml
