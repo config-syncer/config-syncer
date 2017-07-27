@@ -144,10 +144,10 @@ notifierSecretName: kubed-notifier
 ```
 
 In the above example:
- - Notifications are sent when Nodes are added.
- - Notifications are sent when Ingress objects are added in `default` namespace.
- - _No_ notifications are sent when StorageClass/PV/PVC etc are added.
- - Notifications are sent when Events are added in `kube-system` namespace.
+ - `eventForwarder.nodeAdded` is set to an empty object `{}`. So, notifications are sent when Nodes are added.
+ - `eventForwarder.ingressAdded` is set. Notifications are sent when Ingress objects are added in `default` namespace.
+ - `eventForwarder.storageAdded` is missing. So, _no_ notifications are sent when StorageClass/PV/PVC etc are added.
+ - `eventForwarder.warningEvents` is set. Notifications are sent when Events are added in `kube-system` namespace.
 
 
 ## Disable Recycle Bin
@@ -157,6 +157,9 @@ If you would like to disable this feature, remove the `eventForwarder` portion o
 ## Cleaning up
 To cleanup the Kubernetes resources created by this tutorial, run the following commands:
 ```console
+$ kubectl delete pvc myclaim -n demo
+persistentvolumeclaim "myclaim" deleted
+
 $ kubectl delete ns demo
 namespace "demo" deleted
 ```
