@@ -60,145 +60,32 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, go to the next section.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, you should start to receive notifications when a Warning Event happens in your cluster.
 
 
 ## Filter by Namespaces
-
-
-
-
-## Using Recycle Bin
-In this tutorial, a ConfigMap will be used to show how recycle bin feature can be used.
-
-To keep things isolated, this tutorial uses a separate namespace called `demo` throughout this tutorial. Run the following command to prepare your cluster for this tutorial:
-
-```console
-$ kubectl create namespace demo
-namespace "demo" created
-
-~ $ kubectl get namespaces
-NAME          STATUS    AGE
-default       Active    6h
-kube-public   Active    6h
-kube-system   Active    6h
-demo          Active    4m
-```
-
-Create a ConfigMap called `omni` in the `demo` namespace.
-
-```console
-$ kubectl create configmap omni -n demo --from-literal=hello=world
-configmap "omni" created
-```
+You can configure Kubed to forward events for a subset of namespaces. You can also disable sending events for a particular type. Here is an example `config.yaml`:
 ```yaml
-$ kubectl get configmaps omni -n demo -o yaml
-apiVersion: v1
-data:
-  hello: world
-kind: ConfigMap
-metadata:
-  creationTimestamp: 2017-07-26T19:18:40Z
-  name: omni
-  namespace: demo
-  resourceVersion: "34414"
-  selfLink: /api/v1/namespaces/demo/configmaps/omni
-  uid: 3b77f592-7237-11e7-af79-08002738e55e
+eventForwarder:
+  nodeAdded: {}
+  ingressAdded:
+    namespaces:
+    - default
+  warningEvents:
+    namespaces:
+    - kube-system
+  receiver:
+    notifier: mailgun
+    to:
+    - ops@example.com
+notifierSecretName: kubed-notifier
 ```
 
-Now, delete the ConfigMap `omni`. Kubed operator pod will notice this and stored the deleted object in YAML format in a file matching the `selfLink` for that object inside the `recycleBin.path` folder.
-
-```console
-# Exec into kubed operator pod
-$ kubectl exec -it $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system sh
-
-# running inside kubed operator pod
-/ # find /tmp/kubed/trash/
-/tmp/kubed/trash/
-/tmp/kubed/trash/api
-/tmp/kubed/trash/api/v1
-/tmp/kubed/trash/api/v1/namespaces
-/tmp/kubed/trash/api/v1/namespaces/demo
-/tmp/kubed/trash/api/v1/namespaces/demo/configmaps
-/tmp/kubed/trash/api/v1/namespaces/demo/configmaps/omni.20170726T193302.yaml
-
-/ # cat /tmp/kubed/trash/api/v1/namespaces/demo/configmaps/omni.20170726T193302.yaml
-apiVersion: v1
-data:
-  hello: world
-kind: ConfigMap
-metadata:
-  creationTimestamp: 2017-07-26T19:33:02Z
-  name: omni
-  namespace: demo
-  resourceVersion: "35481"
-  selfLink: /api/v1/namespaces/demo/configmaps/omni
-  uid: 3d50fba0-7239-11e7-af79-08002738e55e
-```
-
-## Supported Kubernetes Objects
-Following Kubernetes objects are supported by recycle bin:
-- __v1:__
-  - ComponentStatus
-  - ConfigMap
-  - Endpoints
-  - Event
-  - LimitRange
-  - Namespace
-  - Node
-  - PersistentVolume
-  - PersistentVolumeClaim
-  - Pod
-  - ReplicationController
-  - Secret
-  - Service
-  - ServiceAccount
-- __apps/v1beta1:__
-  - Deployment
-  - StatefulSet
-- __batch/v1:__
-  - Job
-- __batch/v2alpha1:__
-  - CronJob
-- __extensions/v1beta1:__
-  - DaemonSet
-  - Deployment
-  - Ingress
-  - ReplicaSet
-  - ThirdPartyResource
-- __kubedb/v1alpha1:__
-  - DormantDatabase
-  - Elasticsearch
-  - Postgres
-  - Snapshot
-- __monitoring.coreos.com:__
-  - Prometheus
-  - ServiceMonitor
-- __rbac/v1alpha1:__
-  - ClusterRole
-  - ClusterRoleBinding
-  - Role
-  - RoleBinding
-- __rbac/v1beta1:__
-  - ClusterRole
-  - ClusterRoleBinding
-  - Role
-  - RoleBinding
-- __monitoring.appscode.com/v1alpha1:__
-  - ClusterAlert
-  - NodeAlert
-  - PodAlert
-- __stash.appscode.com/v1alpha1:__
-  - Restic
-- __storage/v1:__
-  - StorageClass
-- __storage/v1beta1:__
-  - StorageClass
-- __voyager.appscode.com/v1beta1:__
-  - Certificate
-  - Ingress
-
-To add support for additional object types, please [file an issue](https://github.com/appscode/kubed/issues/new?title=Support+Object+Kind+[xyz]+in+RecycleBin). We are exploring ways to watch for any object deletion [here](https://github.com/appscode/kubed/issues/41).
+In the above example:
+ - Notifications are sent when Nodes are added.
+ - Notifications are sent when Ingress objects are added in `default` namespace.
+ - _No_ notifications are sent when StorageClass/PV/PVC etc are added.
+ - Notifications are sent when Events are added in `kube-system` namespace.
 
 
 ## Disable Recycle Bin
