@@ -9,7 +9,7 @@ Kubed by AppsCode is a Kubernetes Cluster Operator Daemon. Kubed can do the foll
  - Kubed can [forward Cluster Events](/docs/tutorials/event-forwarder.md) to various destinations.
  - Kubed can setup [janitors](/docs/tutorials/janitors.md) for Elasticsearch and InfluxDB.
  - Kubed to [send notifications](/docs/tutorials/notifiers.md) via Email, SMS or Chat.
- - Kubed includes a search engine(/docs/tutorials/apiserver.md) for your cluster objects built on top of [bleve](https://github.com/blevesearch/bleve).
+ - Kubed has a built-in [search engine](/docs/tutorials/apiserver.md) for your cluster objects using [bleve](https://github.com/blevesearch/bleve).
 
 ## Supported Versions
 Kubernetes 1.5+
