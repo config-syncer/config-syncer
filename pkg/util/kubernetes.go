@@ -48,6 +48,15 @@ func IsRecentlyAdded(meta metav1.ObjectMeta) bool {
 	return time.Now().Sub(meta.CreationTimestamp.Time) < maxSyncInterval
 }
 
+func ObfuscateSecret(in apiv1.Secret) *apiv1.Secret {
+	data := make(map[string][]byte)
+	for k := range in.Data {
+		data[k] = []byte("-")
+	}
+	in.Data = data
+	return &in
+}
+
 func GetBool(m map[string]string, key string) (bool, error) {
 	if m == nil {
 		return false, nil
