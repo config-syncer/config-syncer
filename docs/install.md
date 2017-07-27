@@ -2,6 +2,90 @@
 
 # Installation Guide
 
+
+
+
+
+
+
+
+
+
+```yaml
+apiServer:
+  address: :8080
+  enableReverseIndex: true
+  enableSearchIndex: true
+enableConfigSyncer: true
+eventForwarder:
+  ingressAdded:
+    handle: true
+  nodeAdded:
+    handle: true
+  receiver:
+    notifier: mailgun
+    to:
+    - ops@example.com
+  storageAdded:
+    handle: true
+  warningEvents:
+    handle: true
+    namespaces:
+    - kube-system
+janitors:
+- elasticsearch:
+    endpoint: http://elasticsearch-logging.kube-system:9200
+    logIndexPrefix: logstash-
+  kind: Elasticsearch
+  ttl: 2160h0m0s
+- influxdb:
+    endpoint: https://monitoring-influxdb.kube-system:8086
+  kind: InfluxDB
+  ttl: 2160h0m0s
+notifierSecretName: kubed-notifier
+recycleBin:
+  handleUpdates: false
+  path: /tmp/kubed/trash
+  receiver:
+    notifier: mailgun
+    to:
+    - ops@example.com
+  ttl: 168h0m0s
+snapshotter:
+  Storage:
+    gcs:
+      bucket: restic
+      prefix: minikube
+    storageSecretName: snap-secret
+  sanitize: true
+  schedule: '@every 6h'
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Using YAML
 Kubed can be installed using YAML files includes in the [/hack/deploy](/hack/deploy) folder.
 
