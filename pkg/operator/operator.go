@@ -3,6 +3,7 @@ package operator
 import (
 	"encoding/json"
 	"net/http"
+	_ "net/http/pprof"
 	"path/filepath"
 	"sync"
 	"time"
@@ -28,6 +29,7 @@ import (
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"gopkg.in/robfig/cron.v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
@@ -209,7 +211,7 @@ func (op *Operator) RunWatchers() {
 	go op.WatchVoyagerIngresses()
 }
 
-func (op *Operator) ListenAndServe() {
+func (op *Operator) RunAPIServer() {
 	// router is default HTTP request multiplexer for kubed. It matches the URL of each
 	// incoming request against a list of registered patterns with their associated
 	// methods and calls the handler for the pattern that most closely matches the
@@ -235,9 +237,7 @@ func (op *Operator) ListenAndServe() {
 	}
 
 	router.Get("/health", http.HandlerFunc(op.healthHandler))
-
-	http.Handle("/", router)
-	log.Fatalln(http.ListenAndServe(op.Opt.APIAddress, nil))
+	log.Fatalln(http.ListenAndServe(op.Config.APIServer.Address, router))
 }
 
 func (op *Operator) healthHandler(w http.ResponseWriter, r *http.Request) {
@@ -369,5 +369,11 @@ func (op *Operator) RunAndHold() {
 	}
 
 	op.RunWatchers()
-	op.ListenAndServe()
+	go op.RunAPIServer()
+
+	m := pat.New()
+	m.Get("/metrics", promhttp.Handler())
+	http.Handle("/", m)
+	log.Infoln("Listening on", op.Opt.WebAddress)
+	log.Fatal(http.ListenAndServe(op.Opt.WebAddress, nil))
 }

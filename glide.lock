@@ -1,15 +1,11 @@
 hash: c503a73a28c41c3283d643f020fb6a5ce4337f36ca59b0d079f284cd6c52eb6e
-updated: 2017-07-27T02:43:40.014421088-07:00
+updated: 2017-07-27T03:37:36.281332182-07:00
 imports:
 - name: cloud.google.com/go
   version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
   subpackages:
   - compute/metadata
   - internal
-- name: github.com/appscode/api
-  version: 742ab3f1702c1ad123357b1a5ea36f54843711ef
-  subpackages:
-  - version
 - name: github.com/appscode/envconfig
   version: a74ef73ab982beb8f0c6060ac44da1c960fea414
 - name: github.com/appscode/errors
@@ -107,6 +103,10 @@ imports:
   version: 70b2c90b260171e829f1ebd7c17f600c11858dbe
 - name: github.com/Azure/go-autorest
   version: d7c034a8af24eda120dd6460bfcd6d9ed14e43ca
+- name: github.com/beorn7/perks
+  version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
+  subpackages:
+  - quantile
 - name: github.com/blevesearch/bleve
   version: 97393d027342f43b17da2f02c090a4e728ac929f
   subpackages:
@@ -275,6 +275,10 @@ imports:
   repo: https://github.com/mattn/go-isatty
 - name: github.com/mattn/go-runewidth
   version: d6bea18f789704b5f83375793155289da36a3c7f
+- name: github.com/matttproud/golang_protobuf_extensions
+  version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
+  subpackages:
+  - pbutil
 - name: github.com/ncw/swift
   version: e3042b26a510db220549150362f6733012148d45
 - name: github.com/nlopes/slack
@@ -283,6 +287,23 @@ imports:
   version: cca8bbc0798408af109aaaa239cbd2634846b340
 - name: github.com/pkg/errors
   version: a22138067af1c4942683050411a841ade67fe1eb
+- name: github.com/prometheus/client_golang
+  version: c5b7fccd204277076155f10851dad72b76a49317
+  subpackages:
+  - prometheus
+  - prometheus/promhttp
+- name: github.com/prometheus/client_model
+  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
+  subpackages:
+  - go
+- name: github.com/prometheus/common
+  version: 13ba4ddd0caa9c28ca7b7bffe1dfa9ed8d5ef207
+  subpackages:
+  - expfmt
+  - internal/bitbucket.org/ww/goautoneg
+  - model
+- name: github.com/prometheus/procfs
+  version: 454a56f35412459b5e684fd5ec0f9211b94f002a
 - name: github.com/PuerkitoBio/purell
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
 - name: github.com/PuerkitoBio/urlesc
