@@ -57,8 +57,8 @@ FROM alpine
 RUN set -x \
   && apk add --update --no-cache ca-certificates
 
-COPY kubed /usr/bin/kubed
 COPY osm /usr/bin/osm
+COPY kubed /usr/bin/kubed
 ENTRYPOINT ["kubed"]
 EOL
     local cmd="docker build -t appscode/$IMG:$TAG ."
