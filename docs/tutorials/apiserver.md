@@ -62,6 +62,7 @@ type: Opaque
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, go to the next section.
 
 
+## Using Kubed API Server
 
 
 
@@ -79,9 +80,12 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 
 
 ```console
-
-
-$ kubectl exec -it $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system sh
+$ kubectl get pods -n kube-system
+NAME                              READY     STATUS    RESTARTS   AGE
+kube-addon-manager-minikube       1/1       Running   0          33m
+kube-dns-1301475494-hglm0         3/3       Running   0          33m
+kubed-operator-3234987584-sbgrf   1/1       Running   0          19s
+kubernetes-dashboard-l8vlj        1/1       Running   0          33m
 
 
 $ kubectl port-forward $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system 56790
@@ -100,13 +104,7 @@ Handling connection for 8080
 $ curl http://127.0.0.1:8080/search?q=dashboard > ./docs/examples/apiserver/search-result.json
 
 
-                                                                                                                                                             $ kubectl get pods -n kube-system
-NAME                              READY     STATUS    RESTARTS   AGE
-kube-addon-manager-minikube       1/1       Running   0          33m
-kube-dns-1301475494-hglm0         3/3       Running   0          33m
-kubed-operator-3234987584-sbgrf   1/1       Running   0          19s
-kubernetes-dashboard-l8vlj        1/1       Running   0          33m
-
+                                                                                                                                                             
 $ curl http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/kubernetes-dashboard-l8vlj/services > ./docs/examples/apiserver/pod-2-svc.json
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
@@ -129,6 +127,41 @@ https://github.com/coreos/prometheus-operator/issues/230
 
 
 
+
+## Kubed Metrics Server
+kubed exposes Prometheus ready metrics via an endpoint running 
+
+```console
+$ kubectl get pods -n kube-system
+NAME                              READY     STATUS    RESTARTS   AGE
+kube-addon-manager-minikube       1/1       Running   0          33m
+kube-dns-1301475494-hglm0         3/3       Running   0          33m
+kubed-operator-3234987584-sbgrf   1/1       Running   0          19s
+kubernetes-dashboard-l8vlj        1/1       Running   0          33m
+
+
+$ kubectl port-forward $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system 56790
+Forwarding from 127.0.0.1:56790 -> 56790
+E0727 03:50:34.668103   22871 portforward.go:212] Unable to create listener: Error listen tcp6 [::1]:56790: bind: cannot assign requested address
+Handling connection for 56790
+^C⏎
+
+
+$ kubectl port-forward $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system 8080
+Forwarding from 127.0.0.1:8080 -> 8080
+E0727 03:51:10.186041   22995 portforward.go:212] Unable to create listener: Error listen tcp6 [::1]:8080: bind: cannot assign requested address
+Handling connection for 8080
+^C⏎
+
+$ curl http://127.0.0.1:8080/search?q=dashboard > ./docs/examples/apiserver/search-result.json
+
+
+                                                                                                                                                             
+$ curl http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/kubernetes-dashboard-l8vlj/services > ./docs/examples/apiserver/pod-2-svc.json
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  1283  100  1283    0     0  89128      0 --:--:-- --:--:-- --:--:-- 91642
+```
 
 
 
