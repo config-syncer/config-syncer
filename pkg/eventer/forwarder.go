@@ -12,6 +12,7 @@ import (
 	"github.com/ghodss/yaml"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+	"github.com/tamalsaha/go-oneliners"
 )
 
 type EventForwarder struct {
@@ -61,19 +62,24 @@ func (f *EventForwarder) Forward(t metav1.TypeMeta, meta metav1.ObjectMeta, v in
 	}
 	if len(f.Receiver.To) > 0 {
 		sub := fmt.Sprintf("%s %s %s/%s added", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
+		oneliners.FILE(sub)
+		oneliners.FILE(strings.ToLower(f.Receiver.Notifier))
 		if notifier, err := unified.LoadVia(strings.ToLower(f.Receiver.Notifier), f.Loader); err == nil {
 			switch n := notifier.(type) {
 			case notify.ByEmail:
+				oneliners.FILE()
 				n.To(f.Receiver.To[0], f.Receiver.To[1:]...).
 					WithSubject(sub).
 					WithBody(string(bytes)).
 					WithNoTracking().
 					Send()
 			case notify.BySMS:
+				oneliners.FILE()
 				n.To(f.Receiver.To[0], f.Receiver.To[1:]...).
 					WithBody(sub).
 					Send()
 			case notify.ByChat:
+				oneliners.FILE()
 				n.To(f.Receiver.To[0], f.Receiver.To[1:]...).
 					WithBody(sub).
 					Send()

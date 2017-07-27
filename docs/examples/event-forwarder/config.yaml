@@ -6,5 +6,5 @@ eventForwarder:
   receiver:
     notifier: mailgun
     to:
-    - ops@example.com
+    - tamal@appscode.com
 notifierSecretName: kubed-notifier

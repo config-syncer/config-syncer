@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/cache"
+	"github.com/tamalsaha/go-oneliners"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
@@ -50,6 +51,7 @@ func (op *Operator) WatchPersistentVolumeClaims() {
 					if op.Eventer != nil &&
 						op.Config.EventForwarder.StorageAdded != nil &&
 						op.Eventer.IsAllowed(op.Config.EventForwarder.StorageAdded.Namespaces, res.Namespace) {
+						oneliners.FILE(res.ObjectMeta)
 						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
 					}
 				}
