@@ -1,0 +1,4 @@
+apiServer:
+  address: :8081
+  enableReverseIndex: true
+  enableSearchIndex: true
