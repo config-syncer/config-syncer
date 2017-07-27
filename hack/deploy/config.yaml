@@ -14,6 +14,16 @@ eventForwarder:
     handle: true
     namespaces:
     - kube-system
+janitors:
+- elasticsearch:
+    endpoint: http://elasticsearch-logging.kube-system:9200
+    logIndexPrefix: logstash-
+  kind: Elasticsearch
+  ttl: 2160h0m0s
+- influxdb:
+    endpoint: https://monitoring-influxdb.kube-system:8086
+  kind: InfluxDB
+  ttl: 2160h0m0s
 notifierSecretName: kubed-notifier
 recycleBin:
   handleUpdates: false
