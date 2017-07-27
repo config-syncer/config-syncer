@@ -48,9 +48,9 @@ func main() {
 func CreateClusterConfig() config.ClusterConfig {
 	return config.ClusterConfig{
 		RecycleBin: &config.RecycleBinSpec{
-			Path:         "/tmp/kubed/trash",
-			TTL:          metav1.Duration{7 * 24 * time.Hour},
-			HandleUpdate: false,
+			Path:          "/tmp/kubed/trash",
+			TTL:           metav1.Duration{Duration: 7 * 24 * time.Hour},
+			HandleUpdates: false,
 			Receiver: &config.Receiver{
 				To:       []string{"ops@example.com"},
 				Notifier: mailgun.UID,
@@ -58,10 +58,17 @@ func CreateClusterConfig() config.ClusterConfig {
 		},
 		EnableConfigSyncer: true,
 		EventForwarder: &config.EventForwarderSpec{
-			NodeAdded:    &config.ForwarderSpec{},
-			StorageAdded: &config.ForwarderSpec{},
-			IngressAdded: &config.ForwarderSpec{},
-			WarningEvents: &config.ForwarderSpec{
+			NodeAdded: config.ForwarderSpec{
+				Handle: true,
+			},
+			StorageAdded: config.ForwarderSpec{
+				Handle: true,
+			},
+			IngressAdded: config.ForwarderSpec{
+				Handle: true,
+			},
+			WarningEvents: config.ForwarderSpec{
+				Handle: true,
 				Namespaces: []string{
 					"kube-system",
 				}},

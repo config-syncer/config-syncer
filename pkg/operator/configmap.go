@@ -89,7 +89,7 @@ func (op *Operator) WatchConfigMaps() {
 				if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 					!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
 					!reflect.DeepEqual(oldRes.Data, newRes.Data) {
-					if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdate {
+					if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdates {
 						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, old, new)
 					}
 

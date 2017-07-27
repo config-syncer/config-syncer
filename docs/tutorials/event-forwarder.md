@@ -15,10 +15,16 @@ To enable config syncer, you need a cluster config like below.
 $ cat ./docs/examples/event-forwarder/config.yaml
 
 eventForwarder:
-  nodeAdded: {}
-  ingressAdded: {}
-  storageAdded: {}
-  warningEvents: {}
+  nodeAdded:
+    handle: true
+  storageAdded:
+    handle: true
+  ingressAdded:
+    handle: true
+  warningEvents:
+    handle: true
+    namespaces:
+    - kube-system
   receiver:
     notifier: mailgun
     to:
@@ -26,13 +32,13 @@ eventForwarder:
 notifierSecretName: kubed-notifier
 ```
 
-| Key                            | Description                                                                       |
-|--------------------------------|-----------------------------------------------------------------------------------|
-| `eventForwarder.nodeAdded`     | `Optional`. If set, notifications are sent when a Node is added.                  |
-| `eventForwarder.ingressAdded`  | `Optional`. If set, notifications are sent when an Ingress is added.              |
-| `eventForwarder.storageAdded`  | `Optional`. If set, notifications are sent when a StorageClass/PV/PVC is added.   |
-| `eventForwarder.warningEvents` | `Optional`. If set, notifications are sent when a `Warning` Event is added.       |
-| `eventForwarder.receiver`      | `Required`. To learn how to use various notifiers, please visit [here](/docs/tutorials/notifiers.md). |
+| Key                                   | Description                                                                                           |
+|---------------------------------------|-------------------------------------------------------------------------------------------------------|
+| `eventForwarder.nodeAdded.handle`     | `Optional`. If set to true, notifications are sent when a Node is added.                              |
+| `eventForwarder.ingressAdded.handle`  | `Optional`. If set to true, notifications are sent when an Ingress is added.                          |
+| `eventForwarder.storageAdded.handle`  | `Optional`. If set to true, notifications are sent when a StorageClass/PV/PVC is added.               |
+| `eventForwarder.warningEvents.handle` | `Optional`. If set to true, notifications are sent when a `Warning` Event is added.                   |
+| `eventForwarder.receiver`             | `Required`. To learn how to use various notifiers, please visit [here](/docs/tutorials/notifiers.md). |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
@@ -48,15 +54,17 @@ secret "kubed-config" labeled
 $ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
-  config.yaml: ZXZlbnRGb3J3YXJkZXI6CiAgbm9kZUFkZGVkOiB7fQogIGluZ3Jlc3NBZGRlZDoge30KICBzdG9yYWdlQWRkZWQ6IHt9CiAgd2FybmluZ0V2ZW50czoge30KICByZWNlaXZlcjoKICAgIG5vdGlmaWVyOiBtYWlsZ3VuCiAgICB0bzoKICAgIC0gb3BzQGV4YW1wbGUuY29tCm5vdGlmaWVyU2VjcmV0TmFtZToga3ViZWQtbm90aWZpZXIK
+  config.yaml: ZXZlbnRGb3J3YXJkZXI6CiAgbm9kZUFkZGVkOgogICAgaGFuZGxlOiB0cnVlCiAgc3RvcmFnZUFkZGVkOgogICAgaGFuZGxlOiB0cnVlCiAgaW5ncmVzc0FkZGVkOgogICAgaGFuZGxlOiB0cnVlCiAgd2FybmluZ0V2ZW50czoKICAgIGhhbmRsZTogdHJ1ZQogICAgbmFtZXNwYWNlczoKICAgIC0ga3ViZS1zeXN0ZW0KICByZWNlaXZlcjoKICAgIG5vdGlmaWVyOiBtYWlsZ3VuCiAgICB0bzoKICAgIC0gb3BzQGV4YW1wbGUuY29tCm5vdGlmaWVyU2VjcmV0TmFtZToga3ViZWQtbm90aWZpZXIK
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-27T00:53:01Z
+  creationTimestamp: 2017-07-27T05:35:54Z
+  labels:
+    app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "56568"
+  resourceVersion: "70583"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: f0cb8f70-7265-11e7-af79-08002738e55e
+  uid: 753220c3-728d-11e7-87f5-08002738e55e
 type: Opaque
 ```
 
@@ -64,8 +72,6 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 
 
 ## Test Forwarder
-In this tutorial, a PVC will be used to show how event forwarder feature can be used.
-
 To keep things isolated, this tutorial uses a separate namespace called `demo` throughout this tutorial. Run the following command to prepare your cluster for this tutorial:
 
 ```console
@@ -80,7 +86,8 @@ kube-system   Active    6h
 demo          Active    4m
 ```
 
-Create a PVC called `myclaim` in the `demo` namespace.
+### Forward Storage Added Event  
+In this section, a PVC will be used to show how event forwarder feature can be used. Create a PVC called `myclaim` in the `demo` namespace.
 
 ```console
 $ kubectl apply -f ./docs/examples/event-forwarder/demo-0.yaml
@@ -124,6 +131,41 @@ Now, assuming you configured a GMail account as the receiver for events, you sho
 
 ![PVC Added Notification](/docs/images/event-forwarder/pvc-added-notification.png)
 
+### Forward Warning Events
+In this section, a Busybox pod will be used to show how warning events are forwarded. Create a Pod called `busybox` in the `demo` namespace.
+
+```yaml
+$ cat ./docs/examples/event-forwarder/demo-1.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  namespace: demo
+spec:
+  restartPolicy: Never
+  containers:
+  - name: busybox
+    image: busybox
+    imagePullPolicy: IfNotPresent
+    command:
+      - bad
+      - "3600"
+```
+```console
+$ kubectl apply -f ./docs/examples/event-forwarder/demo-1.yaml
+pod "busybox" created
+
+$ kubectl get pods -n demo --show-all
+NAME      READY     STATUS                                                                                                                                                                                                      RESTARTS   AGE
+busybox   0/1       rpc error: code = 2 desc = failed to start container "bcc25386c0c9421b04ce9c574405917fc4940a0b324a2b062f02978c46463f07": Error response from daemon: Container command 'bad' not found or does not exist.   0          10m
+```
+
+Here, the busybox pod fails to start because it uses a missing command called `bad`. This results in 2 `Warning` events. Now, check your GMail account. You should receive 2 emails like below.
+
+![Pod Failed](/docs/images/event-forwarder/pod-fail-1.png)
+![Pod FailedSync](/docs/images/event-forwarder/pod-fail-2.png)
+
 
 ## Filter by Namespaces
 You can configure Kubed to forward events for a subset of namespaces. You can also disable sending events for a particular type. Here is an example `config.yaml`:
@@ -131,9 +173,9 @@ You can configure Kubed to forward events for a subset of namespaces. You can al
 eventForwarder:
   nodeAdded: {}
   ingressAdded:
-    namespaces:
-    - default
+    handle: false
   warningEvents:
+    handle: true
     namespaces:
     - kube-system
   receiver:
@@ -144,10 +186,10 @@ notifierSecretName: kubed-notifier
 ```
 
 In the above example:
- - `eventForwarder.nodeAdded` is set to an empty object `{}`. So, notifications are sent when Nodes are added.
- - `eventForwarder.ingressAdded` is set. Notifications are sent when Ingress objects are added in `default` namespace.
+ - `eventForwarder.nodeAdded` is set to an empty object `{}`. This means `eventForwarder.nodeAdded.handle` is false. So, notifications are _not_ sent when Nodes are added.
+ - `eventForwarder.ingressAdded.handle` is set to `false`. Notifications are _not_ sent when Ingress objects are added.
  - `eventForwarder.storageAdded` is missing. So, _no_ notifications are sent when StorageClass/PV/PVC etc are added.
- - `eventForwarder.warningEvents` is set. Notifications are sent when Events are added in `kube-system` namespace.
+ - `eventForwarder.warningEvents.handle` is set to `true`. Notifications are sent when Events are added in `kube-system` namespace.
 
 
 ## Disable Recycle Bin
