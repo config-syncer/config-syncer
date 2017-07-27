@@ -58,11 +58,11 @@ func CreateClusterConfig() config.ClusterConfig {
 		},
 		EnableConfigSyncer: true,
 		EventForwarder: &config.EventForwarderSpec{
-			NotifyOnStorageAdd:   true,
-			NotifyOnIngressAdd:   true,
-			ForwardWarningEvents: true,
-			EventNamespaces:      []string{"kube-system"},
-			Receiver: &config.Receiver{
+			NodeAdded:     &config.ForwarderSpec{},
+			StorageAdded:  &config.ForwarderSpec{},
+			IngressAdded:  &config.ForwarderSpec{},
+			WarningEvents: &config.ForwarderSpec{},
+			Receiver: config.Receiver{
 				To:       []string{"ops@example.com"},
 				Notifier: mailgun.UID,
 			},

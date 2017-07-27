@@ -47,7 +47,9 @@ func (op *Operator) WatchVoyagerIngresses() {
 						}
 					}
 
-					if op.Eventer != nil && op.Config.EventForwarder.NotifyOnIngressAdd {
+					if op.Eventer != nil &&
+						op.Config.EventForwarder.IngressAdded != nil &&
+						op.Eventer.IsAllowed(op.Config.EventForwarder.IngressAdded.Namespaces, res.Namespace) {
 						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
 					}
 				}
