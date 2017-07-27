@@ -85,7 +85,7 @@ func (op *Operator) WatchStorageClassV1beta1() {
 				if op.Opt.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
-				if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdate {
+				if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdates {
 					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
 						!reflect.DeepEqual(oldRes.Parameters, newRes.Parameters) {

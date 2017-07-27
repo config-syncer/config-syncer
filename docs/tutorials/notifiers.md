@@ -37,7 +37,7 @@ Now, to receiver notifications via Hipchat, configure receiver as below:
 
 ```yaml
 recycleBin:
-  handle_update: false
+  handleUpdates: false
   path: /tmp/kubed/trash
   receiver:
     notifier: hipchat
@@ -93,7 +93,7 @@ Now, to receiver notifications via Mailgun, configure receiver as below:
 
 ```yaml
 recycleBin:
-  handle_update: false
+  handleUpdates: false
   path: /tmp/kubed/trash
   receiver:
     notifier: mailgun
@@ -148,7 +148,7 @@ Now, to receiver notifications via SMTP, configure receiver as below:
 
 ```yaml
 recycleBin:
-  handle_update: false
+  handleUpdates: false
   path: /tmp/kubed/trash
   receiver:
     notifier: smtp
@@ -200,7 +200,7 @@ Now, to receiver notifications via SMTP, configure receiver as below:
 
 ```yaml
 recycleBin:
-  handle_update: false
+  handleUpdates: false
   path: /tmp/kubed/trash
   receiver:
     notifier: twilio
@@ -248,7 +248,7 @@ Now, to receiver notifications via Hipchat, configure receiver as below:
 
 ```yaml
 recycleBin:
-  handle_update: false
+  handleUpdates: false
   path: /tmp/kubed/trash
   receiver:
     notifier: slack
@@ -300,7 +300,7 @@ Now, to receiver notifications via SMTP, configure receiver as below:
 
 ```yaml
 recycleBin:
-  handle_update: false
+  handleUpdates: false
   path: /tmp/kubed/trash
   receiver:
     notifier: plivo

@@ -40,17 +40,17 @@ type InfluxDBSpec struct {
 }
 
 type RecycleBinSpec struct {
-	Path         string          `json:"path,omitempty"`
-	TTL          metav1.Duration `json:"ttl,omitempty"`
-	HandleUpdate bool            `json:"handle_update"`
-	Receiver     *Receiver       `json:"receiver,omitempty"`
+	Path          string          `json:"path,omitempty"`
+	TTL           metav1.Duration `json:"ttl,omitempty"`
+	HandleUpdates bool            `json:"handleUpdates"`
+	Receiver      *Receiver       `json:"receiver,omitempty"`
 }
 
 type EventForwarderSpec struct {
-	NodeAdded     *ForwarderSpec `json:"nodeAdded,omitempty"`
-	StorageAdded  *ForwarderSpec `json:"storageAdded,omitempty"`
-	IngressAdded  *ForwarderSpec `json:"ingressAdded,omitempty"`
-	WarningEvents *ForwarderSpec `json:"warningEvents,omitempty"`
+	NodeAdded     ForwarderSpec `json:"nodeAdded,omitempty"`
+	StorageAdded  ForwarderSpec `json:"storageAdded,omitempty"`
+	IngressAdded  ForwarderSpec `json:"ingressAdded,omitempty"`
+	WarningEvents ForwarderSpec `json:"warningEvents,omitempty"`
 	Receiver      Receiver       `json:"receiver,omitempty"`
 }
 
@@ -59,6 +59,7 @@ type NoNamespacedForwarderSpec struct {
 }
 
 type ForwarderSpec struct {
+	ForwardEvent bool            `json:"forwardEvent"`
 	Namespaces []string `json:"namespaces,omitempty"`
 }
 

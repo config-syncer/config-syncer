@@ -48,9 +48,9 @@ func main() {
 func CreateClusterConfig() config.ClusterConfig {
 	return config.ClusterConfig{
 		RecycleBin: &config.RecycleBinSpec{
-			Path:         "/tmp/kubed/trash",
-			TTL:          metav1.Duration{7 * 24 * time.Hour},
-			HandleUpdate: false,
+			Path:          "/tmp/kubed/trash",
+			TTL:           metav1.Duration{7 * 24 * time.Hour},
+			HandleUpdates: false,
 			Receiver: &config.Receiver{
 				To:       []string{"ops@example.com"},
 				Notifier: mailgun.UID,
