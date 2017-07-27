@@ -3,7 +3,7 @@
 # Installation Guide
 
 ## Create Cluster Config
-Before you can install Kubed, you need a cluster config for Kubed. Cluster config is defined in YAML format. You find an example config in [./hack/deploy/config.yaml](./hack/deploy/config.yaml).
+Before you can install Kubed, you need a cluster config for Kubed. Cluster config is defined in YAML format. You find an example config in [./hack/deploy/config.yaml](/hack/deploy/config.yaml).
 
 ```yaml
 $ cat ./hack/deploy/config.yaml
@@ -62,7 +62,7 @@ To understand the various configuration options, check Kubed [tutorials](/docs/t
 You may have to create another [Secret for notifiers](/docs/tutorials/notifiers.md). If you are [storing cluster snapshots](/docs/tutorials/cluster-snapshot.md) in cloud storage, you have to create a Secret appropriately.
 
 ### Generate Config using script
-If you are familiar with GO, you can use the [./hack/config/main.go](./hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config [./hack/deploy/config.yaml](./hack/deploy/config.yaml).
+If you are familiar with GO, you can use the [./hack/config/main.go](/hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config [./hack/deploy/config.yaml](/hack/deploy/config.yaml).
 
 ```console
 go run ./hack/config/main.go
