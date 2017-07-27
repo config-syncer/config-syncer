@@ -64,7 +64,7 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 
 
 ## Test Forwarder
-In this tutorial, a ConfigMap will be used to show how recycle bin feature can be used.
+In this tutorial, a PVC will be used to show how event forwarder feature can be used.
 
 To keep things isolated, this tutorial uses a separate namespace called `demo` throughout this tutorial. Run the following command to prepare your cluster for this tutorial:
 
@@ -80,11 +80,11 @@ kube-system   Active    6h
 demo          Active    4m
 ```
 
-Create a PVC called `vault` in the `demo` namespace.
+Create a PVC called `myclaim` in the `demo` namespace.
 
 ```console
-$ kubectl create configmap omni -n demo --from-literal=hello=world
-configmap "omni" created
+$ kubectl apply -f ./docs/examples/event-forwarder/demo-0.yaml
+persistentvolumeclaim "myclaim" configured
 ```
 ```yaml
 $ kubectl get configmaps omni -n demo -o yaml
