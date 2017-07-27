@@ -1,8 +1,14 @@
 eventForwarder:
-  nodeAdded: {}
-  ingressAdded: {}
-  storageAdded: {}
-  warningEvents: {}
+  nodeAdded:
+    forwardEvent: true
+  storageAdded:
+    forwardEvent: true
+  ingressAdded:
+    forwardEvent: true
+  warningEvents:
+    forwardEvent: true
+    namespaces:
+    - kube-system
   receiver:
     notifier: mailgun
     to:
