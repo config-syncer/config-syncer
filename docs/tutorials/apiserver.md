@@ -64,26 +64,39 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 
 ## Using Kubed API Server
 Kubed api server has 2 categories of endpoints:
- - Search
+ - Search objects
  - Reverse Lookup
 
 ### Search Kubernetes objects
+To search for Kubernetes objects, use the `/search` URL of Kubed api server. 
+
+```console
+$ kubectl get pods -n kube-system
+NAME                              READY     STATUS    RESTARTS   AGE
+kube-addon-manager-minikube       1/1       Running   0          33m
+kube-dns-1301475494-hglm0         3/3       Running   0          33m
+kubed-operator-3234987584-sbgrf   1/1       Running   0          19s
+kubernetes-dashboard-l8vlj        1/1       Running   0          33m
+
+$ kubectl port-forward $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system 8080
+Forwarding from 127.0.0.1:8080 -> 8080
+E0727 03:51:10.186041   22995 portforward.go:212] Unable to create listener: Error listen tcp6 [::1]:8080: bind: cannot assign requested address
+Handling connection for 8080
+
+
+$ curl http://127.0.0.1:8080/search?q=dashboard > ./docs/examples/apiserver/search-result.json
+```
+
+Now, open the URL [http://127.0.0.1:8080/search?q=dashboard](http://127.0.0.1:8080/search?q=dashboard) in your browser.
 
 
 ## Reverse Lookup of Objects
+Sometimes you may want to know which [Prometheus stores metrics for a given Pod X](https://github.com/coreos/prometheus-operator/issues/230). Using reverse indices maintained by Kubed, answering questions like this become easier. Kubed maintains the following types of reverse indices:
+ - List all Services for a given Pod.
+ - List all ServiceMonitors for a given Service.
+ - List all Prometheus objects for a given ServiceMonitor.
 
-
-
-
-
-
-
-
-
-
-
-
-
+Since these indices are built using watchers, they always lag behind the current truth. But they work well for practical purposes.
 
 ```console
 $ kubectl get pods -n kube-system
@@ -93,23 +106,10 @@ kube-dns-1301475494-hglm0         3/3       Running   0          33m
 kubed-operator-3234987584-sbgrf   1/1       Running   0          19s
 kubernetes-dashboard-l8vlj        1/1       Running   0          33m
 
-
-$ kubectl port-forward $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system 56790
-Forwarding from 127.0.0.1:56790 -> 56790
-E0727 03:50:34.668103   22871 portforward.go:212] Unable to create listener: Error listen tcp6 [::1]:56790: bind: cannot assign requested address
-Handling connection for 56790
-^C⏎
-
-
 $ kubectl port-forward $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system 8080
 Forwarding from 127.0.0.1:8080 -> 8080
 E0727 03:51:10.186041   22995 portforward.go:212] Unable to create listener: Error listen tcp6 [::1]:8080: bind: cannot assign requested address
 Handling connection for 8080
-^C⏎
-
-$ curl http://127.0.0.1:8080/search?q=dashboard > ./docs/examples/apiserver/search-result.json
-
-
                                                                                                                                                              
 $ curl http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/kubernetes-dashboard-l8vlj/services > ./docs/examples/apiserver/pod-2-svc.json
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
@@ -117,62 +117,7 @@ $ curl http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/kubernetes-dashb
 100  1283  100  1283    0     0  89128      0 --:--:-- --:--:-- --:--:-- 91642
 ```
 
-
-		router.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(op.ReverseIndex.Service.ServeHTTP))
-		if util.IsPreferredAPIResource(op.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind) {
-			// Add Indexer only if Server support this resource
-			router.Get("/apis/"+prom.TPRGroup+"/"+prom.TPRVersion+"/namespaces/:namespace/:resource/:name/"+prom.TPRServiceMonitorName, http.HandlerFunc(op.ReverseIndex.ServiceMonitor.ServeHTTP))
-		}
-		if util.IsPreferredAPIResource(op.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRPrometheusesKind) {
-			// Add Indexer only if Server support this resource
-			router.Get("/apis/"+prom.TPRGroup+"/"+prom.TPRVersion+"/namespaces/:namespace/:resource/:name/"+prom.TPRPrometheusName, http.HandlerFunc(op.ReverseIndex.Prometheus.ServeHTTP))
-		}
-
-
-https://github.com/coreos/prometheus-operator/issues/230
-
-
-
-
-## Kubed Metrics Server
-kubed exposes Prometheus ready metrics via an endpoint running 
-
-```console
-$ kubectl get pods -n kube-system
-NAME                              READY     STATUS    RESTARTS   AGE
-kube-addon-manager-minikube       1/1       Running   0          33m
-kube-dns-1301475494-hglm0         3/3       Running   0          33m
-kubed-operator-3234987584-sbgrf   1/1       Running   0          19s
-kubernetes-dashboard-l8vlj        1/1       Running   0          33m
-
-
-$ kubectl port-forward $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system 56790
-Forwarding from 127.0.0.1:56790 -> 56790
-E0727 03:50:34.668103   22871 portforward.go:212] Unable to create listener: Error listen tcp6 [::1]:56790: bind: cannot assign requested address
-Handling connection for 56790
-^C⏎
-
-
-$ kubectl port-forward $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system 8080
-Forwarding from 127.0.0.1:8080 -> 8080
-E0727 03:51:10.186041   22995 portforward.go:212] Unable to create listener: Error listen tcp6 [::1]:8080: bind: cannot assign requested address
-Handling connection for 8080
-^C⏎
-
-$ curl http://127.0.0.1:8080/search?q=dashboard > ./docs/examples/apiserver/search-result.json
-
-
-                                                                                                                                                             
-$ curl http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/kubernetes-dashboard-l8vlj/services > ./docs/examples/apiserver/pod-2-svc.json
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100  1283  100  1283    0     0  89128      0 --:--:-- --:--:-- --:--:-- 91642
-```
-
-
-
-
-
+Now, open the URL [http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/kubernetes-dashboard-l8vlj/services](http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/kubernetes-dashboard-l8vlj/services) in your browser.
 
 
 ## Supported Kubernetes Objects
