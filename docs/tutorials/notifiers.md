@@ -216,21 +216,17 @@ To receive chat notifications in Slack, create a Secret with the following keys:
 | Name             | Description                      |
 |------------------|----------------------------------|
 | SLACK_AUTH_TOKEN | `Required` Slack [legacy auth token](https://api.slack.com/custom-integrations/legacy-tokens) |
-| SLACK_CHANNEL    | `Required` Slack channel name.   |
 
 ```console
 $ echo -n 'your-slack-auth-token' > SLACK_AUTH_TOKEN
-$ echo -n 'your-slack-channel' > SLACK_CHANNEL
 $ kubectl create secret generic kubed-notifier -n kube-system \
-    --from-file=./SLACK_AUTH_TOKEN \
-    --from-file=./SLACK_CHANNEL
+    --from-file=./SLACK_AUTH_TOKEN
 secret "kubed-notifier" created
 ```
 ```yaml
 apiVersion: v1
 data:
   SLACK_AUTH_TOKEN: eW91ci1zbGFjay1hdXRoLXRva2Vu
-  SLACK_CHANNEL: eW91ci1zbGFjay1jaGFubmVs
 kind: Secret
 metadata:
   creationTimestamp: 2017-07-25T01:58:58Z
@@ -253,7 +249,7 @@ recycleBin:
   receiver:
     notifier: slack
     to:
-    - ops-alerts
+    - #ops-alerts
   ttl: 168h
 ```
 
