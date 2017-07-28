@@ -130,7 +130,7 @@ spec:
           secret:
             secretName: kubed-config
         - name: scratch
-          emptyDir: {}          
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
