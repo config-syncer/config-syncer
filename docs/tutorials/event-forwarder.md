@@ -32,12 +32,15 @@ eventForwarder:
 notifierSecretName: kubed-notifier
 ```
 
-| Key                                   | Description                                                                                           |
-|---------------------------------------|-------------------------------------------------------------------------------------------------------|
-| `eventForwarder.nodeAdded.handle`     | `Optional`. If set to true, notifications are sent when a Node is added.                              |
-| `eventForwarder.ingressAdded.handle`  | `Optional`. If set to true, notifications are sent when an Ingress is added.                          |
-| `eventForwarder.storageAdded.handle`  | `Optional`. If set to true, notifications are sent when a StorageClass/PV/PVC is added.               |
-| `eventForwarder.warningEvents.handle` | `Optional`. If set to true, notifications are sent when a `Warning` Event is added.                   |
+| Key                                       | Description                                                                                           |
+|-------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| `eventForwarder.nodeAdded.handle`         | `Optional`. If set to true, notifications are sent when a Node is added.                              |
+| `eventForwarder.ingressAdded.handle`      | `Optional`. If set to true, notifications are sent when an Ingress is added.                          |
+| `eventForwarder.ingressAdded.namespaces`  | `Optional`. If set, notifications are sent only when Ingress are added in these namespaces. Otherwise, notifications are sent when Ingress are added in any namespace |
+| `eventForwarder.storageAdded.handle`      | `Optional`. If set to true, notifications are sent when a StorageClass/PV/PVC is added.               |
+| `eventForwarder.storageAdded.namespaces`  | `Optional`. If set, notifications are sent only when PVC are added in these namespaces. Otherwise, notifications are sent when PVC added in any namespace. Since StorageClass and PV are non-namespaced resource, this field has not effect on these. |
+| `eventForwarder.warningEvents.handle`     | `Optional`. If set to true, notifications are sent when a `Warning` Event is added.                   |
+| `eventForwarder.warningEvents.namespaces` | `Optional`. If set, notifications are sent only when warning events are added in these namespaces. Otherwise, notifications are sent when warning events are added in any namespace |
 | `eventForwarder.receiver`             | `Required`. To learn how to use various notifiers, please visit [here](/docs/tutorials/notifiers.md). |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
