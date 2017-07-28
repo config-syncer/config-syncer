@@ -44,6 +44,7 @@ recycleBin:
     to:
     - ops-alerts
   ttl: 168h
+notifierSecretName: kubed-notifier
 ```
 
 
@@ -100,6 +101,7 @@ recycleBin:
     to:
     - ops-alerts@example.com
   ttl: 168h
+notifierSecretName: kubed-notifier
 ```
 
 
@@ -155,6 +157,7 @@ recycleBin:
     to:
     - ops-alerts@example.com
   ttl: 168h
+notifierSecretName: kubed-notifier
 ```
 
 
@@ -207,6 +210,7 @@ recycleBin:
     to:
     - +1-999-888-1234
   ttl: 168h
+notifierSecretName: kubed-notifier
 ```
 
 
@@ -251,6 +255,7 @@ recycleBin:
     to:
     - #ops-alerts
   ttl: 168h
+notifierSecretName: kubed-notifier
 ```
 
 
@@ -303,6 +308,49 @@ recycleBin:
     to:
     - +1-999-888-1234
   ttl: 168h
+notifierSecretName: kubed-notifier
+```
+
+
+## Using multiple notifiers
+Kubed supports using different notifiers in different scenarios. First add the credentials for the different notifiers in the same Secret `kubed-notifier` and deploy that to Kubernetes. Then in the Kubed cluster config, specify the appropriate notifier for each feature.
+
+```yaml
+apiVersion: v1
+data:
+  MAILGUN_API_KEY: eW91ci1tYWlsZ3VuLWFwaS1rZXk=
+  MAILGUN_DOMAIN: eW91ci1tYWlsZ3VuLWRvbWFpbg==
+  MAILGUN_FROM: bm8tcmVwbHlAZXhhbXBsZS5jb20=
+  SLACK_AUTH_TOKEN: eW91ci1zbGFjay1hdXRoLXRva2Vu
+kind: Secret
+metadata:
+  creationTimestamp: 2017-07-25T01:58:58Z
+  name: kubed-notifier
+  namespace: kube-system
+  resourceVersion: "2534"
+  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-notifier
+  uid: d2571817-70dc-11e7-9b0b-080027503732
+type: Opaque
+
+
+eventForwarder:
+  warningEvents:
+    handle: true
+    namespaces:
+    - kube-system
+  receiver:
+    notifier: mailgun
+    to:
+    - ops@example.com
+recycleBin:
+  handleUpdates: false
+  path: /tmp/kubed/trash
+  receiver:
+    notifier: slack
+    to:
+    - #ops-alerts
+  ttl: 168h
+notifierSecretName: kubed-notifier
 ```
 
 
