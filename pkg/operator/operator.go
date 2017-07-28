@@ -10,6 +10,7 @@ import (
 
 	"github.com/appscode/envconfig"
 	v "github.com/appscode/go/version"
+	"github.com/appscode/kubed/pkg/api"
 	"github.com/appscode/kubed/pkg/backup"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/elasticsearch"
@@ -236,18 +237,13 @@ func (op *Operator) RunAPIServer() {
 		}
 	}
 
-	router.Get("/health", http.HandlerFunc(op.healthHandler))
+	router.Get("/health", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) }))
+	router.Get("/metadata", http.HandlerFunc(op.metadataHandler))
 	log.Fatalln(http.ListenAndServe(op.Config.APIServer.Address, router))
 }
 
-func (op *Operator) healthHandler(w http.ResponseWriter, r *http.Request) {
-	resp := struct {
-		OperatorNamespace   string      `json:"operatorNamespace,omitempty"`
-		SearchEnabled       bool        `json:"searchEnabled"`
-		ReverseIndexEnabled bool        `json:"reverseIndexEnabled"`
-		AnalyticsEnabled    bool        `json:"analyticsEnabled"`
-		Version             interface{} `json:"version,omitempty"`
-	}{
+func (op *Operator) metadataHandler(w http.ResponseWriter, r *http.Request) {
+	resp := &api.KubedMetadata{
 		AnalyticsEnabled:    op.Opt.EnableAnalytics,
 		OperatorNamespace:   op.Opt.OperatorNamespace,
 		SearchEnabled:       op.Config.APIServer.EnableSearchIndex,
