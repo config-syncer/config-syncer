@@ -84,7 +84,7 @@ Forwarding from 127.0.0.1:8080 -> 8080
 E0727 03:51:10.186041   22995 portforward.go:212] Unable to create listener: Error listen tcp6 [::1]:8080: bind: cannot assign requested address
 Handling connection for 8080
 
-
+# in a separate terminal window
 $ curl http://127.0.0.1:8080/search?q=dashboard > ./docs/examples/apiserver/search-result.json
 ```
 
@@ -111,14 +111,15 @@ $ kubectl port-forward $(kubectl get pods --all-namespaces -l app=kubed -o jsonp
 Forwarding from 127.0.0.1:8080 -> 8080
 E0727 03:51:10.186041   22995 portforward.go:212] Unable to create listener: Error listen tcp6 [::1]:8080: bind: cannot assign requested address
 Handling connection for 8080
-                                                                                                                                                             
+
+# in a separate terminal window
 $ curl http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/kubernetes-dashboard-l8vlj/services > ./docs/examples/apiserver/pod-2-svc.json
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100  1283  100  1283    0     0  89128      0 --:--:-- --:--:-- --:--:-- 91642
 ```
 
-Now, open the URL [http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/kubernetes-dashboard-l8vlj/services](http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/kubernetes-dashboard-l8vlj/services) in your browser.
+Now, open the URL [http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/{pod-in-kube-system}/services](http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/{pod-in-kube-system}/services) in your browser.
 
 
 ## Supported Kubernetes Objects
@@ -183,7 +184,7 @@ Following Kubernetes objects are supported by search index:
   - Certificate
   - Ingress
 
-To add support for additional object types, please [file an issue](https://github.com/appscode/kubed/issues/new?title=Support+Object+Kind+[xyz]+in+RecycleBin).
+To add support for additional object types, please [file an issue](https://github.com/appscode/kubed/issues/new?title=Support+Object+Kind+[xyz]+in+SearchEngine).
 
 
 ## Cleaning up
