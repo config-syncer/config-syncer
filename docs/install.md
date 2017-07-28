@@ -59,7 +59,7 @@ snapshotter:
 
 To understand the various configuration options, check Kubed [tutorials](/docs/tutorials/README.md). Once you are satisfied with the configuration, create a Secret with the Kubed cluster config under `config.yaml` key.
 
-You may have to create another [Secret for notifiers](/docs/tutorials/notifiers.md). If you are [storing cluster snapshots](/docs/tutorials/cluster-snapshot.md) in cloud storage, you have to create a Secret appropriately.
+You may have to create another [Secret for notifiers](/docs/tutorials/notifiers.md), usually called `kubed-notifier`. If you are [storing cluster snapshots](/docs/tutorials/cluster-snapshot.md) in cloud storage, you have to create another Secret to provide cloud credentials.
 
 ### Generate Config using script
 If you are familiar with GO, you can use the [./hack/config/main.go](/hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config in [./hack/deploy/config.yaml](/hack/deploy/config.yaml).
