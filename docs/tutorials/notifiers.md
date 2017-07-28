@@ -44,6 +44,7 @@ recycleBin:
     to:
     - ops-alerts
   ttl: 168h
+notifierSecretName: kubed-notifier
 ```
 
 
@@ -100,6 +101,7 @@ recycleBin:
     to:
     - ops-alerts@example.com
   ttl: 168h
+notifierSecretName: kubed-notifier
 ```
 
 
@@ -155,6 +157,7 @@ recycleBin:
     to:
     - ops-alerts@example.com
   ttl: 168h
+notifierSecretName: kubed-notifier
 ```
 
 
@@ -207,6 +210,7 @@ recycleBin:
     to:
     - +1-999-888-1234
   ttl: 168h
+notifierSecretName: kubed-notifier
 ```
 
 
@@ -251,6 +255,7 @@ recycleBin:
     to:
     - #ops-alerts
   ttl: 168h
+notifierSecretName: kubed-notifier
 ```
 
 
@@ -303,6 +308,7 @@ recycleBin:
     to:
     - +1-999-888-1234
   ttl: 168h
+notifierSecretName: kubed-notifier
 ```
 
 
