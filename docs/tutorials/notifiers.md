@@ -313,7 +313,7 @@ notifierSecretName: kubed-notifier
 
 
 ## Using multiple notifiers
-Kubed supports using different notifiers in different scenarios. First add the credentials for the different notifiers in the same Secret `kubed-notifier` and deploy that to Kubernetes. Then in the Kubed cluster config, specify the appropriate notifier for a feature.
+Kubed supports using different notifiers in different scenarios. First add the credentials for the different notifiers in the same Secret `kubed-notifier` and deploy that to Kubernetes. Then in the Kubed cluster config, specify the appropriate notifier for each feature.
 
 ```yaml
 apiVersion: v1
