@@ -29,7 +29,7 @@ eventForwarder:
     notifier: mailgun
     to:
     - ops@example.com
-notifierSecretName: notifier-info
+notifierSecretName: notifier-config
 ```
 
 | Key                                       | Description                                                                                           |
@@ -185,7 +185,7 @@ eventForwarder:
     notifier: mailgun
     to:
     - ops@example.com
-notifierSecretName: notifier-info
+notifierSecretName: notifier-config
 ```
 
 In the above example:

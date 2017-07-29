@@ -9,9 +9,9 @@ data:
 kind: Secret
 metadata:
   creationTimestamp: 2017-07-25T01:57:17Z
-  name: notifier-info
+  name: notifier-config
   namespace: kube-system
   resourceVersion: "2422"
-  selfLink: /api/v1/namespaces/kube-system/secrets/notifier-info
+  selfLink: /api/v1/namespaces/kube-system/secrets/notifier-config
   uid: 965cb1e8-70dc-11e7-9b0b-080027503732
 type: Opaque

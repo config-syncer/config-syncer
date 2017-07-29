@@ -14,7 +14,7 @@ To enable config syncer, you need a cluster config like below.
 ```yaml
 $ cat ./docs/examples/recycle-bin/config.yaml
 
-notifierSecretName: notifier-info
+notifierSecretName: notifier-config
 recycleBin:
   path: /tmp/kubed/trash
   ttl: 168h
