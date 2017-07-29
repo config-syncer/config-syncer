@@ -13,4 +13,4 @@ eventForwarder:
     notifier: mailgun
     to:
     - ops@example.com
-notifierSecretName: kubed-notifier
+notifierSecretName: notifier-info

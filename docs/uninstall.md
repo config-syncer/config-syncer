@@ -5,7 +5,7 @@ Please follow the steps below to uninstall Kubed:
 
 1. Delete the various objects created for Kubed operator.
 ```console
-$ ./hack/deploy/uninstall.sh 
+$ ./hack/deploy/uninstall.sh
 + kubectl delete deployment -l app=kubed -n kube-system
 deployment "kubed-operator" deleted
 + kubectl delete service -l app=kubed -n kube-system

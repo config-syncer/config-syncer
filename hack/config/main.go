@@ -110,6 +110,6 @@ func CreateClusterConfig() config.ClusterConfig {
 				},
 			},
 		},
-		NotifierSecretName: "kubed-notifier",
+		NotifierSecretName: "notifier-info",
 	}
 }

@@ -29,7 +29,7 @@ eventForwarder:
     notifier: mailgun
     to:
     - ops@example.com
-notifierSecretName: kubed-notifier
+notifierSecretName: notifier-info
 ```
 
 | Key                                       | Description                                                                                           |
@@ -185,7 +185,7 @@ eventForwarder:
     notifier: mailgun
     to:
     - ops@example.com
-notifierSecretName: kubed-notifier
+notifierSecretName: notifier-info
 ```
 
 In the above example:
