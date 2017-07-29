@@ -1,4 +1,4 @@
-notifierSecretName: kubed-notifier
+notifierSecretName: any-notifier
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
