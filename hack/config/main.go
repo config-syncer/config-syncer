@@ -110,6 +110,6 @@ func CreateClusterConfig() config.ClusterConfig {
 				},
 			},
 		},
-		NotifierSecretName: "any-notifier",
+		NotifierSecretName: "notifier-info",
 	}
 }
