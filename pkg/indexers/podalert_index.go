@@ -78,25 +78,25 @@ func (ri *PodAlertIndexerImpl) Update(old, new *searchlight.PodAlert) error {
 	return nil
 }
 
-//func (ri *PodAlertIndexerImpl) AddServiceMonitor(m *searchlight.ServiceMonitor, podAlert []*searchlight.PodAlert) error {
-//	key := ri.Key(m.ObjectMeta)
-//	for _, podAlert := range podAlert {
-//		selector, err := metav1.LabelSelectorAsSelector(podAlert.Spec.ServiceMonitorSelector)
-//		if err != nil {
-//			continue
-//		}
-//		if labels.SelectorFromSet(labels.Set(m.Labels)).String() != selector.String() {
-//			continue
-//		}
-//
-//		ri.insert(key, podAlert)
-//	}
-//	return nil
-//}
-//
-//func (ri *PodAlertIndexerImpl) DeleteServiceMonitor(m *searchlight.ServiceMonitor) error {
-//	return ri.index.DeleteInternal(ri.Key(m.ObjectMeta))
-//}
+func (ri *PodAlertIndexerImpl) AddPod(m *apiv1.Pod, podAlert []*searchlight.PodAlert) error {
+	key := ri.Key(m.ObjectMeta)
+	for _, podAlert := range podAlert {
+		selector, err := metav1.LabelSelectorAsSelector(podAlert.Spec.ServiceMonitorSelector)
+		if err != nil {
+			continue
+		}
+		if labels.SelectorFromSet(labels.Set(m.Labels)).String() != selector.String() {
+			continue
+		}
+
+		ri.insert(key, podAlert)
+	}
+	return nil
+}
+
+func (ri *PodAlertIndexerImpl) DeletePod(m *apiv1.Pod) error {
+	return ri.index.DeleteInternal(ri.Key(m.ObjectMeta))
+}
 
 func (ri *PodAlertIndexerImpl) insert(key []byte, podAlert searchlight.PodAlert) error {
 	raw, err := ri.index.GetInternal(key)
