@@ -47,12 +47,6 @@ func (op *Operator) WatchPodAlerts() {
 							log.Errorln(err)
 						}
 					}
-
-					if op.Config.APIServer.EnableReverseIndex {
-						if err := op.ReverseIndex.PodAlert.Add(res); err != nil {
-							log.Errorln(err)
-						}
-					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
@@ -67,12 +61,6 @@ func (op *Operator) WatchPodAlerts() {
 					}
 					if op.TrashCan != nil {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
-					}
-
-					if op.Config.APIServer.EnableReverseIndex {
-						if err := op.ReverseIndex.PodAlert.Delete(res); err != nil {
-							log.Errorln(err)
-						}
 					}
 				}
 			},
@@ -92,12 +80,6 @@ func (op *Operator) WatchPodAlerts() {
 
 				if op.Config.APIServer.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
-				}
-
-				if op.Config.APIServer.EnableReverseIndex {
-					if err := op.ReverseIndex.PodAlert.Update(oldRes, newRes); err != nil {
-						log.Errorln(err)
-					}
 				}
 
 				if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdates {

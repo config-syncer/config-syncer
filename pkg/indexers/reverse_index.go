@@ -44,7 +44,7 @@ func NewReverseIndexer(cl clientset.Interface,
 		ri.Prometheus = &PrometheusIndexerImpl{kubeClient: cl, promClient: pm, index: index}
 	}
 	if util.IsPreferredAPIResource(cl, searchlight.SchemeGroupVersion.String(), searchlight.ResourceKindPodAlert) {
-		ri.PodAlert = &PodAlertIndexerImpl{kubeClient: cl, alertClient: sc, index: index}
+		ri.PodAlert = &PodAlertIndexerImpl{kubeClient: cl, alertClient: sc}
 	}
 
 	return &ri, nil

@@ -237,7 +237,7 @@ func (op *Operator) RunAPIServer() {
 			router.Get("/apis/"+prom.TPRGroup+"/"+prom.TPRVersion+"/namespaces/:namespace/:resource/:name/"+prom.TPRPrometheusName, http.HandlerFunc(op.ReverseIndex.Prometheus.ServeHTTP))
 		}
 		if util.IsPreferredAPIResource(op.KubeClient, searchlight.SchemeGroupVersion.String(), searchlight.ResourceKindPodAlert) {
-			router.Get("/apis/"+searchlight.SchemeGroupVersion.Group+"/"+searchlight.SchemeGroupVersion.Version+"/namespaces/:namespace/pods/:name/"+searchlight.ResourceTypePodAlert, http.HandlerFunc(op.ReverseIndex.PodAlert.ServeHTTP))
+			router.Get("/apis/"+searchlight.V1alpha1SchemeGroupVersion.Group+"/"+searchlight.V1alpha1SchemeGroupVersion.Version+"/namespaces/:namespace/:resource/:name/"+searchlight.ResourceTypePodAlert, http.HandlerFunc(op.ReverseIndex.PodAlert.ServeHTTP))
 		}
 	}
 
