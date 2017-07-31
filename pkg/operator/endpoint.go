@@ -48,7 +48,7 @@ func (op *Operator) WatchEndpoints() {
 					return
 				}
 
-				if reflect.DeepEqual(oldRes.Subsets, newRes.Subsets) || op.ReverseIndex.Service == nil {
+				if reflect.DeepEqual(oldRes.Subsets, newRes.Subsets) || !op.Config.APIServer.EnableReverseIndex {
 					return
 				}
 
