@@ -23,6 +23,7 @@ import (
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
 	"github.com/appscode/pat"
+	searchlight "github.com/appscode/searchlight/api"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
@@ -139,7 +140,7 @@ func (op *Operator) Setup() error {
 	}
 	// Enable pod -> service, service -> serviceMonitor indexing
 	if op.Config.APIServer.EnableReverseIndex {
-		ri, err := indexers.NewReverseIndexer(op.KubeClient, op.PromClient, indexDir)
+		ri, err := indexers.NewReverseIndexer(op.KubeClient, op.PromClient, op.SearchlightClient, indexDir)
 		if err != nil {
 			return err
 		}
@@ -234,6 +235,9 @@ func (op *Operator) RunAPIServer() {
 		if util.IsPreferredAPIResource(op.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRPrometheusesKind) {
 			// Add Indexer only if Server support this resource
 			router.Get("/apis/"+prom.TPRGroup+"/"+prom.TPRVersion+"/namespaces/:namespace/:resource/:name/"+prom.TPRPrometheusName, http.HandlerFunc(op.ReverseIndex.Prometheus.ServeHTTP))
+		}
+		if util.IsPreferredAPIResource(op.KubeClient, searchlight.SchemeGroupVersion.String(), searchlight.ResourceKindPodAlert) {
+			router.Get("/apis/"+searchlight.SchemeGroupVersion.Group+"/"+searchlight.SchemeGroupVersion.Version+"/namespaces/:namespace/pods/:name/"+searchlight.ResourceTypePodAlert, http.HandlerFunc(op.ReverseIndex.PodAlert.ServeHTTP))
 		}
 	}
 

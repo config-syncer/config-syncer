@@ -181,7 +181,7 @@ func (ri *ServiceIndexerImpl) equal(a, b *apiv1.Service) bool {
 }
 
 func (ri *ServiceIndexerImpl) Key(meta metav1.ObjectMeta) []byte {
-	return []byte(util.GetGroupVersionKind(&apiv1.Pod{}).String() + "/" + meta.Namespace + "/" + meta.Name)
+	return []byte(util.GetGroupVersionKind(&apiv1.Pod{}).String() + "/" + meta.Namespace + "/" + meta.Name + "/" + util.GetGroupVersionKind(&apiv1.Service{}).String())
 }
 
 func (ri *ServiceIndexerImpl) ServeHTTP(w http.ResponseWriter, req *http.Request) {
