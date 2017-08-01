@@ -50,7 +50,11 @@ func (op *Operator) WatchEvents() {
 						op.Config.EventForwarder.WarningEvents.IsAllowed(res.Namespace) &&
 						util.IsRecentlyAdded(res.ObjectMeta) {
 						oneliners.FILE()
-						op.Eventer.ForwardEvent(res)
+						err := op.Eventer.ForwardEvent(res)
+						if err != nil {
+							log.Errorln(err)
+						}
+						oneliners.FILE(err)
 					}
 				}
 			},

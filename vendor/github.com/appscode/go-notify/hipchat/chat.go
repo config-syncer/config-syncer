@@ -5,6 +5,7 @@ import (
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
 	"github.com/tbruyelle/hipchat-go/hipchat"
+	"github.com/tamalsaha/go-oneliners"
 )
 
 const UID = "hipchat"
@@ -58,14 +59,17 @@ func (c client) To(to string, cc ...string) notify.ByChat {
 }
 
 func (c *client) Send() error {
+	oneliners.FILE(c.opt)
 	if len(c.opt.To) == 0 {
 		return errors.New("Missing to")
 	}
-
+	oneliners.FILE(c.opt)
 	h := hipchat.NewClient(c.opt.AuthToken)
 	for _, room := range c.opt.To {
+		oneliners.FILE(room)
 		_, err := h.Room.Notification(room, &hipchat.NotificationRequest{Message: c.body})
 		if err != nil {
+			oneliners.FILE(err)
 			return err
 		}
 	}

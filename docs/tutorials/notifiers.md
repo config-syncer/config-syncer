@@ -8,7 +8,7 @@ To receive chat notifications in Hipchat, create a Secret with the following key
 
 | Name                | Description                               |
 |---------------------|-------------------------------------------|
-| HIPCHAT_AUTH_TOKEN  | `Required` Hipchat authentication token   |
+| HIPCHAT_AUTH_TOKEN  | `Required` Hipchat [api access token](https://developer.atlassian.com/hipchat/guide/hipchat-rest-api/api-access-tokens). You can use room notification tokens, if you are planning to send notifications to a single room.   |
 
 ```console
 $ echo -n 'your-hipchat-auth-token' > HIPCHAT_AUTH_TOKEN
