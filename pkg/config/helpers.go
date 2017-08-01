@@ -67,9 +67,9 @@ func (cfg ClusterConfig) Validate() error {
 }
 
 func (b SnapshotSpec) Location(timestamp time.Time) (string, error) {
-	var ts string
+	ts := "snapshot.tar.gz"
 	if b.Overwrite {
-		ts = timestamp.UTC().Format(TimestampFormat)
+		ts = timestamp.UTC().Format(TimestampFormat) + ".tar.gz"
 	}
 	if b.S3 != nil {
 		return filepath.Join(b.S3.Prefix, ts), nil
