@@ -317,7 +317,6 @@ func (op *Operator) RunSnapshotter() error {
 	if err != nil {
 		return err
 	}
-
 	snapshotter := func() error {
 		cfg, err := clientcmd.BuildConfigFromFlags(op.Opt.Master, op.Opt.KubeConfig)
 		if err != nil {
@@ -342,6 +341,13 @@ func (op *Operator) RunSnapshotter() error {
 		sh.ShowCMD = true
 		return sh.Command("osm", "push", "--osmconfig", osmconfigPath, "-c", container, snapshotDir, dest).Run()
 	}
+	// start taking first backup
+	go func() {
+		err := snapshotter()
+		if err != nil {
+			log.Errorln(err)
+		}
+	}()
 	_, err = op.Cron.AddFunc(op.Config.Snapshotter.Schedule, func() {
 		err := snapshotter()
 		if err != nil {
