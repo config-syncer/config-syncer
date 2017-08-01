@@ -308,6 +308,15 @@ func (op *Operator) RunSnapshotter() error {
 		return err
 	}
 
+	// test credentials
+	sh := shell.NewSession()
+	sh.SetDir(op.Opt.ScratchDir)
+	sh.ShowCMD = true
+	err = sh.Command("osm", "lc", "--osmconfig", osmconfigPath).Run()
+	if err != nil {
+		return err
+	}
+
 	snapshotter := func() error {
 		cfg, err := clientcmd.BuildConfigFromFlags(op.Opt.Master, op.Opt.KubeConfig)
 		if err != nil {
@@ -331,12 +340,6 @@ func (op *Operator) RunSnapshotter() error {
 		sh.ShowCMD = true
 		return sh.Command("osm", "push", "--osmconfig", osmconfigPath, "-c", container, snapshotDir, dest).Run()
 	}
-
-	err = snapshotter()
-	if err != nil {
-		return err
-	}
-
 	_, err = op.Cron.AddFunc(op.Config.Snapshotter.Schedule, func() {
 		err := snapshotter()
 		if err != nil {
