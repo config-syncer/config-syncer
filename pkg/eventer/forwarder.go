@@ -25,8 +25,9 @@ func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
 		return err
 	}
 	for _, receiver := range f.Receivers {
-		sub := fmt.Sprintf("%s %s/%s: %s", e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason)
-		if err := f.send(sub, string(bytes), receiver); err != nil {
+		emailSub := fmt.Sprintf("[%s] %s %s/%s on host %s", e.Reason, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Source.Host)
+		chatSub := fmt.Sprintf("[%s] %s %s/%s on host %s: %s", e.Reason, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Source.Host, e.Message)
+		if err := f.send(emailSub, chatSub, string(bytes), receiver); err != nil {
 			log.Errorln(err)
 		}
 	}
@@ -40,14 +41,14 @@ func (f *EventForwarder) Forward(t metav1.TypeMeta, meta metav1.ObjectMeta, v in
 	}
 	for _, receiver := range f.Receivers {
 		sub := fmt.Sprintf("%s %s %s/%s added", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
-		if err := f.send(sub, string(bytes), receiver); err != nil {
+		if err := f.send(sub, sub, string(bytes), receiver); err != nil {
 			log.Errorln(err)
 		}
 	}
 	return nil
 }
 
-func (f *EventForwarder) send(sub, body string, receiver config.Receiver) error {
+func (f *EventForwarder) send(emailSub, chatSub, body string, receiver config.Receiver) error {
 	notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), f.Loader)
 	if err != nil {
 		return err
@@ -55,17 +56,17 @@ func (f *EventForwarder) send(sub, body string, receiver config.Receiver) error 
 	switch n := notifier.(type) {
 	case notify.ByEmail:
 		return n.To(receiver.To[0], receiver.To[1:]...).
-			WithSubject(sub).
+			WithSubject(emailSub).
 			WithBody(body).
 			WithNoTracking().
 			Send()
 	case notify.BySMS:
 		return n.To(receiver.To[0], receiver.To[1:]...).
-			WithBody(sub).
+			WithBody(emailSub).
 			Send()
 	case notify.ByChat:
 		return n.To(receiver.To[0], receiver.To[1:]...).
-			WithBody(sub).
+			WithBody(chatSub).
 			Send()
 	}
 	return nil
