@@ -55,7 +55,7 @@ func CreateClusterConfig() config.ClusterConfig {
 		Snapshotter: &config.SnapshotSpec{
 			Schedule: "@every 6h",
 			Sanitize: true,
-			Storage: &config.Backend{
+			Backend: config.Backend{
 				StorageSecretName: "snap-secret",
 				GCS: &config.GCSSpec{
 					Bucket: "restic",
