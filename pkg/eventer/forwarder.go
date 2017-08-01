@@ -25,7 +25,6 @@ func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
 		return err
 	}
 	for _, receiver := range f.Receivers {
-		e.Source.String()
 		sub := fmt.Sprintf("%s %s/%s: %s", e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason)
 		if err := f.send(sub, string(bytes), receiver); err != nil {
 			log.Errorln(err)
