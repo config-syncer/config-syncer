@@ -25,17 +25,13 @@ type Options struct {
 
 type client struct {
 	opt  Options
-	to   []string
 	body string
 }
 
 var _ notify.ByChat = &client{}
 
 func New(opt Options) *client {
-	return &client{
-		opt: opt,
-		to:  opt.To,
-	}
+	return &client{opt: opt}
 }
 
 func Default() (*client, error) {
@@ -66,7 +62,7 @@ func (c client) WithBody(body string) notify.ByChat {
 }
 
 func (c client) To(to string, cc ...string) notify.ByChat {
-	c.to = append([]string{to}, cc...)
+	c.opt.To = append([]string{to}, cc...)
 	return &c
 }
 

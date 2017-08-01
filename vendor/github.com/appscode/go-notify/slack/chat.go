@@ -15,18 +15,14 @@ type Options struct {
 }
 
 type client struct {
-	opt     Options
-	channel []string
-	body    string
+	opt  Options
+	body string
 }
 
 var _ notify.ByChat = &client{}
 
 func New(opt Options) *client {
-	return &client{
-		opt:     opt,
-		channel: opt.Channel,
-	}
+	return &client{opt: opt}
 }
 
 func Default() (*client, error) {
@@ -57,7 +53,7 @@ func (c client) WithBody(body string) notify.ByChat {
 }
 
 func (c client) To(to string, cc ...string) notify.ByChat {
-	c.channel = append([]string{to}, cc...)
+	c.opt.Channel = append([]string{to}, cc...)
 	return &c
 }
 
@@ -67,7 +63,7 @@ func (c *client) Send() error {
 	}
 
 	s := slack.New(c.opt.AuthToken)
-	for _, channel := range c.channel {
+	for _, channel := range c.opt.Channel {
 		if _, _, err := s.PostMessage(channel, c.body, slack.PostMessageParameters{}); err != nil {
 			return err
 		}
