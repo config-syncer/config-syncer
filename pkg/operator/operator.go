@@ -298,7 +298,7 @@ func (op *Operator) RunSnapshotter() error {
 	}
 
 	osmconfigPath := filepath.Join(op.Opt.ScratchDir, "osm", "config.yaml")
-	err := storage.WriteOSMConfig(op.KubeClient, op.Config.Snapshotter.Storage, op.Opt.OperatorNamespace, osmconfigPath)
+	err := storage.WriteOSMConfig(op.KubeClient, *op.Config.Snapshotter.Storage, op.Opt.OperatorNamespace, osmconfigPath)
 	if err != nil {
 		return err
 	}
