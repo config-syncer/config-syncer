@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 	"path/filepath"
 	"sync"
 	"time"
@@ -329,8 +330,9 @@ func (op *Operator) RunSnapshotter() error {
 		if err != nil {
 			return err
 		}
+		defer os.RemoveAll(snapshotDir)
 
-		dest, err := op.Config.Snapshotter.Backend.Location(t)
+		dest, err := op.Config.Snapshotter.Location(t)
 		if err != nil {
 			return err
 		}
