@@ -280,17 +280,17 @@ secret "kubed-config" labeled
 $ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
-  config.yaml: c25hcHNob3R0ZXI6CiAgU3RvcmFnZToKICAgIGF6dXJlOgogICAgICBjb250YWluZXI6IGJ1Y2tldC1mb3Itc25hcHNob3QKICAgICAgcHJlZml4OiBtaW5pa3ViZQogICAgc3RvcmFnZVNlY3JldE5hbWU6IGF6dXJlLXNlY3JldAogIHNhbml0aXplOiB0cnVlCiAgc2NoZWR1bGU6ICdAZXZlcnkgNmgn
+  config.yaml: c25hcHNob3R0ZXI6CiAgYXp1cmU6CiAgICBjb250YWluZXI6IGJ1Y2tldC1mb3Itc25hcHNob3QKICAgIHByZWZpeDogbWluaWt1YmUKICBzdG9yYWdlU2VjcmV0TmFtZTogYXp1cmUtc2VjcmV0CiAgc2FuaXRpemU6IHRydWUKICBzY2hlZHVsZTogJ0BldmVyeSA2aCc=
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-26T06:01:42Z
+  creationTimestamp: 2017-08-01T06:45:36Z
   labels:
     app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "7555"
+  resourceVersion: "1314"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: e5b8f78f-71c7-11e7-a5ec-0800273df5f2
+  uid: 06180b7b-7685-11e7-b77d-0800274b060f
 type: Opaque
 ```
 
@@ -404,17 +404,17 @@ secret "kubed-config" labeled
 $ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
-  kubed-config.yaml: YXBpVmVyc2lvbjogdjEKa2luZDogQ29uZmlnTWFwCm1ldGFkYXRhOgogIG5hbWU6IGt1YmVkLWNvbmZpZwogIG5hbWVzcGFjZToga3ViZS1zeXN0ZW0KICBsYWJlbHM6CiAgICBhcHA6IGt1YmVkCmRhdGE6CiAgY29uZmlnLnlhbWw6IHwKICAgIHNuYXBzaG90dGVyOgogICAgICBTdG9yYWdlOgogICAgICAgIHN3aWZ0OgogICAgICAgICAgY29udGFpbmVyOiBidWNrZXQtZm9yLXNuYXBzaG90CiAgICAgICAgICBwcmVmaXg6IG1pbmlrdWJlCiAgICAgICAgc3RvcmFnZVNlY3JldE5hbWU6IHNuYXAtc2VjcmV0CiAgICAgIHNhbml0aXplOiB0cnVlCiAgICAgIHNjaGVkdWxlOiAnQGV2ZXJ5IDZoJwo=
+  kubed-config.yaml: YXBpVmVyc2lvbjogdjEKZGF0YToKICBrdWJlZC1jb25maWcueWFtbDogWVhCcFZtVnljMmx2YmpvZ2RqRUthMmx1WkRvZ1EyOXVabWxuVFdGd0NtMWxkR0ZrWVhSaE9nb2dJRzVoYldVNklHdDFZbVZrTFdOdmJtWnBad29nSUc1aGJXVnpjR0ZqWlRvZ2EzVmlaUzF6ZVhOMFpXMEtJQ0JzWVdKbGJITTZDaUFnSUNCaGNIQTZJR3QxWW1Wa0NtUmhkR0U2Q2lBZ1kyOXVabWxuTG5saGJXdzZJSHdLSUNBZ0lITnVZWEJ6YUc5MGRHVnlPZ29nSUNBZ0lDQlRkRzl5WVdkbE9nb2dJQ0FnSUNBZ0lITjNhV1owT2dvZ0lDQWdJQ0FnSUNBZ1kyOXVkR0ZwYm1WeU9pQmlkV05yWlhRdFptOXlMWE51WVhCemFHOTBDaUFnSUNBZ0lDQWdJQ0J3Y21WbWFYZzZJRzFwYm1scmRXSmxDaUFnSUNBZ0lDQWdjM1J2Y21GblpWTmxZM0psZEU1aGJXVTZJSE51WVhBdGMyVmpjbVYwQ2lBZ0lDQWdJSE5oYm1sMGFYcGxPaUIwY25WbENpQWdJQ0FnSUhOamFHVmtkV3hsT2lBblFHVjJaWEo1SURab0p3bz0Ka2luZDogU2VjcmV0Cm1ldGFkYXRhOgogIGNyZWF0aW9uVGltZXN0YW1wOiAyMDE3LTA3LTI2VDA2OjI1OjU0WgogIGxhYmVsczoKICAgIGFwcDoga3ViZWQKICBuYW1lOiBrdWJlZC1jb25maWcKICBuYW1lc3BhY2U6IGt1YmUtc3lzdGVtCiAgcmVzb3VyY2VWZXJzaW9uOiAiOTMwMyIKICBzZWxmTGluazogL2FwaS92MS9uYW1lc3BhY2VzL2t1YmUtc3lzdGVtL3NlY3JldHMva3ViZWQtY29uZmlnCiAgdWlkOiA0Nzc3ZjI4Yi03MWNiLTExZTctYTVlYy0wODAwMjczZGY1ZjIKdHlwZTogT3BhcXVlCg==
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-26T06:25:54Z
+  creationTimestamp: 2017-08-01T06:46:44Z
   labels:
     app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "9303"
+  resourceVersion: "1386"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: 4777f28b-71cb-11e7-a5ec-0800273df5f2
+  uid: 2e9e3b46-7685-11e7-b77d-0800274b060f
 type: Opaque
 ```
 
@@ -455,17 +455,17 @@ secret "kubed-config" labeled
 $ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
-  kubed-config.yaml: YXBpVmVyc2lvbjogdjEKa2luZDogQ29uZmlnTWFwCm1ldGFkYXRhOgogIG5hbWU6IGt1YmVkLWNvbmZpZwogIG5hbWVzcGFjZToga3ViZS1zeXN0ZW0KICBsYWJlbHM6CiAgICBhcHA6IGt1YmVkCmRhdGE6CiAgY29uZmlnLnlhbWw6IHwKICAgIHNuYXBzaG90dGVyOgogICAgICBTdG9yYWdlOgogICAgICAgIGxvY2FsOgogICAgICAgICAgcGF0aDogL3Zhci9kYXRhCiAgICAgICAgc3RvcmFnZVNlY3JldE5hbWU6IGdjcy1zZWNyZXQKICAgICAgc2FuaXRpemU6IHRydWUKICAgICAgc2NoZWR1bGU6ICdAZXZlcnkgNmgnCg==
+  kubed-config.yaml: YXBpVmVyc2lvbjogdjEKZGF0YToKICBrdWJlZC1jb25maWcueWFtbDogWVhCcFZtVnljMmx2YmpvZ2RqRUthMmx1WkRvZ1EyOXVabWxuVFdGd0NtMWxkR0ZrWVhSaE9nb2dJRzVoYldVNklHdDFZbVZrTFdOdmJtWnBad29nSUc1aGJXVnpjR0ZqWlRvZ2EzVmlaUzF6ZVhOMFpXMEtJQ0JzWVdKbGJITTZDaUFnSUNCaGNIQTZJR3QxWW1Wa0NtUmhkR0U2Q2lBZ1kyOXVabWxuTG5saGJXdzZJSHdLSUNBZ0lITnVZWEJ6YUc5MGRHVnlPZ29nSUNBZ0lDQlRkRzl5WVdkbE9nb2dJQ0FnSUNBZ0lHeHZZMkZzT2dvZ0lDQWdJQ0FnSUNBZ2NHRjBhRG9nTDNaaGNpOWtZWFJoQ2lBZ0lDQWdJQ0FnYzNSdmNtRm5aVk5sWTNKbGRFNWhiV1U2SUdkamN5MXpaV055WlhRS0lDQWdJQ0FnYzJGdWFYUnBlbVU2SUhSeWRXVUtJQ0FnSUNBZ2MyTm9aV1IxYkdVNklDZEFaWFpsY25rZ05tZ25DZz09CmtpbmQ6IFNlY3JldAptZXRhZGF0YToKICBjcmVhdGlvblRpbWVzdGFtcDogMjAxNy0wNy0yNlQwOToyNzoxMloKICBsYWJlbHM6CiAgICBhcHA6IGt1YmVkCiAgbmFtZToga3ViZWQtY29uZmlnCiAgbmFtZXNwYWNlOiBrdWJlLXN5c3RlbQogIHJlc291cmNlVmVyc2lvbjogIjIxMjQ5IgogIHNlbGZMaW5rOiAvYXBpL3YxL25hbWVzcGFjZXMva3ViZS1zeXN0ZW0vc2VjcmV0cy9rdWJlZC1jb25maWcKICB1aWQ6IDliNDU1OTRiLTcxZTQtMTFlNy1hNWVjLTA4MDAyNzNkZjVmMgp0eXBlOiBPcGFxdWUK
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-26T09:27:12Z
+  creationTimestamp: 2017-08-01T06:47:43Z
   labels:
     app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "21249"
+  resourceVersion: "1453"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: 9b45594b-71e4-11e7-a5ec-0800273df5f2
+  uid: 51a10e2d-7685-11e7-b77d-0800274b060f
 type: Opaque
 ```
 
