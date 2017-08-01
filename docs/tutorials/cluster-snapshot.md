@@ -66,11 +66,12 @@ snapshotter:
   schedule: '@every 6h'
 ```
 
-| Key                             | Description                                                                     |
-|---------------------------------|---------------------------------------------------------------------------------|
-| `snapshotter.storageSecretName` | `Required`. Name of storage secret                                              |
-| `snapshotter.gcs.bucket`        | `Required`. Name of GCS Bucket                                                  |
-| `snapshotter.gcs.prefix`        | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| Key                             | Description                                                                      |
+|---------------------------------|----------------------------------------------------------------------------------|
+| `snapshotter.storageSecretName` | `Required`. Name of storage secret                                               |
+| `snapshotter.gcs.bucket`        | `Required`. Name of GCS Bucket                                                   |
+| `snapshotter.gcs.prefix`        | `Optional`. Path prefix into bucket where snapshot will be stored                |
+| `snapshotter.overwrite`         | `Optional`. If set to `true`, snapshot folders are reused, otherwise a new folder is created at snapshot timestamp.     |
 | `snapshotter.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
 | `snapshotter.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
@@ -168,6 +169,7 @@ snapshotter:
 | `snapshotter.storageSecretName` | `Required`. Name of storage secret                                              |
 | `snapshotter.s3.bucket`         | `Required`. Name of S3 Bucket                                                   |
 | `snapshotter.s3.prefix`         | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.overwrite`         | `Optional`. If set to `true`, snapshot folders are reused, otherwise a new folder is created at snapshot timestamp.     |
 | `snapshotter.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
 | `snapshotter.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
@@ -262,6 +264,7 @@ snapshotter:
 | `snapshotter.storageSecretName` | `Required`. Name of storage secret                                              |
 | `snapshotter.azure.container`   | `Required`. Name of Azure container                                             |
 | `snapshotter.azure.prefix`      | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.overwrite`         | `Optional`. If set to `true`, snapshot folders are reused, otherwise a new folder is created at snapshot timestamp.     |
 | `snapshotter.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
 | `snapshotter.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
@@ -386,6 +389,7 @@ snapshotter:
 | `snapshotter.storageSecretName` | `Required`. Name of storage secret                                              |
 | `snapshotter.swift.container`   | `Required`. Name of OpenStack Swift container                                   |
 | `snapshotter.swift.prefix`      | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.overwrite`         | `Optional`. If set to `true`, snapshot folders are reused, otherwise a new folder is created at snapshot timestamp.     |
 | `snapshotter.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
 | `snapshotter.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
@@ -437,6 +441,7 @@ snapshotter:
 | Key                             | Description                                                                     |
 |---------------------------------|---------------------------------------------------------------------------------|
 | `snapshotter.local.path`        | `Optional`. Path where snapshot will be stored                                  |
+| `snapshotter.overwrite`         | `Optional`. If set to `true`, snapshot folders are reused, otherwise a new folder is created at snapshot timestamp.     |
 | `snapshotter.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
 | `snapshotter.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
