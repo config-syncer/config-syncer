@@ -67,9 +67,10 @@ func CreateClusterConfig() config.ClusterConfig {
 			Path:          "/tmp/kubed/trash",
 			TTL:           metav1.Duration{Duration: 7 * 24 * time.Hour},
 			HandleUpdates: false,
-			Receiver: &config.Receiver{
+			Receivers: []config.Receiver{{
 				To:       []string{"ops@example.com"},
 				Notifier: mailgun.UID,
+			},
 			},
 		},
 		EnableConfigSyncer: true,
@@ -87,10 +88,12 @@ func CreateClusterConfig() config.ClusterConfig {
 				Handle: true,
 				Namespaces: []string{
 					"kube-system",
-				}},
-			Receiver: config.Receiver{
+				},
+			},
+			Receivers: []config.Receiver{{
 				To:       []string{"ops@example.com"},
 				Notifier: mailgun.UID,
+			},
 			},
 		},
 		Janitors: []config.JanitorSpec{
