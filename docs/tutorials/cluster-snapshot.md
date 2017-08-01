@@ -58,22 +58,21 @@ Now, let's take a look at the cluster config. Here,
 $ cat ./docs/examples/cluster-snapshot/gcs/config.yaml
 
 snapshotter:
-  Storage:
-    gcs:
-      bucket: bucket-for-snapshot
-      prefix: minikube
-    storageSecretName: gcs-secret
+  gcs:
+    bucket: bucket-for-snapshot
+    prefix: minikube
+  storageSecretName: gcs-secret
   sanitize: true
   schedule: '@every 6h'
 ```
 
-| Key                                     | Description                                                                     |
-|-----------------------------------------|---------------------------------------------------------------------------------|
-| `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
-| `snapshotter.storage.gcs.bucket`        | `Required`. Name of GCS Bucket                                                  |
-| `snapshotter.storage.gcs.prefix`        | `Optional`. Path prefix into bucket where snapshot will be stored               |
-| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
-| `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
+| Key                             | Description                                                                     |
+|---------------------------------|---------------------------------------------------------------------------------|
+| `snapshotter.storageSecretName` | `Required`. Name of storage secret                                              |
+| `snapshotter.gcs.bucket`        | `Required`. Name of GCS Bucket                                                  |
+| `snapshotter.gcs.prefix`        | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
+| `snapshotter.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
@@ -155,23 +154,22 @@ Now, let's take a look at the cluster config. Here,
 $ cat ./docs/examples/cluster-snapshot/s3/config.yaml
 
 snapshotter:
-  Storage:
-    s3:
-      endpoint: 's3.amazonaws.com'
-      bucket: kubedb-qa
-      prefix: minikube
-    storageSecretName: snap-secret
+  s3:
+    endpoint: 's3.amazonaws.com'
+    bucket: kubedb-qa
+    prefix: minikube
+  storageSecretName: snap-secret
   sanitize: true
   schedule: '@every 6h'
 ```
 
-| Key                                     | Description                                                                     |
-|-----------------------------------------|---------------------------------------------------------------------------------|
-| `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
-| `snapshotter.storage.s3.bucket`         | `Required`. Name of S3 Bucket                                                   |
-| `snapshotter.storage.s3.prefix`         | `Optional`. Path prefix into bucket where snapshot will be stored               |
-| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
-| `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
+| Key                             | Description                                                                     |
+|---------------------------------|---------------------------------------------------------------------------------|
+| `snapshotter.storageSecretName` | `Required`. Name of storage secret                                              |
+| `snapshotter.s3.bucket`         | `Required`. Name of S3 Bucket                                                   |
+| `snapshotter.s3.prefix`         | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
+| `snapshotter.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
@@ -251,22 +249,21 @@ Now, let's take a look at the cluster config. Here,
 $ cat ./docs/examples/cluster-snapshot/azure/config.yaml
 
 snapshotter:
-  Storage:
-    azure:
-      container: bucket-for-snapshot
-      prefix: minikube
-    storageSecretName: azure-secret
+  azure:
+    container: bucket-for-snapshot
+    prefix: minikube
+  storageSecretName: azure-secret
   sanitize: true
   schedule: '@every 6h'
 ```
 
-| Key                                     | Description                                                                     |
-|-----------------------------------------|---------------------------------------------------------------------------------|
-| `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
-| `snapshotter.storage.azure.container`   | `Required`. Name of Azure container                                             |
-| `snapshotter.storage.azure.prefix`      | `Optional`. Path prefix into bucket where snapshot will be stored               |
-| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
-| `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
+| Key                             | Description                                                                     |
+|---------------------------------|---------------------------------------------------------------------------------|
+| `snapshotter.storageSecretName` | `Required`. Name of storage secret                                              |
+| `snapshotter.azure.container`   | `Required`. Name of Azure container                                             |
+| `snapshotter.azure.prefix`      | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
+| `snapshotter.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
@@ -376,22 +373,21 @@ Now, let's take a look at the cluster config. Here,
 $ cat ./docs/examples/cluster-snapshot/swift/config.yaml
 
 snapshotter:
-  Storage:
-    swift:
-      container: bucket-for-snapshot
-      prefix: minikube
-    storageSecretName: snap-secret
+  swift:
+    container: bucket-for-snapshot
+    prefix: minikube
+  storageSecretName: snap-secret
   sanitize: true
   schedule: '@every 6h'
 ```
 
-| Key                                     | Description                                                                     |
-|-----------------------------------------|---------------------------------------------------------------------------------|
-| `snapshotter.storage.storageSecretName` | `Required`. Name of storage secret                                              |
-| `snapshotter.storage.swift.container`   | `Required`. Name of OpenStack Swift container                                   |
-| `snapshotter.storage.swift.prefix`      | `Optional`. Path prefix into bucket where snapshot will be stored               |
-| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
-| `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
+| Key                             | Description                                                                     |
+|---------------------------------|---------------------------------------------------------------------------------|
+| `snapshotter.storageSecretName` | `Required`. Name of storage secret                                              |
+| `snapshotter.swift.container`   | `Required`. Name of OpenStack Swift container                                   |
+| `snapshotter.swift.prefix`      | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
+| `snapshotter.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
@@ -432,18 +428,17 @@ Now, deploy Kubed operator in your cluster following the steps [here](/docs/inst
 $ cat ./docs/examples/cluster-snapshot/local/config.yaml
 
 snapshotter:
-  Storage:
-    local:
-      path: /var/data
+  local:
+    path: /var/data
   sanitize: true
   schedule: '@every 6h'
 ```
 
-| Key                                     | Description                                                                     |
-|-----------------------------------------|---------------------------------------------------------------------------------|
-| `snapshotter.storage.local.path`        | `Optional`. Path where snapshot will be stored                                  |
-| `snapshotter.sanitize`                  | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
-| `snapshotter.schedule`                  | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
+| Key                             | Description                                                                     |
+|---------------------------------|---------------------------------------------------------------------------------|
+| `snapshotter.local.path`        | `Optional`. Path where snapshot will be stored                                  |
+| `snapshotter.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
+| `snapshotter.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
 
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
@@ -474,7 +469,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster. Since, `snapshotter.storage.local.path` is set to `/var/data`, mount your local volume at that path. You can find example installation scripts below:
+Now, deploy Kubed operator in your cluster. Since, `snapshotter.local.path` is set to `/var/data`, mount your local volume at that path. You can find example installation scripts below:
  - [Without RBAC](/docs/examples/cluster-snapshot/local/without-rbac.yaml)
  - [With RBAC](/docs/examples/cluster-snapshot/local/with-rbac.yaml)
 
