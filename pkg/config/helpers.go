@@ -66,8 +66,11 @@ func (cfg ClusterConfig) Validate() error {
 	return nil
 }
 
-func (b Backend) Location(timestamp time.Time) (string, error) {
-	ts := timestamp.UTC().Format(TimestampFormat)
+func (b SnapshotSpec) Location(timestamp time.Time) (string, error) {
+	var ts string
+	if b.Overwrite {
+		ts = timestamp.UTC().Format(TimestampFormat)
+	}
 	if b.S3 != nil {
 		return filepath.Join(b.S3.Prefix, ts), nil
 	} else if b.GCS != nil {
