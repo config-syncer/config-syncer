@@ -185,17 +185,17 @@ secret "kubed-config" labeled
 $ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
-  config.yaml: c25hcHNob3R0ZXI6CiAgU3RvcmFnZToKICAgIHMzOgogICAgICBlbmRwb2ludDogJ3MzLmFtYXpvbmF3cy5jb20nCiAgICAgIGJ1Y2tldDoga3ViZWRiLXFhCiAgICAgIHByZWZpeDogbWluaWt1YmUKICAgIHN0b3JhZ2VTZWNyZXROYW1lOiBzbmFwLXNlY3JldAogIHNhbml0aXplOiB0cnVlCiAgc2NoZWR1bGU6ICdAZXZlcnkgNmgn
+  config.yaml: c25hcHNob3R0ZXI6CiAgczM6CiAgICBlbmRwb2ludDogJ3MzLmFtYXpvbmF3cy5jb20nCiAgICBidWNrZXQ6IGJ1Y2tldC1mb3Itc25hcHNob3QKICAgIHByZWZpeDogbWluaWt1YmUKICBzdG9yYWdlU2VjcmV0TmFtZTogc25hcC1zZWNyZXQKICBzYW5pdGl6ZTogdHJ1ZQogIHNjaGVkdWxlOiAnQGV2ZXJ5IDZoJw==
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-26T05:32:09Z
+  creationTimestamp: 2017-08-01T06:43:39Z
   labels:
     app: kubed
   name: kubed-config
   namespace: kube-system
-  resourceVersion: "5572"
+  resourceVersion: "1179"
   selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: c4dc8215-71c3-11e7-a5ec-0800273df5f2
+  uid: c0624c33-7684-11e7-b77d-0800274b060f
 type: Opaque
 ```
 
