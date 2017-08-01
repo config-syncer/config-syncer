@@ -40,25 +40,27 @@ func (c *RecycleBin) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new 
 		return err
 	}
 
-	if c.Spec.Receiver != nil && len(c.Spec.Receiver.To) > 0 {
-		sub := fmt.Sprintf("%s %s %s/%s updated", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
-		if notifier, err := unified.LoadVia(strings.ToLower(c.Spec.Receiver.Notifier), c.Loader); err == nil {
-			switch n := notifier.(type) {
-			case notify.ByEmail:
-				n = n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...)
-				if diff, err := prepareDiff(old, new); err == nil {
-					n.WithSubject(sub).WithBody(diff).WithNoTracking().Send()
-				} else {
-					n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
+	for _, receiver := range c.Spec.Receivers {
+		if len(receiver.To) > 0 {
+			sub := fmt.Sprintf("%s %s %s/%s updated", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
+			if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), c.Loader); err == nil {
+				switch n := notifier.(type) {
+				case notify.ByEmail:
+					n = n.To(receiver.To[0], receiver.To[1:]...)
+					if diff, err := prepareDiff(old, new); err == nil {
+						n.WithSubject(sub).WithBody(diff).WithNoTracking().Send()
+					} else {
+						n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
+					}
+				case notify.BySMS:
+					n.To(receiver.To[0], receiver.To[1:]...).
+						WithBody(sub).
+						Send()
+				case notify.ByChat:
+					n.To(receiver.To[0], receiver.To[1:]...).
+						WithBody(sub).
+						Send()
 				}
-			case notify.BySMS:
-				n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...).
-					WithBody(sub).
-					Send()
-			case notify.ByChat:
-				n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...).
-					WithBody(sub).
-					Send()
 			}
 		}
 	}
@@ -82,27 +84,30 @@ func (c *RecycleBin) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interfa
 		return err
 	}
 
-	if c.Spec.Receiver != nil && len(c.Spec.Receiver.To) > 0 {
-		sub := fmt.Sprintf("%s %s %s/%s deleted", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
-		if notifier, err := unified.LoadVia(strings.ToLower(c.Spec.Receiver.Notifier), c.Loader); err == nil {
-			switch n := notifier.(type) {
-			case notify.ByEmail:
-				n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...).
-					WithSubject(sub).
-					WithBody(string(bytes)).
-					WithNoTracking().
-					Send()
-			case notify.BySMS:
-				n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...).
-					WithBody(sub).
-					Send()
-			case notify.ByChat:
-				n.To(c.Spec.Receiver.To[0], c.Spec.Receiver.To[1:]...).
-					WithBody(sub).
-					Send()
+	for _, receiver := range c.Spec.Receivers {
+		if len(receiver.To) > 0 {
+			sub := fmt.Sprintf("%s %s %s/%s deleted", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
+			if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), c.Loader); err == nil {
+				switch n := notifier.(type) {
+				case notify.ByEmail:
+					n.To(receiver.To[0], receiver.To[1:]...).
+						WithSubject(sub).
+						WithBody(string(bytes)).
+						WithNoTracking().
+						Send()
+				case notify.BySMS:
+					n.To(receiver.To[0], receiver.To[1:]...).
+						WithBody(sub).
+						Send()
+				case notify.ByChat:
+					n.To(receiver.To[0], receiver.To[1:]...).
+						WithBody(sub).
+						Send()
+				}
 			}
 		}
 	}
+
 	return ioutil.WriteFile(fullPath, bytes, 0644)
 }
 

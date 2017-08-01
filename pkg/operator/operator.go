@@ -106,8 +106,8 @@ func (op *Operator) Setup() error {
 
 	if op.Config.EventForwarder != nil {
 		op.Eventer = &eventer.EventForwarder{
-			Receiver: op.Config.EventForwarder.Receiver,
-			Loader:   op.NotifierLoader,
+			Receivers: op.Config.EventForwarder.Receivers,
+			Loader:    op.NotifierLoader,
 		}
 	}
 

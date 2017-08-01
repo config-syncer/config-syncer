@@ -2,8 +2,8 @@ notifierSecretName: notifier-config
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
-  receiver:
-    notifier: mailgun
+  receivers:
+  - notifier: mailgun
     to:
     - ops@example.com
   ttl: 168h

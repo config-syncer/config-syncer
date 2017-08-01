@@ -18,8 +18,8 @@ eventForwarder:
     handle: true
   nodeAdded:
     handle: true
-  receiver:
-    notifier: mailgun
+  receivers:
+  - notifier: mailgun
     to:
     - ops@example.com
   storageAdded:
@@ -42,8 +42,8 @@ notifierSecretName: notifier-config
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
-  receiver:
-    notifier: mailgun
+  receivers:
+  - notifier: mailgun
     to:
     - ops@example.com
   ttl: 168h0m0s

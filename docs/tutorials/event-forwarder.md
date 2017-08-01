@@ -25,8 +25,8 @@ eventForwarder:
     handle: true
     namespaces:
     - kube-system
-  receiver:
-    notifier: mailgun
+  receivers:
+  - notifier: mailgun
     to:
     - ops@example.com
 notifierSecretName: notifier-config
@@ -181,8 +181,8 @@ eventForwarder:
     handle: true
     namespaces:
     - kube-system
-  receiver:
-    notifier: mailgun
+  receivers:
+  - notifier: mailgun
     to:
     - ops@example.com
 notifierSecretName: notifier-config

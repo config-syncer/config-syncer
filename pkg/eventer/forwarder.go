@@ -14,34 +14,36 @@ import (
 )
 
 type EventForwarder struct {
-	Receiver config.Receiver
-	Loader   envconfig.LoaderFunc
+	Receivers []config.Receiver
+	Loader    envconfig.LoaderFunc
 }
 
 func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
 	if e.Type == apiv1.EventTypeWarning {
-		if len(f.Receiver.To) > 0 {
-			sub := fmt.Sprintf("%s %s/%s: %s", e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason)
-			if notifier, err := unified.LoadVia(strings.ToLower(f.Receiver.Notifier), f.Loader); err == nil {
-				switch n := notifier.(type) {
-				case notify.ByEmail:
-					bytes, err := yaml.Marshal(e)
-					if err != nil {
-						return err
+		for _, receiver := range f.Receivers {
+			if len(receiver.To) > 0 {
+				sub := fmt.Sprintf("%s %s/%s: %s", e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason)
+				if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), f.Loader); err == nil {
+					switch n := notifier.(type) {
+					case notify.ByEmail:
+						bytes, err := yaml.Marshal(e)
+						if err != nil {
+							return err
+						}
+						n.To(receiver.To[0], receiver.To[1:]...).
+							WithSubject(sub).
+							WithBody(string(bytes)).
+							WithNoTracking().
+							Send()
+					case notify.BySMS:
+						n.To(receiver.To[0], receiver.To[1:]...).
+							WithBody(sub).
+							Send()
+					case notify.ByChat:
+						n.To(receiver.To[0], receiver.To[1:]...).
+							WithBody(sub).
+							Send()
 					}
-					n.To(f.Receiver.To[0], f.Receiver.To[1:]...).
-						WithSubject(sub).
-						WithBody(string(bytes)).
-						WithNoTracking().
-						Send()
-				case notify.BySMS:
-					n.To(f.Receiver.To[0], f.Receiver.To[1:]...).
-						WithBody(sub).
-						Send()
-				case notify.ByChat:
-					n.To(f.Receiver.To[0], f.Receiver.To[1:]...).
-						WithBody(sub).
-						Send()
 				}
 			}
 		}
@@ -54,24 +56,26 @@ func (f *EventForwarder) Forward(t metav1.TypeMeta, meta metav1.ObjectMeta, v in
 	if err != nil {
 		return err
 	}
-	if len(f.Receiver.To) > 0 {
-		sub := fmt.Sprintf("%s %s %s/%s added", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
-		if notifier, err := unified.LoadVia(strings.ToLower(f.Receiver.Notifier), f.Loader); err == nil {
-			switch n := notifier.(type) {
-			case notify.ByEmail:
-				n.To(f.Receiver.To[0], f.Receiver.To[1:]...).
-					WithSubject(sub).
-					WithBody(string(bytes)).
-					WithNoTracking().
-					Send()
-			case notify.BySMS:
-				n.To(f.Receiver.To[0], f.Receiver.To[1:]...).
-					WithBody(sub).
-					Send()
-			case notify.ByChat:
-				n.To(f.Receiver.To[0], f.Receiver.To[1:]...).
-					WithBody(sub).
-					Send()
+	for _, receiver := range f.Receivers {
+		if len(receiver.To) > 0 {
+			sub := fmt.Sprintf("%s %s %s/%s added", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
+			if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), f.Loader); err == nil {
+				switch n := notifier.(type) {
+				case notify.ByEmail:
+					n.To(receiver.To[0], receiver.To[1:]...).
+						WithSubject(sub).
+						WithBody(string(bytes)).
+						WithNoTracking().
+						Send()
+				case notify.BySMS:
+					n.To(receiver.To[0], receiver.To[1:]...).
+						WithBody(sub).
+						Send()
+				case notify.ByChat:
+					n.To(receiver.To[0], receiver.To[1:]...).
+						WithBody(sub).
+						Send()
+				}
 			}
 		}
 	}
