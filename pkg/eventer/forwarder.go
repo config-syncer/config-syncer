@@ -21,6 +21,10 @@ type EventForwarder struct {
 }
 
 func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
+	bytes, err := yaml.Marshal(e)
+	if err != nil {
+		return err
+	}
 	oneliners.FILE()
 	if e.Type == apiv1.EventTypeWarning {
 		oneliners.FILE()
@@ -29,33 +33,7 @@ func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
 			if len(receiver.To) > 0 {
 				oneliners.FILE()
 				sub := fmt.Sprintf("%s %s/%s: %s", e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason)
-				if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), f.Loader); err == nil {
-					log.Infoln(notifier)
-					switch n := notifier.(type) {
-					case notify.ByEmail:
-						bytes, err := yaml.Marshal(e)
-						if err != nil {
-							oneliners.FILE(err)
-							return err
-						}
-						n.To(receiver.To[0], receiver.To[1:]...).
-							WithSubject(sub).
-							WithBody(string(bytes)).
-							WithNoTracking().
-							Send()
-					case notify.BySMS:
-						n.To(receiver.To[0], receiver.To[1:]...).
-							WithBody(sub).
-							Send()
-					case notify.ByChat:
-						n.To(receiver.To[0], receiver.To[1:]...).
-							WithBody(sub).
-							Send()
-					default:
-						log.Infoln(n)
-					}
-				} else {
-					log.Infoln()
+				if err := f.send(sub, string(bytes), receiver); err != nil {
 					log.Errorln(err)
 				}
 			}
@@ -72,25 +50,34 @@ func (f *EventForwarder) Forward(t metav1.TypeMeta, meta metav1.ObjectMeta, v in
 	for _, receiver := range f.Receivers {
 		if len(receiver.To) > 0 {
 			sub := fmt.Sprintf("%s %s %s/%s added", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
-			if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), f.Loader); err == nil {
-				switch n := notifier.(type) {
-				case notify.ByEmail:
-					n.To(receiver.To[0], receiver.To[1:]...).
-						WithSubject(sub).
-						WithBody(string(bytes)).
-						WithNoTracking().
-						Send()
-				case notify.BySMS:
-					n.To(receiver.To[0], receiver.To[1:]...).
-						WithBody(sub).
-						Send()
-				case notify.ByChat:
-					n.To(receiver.To[0], receiver.To[1:]...).
-						WithBody(sub).
-						Send()
-				}
+			if err := f.send(sub, string(bytes), receiver); err != nil {
+				log.Errorln(err)
 			}
 		}
+	}
+	return nil
+}
+
+func (f *EventForwarder) send(sub, body string, receiver config.Receiver) error {
+	notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), f.Loader)
+	if err != nil {
+		return err
+	}
+	switch n := notifier.(type) {
+	case notify.ByEmail:
+		return n.To(receiver.To[0], receiver.To[1:]...).
+			WithSubject(sub).
+			WithBody(body).
+			WithNoTracking().
+			Send()
+	case notify.BySMS:
+		return n.To(receiver.To[0], receiver.To[1:]...).
+			WithBody(sub).
+			Send()
+	case notify.ByChat:
+		return n.To(receiver.To[0], receiver.To[1:]...).
+			WithBody(sub).
+			Send()
 	}
 	return nil
 }
