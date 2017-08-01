@@ -12,8 +12,8 @@ type CheckPod string
 const (
 	CheckPodInfluxQuery CheckPod = "influx_query"
 	CheckPodStatus      CheckPod = "pod_status"
-	CheckVolume         CheckPod = "volume"
-	CheckPodExec        CheckPod = "kube_exec"
+	CheckPodVolume      CheckPod = "pod_volume"
+	CheckPodExec        CheckPod = "pod_exec"
 )
 
 func (c CheckPod) IsValid() bool {
@@ -33,7 +33,7 @@ type CheckNode string
 
 const (
 	CheckNodeInfluxQuery CheckNode = "influx_query"
-	CheckNodeDisk        CheckNode = "node_disk"
+	CheckNodeVolume      CheckNode = "node_volume"
 	CheckNodeStatus      CheckNode = "node_status"
 )
 
@@ -53,18 +53,18 @@ func ParseCheckNode(s string) (*CheckNode, error) {
 type CheckCluster string
 
 const (
-	CheckHttp              CheckCluster = "any_http"
-	CheckComponentStatus   CheckCluster = "component_status"
-	CheckJsonPath          CheckCluster = "json_path"
-	CheckNodeExists        CheckCluster = "node_exists"
-	CheckPodExists         CheckCluster = "pod_exists"
-	CheckClusterEvent      CheckCluster = "kube_event"
-	CheckCertificateExpiry CheckCluster = "certificate_expiry"
-	CheckHelloIcinga       CheckCluster = "hello_icinga"
-	CheckDIG               CheckCluster = "dig"
-	CheckDNS               CheckCluster = "dns"
-	CheckDummy             CheckCluster = "dummy"
-	CheckICMP              CheckCluster = "icmp"
+	CheckComponentStatus CheckCluster = "component_status"
+	CheckJsonPath        CheckCluster = "json_path"
+	CheckNodeExists      CheckCluster = "node_exists"
+	CheckPodExists       CheckCluster = "pod_exists"
+	CheckEvent           CheckCluster = "event"
+	CheckCACert          CheckCluster = "ca_cert"
+	CheckHttp            CheckCluster = "any_http"
+	CheckEnv             CheckCluster = "env"
+	CheckDummy           CheckCluster = "dummy"
+	//CheckICMP          CheckCluster = "icmp"
+	//CheckDIG           CheckCluster = "dig"
+	//CheckDNS           CheckCluster = "dns"
 )
 
 func (c CheckCluster) IsValid() bool {
@@ -93,48 +93,54 @@ var (
 )
 
 func init() {
-	PodCommands = map[CheckPod]IcingaCommand{}
-	NodeCommands = map[CheckNode]IcingaCommand{}
 	ClusterCommands = map[CheckCluster]IcingaCommand{}
-
-	cmdList, err := data.LoadIcingaData()
+	clusterChecks, err := data.LoadClusterChecks()
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, cmd := range cmdList.Command {
+	for _, cmd := range clusterChecks.Command {
 		vars := make(map[string]data.CommandVar)
 		for _, v := range cmd.Vars {
 			vars[v.Name] = v
 		}
-		c := IcingaCommand{
+		ClusterCommands[CheckCluster(cmd.Name)] = IcingaCommand{
 			Name:   cmd.Name,
 			Vars:   vars,
 			States: cmd.States,
 		}
-		if c.Name == string(CheckPodInfluxQuery) ||
-			c.Name == string(CheckPodStatus) ||
-			c.Name == string(CheckVolume) ||
-			c.Name == string(CheckPodExec) {
-			PodCommands[CheckPod(c.Name)] = c
+	}
+
+	NodeCommands = map[CheckNode]IcingaCommand{}
+	nodeChecks, err := data.LoadNodeChecks()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, cmd := range nodeChecks.Command {
+		vars := make(map[string]data.CommandVar)
+		for _, v := range cmd.Vars {
+			vars[v.Name] = v
 		}
-		if c.Name == string(CheckNodeInfluxQuery) ||
-			c.Name == string(CheckNodeDisk) ||
-			c.Name == string(CheckNodeStatus) {
-			NodeCommands[CheckNode(c.Name)] = c
+		NodeCommands[CheckNode(cmd.Name)] = IcingaCommand{
+			Name:   cmd.Name,
+			Vars:   vars,
+			States: cmd.States,
 		}
-		if c.Name == string(CheckHttp) ||
-			c.Name == string(CheckComponentStatus) ||
-			c.Name == string(CheckJsonPath) ||
-			c.Name == string(CheckNodeExists) ||
-			c.Name == string(CheckPodExists) ||
-			c.Name == string(CheckClusterEvent) ||
-			c.Name == string(CheckCertificateExpiry) ||
-			c.Name == string(CheckHelloIcinga) ||
-			c.Name == string(CheckDIG) ||
-			c.Name == string(CheckDNS) ||
-			c.Name == string(CheckDummy) ||
-			c.Name == string(CheckICMP) {
-			ClusterCommands[CheckCluster(c.Name)] = c
+	}
+
+	PodCommands = map[CheckPod]IcingaCommand{}
+	podChecks, err := data.LoadPodChecks()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, cmd := range podChecks.Command {
+		vars := make(map[string]data.CommandVar)
+		for _, v := range cmd.Vars {
+			vars[v.Name] = v
+		}
+		PodCommands[CheckPod(cmd.Name)] = IcingaCommand{
+			Name:   cmd.Name,
+			Vars:   vars,
+			States: cmd.States,
 		}
 	}
 }

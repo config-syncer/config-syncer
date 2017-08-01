@@ -55,6 +55,9 @@ type PodAlertSpec struct {
 	// How frequently notifications will be send
 	AlertInterval metav1.Duration `json:"alertInterval,omitempty"`
 
+	// Secret containing notifier credentials
+	NotifierSecretName string `json:"notifierSecretName,omitempty"`
+
 	// NotifierParams contains information to send notifications for Incident
 	// State, UserUid, Method
 	Receivers []Receiver `json:"receivers,omitempty"`
@@ -108,6 +111,10 @@ func (a PodAlert) IsValid() (bool, error) {
 		}
 	}
 	return true, nil
+}
+
+func (a PodAlert) GetNotifierSecretName() string {
+	return a.Spec.NotifierSecretName
 }
 
 func (a PodAlert) GetReceivers() []Receiver {
