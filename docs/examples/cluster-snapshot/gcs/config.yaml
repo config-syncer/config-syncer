@@ -1,8 +1,7 @@
 snapshotter:
-  Storage:
-    gcs:
-      bucket: bucket-for-snapshot
-      prefix: minikube
-    storageSecretName: gcs-secret
+  gcs:
+    bucket: bucket-for-snapshot
+    prefix: minikube
+  storageSecretName: gcs-secret
   sanitize: true
   schedule: '@every 6h'

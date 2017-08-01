@@ -86,9 +86,9 @@ type Receiver struct {
 // For periodic full cluster backup
 // https://github.com/appscode/kubed/issues/16
 type SnapshotSpec struct {
-	Schedule string  `json:"schedule,omitempty"`
-	Sanitize bool    `json:"sanitize,omitempty"`
-	Storage  Backend `json:",inline"`
+	Schedule string `json:"schedule,omitempty"`
+	Sanitize bool   `json:"sanitize,omitempty"`
+	Backend  `json:",inline,omitempty"`
 }
 
 const (

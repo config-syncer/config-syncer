@@ -48,11 +48,10 @@ recycleBin:
     - ops@example.com
   ttl: 168h0m0s
 snapshotter:
-  Storage:
-    gcs:
-      bucket: restic
-      prefix: minikube
-    storageSecretName: snap-secret
+  gcs:
+    bucket: restic
+    prefix: minikube
+  storageSecretName: snap-secret
   sanitize: true
   schedule: '@every 6h'
 ```
