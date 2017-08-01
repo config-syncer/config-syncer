@@ -11,6 +11,7 @@ import (
 	"github.com/ghodss/yaml"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+	"github.com/tamalsaha/go-oneliners"
 )
 
 type EventForwarder struct {
@@ -19,15 +20,20 @@ type EventForwarder struct {
 }
 
 func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
+	oneliners.FILE()
 	if e.Type == apiv1.EventTypeWarning {
+		oneliners.FILE()
 		for _, receiver := range f.Receivers {
+			oneliners.FILE()
 			if len(receiver.To) > 0 {
+				oneliners.FILE()
 				sub := fmt.Sprintf("%s %s/%s: %s", e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason)
 				if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), f.Loader); err == nil {
 					switch n := notifier.(type) {
 					case notify.ByEmail:
 						bytes, err := yaml.Marshal(e)
 						if err != nil {
+							oneliners.FILE(err)
 							return err
 						}
 						n.To(receiver.To[0], receiver.To[1:]...).

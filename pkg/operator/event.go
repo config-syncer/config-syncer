@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/pkg/api"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/cache"
+	"github.com/tamalsaha/go-oneliners"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
@@ -43,9 +44,12 @@ func (op *Operator) WatchEvents() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.Event); ok {
 					log.Infof("Event %s@%s added", res.Name, res.Namespace)
+					oneliners.FILE(op.Config.EventForwarder.WarningEvents)
 					if op.Eventer != nil &&
 						op.Config.EventForwarder.WarningEvents.Handle &&
-						op.Config.EventForwarder.WarningEvents.IsAllowed(res.Namespace) {
+						op.Config.EventForwarder.WarningEvents.IsAllowed(res.Namespace) &&
+						util.IsRecentlyAdded(res.ObjectMeta) {
+						oneliners.FILE()
 						op.Eventer.ForwardEvent(res)
 					}
 				}

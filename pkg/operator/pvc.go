@@ -51,7 +51,10 @@ func (op *Operator) WatchPersistentVolumeClaims() {
 						op.Config.EventForwarder.StorageAdded.Handle &&
 						op.Config.EventForwarder.StorageAdded.IsAllowed(res.Namespace) &&
 						util.IsRecentlyAdded(res.ObjectMeta) {
-						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
+						err := op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
+						if err != nil {
+							log.Errorln(err)
+						}
 					}
 				}
 			},
