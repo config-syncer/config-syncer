@@ -342,17 +342,22 @@ eventForwarder:
   - notifier: mailgun
     to:
     - ops@example.com
+  - notifier: slack
+    to:
+    - #ops-alerts
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
+  - notifier: mailgun
+    to:
+    - ops@example.com
   - notifier: slack
     to:
     - #ops-alerts
   ttl: 168h
 notifierSecretName: notifier-config
 ```
-
 
 ## Next Steps
  - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/tutorials/cluster-snapshot.md).
