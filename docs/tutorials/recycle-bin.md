@@ -19,8 +19,8 @@ recycleBin:
   path: /tmp/kubed/trash
   ttl: 168h
   handleUpdates: false
-  receiver:
-    notifier: mailgun
+  receivers:
+  - notifier: mailgun
     to:
     - ops@example.com
 ```

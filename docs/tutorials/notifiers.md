@@ -39,8 +39,8 @@ Now, to receiver notifications via Hipchat, configure receiver as below:
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
-  receiver:
-    notifier: hipchat
+  receivers:
+  - notifier: hipchat
     to:
     - ops-alerts
   ttl: 168h
@@ -96,8 +96,8 @@ Now, to receiver notifications via Mailgun, configure receiver as below:
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
-  receiver:
-    notifier: mailgun
+  receivers:
+  - notifier: mailgun
     to:
     - ops-alerts@example.com
   ttl: 168h
@@ -152,8 +152,8 @@ Now, to receiver notifications via SMTP, configure receiver as below:
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
-  receiver:
-    notifier: smtp
+  receivers:
+  - notifier: smtp
     to:
     - ops-alerts@example.com
   ttl: 168h
@@ -205,8 +205,8 @@ Now, to receiver notifications via SMTP, configure receiver as below:
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
-  receiver:
-    notifier: twilio
+  receivers:
+  - notifier: twilio
     to:
     - +1-999-888-1234
   ttl: 168h
@@ -250,8 +250,8 @@ Now, to receiver notifications via Hipchat, configure receiver as below:
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
-  receiver:
-    notifier: slack
+  receivers:
+  - notifier: slack
     to:
     - #ops-alerts
   ttl: 168h
@@ -303,8 +303,8 @@ Now, to receiver notifications via SMTP, configure receiver as below:
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
-  receiver:
-    notifier: plivo
+  receivers:
+  - notifier: plivo
     to:
     - +1-999-888-1234
   ttl: 168h
@@ -338,15 +338,15 @@ eventForwarder:
     handle: true
     namespaces:
     - kube-system
-  receiver:
-    notifier: mailgun
+  receivers:
+  - notifier: mailgun
     to:
     - ops@example.com
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
-  receiver:
-    notifier: slack
+  receivers:
+  - notifier: slack
     to:
     - #ops-alerts
   ttl: 168h
