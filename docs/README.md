@@ -6,7 +6,7 @@ Kubed by AppsCode is a Kubernetes Cluster Operator Daemon. Kubed can do the foll
  - Kubed can take periodic [snapshot](/docs/tutorials/cluster-snapshot.md) of a Kubernetes cluster objects.
  - Kubed provides a [recycle bin](/docs/tutorials/recycle-bin.md) for deleted and/or updated Kubernetes objects.
  - Kubed can keep [ConfigMaps and Secrets synchronized across Namespaces](/docs/tutorials/config-syncer.md).
- - Kubed can [forward Cluster Events](/docs/tutorials/event-forwarder.md) to various destinations.
+ - Kubed can [forward cluster events](/docs/tutorials/event-forwarder.md) to various destinations.
  - Kubed can setup [janitors](/docs/tutorials/janitors.md) for Elasticsearch and InfluxDB.
  - Kubed can [send notifications](/docs/tutorials/notifiers.md) via Email, SMS or Chat.
  - Kubed has a built-in [search engine](/docs/tutorials/apiserver.md) for your cluster objects using [bleve](https://github.com/blevesearch/bleve).
