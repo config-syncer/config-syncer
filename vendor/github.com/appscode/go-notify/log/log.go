@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"errors"
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
 )
@@ -11,7 +12,7 @@ import (
 const UID = "stdout"
 
 type Options struct {
-	To []string `envconfig:"TO" required:"true"`
+	To []string `envconfig:"TO"`
 }
 
 type client struct {
@@ -62,6 +63,10 @@ func (c client) To(to string, cc ...string) notify.ByChat {
 }
 
 func (c *client) Send() error {
+	if len(c.opt.To) == 0 {
+		return errors.New("Missing to")
+	}
+
 	msg := struct {
 		To   []string `json:"to,omitempty"`
 		Body string   `json:"body,omitempty"`

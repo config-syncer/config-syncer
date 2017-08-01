@@ -3,6 +3,7 @@ package smtp
 import (
 	"crypto/tls"
 
+	"errors"
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
 	gomail "gopkg.in/gomail.v2"
@@ -17,7 +18,7 @@ type Options struct {
 	Username           string   `json:"username" envconfig:"USERNAME" required:"true" form:"smtp_username"`
 	Password           string   `json:"password" envconfig:"PASSWORD" required:"true" form:"smtp_password"`
 	From               string   `json:"from" envconfig:"FROM" required:"true" form:"smtp_from"`
-	To                 []string `json:"to" envconfig:"TO" required:"true" form:"smtp_to"`
+	To                 []string `json:"to" envconfig:"TO" form:"smtp_to"`
 }
 
 type client struct {
@@ -84,6 +85,10 @@ func (c client) To(to string, cc ...string) notify.ByEmail {
 }
 
 func (c *client) Send() error {
+	if len(c.opt.To) == 0 {
+		return errors.New("Missing to")
+	}
+
 	mail := gomail.NewMessage()
 	mail.SetHeader("From", c.opt.From)
 	mail.SetHeader("To", c.opt.To...)

@@ -8,10 +8,11 @@ import (
 	"github.com/appscode/go-notify"
 	"github.com/appscode/go-notify/unified"
 	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/log"
 	"github.com/ghodss/yaml"
+	"github.com/tamalsaha/go-oneliners"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-	"github.com/tamalsaha/go-oneliners"
 )
 
 type EventForwarder struct {
@@ -29,6 +30,7 @@ func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
 				oneliners.FILE()
 				sub := fmt.Sprintf("%s %s/%s: %s", e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason)
 				if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), f.Loader); err == nil {
+					log.Infoln(notifier)
 					switch n := notifier.(type) {
 					case notify.ByEmail:
 						bytes, err := yaml.Marshal(e)
@@ -49,7 +51,12 @@ func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
 						n.To(receiver.To[0], receiver.To[1:]...).
 							WithBody(sub).
 							Send()
+					default:
+						log.Infoln(n)
 					}
+				} else {
+					log.Infoln()
+					log.Errorln(err)
 				}
 			}
 		}

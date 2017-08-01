@@ -1,6 +1,7 @@
 package slack
 
 import (
+	"errors"
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
 	"github.com/nlopes/slack"
@@ -10,7 +11,7 @@ const UID = "slack"
 
 type Options struct {
 	AuthToken string   `envconfig:"AUTH_TOKEN" required:"true"`
-	Channel   []string `envconfig:"CHANNEL" required:"true"`
+	Channel   []string `envconfig:"CHANNEL"`
 }
 
 type client struct {
@@ -61,6 +62,10 @@ func (c client) To(to string, cc ...string) notify.ByChat {
 }
 
 func (c *client) Send() error {
+	if len(c.opt.Channel) == 0 {
+		return errors.New("Missing to")
+	}
+
 	s := slack.New(c.opt.AuthToken)
 	for _, channel := range c.channel {
 		if _, _, err := s.PostMessage(channel, c.body, slack.PostMessageParameters{}); err != nil {

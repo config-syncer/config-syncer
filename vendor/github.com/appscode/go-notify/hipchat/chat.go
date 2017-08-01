@@ -1,6 +1,7 @@
 package hipchat
 
 import (
+	"errors"
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
 	"github.com/tbruyelle/hipchat-go/hipchat"
@@ -10,7 +11,7 @@ const UID = "hipchat"
 
 type Options struct {
 	AuthToken string   `envconfig:"AUTH_TOKEN" required:"true"`
-	To        []string `envconfig:"TO" required:"true"`
+	To        []string `envconfig:"TO"`
 }
 
 type client struct {
@@ -61,8 +62,11 @@ func (c client) To(to string, cc ...string) notify.ByChat {
 }
 
 func (c *client) Send() error {
-	h := hipchat.NewClient(c.opt.AuthToken)
+	if len(c.opt.To) == 0 {
+		return errors.New("Missing to")
+	}
 
+	h := hipchat.NewClient(c.opt.AuthToken)
 	for _, room := range c.to {
 		_, err := h.Room.Notification(room, &hipchat.NotificationRequest{Message: c.body})
 		if err != nil {

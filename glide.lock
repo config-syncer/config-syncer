@@ -1,5 +1,5 @@
 hash: c503a73a28c41c3283d643f020fb6a5ce4337f36ca59b0d079f284cd6c52eb6e
-updated: 2017-08-01T03:19:06.812372452-07:00
+updated: 2017-08-01T04:22:28.275950697-07:00
 imports:
 - name: cloud.google.com/go
   version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
@@ -23,7 +23,7 @@ imports:
   - strings
   - version
 - name: github.com/appscode/go-notify
-  version: 984ba317a48743222422263ffc9a7ae3f54173b8
+  version: dd6eec9f25b8715070792d54e498761e21c0e18f
   subpackages:
   - hipchat
   - log
@@ -328,6 +328,8 @@ imports:
 - name: github.com/steveyen/gtreap
   version: 0abe01ef9be25c4aedc174758ec2d917314d6d70
   repo: https://github.com/steveyen/gtreap
+- name: github.com/tamalsaha/go-oneliners
+  version: 4ca214c0460d9077e49e3ef394785f92408f7699
 - name: github.com/tbruyelle/hipchat-go
   version: 749fb9e14beb9995f677c101a754393cecb64b0f
   subpackages:
