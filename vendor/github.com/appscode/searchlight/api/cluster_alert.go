@@ -51,6 +51,9 @@ type ClusterAlertSpec struct {
 	// How frequently notifications will be send
 	AlertInterval metav1.Duration `json:"alertInterval,omitempty"`
 
+	// Secret containing notifier credentials
+	NotifierSecretName string `json:"notifierSecretName,omitempty"`
+
 	// NotifierParams contains information to send notifications for Incident
 	// State, UserUid, Method
 	Receivers []Receiver `json:"receivers,omitempty"`
@@ -84,11 +87,11 @@ func (a ClusterAlert) GetAlertInterval() time.Duration {
 func (a ClusterAlert) IsValid() (bool, error) {
 	cmd, ok := ClusterCommands[a.Spec.Check]
 	if !ok {
-		return false, fmt.Errorf("%s is not a valid cluster check command.", a.Spec.Check)
+		return false, fmt.Errorf("'%s' is not a valid cluster check command.", a.Spec.Check)
 	}
 	for k := range a.Spec.Vars {
 		if _, ok := cmd.Vars[k]; !ok {
-			return false, fmt.Errorf("Var %s is unsupported for check command %s.", k, a.Spec.Check)
+			return false, fmt.Errorf("Var '%s' is unsupported for check command %s.", k, a.Spec.Check)
 		}
 	}
 	for _, rcv := range a.Spec.Receivers {
@@ -100,10 +103,14 @@ func (a ClusterAlert) IsValid() (bool, error) {
 			}
 		}
 		if !found {
-			return false, fmt.Errorf("State %s is unsupported for check command %s.", rcv.State, a.Spec.Check)
+			return false, fmt.Errorf("State '%s' is unsupported for check command %s.", rcv.State, a.Spec.Check)
 		}
 	}
 	return true, nil
+}
+
+func (a ClusterAlert) GetNotifierSecretName() string {
+	return a.Spec.NotifierSecretName
 }
 
 func (a ClusterAlert) GetReceivers() []Receiver {

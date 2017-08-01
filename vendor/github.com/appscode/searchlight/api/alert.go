@@ -9,5 +9,6 @@ type Alert interface {
 	GetCheckInterval() time.Duration
 	GetAlertInterval() time.Duration
 	IsValid() (bool, error)
+	GetNotifierSecretName() string
 	GetReceivers() []Receiver
 }
