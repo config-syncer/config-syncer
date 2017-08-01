@@ -1,6 +1,7 @@
 package mailgun
 
 import (
+	"errors"
 	"github.com/appscode/envconfig"
 	notify "github.com/appscode/go-notify"
 	h2t "github.com/jaytaylor/html2text"
@@ -14,7 +15,7 @@ type Options struct {
 	ApiKey          string   `json:"api_key" envconfig:"API_KEY" required:"true" form:"mailgun_api_key"`
 	PublicApiKey    string   `json:"public_api_key" envconfig:"PUBLIC_API_KEY" form:"mailgun_public_api_key"`
 	From            string   `json:"from" envconfig:"FROM" required:"true" form:"mailgun_from"`
-	To              []string `json:"to" envconfig:"TO" required:"true" form:"mailgun_to"`
+	To              []string `json:"to" envconfig:"TO" form:"mailgun_to"`
 	DisableTracking bool     `json:"disable_tracking" envconfig:"DISABLE_TRACKING" from:"disable_tracking"`
 }
 
@@ -85,8 +86,11 @@ func (c client) To(to string, cc ...string) notify.ByEmail {
 }
 
 func (c *client) Send() error {
-	mg := mailgun.NewMailgun(c.opt.Domain, c.opt.ApiKey, c.opt.PublicApiKey)
+	if len(c.opt.To) == 0 {
+		return errors.New("Missing to")
+	}
 
+	mg := mailgun.NewMailgun(c.opt.Domain, c.opt.ApiKey, c.opt.PublicApiKey)
 	text := c.body
 	if c.html {
 		if t, err := h2t.FromString(c.body); err == nil {

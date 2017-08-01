@@ -3,6 +3,7 @@ package webhook
 import (
 	"net/http"
 
+	"errors"
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
 	"github.com/appscode/go/net/httpclient"
@@ -12,7 +13,7 @@ const UID = "webhook"
 
 type Options struct {
 	URL                string   `envconfig:"URL" required:"true"`
-	To                 []string `envconfig:"TO" required:"true"`
+	To                 []string `envconfig:"TO"`
 	Username           string   `envconfig:"USERNAME"`
 	Password           string   `envconfig:"PASSWORD"`
 	Token              string   `envconfig:"TOKEN"`
@@ -24,17 +25,13 @@ type Options struct {
 
 type client struct {
 	opt  Options
-	to   []string
 	body string
 }
 
 var _ notify.ByChat = &client{}
 
 func New(opt Options) *client {
-	return &client{
-		opt: opt,
-		to:  opt.To,
-	}
+	return &client{opt: opt}
 }
 
 func Default() (*client, error) {
@@ -65,24 +62,28 @@ func (c client) WithBody(body string) notify.ByChat {
 }
 
 func (c client) To(to string, cc ...string) notify.ByChat {
-	c.to = append([]string{to}, cc...)
+	c.opt.To = append([]string{to}, cc...)
 	return &c
 }
 
 func (c *client) Send() error {
-	client := httpclient.Default().
+	if len(c.opt.To) == 0 {
+		return errors.New("Missing to")
+	}
+
+	hc := httpclient.Default().
 		WithBaseURL(c.opt.URL).
 		WithBasicAuth(c.opt.Username, c.opt.Password).
 		WithBearerToken(c.opt.Token)
 	if c.opt.CACertData != "" {
 		if c.opt.ClientCertData != "" && c.opt.ClientKeyData != "" {
-			client = client.WithTLSConfig([]byte(c.opt.CACertData), []byte(c.opt.ClientKeyData), []byte(c.opt.ClientKeyData))
+			hc = hc.WithTLSConfig([]byte(c.opt.CACertData), []byte(c.opt.ClientKeyData), []byte(c.opt.ClientKeyData))
 		} else {
-			client = client.WithTLSConfig([]byte(c.opt.CACertData))
+			hc = hc.WithTLSConfig([]byte(c.opt.CACertData))
 		}
 	}
 	if c.opt.InsecureSkipVerify {
-		client = client.WithInsecureSkipVerify()
+		hc = hc.WithInsecureSkipVerify()
 	}
 
 	msg := struct {
@@ -92,6 +93,6 @@ func (c *client) Send() error {
 		c.opt.To,
 		c.body,
 	}
-	_, err := client.Call(http.MethodPost, "", msg, nil, true)
+	_, err := hc.Call(http.MethodPost, "", msg, nil, true)
 	return err
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"errors"
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
 )
@@ -17,7 +18,7 @@ type Options struct {
 	AccountSid string   `envconfig:"ACCOUNT_SID" required:"true"`
 	AuthToken  string   `envconfig:"AUTH_TOKEN" required:"true"`
 	From       string   `envconfig:"FROM" required:"true"`
-	To         []string `envconfig:"TO" required:"true"`
+	To         []string `envconfig:"TO"`
 }
 
 type client struct {
@@ -71,8 +72,11 @@ func (c client) To(to string, cc ...string) notify.BySMS {
 }
 
 func (c *client) Send() error {
-	h := &http.Client{Timeout: time.Second * 10}
+	if len(c.opt.To) == 0 {
+		return errors.New("Missing to")
+	}
 
+	hc := &http.Client{Timeout: time.Second * 10}
 	v := url.Values{}
 	v.Set("From", c.opt.From)
 	v.Set("Body", c.body)
@@ -87,7 +91,7 @@ func (c *client) Send() error {
 		req.SetBasicAuth(c.opt.AccountSid, c.opt.AuthToken)
 		req.Header.Add("Accept", "application/json")
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-		_, err = h.Do(req)
+		_, err = hc.Do(req)
 		if err != nil {
 			return err
 		}

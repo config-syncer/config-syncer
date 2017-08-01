@@ -21,7 +21,7 @@ type Options struct {
 	AuthID    string   `envconfig:"AUTH_ID" required:"true"`
 	AuthToken string   `envconfig:"AUTH_TOKEN" required:"true"`
 	From      string   `envconfig:"FROM" required:"true"`
-	To        []string `envconfig:"TO" required:"true"`
+	To        []string `envconfig:"TO"`
 }
 
 type client struct {
@@ -73,7 +73,11 @@ func (c client) To(to string, cc ...string) notify.BySMS {
 }
 
 func (c *client) Send() error {
-	httpClient := &http.Client{Timeout: time.Second * 10}
+	if len(c.opt.To) == 0 {
+		return errors.New("Missing to")
+	}
+
+	hc := &http.Client{Timeout: time.Second * 10}
 
 	url := fmt.Sprintf(urlTemplate, c.opt.AuthID)
 	params := struct {
@@ -100,7 +104,7 @@ func (c *client) Send() error {
 		req.SetBasicAuth(c.opt.AuthID, c.opt.AuthToken)
 		req.Header.Add("Content-Type", "application/json")
 
-		resp, err := httpClient.Do(req)
+		resp, err := hc.Do(req)
 		if err != nil {
 			return err
 		}

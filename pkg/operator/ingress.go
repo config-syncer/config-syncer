@@ -52,7 +52,10 @@ func (op *Operator) WatchIngresses() {
 						op.Config.EventForwarder.IngressAdded.Handle &&
 						op.Config.EventForwarder.IngressAdded.IsAllowed(res.Namespace) &&
 						util.IsRecentlyAdded(res.ObjectMeta) {
-						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
+						err := op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
+						if err != nil {
+							log.Errorln(err)
+						}
 					}
 				}
 			},

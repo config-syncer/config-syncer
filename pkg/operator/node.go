@@ -51,7 +51,10 @@ func (op *Operator) WatchNodes() {
 						op.Config.EventForwarder.NodeAdded.Handle &&
 						op.Config.EventForwarder.NodeAdded.IsAllowed(res.Namespace) &&
 						util.IsRecentlyAdded(res.ObjectMeta) {
-						op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
+						err := op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
+						if err != nil {
+							log.Errorln(err)
+						}
 					}
 				}
 			},

@@ -45,8 +45,12 @@ func (op *Operator) WatchEvents() {
 					log.Infof("Event %s@%s added", res.Name, res.Namespace)
 					if op.Eventer != nil &&
 						op.Config.EventForwarder.WarningEvents.Handle &&
-						op.Config.EventForwarder.WarningEvents.IsAllowed(res.Namespace) {
-						op.Eventer.ForwardEvent(res)
+						op.Config.EventForwarder.WarningEvents.IsAllowed(res.Namespace) &&
+						util.IsRecentlyAdded(res.ObjectMeta) {
+						err := op.Eventer.ForwardEvent(res)
+						if err != nil {
+							log.Errorln(err)
+						}
 					}
 				}
 			},
