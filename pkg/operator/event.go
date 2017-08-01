@@ -35,6 +35,7 @@ func (op *Operator) WatchEvents() {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.Event); ok {
+					log.Infof("Event %s@%s added", res.Name, res.Namespace)
 					if op.Eventer != nil &&
 						op.Config.EventForwarder.WarningEvents.Handle &&
 						op.Config.EventForwarder.WarningEvents.IsAllowed(res.Namespace) {
