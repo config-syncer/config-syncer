@@ -4,7 +4,6 @@ import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/log"
-	"github.com/tamalsaha/go-oneliners"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -44,17 +43,14 @@ func (op *Operator) WatchEvents() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.Event); ok {
 					log.Infof("Event %s@%s added", res.Name, res.Namespace)
-					oneliners.FILE(op.Config.EventForwarder.WarningEvents)
 					if op.Eventer != nil &&
 						op.Config.EventForwarder.WarningEvents.Handle &&
 						op.Config.EventForwarder.WarningEvents.IsAllowed(res.Namespace) &&
 						util.IsRecentlyAdded(res.ObjectMeta) {
-						oneliners.FILE()
 						err := op.Eventer.ForwardEvent(res)
 						if err != nil {
 							log.Errorln(err)
 						}
-						oneliners.FILE(err)
 					}
 				}
 			},

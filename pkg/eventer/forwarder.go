@@ -10,7 +10,6 @@ import (
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/log"
 	"github.com/ghodss/yaml"
-	"github.com/tamalsaha/go-oneliners"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
@@ -25,18 +24,11 @@ func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
 	if err != nil {
 		return err
 	}
-	oneliners.FILE()
-	if e.Type == apiv1.EventTypeWarning {
-		oneliners.FILE()
-		for _, receiver := range f.Receivers {
-			oneliners.FILE()
-			if len(receiver.To) > 0 {
-				oneliners.FILE()
-				sub := fmt.Sprintf("%s %s/%s: %s", e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason)
-				if err := f.send(sub, string(bytes), receiver); err != nil {
-					log.Errorln(err)
-				}
-			}
+	for _, receiver := range f.Receivers {
+		e.Source.String()
+		sub := fmt.Sprintf("%s %s/%s: %s", e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason)
+		if err := f.send(sub, string(bytes), receiver); err != nil {
+			log.Errorln(err)
 		}
 	}
 	return nil
@@ -48,11 +40,9 @@ func (f *EventForwarder) Forward(t metav1.TypeMeta, meta metav1.ObjectMeta, v in
 		return err
 	}
 	for _, receiver := range f.Receivers {
-		if len(receiver.To) > 0 {
-			sub := fmt.Sprintf("%s %s %s/%s added", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
-			if err := f.send(sub, string(bytes), receiver); err != nil {
-				log.Errorln(err)
-			}
+		sub := fmt.Sprintf("%s %s %s/%s added", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
+		if err := f.send(sub, string(bytes), receiver); err != nil {
+			log.Errorln(err)
 		}
 	}
 	return nil
