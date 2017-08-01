@@ -324,12 +324,22 @@ func (op *Operator) RunSnapshotter() error {
 		}
 
 		t := time.Now().UTC()
-		snapshotDir := filepath.Join(op.Opt.ScratchDir, "snapshot", t.Format(config.TimestampFormat))
+		ts := t.Format(config.TimestampFormat)
+		snapshotRoot := filepath.Join(op.Opt.ScratchDir, "snapshot")
+		snapshotDir := filepath.Join(snapshotRoot, ts)
+		snapshotFile := filepath.Join(snapshotRoot, ts+".tar.gz")
 		err = backup.SnapshotCluster(cfg, snapshotDir, op.Config.Snapshotter.Sanitize)
 		if err != nil {
 			return err
 		}
-		defer os.RemoveAll(snapshotDir)
+		defer func() {
+			if err := os.RemoveAll(snapshotDir); err != nil {
+				log.Errorln(err)
+			}
+			if err := os.Remove(snapshotFile); err != nil {
+				log.Errorln(err)
+			}
+		}()
 
 		dest, err := op.Config.Snapshotter.Location(t)
 		if err != nil {
@@ -337,9 +347,14 @@ func (op *Operator) RunSnapshotter() error {
 		}
 
 		sh := shell.NewSession()
-		sh.SetDir(op.Opt.ScratchDir)
+		sh.SetDir(snapshotRoot)
 		sh.ShowCMD = true
-		return sh.Command("osm", "push", "--osmconfig", osmconfigPath, "-c", container, snapshotDir, dest).Run()
+
+		err = sh.Command("tar", "-czf", ts+".tar.gz", ts).Run()
+		if err != nil {
+			return err
+		}
+		return sh.Command("osm", "push", "--osmconfig", osmconfigPath, "-c", container, snapshotFile, dest).Run()
 	}
 	// start taking first backup
 	go func() {
