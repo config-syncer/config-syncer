@@ -4,12 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify/hipchat"
 	"github.com/appscode/go-notify/log"
 	"github.com/appscode/go-notify/mailgun"
 	"github.com/appscode/go-notify/plivo"
+	"github.com/appscode/go-notify/pushover"
 	"github.com/appscode/go-notify/slack"
 	"github.com/appscode/go-notify/smtp"
 	"github.com/appscode/go-notify/twilio"
@@ -29,7 +31,7 @@ func Default() (interface{}, error) {
 }
 
 func DefaultVia(via string) (interface{}, error) {
-	switch via {
+	switch strings.ToLower(via) {
 	case plivo.UID:
 		return plivo.Default()
 	case twilio.UID:
@@ -46,6 +48,8 @@ func DefaultVia(via string) (interface{}, error) {
 		return log.Default()
 	case webhook.UID:
 		return webhook.Default()
+	case pushover.UID:
+		return pushover.Default()
 	}
 	return nil, fmt.Errorf("Unknown notifier %s", via)
 }
@@ -59,7 +63,7 @@ func Load(loader envconfig.LoaderFunc) (interface{}, error) {
 }
 
 func LoadVia(via string, loader envconfig.LoaderFunc) (interface{}, error) {
-	switch via {
+	switch strings.ToLower(via) {
 	case plivo.UID:
 		return plivo.Load(loader)
 	case twilio.UID:
@@ -76,6 +80,8 @@ func LoadVia(via string, loader envconfig.LoaderFunc) (interface{}, error) {
 		return log.Load(loader)
 	case webhook.UID:
 		return webhook.Load(loader)
+	case pushover.UID:
+		return pushover.Load(loader)
 	}
 	return nil, fmt.Errorf("Unknown notifier %s", via)
 }

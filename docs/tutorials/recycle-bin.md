@@ -20,7 +20,7 @@ recycleBin:
   ttl: 168h
   handleUpdates: false
   receivers:
-  - notifier: mailgun
+  - notifier: Mailgun
     to:
     - ops@example.com
 ```

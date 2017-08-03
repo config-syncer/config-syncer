@@ -32,7 +32,7 @@ type: Opaque
 ```
 
 Now, to receiver notifications via Hipchat, configure receiver as below:
- - notifier: `hipchat`
+ - notifier: `Hipchat`
  - to: a list of chat room names
 
 ```yaml
@@ -40,7 +40,7 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: hipchat
+  - notifier: Hipchat
     to:
     - ops-alerts
   ttl: 168h
@@ -89,7 +89,7 @@ type: Opaque
 ```
 
 Now, to receiver notifications via Mailgun, configure receiver as below:
- - notifier: `mailgun`
+ - notifier: `Mailgun`
  - to: a list of email addresses
 
 ```yaml
@@ -97,7 +97,7 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: mailgun
+  - notifier: Mailgun
     to:
     - ops-alerts@example.com
   ttl: 168h
@@ -145,7 +145,7 @@ $ echo -n 'your-gmail-address' > SMTP_FROM
 ```
 
 Now, to receiver notifications via SMTP, configure receiver as below:
- - notifier: `smtp`
+ - notifier: `SMTP`
  - to: a list of email addresses
 
 ```yaml
@@ -153,7 +153,7 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: smtp
+  - notifier: SMTP
     to:
     - ops-alerts@example.com
   ttl: 168h
@@ -198,7 +198,7 @@ type: Opaque
 ```
 
 Now, to receiver notifications via SMTP, configure receiver as below:
- - notifier: `twilio`
+ - notifier: `Twilio`
  - to: a list of receiver mobile numbers
 
 ```yaml
@@ -206,7 +206,7 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: twilio
+  - notifier: Twilio
     to:
     - +1-999-888-1234
   ttl: 168h
@@ -243,7 +243,7 @@ type: Opaque
 ```
 
 Now, to receiver notifications via Hipchat, configure receiver as below:
- - notifier: `slack`
+ - notifier: `Slack`
  - to: a list of chat room names
 
 ```yaml
@@ -251,7 +251,7 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: slack
+  - notifier: Slack
     to:
     - '#ops-alerts'
   ttl: 168h
@@ -296,7 +296,7 @@ type: Opaque
 ```
 
 Now, to receiver notifications via SMTP, configure receiver as below:
- - notifier: `plivo`
+ - notifier: `Plivo`
  - to: a list of receiver mobile numbers
 
 ```yaml
@@ -304,7 +304,7 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: plivo
+  - notifier: Plivo
     to:
     - +1-999-888-1234
   ttl: 168h
@@ -339,10 +339,10 @@ eventForwarder:
     namespaces:
     - kube-system
   receivers:
-  - notifier: mailgun
+  - notifier: Mailgun
     to:
     - ops@example.com
-  - notifier: slack
+  - notifier: Slack
     to:
     - #ops-alerts
 recycleBin:
