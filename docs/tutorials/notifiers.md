@@ -362,7 +362,7 @@ notifierSecretName: notifier-config
 ## Next Steps
  - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/tutorials/cluster-snapshot.md).
  - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/tutorials/recycle-bin.md).
- - Need to keep some configuration synchronized across domains? Try [Kubed config syncer](/docs/tutorials/config-syncer.md).
+ - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/tutorials/config-syncer.md).
  - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/tutorials/event-forwarder.md).
  - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/tutorials/janitors.md) to delete old data.
  - Wondering what features are coming next? Please visit [here](/ROADMAP.md).
