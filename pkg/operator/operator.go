@@ -32,7 +32,7 @@ import (
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"gopkg.in/robfig/cron.v2"
+	"github.com/robfig/cron"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -284,13 +284,12 @@ func (op *Operator) RunTrashCanCleaner() error {
 		return nil
 	}
 
-	_, err := op.Cron.AddFunc("@every 1h", func() {
+	return op.Cron.AddFunc("@every 1h", func() {
 		err := op.TrashCan.Cleanup()
 		if err != nil {
 			log.Errorln(err)
 		}
 	})
-	return err
 }
 
 func (op *Operator) RunSnapshotter() error {
@@ -363,13 +362,12 @@ func (op *Operator) RunSnapshotter() error {
 			log.Errorln(err)
 		}
 	}()
-	_, err = op.Cron.AddFunc(op.Config.Snapshotter.Schedule, func() {
+	return op.Cron.AddFunc(op.Config.Snapshotter.Schedule, func() {
 		err := snapshotter()
 		if err != nil {
 			log.Errorln(err)
 		}
 	})
-	return err
 }
 
 func (op *Operator) RunAndHold() {

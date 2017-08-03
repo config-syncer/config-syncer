@@ -37,10 +37,8 @@ import:
   version: master
 - package: gopkg.in/olivere/elastic.v3
   version: v3.0.59
-- package: gopkg.in/robfig/cron.v2
-  repo: https://github.com/appscode/cron.git
-  vcs: git
-  version: v2
+- package: github.com/robfig/cron
+  version: master
 - package: k8s.io/apimachinery
   version: 75b8dd260ef0469d96d578705a87cffd0e09dab8
 - package: k8s.io/client-go
