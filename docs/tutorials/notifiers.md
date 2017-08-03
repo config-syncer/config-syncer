@@ -312,6 +312,81 @@ notifierSecretName: notifier-config
 ```
 
 
+## Pushover.net
+To receive SMS notifications via Plivo, create a Secret with the following keys:
+
+| Name               | Description                                                                    |
+|--------------------|--------------------------------------------------------------------------------|
+| PUSHOVER_TOKEN     | `Required` Pushover.net token.                                                 |
+| PUSHOVER_USER_KEY  | `Required` User key or group key.                                              |
+| PUSHOVER_DEVICE    | `Optional` Device name used to send the message directly to that device.       |
+| PUSHOVER_TITLE     | `Optional` Message's title, otherwise your app's name is used.                 |
+| PUSHOVER_URL       | `Optional` A supplementary URL to show with your message.                      |
+| PUSHOVER_URL_TITLE | `Optional` A title for the supplementary URL, otherwise just the URL is shown. |
+| PUSHOVER_PRIORITY  | `Optional` Send as -2 to generate no notification/alert, -1 to always send as a quiet notification, 1 to display as high-priority and bypass the user's quiet hours, or 2 to also require confirmation from the user.   |
+| PUSHOVER_SOUND     | `Optional` The name of one of the sounds supported by device clients to override the user's default sound choice.   |
+
+
+```console
+$ echo -n 'your-plivo-auth-id' > PLIVO_AUTH_ID
+$ echo -n 'your-plivo-auth-token' > PLIVO_AUTH_TOKEN
+$ echo -n 'your-plivo-from' > PLIVO_FROM
+$ kubectl create secret generic notifier-config -n kube-system \
+    --from-file=./PLIVO_AUTH_ID \
+    --from-file=./PLIVO_AUTH_TOKEN \
+    --from-file=./PLIVO_FROM
+secret "notifier-config" created
+```
+```yaml
+apiVersion: v1
+data:
+  PLIVO_AUTH_ID: eW91ci1wbGl2by1hdXRoLWlk
+  PLIVO_AUTH_TOKEN: eW91ci1wbGl2by1hdXRoLXRva2Vu
+  PLIVO_FROM: eW91ci1wbGl2by1mcm9t
+kind: Secret
+metadata:
+  creationTimestamp: 2017-07-25T02:00:02Z
+  name: notifier-config
+  namespace: kube-system
+  resourceVersion: "2606"
+  selfLink: /api/v1/namespaces/kube-system/secrets/notifier-config
+  uid: f8dade1c-70dc-11e7-9b0b-080027503732
+type: Opaque
+```
+
+Now, to receiver notifications via SMTP, configure receiver as below:
+ - notifier: `Plivo`
+ - to: a list of receiver mobile numbers
+
+```yaml
+recycleBin:
+  handleUpdates: false
+  path: /tmp/kubed/trash
+  receivers:
+  - notifier: Plivo
+    to:
+    - +1-999-888-1234
+  ttl: 168h
+notifierSecretName: notifier-config
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Using multiple notifiers
 Kubed supports using different notifiers in different scenarios. First add the credentials for the different notifiers in the same Secret `notifier-config` and deploy that to Kubernetes. Then in the Kubed cluster config, specify the appropriate notifier for each feature.
 
