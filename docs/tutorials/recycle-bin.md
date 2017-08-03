@@ -215,7 +215,7 @@ To uninstall Kubed operator, please follow the steps [here](/docs/uninstall.md).
 
 ## Next Steps
  - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/tutorials/cluster-snapshot.md).
- - Need to keep some configuration synchronized across domains? Try [Kubed config syncer](/docs/tutorials/config-syncer.md).
+ - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/tutorials/config-syncer.md).
  - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/tutorials/event-forwarder.md).
  - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/tutorials/janitors.md) to delete old data.
  - See the list of supported notifiers [here](/docs/tutorials/notifiers.md).
