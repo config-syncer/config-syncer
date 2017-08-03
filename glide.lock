@@ -1,5 +1,5 @@
-hash: c503a73a28c41c3283d643f020fb6a5ce4337f36ca59b0d079f284cd6c52eb6e
-updated: 2017-08-01T06:09:15.932241376-07:00
+hash: 4c22dd32b5c0ccd9945c6e41558270b297017305b81586c080a0fa68825370ad
+updated: 2017-08-02T23:48:56.120853124-07:00
 imports:
 - name: cloud.google.com/go
   version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
@@ -23,7 +23,7 @@ imports:
   - strings
   - version
 - name: github.com/appscode/go-notify
-  version: 1ecbe3cbc7b28971a2db50a9981f0790b9f500e2
+  version: eb3a0d7db7010d84e668f0188f10ca595ced856c
   subpackages:
   - hipchat
   - log
@@ -47,7 +47,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 264d4b6a8ed3affb6f96f772dcffecd16217c205
+  version: 73da3c0cb337939b3ecd598682dc3f6e0ced77c4
   subpackages:
   - api
   - api/install
@@ -55,13 +55,13 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: e7c5154b07ed13e321a16be53f969fa32b66925c
+  version: f98d18770dcd9c6a75f009059c3cc2b51a705fc9
   subpackages:
   - api
   - api/install
   - client/clientset
 - name: github.com/appscode/voyager
-  version: bf3fb3419a7d70ff1d1f3195fafb43920d875bdf
+  version: bc95969729a9e79972fd7d7bda6ad15624c67d28
   subpackages:
   - api
   - api/install
@@ -308,6 +308,8 @@ imports:
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
+- name: github.com/robfig/cron
+  version: 736158dc09e10f1911ca3a1e1b01f11b566ce5db
 - name: github.com/russross/blackfriday
   version: 300106c228d52c8941d4b3de6054a6062a86dda3
 - name: github.com/sergi/go-diff
@@ -384,7 +386,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: a6c48f50d74c2f09a86a79f066b0827284b4be86
+  version: 3c107eb0fd1188c1e2f52a3101424b250162144b
   subpackages:
   - gensupport
   - googleapi
@@ -413,10 +415,6 @@ imports:
   subpackages:
   - backoff
   - uritemplates
-- name: gopkg.in/robfig/cron.v2
-  version: ca60c6d796d4b1f7bb2a8fd5271d8a59aeffb4bf
-  repo: https://github.com/appscode/cron.git
-  vcs: git
 - name: gopkg.in/yaml.v2
   version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/apimachinery
