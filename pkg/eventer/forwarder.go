@@ -31,8 +31,8 @@ func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
 		host = "on host " + e.Source.Host
 	}
 	for _, receiver := range f.Receivers {
-		emailSub := fmt.Sprintf("[%s,%s]: %s %s/%s %s %s", stringz.Val(f.ClusterName, "?"), e.Source.Component, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason, host)
-		chatSub := fmt.Sprintf("[%s,%s] %s %s/%s %s %s: %s", stringz.Val(f.ClusterName, "?"), e.Source.Component, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason, host, e.Message)
+		emailSub := fmt.Sprintf("[%s, %s]: %s %s/%s %s %s", stringz.Val(f.ClusterName, "?"), e.Source.Component, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason, host)
+		chatSub := fmt.Sprintf("[%s, %s] %s %s/%s %s %s: %s", stringz.Val(f.ClusterName, "?"), e.Source.Component, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason, host, e.Message)
 		if err := f.send(emailSub, chatSub, string(bytes), receiver); err != nil {
 			log.Errorln(err)
 		}
