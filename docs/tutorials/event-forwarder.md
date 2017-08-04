@@ -35,6 +35,7 @@ notifierSecretName: notifier-config
 
 | Key                                       | Description                                                                                           |
 |-------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| `clusterName`                             | `Optional`. A meaningful identifer for cluster. This cluster name will be prefixed to any notification sent via Email/SMS/Chat so that you can identify the source easily. |
 | `eventForwarder.nodeAdded.handle`         | `Optional`. If set to true, notifications are sent when a Node is added.                              |
 | `eventForwarder.ingressAdded.handle`      | `Optional`. If set to true, notifications are sent when an Ingress is added.                          |
 | `eventForwarder.ingressAdded.namespaces`  | `Optional`. If set, notifications are sent only when Ingress are added in these namespaces. Otherwise, notifications are sent when Ingress are added in any namespace |

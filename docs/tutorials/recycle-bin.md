@@ -28,6 +28,7 @@ recycleBin:
 
 | Key                        | Description                                                                               |
 |----------------------------|-------------------------------------------------------------------------------------------|
+| `clusterName`              | `Optional`. A meaningful identifer for cluster. This cluster name will be prefixed to any notification sent via Email/SMS/Chat so that you can identify the source easily. |
 | `recycleBin.path`          | `Required`. Path to folder where deleted and/or updated objects are stored. |
 | `recycleBin.ttl`           | `Required`. Duration for which deleted and/or updated objects are stored before purging. |
 | `recycleBin.handleUpdates` | `Optional`. If set to `true`, past version of supported objects are stored when updated. We recommend that you keep this set to `false` on an active cluster. |
