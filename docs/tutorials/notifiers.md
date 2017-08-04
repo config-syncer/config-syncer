@@ -319,7 +319,7 @@ notifierSecretName: notifier-config
 
 
 ## Pushover.net
-To receive SMS notifications via Pushover.net, create a Secret with the following keys:
+To receive push notifications via Pushover.net, create a Secret with the following keys:
 
 | Name               | Description                                                                    |
 |--------------------|--------------------------------------------------------------------------------|
