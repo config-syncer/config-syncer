@@ -319,7 +319,6 @@ To receive SMS notifications via Plivo, create a Secret with the following keys:
 |--------------------|--------------------------------------------------------------------------------|
 | PUSHOVER_TOKEN     | `Required` Pushover.net token.                                                 |
 | PUSHOVER_USER_KEY  | `Required` User key or group key.                                              |
-| PUSHOVER_DEVICE    | `Optional` Device name used to send the message directly to that device.       |
 | PUSHOVER_TITLE     | `Optional` Message's title, otherwise your app's name is used.                 |
 | PUSHOVER_URL       | `Optional` A supplementary URL to show with your message.                      |
 | PUSHOVER_URL_TITLE | `Optional` A title for the supplementary URL, otherwise just the URL is shown. |
@@ -330,7 +329,6 @@ To receive SMS notifications via Plivo, create a Secret with the following keys:
 ```console
 $ echo -n 'your-pushover-token' > PUSHOVER_TOKEN
 $ echo -n 'your-pushover-user-key' > PUSHOVER_USER_KEY
-$ echo -n 'your-pushover-device' > PUSHOVER_DEVICE
 $ echo -n 'your-pushover-title' > PUSHOVER_TITLE
 $ echo -n 'your-pushover-url' > PUSHOVER_URL
 $ echo -n 'your-pushover-url-title' > PUSHOVER_URL_TITLE
@@ -339,7 +337,6 @@ $ echo -n 'your-pushover-sound' > PUSHOVER_SOUND
 $ kubectl create secret generic notifier-config -n kube-system \
     --from-file=./PUSHOVER_TOKEN \
     --from-file=./PUSHOVER_USER_KEY \
-    --from-file=./PUSHOVER_DEVICE \
     --from-file=./PUSHOVER_TITLE \
     --from-file=./PUSHOVER_URL \
     --from-file=./PUSHOVER_URL_TITLE \
@@ -350,7 +347,6 @@ secret "notifier-config" created
 ```yaml
 apiVersion: v1
 data:
-  PUSHOVER_DEVICE: eW91ci1wdXNob3Zlci1kZXZpY2U=
   PUSHOVER_PRIORITY: eW91ci1wdXNob3Zlci1wcmlvcml0eQ==
   PUSHOVER_SOUND: eW91ci1wdXNob3Zlci1zb3VuZA==
   PUSHOVER_TITLE: eW91ci1wdXNob3Zlci10aXRsZQ==
@@ -371,16 +367,16 @@ type: Opaque
 
 Now, to receiver notifications via Pushover.net, configure receiver as below:
  - notifier: `Pushover`
- - to: a list of receiver mobile numbers
+ - to: a list of devices where notifications will be sent. If list is empty, all devices will be notified.
 
 ```yaml
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: Plivo
+  - notifier: Pushover
     to:
-    - +1-999-888-1234
+    - my-phone
   ttl: 168h
 notifierSecretName: notifier-config
 ```
