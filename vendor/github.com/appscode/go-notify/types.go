@@ -26,3 +26,10 @@ type ByChat interface {
 	To(to string, cc ...string) ByChat
 	Send() error
 }
+
+type ByPush interface {
+	UID() string
+	WithBody(body string) ByPush
+	To(to ...string) ByPush
+	Send() error
+}

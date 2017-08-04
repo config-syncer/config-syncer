@@ -62,6 +62,10 @@ func (c *RecycleBin) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new 
 					n.To(receiver.To[0], receiver.To[1:]...).
 						WithBody(sub).
 						Send()
+				case notify.ByPush:
+					n.To(receiver.To...).
+						WithBody(sub).
+						Send()
 				}
 			}
 		}
@@ -103,6 +107,10 @@ func (c *RecycleBin) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interfa
 						Send()
 				case notify.ByChat:
 					n.To(receiver.To[0], receiver.To[1:]...).
+						WithBody(sub).
+						Send()
+				case notify.ByPush:
+					n.To(receiver.To...).
 						WithBody(sub).
 						Send()
 				}
