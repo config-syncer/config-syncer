@@ -14,6 +14,7 @@ To enable config syncer, you need a cluster config like below.
 ```yaml
 $ cat ./docs/examples/event-forwarder/config.yaml
 
+clusterName: unicorn
 eventForwarder:
   nodeAdded:
     handle: true
@@ -173,6 +174,7 @@ Here, the busybox pod fails to start because it uses a missing command called `b
 ## Filter by Namespaces
 You can configure Kubed to forward events for a subset of namespaces. You can also disable sending events for a particular type. Here is an example `config.yaml`:
 ```yaml
+clusterName: unicorn
 eventForwarder:
   nodeAdded: {}
   ingressAdded:
