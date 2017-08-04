@@ -5,7 +5,7 @@ replicaCount: 1
 kubed:
   image: appscode/kubed
   pullPolicy: IfNotPresent
-  tag: 0.1.0
+  tag: 0.2.0
 ## Install Default RBAC roles and bindings
 rbac:
   install: false
