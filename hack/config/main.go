@@ -47,6 +47,7 @@ func main() {
 
 func CreateClusterConfig() config.ClusterConfig {
 	return config.ClusterConfig{
+		ClusterName: "unicorn",
 		APIServer: config.APIServerSpec{
 			Address:            ":8080",
 			EnableSearchIndex:  true,

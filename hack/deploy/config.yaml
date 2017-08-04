@@ -2,6 +2,7 @@ apiServer:
   address: :8080
   enableReverseIndex: true
   enableSearchIndex: true
+clusterName: unicorn
 enableConfigSyncer: true
 eventForwarder:
   ingressAdded:
