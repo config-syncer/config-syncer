@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/appscode/go-notify/mailgun"
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/log"
@@ -70,7 +69,7 @@ func CreateClusterConfig() config.ClusterConfig {
 			HandleUpdates: false,
 			Receivers: []config.Receiver{{
 				To:       []string{"ops@example.com"},
-				Notifier: mailgun.UID,
+				Notifier: "Mailgun",
 			},
 			},
 		},
@@ -93,7 +92,7 @@ func CreateClusterConfig() config.ClusterConfig {
 			},
 			Receivers: []config.Receiver{{
 				To:       []string{"ops@example.com"},
-				Notifier: mailgun.UID,
+				Notifier: "Mailgun",
 			},
 			},
 		},
