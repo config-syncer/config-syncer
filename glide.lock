@@ -1,5 +1,5 @@
 hash: 4c22dd32b5c0ccd9945c6e41558270b297017305b81586c080a0fa68825370ad
-updated: 2017-08-03T23:01:32.179436893-07:00
+updated: 2017-08-04T02:04:49.459926954-07:00
 imports:
 - name: cloud.google.com/go
   version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
@@ -23,7 +23,7 @@ imports:
   - strings
   - version
 - name: github.com/appscode/go-notify
-  version: a8e65e7d0a63ac7c26c79d819083050c7af6d258
+  version: c1f627b4151ce1f8b5b80eeab2eb94c2561af00c
   subpackages:
   - hipchat
   - log

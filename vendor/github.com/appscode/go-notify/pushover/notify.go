@@ -38,7 +38,7 @@ type client struct {
 	opt Options
 }
 
-var _ notify.ByChat = &client{}
+var _ notify.ByPush = &client{}
 
 func New(opt Options) *client {
 	return &client{opt: opt}
@@ -70,13 +70,13 @@ func (c client) UID() string {
 	return UID
 }
 
-func (c client) WithBody(body string) notify.ByChat {
+func (c client) WithBody(body string) notify.ByPush {
 	c.opt.Message = body
 	return &c
 }
 
-func (c client) To(to string, cc ...string) notify.ByChat {
-	c.opt.Device = append([]string{to}, cc...)
+func (c client) To(to ...string) notify.ByPush {
+	c.opt.Device = append([]string{}, to...)
 	return &c
 }
 

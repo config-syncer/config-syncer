@@ -74,6 +74,10 @@ func (f *EventForwarder) send(emailSub, chatSub, body string, receiver config.Re
 		return n.To(receiver.To[0], receiver.To[1:]...).
 			WithBody(chatSub).
 			Send()
+	case notify.ByPush:
+		return n.To(receiver.To...).
+			WithBody(chatSub).
+			Send()
 	}
 	return nil
 }
