@@ -1,5 +1,5 @@
 hash: 4c22dd32b5c0ccd9945c6e41558270b297017305b81586c080a0fa68825370ad
-updated: 2017-08-02T23:48:56.120853124-07:00
+updated: 2017-08-03T23:01:32.179436893-07:00
 imports:
 - name: cloud.google.com/go
   version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
@@ -23,12 +23,13 @@ imports:
   - strings
   - version
 - name: github.com/appscode/go-notify
-  version: eb3a0d7db7010d84e668f0188f10ca595ced856c
+  version: a8e65e7d0a63ac7c26c79d819083050c7af6d258
   subpackages:
   - hipchat
   - log
   - mailgun
   - plivo
+  - pushover
   - slack
   - smtp
   - twilio

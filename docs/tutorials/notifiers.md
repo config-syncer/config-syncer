@@ -32,7 +32,7 @@ type: Opaque
 ```
 
 Now, to receiver notifications via Hipchat, configure receiver as below:
- - notifier: `hipchat`
+ - notifier: `Hipchat`
  - to: a list of chat room names
 
 ```yaml
@@ -40,7 +40,7 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: hipchat
+  - notifier: Hipchat
     to:
     - ops-alerts
   ttl: 168h
@@ -89,7 +89,7 @@ type: Opaque
 ```
 
 Now, to receiver notifications via Mailgun, configure receiver as below:
- - notifier: `mailgun`
+ - notifier: `Mailgun`
  - to: a list of email addresses
 
 ```yaml
@@ -97,7 +97,7 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: mailgun
+  - notifier: Mailgun
     to:
     - ops-alerts@example.com
   ttl: 168h
@@ -145,7 +145,7 @@ $ echo -n 'your-gmail-address' > SMTP_FROM
 ```
 
 Now, to receiver notifications via SMTP, configure receiver as below:
- - notifier: `smtp`
+ - notifier: `SMTP`
  - to: a list of email addresses
 
 ```yaml
@@ -153,7 +153,7 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: smtp
+  - notifier: SMTP
     to:
     - ops-alerts@example.com
   ttl: 168h
@@ -198,7 +198,7 @@ type: Opaque
 ```
 
 Now, to receiver notifications via SMTP, configure receiver as below:
- - notifier: `twilio`
+ - notifier: `Twilio`
  - to: a list of receiver mobile numbers
 
 ```yaml
@@ -206,7 +206,7 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: twilio
+  - notifier: Twilio
     to:
     - +1-999-888-1234
   ttl: 168h
@@ -243,7 +243,7 @@ type: Opaque
 ```
 
 Now, to receiver notifications via Hipchat, configure receiver as below:
- - notifier: `slack`
+ - notifier: `Slack`
  - to: a list of chat room names
 
 ```yaml
@@ -251,7 +251,7 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: slack
+  - notifier: Slack
     to:
     - '#ops-alerts'
   ttl: 168h
@@ -296,7 +296,7 @@ type: Opaque
 ```
 
 Now, to receiver notifications via SMTP, configure receiver as below:
- - notifier: `plivo`
+ - notifier: `Plivo`
  - to: a list of receiver mobile numbers
 
 ```yaml
@@ -304,9 +304,79 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: plivo
+  - notifier: Plivo
     to:
     - +1-999-888-1234
+  ttl: 168h
+notifierSecretName: notifier-config
+```
+
+
+## Pushover.net
+To receive SMS notifications via Pushover.net, create a Secret with the following keys:
+
+| Name               | Description                                                                    |
+|--------------------|--------------------------------------------------------------------------------|
+| PUSHOVER_TOKEN     | `Required` Pushover.net token.                                                 |
+| PUSHOVER_USER_KEY  | `Required` User key or group key.                                              |
+| PUSHOVER_TITLE     | `Optional` Message's title, otherwise your app's name is used.                 |
+| PUSHOVER_URL       | `Optional` A supplementary URL to show with your message.                      |
+| PUSHOVER_URL_TITLE | `Optional` A title for the supplementary URL, otherwise just the URL is shown. |
+| PUSHOVER_PRIORITY  | `Optional` Send as -2 to generate no notification/alert, -1 to always send as a quiet notification, 1 to display as high-priority and bypass the user's quiet hours, or 2 to also require confirmation from the user.   |
+| PUSHOVER_SOUND     | `Optional` The name of one of the sounds supported by device clients to override the user's default sound choice.   |
+
+
+```console
+$ echo -n 'your-pushover-token' > PUSHOVER_TOKEN
+$ echo -n 'your-pushover-user-key' > PUSHOVER_USER_KEY
+$ echo -n 'your-pushover-title' > PUSHOVER_TITLE
+$ echo -n 'your-pushover-url' > PUSHOVER_URL
+$ echo -n 'your-pushover-url-title' > PUSHOVER_URL_TITLE
+$ echo -n 'your-pushover-priority' > PUSHOVER_PRIORITY
+$ echo -n 'your-pushover-sound' > PUSHOVER_SOUND
+$ kubectl create secret generic notifier-config -n kube-system \
+    --from-file=./PUSHOVER_TOKEN \
+    --from-file=./PUSHOVER_USER_KEY \
+    --from-file=./PUSHOVER_TITLE \
+    --from-file=./PUSHOVER_URL \
+    --from-file=./PUSHOVER_URL_TITLE \
+    --from-file=./PUSHOVER_PRIORITY \
+    --from-file=./PUSHOVER_SOUND
+secret "notifier-config" created
+```
+```yaml
+apiVersion: v1
+data:
+  PUSHOVER_PRIORITY: eW91ci1wdXNob3Zlci1wcmlvcml0eQ==
+  PUSHOVER_SOUND: eW91ci1wdXNob3Zlci1zb3VuZA==
+  PUSHOVER_TITLE: eW91ci1wdXNob3Zlci10aXRsZQ==
+  PUSHOVER_TOKEN: eW91ci1wdXNob3Zlci10b2tlbg==
+  PUSHOVER_URL: eW91ci1wdXNob3Zlci11cmw=
+  PUSHOVER_URL_TITLE: eW91ci1wdXNob3Zlci11cmwtdGl0bGU=
+  PUSHOVER_USER_KEY: eW91ci1wdXNob3Zlci11c2VyLWtleQ==
+kind: Secret
+metadata:
+  creationTimestamp: 2017-08-04T05:13:07Z
+  name: notifier-config
+  namespace: kube-system
+  resourceVersion: "33711872"
+  selfLink: /api/v1/namespaces/kube-system/secrets/notifier-config
+  uid: 99df75a8-78d3-11e7-acfa-42010af00141
+type: Opaque
+```
+
+Now, to receiver notifications via Pushover.net, configure receiver as below:
+ - notifier: `Pushover`
+ - to: a list of devices where notifications will be sent. If list is empty, all devices will be notified.
+
+```yaml
+recycleBin:
+  handleUpdates: false
+  path: /tmp/kubed/trash
+  receivers:
+  - notifier: Pushover
+    to:
+    - my-phone
   ttl: 168h
 notifierSecretName: notifier-config
 ```
@@ -339,10 +409,10 @@ eventForwarder:
     namespaces:
     - kube-system
   receivers:
-  - notifier: mailgun
+  - notifier: Mailgun
     to:
     - ops@example.com
-  - notifier: slack
+  - notifier: Slack
     to:
     - #ops-alerts
 recycleBin:

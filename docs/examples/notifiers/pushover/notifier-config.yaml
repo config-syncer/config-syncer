@@ -1,0 +1,18 @@
+apiVersion: v1
+data:
+  PUSHOVER_PRIORITY: eW91ci1wdXNob3Zlci1wcmlvcml0eQ==
+  PUSHOVER_SOUND: eW91ci1wdXNob3Zlci1zb3VuZA==
+  PUSHOVER_TITLE: eW91ci1wdXNob3Zlci10aXRsZQ==
+  PUSHOVER_TOKEN: eW91ci1wdXNob3Zlci10b2tlbg==
+  PUSHOVER_URL: eW91ci1wdXNob3Zlci11cmw=
+  PUSHOVER_URL_TITLE: eW91ci1wdXNob3Zlci11cmwtdGl0bGU=
+  PUSHOVER_USER_KEY: eW91ci1wdXNob3Zlci11c2VyLWtleQ==
+kind: Secret
+metadata:
+  creationTimestamp: 2017-08-04T05:13:07Z
+  name: notifier-config
+  namespace: kube-system
+  resourceVersion: "33711872"
+  selfLink: /api/v1/namespaces/kube-system/secrets/notifier-config
+  uid: 99df75a8-78d3-11e7-acfa-42010af00141
+type: Opaque
