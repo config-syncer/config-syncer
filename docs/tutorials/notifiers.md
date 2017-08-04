@@ -328,34 +328,49 @@ To receive SMS notifications via Plivo, create a Secret with the following keys:
 
 
 ```console
-$ echo -n 'your-plivo-auth-id' > PLIVO_AUTH_ID
-$ echo -n 'your-plivo-auth-token' > PLIVO_AUTH_TOKEN
-$ echo -n 'your-plivo-from' > PLIVO_FROM
+$ echo -n 'your-pushover-token' > PUSHOVER_TOKEN
+$ echo -n 'your-pushover-user-key' > PUSHOVER_USER_KEY
+$ echo -n 'your-pushover-device' > PUSHOVER_DEVICE
+$ echo -n 'your-pushover-title' > PUSHOVER_TITLE
+$ echo -n 'your-pushover-url' > PUSHOVER_URL
+$ echo -n 'your-pushover-url-title' > PUSHOVER_URL_TITLE
+$ echo -n 'your-pushover-priority' > PUSHOVER_PRIORITY
+$ echo -n 'your-pushover-sound' > PUSHOVER_SOUND
 $ kubectl create secret generic notifier-config -n kube-system \
-    --from-file=./PLIVO_AUTH_ID \
-    --from-file=./PLIVO_AUTH_TOKEN \
-    --from-file=./PLIVO_FROM
+    --from-file=./PUSHOVER_TOKEN \
+    --from-file=./PUSHOVER_USER_KEY \
+    --from-file=./PUSHOVER_DEVICE \
+    --from-file=./PUSHOVER_TITLE \
+    --from-file=./PUSHOVER_URL \
+    --from-file=./PUSHOVER_URL_TITLE \
+    --from-file=./PUSHOVER_PRIORITY \
+    --from-file=./PUSHOVER_SOUND
 secret "notifier-config" created
 ```
 ```yaml
 apiVersion: v1
 data:
-  PLIVO_AUTH_ID: eW91ci1wbGl2by1hdXRoLWlk
-  PLIVO_AUTH_TOKEN: eW91ci1wbGl2by1hdXRoLXRva2Vu
-  PLIVO_FROM: eW91ci1wbGl2by1mcm9t
+  PUSHOVER_DEVICE: eW91ci1wdXNob3Zlci1kZXZpY2U=
+  PUSHOVER_PRIORITY: eW91ci1wdXNob3Zlci1wcmlvcml0eQ==
+  PUSHOVER_SOUND: eW91ci1wdXNob3Zlci1zb3VuZA==
+  PUSHOVER_TITLE: eW91ci1wdXNob3Zlci10aXRsZQ==
+  PUSHOVER_TOKEN: eW91ci1wdXNob3Zlci10b2tlbg==
+  PUSHOVER_URL: eW91ci1wdXNob3Zlci11cmw=
+  PUSHOVER_URL_TITLE: eW91ci1wdXNob3Zlci11cmwtdGl0bGU=
+  PUSHOVER_USER_KEY: eW91ci1wdXNob3Zlci11c2VyLWtleQ==
 kind: Secret
 metadata:
-  creationTimestamp: 2017-07-25T02:00:02Z
+  creationTimestamp: 2017-08-04T05:13:07Z
   name: notifier-config
   namespace: kube-system
-  resourceVersion: "2606"
+  resourceVersion: "33711872"
   selfLink: /api/v1/namespaces/kube-system/secrets/notifier-config
-  uid: f8dade1c-70dc-11e7-9b0b-080027503732
+  uid: 99df75a8-78d3-11e7-acfa-42010af00141
 type: Opaque
 ```
 
-Now, to receiver notifications via SMTP, configure receiver as below:
- - notifier: `Plivo`
+Now, to receiver notifications via Pushover.net, configure receiver as below:
+ - notifier: `Pushover`
  - to: a list of receiver mobile numbers
 
 ```yaml
@@ -369,22 +384,6 @@ recycleBin:
   ttl: 168h
 notifierSecretName: notifier-config
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## Using multiple notifiers

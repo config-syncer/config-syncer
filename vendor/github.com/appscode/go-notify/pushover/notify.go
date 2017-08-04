@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
@@ -24,18 +25,17 @@ type Options struct {
 	Message string `envconfig:"MESSAGE"`
 
 	// Optional params
-	Device    string `envconfig:"DEVICE"`
-	Title     string `envconfig:"TITLE"`
-	URL       string `envconfig:"URL"`
-	URLTitle  string `envconfig:"URL_TITLE"`
-	Priority  string `envconfig:"PRIORITY"`
-	Timestamp string `envconfig:"TIMESTAMP"`
-	Sound     string `envconfig:"SOUND"`
+	Device    []string `envconfig:"DEVICE"`
+	Title     string   `envconfig:"TITLE"`
+	URL       string   `envconfig:"URL"`
+	URLTitle  string   `envconfig:"URL_TITLE"`
+	Priority  string   `envconfig:"PRIORITY"`
+	Timestamp string   `envconfig:"TIMESTAMP"`
+	Sound     string   `envconfig:"SOUND"`
 }
 
 type client struct {
 	opt Options
-	to  []string
 }
 
 var _ notify.ByChat = &client{}
@@ -76,36 +76,21 @@ func (c client) WithBody(body string) notify.ByChat {
 }
 
 func (c client) To(to string, cc ...string) notify.ByChat {
-	c.to = append([]string{to}, cc...)
+	c.opt.Device = append([]string{to}, cc...)
 	return &c
 }
 
 func (c *client) Send() error {
-	if len(c.to) == 0 {
-		return errors.New("Missing to")
+	if c.opt.Token == "" {
+		return errors.New("Missing token")
 	}
-
+	if c.opt.User =="" {
+		return errors.New("Missing user")
+	}
 	if c.opt.Message == "" {
 		return errors.New("Missing message")
 	}
 
-	if c.opt.User != "" {
-		if err := c.send(c.opt.User); err != nil {
-			return err
-		}
-	}
-
-	for _, token := range c.to {
-		if err := c.send(token); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (c *client) send(userToken string) error {
-	c.opt.User = userToken
 	msg := makeFormPayload(c.opt)
 	buf := bytes.NewBufferString(msg.Encode())
 
@@ -146,8 +131,8 @@ func makeFormPayload(opt Options) url.Values {
 		data.Set("message", opt.Message)
 	}
 
-	if opt.Device != "" {
-		data.Set("device", opt.Device)
+	if len(opt.Device) > 0 {
+		data.Set("device", strings.Join(opt.Device, ","))
 	}
 
 	if opt.Title != "" {
