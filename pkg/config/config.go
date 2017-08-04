@@ -14,6 +14,7 @@ const (
 )
 
 type ClusterConfig struct {
+	ClusterName        string              `json:"clusterName,omitempty"`
 	Snapshotter        *SnapshotSpec       `json:"snapshotter,omitempty"`
 	RecycleBin         *RecycleBinSpec     `json:"recycleBin,omitempty"`
 	EventForwarder     *EventForwarderSpec `json:"eventForwarder,omitempty"`

@@ -1,7 +1,7 @@
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 # Supported Notifiers
-Kubed can send notifications via Email, SMS or Chat for various operations using [appscode/go-notify](https://github.com/appscode/go-notify) library. To connect to these services, you need to create a Secret with the appropriate keys. Then pass the secret name to Kubed by setting `notifierSecretName` field in Kubed cluster config.
+Kubed can send notifications via Email, SMS or Chat for various operations using [appscode/go-notify](https://github.com/appscode/go-notify) library. To connect to these services, you need to create a Secret with the appropriate keys. Then pass the secret name to Kubed by setting `notifierSecretName` field in Kubed cluster config. Also, set `clusterName` to a meaningful name for you. This cluster name will be prefixed to any notification sent via Email/SMS/Chat so that you can identify the source easily.
 
 ## Hipchat
 To receive chat notifications in Hipchat, create a Secret with the following key:
@@ -36,6 +36,7 @@ Now, to receiver notifications via Hipchat, configure receiver as below:
  - to: a list of chat room names
 
 ```yaml
+clusterName: unicorn
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
@@ -93,6 +94,7 @@ Now, to receiver notifications via Mailgun, configure receiver as below:
  - to: a list of email addresses
 
 ```yaml
+clusterName: unicorn
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
@@ -149,6 +151,7 @@ Now, to receiver notifications via SMTP, configure receiver as below:
  - to: a list of email addresses
 
 ```yaml
+clusterName: unicorn
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
@@ -202,6 +205,7 @@ Now, to receiver notifications via SMTP, configure receiver as below:
  - to: a list of receiver mobile numbers
 
 ```yaml
+clusterName: unicorn
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
@@ -247,6 +251,7 @@ Now, to receiver notifications via Hipchat, configure receiver as below:
  - to: a list of chat room names
 
 ```yaml
+clusterName: unicorn
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
@@ -300,6 +305,7 @@ Now, to receiver notifications via SMTP, configure receiver as below:
  - to: a list of receiver mobile numbers
 
 ```yaml
+clusterName: unicorn
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
@@ -370,6 +376,7 @@ Now, to receiver notifications via Pushover.net, configure receiver as below:
  - to: a list of devices where notifications will be sent. If list is empty, all devices will be notified.
 
 ```yaml
+clusterName: unicorn
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
@@ -403,6 +410,7 @@ metadata:
 type: Opaque
 
 
+clusterName: unicorn
 eventForwarder:
   warningEvents:
     handle: true

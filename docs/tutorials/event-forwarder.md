@@ -14,6 +14,7 @@ To enable config syncer, you need a cluster config like below.
 ```yaml
 $ cat ./docs/examples/event-forwarder/config.yaml
 
+clusterName: unicorn
 eventForwarder:
   nodeAdded:
     handle: true
@@ -41,7 +42,8 @@ notifierSecretName: notifier-config
 | `eventForwarder.storageAdded.namespaces`  | `Optional`. If set, notifications are sent only when PVC are added in these namespaces. Otherwise, notifications are sent when PVC added in any namespace. Since StorageClass and PV are non-namespaced resource, this field has not effect on these. |
 | `eventForwarder.warningEvents.handle`     | `Optional`. If set to true, notifications are sent when a `Warning` Event is added.                   |
 | `eventForwarder.warningEvents.namespaces` | `Optional`. If set, notifications are sent only when warning events are added in these namespaces. Otherwise, notifications are sent when warning events are added in any namespace |
-| `eventForwarder.receiver`             | `Required`. To learn how to use various notifiers, please visit [here](/docs/tutorials/notifiers.md). |
+| `eventForwarder.receiver`                 | `Required`. To learn how to use various notifiers, please visit [here](/docs/tutorials/notifiers.md). |
+| `clusterName`                             | `Optional`. A meaningful identifer for cluster. This cluster name will be prefixed to any notification sent via Email/SMS/Chat so that you can identify the source easily. |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
@@ -173,6 +175,7 @@ Here, the busybox pod fails to start because it uses a missing command called `b
 ## Filter by Namespaces
 You can configure Kubed to forward events for a subset of namespaces. You can also disable sending events for a particular type. Here is an example `config.yaml`:
 ```yaml
+clusterName: unicorn
 eventForwarder:
   nodeAdded: {}
   ingressAdded:

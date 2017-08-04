@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/appscode/go-notify/mailgun"
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/log"
@@ -47,6 +46,7 @@ func main() {
 
 func CreateClusterConfig() config.ClusterConfig {
 	return config.ClusterConfig{
+		ClusterName: "unicorn",
 		APIServer: config.APIServerSpec{
 			Address:            ":8080",
 			EnableSearchIndex:  true,
@@ -69,7 +69,7 @@ func CreateClusterConfig() config.ClusterConfig {
 			HandleUpdates: false,
 			Receivers: []config.Receiver{{
 				To:       []string{"ops@example.com"},
-				Notifier: mailgun.UID,
+				Notifier: "Mailgun",
 			},
 			},
 		},
@@ -92,7 +92,7 @@ func CreateClusterConfig() config.ClusterConfig {
 			},
 			Receivers: []config.Receiver{{
 				To:       []string{"ops@example.com"},
-				Notifier: mailgun.UID,
+				Notifier: "Mailgun",
 			},
 			},
 		},

@@ -12,6 +12,7 @@ import (
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
 	"github.com/appscode/go-notify/unified"
+	stringz "github.com/appscode/go/strings"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/ghodss/yaml"
 	diff "github.com/yudai/gojsondiff"
@@ -20,8 +21,9 @@ import (
 )
 
 type RecycleBin struct {
-	Spec   config.RecycleBinSpec
-	Loader envconfig.LoaderFunc
+	ClusterName string
+	Spec        config.RecycleBinSpec
+	Loader      envconfig.LoaderFunc
 }
 
 func (c *RecycleBin) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new interface{}) error {
@@ -42,7 +44,7 @@ func (c *RecycleBin) Update(t metav1.TypeMeta, meta metav1.ObjectMeta, old, new 
 
 	for _, receiver := range c.Spec.Receivers {
 		if len(receiver.To) > 0 {
-			sub := fmt.Sprintf("%s %s %s/%s updated", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
+			sub := fmt.Sprintf("[%s]: %s %s %s/%s updated", stringz.Val(c.ClusterName, "?"), t.APIVersion, t.Kind, meta.Namespace, meta.Name)
 			if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), c.Loader); err == nil {
 				switch n := notifier.(type) {
 				case notify.ByEmail:
@@ -86,7 +88,7 @@ func (c *RecycleBin) Delete(t metav1.TypeMeta, meta metav1.ObjectMeta, v interfa
 
 	for _, receiver := range c.Spec.Receivers {
 		if len(receiver.To) > 0 {
-			sub := fmt.Sprintf("%s %s %s/%s deleted", t.APIVersion, t.Kind, meta.Namespace, meta.Name)
+			sub := fmt.Sprintf("[%s]: %s %s %s/%s deleted", stringz.Val(c.ClusterName, "?"), t.APIVersion, t.Kind, meta.Namespace, meta.Name)
 			if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), c.Loader); err == nil {
 				switch n := notifier.(type) {
 				case notify.ByEmail:

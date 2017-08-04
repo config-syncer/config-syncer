@@ -100,15 +100,17 @@ func (op *Operator) Setup() error {
 			op.Config.RecycleBin.Path = filepath.Join(op.Opt.ScratchDir, "transhcan")
 		}
 		op.TrashCan = &rbin.RecycleBin{
-			Spec:   *op.Config.RecycleBin,
-			Loader: op.NotifierLoader,
+			ClusterName: op.Config.ClusterName,
+			Spec:        *op.Config.RecycleBin,
+			Loader:      op.NotifierLoader,
 		}
 	}
 
 	if op.Config.EventForwarder != nil {
 		op.Eventer = &eventer.EventForwarder{
-			Receivers: op.Config.EventForwarder.Receivers,
-			Loader:    op.NotifierLoader,
+			ClusterName: op.Config.ClusterName,
+			Receivers:   op.Config.EventForwarder.Receivers,
+			Loader:      op.NotifierLoader,
 		}
 	}
 
