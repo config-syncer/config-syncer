@@ -12,6 +12,7 @@ apiServer:
   address: :8080
   enableReverseIndex: true
   enableSearchIndex: true
+clusterName: unicorn
 enableConfigSyncer: true
 eventForwarder:
   ingressAdded:
@@ -19,7 +20,7 @@ eventForwarder:
   nodeAdded:
     handle: true
   receivers:
-  - notifier: Mailgun
+  - notifier: mailgun
     to:
     - ops@example.com
   storageAdded:
@@ -43,7 +44,7 @@ recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
   receivers:
-  - notifier: Mailgun
+  - notifier: mailgun
     to:
     - ops@example.com
   ttl: 168h0m0s
@@ -51,9 +52,9 @@ snapshotter:
   gcs:
     bucket: restic
     prefix: minikube
-  storageSecretName: snap-secret
   sanitize: true
   schedule: '@every 6h'
+  storageSecretName: snap-secret
 ```
 
 To understand the various configuration options, check Kubed [tutorials](/docs/tutorials/README.md). Once you are satisfied with the configuration, create a Secret with the Kubed cluster config under `config.yaml` key.
