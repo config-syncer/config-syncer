@@ -1,7 +1,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/appscode/kubed)](https://goreportcard.com/report/github.com/appscode/kubed)
 
 # Kubed
-Kubed by AppsCode is a Kubernetes Cluster Operator Daemon. Kubed can do the following things for you:
+Kubed (pronounced Cube-Dee) by AppsCode is a Kubernetes Cluster Operator Daemon. Kubed can do the following things for you:
 
  - Kubed can take periodic [snapshot](/docs/tutorials/cluster-snapshot.md) of a Kubernetes cluster objects.
  - Kubed provides a [recycle bin](/docs/tutorials/recycle-bin.md) for deleted and/or updated Kubernetes objects.
