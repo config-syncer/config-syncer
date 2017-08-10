@@ -432,7 +432,7 @@ recycleBin:
     - ops@example.com
   - notifier: slack
     to:
-    - #ops-alerts
+    - '#ops-alerts'
   ttl: 168h
 notifierSecretName: notifier-config
 ```
