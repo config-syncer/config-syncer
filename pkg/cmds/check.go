@@ -18,7 +18,7 @@ func NewCmdCheck() *cobra.Command {
 		Use:   "check",
 		Short: "Check cluster config",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			flags.EnsureRequiredFlags(cmd, "context", "backup-dir")
+			flags.EnsureRequiredFlags(cmd, "clusterconfig")
 
 			cfg, err := config.LoadConfig(configPath)
 			if err != nil {
