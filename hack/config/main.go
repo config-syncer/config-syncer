@@ -4,9 +4,9 @@ import (
 	"io/ioutil"
 	"time"
 
+	"github.com/appscode/go/log"
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/config"
-	"github.com/appscode/log"
 	"github.com/ghodss/yaml"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"

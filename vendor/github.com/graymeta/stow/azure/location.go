@@ -20,7 +20,7 @@ func (l *location) Close() error {
 }
 
 func (l *location) CreateContainer(name string) (stow.Container, error) {
-	err := l.client.CreateContainer(name, az.ContainerAccessTypeBlob)
+	err := l.client.GetContainerReference(name).Create(&az.CreateContainerOptions{Access: az.ContainerAccessTypeBlob})
 	if err != nil {
 		if strings.Contains(err.Error(), "ErrorCode=ContainerAlreadyExists") {
 			return l.Container(name)
@@ -109,5 +109,5 @@ func (l *location) ItemByURL(url *url.URL) (stow.Item, error) {
 }
 
 func (l *location) RemoveContainer(id string) error {
-	return l.client.DeleteContainer(id)
+	return l.client.GetContainerReference(id).Delete(nil)
 }

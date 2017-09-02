@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/appscode/envconfig"
+	"github.com/appscode/go/log"
 	v "github.com/appscode/go/version"
 	"github.com/appscode/kubed/pkg/api"
 	"github.com/appscode/kubed/pkg/backup"
@@ -22,7 +23,6 @@ import (
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kubed/pkg/util"
-	"github.com/appscode/log"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
@@ -49,8 +49,6 @@ type Options struct {
 	EnableConfigSync  bool
 	ScratchDir        string
 	OperatorNamespace string
-
-	EnableAnalytics bool
 }
 
 type Operator struct {
@@ -230,13 +228,13 @@ func (op *Operator) RunAPIServer() {
 	// Enable pod -> service, service -> serviceMonitor indexing
 	if op.Config.APIServer.EnableReverseIndex {
 		router.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(op.ReverseIndex.Service.ServeHTTP))
-		if util.IsPreferredAPIResource(op.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind) {
+		if util.IsPreferredAPIResource(op.KubeClient, prom.Group+"/"+prom.Version, prom.ServiceMonitorsKind) {
 			// Add Indexer only if Server support this resource
-			router.Get("/apis/"+prom.TPRGroup+"/"+prom.TPRVersion+"/namespaces/:namespace/:resource/:name/"+prom.TPRServiceMonitorName, http.HandlerFunc(op.ReverseIndex.ServiceMonitor.ServeHTTP))
+			router.Get("/apis/"+prom.Group+"/"+prom.Version+"/namespaces/:namespace/:resource/:name/"+prom.ServiceMonitorName, http.HandlerFunc(op.ReverseIndex.ServiceMonitor.ServeHTTP))
 		}
-		if util.IsPreferredAPIResource(op.KubeClient, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRPrometheusesKind) {
+		if util.IsPreferredAPIResource(op.KubeClient, prom.Group+"/"+prom.Version, prom.PrometheusesKind) {
 			// Add Indexer only if Server support this resource
-			router.Get("/apis/"+prom.TPRGroup+"/"+prom.TPRVersion+"/namespaces/:namespace/:resource/:name/"+prom.TPRPrometheusName, http.HandlerFunc(op.ReverseIndex.Prometheus.ServeHTTP))
+			router.Get("/apis/"+prom.Group+"/"+prom.Version+"/namespaces/:namespace/:resource/:name/"+prom.PrometheusName, http.HandlerFunc(op.ReverseIndex.Prometheus.ServeHTTP))
 		}
 	}
 
@@ -247,7 +245,6 @@ func (op *Operator) RunAPIServer() {
 
 func (op *Operator) metadataHandler(w http.ResponseWriter, r *http.Request) {
 	resp := &api.KubedMetadata{
-		AnalyticsEnabled:    op.Opt.EnableAnalytics,
 		OperatorNamespace:   op.Opt.OperatorNamespace,
 		SearchEnabled:       op.Config.APIServer.EnableSearchIndex,
 		ReverseIndexEnabled: op.Config.APIServer.EnableReverseIndex,

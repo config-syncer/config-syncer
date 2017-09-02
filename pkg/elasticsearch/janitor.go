@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/appscode/go/log"
 	"github.com/appscode/kubed/pkg/config"
-	"github.com/appscode/log"
 	elastic "gopkg.in/olivere/elastic.v3"
 )
 

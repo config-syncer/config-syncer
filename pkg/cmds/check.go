@@ -15,8 +15,9 @@ func NewCmdCheck() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "check",
-		Short: "Check cluster config",
+		Use:               "check",
+		Short:             "Check cluster config",
+		DisableAutoGenTag: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			flags.EnsureRequiredFlags(cmd, "clusterconfig")
 

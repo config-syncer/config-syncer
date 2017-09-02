@@ -31,11 +31,11 @@ func NewReverseIndexer(cl clientset.Interface, pm prom.MonitoringV1alpha1Interfa
 		index:      index,
 	}
 	ri.Service = &ServiceIndexerImpl{kubeClient: cl, index: index}
-	if util.IsPreferredAPIResource(cl, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRServiceMonitorsKind) {
+	if util.IsPreferredAPIResource(cl, prom.Group+"/"+prom.Version, prom.ServiceMonitorsKind) {
 		// Add Indexer only if Server support this resource
 		ri.ServiceMonitor = &ServiceMonitorIndexerImpl{kubeClient: cl, index: index}
 	}
-	if util.IsPreferredAPIResource(cl, prom.TPRGroup+"/"+prom.TPRVersion, prom.TPRPrometheusesKind) {
+	if util.IsPreferredAPIResource(cl, prom.Group+"/"+prom.Version, prom.PrometheusesKind) {
 		// Add Indexer only if Server support this resource
 		ri.Prometheus = &PrometheusIndexerImpl{kubeClient: cl, promClient: pm, index: index}
 	}

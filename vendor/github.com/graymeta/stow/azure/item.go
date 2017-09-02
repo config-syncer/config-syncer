@@ -33,7 +33,7 @@ func (i *item) Name() string {
 }
 
 func (i *item) URL() *url.URL {
-	u := i.client.GetBlobURL(i.container.id, i.id)
+	u := i.client.GetContainerReference(i.container.id).GetBlobReference(i.id).GetURL()
 	url, _ := url.Parse(u)
 	url.Scheme = "azure"
 	return url
@@ -44,7 +44,7 @@ func (i *item) Size() (int64, error) {
 }
 
 func (i *item) Open() (io.ReadCloser, error) {
-	return i.client.GetBlob(i.container.id, i.id)
+	return i.client.GetContainerReference(i.container.id).GetBlobReference(i.id).Get(nil)
 }
 
 func (i *item) ETag() (string, error) {
@@ -52,7 +52,7 @@ func (i *item) ETag() (string, error) {
 }
 
 func (i *item) LastMod() (time.Time, error) {
-	return time.Parse(timeFormat, i.properties.LastModified)
+	return time.Time(i.properties.LastModified), nil
 }
 
 func (i *item) Metadata() (map[string]interface{}, error) {
@@ -67,13 +67,14 @@ func (i *item) Metadata() (map[string]interface{}, error) {
 func (i *item) ensureInfo() error {
 	if i.metadata == nil {
 		i.infoOnce.Do(func() {
-			md, infoErr := i.client.GetBlobMetadata(i.container.Name(), i.Name())
+			blob := i.client.GetContainerReference(i.container.Name()).GetBlobReference(i.Name())
+			infoErr := blob.GetMetadata(nil)
 			if infoErr != nil {
 				i.infoErr = infoErr
 				return
 			}
 
-			mdParsed, infoErr := parseMetadata(md)
+			mdParsed, infoErr := parseMetadata(blob.Metadata)
 			if infoErr != nil {
 				i.infoErr = infoErr
 				return

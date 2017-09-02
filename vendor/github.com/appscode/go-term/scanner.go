@@ -1,9 +1,13 @@
 package term
 
 import (
+	"bytes"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/howeyc/gopass"
 )
 
 func Read(prompt string) string {
@@ -15,6 +19,18 @@ func Read(prompt string) string {
 		ans = strings.TrimSpace(ans)
 		if ans != "" {
 			return ans
+		}
+	}
+}
+
+func ReadMasked(prompt string) string {
+	for {
+		Infoln(prompt)
+		if token, err := gopass.GetPasswdMasked(); err == nil {
+			token = bytes.TrimSpace(token)
+			if len(token) > 0 {
+				return string(token)
+			}
 		}
 	}
 }
@@ -65,8 +81,10 @@ func Confirm(prompt string) {
 }
 
 func List(items []string) (int, string) {
+	sort.Strings(items)
+	width := len(strconv.Itoa(len(items)))
 	for i, item := range items {
-		fmt.Printf("[%v] %v\n", i+1, item)
+		fmt.Printf("[%"+strconv.Itoa(width)+"d] %v\n", i+1, item)
 	}
 	for {
 		fmt.Print("Select option: ")

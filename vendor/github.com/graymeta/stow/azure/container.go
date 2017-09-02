@@ -30,7 +30,8 @@ func (c *container) Name() string {
 }
 
 func (c *container) Item(id string) (stow.Item, error) {
-	blobProperties, err := c.client.GetBlobProperties(c.id, id)
+	blob := c.client.GetContainerReference(c.id).GetBlobReference(id)
+	err := blob.GetProperties(nil)
 	if err != nil {
 		if strings.Contains(err.Error(), "404") {
 			return nil, stow.ErrNotFound
@@ -41,7 +42,7 @@ func (c *container) Item(id string) (stow.Item, error) {
 		id:         id,
 		container:  c,
 		client:     c.client,
-		properties: *blobProperties,
+		properties: blob.Properties,
 	}
 
 	etag := cleanEtag(item.properties.Etag) // Etags returned from this method include quotes. Strip them.
@@ -59,7 +60,7 @@ func (c *container) Browse(prefix, delimiter, cursor string, count int) (*stow.I
 	if cursor != "" {
 		params.Marker = cursor
 	}
-	listblobs, err := c.client.ListBlobs(c.id, params)
+	listblobs, err := c.client.GetContainerReference(c.id).ListBlobs(params)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +101,7 @@ func (c *container) Put(name string, r io.Reader, size int64, metadata map[strin
 	}
 
 	name = strings.Replace(name, " ", "+", -1)
-	err = c.client.CreateBlockBlobFromReader(c.id, name, uint64(size), r, nil)
+	err = c.client.GetContainerReference(c.id).GetBlobReference(name).CreateBlockBlobFromReader(r, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create or update Item")
 	}
@@ -115,7 +116,7 @@ func (c *container) Put(name string, r io.Reader, size int64, metadata map[strin
 		container: c,
 		client:    c.client,
 		properties: az.BlobProperties{
-			LastModified:  time.Now().Format(timeFormat),
+			LastModified:  az.TimeRFC1123(time.Now()),
 			Etag:          "",
 			ContentLength: size,
 		},
@@ -124,7 +125,9 @@ func (c *container) Put(name string, r io.Reader, size int64, metadata map[strin
 }
 
 func (c *container) SetItemMetadata(itemName string, md map[string]string) error {
-	return c.client.SetBlobMetadata(c.id, itemName, md, nil)
+	blob := c.client.GetContainerReference(c.id).GetBlobReference(itemName)
+	blob.Metadata = md
+	return blob.SetMetadata(nil)
 }
 
 func parseMetadata(md map[string]string) (map[string]interface{}, error) {
@@ -148,7 +151,7 @@ func prepMetadata(md map[string]interface{}) (map[string]string, error) {
 }
 
 func (c *container) RemoveItem(id string) error {
-	return c.client.DeleteBlob(c.id, id, nil)
+	return c.client.GetContainerReference(c.id).GetBlobReference(id).Delete(nil)
 }
 
 // Remove quotation marks from beginning and end. This includes quotations that

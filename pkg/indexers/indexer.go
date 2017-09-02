@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	"github.com/appscode/errors"
+	"github.com/appscode/go/errors"
 	"github.com/blevesearch/bleve"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

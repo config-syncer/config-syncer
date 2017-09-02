@@ -3,6 +3,7 @@ package clientset
 import (
 	aci "github.com/k8sdb/apimachinery/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	types "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/rest"
 )
@@ -19,6 +20,7 @@ type DormantDatabaseInterface interface {
 	Delete(name string) error
 	Watch(opts metav1.ListOptions) (watch.Interface, error)
 	UpdateStatus(drmn *aci.DormantDatabase) (*aci.DormantDatabase, error)
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (*aci.DormantDatabase, error)
 }
 
 type DormantDatabaseImpl struct {
@@ -103,6 +105,19 @@ func (c *DormantDatabaseImpl) UpdateStatus(drmn *aci.DormantDatabase) (result *a
 		Name(drmn.Name).
 		SubResource("status").
 		Body(drmn).
+		Do().
+		Into(result)
+	return
+}
+
+func (c *DormantDatabaseImpl) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *aci.DormantDatabase, err error) {
+	result = &aci.DormantDatabase{}
+	err = c.r.Patch(pt).
+		Namespace(c.ns).
+		Resource(aci.ResourceTypeDormantDatabase).
+		SubResource(subresources...).
+		Name(name).
+		Body(data).
 		Do().
 		Into(result)
 	return

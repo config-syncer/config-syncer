@@ -104,17 +104,21 @@ func (l *location) Container(id string) (stow.Container, error) {
 	if !ok {
 		return nil, errors.New("missing " + ConfigKeyPath + " configuration")
 	}
-	containers, err := l.filesToContainers(path, id)
+	fullpath := filepath.Join(path, id)
+	abspath, err := filepath.Abs(fullpath)
 	if err != nil {
+		return nil, err
+	}
+	if _, err = os.Stat(abspath); err != nil {
 		if os.IsNotExist(err) {
 			return nil, stow.ErrNotFound
 		}
 		return nil, err
 	}
-	if len(containers) == 0 {
-		return nil, stow.ErrNotFound
-	}
-	return containers[0], nil
+	return &container{
+		name: id,
+		path: abspath,
+	}, nil
 }
 
 // filesToContainers takes a list of files and turns it into a

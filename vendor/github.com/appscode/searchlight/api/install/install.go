@@ -13,7 +13,7 @@ func init() {
 			GroupName:                  aci.GroupName,
 			VersionPreferenceOrder:     []string{aci.V1alpha1SchemeGroupVersion.Version},
 			ImportPrefix:               "github.com/appscode/searchlight/api",
-			RootScopedKinds:            sets.NewString("ThirdPartyResource"),
+			RootScopedKinds:            sets.NewString("CustomResourceDefinition"),
 			AddInternalObjectsToScheme: aci.AddToScheme,
 		},
 		announced.VersionToSchemeFunc{

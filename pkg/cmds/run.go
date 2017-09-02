@@ -6,10 +6,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/appscode/go/log"
 	"github.com/appscode/go/runtime"
-	"github.com/appscode/kubed/pkg/analytics"
 	"github.com/appscode/kubed/pkg/operator"
-	"github.com/appscode/log"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
@@ -22,27 +21,18 @@ import (
 )
 
 // runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml"
-func NewCmdRun(version string) *cobra.Command {
+func NewCmdRun() *cobra.Command {
 	opt := operator.Options{
 		ConfigPath:        "/srv/kubed/config.yaml",
 		APIAddress:        ":8080",
 		WebAddress:        ":56790",
 		ScratchDir:        "/tmp",
 		OperatorNamespace: namespace(),
-		EnableAnalytics:   true,
 	}
 	cmd := &cobra.Command{
-		Use:   "run",
-		Short: "Run daemon",
-		PreRun: func(cmd *cobra.Command, args []string) {
-			if opt.EnableAnalytics {
-				analytics.Enable()
-			}
-			analytics.SendEvent("kubed", "started", version)
-		},
-		PostRun: func(cmd *cobra.Command, args []string) {
-			analytics.SendEvent("kubed", "stopped", version)
-		},
+		Use:               "run",
+		Short:             "Run daemon",
+		DisableAutoGenTag: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			log.Infoln("Starting kubed...")
 
@@ -56,7 +46,6 @@ func NewCmdRun(version string) *cobra.Command {
 	cmd.Flags().StringVar(&opt.ScratchDir, "scratch-dir", opt.ScratchDir, "Directory used to store temporary files. Use an `emptyDir` in Kubernetes.")
 	cmd.Flags().StringVar(&opt.APIAddress, "api.address", opt.APIAddress, "The address of the Kubed API Server (overrides any value in clusterconfig)")
 	cmd.Flags().StringVar(&opt.WebAddress, "web.address", opt.WebAddress, "Address to listen on for web interface and telemetry.")
-	cmd.Flags().BoolVar(&opt.EnableAnalytics, "analytics", opt.EnableAnalytics, "Send analytical events to Google Analytics")
 
 	return cmd
 }
