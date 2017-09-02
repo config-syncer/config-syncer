@@ -34,7 +34,7 @@ func (op *Operator) WatchReplicationControllers() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.ReplicationController{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.ReplicationController); ok {

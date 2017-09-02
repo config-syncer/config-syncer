@@ -35,7 +35,7 @@ func (op *Operator) WatchReplicaSets() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&extensions.ReplicaSet{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*extensions.ReplicaSet); ok {

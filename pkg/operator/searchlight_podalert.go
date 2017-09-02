@@ -35,7 +35,7 @@ func (op *Operator) WatchPodAlerts() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.PodAlert{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.PodAlert); ok {

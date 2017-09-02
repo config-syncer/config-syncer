@@ -35,7 +35,7 @@ func (op *Operator) WatchIngresses() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&extensions.Ingress{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*extensions.Ingress); ok {

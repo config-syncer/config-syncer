@@ -35,7 +35,7 @@ func (op *Operator) WatchAlertmanagers() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&prom.Alertmanager{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*prom.Alertmanager); ok {

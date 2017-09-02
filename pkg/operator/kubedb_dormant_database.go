@@ -35,7 +35,7 @@ func (op *Operator) WatchDormantDatabases() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.DormantDatabase{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.DormantDatabase); ok {

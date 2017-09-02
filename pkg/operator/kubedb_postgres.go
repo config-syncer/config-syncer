@@ -35,7 +35,7 @@ func (op *Operator) WatchPostgreses() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Postgres{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Postgres); ok {

@@ -35,7 +35,7 @@ func (op *Operator) WatchServiceMonitors() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&prom.ServiceMonitor{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*prom.ServiceMonitor); ok {

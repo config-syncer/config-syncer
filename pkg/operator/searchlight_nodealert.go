@@ -35,7 +35,7 @@ func (op *Operator) WatchNodeAlerts() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.NodeAlert{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.NodeAlert); ok {

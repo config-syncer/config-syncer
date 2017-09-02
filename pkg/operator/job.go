@@ -36,7 +36,7 @@ func (op *Operator) WatchJobs() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&batch.Job{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*batch.Job); ok {

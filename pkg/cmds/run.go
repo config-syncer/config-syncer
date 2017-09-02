@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/appscode/go/log"
 	"github.com/appscode/go/runtime"
@@ -28,6 +29,7 @@ func NewCmdRun() *cobra.Command {
 		WebAddress:        ":56790",
 		ScratchDir:        "/tmp",
 		OperatorNamespace: namespace(),
+		ResyncPeriod:      5 * time.Minute,
 	}
 	cmd := &cobra.Command{
 		Use:               "run",
@@ -46,6 +48,7 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringVar(&opt.ScratchDir, "scratch-dir", opt.ScratchDir, "Directory used to store temporary files. Use an `emptyDir` in Kubernetes.")
 	cmd.Flags().StringVar(&opt.APIAddress, "api.address", opt.APIAddress, "The address of the Kubed API Server (overrides any value in clusterconfig)")
 	cmd.Flags().StringVar(&opt.WebAddress, "web.address", opt.WebAddress, "Address to listen on for web interface and telemetry.")
+	cmd.Flags().DurationVar(&opt.ResyncPeriod, "resync-period", opt.ResyncPeriod, "If non-zero, will re-list this often. Otherwise, re-list will be delayed aslong as possible (until the upstream source closes the watch or times out.")
 
 	return cmd
 }

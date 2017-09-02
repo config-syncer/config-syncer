@@ -49,6 +49,8 @@ type Options struct {
 	EnableConfigSync  bool
 	ScratchDir        string
 	OperatorNamespace string
+
+	ResyncPeriod time.Duration
 }
 
 type Operator struct {
@@ -70,7 +72,6 @@ type Operator struct {
 	NotifierLoader envconfig.LoaderFunc
 	ConfigSyncer   *syncer.ConfigSyncer
 
-	syncPeriod time.Duration
 	sync.Mutex
 }
 
@@ -147,7 +148,7 @@ func (op *Operator) Setup() error {
 		op.ReverseIndex = ri
 	}
 
-	op.syncPeriod = time.Minute * 2
+	op.Opt.ResyncPeriod = time.Minute * 2
 	return nil
 }
 

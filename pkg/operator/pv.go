@@ -34,7 +34,7 @@ func (op *Operator) WatchPersistentVolumes() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.PersistentVolume{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.PersistentVolume); ok {

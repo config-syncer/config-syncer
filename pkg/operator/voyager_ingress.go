@@ -34,7 +34,7 @@ func (op *Operator) WatchVoyagerIngresses() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Ingress{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Ingress); ok {

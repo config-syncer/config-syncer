@@ -34,7 +34,7 @@ func (op *Operator) WatchVoyagerCertificates() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Certificate{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Certificate); ok {

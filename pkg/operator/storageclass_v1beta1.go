@@ -34,7 +34,7 @@ func (op *Operator) WatchStorageClassV1beta1() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&storage.StorageClass{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*storage.StorageClass); ok {

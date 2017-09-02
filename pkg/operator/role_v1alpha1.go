@@ -35,7 +35,7 @@ func (op *Operator) WatchRoleV1alpha1() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&rbac.Role{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*rbac.Role); ok {

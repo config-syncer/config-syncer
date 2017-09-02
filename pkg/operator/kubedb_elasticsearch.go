@@ -35,7 +35,7 @@ func (op *Operator) WatchElasticsearches() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Elasticsearch{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Elasticsearch); ok {

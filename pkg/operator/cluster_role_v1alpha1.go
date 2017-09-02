@@ -35,7 +35,7 @@ func (op *Operator) WatchClusterRoleV1alpha1() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&rbac.ClusterRole{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*rbac.ClusterRole); ok {

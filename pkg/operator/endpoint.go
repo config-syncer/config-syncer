@@ -33,7 +33,7 @@ func (op *Operator) WatchEndpoints() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.Endpoints{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				oldRes, ok := oldObj.(*apiv1.Endpoints)

@@ -38,7 +38,7 @@ func (op *Operator) WatchEvents() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.Event{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.Event); ok {

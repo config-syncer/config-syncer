@@ -33,7 +33,7 @@ func (op *Operator) watchService() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.Service{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.Service); ok {

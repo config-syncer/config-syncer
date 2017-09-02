@@ -34,7 +34,7 @@ func (op *Operator) WatchSecrets() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&apiv1.Secret{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.Secret); ok {

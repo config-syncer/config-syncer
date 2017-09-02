@@ -35,7 +35,7 @@ func (op *Operator) WatchRoleBindingV1beta1() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&rbac.RoleBinding{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*rbac.RoleBinding); ok {

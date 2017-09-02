@@ -35,7 +35,7 @@ func (op *Operator) WatchDaemonSets() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&extensions.DaemonSet{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*extensions.DaemonSet); ok {

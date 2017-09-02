@@ -34,7 +34,7 @@ func (op *Operator) WatchRestics() {
 	}
 	_, ctrl := cache.NewInformer(lw,
 		&tapi.Restic{},
-		op.syncPeriod,
+		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Restic); ok {
