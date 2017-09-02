@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/appscode/go-term"
-	"github.com/appscode/log"
+	"github.com/appscode/go/log"
 	"github.com/ghodss/yaml"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"

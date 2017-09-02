@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
+	logs "github.com/appscode/go/log/golog"
 	"github.com/appscode/kubed/pkg/cmds"
-	logs "github.com/appscode/log/golog"
 	_ "k8s.io/client-go/kubernetes/fake"
 )
 

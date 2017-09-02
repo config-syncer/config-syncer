@@ -5,6 +5,10 @@ import (
 	"net"
 	"strconv"
 	"strings"
+
+	stringz "github.com/appscode/go/strings"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
@@ -91,12 +95,62 @@ const (
 	//
 	// If the annotation is not set default values used to config defaults section will be:
 	//
-	// timeout  connect         50000
-	// timeout  client          50000
-	// timeout  client-fin      50000
-	// timeout  server          50000
-	// timeout  tunnel          50000
+	// timeout  connect         50s
+	// timeout  client          50s
+	// timeout  client-fin      50s
+	// timeout  server          50s
+	// timeout  tunnel          50s
 	DefaultsTimeOut = EngressKey + "/" + "default-timeout"
+
+	// https://github.com/appscode/voyager/issues/343
+	// Supports all valid options for defaults section of HAProxy config
+	// https://cbonte.github.io/haproxy-dconv/1.7/configuration.html#4.2-option%20abortonclose
+	// from the list from here
+	// expects a json encoded map
+	// ie: "ingress.appscode.com/default-option": '{"http-keep-alive": "true", "dontlognull": "true", "clitcpka": "false"}'
+	// This will be appended in the defaults section of HAProxy as
+	//
+	//   option http-keep-alive
+	//   option dontlognull
+	//   no option clitcpka
+	//
+	DefaultsOption = EngressKey + "/" + "default-option"
+
+	// Available Options
+	//   ssl:
+	//    Creates a TLS/SSL socket when connecting to this server in order to cipher/decipher the traffic
+	//
+	//    if verify not set the following error may occurred
+	//    [/etc/haproxy/haproxy.cfg:49] verify is enabled by default but no CA file specified.
+	//    If you're running on a LAN where you're certain to trust the server's certificate,
+	//    please set an explicit 'verify none' statement on the 'server' line, or use
+	//    'ssl-server-verify none' in the global section to disable server-side verifications by default.
+	//
+	//   verify [none|required]:
+	//    Sets HAProxy‘s behavior regarding the certificated presented by the server:
+	//   none :
+	//    doesn’t verify the certificate of the server
+	//
+	//   required (default value) :
+	//    TLS handshake is aborted if the validation of the certificate presented by the server returns an error.
+	//
+	//   veryfyhost <hostname>:
+	//    Sets a <hostname> to look for in the Subject and SubjectAlternateNames fields provided in the
+	//    certificate sent by the server. If <hostname> can’t be found, then the TLS handshake is aborted.
+	// ie.
+	// ingress.appscode.com/backend-tls: "ssl verify none"
+	//
+	// If this annotation is not set HAProxy will connect to backend as http,
+	// This value should not be set if the backend do not support https resolution.
+	BackendTLSOptions = EngressKey + "/backend-tls"
+
+	certificateAnnotationKeyEnabled                      = "certificate.appscode.com/enabled"
+	certificateAnnotationKeyName                         = "certificate.appscode.com/name"
+	certificateAnnotationKeyProvider                     = "certificate.appscode.com/provider"
+	certificateAnnotationKeyEmail                        = "certificate.appscode.com/email"
+	certificateAnnotationKeyProviderCredentialSecretName = "certificate.appscode.com/provider-secret"
+	certificateAnnotationKeyACMEUserSecretName           = "certificate.appscode.com/user-secret"
+	certificateAnnotationKeyACMEServerURL                = "certificate.appscode.com/server-url"
 )
 
 func (r Ingress) OffshootName() string {
@@ -231,22 +285,22 @@ func (r Ingress) KeepSourceIP() bool {
 
 var timeoutDefaults = map[string]string{
 	// Maximum time to wait for a connection attempt to a server to succeed.
-	"connect": "50000",
+	"connect": "50s",
 
 	// Maximum inactivity time on the client side.
 	// Applies when the client is expected to acknowledge or send data.
-	"client": "50000",
+	"client": "50s",
 
 	// Inactivity timeout on the client side for half-closed connections.
 	// Applies when the client is expected to acknowledge or send data
 	// while one direction is already shut down.
-	"client-fin": "50000",
+	"client-fin": "50s",
 
 	// Maximum inactivity time on the server side.
-	"server": "50000",
+	"server": "50s",
 
 	// Timeout to use with WebSocket and CONNECT
-	"tunnel": "50000",
+	"tunnel": "50s",
 }
 
 func (r Ingress) Timeouts() map[string]string {
@@ -268,6 +322,81 @@ func (r Ingress) Timeouts() map[string]string {
 	}
 
 	return ans
+}
+
+func (r Ingress) HAProxyOptions() map[string]bool {
+	ans, _ := getMap(r.Annotations, DefaultsOption)
+	if ans == nil {
+		ans = make(map[string]string)
+	}
+
+	ret := make(map[string]bool)
+	for k := range ans {
+		val, err := getBool(ans, k)
+		if err != nil {
+			continue
+		}
+		ret[k] = val
+	}
+
+	if len(ret) == 0 {
+		ret["http-server-close"] = true
+		ret["dontlognull"] = true
+	}
+
+	return ret
+}
+
+func (r Ingress) CertificateSpec() (*Certificate, bool) {
+	if r.Annotations == nil {
+		return nil, false
+	}
+	if val, ok := r.Annotations[certificateAnnotationKeyEnabled]; ok && val == "true" {
+		certificateName := r.Annotations[certificateAnnotationKeyName]
+		// Check if a certificate already exists.
+		newCertificate := &Certificate{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      certificateName,
+				Namespace: r.Namespace,
+			},
+			Spec: CertificateSpec{
+				Provider: r.Annotations[certificateAnnotationKeyProvider],
+				Email:    r.Annotations[certificateAnnotationKeyEmail],
+				ProviderCredentialSecretName: r.Annotations[certificateAnnotationKeyProviderCredentialSecretName],
+				HTTPProviderIngressReference: apiv1.ObjectReference{
+					Kind:            "Ingress",
+					Name:            r.Name,
+					Namespace:       r.Namespace,
+					ResourceVersion: r.ResourceVersion,
+					UID:             r.UID,
+				},
+				ACMEUserSecretName: r.Annotations[certificateAnnotationKeyACMEUserSecretName],
+				ACMEServerURL:      r.Annotations[certificateAnnotationKeyACMEServerURL],
+			},
+		}
+
+		if v, ok := r.Annotations[APISchema]; ok {
+			if v == APISchemaIngress {
+				newCertificate.Spec.HTTPProviderIngressReference.APIVersion = APISchemaIngress
+			} else {
+				newCertificate.Spec.HTTPProviderIngressReference.APIVersion = APISchemaEngress
+			}
+		}
+
+		for _, rule := range r.Spec.Rules {
+			found := false
+			for _, tls := range r.Spec.TLS {
+				if stringz.Contains(tls.Hosts, rule.Host) {
+					found = true
+				}
+			}
+			if !found {
+				newCertificate.Spec.Domains = append(newCertificate.Spec.Domains, rule.Host)
+			}
+		}
+		return newCertificate, true
+	}
+	return nil, false
 }
 
 // ref: https://github.com/kubernetes/kubernetes/blob/078238a461a0872a8eacb887fbb3d0085714604c/staging/src/k8s.io/apiserver/pkg/apis/example/v1/types.go#L134

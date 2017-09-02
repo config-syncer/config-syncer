@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/appscode/log"
+	"github.com/appscode/go/log"
 	"github.com/appscode/pat"
 	"github.com/blevesearch/bleve"
 )

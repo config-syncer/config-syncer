@@ -158,7 +158,12 @@ func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string
 }
 
 func (c *container) Item(id string) (stow.Item, error) {
-	path := id
+	var path string
+	if filepath.IsAbs(id) {
+		path = id
+	} else {
+		path = filepath.Join(c.path, id)
+	}
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) {
 		return nil, stow.ErrNotFound

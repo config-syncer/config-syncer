@@ -3,6 +3,7 @@ package clientset
 import (
 	aci "github.com/k8sdb/apimachinery/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	types "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/rest"
 )
@@ -19,6 +20,7 @@ type ElasticsearchInterface interface {
 	Delete(name string) error
 	Watch(opts metav1.ListOptions) (watch.Interface, error)
 	UpdateStatus(elastic *aci.Elasticsearch) (*aci.Elasticsearch, error)
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (*aci.Elasticsearch, error)
 }
 
 type ElasticsearchImpl struct {
@@ -103,6 +105,19 @@ func (c *ElasticsearchImpl) UpdateStatus(elastic *aci.Elasticsearch) (result *ac
 		Name(elastic.Name).
 		SubResource("status").
 		Body(elastic).
+		Do().
+		Into(result)
+	return
+}
+
+func (c *ElasticsearchImpl) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *aci.Elasticsearch, err error) {
+	result = &aci.Elasticsearch{}
+	err = c.r.Patch(pt).
+		Namespace(c.ns).
+		Resource(aci.ResourceTypeElasticsearch).
+		SubResource(subresources...).
+		Name(name).
+		Body(data).
 		Do().
 		Into(result)
 	return

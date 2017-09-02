@@ -4,9 +4,9 @@ import (
 	"errors"
 	"reflect"
 
+	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
-	"github.com/appscode/log"
 	tapi "github.com/appscode/stash/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"

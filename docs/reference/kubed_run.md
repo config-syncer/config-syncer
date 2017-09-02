@@ -14,7 +14,6 @@ kubed run [flags]
 ### Options
 
 ```
-      --analytics              Send analytical events to Google Analytics (default true)
       --api.address string     The address of the Kubed API Server (overrides any value in clusterconfig) (default ":8080")
       --clusterconfig string   Path to cluster config file (default "/srv/kubed/config.yaml")
   -h, --help                   help for run
@@ -28,6 +27,7 @@ kubed run [flags]
 
 ```
       --alsologtostderr                  log to standard error as well as files
+      --analytics                        Send analytical events to Google Analytics (default true)
       --log_backtrace_at traceLocation   when logging hits line file:N, emit a stack trace (default :0)
       --log_dir string                   If non-empty, write log files in this directory
       --logtostderr                      log to standard error instead of files
@@ -38,5 +38,4 @@ kubed run [flags]
 
 ### SEE ALSO
 * [kubed](kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
-
 

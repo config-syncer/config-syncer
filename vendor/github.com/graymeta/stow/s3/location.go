@@ -12,8 +12,9 @@ import (
 
 // A location contains a client + the configurations used to create the client.
 type location struct {
-	config stow.Config
-	client *s3.S3
+	config         stow.Config
+	customEndpoint string
+	client         *s3.S3
 }
 
 // CreateContainer creates a new container, in this case an S3 bucket.
@@ -32,9 +33,10 @@ func (l *location) CreateContainer(containerName string) (stow.Container, error)
 	region, _ := l.config.Config("region")
 
 	newContainer := &container{
-		name:   containerName,
-		client: l.client,
-		region: region,
+		name:           containerName,
+		client:         l.client,
+		region:         region,
+		customEndpoint: l.customEndpoint,
 	}
 
 	return newContainer, nil
@@ -68,9 +70,10 @@ func (l *location) Containers(prefix, cursor string, count int) ([]stow.Containe
 		}
 
 		newContainer := &container{
-			name:   *(bucket.Name),
-			client: l.client,
-			region: clientRegion,
+			name:           *(bucket.Name),
+			client:         l.client,
+			region:         clientRegion,
+			customEndpoint: l.customEndpoint,
 		}
 
 		containers = append(containers, newContainer)
@@ -104,9 +107,10 @@ func (l *location) Container(id string) (stow.Container, error) {
 	region, _ := l.config.Config("region")
 
 	c := &container{
-		name:   id,
-		client: l.client,
-		region: region,
+		name:           id,
+		client:         l.client,
+		region:         region,
+		customEndpoint: l.customEndpoint,
 	}
 
 	return c, nil
@@ -129,42 +133,62 @@ func (l *location) RemoveContainer(id string) error {
 // ItemByURL retrieves a stow.Item by parsing the URL, in this
 // case an item is an object.
 func (l *location) ItemByURL(url *url.URL) (stow.Item, error) {
-	genericURL := []string{"https://s3-", ".amazonaws.com/"}
+	if l.customEndpoint == "" {
+		genericURL := []string{"https://s3-", ".amazonaws.com/"}
 
-	// Remove genericURL[0] from URL:
-	// url = <genericURL[0]><region><genericURL[1]><bucket name><object path>
-	firstCut := strings.Replace(url.Path, genericURL[0], "", 1)
+		// Remove genericURL[0] from URL:
+		// url = <genericURL[0]><region><genericURL[1]><bucket name><object path>
+		firstCut := strings.Replace(url.Path, genericURL[0], "", 1)
 
-	// find first dot so that we could extract region.
-	dotIndex := strings.Index(firstCut, ".")
+		// find first dot so that we could extract region.
+		dotIndex := strings.Index(firstCut, ".")
 
-	// region of the s3 bucket.
-	region := firstCut[0:dotIndex]
+		// region of the s3 bucket.
+		region := firstCut[0:dotIndex]
 
-	// Remove <region><genericURL[1]> from
-	// <region><genericURL[1]><bucket name><object path>
-	secondCut := strings.Replace(firstCut, region+genericURL[1], "", 1)
+		// Remove <region><genericURL[1]> from
+		// <region><genericURL[1]><bucket name><object path>
+		secondCut := strings.Replace(firstCut, region+genericURL[1], "", 1)
 
-	// Get the index of the first slash to get the end of the bucket name.
-	firstSlash := strings.Index(secondCut, "/")
+		// Get the index of the first slash to get the end of the bucket name.
+		firstSlash := strings.Index(secondCut, "/")
 
-	// Grab bucket name
-	bucketName := secondCut[:firstSlash]
+		// Grab bucket name
+		bucketName := secondCut[:firstSlash]
 
-	// Everything afterwards pertains to object.
-	objectPath := secondCut[firstSlash+1:]
+		// Everything afterwards pertains to object.
+		objectPath := secondCut[firstSlash+1:]
 
-	// Get the container by bucket name.
-	cont, err := l.Container(bucketName)
-	if err != nil {
-		return nil, errors.Wrapf(err, "ItemByURL, getting container by the bucketname %v", bucketName)
+		// Get the container by bucket name.
+		cont, err := l.Container(bucketName)
+		if err != nil {
+			return nil, errors.Wrapf(err, "ItemByURL, getting container by the bucketname %s", bucketName)
+		}
+
+		// Get the item by object name.
+		it, err := cont.Item(objectPath)
+		if err != nil {
+			return nil, errors.Wrapf(err, "ItemByURL, getting item by object name %s", objectPath)
+		}
+
+		return it, err
 	}
 
-	// Get the item by object name.
-	it, err := cont.Item(objectPath)
+	urlParts := strings.Split(url.Path, "/")
+	if len(urlParts) < 2 {
+		return nil, errors.New("parsing ItemByURL URL")
+	}
+	containerName := urlParts[0]
+	itemName := strings.Join(urlParts[1:], "/")
+
+	c, err := l.Container(containerName)
 	if err != nil {
-		return nil, errors.Wrapf(err, "ItemByURL, getting item by object name %v", objectPath)
+		return nil, errors.Wrapf(err, "ItemByURL, getting container by the bucketname %s", containerName)
 	}
 
-	return it, err
+	i, err := c.Item(itemName)
+	if err != nil {
+		return nil, errors.Wrapf(err, "ItemByURL, getting item by object name %s", itemName)
+	}
+	return i, nil
 }

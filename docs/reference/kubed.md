@@ -11,6 +11,7 @@ Kubed is a Kubernetes daemon to perform cluster management tasks. For more infor
 
 ```
       --alsologtostderr                  log to standard error as well as files
+      --analytics                        Send analytical events to Google Analytics (default true)
   -h, --help                             help for kubed
       --log_backtrace_at traceLocation   when logging hits line file:N, emit a stack trace (default :0)
       --log_dir string                   If non-empty, write log files in this directory
@@ -25,5 +26,4 @@ Kubed is a Kubernetes daemon to perform cluster management tasks. For more infor
 * [kubed run](kubed_run.md)	 - Run daemon
 * [kubed snapshot](kubed_snapshot.md)	 - Takes a snapshot of Kubernetes api objects
 * [kubed version](kubed_version.md)	 - Prints binary version number.
-
 

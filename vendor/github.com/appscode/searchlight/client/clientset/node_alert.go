@@ -3,6 +3,7 @@ package clientset
 import (
 	aci "github.com/appscode/searchlight/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	types "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/rest"
 )
@@ -19,6 +20,7 @@ type NodeAlertInterface interface {
 	Delete(name string) error
 	Watch(opts metav1.ListOptions) (watch.Interface, error)
 	UpdateStatus(NodeAlert *aci.NodeAlert) (*aci.NodeAlert, error)
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (*aci.NodeAlert, error)
 }
 
 type NodeAlertImpl struct {
@@ -103,6 +105,19 @@ func (c *NodeAlertImpl) UpdateStatus(alert *aci.NodeAlert) (result *aci.NodeAler
 		Name(alert.Name).
 		SubResource("status").
 		Body(alert).
+		Do().
+		Into(result)
+	return
+}
+
+func (c *NodeAlertImpl) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *aci.NodeAlert, err error) {
+	result = &aci.NodeAlert{}
+	err = c.r.Patch(pt).
+		Namespace(c.ns).
+		Resource(aci.ResourceTypeNodeAlert).
+		SubResource(subresources...).
+		Name(name).
+		Body(data).
 		Do().
 		Into(result)
 	return

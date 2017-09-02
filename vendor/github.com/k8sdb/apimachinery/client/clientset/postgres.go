@@ -3,6 +3,7 @@ package clientset
 import (
 	aci "github.com/k8sdb/apimachinery/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	types "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/rest"
 )
@@ -19,6 +20,7 @@ type PostgresInterface interface {
 	Delete(name string) error
 	Watch(opts metav1.ListOptions) (watch.Interface, error)
 	UpdateStatus(postgres *aci.Postgres) (*aci.Postgres, error)
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (*aci.Postgres, error)
 }
 
 type PostgresImpl struct {
@@ -103,6 +105,19 @@ func (c *PostgresImpl) UpdateStatus(postgres *aci.Postgres) (result *aci.Postgre
 		Name(postgres.Name).
 		SubResource("status").
 		Body(postgres).
+		Do().
+		Into(result)
+	return
+}
+
+func (c *PostgresImpl) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *aci.Postgres, err error) {
+	result = &aci.Postgres{}
+	err = c.r.Patch(pt).
+		Namespace(c.ns).
+		Resource(aci.ResourceTypePostgres).
+		SubResource(subresources...).
+		Name(name).
+		Body(data).
 		Do().
 		Into(result)
 	return

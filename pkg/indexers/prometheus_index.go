@@ -6,8 +6,8 @@ import (
 	"reflect"
 
 	"github.com/appscode/go/arrays"
+	"github.com/appscode/go/log"
 	"github.com/appscode/kubed/pkg/util"
-	"github.com/appscode/log"
 	"github.com/appscode/pat"
 	"github.com/blevesearch/bleve"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"

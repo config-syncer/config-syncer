@@ -19,8 +19,9 @@ func NewCmdSnapshot() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "snapshot",
-		Short: "Takes a snapshot of Kubernetes api objects",
+		Use:               "snapshot",
+		Short:             "Takes a snapshot of Kubernetes api objects",
+		DisableAutoGenTag: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			flags.EnsureRequiredFlags(cmd, "context", "backup-dir")
 

@@ -1,9 +1,9 @@
 package s3
 
 import (
+	"fmt"
 	"io"
 	"net/url"
-	"strings"
 	"sync"
 	"time"
 
@@ -59,12 +59,19 @@ func (i *item) Size() (int64, error) {
 // URL returns a formatted string which follows the predefined format
 // that every S3 asset is given.
 func (i *item) URL() *url.URL {
-	genericURL := []string{"https://s3-", i.container.Region(), ".amazonaws.com/",
-		i.container.Name(), "/", i.Name()}
+	if i.container.customEndpoint == "" {
+		genericURL := fmt.Sprintf("https://s3.dualstack.%s.amazonaws.com/%s/%s", i.container.Region(), i.container.Name(), i.Name())
 
+		return &url.URL{
+			Scheme: "s3",
+			Path:   genericURL,
+		}
+	}
+
+	genericURL := fmt.Sprintf("%s/%s", i.container.Name(), i.Name())
 	return &url.URL{
 		Scheme: "s3",
-		Path:   strings.Join(genericURL, ""),
+		Path:   genericURL,
 	}
 }
 

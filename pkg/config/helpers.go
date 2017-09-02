@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/appscode/errors"
 	yc "github.com/appscode/go/encoding/yaml"
+	"github.com/appscode/go/errors"
 	"github.com/ghodss/yaml"
 )
 

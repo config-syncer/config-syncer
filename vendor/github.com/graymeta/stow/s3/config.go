@@ -68,15 +68,16 @@ func init() {
 		}
 
 		// Create a new client (s3 session)
-		client, err := newS3Client(config)
+		client, endpoint, err := newS3Client(config)
 		if err != nil {
 			return nil, err
 		}
 
 		// Create a location with given config and client (s3 session).
 		loc := &location{
-			config: config,
-			client: client,
+			config:         config,
+			client:         client,
+			customEndpoint: endpoint,
 		}
 
 		return loc, nil
@@ -90,7 +91,7 @@ func init() {
 }
 
 // Attempts to create a session based on the information given.
-func newS3Client(config stow.Config) (*s3.S3, error) {
+func newS3Client(config stow.Config) (client *s3.S3, endpoint string, err error) {
 	authType, _ := config.Config(ConfigAuthType)
 	accessKeyID, _ := config.Config(ConfigAccessKeyID)
 	secretKey, _ := config.Config(ConfigSecretKey)
@@ -118,7 +119,7 @@ func newS3Client(config stow.Config) (*s3.S3, error) {
 		awsConfig.WithCredentials(credentials.NewStaticCredentials(accessKeyID, secretKey, ""))
 	}
 
-	endpoint, ok := config.Config(ConfigEndpoint)
+	endpoint, ok = config.Config(ConfigEndpoint)
 	if ok {
 		awsConfig.WithEndpoint(endpoint).
 			WithS3ForcePathStyle(true)
@@ -131,10 +132,10 @@ func newS3Client(config stow.Config) (*s3.S3, error) {
 
 	sess := session.New(awsConfig)
 	if sess == nil {
-		return nil, errors.New("creating the S3 session")
+		return nil, "", errors.New("creating the S3 session")
 	}
 
 	s3Client := s3.New(sess)
 
-	return s3Client, nil
+	return s3Client, endpoint, nil
 }
