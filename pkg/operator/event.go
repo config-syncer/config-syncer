@@ -49,7 +49,7 @@ func (op *Operator) WatchEvents() {
 					if op.Eventer != nil &&
 						op.Config.EventForwarder.WarningEvents.Handle &&
 						op.Config.EventForwarder.WarningEvents.IsAllowed(res.Namespace) &&
-						util.IsRecentlyAdded(res.ObjectMeta) {
+						util.IsRecent(res.ObjectMeta.CreationTimestamp) {
 						err := op.Eventer.ForwardEvent(res)
 						if err != nil {
 							log.Errorln(err)

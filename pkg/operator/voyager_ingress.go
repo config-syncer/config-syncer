@@ -51,8 +51,8 @@ func (op *Operator) WatchVoyagerIngresses() {
 					if op.Eventer != nil &&
 						op.Config.EventForwarder.IngressAdded.Handle &&
 						op.Config.EventForwarder.IngressAdded.IsAllowed(res.Namespace) &&
-						util.IsRecentlyAdded(res.ObjectMeta) {
-						err := op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
+						util.IsRecent(res.ObjectMeta.CreationTimestamp) {
+						err := op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, "added", obj)
 						if err != nil {
 							log.Errorln(err)
 						}

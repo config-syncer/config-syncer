@@ -174,6 +174,7 @@ func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {
 
 func (op *Operator) RunWatchers() {
 	go op.WatchAlertmanagerV1()
+	go op.WatchCertificateSigningRequests()
 	go op.WatchClusterAlerts()
 	go op.WatchClusterRoleBindingV1alpha1()
 	go op.WatchClusterRoleBindingV1beta1()

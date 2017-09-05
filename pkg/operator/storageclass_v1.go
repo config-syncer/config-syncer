@@ -50,8 +50,8 @@ func (op *Operator) WatchStorageClassV1() {
 
 					if op.Eventer != nil &&
 						op.Config.EventForwarder.StorageAdded.Handle &&
-						util.IsRecentlyAdded(res.ObjectMeta) {
-						err := op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, obj)
+						util.IsRecent(res.ObjectMeta.CreationTimestamp) {
+						err := op.Eventer.Forward(res.TypeMeta, res.ObjectMeta, "added", obj)
 						if err != nil {
 							log.Errorln(err)
 						}

@@ -2,6 +2,8 @@ clusterName: unicorn
 eventForwarder:
   nodeAdded:
     handle: true
+  csrEvents:
+    handle: true
   storageAdded:
     handle: true
   ingressAdded:

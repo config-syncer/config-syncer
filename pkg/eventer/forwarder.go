@@ -40,13 +40,13 @@ func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
 	return nil
 }
 
-func (f *EventForwarder) Forward(t metav1.TypeMeta, meta metav1.ObjectMeta, v interface{}) error {
+func (f *EventForwarder) Forward(t metav1.TypeMeta, meta metav1.ObjectMeta, eventType string, v interface{}) error {
 	bytes, err := yaml.Marshal(v)
 	if err != nil {
 		return err
 	}
 	for _, receiver := range f.Receivers {
-		sub := fmt.Sprintf("[%s]: %s %s %s/%s added", stringz.Val(f.ClusterName, "?"), t.APIVersion, t.Kind, meta.Namespace, meta.Name)
+		sub := fmt.Sprintf("[%s]: %s %s %s/%s %s", stringz.Val(f.ClusterName, "?"), t.APIVersion, t.Kind, meta.Namespace, meta.Name, eventType)
 		if err := f.send(sub, sub, string(bytes), receiver); err != nil {
 			log.Errorln(err)
 		}
