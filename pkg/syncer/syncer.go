@@ -1,6 +1,8 @@
 package syncer
 
 import (
+	"encoding/json"
+
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/util"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
@@ -73,6 +75,16 @@ func (s *ConfigSyncer) upsertConfigMap(src *apiv1.ConfigMap, namespace string) e
 				n.Annotations[k] = v
 			}
 		}
+		ref, _ := json.Marshal(apiv1.ObjectReference{
+			APIVersion:      src.APIVersion,
+			Kind:            src.Kind,
+			Name:            src.Name,
+			Namespace:       src.Namespace,
+			UID:             src.UID,
+			ResourceVersion: src.ResourceVersion,
+		})
+		n.Annotations[config.ConfigOriginKey] = string(ref)
+
 		_, err := s.KubeClient.CoreV1().ConfigMaps(namespace).Create(&n)
 		return err
 	}
@@ -85,6 +97,15 @@ func (s *ConfigSyncer) upsertConfigMap(src *apiv1.ConfigMap, namespace string) e
 			nu.Annotations[k] = v
 		}
 	}
+	ref, _ := json.Marshal(apiv1.ObjectReference{
+		APIVersion:      src.APIVersion,
+		Kind:            src.Kind,
+		Name:            src.Name,
+		Namespace:       src.Namespace,
+		UID:             src.UID,
+		ResourceVersion: src.ResourceVersion,
+	})
+	nu.Annotations[config.ConfigOriginKey] = string(ref)
 	_, err = s.KubeClient.CoreV1().ConfigMaps(namespace).Update(nu)
 	return err
 }
@@ -149,6 +170,15 @@ func (s *ConfigSyncer) upsertSecret(src *apiv1.Secret, namespace string) error {
 				n.Annotations[k] = v
 			}
 		}
+		ref, _ := json.Marshal(apiv1.ObjectReference{
+			APIVersion:      src.APIVersion,
+			Kind:            src.Kind,
+			Name:            src.Name,
+			Namespace:       src.Namespace,
+			UID:             src.UID,
+			ResourceVersion: src.ResourceVersion,
+		})
+		n.Annotations[config.ConfigOriginKey] = string(ref)
 		_, err := s.KubeClient.CoreV1().Secrets(namespace).Create(&n)
 		return err
 	}
@@ -162,6 +192,15 @@ func (s *ConfigSyncer) upsertSecret(src *apiv1.Secret, namespace string) error {
 			nu.Annotations[k] = v
 		}
 	}
+	ref, _ := json.Marshal(apiv1.ObjectReference{
+		APIVersion:      src.APIVersion,
+		Kind:            src.Kind,
+		Name:            src.Name,
+		Namespace:       src.Namespace,
+		UID:             src.UID,
+		ResourceVersion: src.ResourceVersion,
+	})
+	nu.Annotations[config.ConfigOriginKey] = string(ref)
 	_, err = s.KubeClient.CoreV1().Secrets(namespace).Update(nu)
 	return err
 }

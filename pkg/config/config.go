@@ -8,6 +8,7 @@ import (
 const (
 	TimestampFormat = "20060102T150405"
 	ConfigSyncKey   = "kubed.appscode.com/sync"
+	ConfigOriginKey = "kubed.appscode.com/origin"
 
 	JanitorElasticsearch = "Elasticsearch"
 	JanitorInfluxDB      = "InfluxDB"
