@@ -28,8 +28,8 @@ import (
 	scs "github.com/appscode/stash/client/clientset"
 	vcs "github.com/appscode/voyager/client/clientset"
 	shell "github.com/codeskyblue/go-sh"
-	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
-	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
+	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
+	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
@@ -58,7 +58,7 @@ type Operator struct {
 	VoyagerClient     vcs.ExtensionInterface
 	SearchlightClient srch_cs.ExtensionInterface
 	StashClient       scs.ExtensionInterface
-	PromClient        pcm.MonitoringV1alpha1Interface
+	PromClient        pcm.MonitoringV1Interface
 	KubeDBClient      kcs.ExtensionInterface
 
 	Opt    Options
@@ -173,7 +173,7 @@ func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {
 }
 
 func (op *Operator) RunWatchers() {
-	go op.WatchAlertmanagers()
+	go op.WatchAlertmanagerV1()
 	go op.WatchClusterAlerts()
 	go op.WatchClusterRoleBindingV1alpha1()
 	go op.WatchClusterRoleBindingV1beta1()
@@ -195,7 +195,7 @@ func (op *Operator) RunWatchers() {
 	go op.WatchPersistentVolumes()
 	go op.WatchPodAlerts()
 	go op.WatchPostgreses()
-	go op.WatchPrometheuss()
+	go op.WatchPrometheusV1()
 	go op.WatchReplicaSets()
 	go op.WatchReplicationControllers()
 	go op.WatchRestics()
@@ -206,7 +206,7 @@ func (op *Operator) RunWatchers() {
 	go op.WatchSecrets()
 	go op.watchService()
 	go op.WatchEndpoints()
-	go op.WatchServiceMonitors()
+	go op.WatchServiceMonitorV1()
 	go op.WatchStatefulSets()
 	go op.WatchStorageClassV1()
 	go op.WatchStorageClassV1beta1()

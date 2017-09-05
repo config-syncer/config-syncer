@@ -1,5 +1,5 @@
-hash: beb72480b454c8dc847c5e64e937a2c16a16333b46ace1ac98ee0f92e6f80cf2
-updated: 2017-09-02T00:53:53.847310949-07:00
+hash: 1f246cedf3adcb879254999bf6f55ca8e64b6ef4f7a79f0238f5977b88d9e9e1
+updated: 2017-09-05T04:41:26.263647966-07:00
 imports:
 - name: cloud.google.com/go
   version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
@@ -25,6 +25,7 @@ imports:
   - net/httpclient
   - runtime
   - strings
+  - types
   - version
 - name: github.com/appscode/go-notify
   version: c1f627b4151ce1f8b5b80eeab2eb94c2561af00c
@@ -41,6 +42,25 @@ imports:
   - webhook
 - name: github.com/appscode/go-term
   version: d0c677f2d84034b1357d3f69ffd29c5fb81f662f
+- name: github.com/appscode/jsonpatch
+  version: 3cdd2454b5443228620ea11294085ec3489936a6
+- name: github.com/appscode/kutil
+  version: 891adee1b7d4a140af35daff098b183e7fc26eb2
+  subpackages:
+  - apps/v1beta1
+  - batch/v1
+  - core/v1
+  - extensions/v1beta1
+  - kubedb/v1alpha1
+  - prometheus/v1
+  - prometheus/v1alpha1
+  - rbac/v1alpha1
+  - rbac/v1beta1
+  - searchlight/v1alpha1
+  - stash/v1alpha1
+  - storage/v1
+  - storage/v1beta1
+  - voyager/v1beta1
 - name: github.com/appscode/log
   version: 68e0e42e42c01371f3950571fc87c2298a51dd8f
 - name: github.com/appscode/osm
@@ -50,7 +70,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 9fb1f89a946766f57882a8e7696f0a5c2d41a7ec
+  version: f594a07316a8abcfa8f4a075b1da8bd9cea3380b
   subpackages:
   - api
   - api/install
@@ -58,13 +78,13 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: e31dd8f75acf50e9c6525b590d03ee60a1e04104
+  version: 9cfb37cf71011815730a45b5d6cf77abfd02213b
   subpackages:
   - api
   - api/install
   - client/clientset
 - name: github.com/appscode/voyager
-  version: 8b72dcfc18c6e7ad17c90e96627e9316d69510cb
+  version: 93d14a6c19d3ac89c9dc2fbe03fcce1154b7a6e0
   subpackages:
   - api
   - api/install
@@ -162,6 +182,7 @@ imports:
 - name: github.com/coreos/prometheus-operator
   version: f5284c9eddc956775e06f854a9bffc6bfece3d9c
   subpackages:
+  - pkg/client/monitoring/v1
   - pkg/client/monitoring/v1alpha1
 - name: github.com/cpuguy83/go-md2man
   version: 71acacd42f85e5e82f70a55327789582a5200a90
@@ -222,7 +243,7 @@ imports:
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/graymeta/stow
-  version: 6488a0a4895d8a6110189aa4a88681391840a24a
+  version: 6f2b8867a3fb15cca5507da1d552b55cfe5d07a7
   repo: https://github.com/appscode/stow.git
   vcs: git
   subpackages:
@@ -231,6 +252,10 @@ imports:
   - local
   - s3
   - swift
+- name: github.com/hashicorp/go-version
+  version: ac737305c16432f4c660c6fc68cdcda4b5a0b5ae
+  repo: https://github.com/appscode/go-version.git
+  vcs: git
 - name: github.com/hashicorp/golang-lru
   version: a0d98a5f288019575c6d1f4bb1573fef2d1fcdc4
   subpackages:
@@ -390,7 +415,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: f5fa6a3eed6362c07f4e2e4425faeab907a041bd
+  version: 519500316f39a9934d1d88615a1a047035a4bae5
   subpackages:
   - gensupport
   - googleapi

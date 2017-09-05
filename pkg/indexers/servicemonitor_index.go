@@ -7,10 +7,10 @@ import (
 
 	"github.com/appscode/go/arrays"
 	"github.com/appscode/go/log"
-	"github.com/appscode/kubed/pkg/util"
+	kutil "github.com/appscode/kutil/prometheus/v1alpha1"
 	"github.com/appscode/pat"
 	"github.com/blevesearch/bleve"
-	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
+	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -203,7 +203,7 @@ func (ri *ServiceMonitorIndexerImpl) equal(a, b *prom.ServiceMonitor) bool {
 }
 
 func (ri *ServiceMonitorIndexerImpl) Key(meta metav1.ObjectMeta) []byte {
-	return []byte(util.GetGroupVersionKind(&apiv1.Service{}).String() + "/" + meta.Namespace + "/" + meta.Name)
+	return []byte(kutil.GetGroupVersionKind(&apiv1.Service{}).String() + "/" + meta.Namespace + "/" + meta.Name)
 }
 
 func (ri *ServiceMonitorIndexerImpl) ServeHTTP(w http.ResponseWriter, req *http.Request) {

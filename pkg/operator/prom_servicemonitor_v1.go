@@ -7,7 +7,8 @@ import (
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
-	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
+	kutil "github.com/appscode/kutil/prometheus/v1"
+	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -17,7 +18,7 @@ import (
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (op *Operator) WatchServiceMonitors() {
+func (op *Operator) WatchServiceMonitorV1() {
 	if !util.IsPreferredAPIResource(op.KubeClient, prom.Group+"/"+prom.Version, prom.ServiceMonitorsKind) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", prom.Group+"/"+prom.Version, prom.ServiceMonitorsKind)
 		return
@@ -40,7 +41,7 @@ func (op *Operator) WatchServiceMonitors() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*prom.ServiceMonitor); ok {
 					log.Infof("ServiceMonitor %s@%s added", res.Name, res.Namespace)
-					util.AssignTypeKind(res)
+					kutil.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -68,7 +69,7 @@ func (op *Operator) WatchServiceMonitors() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*prom.ServiceMonitor); ok {
 					log.Infof("ServiceMonitor %s@%s deleted", res.Name, res.Namespace)
-					util.AssignTypeKind(res)
+					kutil.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
@@ -100,8 +101,8 @@ func (op *Operator) WatchServiceMonitors() {
 					log.Errorln(errors.New("Invalid ServiceMonitor object"))
 					return
 				}
-				util.AssignTypeKind(oldRes)
-				util.AssignTypeKind(newRes)
+				kutil.AssignTypeKind(oldRes)
+				kutil.AssignTypeKind(newRes)
 
 				if op.Config.APIServer.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)

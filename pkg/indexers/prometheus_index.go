@@ -7,10 +7,10 @@ import (
 
 	"github.com/appscode/go/arrays"
 	"github.com/appscode/go/log"
-	"github.com/appscode/kubed/pkg/util"
+	kutil "github.com/appscode/kutil/prometheus/v1alpha1"
 	"github.com/appscode/pat"
 	"github.com/blevesearch/bleve"
-	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
+	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -31,7 +31,7 @@ var _ PrometheusIndexer = &PrometheusIndexerImpl{}
 
 type PrometheusIndexerImpl struct {
 	kubeClient clientset.Interface
-	promClient prom.MonitoringV1alpha1Interface
+	promClient prom.MonitoringV1Interface
 	index      bleve.Index
 }
 
@@ -195,7 +195,7 @@ func (ri *PrometheusIndexerImpl) equal(a, b *prom.Prometheus) bool {
 }
 
 func (ri *PrometheusIndexerImpl) Key(meta metav1.ObjectMeta) []byte {
-	return []byte(util.GetGroupVersionKind(&prom.ServiceMonitor{}).String() + "/" + meta.Namespace + "/" + meta.Name)
+	return []byte(kutil.GetGroupVersionKind(&prom.ServiceMonitor{}).String() + "/" + meta.Namespace + "/" + meta.Name)
 }
 
 func (ri *PrometheusIndexerImpl) ServeHTTP(w http.ResponseWriter, req *http.Request) {

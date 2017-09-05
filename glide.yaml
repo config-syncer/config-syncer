@@ -4,6 +4,8 @@ import:
   version: master
 - package: github.com/appscode/go-notify
   version: master
+- package: github.com/appscode/kutil
+  version: release-4.0
 - package: github.com/appscode/go-term
   version: master
 - package: github.com/appscode/go
@@ -57,6 +59,10 @@ import:
   version: master
 - package: github.com/yudai/gojsondiff
   version: master
+- package: github.com/hashicorp/go-version
+  repo: https://github.com/appscode/go-version.git
+  version: master
+  vcs: git
 testImport:
 - package: github.com/google/certificate-transparency
 - package: github.com/stretchr/testify

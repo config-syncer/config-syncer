@@ -7,6 +7,7 @@ import (
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
+	kutil "github.com/appscode/kutil/rbac/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -40,7 +41,7 @@ func (op *Operator) WatchClusterRoleV1alpha1() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*rbac.ClusterRole); ok {
 					log.Infof("ClusterRole %s@%s added", res.Name, res.Namespace)
-					util.AssignTypeKind(res)
+					kutil.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -52,7 +53,7 @@ func (op *Operator) WatchClusterRoleV1alpha1() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*rbac.ClusterRole); ok {
 					log.Infof("ClusterRole %s@%s deleted", res.Name, res.Namespace)
-					util.AssignTypeKind(res)
+					kutil.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
@@ -75,8 +76,8 @@ func (op *Operator) WatchClusterRoleV1alpha1() {
 					log.Errorln(errors.New("Invalid ClusterRole object"))
 					return
 				}
-				util.AssignTypeKind(oldRes)
-				util.AssignTypeKind(newRes)
+				kutil.AssignTypeKind(oldRes)
+				kutil.AssignTypeKind(newRes)
 
 				if op.Config.APIServer.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)

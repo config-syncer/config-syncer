@@ -4,6 +4,7 @@ import (
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
+	kutil "github.com/appscode/kutil/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -43,6 +44,8 @@ func (op *Operator) WatchEvents() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.Event); ok {
 					log.Infof("Event %s@%s added", res.Name, res.Namespace)
+					kutil.AssignTypeKind(res)
+
 					if op.Eventer != nil &&
 						op.Config.EventForwarder.WarningEvents.Handle &&
 						op.Config.EventForwarder.WarningEvents.IsAllowed(res.Namespace) &&
