@@ -7,6 +7,7 @@ import (
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
+	kutil "github.com/appscode/kutil/stash/v1alpha1"
 	tapi "github.com/appscode/stash/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -39,7 +40,7 @@ func (op *Operator) WatchRestics() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Restic); ok {
 					log.Infof("Restic %s@%s added", res.Name, res.Namespace)
-					util.AssignTypeKind(res)
+					kutil.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -51,7 +52,7 @@ func (op *Operator) WatchRestics() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*tapi.Restic); ok {
 					log.Infof("Restic %s@%s deleted", res.Name, res.Namespace)
-					util.AssignTypeKind(res)
+					kutil.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
@@ -74,8 +75,8 @@ func (op *Operator) WatchRestics() {
 					log.Errorln(errors.New("Invalid Restic object"))
 					return
 				}
-				util.AssignTypeKind(oldRes)
-				util.AssignTypeKind(newRes)
+				kutil.AssignTypeKind(oldRes)
+				kutil.AssignTypeKind(newRes)
 
 				if op.Config.APIServer.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)

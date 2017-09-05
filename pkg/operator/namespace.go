@@ -3,6 +3,7 @@ package operator
 import (
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
+	kutil "github.com/appscode/kutil/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -29,6 +30,7 @@ func (op *Operator) watchNamespaces() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.Namespace); ok {
 					log.Infof("Namespace %s added", res.Name)
+					kutil.AssignTypeKind(res)
 
 					if op.ConfigSyncer != nil {
 						op.ConfigSyncer.SyncIntoNamespace(res.Name)

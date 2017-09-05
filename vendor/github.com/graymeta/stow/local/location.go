@@ -25,19 +25,31 @@ func (l *location) ItemByURL(u *url.URL) (stow.Item, error) {
 }
 
 func (l *location) RemoveContainer(id string) error {
-	return os.RemoveAll(id)
+	var path string
+	if filepath.IsAbs(id) {
+		path = id
+	} else {
+		loc, ok := l.config.Config(ConfigKeyPath)
+		if !ok {
+			return errors.New("missing " + ConfigKeyPath + " configuration")
+		}
+		path = filepath.Join(loc, id)
+	}
+	// invariant: path == abs path && path must be a folder
+	return os.RemoveAll(path)
 }
 
 func (l *location) CreateContainer(name string) (stow.Container, error) {
-	path, ok := l.config.Config(ConfigKeyPath)
+	loc, ok := l.config.Config(ConfigKeyPath)
 	if !ok {
 		return nil, errors.New("missing " + ConfigKeyPath + " configuration")
 	}
-	fullpath := filepath.Join(path, name)
-	if err := os.Mkdir(fullpath, 0777); err != nil {
+	path := filepath.Join(loc, name)
+	if err := os.Mkdir(path, 0777); err != nil {
 		return nil, err
 	}
-	abspath, err := filepath.Abs(fullpath)
+	// invariant: path == abs path
+	abspath, err := filepath.Abs(path)
 	if err != nil {
 		return nil, err
 	}
@@ -100,16 +112,17 @@ func (l *location) Containers(prefix string, cursor string, count int) ([]stow.C
 }
 
 func (l *location) Container(id string) (stow.Container, error) {
-	path, ok := l.config.Config(ConfigKeyPath)
-	if !ok {
-		return nil, errors.New("missing " + ConfigKeyPath + " configuration")
+	var path string
+	if filepath.IsAbs(id) {
+		path = id
+	} else {
+		loc, ok := l.config.Config(ConfigKeyPath)
+		if !ok {
+			return nil, errors.New("missing " + ConfigKeyPath + " configuration")
+		}
+		path = filepath.Join(loc, id)
 	}
-	fullpath := filepath.Join(path, id)
-	abspath, err := filepath.Abs(fullpath)
-	if err != nil {
-		return nil, err
-	}
-	if _, err = os.Stat(abspath); err != nil {
+	if _, err := os.Stat(path); err != nil {
 		if os.IsNotExist(err) {
 			return nil, stow.ErrNotFound
 		}
@@ -117,7 +130,7 @@ func (l *location) Container(id string) (stow.Container, error) {
 	}
 	return &container{
 		name: id,
-		path: abspath,
+		path: path,
 	}, nil
 }
 

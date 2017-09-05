@@ -7,6 +7,7 @@ import (
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
+	kutil "github.com/appscode/kutil/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -39,7 +40,7 @@ func (op *Operator) WatchPersistentVolumes() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.PersistentVolume); ok {
 					log.Infof("PersistentVolume %s@%s added", res.Name, res.Namespace)
-					util.AssignTypeKind(res)
+					kutil.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -61,7 +62,7 @@ func (op *Operator) WatchPersistentVolumes() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.PersistentVolume); ok {
 					log.Infof("PersistentVolume %s@%s deleted", res.Name, res.Namespace)
-					util.AssignTypeKind(res)
+					kutil.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
@@ -84,8 +85,8 @@ func (op *Operator) WatchPersistentVolumes() {
 					log.Errorln(errors.New("Invalid PersistentVolume object"))
 					return
 				}
-				util.AssignTypeKind(oldRes)
-				util.AssignTypeKind(oldRes)
+				kutil.AssignTypeKind(oldRes)
+				kutil.AssignTypeKind(oldRes)
 
 				if op.Config.APIServer.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)

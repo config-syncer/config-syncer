@@ -47,7 +47,13 @@ func (c *container) CreateItem(name string) (stow.Item, io.WriteCloser, error) {
 }
 
 func (c *container) RemoveItem(id string) error {
-	return os.Remove(id)
+	var path string
+	if filepath.IsAbs(id) {
+		path = id
+	} else {
+		path = filepath.Join(c.path, id)
+	}
+	return os.Remove(path)
 }
 
 func (c *container) Put(name string, r io.Reader, size int64, metadata map[string]interface{}) (stow.Item, error) {
@@ -89,7 +95,27 @@ func (c *container) Browse(prefix, delimiter, cursor string, count int) (*stow.I
 			return nil, fmt.Errorf("Bad delimiter %v", delimiter)
 		}
 	} else if sz == len(delimiter) && r == os.PathSeparator {
-		files, err = ioutil.ReadDir(c.path)
+		var dir string
+		if filepath.IsAbs(prefix) {
+			dir = prefix
+		} else {
+			dir = filepath.Join(c.path, prefix)
+		}
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			return &stow.ItemPage{}, nil
+		}
+		var fis []os.FileInfo
+		fis, err = ioutil.ReadDir(dir)
+		for _, fi := range fis {
+			n, err := filepath.Rel(c.path, filepath.Join(dir, fi.Name()))
+			if err != nil {
+				return nil, err
+			}
+			files = append(files, fileinfo{
+				FileInfo: fi,
+				name:     n,
+			})
+		}
 	} else {
 		return nil, errors.New("Unknown delimeter " + delimiter)
 	}

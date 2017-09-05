@@ -6,6 +6,7 @@ import (
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
+	kutil "github.com/appscode/kutil/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -41,12 +42,13 @@ func (op *Operator) WatchEndpoints() {
 					log.Errorln("Invalid Endpoint object")
 					return
 				}
-
 				newRes, ok := newObj.(*apiv1.Endpoints)
 				if !ok {
 					log.Errorln("Invalid Endpoint object")
 					return
 				}
+				kutil.AssignTypeKind(oldRes)
+				kutil.AssignTypeKind(newRes)
 
 				if reflect.DeepEqual(oldRes.Subsets, newRes.Subsets) || !op.Config.APIServer.EnableReverseIndex {
 					return

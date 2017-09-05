@@ -7,6 +7,7 @@ import (
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
+	kutil "github.com/appscode/kutil/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -39,7 +40,7 @@ func (op *Operator) WatchReplicationControllers() {
 			AddFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.ReplicationController); ok {
 					log.Infof("ReplicationController %s@%s added", res.Name, res.Namespace)
-					util.AssignTypeKind(res)
+					kutil.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleAdd(obj); err != nil {
@@ -51,7 +52,7 @@ func (op *Operator) WatchReplicationControllers() {
 			DeleteFunc: func(obj interface{}) {
 				if res, ok := obj.(*apiv1.ReplicationController); ok {
 					log.Infof("ReplicationController %s@%s deleted", res.Name, res.Namespace)
-					util.AssignTypeKind(res)
+					kutil.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
 						if err := op.SearchIndex.HandleDelete(obj); err != nil {
@@ -74,8 +75,8 @@ func (op *Operator) WatchReplicationControllers() {
 					log.Errorln(errors.New("Invalid ReplicationController object"))
 					return
 				}
-				util.AssignTypeKind(oldRes)
-				util.AssignTypeKind(newRes)
+				kutil.AssignTypeKind(oldRes)
+				kutil.AssignTypeKind(newRes)
 
 				if op.Config.APIServer.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
