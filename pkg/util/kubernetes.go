@@ -26,11 +26,11 @@ func IsPreferredAPIResource(kubeClient clientset.Interface, groupVersion, kind s
 }
 
 const (
-	maxSyncInterval = 5 * time.Minute
+	MaxSyncInterval = 5 * time.Minute
 )
 
-func IsRecentlyAdded(meta metav1.ObjectMeta) bool {
-	return time.Now().Sub(meta.CreationTimestamp.Time) < maxSyncInterval
+func IsRecent(t metav1.Time) bool {
+	return time.Now().Sub(t.Time) < MaxSyncInterval
 }
 
 func ObfuscateSecret(in apiv1.Secret) *apiv1.Secret {

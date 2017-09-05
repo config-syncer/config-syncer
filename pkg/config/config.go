@@ -61,6 +61,7 @@ type EventForwarderSpec struct {
 	StorageAdded  ForwarderSpec `json:"storageAdded,omitempty"`
 	IngressAdded  ForwarderSpec `json:"ingressAdded,omitempty"`
 	WarningEvents ForwarderSpec `json:"warningEvents,omitempty"`
+	CSREvents     ForwarderSpec `json:"csrEvents,omitempty"`
 	Receivers     []Receiver    `json:"receivers,omitempty"`
 }
 

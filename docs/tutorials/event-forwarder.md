@@ -18,6 +18,8 @@ clusterName: unicorn
 eventForwarder:
   nodeAdded:
     handle: true
+  csrEvents:
+    handle: true
   storageAdded:
     handle: true
   ingressAdded:
@@ -36,6 +38,7 @@ notifierSecretName: notifier-config
 | Key                                       | Description                                                                                           |
 |-------------------------------------------|-------------------------------------------------------------------------------------------------------|
 | `eventForwarder.nodeAdded.handle`         | `Optional`. If set to true, notifications are sent when a Node is added.                              |
+| `eventForwarder.csrEvents.handle`         | `Optional`. If set to true, notifications are sent when a [CertificateSigningRequest](https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/) is added, approved or denied. |
 | `eventForwarder.ingressAdded.handle`      | `Optional`. If set to true, notifications are sent when an Ingress is added.                          |
 | `eventForwarder.ingressAdded.namespaces`  | `Optional`. If set, notifications are sent only when Ingress are added in these namespaces. Otherwise, notifications are sent when Ingress are added in any namespace |
 | `eventForwarder.storageAdded.handle`      | `Optional`. If set to true, notifications are sent when a StorageClass/PV/PVC is added.               |
