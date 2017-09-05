@@ -203,7 +203,7 @@ func (ri *ServiceMonitorIndexerImpl) equal(a, b *prom.ServiceMonitor) bool {
 }
 
 func (ri *ServiceMonitorIndexerImpl) Key(meta metav1.ObjectMeta) []byte {
-	return []byte(util.GetGroupVersionKind(&apiv1.Service{}).String() + "/" + meta.Namespace + "/" + meta.Name)
+	return []byte(util.GetGroupVersionKind(&apiv1.Service{}).String() + "/" + meta.Namespace + "/" + meta.Name + "/" + util.GetGroupVersionKind(&prom.ServiceMonitor{}).String())
 }
 
 func (ri *ServiceMonitorIndexerImpl) ServeHTTP(w http.ResponseWriter, req *http.Request) {

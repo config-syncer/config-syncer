@@ -81,6 +81,7 @@ func (op *Operator) WatchPodAlerts() {
 				if op.Config.APIServer.EnableSearchIndex {
 					op.SearchIndex.HandleUpdate(old, new)
 				}
+
 				if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdates {
 					if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 						!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||

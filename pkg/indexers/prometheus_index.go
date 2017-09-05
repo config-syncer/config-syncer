@@ -195,7 +195,7 @@ func (ri *PrometheusIndexerImpl) equal(a, b *prom.Prometheus) bool {
 }
 
 func (ri *PrometheusIndexerImpl) Key(meta metav1.ObjectMeta) []byte {
-	return []byte(util.GetGroupVersionKind(&prom.ServiceMonitor{}).String() + "/" + meta.Namespace + "/" + meta.Name)
+	return []byte(util.GetGroupVersionKind(&prom.ServiceMonitor{}).String() + "/" + meta.Namespace + "/" + meta.Name + "/" + meta.Name + "/" + util.GetGroupVersionKind(&prom.Prometheus{}).String())
 }
 
 func (ri *PrometheusIndexerImpl) ServeHTTP(w http.ResponseWriter, req *http.Request) {
