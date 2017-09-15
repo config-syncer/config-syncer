@@ -103,7 +103,7 @@ spec:
       labels:
         app: kubed
     spec:
-      serviceAccountName: kubed
+      serviceAccountName: kubed-operator
       containers:
       - name: kubed
         image: appscode/kubed:0.2.0
