@@ -13,7 +13,7 @@ This chart bootstraps a [Kubed controller](https://github.com/appscode/kubed) de
 
 ## Prerequisites
 
-- Kubernetes 1.5+ 
+- Kubernetes 1.5+
 
 ## Installing the Chart
 To install the chart with the release name `my-release`:
@@ -39,37 +39,33 @@ The command removes all the Kubernetes components associated with the chart and 
 The following tables lists the configurable parameters of the Kubed chart and their default values.
 
 
-| Parameter         | Description                                                       | Default            |
-| ------------------| ------------------------------------------------------------------|--------------------|
-| `replicaCount`    | Number of kubed operator replicas to create (only 1 is supported) | `1`                |
-| `.image`          | container image                                                   | `appscode/kubed`   |
-| `tag`             | container image tag                                               | `0.2.0`            |
-| `pullPolicy`      | container image pull policy                                       | `IfNotPresent`     |
-| `rbac.install`    | install required rbac service account, roles and rolebindings     | `false`            |
-| `rbac.apiVersion` | rbac api version v1alpha1\|v1beta1                                | `v1beta1`          |
+| Parameter                 | Description                                                       | Default            |
+| --------------------------| ------------------------------------------------------------------|--------------------|
+| `replicaCount`            | Number of kubed operator replicas to create (only 1 is supported) | `1`                |
+| `.image`                  | container image                                                   | `appscode/kubed`   |
+| `tag`                     | container image tag                                               | `0.2.0`            |
+| `pullPolicy`              | container image pull policy                                       | `IfNotPresent`     |
+| `rbac.create`             | install required rbac service account, roles and rolebindings     | `false`            |
+| `rbac.serviceAccountName` | ServiceAccount Kubed will use (ignored if rbac.create=true)       | `default`          |
 
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
 
-```bash
+```console
 $ helm install --name my-release --set image.tag=v0.2.1 chart/kubed
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while
 installing the chart. For example:
 
-```bash
+```console
 $ helm install --name my-release --values values.yaml chart/kubed
 ```
 
 ## RBAC
 By default the chart will not install the recommended RBAC roles and rolebindings.
 
-You need to have the following parameter on the api server. See the following document for how to enable [RBAC](https://kubernetes.io/docs/admin/authorization/rbac/)
-
-```
---authorization-mode=RBAC
-```
+You need to have the flag `--authorization-mode=RBAC` on the api server. See the following document for how to enable [RBAC](https://kubernetes.io/docs/admin/authorization/rbac/).
 
 To determine if your cluster supports RBAC, run the the following command:
 
@@ -77,20 +73,12 @@ To determine if your cluster supports RBAC, run the the following command:
 $ kubectl api-versions | grep rbac
 ```
 
-If the output contains "alpha" and/or "beta", you can may install the chart with RBAC enabled (see below).
+If the output contains "beta", you may install the chart with RBAC enabled (see below).
 
 ### Enable RBAC role/rolebinding creation
 
 To enable the creation of RBAC resources (On clusters with RBAC). Do the following:
 
 ```console
-$ helm install --name my-release chart/kubed --set rbac.install=true
-```
-
-### Changing RBAC manifest apiVersion
-
-By default the RBAC resources are generated with the "v1beta1" apiVersion. To use "v1alpha1" do the following:
-
-```console
-$ helm install --name my-release chart/kubed --set rbac.install=true,rbac.apiVersion=v1alpha1
+$ helm install --name my-release chart/kubed --set rbac.create=true
 ```
