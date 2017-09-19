@@ -8,7 +8,7 @@ import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	kutil "github.com/appscode/kutil/voyager/v1beta1"
-	tapi "github.com/appscode/voyager/api"
+	tapi "github.com/appscode/voyager/apis/voyager/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -19,8 +19,8 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchVoyagerIngresses() {
-	if !util.IsPreferredAPIResource(op.KubeClient, tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindIngress) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindIngress)
+	if !util.IsPreferredAPIResource(op.KubeClient, tapi.SchemeGroupVersion.String(), tapi.ResourceKindIngress) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.SchemeGroupVersion.String(), tapi.ResourceKindIngress)
 		return
 	}
 	defer acrt.HandleCrash()

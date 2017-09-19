@@ -188,6 +188,12 @@ func (ctx *textifyTraverseContext) handleElement(node *html.Node) error {
 		return ctx.emit("*" + str + "*")
 
 	case atom.A:
+		linkText := ""
+		// For simple link element content with single text node only, peek at the link text.
+		if node.FirstChild != nil && node.FirstChild.NextSibling == nil && node.FirstChild.Type == html.TextNode {
+			linkText = node.FirstChild.Data
+		}
+
 		// If image is the only child, take its alt text as the link text.
 		if img := node.FirstChild; img != nil && node.LastChild == img && img.DataAtom == atom.Img {
 			if altText := getAttrVal(img, "alt"); altText != "" {
@@ -202,7 +208,8 @@ func (ctx *textifyTraverseContext) handleElement(node *html.Node) error {
 		hrefLink := ""
 		if attrVal := getAttrVal(node, "href"); attrVal != "" {
 			attrVal = ctx.normalizeHrefLink(attrVal)
-			if attrVal != "" {
+			// Don't print link href if it matches link element content or if the link is empty.
+			if attrVal != "" && linkText != attrVal {
 				hrefLink = "( " + attrVal + " )"
 			}
 		}
@@ -347,7 +354,7 @@ func (ctx *textifyTraverseContext) emit(data string) error {
 	for _, line := range lines {
 		runes := []rune(line)
 		startsWithSpace := unicode.IsSpace(runes[0])
-		if !startsWithSpace && !ctx.endsWithSpace {
+		if !startsWithSpace && !ctx.endsWithSpace && !strings.HasPrefix(data, ".") {
 			if err = ctx.buf.WriteByte(' '); err != nil {
 				return err
 			}

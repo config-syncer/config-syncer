@@ -2,44 +2,40 @@ package v1alpha1
 
 import (
 	"errors"
+	"fmt"
+	"reflect"
 
-	kubedb "github.com/k8sdb/apimachinery/api"
+	"github.com/appscode/kutil"
+	"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 func GetGroupVersionKind(v interface{}) schema.GroupVersionKind {
-	switch v.(type) {
-	case *kubedb.Postgres:
-		return kubedb.V1alpha1SchemeGroupVersion.WithKind("Postgres")
-	case *kubedb.Elasticsearch:
-		return kubedb.V1alpha1SchemeGroupVersion.WithKind("Elasticsearch")
-	case *kubedb.Snapshot:
-		return kubedb.V1alpha1SchemeGroupVersion.WithKind("Snapshot")
-	case *kubedb.DormantDatabase:
-		return kubedb.V1alpha1SchemeGroupVersion.WithKind("DormantDatabase")
-	default:
-		return schema.GroupVersionKind{}
-	}
+	return v1alpha1.SchemeGroupVersion.WithKind(kutil.GetKind(v))
 }
 
 func AssignTypeKind(v interface{}) error {
+	if reflect.ValueOf(v).Kind() != reflect.Ptr {
+		return fmt.Errorf("%v must be a pointer", v)
+	}
+
 	switch u := v.(type) {
-	case *kubedb.Postgres:
-		u.APIVersion = kubedb.V1alpha1SchemeGroupVersion.String()
-		u.Kind = "Postgres"
+	case *v1alpha1.Postgres:
+		u.APIVersion = v1alpha1.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *kubedb.Elasticsearch:
-		u.APIVersion = kubedb.V1alpha1SchemeGroupVersion.String()
-		u.Kind = "Elasticsearch"
+	case *v1alpha1.Elasticsearch:
+		u.APIVersion = v1alpha1.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *kubedb.Snapshot:
-		u.APIVersion = kubedb.V1alpha1SchemeGroupVersion.String()
-		u.Kind = "Snapshot"
+	case *v1alpha1.Snapshot:
+		u.APIVersion = v1alpha1.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *kubedb.DormantDatabase:
-		u.APIVersion = kubedb.V1alpha1SchemeGroupVersion.String()
-		u.Kind = "DormantDatabase"
+	case *v1alpha1.DormantDatabase:
+		u.APIVersion = v1alpha1.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
 	}
-	return errors.New("Unknown api object type")
+	return errors.New("unknown api object type")
 }

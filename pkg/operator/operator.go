@@ -24,13 +24,13 @@ import (
 	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/pat"
-	srch_cs "github.com/appscode/searchlight/client/clientset"
-	scs "github.com/appscode/stash/client/clientset"
-	vcs "github.com/appscode/voyager/client/clientset"
+	srch_cs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
+	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
+	vcs "github.com/appscode/voyager/client/typed/voyager/v1beta1"
 	shell "github.com/codeskyblue/go-sh"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	kcs "github.com/k8sdb/apimachinery/client/clientset"
+	kcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -55,11 +55,11 @@ type Options struct {
 
 type Operator struct {
 	KubeClient        clientset.Interface
-	VoyagerClient     vcs.ExtensionInterface
-	SearchlightClient srch_cs.ExtensionInterface
-	StashClient       scs.ExtensionInterface
+	VoyagerClient     vcs.VoyagerV1beta1Interface
+	SearchlightClient srch_cs.MonitoringV1alpha1Interface
+	StashClient       scs.StashV1alpha1Interface
 	PromClient        pcm.MonitoringV1Interface
-	KubeDBClient      kcs.ExtensionInterface
+	KubeDBClient      kcs.KubedbV1alpha1Interface
 
 	Opt    Options
 	Config config.ClusterConfig
