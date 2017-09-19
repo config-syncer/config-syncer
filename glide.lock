@@ -1,5 +1,5 @@
 hash: 1f246cedf3adcb879254999bf6f55ca8e64b6ef4f7a79f0238f5977b88d9e9e1
-updated: 2017-09-05T05:44:57.631295494-07:00
+updated: 2017-09-18T23:50:05.477220861-07:00
 imports:
 - name: cloud.google.com/go
   version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
@@ -42,10 +42,8 @@ imports:
   - webhook
 - name: github.com/appscode/go-term
   version: d0c677f2d84034b1357d3f69ffd29c5fb81f662f
-- name: github.com/appscode/jsonpatch
-  version: 3cdd2454b5443228620ea11294085ec3489936a6
 - name: github.com/appscode/kutil
-  version: f2221b482d48b0b0e9ad27324d23b857bbe9f7ca
+  version: 1f75c33d081d0e7e1073ed9e8a5774e5c8c93e86
   subpackages:
   - apps/v1beta1
   - batch/v1
@@ -65,31 +63,34 @@ imports:
 - name: github.com/appscode/log
   version: 68e0e42e42c01371f3950571fc87c2298a51dd8f
 - name: github.com/appscode/osm
-  version: c4eb9d9f2fa11a22cd4b5f358afa5c89245059b4
+  version: e8902e8a7b1ca8c0b7ec38579c08e74ba631a192
   subpackages:
   - context
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: f594a07316a8abcfa8f4a075b1da8bd9cea3380b
+  version: ff0fc69a942b9309ee39ce80ac9680b6f7ac4510
   subpackages:
-  - api
-  - api/install
-  - client/clientset
+  - apis/monitoring
+  - apis/monitoring/v1alpha1
+  - client/scheme
+  - client/typed/monitoring/v1alpha1
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: 9cfb37cf71011815730a45b5d6cf77abfd02213b
+  version: a04187d5b53b4495a9131841cb825e671dd648d8
   subpackages:
-  - api
-  - api/install
-  - client/clientset
+  - apis/stash
+  - apis/stash/v1alpha1
+  - client/scheme
+  - client/typed/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 93d14a6c19d3ac89c9dc2fbe03fcce1154b7a6e0
+  version: 794551f8cc6bb53760bf984029c27e8dc089ada0
   subpackages:
-  - api
-  - api/install
-  - client/clientset
+  - apis/voyager
+  - apis/voyager/v1beta1
+  - client/scheme
+  - client/typed/voyager/v1beta1
 - name: github.com/aws/aws-sdk-go
   version: 819b71cf8430e434c1eee7e7e8b0f2b8870be899
   subpackages:
@@ -274,7 +275,7 @@ imports:
   - models
   - pkg/escape
 - name: github.com/jaytaylor/html2text
-  version: 7c7a33a7a158a5ce395c803d2b6a209b2bbc14c8
+  version: 0ee88d3006305456b84cad14a24b2576f9411965
 - name: github.com/jmespath/go-jmespath
   version: 0b12d6b521d83fc7f755e7cfc1b1fbdd35a01a74
 - name: github.com/jpillora/go-ogle-analytics
@@ -282,11 +283,12 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/k8sdb/apimachinery
-  version: cfbe93778fc3dacca84ddc3415e4759ab1e0004f
+  version: e35c53dd130bc712bf3dd9250df706b710e0c535
   subpackages:
-  - api
-  - api/install
-  - client/clientset
+  - apis/kubedb
+  - apis/kubedb/v1alpha1
+  - client/scheme
+  - client/typed/kubedb/v1alpha1
 - name: github.com/mailgun/mailgun-go
   version: 369a1fa57ce6fb314e627087b9fff0db5c266c0f
 - name: github.com/mailru/easyjson
@@ -325,7 +327,7 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: bc8b88226a1210b016e9993b1d75f858c9c8f778
+  version: 2f17f4a9d485bf34b4bfaccc273805040e4f86c8
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
@@ -350,7 +352,7 @@ imports:
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/spf13/cobra
-  version: 3c0b56b677e04926dfa835a1b3f11cd4f62f076e
+  version: b78744579491c1ceeaaa3b40205e56b0591b93a3
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -416,7 +418,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: 519500316f39a9934d1d88615a1a047035a4bae5
+  version: f07af8828cedf46b54a535f7cd5b4d82a7d1cbbb
   subpackages:
   - gensupport
   - googleapi
@@ -483,16 +485,19 @@ imports:
   - pkg/util/framer
   - pkg/util/intstr
   - pkg/util/json
+  - pkg/util/mergepatch
   - pkg/util/net
   - pkg/util/rand
   - pkg/util/runtime
   - pkg/util/sets
+  - pkg/util/strategicpatch
   - pkg/util/validation
   - pkg/util/validation/field
   - pkg/util/wait
   - pkg/util/yaml
   - pkg/version
   - pkg/watch
+  - third_party/forked/golang/json
   - third_party/forked/golang/reflect
 - name: k8s.io/client-go
   version: d92e8497f71b7b4e0494e5bd204b48d34bd6f254

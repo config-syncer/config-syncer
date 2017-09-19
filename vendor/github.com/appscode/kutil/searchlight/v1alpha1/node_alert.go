@@ -4,23 +4,23 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/appscode/jsonpatch"
 	"github.com/appscode/kutil"
-	aci "github.com/appscode/searchlight/api"
-	tcs "github.com/appscode/searchlight/client/clientset"
+	aci "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
+	tcs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
 	"github.com/golang/glog"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func EnsureNodeAlert(c tcs.ExtensionInterface, meta metav1.ObjectMeta, transform func(alert *aci.NodeAlert) *aci.NodeAlert) (*aci.NodeAlert, error) {
+func EnsureNodeAlert(c tcs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *aci.NodeAlert) *aci.NodeAlert) (*aci.NodeAlert, error) {
 	return CreateOrPatchNodeAlert(c, meta, transform)
 }
 
-func CreateOrPatchNodeAlert(c tcs.ExtensionInterface, meta metav1.ObjectMeta, transform func(alert *aci.NodeAlert) *aci.NodeAlert) (*aci.NodeAlert, error) {
-	cur, err := c.NodeAlerts(meta.Namespace).Get(meta.Name)
+func CreateOrPatchNodeAlert(c tcs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *aci.NodeAlert) *aci.NodeAlert) (*aci.NodeAlert, error) {
+	cur, err := c.NodeAlerts(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		return c.NodeAlerts(meta.Namespace).Create(transform(&aci.NodeAlert{ObjectMeta: meta}))
 	} else if err != nil {
@@ -29,7 +29,7 @@ func CreateOrPatchNodeAlert(c tcs.ExtensionInterface, meta metav1.ObjectMeta, tr
 	return PatchNodeAlert(c, cur, transform)
 }
 
-func PatchNodeAlert(c tcs.ExtensionInterface, cur *aci.NodeAlert, transform func(*aci.NodeAlert) *aci.NodeAlert) (*aci.NodeAlert, error) {
+func PatchNodeAlert(c tcs.MonitoringV1alpha1Interface, cur *aci.NodeAlert, transform func(*aci.NodeAlert) *aci.NodeAlert) (*aci.NodeAlert, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
 		return nil, err
@@ -40,27 +40,23 @@ func PatchNodeAlert(c tcs.ExtensionInterface, cur *aci.NodeAlert, transform func
 		return nil, err
 	}
 
-	patch, err := jsonpatch.CreatePatch(curJson, modJson)
+	patch, err := strategicpatch.CreateTwoWayMergePatch(curJson, modJson, aci.NodeAlert{})
 	if err != nil {
 		return nil, err
 	}
-	if len(patch) == 0 {
+	if len(patch) == 0 || string(patch) == "{}" {
 		return cur, nil
 	}
-	pb, err := json.MarshalIndent(patch, "", "  ")
-	if err != nil {
-		return nil, err
-	}
-	glog.V(5).Infof("Patching NodeAlert %s@%s with %s.", cur.Name, cur.Namespace, string(pb))
-	result, err := c.NodeAlerts(cur.Namespace).Patch(cur.Name, types.JSONPatchType, pb)
+	glog.V(5).Infof("Patching NodeAlert %s@%s with %s.", cur.Name, cur.Namespace, string(patch))
+	result, err := c.NodeAlerts(cur.Namespace).Patch(cur.Name, types.StrategicMergePatchType, patch)
 	return result, err
 }
 
-func TryPatchNodeAlert(c tcs.ExtensionInterface, meta metav1.ObjectMeta, transform func(*aci.NodeAlert) *aci.NodeAlert) (result *aci.NodeAlert, err error) {
+func TryPatchNodeAlert(c tcs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(*aci.NodeAlert) *aci.NodeAlert) (result *aci.NodeAlert, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++
-		cur, e2 := c.NodeAlerts(meta.Namespace).Get(meta.Name)
+		cur, e2 := c.NodeAlerts(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
@@ -77,11 +73,11 @@ func TryPatchNodeAlert(c tcs.ExtensionInterface, meta metav1.ObjectMeta, transfo
 	return
 }
 
-func TryUpdateNodeAlert(c tcs.ExtensionInterface, meta metav1.ObjectMeta, transform func(*aci.NodeAlert) *aci.NodeAlert) (result *aci.NodeAlert, err error) {
+func TryUpdateNodeAlert(c tcs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(*aci.NodeAlert) *aci.NodeAlert) (result *aci.NodeAlert, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++
-		cur, e2 := c.NodeAlerts(meta.Namespace).Get(meta.Name)
+		cur, e2 := c.NodeAlerts(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {

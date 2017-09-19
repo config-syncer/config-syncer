@@ -4,23 +4,23 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/appscode/jsonpatch"
 	"github.com/appscode/kutil"
-	aci "github.com/appscode/searchlight/api"
-	tcs "github.com/appscode/searchlight/client/clientset"
+	aci "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
+	tcs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
 	"github.com/golang/glog"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func EnsureClusterAlert(c tcs.ExtensionInterface, meta metav1.ObjectMeta, transform func(alert *aci.ClusterAlert) *aci.ClusterAlert) (*aci.ClusterAlert, error) {
+func EnsureClusterAlert(c tcs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *aci.ClusterAlert) *aci.ClusterAlert) (*aci.ClusterAlert, error) {
 	return CreateOrPatchClusterAlert(c, meta, transform)
 }
 
-func CreateOrPatchClusterAlert(c tcs.ExtensionInterface, meta metav1.ObjectMeta, transform func(alert *aci.ClusterAlert) *aci.ClusterAlert) (*aci.ClusterAlert, error) {
-	cur, err := c.ClusterAlerts(meta.Namespace).Get(meta.Name)
+func CreateOrPatchClusterAlert(c tcs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *aci.ClusterAlert) *aci.ClusterAlert) (*aci.ClusterAlert, error) {
+	cur, err := c.ClusterAlerts(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		return c.ClusterAlerts(meta.Namespace).Create(transform(&aci.ClusterAlert{ObjectMeta: meta}))
 	} else if err != nil {
@@ -29,7 +29,7 @@ func CreateOrPatchClusterAlert(c tcs.ExtensionInterface, meta metav1.ObjectMeta,
 	return PatchClusterAlert(c, cur, transform)
 }
 
-func PatchClusterAlert(c tcs.ExtensionInterface, cur *aci.ClusterAlert, transform func(*aci.ClusterAlert) *aci.ClusterAlert) (*aci.ClusterAlert, error) {
+func PatchClusterAlert(c tcs.MonitoringV1alpha1Interface, cur *aci.ClusterAlert, transform func(*aci.ClusterAlert) *aci.ClusterAlert) (*aci.ClusterAlert, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
 		return nil, err
@@ -40,27 +40,23 @@ func PatchClusterAlert(c tcs.ExtensionInterface, cur *aci.ClusterAlert, transfor
 		return nil, err
 	}
 
-	patch, err := jsonpatch.CreatePatch(curJson, modJson)
+	patch, err := strategicpatch.CreateTwoWayMergePatch(curJson, modJson, aci.ClusterAlert{})
 	if err != nil {
 		return nil, err
 	}
-	if len(patch) == 0 {
+	if len(patch) == 0 || string(patch) == "{}" {
 		return cur, nil
 	}
-	pb, err := json.MarshalIndent(patch, "", "  ")
-	if err != nil {
-		return nil, err
-	}
-	glog.V(5).Infof("Patching ClusterAlert %s@%s with %s.", cur.Name, cur.Namespace, string(pb))
-	result, err := c.ClusterAlerts(cur.Namespace).Patch(cur.Name, types.JSONPatchType, pb)
+	glog.V(5).Infof("Patching ClusterAlert %s@%s with %s.", cur.Name, cur.Namespace, string(patch))
+	result, err := c.ClusterAlerts(cur.Namespace).Patch(cur.Name, types.StrategicMergePatchType, patch)
 	return result, err
 }
 
-func TryPatchClusterAlert(c tcs.ExtensionInterface, meta metav1.ObjectMeta, transform func(*aci.ClusterAlert) *aci.ClusterAlert) (result *aci.ClusterAlert, err error) {
+func TryPatchClusterAlert(c tcs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(*aci.ClusterAlert) *aci.ClusterAlert) (result *aci.ClusterAlert, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++
-		cur, e2 := c.ClusterAlerts(meta.Namespace).Get(meta.Name)
+		cur, e2 := c.ClusterAlerts(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
@@ -77,11 +73,11 @@ func TryPatchClusterAlert(c tcs.ExtensionInterface, meta metav1.ObjectMeta, tran
 	return
 }
 
-func TryUpdateClusterAlert(c tcs.ExtensionInterface, meta metav1.ObjectMeta, transform func(*aci.ClusterAlert) *aci.ClusterAlert) (result *aci.ClusterAlert, err error) {
+func TryUpdateClusterAlert(c tcs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(*aci.ClusterAlert) *aci.ClusterAlert) (result *aci.ClusterAlert, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++
-		cur, e2 := c.ClusterAlerts(meta.Namespace).Get(meta.Name)
+		cur, e2 := c.ClusterAlerts(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
