@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/appscode/kubed/pkg/config"
+	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestEsJanitor(t *testing.T) {
