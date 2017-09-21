@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	yc "github.com/appscode/go/encoding/yaml"
@@ -98,4 +99,21 @@ func (b Backend) Container() (string, error) {
 		return b.Swift.Container, nil
 	}
 	return "", errors.New("No storage provider is configured.")
+}
+
+func LoadJanitorAuthInfo(data map[string][]byte) *JanitorAuthInfo {
+	if data == nil {
+		return &JanitorAuthInfo{}
+	}
+	insecureSkipVerify, _ := strconv.ParseBool(string(data["INSECURE_SKIP_VERIFY"]))
+
+	return &JanitorAuthInfo{
+		CACertData:         data["CA_CERT_DATA"],
+		ClientCertData:     data["CLIENT_CERT_DATA"],
+		ClientKeyData:      data["CLIENT_KEY_DATA"],
+		InsecureSkipVerify: insecureSkipVerify,
+		Username:           string(data["USERNAME"]),
+		Password:           string(data["PASSWORD"]),
+		Token:              string(data["TOKEN"]),
+	}
 }
