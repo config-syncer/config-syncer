@@ -46,7 +46,7 @@
 - Fix config object. [\#105](https://github.com/appscode/kubed/pull/105) ([tamalsaha](https://github.com/tamalsaha))
 
 ## [0.2.0](https://github.com/appscode/kubed/tree/0.2.0) (2017-08-04)
-Kubed 0.2.0 can send push notifications. To install, please visit [here](/docs/install.md). If you are existing user, please update the image tag.
+Kubed 0.2.0 can send push notifications.
 
 __Notable Features__
  - Send [push notification](/docs/tutorials/notifiers.md#pushovernet) via [pushover.net](https://pushover.net/) Thanks [Sean Johnson](https://github.com/pirogoeth) !
@@ -54,7 +54,7 @@ __Notable Features__
 
 
 ## [0.1.0](https://github.com/appscode/kubed/tree/0.1.0) (2017-08-01)
-First public release of Kubed. To install, please visit [here](/docs/install.md).
+First public release of Kubed.
 
 __Notable Features__
  - Takes periodic [snapshot](/docs/tutorials/cluster-snapshot.md) of a Kubernetes cluster objects.
