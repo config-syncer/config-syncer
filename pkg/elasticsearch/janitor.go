@@ -33,9 +33,12 @@ func (j *Janitor) Cleanup() error {
 					mTLSConfig.Certificates = []tls.Certificate{cert}
 				}
 			}
-		} else {
+		}
+
+		if j.AuthInfo.InsecureSkipVerify {
 			mTLSConfig.InsecureSkipVerify = true
 		}
+
 		tr := &http.Transport{
 			TLSClientConfig: mTLSConfig,
 		}

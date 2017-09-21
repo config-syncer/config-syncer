@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	yc "github.com/appscode/go/encoding/yaml"
@@ -104,12 +105,15 @@ func LoadJanitorAuthInfo(data map[string][]byte) *JanitorAuthInfo {
 	if data == nil {
 		return &JanitorAuthInfo{}
 	}
+	insecureSkipVerify, _ := strconv.ParseBool(string(data["INSECURE_SKIP_VERIFY"]))
+
 	return &JanitorAuthInfo{
-		CACertData:     data["CA_CERT_DATA"],
-		ClientCertData: data["CLIENT_CERT_DATA"],
-		ClientKeyData:  data["CLIENT_KEY_DATA"],
-		Username:       string(data["USERNAME"]),
-		Password:       string(data["PASSWORD"]),
-		Token:          string(data["TOKEN"]),
+		CACertData:         data["CA_CERT_DATA"],
+		ClientCertData:     data["CLIENT_CERT_DATA"],
+		ClientKeyData:      data["CLIENT_KEY_DATA"],
+		InsecureSkipVerify: insecureSkipVerify,
+		Username:           string(data["USERNAME"]),
+		Password:           string(data["PASSWORD"]),
+		Token:              string(data["TOKEN"]),
 	}
 }

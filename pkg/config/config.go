@@ -167,9 +167,10 @@ type SwiftSpec struct {
 }
 
 type JanitorAuthInfo struct {
-	CACertData     []byte `envconfig:"CA_CERT_DATA"`
-	ClientCertData []byte `envconfig:"CLIENT_CERT_DATA"`
-	ClientKeyData  []byte `envconfig:"CLIENT_KEY_DATA"`
+	CACertData         []byte `envconfig:"CA_CERT_DATA"`
+	ClientCertData     []byte `envconfig:"CLIENT_CERT_DATA"`
+	ClientKeyData      []byte `envconfig:"CLIENT_KEY_DATA"`
+	InsecureSkipVerify bool   `envconfig:"INSECURE_SKIP_VERIFY"`
 
 	Username string `envconfig:"USERNAME"`
 	Password string `envconfig:"PASSWORD"`
