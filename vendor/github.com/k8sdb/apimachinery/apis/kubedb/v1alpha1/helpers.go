@@ -118,19 +118,19 @@ func (e Elasticsearch) StatefulSetAnnotations() map[string]string {
 	return annotations
 }
 
-func (p Elasticsearch) ResourceCode() string {
+func (e Elasticsearch) ResourceCode() string {
 	return ResourceCodeElasticsearch
 }
 
-func (p Elasticsearch) ResourceKind() string {
+func (e Elasticsearch) ResourceKind() string {
 	return ResourceKindElasticsearch
 }
 
-func (p Elasticsearch) ResourceName() string {
+func (e Elasticsearch) ResourceName() string {
 	return ResourceNameElasticsearch
 }
 
-func (p Elasticsearch) ResourceType() string {
+func (e Elasticsearch) ResourceType() string {
 	return ResourceTypeElasticsearch
 }
 
@@ -138,19 +138,19 @@ func (d DormantDatabase) OffshootName() string {
 	return d.Name
 }
 
-func (p DormantDatabase) ResourceCode() string {
+func (d DormantDatabase) ResourceCode() string {
 	return ResourceCodeDormantDatabase
 }
 
-func (p DormantDatabase) ResourceKind() string {
+func (d DormantDatabase) ResourceKind() string {
 	return ResourceKindDormantDatabase
 }
 
-func (p DormantDatabase) ResourceName() string {
+func (d DormantDatabase) ResourceName() string {
 	return ResourceNameDormantDatabase
 }
 
-func (p DormantDatabase) ResourceType() string {
+func (d DormantDatabase) ResourceType() string {
 	return ResourceTypeDormantDatabase
 }
 
@@ -174,19 +174,19 @@ func (s Snapshot) Location() (string, error) {
 	return "", errors.New("No storage provider is configured.")
 }
 
-func (p Snapshot) ResourceCode() string {
+func (s Snapshot) ResourceCode() string {
 	return ResourceCodeSnapshot
 }
 
-func (p Snapshot) ResourceKind() string {
+func (s Snapshot) ResourceKind() string {
 	return ResourceKindSnapshot
 }
 
-func (p Snapshot) ResourceName() string {
+func (s Snapshot) ResourceName() string {
 	return ResourceNameSnapshot
 }
 
-func (p Snapshot) ResourceType() string {
+func (s Snapshot) ResourceType() string {
 	return ResourceTypeSnapshot
 }
 

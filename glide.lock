@@ -1,5 +1,5 @@
 hash: 1f246cedf3adcb879254999bf6f55ca8e64b6ef4f7a79f0238f5977b88d9e9e1
-updated: 2017-09-18T23:50:05.477220861-07:00
+updated: 2017-09-21T06:09:45.201977672-07:00
 imports:
 - name: cloud.google.com/go
   version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
@@ -7,7 +7,7 @@ imports:
   - compute/metadata
   - internal
 - name: github.com/appscode/envconfig
-  version: a74ef73ab982beb8f0c6060ac44da1c960fea414
+  version: 8debe51c027cc6d944705e16415fd948cb32824c
 - name: github.com/appscode/errors
   version: 748883e321a9f99fe901bd2663c7af3fcae43ea4
 - name: github.com/appscode/go
@@ -43,7 +43,7 @@ imports:
 - name: github.com/appscode/go-term
   version: d0c677f2d84034b1357d3f69ffd29c5fb81f662f
 - name: github.com/appscode/kutil
-  version: 1f75c33d081d0e7e1073ed9e8a5774e5c8c93e86
+  version: 6788b3a7e56c2f71e4c41f44835b8f1fafca8c16
   subpackages:
   - apps/v1beta1
   - batch/v1
@@ -78,14 +78,14 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: a04187d5b53b4495a9131841cb825e671dd648d8
+  version: 2c8add5f1817ddf4dfee1a69ed9eb94eef2b76b7
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
   - client/scheme
   - client/typed/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 794551f8cc6bb53760bf984029c27e8dc089ada0
+  version: 4e8d07a40ea99c998d4a47ef4ffde8a086ee585d
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -187,7 +187,7 @@ imports:
   - pkg/client/monitoring/v1
   - pkg/client/monitoring/v1alpha1
 - name: github.com/cpuguy83/go-md2man
-  version: 71acacd42f85e5e82f70a55327789582a5200a90
+  version: 1d903dcb749992f3741d744c0f8376b4bd7eb3e1
   subpackages:
   - md2man
 - name: github.com/davecgh/go-spew
@@ -207,6 +207,8 @@ imports:
   - log
 - name: github.com/emicklei/go-restful-swagger12
   version: dcef7f55730566d41eae5db10e7d6981829720f6
+- name: github.com/evanphx/json-patch
+  version: ba18e35c5c1b36ef6334cad706eb681153d2d379
 - name: github.com/facebookgo/stack
   version: 751773369052141c013c6e827a71e8f35c07879c
 - name: github.com/fatih/color
@@ -233,7 +235,7 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 44145f04b68cf362d9c4df2182967c2275eaefed
+  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
 - name: github.com/golang/protobuf
   version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
@@ -283,7 +285,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/k8sdb/apimachinery
-  version: e35c53dd130bc712bf3dd9250df706b710e0c535
+  version: 0ce956bc35245de2d2ac64a4abd861eeffb9a93f
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -304,7 +306,7 @@ imports:
   version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
   repo: https://github.com/mattn/go-isatty
 - name: github.com/mattn/go-runewidth
-  version: d6bea18f789704b5f83375793155289da36a3c7f
+  version: 97311d9f7767e3d6f422ea06661bc2c7a19e8a5d
 - name: github.com/matttproud/golang_protobuf_extensions
   version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
   subpackages:
@@ -316,7 +318,7 @@ imports:
 - name: github.com/olekukonko/tablewriter
   version: cca8bbc0798408af109aaaa239cbd2634846b340
 - name: github.com/pkg/errors
-  version: a22138067af1c4942683050411a841ade67fe1eb
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -418,7 +420,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: f07af8828cedf46b54a535f7cd5b4d82a7d1cbbb
+  version: 586095a6e4078caf0dc0b64f8545fa8679442013
   subpackages:
   - gensupport
   - googleapi
@@ -485,6 +487,7 @@ imports:
   - pkg/util/framer
   - pkg/util/intstr
   - pkg/util/json
+  - pkg/util/jsonmergepatch
   - pkg/util/mergepatch
   - pkg/util/net
   - pkg/util/rand

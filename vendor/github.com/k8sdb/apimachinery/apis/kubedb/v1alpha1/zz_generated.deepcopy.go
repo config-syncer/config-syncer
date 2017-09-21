@@ -270,6 +270,25 @@ func DeepCopy_v1alpha1_ElasticsearchSpec(in interface{}, out interface{}, c *con
 		} else {
 			out.Resources = *newVal.(*v1.ResourceRequirements)
 		}
+		if in.Affinity != nil {
+			in, out := &in.Affinity, &out.Affinity
+			if newVal, err := c.DeepCopy(*in); err != nil {
+				return err
+			} else {
+				*out = newVal.(*v1.Affinity)
+			}
+		}
+		if in.Tolerations != nil {
+			in, out := &in.Tolerations, &out.Tolerations
+			*out = make([]v1.Toleration, len(*in))
+			for i := range *in {
+				if newVal, err := c.DeepCopy(&(*in)[i]); err != nil {
+					return err
+				} else {
+					(*out)[i] = *newVal.(*v1.Toleration)
+				}
+			}
+		}
 		return nil
 	}
 }
@@ -543,6 +562,25 @@ func DeepCopy_v1alpha1_PostgresSpec(in interface{}, out interface{}, c *conversi
 			return err
 		} else {
 			out.Resources = *newVal.(*v1.ResourceRequirements)
+		}
+		if in.Affinity != nil {
+			in, out := &in.Affinity, &out.Affinity
+			if newVal, err := c.DeepCopy(*in); err != nil {
+				return err
+			} else {
+				*out = newVal.(*v1.Affinity)
+			}
+		}
+		if in.Tolerations != nil {
+			in, out := &in.Tolerations, &out.Tolerations
+			*out = make([]v1.Toleration, len(*in))
+			for i := range *in {
+				if newVal, err := c.DeepCopy(&(*in)[i]); err != nil {
+					return err
+				} else {
+					(*out)[i] = *newVal.(*v1.Toleration)
+				}
+			}
 		}
 		return nil
 	}
