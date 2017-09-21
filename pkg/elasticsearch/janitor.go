@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 
@@ -39,8 +40,19 @@ func (j *Janitor) Cleanup() error {
 			mTLSConfig.InsecureSkipVerify = true
 		}
 
+		// https://github.com/golang/go/blob/eca45997dfd6cd14a59fbdea2385f6648a0dc786/src/net/http/transport.go#L40
 		tr := &http.Transport{
-			TLSClientConfig: mTLSConfig,
+			Proxy: http.ProxyFromEnvironment,
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+				DualStack: true,
+			}).DialContext,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			TLSClientConfig:       mTLSConfig,
 		}
 		httpClient = &http.Client{Transport: tr}
 	}
