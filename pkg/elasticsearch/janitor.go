@@ -1,7 +1,10 @@
 package es
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/appscode/go/log"
@@ -10,12 +13,37 @@ import (
 )
 
 type Janitor struct {
-	Spec config.ElasticSearchSpec
-	TTL  time.Duration
+	Spec     config.ElasticsearchSpec
+	AuthInfo *config.JanitorAuthInfo
+	TTL      time.Duration
 }
 
 func (j *Janitor) Cleanup() error {
+	var httpClient *http.Client
+
+	if j.AuthInfo != nil {
+		mTLSConfig := &tls.Config{}
+		if j.AuthInfo.CACertData != nil {
+			certs := x509.NewCertPool()
+			certs.AppendCertsFromPEM(j.AuthInfo.CACertData)
+			mTLSConfig.RootCAs = certs
+			if j.AuthInfo.ClientCertData != nil && j.AuthInfo.ClientKeyData != nil {
+				cert, err := tls.X509KeyPair(j.AuthInfo.ClientCertData, j.AuthInfo.ClientKeyData)
+				if err == nil {
+					mTLSConfig.Certificates = []tls.Certificate{cert}
+				}
+			}
+		} else {
+			mTLSConfig.InsecureSkipVerify = true
+		}
+		tr := &http.Transport{
+			TLSClientConfig: mTLSConfig,
+		}
+		httpClient = &http.Client{Transport: tr}
+	}
+
 	client, err := elastic.NewClient(
+		elastic.SetHttpClient(httpClient),
 		// elastic.SetSniff(false),
 		elastic.SetURL(j.Spec.Endpoint),
 	)

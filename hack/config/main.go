@@ -100,9 +100,10 @@ func CreateClusterConfig() config.ClusterConfig {
 			{
 				Kind: config.JanitorElasticsearch,
 				TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
-				Elasticsearch: &config.ElasticSearchSpec{
-					Endpoint:       "http://elasticsearch-logging.kube-system:9200",
+				Elasticsearch: &config.ElasticsearchSpec{
+					Endpoint:       "https://elasticsearch-logging.kube-system:9200",
 					LogIndexPrefix: "logstash-",
+					SecretName:     "elasticsearch-logging-cert",
 				},
 			},
 			{

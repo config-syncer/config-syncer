@@ -33,6 +33,7 @@ import (
 	kcs "github.com/k8sdb/apimachinery/client/clientset"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
+	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -264,7 +265,20 @@ func (op *Operator) metadataHandler(w http.ResponseWriter, r *http.Request) {
 func (op *Operator) RunElasticsearchCleaner() error {
 	for _, j := range op.Config.Janitors {
 		if j.Kind == config.JanitorElasticsearch {
-			janitor := es.Janitor{Spec: *j.Elasticsearch, TTL: j.TTL.Duration}
+			var authInfo *config.JanitorAuthInfo
+
+			if j.Elasticsearch.SecretName != "" {
+				secret, err := op.KubeClient.CoreV1().Secrets(op.Opt.OperatorNamespace).
+					Get(j.Elasticsearch.SecretName, metav1.GetOptions{})
+				if err != nil && !kerr.IsNotFound(err) {
+					return err
+				}
+				if secret != nil {
+					authInfo = config.LoadJanitorAuthInfo(secret.Data)
+				}
+			}
+
+			janitor := es.Janitor{Spec: *j.Elasticsearch, AuthInfo: authInfo, TTL: j.TTL.Duration}
 			err := janitor.Cleanup()
 			if err != nil {
 				return err

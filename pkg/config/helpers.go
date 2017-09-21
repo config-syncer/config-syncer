@@ -99,3 +99,17 @@ func (b Backend) Container() (string, error) {
 	}
 	return "", errors.New("No storage provider is configured.")
 }
+
+func LoadJanitorAuthInfo(data map[string][]byte) *JanitorAuthInfo {
+	if data == nil {
+		return &JanitorAuthInfo{}
+	}
+	return &JanitorAuthInfo{
+		CACertData:     data["CA_CERT_DATA"],
+		ClientCertData: data["CLIENT_CERT_DATA"],
+		ClientKeyData:  data["CLIENT_KEY_DATA"],
+		Username:       string(data["USERNAME"]),
+		Password:       string(data["PASSWORD"]),
+		Token:          string(data["TOKEN"]),
+	}
+}

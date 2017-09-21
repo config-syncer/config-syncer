@@ -34,13 +34,14 @@ type APIServerSpec struct {
 type JanitorSpec struct {
 	Kind          string             `json:"kind"`
 	TTL           metav1.Duration    `json:"ttl"`
-	Elasticsearch *ElasticSearchSpec `json:"elasticsearch,omitempty,omitempty"`
+	Elasticsearch *ElasticsearchSpec `json:"elasticsearch,omitempty,omitempty"`
 	InfluxDB      *InfluxDBSpec      `json:"influxdb,omitempty"`
 }
 
-type ElasticSearchSpec struct {
+type ElasticsearchSpec struct {
 	Endpoint       string `json:"endpoint,omitempty"`
 	LogIndexPrefix string `json:"logIndexPrefix,omitempty"`
+	SecretName     string `json:"secretName,omitempty"`
 }
 
 type InfluxDBSpec struct {
@@ -163,4 +164,14 @@ type AzureSpec struct {
 type SwiftSpec struct {
 	Container string `json:"container,omitempty"`
 	Prefix    string `json:"prefix,omitempty"`
+}
+
+type JanitorAuthInfo struct {
+	CACertData     []byte `envconfig:"CA_CERT_DATA"`
+	ClientCertData []byte `envconfig:"CLIENT_CERT_DATA"`
+	ClientKeyData  []byte `envconfig:"CLIENT_KEY_DATA"`
+
+	Username string `envconfig:"USERNAME"`
+	Password string `envconfig:"PASSWORD"`
+	Token    string `envconfig:"TOKEN"`
 }
