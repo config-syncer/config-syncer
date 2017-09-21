@@ -3,10 +3,11 @@ package v1alpha1
 import (
 	"errors"
 	"fmt"
+	"reflect"
+
 	"github.com/appscode/kutil"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"reflect"
 )
 
 func GetGroupVersionKind(v interface{}) schema.GroupVersionKind {

@@ -67,7 +67,7 @@ func TryPatchJob(c clientset.Interface, meta metav1.ObjectMeta, transform func(*
 	})
 
 	if err != nil {
-		err = fmt.Errorf("Failed to patch Job %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
+		err = fmt.Errorf("failed to patch Job %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
 	}
 	return
 }
@@ -88,7 +88,7 @@ func TryUpdateJob(c clientset.Interface, meta metav1.ObjectMeta, transform func(
 	})
 
 	if err != nil {
-		err = fmt.Errorf("Failed to update Job %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
+		err = fmt.Errorf("failed to update Job %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
 	}
 	return
 }

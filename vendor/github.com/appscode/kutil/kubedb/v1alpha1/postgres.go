@@ -11,7 +11,7 @@ import (
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/strategicpatch"
+	"k8s.io/apimachinery/pkg/util/jsonmergepatch"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
@@ -40,7 +40,7 @@ func PatchPostgres(c tcs.KubedbV1alpha1Interface, cur *aci.Postgres, transform f
 		return nil, err
 	}
 
-	patch, err := strategicpatch.CreateTwoWayMergePatch(curJson, modJson, aci.Postgres{})
+	patch, err := jsonmergepatch.CreateThreeWayJSONMergePatch(curJson, modJson, curJson)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func PatchPostgres(c tcs.KubedbV1alpha1Interface, cur *aci.Postgres, transform f
 		return cur, nil
 	}
 	glog.V(5).Infof("Patching Postgres %s@%s with %s.", cur.Name, cur.Namespace, string(patch))
-	result, err := c.Postgreses(cur.Namespace).Patch(cur.Name, types.StrategicMergePatchType, patch)
+	result, err := c.Postgreses(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
 	return result, err
 }
 
@@ -68,7 +68,7 @@ func TryPatchPostgres(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, tra
 	})
 
 	if err != nil {
-		err = fmt.Errorf("Failed to patch Postgres %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
+		err = fmt.Errorf("failed to patch Postgres %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
 	}
 	return
 }
@@ -89,7 +89,7 @@ func TryUpdatePostgres(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, tr
 	})
 
 	if err != nil {
-		err = fmt.Errorf("Failed to update Postgres %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
+		err = fmt.Errorf("failed to update Postgres %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
 	}
 	return
 }

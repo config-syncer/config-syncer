@@ -11,7 +11,7 @@ import (
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/strategicpatch"
+	"k8s.io/apimachinery/pkg/util/jsonmergepatch"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
@@ -40,7 +40,7 @@ func PatchClusterAlert(c tcs.MonitoringV1alpha1Interface, cur *aci.ClusterAlert,
 		return nil, err
 	}
 
-	patch, err := strategicpatch.CreateTwoWayMergePatch(curJson, modJson, aci.ClusterAlert{})
+	patch, err := jsonmergepatch.CreateThreeWayJSONMergePatch(curJson, modJson, curJson)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func PatchClusterAlert(c tcs.MonitoringV1alpha1Interface, cur *aci.ClusterAlert,
 		return cur, nil
 	}
 	glog.V(5).Infof("Patching ClusterAlert %s@%s with %s.", cur.Name, cur.Namespace, string(patch))
-	result, err := c.ClusterAlerts(cur.Namespace).Patch(cur.Name, types.StrategicMergePatchType, patch)
+	result, err := c.ClusterAlerts(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
 	return result, err
 }
 
@@ -68,7 +68,7 @@ func TryPatchClusterAlert(c tcs.MonitoringV1alpha1Interface, meta metav1.ObjectM
 	})
 
 	if err != nil {
-		err = fmt.Errorf("Failed to patch ClusterAlert %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
+		err = fmt.Errorf("failed to patch ClusterAlert %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
 	}
 	return
 }
@@ -89,7 +89,7 @@ func TryUpdateClusterAlert(c tcs.MonitoringV1alpha1Interface, meta metav1.Object
 	})
 
 	if err != nil {
-		err = fmt.Errorf("Failed to update ClusterAlert %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
+		err = fmt.Errorf("failed to update ClusterAlert %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
 	}
 	return
 }

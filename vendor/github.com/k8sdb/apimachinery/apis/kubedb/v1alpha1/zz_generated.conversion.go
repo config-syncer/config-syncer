@@ -340,6 +340,9 @@ func autoConvert_v1alpha1_ElasticsearchSpec_To_kubedb_ElasticsearchSpec(in *Elas
 	out.DoNotPause = in.DoNotPause
 	out.Monitor = (*kubedb.MonitorSpec)(unsafe.Pointer(in.Monitor))
 	out.Resources = in.Resources
+	out.Affinity = (*api_v1.Affinity)(unsafe.Pointer(in.Affinity))
+	out.SchedulerName = in.SchedulerName
+	out.Tolerations = *(*[]api_v1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
 }
 
@@ -358,6 +361,9 @@ func autoConvert_kubedb_ElasticsearchSpec_To_v1alpha1_ElasticsearchSpec(in *kube
 	out.DoNotPause = in.DoNotPause
 	out.Monitor = (*MonitorSpec)(unsafe.Pointer(in.Monitor))
 	out.Resources = in.Resources
+	out.Affinity = (*api_v1.Affinity)(unsafe.Pointer(in.Affinity))
+	out.SchedulerName = in.SchedulerName
+	out.Tolerations = *(*[]api_v1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
 }
 
@@ -646,6 +652,9 @@ func autoConvert_v1alpha1_PostgresSpec_To_kubedb_PostgresSpec(in *PostgresSpec, 
 	out.DoNotPause = in.DoNotPause
 	out.Monitor = (*kubedb.MonitorSpec)(unsafe.Pointer(in.Monitor))
 	out.Resources = in.Resources
+	out.Affinity = (*api_v1.Affinity)(unsafe.Pointer(in.Affinity))
+	out.SchedulerName = in.SchedulerName
+	out.Tolerations = *(*[]api_v1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
 }
 
@@ -664,6 +673,9 @@ func autoConvert_kubedb_PostgresSpec_To_v1alpha1_PostgresSpec(in *kubedb.Postgre
 	out.DoNotPause = in.DoNotPause
 	out.Monitor = (*MonitorSpec)(unsafe.Pointer(in.Monitor))
 	out.Resources = in.Resources
+	out.Affinity = (*api_v1.Affinity)(unsafe.Pointer(in.Affinity))
+	out.SchedulerName = in.SchedulerName
+	out.Tolerations = *(*[]api_v1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
 }
 
