@@ -45,6 +45,7 @@ The following tables lists the configurable parameters of the Kubed chart and th
 | `.image`                  | container image                                                   | `appscode/kubed`   |
 | `tag`                     | container image tag                                               | `0.2.0`            |
 | `pullPolicy`              | container image pull policy                                       | `IfNotPresent`     |
+| `criticalAddon`           | If true, installs kubed operator as critical addon                | `false`            |
 | `rbac.create`             | install required rbac service account, roles and rolebindings     | `false`            |
 | `rbac.serviceAccountName` | ServiceAccount Kubed will use (ignored if rbac.create=true)       | `default`          |
 
