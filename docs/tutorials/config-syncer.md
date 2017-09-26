@@ -185,6 +185,10 @@ $ kubectl get configmaps --all-namespaces | grep omni
 demo          omni                                 2         18m
 ```
 
+## Origin annotation
+Since 0.3.0, kubed operator will apply `kubed.appscode.com/origin` annotation on ConfigMap or Secret copies.
+![origin annotation](/docs/images/config-syncer/config-origin.png)
+
 
 ## Disable Syncer
 If you would like to disable this feature, either remove the `enableConfigSyncer` field in your Kubed cluster config or set `enableConfigSyncer` to false. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
