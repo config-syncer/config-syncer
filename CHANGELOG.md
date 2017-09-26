@@ -1,49 +1,19 @@
 # Change Log
 
-## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
+## [0.3.0](https://github.com/appscode/kubed/tree/0.3.0) (2017-09-26)
+Kubed 0.3.0 can send push notifications.
 
-[Full Changelog](https://github.com/appscode/kubed/compare/4.0.0-alpha.0...HEAD)
-
-**Implemented enhancements:**
-
-- Support TLS for elasticsearch connection [\#126](https://github.com/appscode/kubed/pull/126) ([aerokite](https://github.com/aerokite))
-
-**Fixed bugs:**
-
-- Installing kubed fails due to missing service account [\#121](https://github.com/appscode/kubed/issues/121)
-- Cleanup search index when a namespace is deleted. [\#109](https://github.com/appscode/kubed/issues/109)
-
-**Closed issues:**
-
-- Vault Integration [\#119](https://github.com/appscode/kubed/issues/119)
+__Changelog__
 - Support auth for Elasticsearch janitor [\#64](https://github.com/appscode/kubed/issues/64)
+- Install kubed as a critical addon [\#129](https://github.com/appscode/kubed/pull/129)
+- Update chart to match recent convention [\#123](https://github.com/appscode/kubed/pull/123)
+- Use correct service account for RBAC installer [\#122](https://github.com/appscode/kubed/pull/122)
+- Forward CSR approved/denied events [\#117](https://github.com/appscode/kubed/pull/117)
+- Use kutil package for utils [\#116](https://github.com/appscode/kubed/pull/116)
+- Annotate copied configmaps & secrets with kubed.appscode.com/origin [\#115](https://github.com/appscode/kubed/pull/115)
+- Use client-go 4.0.0 [\#114](https://github.com/appscode/kubed/pull/114)
+- Fix config object. [\#105](https://github.com/appscode/kubed/pull/105)
 
-**Merged pull requests:**
-
-- Revendor for generator clients. [\#124](https://github.com/appscode/kubed/pull/124) ([tamalsaha](https://github.com/tamalsaha))
-- Update chart to match recent convention [\#123](https://github.com/appscode/kubed/pull/123) ([tamalsaha](https://github.com/tamalsaha))
-- Use correct service account for RBAC installer [\#122](https://github.com/appscode/kubed/pull/122) ([tamalsaha](https://github.com/tamalsaha))
-- Fix command in Developer-guide doc [\#120](https://github.com/appscode/kubed/pull/120) ([the-redback](https://github.com/the-redback))
-
-## [4.0.0-alpha.0](https://github.com/appscode/kubed/tree/4.0.0-alpha.0) (2017-09-05)
-[Full Changelog](https://github.com/appscode/kubed/compare/0.2.0...4.0.0-alpha.0)
-
-**Implemented enhancements:**
-
-- Annotate replicated objects indicating they are a replica and the source [\#112](https://github.com/appscode/kubed/issues/112)
-
-**Closed issues:**
-
-- Notify about new CSR requests [\#73](https://github.com/appscode/kubed/issues/73)
-- Support CRD [\#53](https://github.com/appscode/kubed/issues/53)
-
-**Merged pull requests:**
-
-- Forward CSR approved/denied events [\#117](https://github.com/appscode/kubed/pull/117) ([tamalsaha](https://github.com/tamalsaha))
-- Use kutil package for utils [\#116](https://github.com/appscode/kubed/pull/116) ([tamalsaha](https://github.com/tamalsaha))
-- Annotate copied configmaps & secrets with kubed.appscode.com/origin [\#115](https://github.com/appscode/kubed/pull/115) ([tamalsaha](https://github.com/tamalsaha))
-- Use client-go 4.0.0 [\#114](https://github.com/appscode/kubed/pull/114) ([tamalsaha](https://github.com/tamalsaha))
-- Fix config object. [\#105](https://github.com/appscode/kubed/pull/105) ([tamalsaha](https://github.com/tamalsaha))
 
 ## [0.2.0](https://github.com/appscode/kubed/tree/0.2.0) (2017-08-04)
 Kubed 0.2.0 can send push notifications.
