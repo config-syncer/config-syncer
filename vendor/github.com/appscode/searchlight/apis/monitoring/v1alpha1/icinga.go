@@ -3,7 +3,7 @@ package v1alpha1
 import (
 	"fmt"
 
-	"github.com/appscode/log"
+	"github.com/appscode/go/log"
 	"github.com/appscode/searchlight/data"
 )
 
