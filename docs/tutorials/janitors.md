@@ -74,6 +74,17 @@ type: Opaque
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, janitor operations are applied within one hour.
 
 
+## Janitor Authentication
+The following keys are supported for Secret passed via `elasticsearch.secretName`.
+
+| Key                    | Description                                                                 |
+-------------------------|-----------------------------------------------------------------------------|
+| `CA_CERT_DATA`         | `Optional` PEM encoded CA certificate used to connect to Elasticsearch.     |
+| `CLIENT_CERT_DATA`     | `Optional` PEM encoded Client certificate used to connect to Elasticsearch. |
+| `CLIENT_KEY_DATA`      | `Optional` PEM encoded Client private key used to connect to Elasticsearch. |
+| `INSECURE_SKIP_VERIFY` | `Optional` If set to `true`, skip certificate verification.                 |
+
+
 ## Disable Janitors
 If you would like to disable this feature, remove the `janitors` portion of your Kubed cluster config. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
 
