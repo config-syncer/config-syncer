@@ -102,6 +102,8 @@ spec:
     metadata:
       labels:
         app: kubed
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
       serviceAccountName: kubed-operator
       containers:
@@ -131,6 +133,9 @@ spec:
             secretName: kubed-config
         - name: scratch
           emptyDir: {}
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
 ---
 apiVersion: v1
 kind: Service
