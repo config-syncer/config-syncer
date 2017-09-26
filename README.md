@@ -12,7 +12,12 @@ Kubed (pronounced Cube-Dee) by AppsCode is a Kubernetes Cluster Operator Daemon.
  - Kubed has a built-in [search engine](/docs/tutorials/apiserver.md) for your cluster objects using [bleve](https://github.com/blevesearch/bleve).
 
 ## Supported Versions
-Kubernetes 1.5+
+Please pick a version of Kubed that matches your Kubernetes installation.
+
+| Kubed Version                                                            | Docs                                                            | Kubernetes Version |
+|--------------------------------------------------------------------------|-----------------------------------------------------------------|--------------------|
+| [0.3.0](https://github.com/appscode/kubed/releases/tag/0.3.0) (uses CRD) | [User Guide](https://github.com/appscode/kubed/tree/0.3.0/docs) | 1.7.x+             |
+| [0.2.0](https://github.com/appscode/kubed/releases/tag/0.2.0) (uses TPR) | [User Guide](https://github.com/appscode/kubed/tree/0.2.0/docs) | 1.5.x - 1.7.x      |
 
 ## Installation
 To install Kubed, please follow the guide [here](/docs/install.md).
