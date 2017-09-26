@@ -37,6 +37,7 @@ janitors:
 | `ttl`                          | `Required`. Time-to-live for data (eg, 5h30m30s).                       |
 | `elasticsearch.endpoint`       | Required for kind `Elasticsearch`. URL of Elasticsearch cluster.        |
 | `elasticsearch.logIndexPrefix` | Required for kind `Elasticsearch`. Prefix of log index.                 |
+| `elasticsearch.secretName`     | Optional for kind `Elasticsearch`. Name of secret used to pass Elasticsearch authentication . |
 | `influxdb.endpoint`            | Required for kind `InfluxDB`. URL of [InfluxDB server](https://github.com/kubernetes/heapster/blob/master/docs/sink-configuration.md#influxdb). |
 | `influxdb.username`            | Optional for kind `InfluxDB`. InfluxDB username (default: root)         |
 | `influxdb.password`            | Optional for kind `InfluxDB`. InfluxDB password (default: root)         |
