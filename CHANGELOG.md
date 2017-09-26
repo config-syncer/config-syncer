@@ -1,7 +1,7 @@
 # Change Log
 
 ## [0.3.0](https://github.com/appscode/kubed/tree/0.3.0) (2017-09-26)
-Kubed 0.3.0 can send push notifications.
+Kubed 0.3.0 supports auth for Elasticsearch janitors and annotates copied configmaps & secrets.
 
 __Changelog__
 - Support auth for Elasticsearch janitor [\#64](https://github.com/appscode/kubed/issues/64)
