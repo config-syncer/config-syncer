@@ -31,7 +31,7 @@ apiServer:
 |--------------------------------|------------------------------------------------------------------------------------------------|
 | `apiServer.address`            | `Optional`. Address of the Kubed API Server (can be overridden by `kubed run --address` flag). |
 | `apiServer.enableReverseIndex` | `Optional`. If set to `true`, builds a reverse index                                           |
-| `apiServer.enableReverseIndex` | `Optional`. If set to `true`, builds a search index for Kubernetes api objects using [bleve](https://github.com/blevesearch/bleve). |
+| `apiServer.enableSearchIndex` | `Optional`. If set to `true`, builds a search index for Kubernetes api objects using [bleve](https://github.com/blevesearch/bleve). |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
