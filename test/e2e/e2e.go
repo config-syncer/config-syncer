@@ -8,7 +8,6 @@ import (
 	"time"
 	"github.com/appscode/kubed/test/framework"
 	"github.com/appscode/kubed/pkg/operator"
-	"fmt"
 )
 
 const TestTimeout  = 2 * time.Hour
@@ -23,15 +22,11 @@ func TestE2ESuit(t *testing.T)  {
 
 	root = framework.New()
 
-	fmt.Println("Hello Root==============", root)
-
 	junitReporter := reporters.NewJUnitReporter("report.xml")
 	RunSpecsWithDefaultAndCustomReporters(t, "Kubed E2e Suite", []Reporter{junitReporter})
 }
 
 var _ = BeforeSuite(func() {
-	fmt.Println("Hello bfore suit")
-	By("hello------------------- config" + root.Config.KubeConfig)
 	op := &operator.Operator{
 		KubeClient:        root.KubeClient,
 		VoyagerClient:     root.KubedOperator.VoyagerClient,
@@ -50,4 +45,8 @@ var _ = BeforeSuite(func() {
 
 	err = op.Setup()
 	Expect(err).NotTo(HaveOccurred())
+})
+
+var _ = AfterSuite(func() {
+	root.DeleteNamespace()
 })

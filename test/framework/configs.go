@@ -27,15 +27,6 @@ type E2EConfig struct {
 }
 
 func init() {
-	/*fmt.Println("******************Hello Init", flag.String("master", "", ""))
-	flag.StringVar(&testConfigs.Master, "master", "", "The address of the Kubernetes API server (overrides any value in kubeconfig)")
-	flag.StringVar(&testConfigs.KubeConfig, "kubeconfig", "", "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
-	flag.StringVar(&testConfigs.CloudProviderName, "cloud-provider", "", "Name of cloud provider")
-	flag.StringVar(&testConfigs.HAProxyImageName, "haproxy-image", "appscode/haproxy:1.7.9-4.0.0-rc.1", "haproxy image name to be run")
-	flag.StringVar(&testConfigs.TestNamespace, "namespace", "test-"+rand.Characters(5), "Run tests in this namespaces")
-	// &testConfigs.Master = ""
-	&testConfigs.KubeConfig = ""*/
-
 	enableLogging()
 }
 
@@ -54,10 +45,6 @@ func enableLogging() {
 }
 
 func (c *E2EConfig) validate()  {
-	/*if c.CloudProviderName == "" {
-		log.Fatal("Provider name required, not provided")
-	}*/
-
 	if len(c.KubeConfig) == 0 {
 		c.KubeConfig = filepath.Join(homedir.HomeDir(), ".kube/config")
 	}

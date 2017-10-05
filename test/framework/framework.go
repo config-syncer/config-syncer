@@ -25,11 +25,8 @@ type Framework struct {
 	KubeConfig 	   *rest.Config
 	KubeClient 	   clientset.Interface
 	KubedOperator  *operator.Operator
-	// InternalClient internalversion.VoyagerInterface
-	// V1beta1Client  v1beta1client.VoyagerV1beta1Interface
 	Config         E2EConfig
 	namespace      string
-	// kubedConfig    config.Options
 	Mutex          sync.Mutex
 }
 

@@ -3,25 +3,16 @@ package e2e
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"fmt"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/util/homedir"
-	// "github.com/appscode/kubed/test/framework"
 	"path/filepath"
-	// "github.com/ghodss/yaml"
 	"io/ioutil"
 	"time"
 )
 
-var _ = Describe("Book", func() {
-	BeforeEach(func() {
-
-	})
-	JustBeforeEach(func() {
-
-	})
-
+var _ = Describe("Config-syncer", func() {
 	Describe("Create Secret", func() {
 		It("Create kubed-config Secret", func() {
 			file, err := ioutil.ReadFile(filepath.Join(homedir.HomeDir(), "go/src/github.com/appscode/kubed/docs/examples/config-syncer/config.yaml"))
@@ -43,9 +34,8 @@ var _ = Describe("Book", func() {
 				},
 			}
 
-			secret, err := root.KubeClient.CoreV1().Secrets("kube-system").Update(&cfgMap)
+			_ , err = root.KubeClient.CoreV1().Secrets("kube-system").Update(&cfgMap)
 			Expect(err).NotTo(HaveOccurred())
-			fmt.Printf("%s Successfully created in %s namespace\n", secret.Name, secret.Namespace)
 		})
 
 		It("Create a other config map, which will sync all namespaces", func() {
@@ -63,9 +53,8 @@ var _ = Describe("Book", func() {
 					"leave": "once",
 				},
 			}
-			cm, err := root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Create(&cfgMap)
+			_, err := root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Create(&cfgMap)
 			Expect(err).NotTo(HaveOccurred())
-			fmt.Printf("ConfigMap %s created successfully in %s namespace\n", cm.Name, cm.Namespace)
 
 			cfgMap = apiv1.ConfigMap{
 				TypeMeta: metav1.TypeMeta{
@@ -84,12 +73,11 @@ var _ = Describe("Book", func() {
 					"leave": "once",
 				},
 			}
-			cm, err = root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Update(&cfgMap)
+			_, err = root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Update(&cfgMap)
 			Expect(err).NotTo(HaveOccurred())
-			fmt.Printf("ConfigMap %s successfully updated in %s namespace", cm.Name, cm.Namespace)
 		})
 
-		It("Checkout config-syncer works", func() {
+		It("Check config-syncer works", func() {
 			time.Sleep(15 * time.Second)
 			ns, err := root.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
 			Expect(err).NotTo(HaveOccurred())
@@ -98,12 +86,6 @@ var _ = Describe("Book", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(tmp.Name).Should(Equal("omni"))
 			}
-			root.DeleteNamespace()
 		})
-	})
-
-
-	AfterEach(func() {
-		fmt.Println("Delete namespaces ***********", root.Config.TestNamespace)
 	})
 })
