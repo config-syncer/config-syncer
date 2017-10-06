@@ -13,21 +13,26 @@ import (
 	vcs "github.com/appscode/voyager/client/clientset"
 	// pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	srch_cs "github.com/appscode/searchlight/client/clientset"
+	"github.com/appscode/go/crypto/rand"
 )
-
 
 const (
 	MaxRetry = 200
-	NoRetry = 1
+	NoRetry  = 1
 )
 
 type Framework struct {
-	KubeConfig 	   *rest.Config
-	KubeClient 	   clientset.Interface
-	KubedOperator  *operator.Operator
-	Config         E2EConfig
-	namespace      string
-	Mutex          sync.Mutex
+	KubeConfig    *rest.Config
+	KubeClient    clientset.Interface
+	KubedOperator *operator.Operator
+	Config        E2EConfig
+	namespace     string
+	Mutex         sync.Mutex
+}
+
+type Invocation struct {
+	*Framework
+	app string
 }
 
 func New() *Framework {
@@ -49,4 +54,15 @@ func New() *Framework {
 			KubeDBClient:      kcs.NewForConfigOrDie(c),
 		},
 	}
+}
+
+func (f *Framework) Invoke() *Invocation {
+	return &Invocation{
+		Framework: f,
+		app:       rand.WithUniqSuffix("kubed-e2e"),
+	}
+}
+
+func (f *Invocation) App() string {
+	return f.app
 }

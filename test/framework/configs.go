@@ -50,10 +50,10 @@ func (c *E2EConfig) validate()  {
 	}
 
 	if len(c.TestNamespace) == 0 {
-		c.TestNamespace = rand.WithUniqSuffix("test-kubed")
+		c.TestNamespace = rand.WithUniqSuffix("kubed-e2e")
 	}
 
-	if !strings.HasPrefix(c.TestNamespace, "test-") {
+	if !strings.HasPrefix(c.TestNamespace, "kubed-e2e") {
 		log.Fatal("Namespace is not a Test namespace")
 	}
 }
