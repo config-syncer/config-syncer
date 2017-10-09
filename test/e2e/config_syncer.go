@@ -24,7 +24,20 @@ var _ = Describe("Config-syncer", func() {
 				tmp, err := f.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{LabelSelector: metav1.FormatLabelSelector(configSelector)})
 				Expect(err).NotTo(HaveOccurred())
 				return len(tmp.Items)
-			}, "10m", "5s").Should(Equal(len(ns.Items)))
+			}).Should(Equal(len(ns.Items)))
+		}
+		cfgMap = &apiv1.ConfigMap{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "v1",
+				Kind:       "ConfigMap",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+
+			},
+			Data: map[string]string{
+				"you":   "only",
+				"leave": "once",
+			},
 		}
 	)
 
@@ -60,33 +73,17 @@ var _ = Describe("Config-syncer", func() {
 			err := f.KubeClient.CoreV1().ConfigMaps(value.Namespace).Delete(value.Name, &metav1.DeleteOptions{})
 			Expect(err).NotTo(HaveOccurred())
 		}
-
-		tmp, err = f.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{LabelSelector: metav1.FormatLabelSelector(configSelector)})
-		Expect(err).NotTo(HaveOccurred())
-
-		Expect(len(tmp.Items)).Should(Equal(0))
 	})
 
 	Describe("Config-syncer test", func() {
 		Context("Config-sync with update config map", func() {
 			BeforeEach(func() {
-				cfgMap := &apiv1.ConfigMap{
-					TypeMeta: metav1.TypeMeta{
-						APIVersion: "v1",
-						Kind:       "ConfigMap",
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      f.App(),
-						Namespace: f.Config.TestNamespace,
-						Labels: map[string]string{
-							"app": f.App(),
-						},
-					},
-					Data: map[string]string{
-						"you":   "only",
-						"leave": "once",
-					},
+				cfgMap.ObjectMeta.Name = f.App()
+				if cfgMap.ObjectMeta.Labels == nil {
+					cfgMap.ObjectMeta.Labels = make(map[string]string)
 				}
+				cfgMap.ObjectMeta.Labels["app"] = f.App()
+
 				c, err := root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Create(cfgMap)
 				Expect(err).NotTo(HaveOccurred())
 
@@ -102,26 +99,13 @@ var _ = Describe("Config-syncer", func() {
 
 		Context("Config-sync with create config map", func() {
 			BeforeEach(func() {
-				cfgMap := &apiv1.ConfigMap{
-					TypeMeta: metav1.TypeMeta{
-						APIVersion: "v1",
-						Kind:       "ConfigMap",
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      f.App(),
-						Namespace: f.Config.TestNamespace,
-						Labels: map[string]string{
-							"app": f.App(),
-						},
-						Annotations: map[string]string{
-							"kubed.appscode.com/sync": "true",
-						},
-					},
-					Data: map[string]string{
-						"you":   "only",
-						"leave": "once",
-					},
+				cfgMap.ObjectMeta.Name = f.App()
+				if cfgMap.ObjectMeta.Labels == nil {
+					cfgMap.ObjectMeta.Labels = make(map[string]string)
 				}
+				cfgMap.ObjectMeta.Labels["app"] = f.App()
+
+				metav1.SetMetaDataAnnotation(&cfgMap.ObjectMeta, "kubed.appscode.com/sync", "true")
 				c, err := root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Create(cfgMap)
 				Expect(err).NotTo(HaveOccurred())
 
