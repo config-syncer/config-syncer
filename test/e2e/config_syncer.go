@@ -23,6 +23,7 @@ var _ = Describe("Config-syncer", func() {
 			Eventually(func() int {
 				tmp, err := f.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{LabelSelector: metav1.FormatLabelSelector(configSelector)})
 				Expect(err).NotTo(HaveOccurred())
+
 				return len(tmp.Items)
 			}).Should(Equal(len(ns.Items)))
 		}
@@ -79,6 +80,8 @@ var _ = Describe("Config-syncer", func() {
 		Context("Config-sync with update config map", func() {
 			BeforeEach(func() {
 				cfgMap.ObjectMeta.Name = f.App()
+				cfgMap.ObjectMeta.Namespace = f.Namespace()
+
 				if cfgMap.ObjectMeta.Labels == nil {
 					cfgMap.ObjectMeta.Labels = make(map[string]string)
 				}
@@ -100,6 +103,7 @@ var _ = Describe("Config-syncer", func() {
 		Context("Config-sync with create config map", func() {
 			BeforeEach(func() {
 				cfgMap.ObjectMeta.Name = f.App()
+				cfgMap.ObjectMeta.Namespace = f.Namespace()
 				if cfgMap.ObjectMeta.Labels == nil {
 					cfgMap.ObjectMeta.Labels = make(map[string]string)
 				}
