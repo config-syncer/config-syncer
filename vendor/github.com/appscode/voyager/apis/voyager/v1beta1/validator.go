@@ -8,7 +8,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 type indices struct {
@@ -33,7 +32,20 @@ func (a address) String() string {
 	return fmt.Sprintf(":%d", a.PodPort)
 }
 
-func (r *Ingress) IsValid(cloudProvider string) error {
+func (r *Ingress) Migrate() {
+	for ti, tls := range r.Spec.TLS {
+		if tls.SecretName != "" {
+			r.Spec.TLS[ti].Ref = &LocalTypedReference{
+				APIVersion: "v1",
+				Kind:       "Secret",
+				Name:       tls.SecretName,
+			}
+			r.Spec.TLS[ti].SecretName = ""
+		}
+	}
+}
+
+func (r Ingress) IsValid(cloudProvider string) error {
 	for ri, rule := range r.Spec.FrontendRules {
 		if _, err := checkRequiredPort(rule.Port); err != nil {
 			return fmt.Errorf("spec.frontendRules[%d].port %s is invalid. Reason: %s", ri, rule.Port, err)
@@ -41,29 +53,14 @@ func (r *Ingress) IsValid(cloudProvider string) error {
 	}
 	for ti, tls := range r.Spec.TLS {
 		if tls.SecretName != "" {
-			if tls.SecretRef != nil &&
-				!(tls.SecretRef.Name == tls.SecretName &&
-					(tls.SecretRef.Namespace == "" || tls.SecretRef.Namespace == r.Namespace) &&
-					(tls.SecretRef.Kind == "" || tls.SecretRef.Kind == "Secret")) {
-				return fmt.Errorf("spec.tls[%d] specifies different secret name and secret ref", ti)
-			}
-			if r.Spec.TLS[ti].SecretRef == nil {
-				r.Spec.TLS[ti].SecretRef = &apiv1.ObjectReference{
-					APIVersion: "v1",
-					Kind:       "Secret",
-					Name:       tls.SecretName,
-				}
-			}
-		} else if tls.SecretRef == nil {
+			return fmt.Errorf("spec.tls[%d].secretName must be migrated to spec.tls[%d].ref", ti, ti)
+		} else if tls.Ref == nil {
 			return fmt.Errorf("spec.tls[%d] specifies no secret name and secret ref", ti)
 		} else {
-			if tls.SecretRef.Kind != "" && sets.NewString("Secret", "Certificate").Has(tls.SecretRef.Kind) {
-				return fmt.Errorf("spec.tls[%d].secretRef.kind %s is unsupported", ti, tls.SecretRef.Kind)
+			if tls.Ref.Kind != "" && !(strings.EqualFold(tls.Ref.Kind, "Secret") || strings.EqualFold(tls.Ref.Kind, "Certificate")) {
+				return fmt.Errorf("spec.tls[%d].ref.kind %s is unsupported", ti, tls.Ref.Kind)
 			}
-			if tls.SecretRef.Namespace != "" && tls.SecretRef.Namespace != r.Namespace {
-				return fmt.Errorf("spec.tls[%d].secretRef.namespace does not match ingress namespace", ti)
-			}
-			if tls.SecretRef.Name == "" {
+			if tls.Ref.Name == "" {
 				return fmt.Errorf("spec.tls[%d] specifies no secret name and secret ref name", ti)
 			}
 		}
@@ -73,7 +70,7 @@ func (r *Ingress) IsValid(cloudProvider string) error {
 	nodePorts := make(map[int]int)
 	usesHTTPRule := false
 	for ri, rule := range r.Spec.Rules {
-		if rule.HTTP != nil {
+		if rule.HTTP != nil && rule.TCP == nil {
 			usesHTTPRule = true
 			var err error
 			var podPort, nodePort int
@@ -150,7 +147,7 @@ func (r *Ingress) IsValid(cloudProvider string) error {
 					}
 				}
 			}
-		} else if rule.TCP != nil {
+		} else if rule.TCP != nil && rule.HTTP == nil {
 			var a *address
 			if podPort, err := checkRequiredPort(rule.TCP.Port); err != nil {
 				return fmt.Errorf("spec.rule[%d].tcp.port %s is invalid. Reason: %s", ri, rule.TCP.Port, err)
@@ -222,7 +219,7 @@ func (r *Ingress) IsValid(cloudProvider string) error {
 		return fmt.Errorf("ingress %s@%s uses unsupported LBType %s for cloud provider %s", r.Name, r.Namespace, r.LBType(), cloudProvider)
 	}
 
-	if (r.LBType() == LBTypeNodePort || r.LBType() == LBTypeHostPort) && len(r.Spec.LoadBalancerSourceRanges) > 0 {
+	if (r.LBType() == LBTypeNodePort || r.LBType() == LBTypeHostPort || r.LBType() == LBTypeInternal) && len(r.Spec.LoadBalancerSourceRanges) > 0 {
 		return fmt.Errorf("ingress %s@%s of type %s can't use `spec.LoadBalancerSourceRanges`", r.Name, r.Namespace, r.LBType())
 	}
 
@@ -243,6 +240,8 @@ func (r Ingress) SupportsLBType(cloudProvider string) bool {
 	case LBTypeHostPort:
 		// TODO: https://github.com/appscode/voyager/issues/374
 		return cloudProvider != "acs" && cloudProvider != "azure" && cloudProvider != "gce" && cloudProvider != "gke"
+	case LBTypeInternal:
+		return true
 	default:
 		return false
 	}
@@ -290,7 +289,6 @@ func (c Certificate) IsValid(cloudProvider string) error {
 
 	if c.Spec.ChallengeProvider.HTTP != nil {
 		if len(c.Spec.ChallengeProvider.HTTP.Ingress.Name) == 0 ||
-			len(c.Spec.ChallengeProvider.HTTP.Ingress.Namespace) == 0 ||
 			(c.Spec.ChallengeProvider.HTTP.Ingress.APIVersion != SchemeGroupVersion.String() && c.Spec.ChallengeProvider.HTTP.Ingress.APIVersion != "extensions/v1beta1") {
 			return fmt.Errorf("invalid ingress reference")
 		}
@@ -311,10 +309,6 @@ func (c Certificate) IsValid(cloudProvider string) error {
 
 	if len(c.Spec.ACMEUserSecretName) == 0 {
 		return fmt.Errorf("no user secret name specified")
-	}
-
-	if c.Spec.Storage.Secret == nil && c.Spec.Storage.Vault == nil {
-		return fmt.Errorf("no storage specified")
 	}
 
 	if c.Spec.Storage.Secret != nil && c.Spec.Storage.Vault != nil {

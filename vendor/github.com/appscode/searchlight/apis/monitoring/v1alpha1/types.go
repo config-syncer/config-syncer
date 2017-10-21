@@ -4,7 +4,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// +genclient=true
+// +genclient
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -18,6 +18,8 @@ type ClusterAlert struct {
 	// More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status
 	Spec ClusterAlertSpec `json:"spec,omitempty"`
 }
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // ClusterAlertList is a collection of ClusterAlert.
 type ClusterAlertList struct {
@@ -49,10 +51,10 @@ type ClusterAlertSpec struct {
 	Receivers []Receiver `json:"receivers,omitempty"`
 
 	// Vars contains Icinga Service variables to be used in CheckCommand
-	Vars map[string]interface{} `json:"vars,omitempty"`
+	Vars map[string]string `json:"vars,omitempty"`
 }
 
-// +genclient=true
+// +genclient
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -66,6 +68,8 @@ type NodeAlert struct {
 	// More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status
 	Spec NodeAlertSpec `json:"spec,omitempty"`
 }
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // NodeAlertList is a collection of NodeAlert.
 type NodeAlertList struct {
@@ -101,10 +105,10 @@ type NodeAlertSpec struct {
 	Receivers []Receiver `json:"receivers,omitempty"`
 
 	// Vars contains Icinga Service variables to be used in CheckCommand
-	Vars map[string]interface{} `json:"vars,omitempty"`
+	Vars map[string]string `json:"vars,omitempty"`
 }
 
-// +genclient=true
+// +genclient
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -118,6 +122,8 @@ type PodAlert struct {
 	// More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status
 	Spec PodAlertSpec `json:"spec,omitempty"`
 }
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // PodAlertList is a collection of PodAlert.
 type PodAlertList struct {
@@ -153,7 +159,7 @@ type PodAlertSpec struct {
 	Receivers []Receiver `json:"receivers,omitempty"`
 
 	// Vars contains Icinga Service variables to be used in CheckCommand
-	Vars map[string]interface{} `json:"vars,omitempty"`
+	Vars map[string]string `json:"vars,omitempty"`
 }
 
 type Receiver struct {

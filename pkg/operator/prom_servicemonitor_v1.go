@@ -9,11 +9,11 @@ import (
 	"github.com/appscode/kubed/pkg/util"
 	kutil "github.com/appscode/kutil/prometheus/v1"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -28,10 +28,10 @@ func (op *Operator) WatchServiceMonitorV1() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return op.PromClient.ServiceMonitors(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.PromClient.ServiceMonitors(core.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return op.PromClient.ServiceMonitors(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.PromClient.ServiceMonitors(core.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
@@ -54,7 +54,7 @@ func (op *Operator) WatchServiceMonitorV1() {
 							log.Errorln(err)
 						}
 						if op.ReverseIndex.Prometheus != nil {
-							proms, err := op.PromClient.Prometheuses(apiv1.NamespaceAll).List(metav1.ListOptions{})
+							proms, err := op.PromClient.Prometheuses(core.NamespaceAll).List(metav1.ListOptions{})
 							if err != nil {
 								log.Errorln(err)
 								return

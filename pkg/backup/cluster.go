@@ -9,10 +9,10 @@ import (
 	"github.com/appscode/go-term"
 	"github.com/appscode/go/log"
 	"github.com/ghodss/yaml"
+	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
-	kapi "k8s.io/client-go/pkg/api"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
 )
@@ -54,7 +54,7 @@ func SnapshotCluster(kubeConfig *rest.Config, backupDir string, sanitize bool) e
 			kubeConfig.ContentConfig = dynamic.ContentConfig()
 			kubeConfig.GroupVersion = &schema.GroupVersion{Group: gv.Group, Version: gv.Version}
 			kubeConfig.APIPath = "/apis"
-			if gv.Group == kapi.GroupName {
+			if gv.Group == core.GroupName {
 				kubeConfig.APIPath = "/api"
 			}
 			restClient, err := rest.RESTClientFor(kubeConfig)
@@ -172,13 +172,13 @@ func cleanUpPodSpec(podSpec map[string]interface{}) map[string]interface{} {
 		term.Errorln(err)
 		return podSpec
 	}
-	p := &kapi.PodSpec{}
+	p := &core.PodSpec{}
 	err = yaml.Unmarshal(b, p)
 	if err != nil {
 		term.Errorln(err)
 		return podSpec // Not a podspec
 	}
-	p.DNSPolicy = kapi.DNSPolicy("")
+	p.DNSPolicy = core.DNSPolicy("")
 	p.NodeName = ""
 	if p.ServiceAccountName == "default" {
 		p.ServiceAccountName = ""

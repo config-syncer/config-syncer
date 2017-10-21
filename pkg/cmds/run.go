@@ -16,8 +16,8 @@ import (
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	kcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
 	"github.com/spf13/cobra"
+	core "k8s.io/api/core/v1"
 	clientset "k8s.io/client-go/kubernetes"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -95,5 +95,5 @@ func namespace() string {
 			return ns
 		}
 	}
-	return apiv1.NamespaceDefault
+	return core.NamespaceDefault
 }

@@ -1,9 +1,9 @@
 package v1beta1
 
 import (
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
@@ -12,7 +12,7 @@ const (
 	ResourceTypeIngress = "ingresses"
 )
 
-// +genclient=true
+// +genclient
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -79,11 +79,11 @@ type IngressSpec struct {
 	LoadBalancerSourceRanges []string `json:"loadBalancerSourceRanges,omitempty"`
 
 	// Compute Resources required by the sidecar container.
-	Resources apiv1.ResourceRequirements `json:"resources,omitempty"`
+	Resources core.ResourceRequirements `json:"resources,omitempty"`
 
 	// If specified, the pod's scheduling constraints
 	// +optional
-	Affinity *apiv1.Affinity `json:"affinity,omitempty" protobuf:"bytes,18,opt,name=affinity"`
+	Affinity *core.Affinity `json:"affinity,omitempty" protobuf:"bytes,18,opt,name=affinity"`
 
 	// If specified, the pod will be dispatched by specified scheduler.
 	// If not specified, the pod will be dispatched by default scheduler.
@@ -92,7 +92,7 @@ type IngressSpec struct {
 
 	// If specified, the pod's tolerations.
 	// +optional
-	Tolerations []apiv1.Toleration `json:"tolerations,omitempty" protobuf:"bytes,22,opt,name=tolerations"`
+	Tolerations []core.Toleration `json:"tolerations,omitempty" protobuf:"bytes,22,opt,name=tolerations"`
 }
 
 // IngressTLS describes the transport layer security associated with an Ingress.
@@ -110,14 +110,14 @@ type IngressTLS struct {
 	// Deprecated
 	SecretName string `json:"secretName,omitempty"`
 
-	// SecretRef to used tls termination.
-	SecretRef *apiv1.ObjectReference `json:"secretRef,omitempty"`
+	// Ref to used tls termination.
+	Ref *LocalTypedReference `json:"ref,omitempty"`
 }
 
 // IngressStatus describe the current state of the Ingress.
 type IngressStatus struct {
 	// LoadBalancer contains the current status of the load-balancer.
-	LoadBalancer apiv1.LoadBalancerStatus `json:"loadBalancer,omitempty"`
+	LoadBalancer core.LoadBalancerStatus `json:"loadBalancer,omitempty"`
 }
 
 // IngressRule represents the rules mapping the paths under a specified host to
@@ -269,4 +269,30 @@ type FrontendRule struct {
 	Port intstr.IntOrString `json:"port,omitempty"`
 	// Serialized rules
 	Rules []string `json:"rules,omitempty"`
+
+	Auth *AuthOption `json:"auth,omitempty"`
+}
+
+type AuthOption struct {
+	Basic *BasicAuth `json:"basic,omitempty"`
+	TLS   *TLSAuth   `json:"tls,omitempty"`
+}
+
+type BasicAuth struct {
+	SecretName string `json:"secretName,omitempty"`
+	Realm      string `json:"realm,omitempty"`
+}
+
+type TLSAuthVerifyOption string
+
+const (
+	TLSAuthVerifyOptional TLSAuthVerifyOption = "optional"
+	TLSAuthVerifyRequired TLSAuthVerifyOption = "required"
+)
+
+type TLSAuth struct {
+	SecretName   string              `json:"secretName,omitempty"`
+	VerifyClient TLSAuthVerifyOption `json:"verifyClient,omitempty"`
+	Headers      map[string]string   `json:"headers,omitempty"`
+	ErrorPage    string              `json:"errorPage,omitempty"`
 }

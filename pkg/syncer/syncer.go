@@ -5,17 +5,17 @@ import (
 
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/util"
+	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 type ConfigSyncer struct {
 	KubeClient clientset.Interface
 }
 
-func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *apiv1.ConfigMap) error {
+func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *core.ConfigMap) error {
 	var oldSynced, newSynced bool
 	if oldSrc != nil {
 		oldSynced, _ = util.GetBool(oldSrc.Annotations, config.ConfigSyncKey)
@@ -50,7 +50,7 @@ func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *apiv1.ConfigMap) error {
 	return nil
 }
 
-func (s *ConfigSyncer) upsertConfigMap(src *apiv1.ConfigMap, namespace string) error {
+func (s *ConfigSyncer) upsertConfigMap(src *core.ConfigMap, namespace string) error {
 	ok, err := util.GetBool(src.Annotations, config.ConfigSyncKey)
 	if err != nil {
 		return err
@@ -75,7 +75,7 @@ func (s *ConfigSyncer) upsertConfigMap(src *apiv1.ConfigMap, namespace string) e
 				n.Annotations[k] = v
 			}
 		}
-		ref, _ := json.Marshal(apiv1.ObjectReference{
+		ref, _ := json.Marshal(core.ObjectReference{
 			APIVersion:      src.APIVersion,
 			Kind:            src.Kind,
 			Name:            src.Name,
@@ -97,7 +97,7 @@ func (s *ConfigSyncer) upsertConfigMap(src *apiv1.ConfigMap, namespace string) e
 			nu.Annotations[k] = v
 		}
 	}
-	ref, _ := json.Marshal(apiv1.ObjectReference{
+	ref, _ := json.Marshal(core.ObjectReference{
 		APIVersion:      src.APIVersion,
 		Kind:            src.Kind,
 		Name:            src.Name,
@@ -110,7 +110,7 @@ func (s *ConfigSyncer) upsertConfigMap(src *apiv1.ConfigMap, namespace string) e
 	return err
 }
 
-func (s *ConfigSyncer) SyncSecret(oldSrc, newSrc *apiv1.Secret) error {
+func (s *ConfigSyncer) SyncSecret(oldSrc, newSrc *core.Secret) error {
 	var oldSynced, newSynced bool
 	if oldSrc != nil {
 		oldSynced, _ = util.GetBool(oldSrc.Annotations, config.ConfigSyncKey)
@@ -145,7 +145,7 @@ func (s *ConfigSyncer) SyncSecret(oldSrc, newSrc *apiv1.Secret) error {
 	return nil
 }
 
-func (s *ConfigSyncer) upsertSecret(src *apiv1.Secret, namespace string) error {
+func (s *ConfigSyncer) upsertSecret(src *core.Secret, namespace string) error {
 	ok, err := util.GetBool(src.Annotations, config.ConfigSyncKey)
 	if err != nil {
 		return err
@@ -170,7 +170,7 @@ func (s *ConfigSyncer) upsertSecret(src *apiv1.Secret, namespace string) error {
 				n.Annotations[k] = v
 			}
 		}
-		ref, _ := json.Marshal(apiv1.ObjectReference{
+		ref, _ := json.Marshal(core.ObjectReference{
 			APIVersion:      src.APIVersion,
 			Kind:            src.Kind,
 			Name:            src.Name,
@@ -192,7 +192,7 @@ func (s *ConfigSyncer) upsertSecret(src *apiv1.Secret, namespace string) error {
 			nu.Annotations[k] = v
 		}
 	}
-	ref, _ := json.Marshal(apiv1.ObjectReference{
+	ref, _ := json.Marshal(core.ObjectReference{
 		APIVersion:      src.APIVersion,
 		Kind:            src.Kind,
 		Name:            src.Name,
@@ -211,7 +211,7 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 		return err
 	}
 
-	cfgmaps, err := s.KubeClient.CoreV1().ConfigMaps(apiv1.NamespaceAll).List(metav1.ListOptions{})
+	cfgmaps, err := s.KubeClient.CoreV1().ConfigMaps(core.NamespaceAll).List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
@@ -219,7 +219,7 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 		s.upsertConfigMap(&cfgmap, namespace)
 	}
 
-	secrets, err := s.KubeClient.CoreV1().Secrets(apiv1.NamespaceAll).List(metav1.ListOptions{})
+	secrets, err := s.KubeClient.CoreV1().Secrets(core.NamespaceAll).List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}

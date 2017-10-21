@@ -7,13 +7,13 @@ import (
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
-	kutil "github.com/appscode/kutil/kubedb/v1alpha1"
 	tapi "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
+	kutil "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1/util"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -28,10 +28,10 @@ func (op *Operator) WatchElasticsearches() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return op.KubeDBClient.Elasticsearchs(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeDBClient.Elasticsearchs(core.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return op.KubeDBClient.Elasticsearchs(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeDBClient.Elasticsearchs(core.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,

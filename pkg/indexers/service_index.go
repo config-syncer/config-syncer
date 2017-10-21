@@ -11,19 +11,19 @@ import (
 	kutil "github.com/appscode/kutil/core/v1"
 	"github.com/appscode/pat"
 	"github.com/blevesearch/bleve"
+	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	clientset "k8s.io/client-go/kubernetes"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 type ServiceIndexer interface {
-	Add(svc *apiv1.Service) error
-	Delete(svc *apiv1.Service) error
-	AddPodForService(svc *apiv1.Service, pod *apiv1.Pod) error
-	DeletePodForService(svc *apiv1.Service, pod *apiv1.Pod) error
-	Update(old, new *apiv1.Service) error
+	Add(svc *core.Service) error
+	Delete(svc *core.Service) error
+	AddPodForService(svc *core.Service, pod *core.Pod) error
+	DeletePodForService(svc *core.Service, pod *core.Pod) error
+	Update(old, new *core.Service) error
 	Key(meta metav1.ObjectMeta) []byte
 	ServeHTTP(w http.ResponseWriter, req *http.Request)
 }
@@ -35,7 +35,7 @@ type ServiceIndexerImpl struct {
 	index      bleve.Index
 }
 
-func (ri *ServiceIndexerImpl) Add(svc *apiv1.Service) error {
+func (ri *ServiceIndexerImpl) Add(svc *core.Service) error {
 	log.Infof("New service: %v", svc.Name)
 	log.V(5).Infof("Service details: %v", svc)
 
@@ -51,7 +51,7 @@ func (ri *ServiceIndexerImpl) Add(svc *apiv1.Service) error {
 	return nil
 }
 
-func (ri *ServiceIndexerImpl) Delete(svc *apiv1.Service) error {
+func (ri *ServiceIndexerImpl) Delete(svc *core.Service) error {
 	pods, err := ri.podsForService(svc)
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func (ri *ServiceIndexerImpl) Delete(svc *apiv1.Service) error {
 	return nil
 }
 
-func (ri *ServiceIndexerImpl) Update(old, new *apiv1.Service) error {
+func (ri *ServiceIndexerImpl) Update(old, new *core.Service) error {
 	if !reflect.DeepEqual(old.Spec.Selector, new.Spec.Selector) {
 		// Only update if selector changes
 		err := ri.Delete(old)
@@ -79,19 +79,19 @@ func (ri *ServiceIndexerImpl) Update(old, new *apiv1.Service) error {
 	return nil
 }
 
-func (ri *ServiceIndexerImpl) AddPodForService(svc *apiv1.Service, pod *apiv1.Pod) error {
+func (ri *ServiceIndexerImpl) AddPodForService(svc *core.Service, pod *core.Pod) error {
 	key := ri.Key(svc.ObjectMeta)
 	return ri.insert(key, svc)
 }
 
-func (ri *ServiceIndexerImpl) DeletePodForService(svc *apiv1.Service, pod *apiv1.Pod) error {
+func (ri *ServiceIndexerImpl) DeletePodForService(svc *core.Service, pod *core.Pod) error {
 	return ri.remove(ri.Key(pod.ObjectMeta), svc)
 }
 
-func (ri *ServiceIndexerImpl) insert(key []byte, svc *apiv1.Service) error {
+func (ri *ServiceIndexerImpl) insert(key []byte, svc *core.Service) error {
 	raw, err := ri.index.GetInternal(key)
 	if err != nil || len(raw) == 0 {
-		data := apiv1.ServiceList{Items: []apiv1.Service{*svc}}
+		data := core.ServiceList{Items: []core.Service{*svc}}
 		raw, err := json.Marshal(data)
 		if err != nil {
 			return err
@@ -101,7 +101,7 @@ func (ri *ServiceIndexerImpl) insert(key []byte, svc *apiv1.Service) error {
 			return err
 		}
 	} else {
-		var data apiv1.ServiceList
+		var data core.ServiceList
 		err := json.Unmarshal(raw, &data)
 		if err != nil {
 			return err
@@ -122,18 +122,18 @@ func (ri *ServiceIndexerImpl) insert(key []byte, svc *apiv1.Service) error {
 	return nil
 }
 
-func (ri ServiceIndexerImpl) remove(key []byte, svc *apiv1.Service) error {
+func (ri ServiceIndexerImpl) remove(key []byte, svc *core.Service) error {
 	raw, err := ri.index.GetInternal(key)
 	if err != nil {
 		return err
 	}
 	if len(raw) > 0 {
-		var data apiv1.ServiceList
+		var data core.ServiceList
 		err := json.Unmarshal(raw, &data)
 		if err != nil {
 			return err
 		}
-		var ni []apiv1.Service
+		var ni []core.Service
 		for i, valueSvc := range data.Items {
 			if ri.equal(svc, &valueSvc) {
 				ni = append(data.Items[:i], data.Items[i+1:]...)
@@ -148,7 +148,7 @@ func (ri ServiceIndexerImpl) remove(key []byte, svc *apiv1.Service) error {
 				return err
 			}
 		} else {
-			raw, err := json.Marshal(apiv1.ServiceList{Items: ni})
+			raw, err := json.Marshal(core.ServiceList{Items: ni})
 			if err != nil {
 				return err
 			}
@@ -161,11 +161,11 @@ func (ri ServiceIndexerImpl) remove(key []byte, svc *apiv1.Service) error {
 	return nil
 }
 
-func (ri *ServiceIndexerImpl) podsForService(svc *apiv1.Service) (*apiv1.PodList, error) {
+func (ri *ServiceIndexerImpl) podsForService(svc *core.Service) (*core.PodList, error) {
 	// Service have an empty selector. Instead of getting all pod we
 	// try to ignore pods for it.
 	if len(svc.Spec.Selector) == 0 {
-		return &apiv1.PodList{}, nil
+		return &core.PodList{}, nil
 	}
 
 	return ri.kubeClient.CoreV1().Pods(metav1.NamespaceAll).List(metav1.ListOptions{
@@ -173,7 +173,7 @@ func (ri *ServiceIndexerImpl) podsForService(svc *apiv1.Service) (*apiv1.PodList
 	})
 }
 
-func (ri *ServiceIndexerImpl) equal(a, b *apiv1.Service) bool {
+func (ri *ServiceIndexerImpl) equal(a, b *core.Service) bool {
 	if a.Name == b.Name && a.Namespace == b.Namespace {
 		return true
 	}
@@ -181,7 +181,7 @@ func (ri *ServiceIndexerImpl) equal(a, b *apiv1.Service) bool {
 }
 
 func (ri *ServiceIndexerImpl) Key(meta metav1.ObjectMeta) []byte {
-	return []byte(kutil.GetGroupVersionKind(&apiv1.Pod{}).String() + "/" + meta.Namespace + "/" + meta.Name)
+	return []byte(kutil.GetGroupVersionKind(&core.Pod{}).String() + "/" + meta.Namespace + "/" + meta.Name)
 }
 
 func (ri *ServiceIndexerImpl) ServeHTTP(w http.ResponseWriter, req *http.Request) {

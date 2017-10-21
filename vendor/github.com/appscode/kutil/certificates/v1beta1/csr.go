@@ -6,30 +6,33 @@ import (
 
 	"github.com/appscode/kutil"
 	"github.com/golang/glog"
+	certificates "k8s.io/api/certificates/v1beta1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/apimachinery/pkg/util/wait"
-	clientset "k8s.io/client-go/kubernetes"
-	certificates "k8s.io/client-go/pkg/apis/certificates/v1beta1"
+	"k8s.io/client-go/kubernetes"
 )
 
-func EnsureCSR(c clientset.Interface, meta metav1.ObjectMeta, transform func(*certificates.CertificateSigningRequest) *certificates.CertificateSigningRequest) (*certificates.CertificateSigningRequest, error) {
-	return CreateOrPatchCSR(c, meta, transform)
-}
-
-func CreateOrPatchCSR(c clientset.Interface, meta metav1.ObjectMeta, transform func(*certificates.CertificateSigningRequest) *certificates.CertificateSigningRequest) (*certificates.CertificateSigningRequest, error) {
+func CreateOrPatchCSR(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*certificates.CertificateSigningRequest) *certificates.CertificateSigningRequest) (*certificates.CertificateSigningRequest, error) {
 	cur, err := c.CertificatesV1beta1().CertificateSigningRequests().Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
-		return c.CertificatesV1beta1().CertificateSigningRequests().Create(transform(&certificates.CertificateSigningRequest{ObjectMeta: meta}))
+		glog.V(3).Infof("Creating CertificateSigningRequest %s/%s.", meta.Namespace, meta.Name)
+		return c.CertificatesV1beta1().CertificateSigningRequests().Create(transform(&certificates.CertificateSigningRequest{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "CertificateSigningRequest",
+				APIVersion: certificates.SchemeGroupVersion.String(),
+			},
+			ObjectMeta: meta,
+		}))
 	} else if err != nil {
 		return nil, err
 	}
 	return PatchCSR(c, cur, transform)
 }
 
-func PatchCSR(c clientset.Interface, cur *certificates.CertificateSigningRequest, transform func(*certificates.CertificateSigningRequest) *certificates.CertificateSigningRequest) (*certificates.CertificateSigningRequest, error) {
+func PatchCSR(c kubernetes.Interface, cur *certificates.CertificateSigningRequest, transform func(*certificates.CertificateSigningRequest) *certificates.CertificateSigningRequest) (*certificates.CertificateSigningRequest, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
 		return nil, err
@@ -47,11 +50,11 @@ func PatchCSR(c clientset.Interface, cur *certificates.CertificateSigningRequest
 	if len(patch) == 0 || string(patch) == "{}" {
 		return cur, nil
 	}
-	glog.V(5).Infof("Patching CertificateSigningRequest %s@%s with %s.", cur.Name, cur.Namespace, string(patch))
+	glog.V(3).Infof("Patching CertificateSigningRequest %s/%s with %s.", cur.Namespace, cur.Name, string(patch))
 	return c.CertificatesV1beta1().CertificateSigningRequests().Patch(cur.Name, types.StrategicMergePatchType, patch)
 }
 
-func TryPatchCSR(c clientset.Interface, meta metav1.ObjectMeta, transform func(*certificates.CertificateSigningRequest) *certificates.CertificateSigningRequest) (result *certificates.CertificateSigningRequest, err error) {
+func TryPatchCSR(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*certificates.CertificateSigningRequest) *certificates.CertificateSigningRequest) (result *certificates.CertificateSigningRequest, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++
@@ -62,17 +65,17 @@ func TryPatchCSR(c clientset.Interface, meta metav1.ObjectMeta, transform func(*
 			result, e2 = PatchCSR(c, cur, transform)
 			return e2 == nil, nil
 		}
-		glog.Errorf("Attempt %d failed to patch CertificateSigningRequest %s@%s due to %v.", attempt, cur.Name, cur.Namespace, e2)
+		glog.Errorf("Attempt %d failed to patch CertificateSigningRequest %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)
 		return false, nil
 	})
 
 	if err != nil {
-		err = fmt.Errorf("failed to patch CertificateSigningRequest %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
+		err = fmt.Errorf("failed to patch CertificateSigningRequest %s/%s after %d attempts due to %v", meta.Namespace, meta.Name, attempt, err)
 	}
 	return
 }
 
-func TryUpdateCSR(c clientset.Interface, meta metav1.ObjectMeta, transform func(*certificates.CertificateSigningRequest) *certificates.CertificateSigningRequest) (result *certificates.CertificateSigningRequest, err error) {
+func TryUpdateCSR(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*certificates.CertificateSigningRequest) *certificates.CertificateSigningRequest) (result *certificates.CertificateSigningRequest, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++
@@ -83,12 +86,12 @@ func TryUpdateCSR(c clientset.Interface, meta metav1.ObjectMeta, transform func(
 			result, e2 = c.CertificatesV1beta1().CertificateSigningRequests().Update(transform(cur))
 			return e2 == nil, nil
 		}
-		glog.Errorf("Attempt %d failed to update CertificateSigningRequest %s@%s due to %v.", attempt, cur.Name, cur.Namespace, e2)
+		glog.Errorf("Attempt %d failed to update CertificateSigningRequest %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)
 		return false, nil
 	})
 
 	if err != nil {
-		err = fmt.Errorf("failed to update CertificateSigningRequest %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
+		err = fmt.Errorf("failed to update CertificateSigningRequest %s/%s after %d attempts due to %v", meta.Namespace, meta.Name, attempt, err)
 	}
 	return
 }

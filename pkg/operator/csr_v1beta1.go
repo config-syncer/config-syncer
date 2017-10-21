@@ -8,11 +8,11 @@ import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	kutil "github.com/appscode/kutil/certificates/v1beta1"
+	certificates "k8s.io/api/certificates/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	certificates "k8s.io/client-go/pkg/apis/certificates/v1beta1"
 	"k8s.io/client-go/tools/cache"
 )
 

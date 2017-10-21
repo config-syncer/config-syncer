@@ -75,11 +75,13 @@ func (c CheckCluster) IsValid() bool {
 func ParseCheckCluster(s string) (*CheckCluster, error) {
 	cmd := CheckCluster(s)
 	if _, ok := ClusterCommands[cmd]; !ok {
-		return nil, fmt.Errorf("Invalid cluster check command %s", s)
+		return nil, fmt.Errorf("invalid cluster check command %s", s)
 	}
 	return &cmd, nil
 }
 
+// +k8s:deepcopy-gen=false
+// +k8s:gen-deepcopy=false
 type IcingaCommand struct {
 	Name   string
 	Vars   map[string]data.CommandVar

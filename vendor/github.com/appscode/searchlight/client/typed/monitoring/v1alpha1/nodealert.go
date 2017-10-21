@@ -58,6 +58,41 @@ func newNodeAlerts(c *MonitoringV1alpha1Client, namespace string) *nodeAlerts {
 	}
 }
 
+// Get takes name of the nodeAlert, and returns the corresponding nodeAlert object, and an error if there is any.
+func (c *nodeAlerts) Get(name string, options v1.GetOptions) (result *v1alpha1.NodeAlert, err error) {
+	result = &v1alpha1.NodeAlert{}
+	err = c.client.Get().
+		Namespace(c.ns).
+		Resource("nodealerts").
+		Name(name).
+		VersionedParams(&options, scheme.ParameterCodec).
+		Do().
+		Into(result)
+	return
+}
+
+// List takes label and field selectors, and returns the list of NodeAlerts that match those selectors.
+func (c *nodeAlerts) List(opts v1.ListOptions) (result *v1alpha1.NodeAlertList, err error) {
+	result = &v1alpha1.NodeAlertList{}
+	err = c.client.Get().
+		Namespace(c.ns).
+		Resource("nodealerts").
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Do().
+		Into(result)
+	return
+}
+
+// Watch returns a watch.Interface that watches the requested nodeAlerts.
+func (c *nodeAlerts) Watch(opts v1.ListOptions) (watch.Interface, error) {
+	opts.Watch = true
+	return c.client.Get().
+		Namespace(c.ns).
+		Resource("nodealerts").
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Watch()
+}
+
 // Create takes the representation of a nodeAlert and creates it.  Returns the server's representation of the nodeAlert, and an error, if there is any.
 func (c *nodeAlerts) Create(nodeAlert *v1alpha1.NodeAlert) (result *v1alpha1.NodeAlert, err error) {
 	result = &v1alpha1.NodeAlert{}
@@ -103,41 +138,6 @@ func (c *nodeAlerts) DeleteCollection(options *v1.DeleteOptions, listOptions v1.
 		Body(options).
 		Do().
 		Error()
-}
-
-// Get takes name of the nodeAlert, and returns the corresponding nodeAlert object, and an error if there is any.
-func (c *nodeAlerts) Get(name string, options v1.GetOptions) (result *v1alpha1.NodeAlert, err error) {
-	result = &v1alpha1.NodeAlert{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("nodealerts").
-		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
-		Into(result)
-	return
-}
-
-// List takes label and field selectors, and returns the list of NodeAlerts that match those selectors.
-func (c *nodeAlerts) List(opts v1.ListOptions) (result *v1alpha1.NodeAlertList, err error) {
-	result = &v1alpha1.NodeAlertList{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("nodealerts").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Do().
-		Into(result)
-	return
-}
-
-// Watch returns a watch.Interface that watches the requested nodeAlerts.
-func (c *nodeAlerts) Watch(opts v1.ListOptions) (watch.Interface, error) {
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(c.ns).
-		Resource("nodealerts").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Watch()
 }
 
 // Patch applies the patch and returns the patched nodeAlert.

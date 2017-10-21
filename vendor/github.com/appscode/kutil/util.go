@@ -2,22 +2,25 @@ package kutil
 
 import (
 	"fmt"
+	"github.com/hashicorp/go-version"
+	"github.com/pkg/errors"
 	"io/ioutil"
+	core "k8s.io/api/core/v1"
+	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	kerr "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes"
+	clientsetscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	"net/http"
 	"os"
 	"reflect"
 	"strings"
 	"time"
-
-	"github.com/hashicorp/go-version"
-	"github.com/pkg/errors"
-	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/wait"
-	clientset "k8s.io/client-go/kubernetes"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/rest"
 )
 
 const (
@@ -34,10 +37,10 @@ func Namespace() string {
 			return ns
 		}
 	}
-	return apiv1.NamespaceDefault
+	return core.NamespaceDefault
 }
 
-func IsPreferredAPIResource(c clientset.Interface, groupVersion, kind string) bool {
+func IsPreferredAPIResource(c kubernetes.Interface, groupVersion, kind string) bool {
 	if resourceList, err := c.Discovery().ServerPreferredResources(); err == nil {
 		for _, resources := range resourceList {
 			if resources.GroupVersion != groupVersion {
@@ -53,7 +56,7 @@ func IsPreferredAPIResource(c clientset.Interface, groupVersion, kind string) bo
 	return false
 }
 
-func CheckAPIVersion(c clientset.Interface, constraint string) (bool, error) {
+func CheckAPIVersion(c kubernetes.Interface, constraint string) (bool, error) {
 	info, err := c.Discovery().ServerVersion()
 	if err != nil {
 		return false, err
@@ -77,7 +80,7 @@ func WaitForCRDReady(restClient rest.Interface, crds []*apiextensions.CustomReso
 			if err != nil {
 				// RESTClient returns *apierrors.StatusError for any status codes < 200 or > 206
 				// and http.Client.Do errors are returned directly.
-				if se, ok := err.(*apierrors.StatusError); ok {
+				if se, ok := err.(*kerr.StatusError); ok {
 					if se.Status().Code == http.StatusNotFound {
 						return false, nil
 					}
@@ -95,7 +98,7 @@ func WaitForCRDReady(restClient rest.Interface, crds []*apiextensions.CustomReso
 		return true, nil
 	})
 
-	return errors.Wrap(err, fmt.Sprintf("timed out waiting for TPR"))
+	return errors.Wrap(err, fmt.Sprintf("timed out waiting for CRD"))
 }
 
 func DeleteInBackground() *metav1.DeleteOptions {
@@ -114,4 +117,67 @@ func GetKind(v interface{}) string {
 		val = val.Elem()
 	}
 	return val.Type().Name()
+}
+
+func GetObjectReference(v interface{}, gv schema.GroupVersion) *core.ObjectReference {
+	m, err := meta.Accessor(v)
+	if err != nil {
+		return &core.ObjectReference{}
+	}
+	return &core.ObjectReference{
+		APIVersion:      gv.String(),
+		Kind:            GetKind(v),
+		Namespace:       m.GetNamespace(),
+		Name:            m.GetName(),
+		UID:             m.GetUID(),
+		ResourceVersion: m.GetResourceVersion(),
+	}
+}
+
+// MarshalToYAML marshals an object into yaml.
+func MarshalToYAML(obj runtime.Object, gv schema.GroupVersion) ([]byte, error) {
+	mediaType := "application/yaml"
+	info, ok := runtime.SerializerInfoForMediaType(clientsetscheme.Codecs.SupportedMediaTypes(), mediaType)
+	if !ok {
+		return []byte{}, fmt.Errorf("unsupported media type %q", mediaType)
+	}
+
+	encoder := clientsetscheme.Codecs.EncoderForVersion(info.Serializer, gv)
+	return runtime.Encode(encoder, obj)
+}
+
+// UnmarshalToYAML unmarshals an object into yaml.
+func UnmarshalToYAML(data []byte, gv schema.GroupVersion) (runtime.Object, error) {
+	mediaType := "application/yaml"
+	info, ok := runtime.SerializerInfoForMediaType(clientsetscheme.Codecs.SupportedMediaTypes(), mediaType)
+	if !ok {
+		return nil, fmt.Errorf("unsupported media type %q", mediaType)
+	}
+
+	decoder := clientsetscheme.Codecs.DecoderToVersion(info.Serializer, gv)
+	return runtime.Decode(decoder, data)
+}
+
+// MarshalToJson marshals an object into json.
+func MarshalToJson(obj runtime.Object, gv schema.GroupVersion) ([]byte, error) {
+	mediaType := "application/json"
+	info, ok := runtime.SerializerInfoForMediaType(clientsetscheme.Codecs.SupportedMediaTypes(), mediaType)
+	if !ok {
+		return []byte{}, fmt.Errorf("unsupported media type %q", mediaType)
+	}
+
+	encoder := clientsetscheme.Codecs.EncoderForVersion(info.Serializer, gv)
+	return runtime.Encode(encoder, obj)
+}
+
+// UnmarshalToJSON unmarshals an object into json.
+func UnmarshalToJSON(data []byte, gv schema.GroupVersion) (runtime.Object, error) {
+	mediaType := "application/json"
+	info, ok := runtime.SerializerInfoForMediaType(clientsetscheme.Codecs.SupportedMediaTypes(), mediaType)
+	if !ok {
+		return nil, fmt.Errorf("unsupported media type %q", mediaType)
+	}
+
+	decoder := clientsetscheme.Codecs.DecoderToVersion(info.Serializer, gv)
+	return runtime.Decode(decoder, data)
 }

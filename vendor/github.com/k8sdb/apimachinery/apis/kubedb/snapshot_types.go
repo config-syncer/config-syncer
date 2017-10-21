@@ -1,8 +1,8 @@
 package kubedb
 
 import (
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
@@ -12,7 +12,7 @@ const (
 	ResourceTypeSnapshot = "snapshots"
 )
 
-// +genclient=true
+// +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type Snapshot struct {
@@ -28,7 +28,7 @@ type SnapshotSpec struct {
 	// Snapshot Spec
 	SnapshotStorageSpec `json:",inline,omitempty"`
 	// Compute Resources required by the sidecar container.
-	Resources apiv1.ResourceRequirements `json:"resources,omitempty"`
+	Resources core.ResourceRequirements `json:"resources,omitempty"`
 }
 
 type SnapshotPhase string

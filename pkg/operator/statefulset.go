@@ -8,12 +8,12 @@ import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	kutil "github.com/appscode/kutil/apps/v1beta1"
+	apps "k8s.io/api/apps/v1beta1"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
-	apps "k8s.io/client-go/pkg/apis/apps/v1beta1"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -28,10 +28,10 @@ func (op *Operator) WatchStatefulSets() {
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return op.KubeClient.AppsV1beta1().StatefulSets(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.KubeClient.AppsV1beta1().StatefulSets(core.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return op.KubeClient.AppsV1beta1().StatefulSets(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.KubeClient.AppsV1beta1().StatefulSets(core.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,

@@ -4,12 +4,14 @@ import:
   version: master
 - package: github.com/appscode/go-notify
   version: master
-- package: github.com/appscode/kutil
-  version: release-4.0
 - package: github.com/appscode/go-term
   version: master
 - package: github.com/appscode/go
   version: master
+- package: github.com/appscode/kutil
+  version: release-5.0
+- package: github.com/appscode/osm
+  version: 0.6.0
 - package: github.com/appscode/pat
   version: master
 - package: github.com/appscode/searchlight
@@ -20,31 +22,40 @@ import:
   version: master
 - package: github.com/blevesearch/bleve
   version: v0.5.0
+- package: github.com/codeskyblue/go-sh
+  version: master
 - package: github.com/coreos/prometheus-operator
-  version: v0.12.0
+  repo: https://github.com/appscode/prometheus-operator.git
+  vcs: git
+  version: client-go-5
 - package: github.com/ghodss/yaml
   version: v1.0.0
+- package: github.com/graymeta/stow
+  repo: https://github.com/appscode/stow.git
+  version: master
+  vcs: git
 - package: github.com/influxdata/influxdb
   version: v0.11.0
 - package: github.com/jpillora/go-ogle-analytics
 - package: github.com/k8sdb/apimachinery
   version: master
-- package: github.com/spf13/cobra
-  version: master
-- package: github.com/spf13/pflag
-  version: master
-- package: gopkg.in/olivere/elastic.v3
-  version: v3.0.59
+- package: github.com/prometheus/client_golang
+  version: v0.8.0
 - package: github.com/robfig/cron
   version: master
+- package: github.com/spf13/cobra
+- package: github.com/spf13/pflag
+  version: v1.0.0
+- package: github.com/yudai/gojsondiff
+  version: 1.0.0
+- package: gopkg.in/olivere/elastic.v3
+  version: v3.0.59
+- package: k8s.io/api
+  version: fe29995db37613b9c5b2a647544cf627bfa8d299
 - package: k8s.io/apimachinery
-  version: 1fd2e63a9a370677308a42f24fd40c86438afddf
+  version: 019ae5ada31de202164b118aee88ee2d14075c31
 - package: k8s.io/client-go
-  version: v4.0.0
-- package: github.com/graymeta/stow
-  repo: https://github.com/appscode/stow.git
-  version: master
-  vcs: git
+  version: v5.0.0
 - package: google.golang.org/api/storage/v1
   version: master
 - package: cloud.google.com/go
@@ -57,13 +68,12 @@ import:
   version: v1.7.8
 - package: github.com/ncw/swift
   version: master
-- package: github.com/yudai/gojsondiff
-  version: master
 - package: github.com/hashicorp/go-version
   repo: https://github.com/appscode/go-version.git
   version: master
   vcs: git
+- package: github.com/mattn/go-isatty
+  version: 57fdcb988a5c543893cc61bce354a6e24ab70022
 testImport:
-- package: github.com/google/certificate-transparency
 - package: github.com/stretchr/testify
   version: v1.1.4

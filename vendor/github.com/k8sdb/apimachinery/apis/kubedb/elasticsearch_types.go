@@ -2,8 +2,8 @@ package kubedb
 
 import (
 	"github.com/appscode/go/encoding/json/types"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
@@ -13,7 +13,7 @@ const (
 	ResourceTypeElasticsearch = "elasticsearchs"
 )
 
-// +genclient=true
+// +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Elasticsearch defines a Elasticsearch database.
@@ -30,7 +30,7 @@ type ElasticsearchSpec struct {
 	// Number of instances to deploy for a Elasticsearch database.
 	Replicas int32 `json:"replicas,omitempty"`
 	// Storage to specify how storage shall be used.
-	Storage *apiv1.PersistentVolumeClaimSpec `json:"storage,omitempty"`
+	Storage *core.PersistentVolumeClaimSpec `json:"storage,omitempty"`
 	// NodeSelector is a selector which must be true for the pod to fit on a node
 	// +optional
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
@@ -48,17 +48,17 @@ type ElasticsearchSpec struct {
 	// +optional
 	Monitor *MonitorSpec `json:"monitor,omitempty"`
 	// Compute Resources required by the sidecar container.
-	Resources apiv1.ResourceRequirements `json:"resources,omitempty"`
+	Resources core.ResourceRequirements `json:"resources,omitempty"`
 	// If specified, the pod's scheduling constraints
 	// +optional
-	Affinity *apiv1.Affinity `json:"affinity,omitempty" protobuf:"bytes,18,opt,name=affinity"`
+	Affinity *core.Affinity `json:"affinity,omitempty" protobuf:"bytes,18,opt,name=affinity"`
 	// If specified, the pod will be dispatched by specified scheduler.
 	// If not specified, the pod will be dispatched by default scheduler.
 	// +optional
 	SchedulerName string `json:"schedulerName,omitempty" protobuf:"bytes,19,opt,name=schedulerName"`
 	// If specified, the pod's tolerations.
 	// +optional
-	Tolerations []apiv1.Toleration `json:"tolerations,omitempty" protobuf:"bytes,22,opt,name=tolerations"`
+	Tolerations []core.Toleration `json:"tolerations,omitempty" protobuf:"bytes,22,opt,name=tolerations"`
 }
 
 type ElasticsearchStatus struct {
@@ -76,6 +76,8 @@ type ElasticsearchList struct {
 	Items []Elasticsearch `json:"items,omitempty"`
 }
 
+// +k8s:deepcopy-gen=false
+// +k8s:gen-deepcopy=false
 // Following structure is used for audit summary report
 type ElasticsearchSummary struct {
 	IdCount map[string]int64 `json:"idCount"`

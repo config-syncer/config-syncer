@@ -6,30 +6,33 @@ import (
 
 	"github.com/appscode/kutil"
 	"github.com/golang/glog"
+	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/apimachinery/pkg/util/wait"
-	clientset "k8s.io/client-go/kubernetes"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
-func EnsureServiceAccount(c clientset.Interface, meta metav1.ObjectMeta, transform func(*apiv1.ServiceAccount) *apiv1.ServiceAccount) (*apiv1.ServiceAccount, error) {
-	return CreateOrPatchServiceAccount(c, meta, transform)
-}
-
-func CreateOrPatchServiceAccount(c clientset.Interface, meta metav1.ObjectMeta, transform func(*apiv1.ServiceAccount) *apiv1.ServiceAccount) (*apiv1.ServiceAccount, error) {
+func CreateOrPatchServiceAccount(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*core.ServiceAccount) *core.ServiceAccount) (*core.ServiceAccount, error) {
 	cur, err := c.CoreV1().ServiceAccounts(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
-		return c.CoreV1().ServiceAccounts(meta.Namespace).Create(transform(&apiv1.ServiceAccount{ObjectMeta: meta}))
+		glog.V(3).Infof("Creating ServiceAccount %s/%s.", meta.Namespace, meta.Name)
+		return c.CoreV1().ServiceAccounts(meta.Namespace).Create(transform(&core.ServiceAccount{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "ServiceAccount",
+				APIVersion: core.SchemeGroupVersion.String(),
+			},
+			ObjectMeta: meta,
+		}))
 	} else if err != nil {
 		return nil, err
 	}
 	return PatchServiceAccount(c, cur, transform)
 }
 
-func PatchServiceAccount(c clientset.Interface, cur *apiv1.ServiceAccount, transform func(*apiv1.ServiceAccount) *apiv1.ServiceAccount) (*apiv1.ServiceAccount, error) {
+func PatchServiceAccount(c kubernetes.Interface, cur *core.ServiceAccount, transform func(*core.ServiceAccount) *core.ServiceAccount) (*core.ServiceAccount, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
 		return nil, err
@@ -40,18 +43,18 @@ func PatchServiceAccount(c clientset.Interface, cur *apiv1.ServiceAccount, trans
 		return nil, err
 	}
 
-	patch, err := strategicpatch.CreateTwoWayMergePatch(curJson, modJson, apiv1.ServiceAccount{})
+	patch, err := strategicpatch.CreateTwoWayMergePatch(curJson, modJson, core.ServiceAccount{})
 	if err != nil {
 		return nil, err
 	}
 	if len(patch) == 0 || string(patch) == "{}" {
 		return cur, nil
 	}
-	glog.V(5).Infof("Patching ServiceAccount %s@%s with %s", cur.Name, cur.Namespace, string(patch))
+	glog.V(3).Infof("Patching ServiceAccount %s/%s with %s", cur.Namespace, cur.Name, string(patch))
 	return c.CoreV1().ServiceAccounts(cur.Namespace).Patch(cur.Name, types.StrategicMergePatchType, patch)
 }
 
-func TryPatchServiceAccount(c clientset.Interface, meta metav1.ObjectMeta, transform func(*apiv1.ServiceAccount) *apiv1.ServiceAccount) (result *apiv1.ServiceAccount, err error) {
+func TryPatchServiceAccount(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*core.ServiceAccount) *core.ServiceAccount) (result *core.ServiceAccount, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++
@@ -62,17 +65,17 @@ func TryPatchServiceAccount(c clientset.Interface, meta metav1.ObjectMeta, trans
 			result, e2 = PatchServiceAccount(c, cur, transform)
 			return e2 == nil, nil
 		}
-		glog.Errorf("Attempt %d failed to patch ServiceAccount %s@%s due to %v.", attempt, cur.Name, cur.Namespace, e2)
+		glog.Errorf("Attempt %d failed to patch ServiceAccount %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)
 		return false, nil
 	})
 
 	if err != nil {
-		err = fmt.Errorf("failed to patch ServiceAccount %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
+		err = fmt.Errorf("failed to patch ServiceAccount %s/%s after %d attempts due to %v", meta.Namespace, meta.Name, attempt, err)
 	}
 	return
 }
 
-func TryUpdateServiceAccount(c clientset.Interface, meta metav1.ObjectMeta, transform func(*apiv1.ServiceAccount) *apiv1.ServiceAccount) (result *apiv1.ServiceAccount, err error) {
+func TryUpdateServiceAccount(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*core.ServiceAccount) *core.ServiceAccount) (result *core.ServiceAccount, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++
@@ -83,12 +86,12 @@ func TryUpdateServiceAccount(c clientset.Interface, meta metav1.ObjectMeta, tran
 			result, e2 = c.CoreV1().ServiceAccounts(cur.Namespace).Update(transform(cur))
 			return e2 == nil, nil
 		}
-		glog.Errorf("Attempt %d failed to update ServiceAccount %s@%s due to %v.", attempt, cur.Name, cur.Namespace, e2)
+		glog.Errorf("Attempt %d failed to update ServiceAccount %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)
 		return false, nil
 	})
 
 	if err != nil {
-		err = fmt.Errorf("failed to update ServiceAccount %s@%s after %d attempts due to %v", meta.Name, meta.Namespace, attempt, err)
+		err = fmt.Errorf("failed to update ServiceAccount %s/%s after %d attempts due to %v", meta.Namespace, meta.Name, attempt, err)
 	}
 	return
 }

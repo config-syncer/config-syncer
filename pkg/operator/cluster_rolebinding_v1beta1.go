@@ -7,20 +7,20 @@ import (
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
-	kutil "github.com/appscode/kutil/rbac/v1alpha1"
+	kutil "github.com/appscode/kutil/rbac/v1beta1"
+	core "k8s.io/api/core/v1"
+	rbac "k8s.io/api/rbac/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
-	rbac "k8s.io/client-go/pkg/apis/rbac/v1beta1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchClusterRoleBindingV1beta1() {
-	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "ClusterRoleBinding") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "ClusterRoleBinding")
+	if !util.IsPreferredAPIResource(op.KubeClient, core.SchemeGroupVersion.String(), "ClusterRoleBinding") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", core.SchemeGroupVersion.String(), "ClusterRoleBinding")
 		return
 	}
 

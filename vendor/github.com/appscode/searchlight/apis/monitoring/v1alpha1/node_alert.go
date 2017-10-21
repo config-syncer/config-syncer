@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	apiv1 "k8s.io/client-go/pkg/api/v1"
+	core "k8s.io/api/core/v1"
 )
 
 const (
@@ -68,8 +68,8 @@ func (a NodeAlert) GetReceivers() []Receiver {
 	return a.Spec.Receivers
 }
 
-func (a NodeAlert) ObjectReference() *apiv1.ObjectReference {
-	return &apiv1.ObjectReference{
+func (a NodeAlert) ObjectReference() *core.ObjectReference {
+	return &core.ObjectReference{
 		APIVersion:      SchemeGroupVersion.String(),
 		Kind:            ResourceKindNodeAlert,
 		Namespace:       a.Namespace,
