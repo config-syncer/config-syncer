@@ -6,10 +6,10 @@ import (
 
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes"
 )
 
-func IsPreferredAPIResource(kubeClient clientset.Interface, groupVersion, kind string) bool {
+func IsPreferredAPIResource(kubeClient kubernetes.Interface, groupVersion, kind string) bool {
 	if resourceList, err := kubeClient.Discovery().ServerPreferredResources(); err == nil {
 		for _, resources := range resourceList {
 			if resources.GroupVersion != groupVersion {

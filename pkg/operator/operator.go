@@ -35,7 +35,7 @@ import (
 	"github.com/robfig/cron"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -55,7 +55,7 @@ type Options struct {
 }
 
 type Operator struct {
-	KubeClient        clientset.Interface
+	KubeClient        kubernetes.Interface
 	VoyagerClient     vcs.VoyagerV1beta1Interface
 	SearchlightClient srch_cs.MonitoringV1alpha1Interface
 	StashClient       scs.StashV1alpha1Interface

@@ -8,6 +8,7 @@ import (
 
 	"github.com/appscode/go/log"
 	core "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -112,7 +113,7 @@ func TestRemoveService(t *testing.T) {
 
 func newService() *core.Service {
 	return &core.Service{
-		ObjectMeta: metacore.ObjectMeta{
+		ObjectMeta: metav1.ObjectMeta{
 			Name:      "foo",
 			Namespace: "default",
 		},
@@ -126,7 +127,7 @@ func newService() *core.Service {
 
 func newPod(name string) *core.Pod {
 	return &core.Pod{
-		ObjectMeta: metacore.ObjectMeta{
+		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
 			Namespace: "default",
 			Labels: map[string]string{

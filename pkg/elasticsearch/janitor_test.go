@@ -7,7 +7,7 @@ import (
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -15,7 +15,7 @@ func TestEsJanitor(t *testing.T) {
 	c, err := clientcmd.BuildConfigFromFlags("", "")
 	assert.Nil(t, err)
 
-	kubeClient := clientset.NewForConfigOrDie(c)
+	kubeClient := kubernetes.NewForConfigOrDie(c)
 
 	var authInfo *config.JanitorAuthInfo
 	secret, err := kubeClient.CoreV1().Secrets("").Get("", metav1.GetOptions{})

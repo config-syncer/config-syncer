@@ -15,7 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes"
 )
 
 type ServiceMonitorIndexer interface {
@@ -31,7 +31,7 @@ type ServiceMonitorIndexer interface {
 var _ ServiceMonitorIndexer = &ServiceMonitorIndexerImpl{}
 
 type ServiceMonitorIndexerImpl struct {
-	kubeClient clientset.Interface
+	kubeClient kubernetes.Interface
 	index      bleve.Index
 }
 

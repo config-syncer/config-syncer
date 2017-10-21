@@ -19,14 +19,14 @@ import (
 	"github.com/graymeta/stow/s3"
 	"github.com/graymeta/stow/swift"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes"
 )
 
 const (
 	SecretMountPath = "/etc/osm"
 )
 
-func WriteOSMConfig(client clientset.Interface, snapshot tapi.Backend, namespace string, path string) error {
+func WriteOSMConfig(client kubernetes.Interface, snapshot tapi.Backend, namespace string, path string) error {
 	osmCtx, err := NewOSMContext(client, snapshot, namespace)
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func WriteOSMConfig(client clientset.Interface, snapshot tapi.Backend, namespace
 	return ioutil.WriteFile(path, osmBytes, 0644)
 }
 
-func CheckBucketAccess(client clientset.Interface, spec tapi.Backend, namespace string) error {
+func CheckBucketAccess(client kubernetes.Interface, spec tapi.Backend, namespace string) error {
 	cfg, err := NewOSMContext(client, spec, namespace)
 	if err != nil {
 		return err
@@ -74,7 +74,7 @@ func CheckBucketAccess(client clientset.Interface, spec tapi.Backend, namespace 
 	return nil
 }
 
-func NewOSMContext(client clientset.Interface, spec tapi.Backend, namespace string) (*otx.Context, error) {
+func NewOSMContext(client kubernetes.Interface, spec tapi.Backend, namespace string) (*otx.Context, error) {
 	config := make(map[string][]byte)
 
 	if spec.StorageSecretName != "" {

@@ -6,12 +6,12 @@ import (
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/blevesearch/bleve"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes"
 )
 
 type ReverseIndexer struct {
 	// kubeClient to access kube api server
-	kubeClient clientset.Interface
+	kubeClient kubernetes.Interface
 	promClient prom.MonitoringV1Interface
 	index      bleve.Index
 
@@ -20,7 +20,7 @@ type ReverseIndexer struct {
 	Prometheus     PrometheusIndexer
 }
 
-func NewReverseIndexer(cl clientset.Interface, pm prom.MonitoringV1Interface, dst string) (*ReverseIndexer, error) {
+func NewReverseIndexer(cl kubernetes.Interface, pm prom.MonitoringV1Interface, dst string) (*ReverseIndexer, error) {
 	index, err := ensureIndex(filepath.Join(dst, "reverse.indexer"), "indexer")
 	if err != nil {
 		return nil, err
