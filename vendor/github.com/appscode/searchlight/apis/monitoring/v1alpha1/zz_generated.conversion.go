@@ -29,7 +29,7 @@ import (
 )
 
 func init() {
-	SchemeBuilder.Register(RegisterConversions)
+	localSchemeBuilder.Register(RegisterConversions)
 }
 
 // RegisterConversions adds conversion functions to the given scheme.
@@ -87,11 +87,7 @@ func Convert_monitoring_ClusterAlert_To_v1alpha1_ClusterAlert(in *monitoring.Clu
 
 func autoConvert_v1alpha1_ClusterAlertList_To_monitoring_ClusterAlertList(in *ClusterAlertList, out *monitoring.ClusterAlertList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	if in.Items == nil {
-		out.Items = make([]monitoring.ClusterAlert, 0)
-	} else {
-		out.Items = *(*[]monitoring.ClusterAlert)(unsafe.Pointer(&in.Items))
-	}
+	out.Items = *(*[]monitoring.ClusterAlert)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
@@ -102,11 +98,7 @@ func Convert_v1alpha1_ClusterAlertList_To_monitoring_ClusterAlertList(in *Cluste
 
 func autoConvert_monitoring_ClusterAlertList_To_v1alpha1_ClusterAlertList(in *monitoring.ClusterAlertList, out *ClusterAlertList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	if in.Items == nil {
-		out.Items = make([]ClusterAlert, 0)
-	} else {
-		out.Items = *(*[]ClusterAlert)(unsafe.Pointer(&in.Items))
-	}
+	out.Items = *(*[]ClusterAlert)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
@@ -121,7 +113,7 @@ func autoConvert_v1alpha1_ClusterAlertSpec_To_monitoring_ClusterAlertSpec(in *Cl
 	out.AlertInterval = in.AlertInterval
 	out.NotifierSecretName = in.NotifierSecretName
 	out.Receivers = *(*[]monitoring.Receiver)(unsafe.Pointer(&in.Receivers))
-	out.Vars = *(*map[string]interface{})(unsafe.Pointer(&in.Vars))
+	out.Vars = *(*map[string]string)(unsafe.Pointer(&in.Vars))
 	return nil
 }
 
@@ -136,7 +128,7 @@ func autoConvert_monitoring_ClusterAlertSpec_To_v1alpha1_ClusterAlertSpec(in *mo
 	out.AlertInterval = in.AlertInterval
 	out.NotifierSecretName = in.NotifierSecretName
 	out.Receivers = *(*[]Receiver)(unsafe.Pointer(&in.Receivers))
-	out.Vars = *(*map[string]interface{})(unsafe.Pointer(&in.Vars))
+	out.Vars = *(*map[string]string)(unsafe.Pointer(&in.Vars))
 	return nil
 }
 
@@ -173,11 +165,7 @@ func Convert_monitoring_NodeAlert_To_v1alpha1_NodeAlert(in *monitoring.NodeAlert
 
 func autoConvert_v1alpha1_NodeAlertList_To_monitoring_NodeAlertList(in *NodeAlertList, out *monitoring.NodeAlertList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	if in.Items == nil {
-		out.Items = make([]monitoring.NodeAlert, 0)
-	} else {
-		out.Items = *(*[]monitoring.NodeAlert)(unsafe.Pointer(&in.Items))
-	}
+	out.Items = *(*[]monitoring.NodeAlert)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
@@ -188,11 +176,7 @@ func Convert_v1alpha1_NodeAlertList_To_monitoring_NodeAlertList(in *NodeAlertLis
 
 func autoConvert_monitoring_NodeAlertList_To_v1alpha1_NodeAlertList(in *monitoring.NodeAlertList, out *NodeAlertList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	if in.Items == nil {
-		out.Items = make([]NodeAlert, 0)
-	} else {
-		out.Items = *(*[]NodeAlert)(unsafe.Pointer(&in.Items))
-	}
+	out.Items = *(*[]NodeAlert)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
@@ -209,7 +193,7 @@ func autoConvert_v1alpha1_NodeAlertSpec_To_monitoring_NodeAlertSpec(in *NodeAler
 	out.AlertInterval = in.AlertInterval
 	out.NotifierSecretName = in.NotifierSecretName
 	out.Receivers = *(*[]monitoring.Receiver)(unsafe.Pointer(&in.Receivers))
-	out.Vars = *(*map[string]interface{})(unsafe.Pointer(&in.Vars))
+	out.Vars = *(*map[string]string)(unsafe.Pointer(&in.Vars))
 	return nil
 }
 
@@ -226,7 +210,7 @@ func autoConvert_monitoring_NodeAlertSpec_To_v1alpha1_NodeAlertSpec(in *monitori
 	out.AlertInterval = in.AlertInterval
 	out.NotifierSecretName = in.NotifierSecretName
 	out.Receivers = *(*[]Receiver)(unsafe.Pointer(&in.Receivers))
-	out.Vars = *(*map[string]interface{})(unsafe.Pointer(&in.Vars))
+	out.Vars = *(*map[string]string)(unsafe.Pointer(&in.Vars))
 	return nil
 }
 
@@ -263,11 +247,7 @@ func Convert_monitoring_PodAlert_To_v1alpha1_PodAlert(in *monitoring.PodAlert, o
 
 func autoConvert_v1alpha1_PodAlertList_To_monitoring_PodAlertList(in *PodAlertList, out *monitoring.PodAlertList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	if in.Items == nil {
-		out.Items = make([]monitoring.PodAlert, 0)
-	} else {
-		out.Items = *(*[]monitoring.PodAlert)(unsafe.Pointer(&in.Items))
-	}
+	out.Items = *(*[]monitoring.PodAlert)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
@@ -278,11 +258,7 @@ func Convert_v1alpha1_PodAlertList_To_monitoring_PodAlertList(in *PodAlertList, 
 
 func autoConvert_monitoring_PodAlertList_To_v1alpha1_PodAlertList(in *monitoring.PodAlertList, out *PodAlertList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	if in.Items == nil {
-		out.Items = make([]PodAlert, 0)
-	} else {
-		out.Items = *(*[]PodAlert)(unsafe.Pointer(&in.Items))
-	}
+	out.Items = *(*[]PodAlert)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
@@ -299,7 +275,7 @@ func autoConvert_v1alpha1_PodAlertSpec_To_monitoring_PodAlertSpec(in *PodAlertSp
 	out.AlertInterval = in.AlertInterval
 	out.NotifierSecretName = in.NotifierSecretName
 	out.Receivers = *(*[]monitoring.Receiver)(unsafe.Pointer(&in.Receivers))
-	out.Vars = *(*map[string]interface{})(unsafe.Pointer(&in.Vars))
+	out.Vars = *(*map[string]string)(unsafe.Pointer(&in.Vars))
 	return nil
 }
 
@@ -316,7 +292,7 @@ func autoConvert_monitoring_PodAlertSpec_To_v1alpha1_PodAlertSpec(in *monitoring
 	out.AlertInterval = in.AlertInterval
 	out.NotifierSecretName = in.NotifierSecretName
 	out.Receivers = *(*[]Receiver)(unsafe.Pointer(&in.Receivers))
-	out.Vars = *(*map[string]interface{})(unsafe.Pointer(&in.Vars))
+	out.Vars = *(*map[string]string)(unsafe.Pointer(&in.Vars))
 	return nil
 }
 

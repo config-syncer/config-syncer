@@ -2,8 +2,8 @@ package v1alpha1
 
 import (
 	"github.com/appscode/go/encoding/json/types"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
@@ -13,7 +13,7 @@ const (
 	ResourceTypePostgres = "postgreses"
 )
 
-// +genclient=true
+// +genclient
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -29,9 +29,9 @@ type PostgresSpec struct {
 	// Version of Postgres to be deployed.
 	Version types.StrYo `json:"version,omitempty"`
 	// Storage to specify how storage shall be used.
-	Storage *apiv1.PersistentVolumeClaimSpec `json:"storage,omitempty"`
+	Storage *core.PersistentVolumeClaimSpec `json:"storage,omitempty"`
 	// Database authentication secret
-	DatabaseSecret *apiv1.SecretVolumeSource `json:"databaseSecret,omitempty"`
+	DatabaseSecret *core.SecretVolumeSource `json:"databaseSecret,omitempty"`
 	// NodeSelector is a selector which must be true for the pod to fit on a node
 	// +optional
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
@@ -49,17 +49,17 @@ type PostgresSpec struct {
 	// +optional
 	Monitor *MonitorSpec `json:"monitor,omitempty"`
 	// Compute Resources required by the sidecar container.
-	Resources apiv1.ResourceRequirements `json:"resources,omitempty"`
+	Resources core.ResourceRequirements `json:"resources,omitempty"`
 	// If specified, the pod's scheduling constraints
 	// +optional
-	Affinity *apiv1.Affinity `json:"affinity,omitempty" protobuf:"bytes,18,opt,name=affinity"`
+	Affinity *core.Affinity `json:"affinity,omitempty" protobuf:"bytes,18,opt,name=affinity"`
 	// If specified, the pod will be dispatched by specified scheduler.
 	// If not specified, the pod will be dispatched by default scheduler.
 	// +optional
 	SchedulerName string `json:"schedulerName,omitempty" protobuf:"bytes,19,opt,name=schedulerName"`
 	// If specified, the pod's tolerations.
 	// +optional
-	Tolerations []apiv1.Toleration `json:"tolerations,omitempty" protobuf:"bytes,22,opt,name=tolerations"`
+	Tolerations []core.Toleration `json:"tolerations,omitempty" protobuf:"bytes,22,opt,name=tolerations"`
 }
 
 type PostgresStatus struct {

@@ -1,12 +1,12 @@
 package v1alpha1
 
 import (
+	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
-func (d DormantDatabase) ObjectReference() *apiv1.ObjectReference {
-	return &apiv1.ObjectReference{
+func (d DormantDatabase) ObjectReference() *core.ObjectReference {
+	return &core.ObjectReference{
 		APIVersion:      SchemeGroupVersion.String(),
 		Kind:            ResourceKindDormantDatabase,
 		Namespace:       d.Namespace,
@@ -16,8 +16,8 @@ func (d DormantDatabase) ObjectReference() *apiv1.ObjectReference {
 	}
 }
 
-func (p Postgres) ObjectReference() *apiv1.ObjectReference {
-	return &apiv1.ObjectReference{
+func (p Postgres) ObjectReference() *core.ObjectReference {
+	return &core.ObjectReference{
 		APIVersion:      SchemeGroupVersion.String(),
 		Kind:            ResourceKindPostgres,
 		Namespace:       p.Namespace,
@@ -27,8 +27,8 @@ func (p Postgres) ObjectReference() *apiv1.ObjectReference {
 	}
 }
 
-func (e Elasticsearch) ObjectReference() *apiv1.ObjectReference {
-	return &apiv1.ObjectReference{
+func (e Elasticsearch) ObjectReference() *core.ObjectReference {
+	return &core.ObjectReference{
 		APIVersion:      SchemeGroupVersion.String(),
 		Kind:            ResourceKindElasticsearch,
 		Namespace:       e.Namespace,
@@ -38,8 +38,8 @@ func (e Elasticsearch) ObjectReference() *apiv1.ObjectReference {
 	}
 }
 
-func (s Snapshot) ObjectReference() *apiv1.ObjectReference {
-	return &apiv1.ObjectReference{
+func (s Snapshot) ObjectReference() *core.ObjectReference {
+	return &core.ObjectReference{
 		APIVersion:      SchemeGroupVersion.String(),
 		Kind:            ResourceKindSnapshot,
 		Namespace:       s.Namespace,
@@ -49,7 +49,7 @@ func (s Snapshot) ObjectReference() *apiv1.ObjectReference {
 	}
 }
 
-func ObjectReferenceFor(obj runtime.Object) *apiv1.ObjectReference {
+func ObjectReferenceFor(obj runtime.Object) *core.ObjectReference {
 	switch u := obj.(type) {
 	case *DormantDatabase:
 		return u.ObjectReference()
@@ -60,5 +60,5 @@ func ObjectReferenceFor(obj runtime.Object) *apiv1.ObjectReference {
 	case *Snapshot:
 		return u.ObjectReference()
 	}
-	return &apiv1.ObjectReference{}
+	return &core.ObjectReference{}
 }

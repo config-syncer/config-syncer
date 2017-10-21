@@ -1,8 +1,8 @@
 package v1beta1
 
 import (
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
@@ -11,7 +11,7 @@ const (
 	ResourceTypeCertificate = "certificates"
 )
 
-// +genclient=true
+// +genclient
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -53,7 +53,7 @@ type CertificateSpec struct {
 
 	// This is the ingress Reference that will be used if provider is http
 	// Deprecated
-	HTTPProviderIngressReference apiv1.ObjectReference `json:"httpProviderIngressReference,omitempty"`
+	HTTPProviderIngressReference LocalTypedReference `json:"httpProviderIngressReference,omitempty"`
 
 	// ProviderCredentialSecretName is used to create the acme client, that will do
 	// needed processing in DNS.
@@ -71,7 +71,7 @@ type ChallengeProvider struct {
 }
 
 type HTTPChallengeProvider struct {
-	Ingress apiv1.ObjectReference `json:"ingress,omitempty"`
+	Ingress LocalTypedReference `json:"ingress,omitempty"`
 }
 
 type DNSChallengeProvider struct {
@@ -81,13 +81,8 @@ type DNSChallengeProvider struct {
 }
 
 type CertificateStorage struct {
-	Secret *SecretStore `json:"secret,omitempty"`
-	Vault  *VaultStore  `json:"vault,omitempty"`
-}
-
-type SecretStore struct {
-	// Secret name to store the certificate, default cert-<certificate-name>
-	Name string `json:"name,omitempty"`
+	Secret *core.LocalObjectReference `json:"secret,omitempty"`
+	Vault  *VaultStore                `json:"vault,omitempty"`
 }
 
 type VaultStore struct {

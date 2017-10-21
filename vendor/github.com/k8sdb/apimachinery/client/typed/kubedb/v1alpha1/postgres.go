@@ -59,6 +59,41 @@ func newPostgreses(c *KubedbV1alpha1Client, namespace string) *postgreses {
 	}
 }
 
+// Get takes name of the postgres, and returns the corresponding postgres object, and an error if there is any.
+func (c *postgreses) Get(name string, options v1.GetOptions) (result *v1alpha1.Postgres, err error) {
+	result = &v1alpha1.Postgres{}
+	err = c.client.Get().
+		Namespace(c.ns).
+		Resource("postgreses").
+		Name(name).
+		VersionedParams(&options, scheme.ParameterCodec).
+		Do().
+		Into(result)
+	return
+}
+
+// List takes label and field selectors, and returns the list of Postgreses that match those selectors.
+func (c *postgreses) List(opts v1.ListOptions) (result *v1alpha1.PostgresList, err error) {
+	result = &v1alpha1.PostgresList{}
+	err = c.client.Get().
+		Namespace(c.ns).
+		Resource("postgreses").
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Do().
+		Into(result)
+	return
+}
+
+// Watch returns a watch.Interface that watches the requested postgreses.
+func (c *postgreses) Watch(opts v1.ListOptions) (watch.Interface, error) {
+	opts.Watch = true
+	return c.client.Get().
+		Namespace(c.ns).
+		Resource("postgreses").
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Watch()
+}
+
 // Create takes the representation of a postgres and creates it.  Returns the server's representation of the postgres, and an error, if there is any.
 func (c *postgreses) Create(postgres *v1alpha1.Postgres) (result *v1alpha1.Postgres, err error) {
 	result = &v1alpha1.Postgres{}
@@ -85,7 +120,7 @@ func (c *postgreses) Update(postgres *v1alpha1.Postgres) (result *v1alpha1.Postg
 }
 
 // UpdateStatus was generated because the type contains a Status member.
-// Add a +genclientstatus=false comment above the type to avoid generating UpdateStatus().
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 
 func (c *postgreses) UpdateStatus(postgres *v1alpha1.Postgres) (result *v1alpha1.Postgres, err error) {
 	result = &v1alpha1.Postgres{}
@@ -120,41 +155,6 @@ func (c *postgreses) DeleteCollection(options *v1.DeleteOptions, listOptions v1.
 		Body(options).
 		Do().
 		Error()
-}
-
-// Get takes name of the postgres, and returns the corresponding postgres object, and an error if there is any.
-func (c *postgreses) Get(name string, options v1.GetOptions) (result *v1alpha1.Postgres, err error) {
-	result = &v1alpha1.Postgres{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("postgreses").
-		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
-		Into(result)
-	return
-}
-
-// List takes label and field selectors, and returns the list of Postgreses that match those selectors.
-func (c *postgreses) List(opts v1.ListOptions) (result *v1alpha1.PostgresList, err error) {
-	result = &v1alpha1.PostgresList{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("postgreses").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Do().
-		Into(result)
-	return
-}
-
-// Watch returns a watch.Interface that watches the requested postgreses.
-func (c *postgreses) Watch(opts v1.ListOptions) (watch.Interface, error) {
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(c.ns).
-		Resource("postgreses").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Watch()
 }
 
 // Patch applies the patch and returns the patched postgres.

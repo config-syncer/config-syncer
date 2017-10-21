@@ -4,9 +4,9 @@ import (
 	"strconv"
 	"time"
 
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 func IsPreferredAPIResource(kubeClient clientset.Interface, groupVersion, kind string) bool {
@@ -33,7 +33,7 @@ func IsRecent(t metav1.Time) bool {
 	return time.Now().Sub(t.Time) < MaxSyncInterval
 }
 
-func ObfuscateSecret(in apiv1.Secret) *apiv1.Secret {
+func ObfuscateSecret(in core.Secret) *core.Secret {
 	data := make(map[string][]byte)
 	for k := range in.Data {
 		data[k] = []byte("-")

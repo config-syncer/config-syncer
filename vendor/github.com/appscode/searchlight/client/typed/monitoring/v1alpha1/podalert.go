@@ -58,6 +58,41 @@ func newPodAlerts(c *MonitoringV1alpha1Client, namespace string) *podAlerts {
 	}
 }
 
+// Get takes name of the podAlert, and returns the corresponding podAlert object, and an error if there is any.
+func (c *podAlerts) Get(name string, options v1.GetOptions) (result *v1alpha1.PodAlert, err error) {
+	result = &v1alpha1.PodAlert{}
+	err = c.client.Get().
+		Namespace(c.ns).
+		Resource("podalerts").
+		Name(name).
+		VersionedParams(&options, scheme.ParameterCodec).
+		Do().
+		Into(result)
+	return
+}
+
+// List takes label and field selectors, and returns the list of PodAlerts that match those selectors.
+func (c *podAlerts) List(opts v1.ListOptions) (result *v1alpha1.PodAlertList, err error) {
+	result = &v1alpha1.PodAlertList{}
+	err = c.client.Get().
+		Namespace(c.ns).
+		Resource("podalerts").
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Do().
+		Into(result)
+	return
+}
+
+// Watch returns a watch.Interface that watches the requested podAlerts.
+func (c *podAlerts) Watch(opts v1.ListOptions) (watch.Interface, error) {
+	opts.Watch = true
+	return c.client.Get().
+		Namespace(c.ns).
+		Resource("podalerts").
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Watch()
+}
+
 // Create takes the representation of a podAlert and creates it.  Returns the server's representation of the podAlert, and an error, if there is any.
 func (c *podAlerts) Create(podAlert *v1alpha1.PodAlert) (result *v1alpha1.PodAlert, err error) {
 	result = &v1alpha1.PodAlert{}
@@ -103,41 +138,6 @@ func (c *podAlerts) DeleteCollection(options *v1.DeleteOptions, listOptions v1.L
 		Body(options).
 		Do().
 		Error()
-}
-
-// Get takes name of the podAlert, and returns the corresponding podAlert object, and an error if there is any.
-func (c *podAlerts) Get(name string, options v1.GetOptions) (result *v1alpha1.PodAlert, err error) {
-	result = &v1alpha1.PodAlert{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("podalerts").
-		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
-		Into(result)
-	return
-}
-
-// List takes label and field selectors, and returns the list of PodAlerts that match those selectors.
-func (c *podAlerts) List(opts v1.ListOptions) (result *v1alpha1.PodAlertList, err error) {
-	result = &v1alpha1.PodAlertList{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("podalerts").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Do().
-		Into(result)
-	return
-}
-
-// Watch returns a watch.Interface that watches the requested podAlerts.
-func (c *podAlerts) Watch(opts v1.ListOptions) (watch.Interface, error) {
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(c.ns).
-		Resource("podalerts").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Watch()
 }
 
 // Patch applies the patch and returns the patched podAlert.

@@ -8,9 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
@@ -34,10 +35,13 @@ func (r Ingress) HasChanged(o Ingress) (bool, error) {
 	if r.Name != o.Name ||
 		r.Namespace != o.Namespace ||
 		r.APISchema() != o.APISchema() {
-		return false, errors.New("Not the same Ingress.")
+		return false, errors.New("not the same Ingress")
 	}
 
-	if !reflect.DeepEqual(r.Spec, o.Spec) {
+	specEqual := cmp.Equal(r.Spec, o.Spec, cmp.Comparer(func(x, y resource.Quantity) bool {
+		return x.Cmp(y) == 0
+	}))
+	if !specEqual {
 		return true, nil
 	}
 
@@ -56,14 +60,14 @@ func (r Ingress) HasChanged(o Ingress) (bool, error) {
 	return !reflect.DeepEqual(ra, oa), nil
 }
 
-func (r Ingress) FindTLSSecret(h string) (*apiv1.ObjectReference, bool) {
+func (r Ingress) FindTLSSecret(h string) (*LocalTypedReference, bool) {
 	if h == "" {
 		return nil, false
 	}
 	for _, tls := range r.Spec.TLS {
 		for _, host := range tls.Hosts {
 			if host == h {
-				return tls.SecretRef, true
+				return tls.Ref, true
 			}
 		}
 	}
@@ -218,16 +222,25 @@ func (c Certificate) IsRateLimited() bool {
 }
 
 func (c Certificate) SecretName() string {
-	if c.Spec.Storage.Secret != nil {
-		if c.Spec.Storage.Secret.Name == "" {
-			return "cert-" + c.Name
+	if c.Spec.Storage.Vault != nil {
+		if c.Spec.Storage.Vault.Name != "" {
+			return c.Spec.Storage.Vault.Name
 		}
-		return c.Spec.Storage.Secret.Name
-	} else if c.Spec.Storage.Vault != nil {
-		if c.Spec.Storage.Vault.Name == "" {
-			return "cert-" + c.Name
-		}
-		return c.Spec.Storage.Vault.Name
+		return "tls-" + c.Name
 	}
-	return ""
+	if c.Spec.Storage.Secret != nil && c.Spec.Storage.Secret.Name != "" {
+		return c.Spec.Storage.Secret.Name
+	}
+	return "tls-" + c.Name
+}
+
+func (r Ingress) UsesAuthSecret(namespace, name string) bool {
+	if r.Namespace != namespace {
+		return false
+	}
+
+	if r.AuthSecretName() == name {
+		return true
+	}
+	return false
 }

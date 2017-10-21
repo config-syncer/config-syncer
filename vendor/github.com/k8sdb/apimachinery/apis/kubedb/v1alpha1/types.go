@@ -1,7 +1,7 @@
 package v1alpha1
 
 import (
-	apiv1 "k8s.io/client-go/pkg/api/v1"
+	core "k8s.io/api/core/v1"
 )
 
 type InitSpec struct {
@@ -10,8 +10,8 @@ type InitSpec struct {
 }
 
 type ScriptSourceSpec struct {
-	ScriptPath         string `json:"scriptPath,omitempty"`
-	apiv1.VolumeSource `json:",inline,omitempty"`
+	ScriptPath        string `json:"scriptPath,omitempty"`
+	core.VolumeSource `json:",inline,omitempty"`
 }
 
 type SnapshotSourceSpec struct {
@@ -23,7 +23,7 @@ type BackupScheduleSpec struct {
 	CronExpression      string `json:"cronExpression,omitempty"`
 	SnapshotStorageSpec `json:",inline,omitempty"`
 	// Compute Resources required by the sidecar container.
-	Resources apiv1.ResourceRequirements `json:"resources,omitempty"`
+	Resources core.ResourceRequirements `json:"resources,omitempty"`
 }
 
 const (
@@ -72,8 +72,8 @@ type SnapshotStorageSpec struct {
 }
 
 type LocalSpec struct {
-	VolumeSource apiv1.VolumeSource `json:"volumeSource,omitempty"`
-	Path         string             `json:"path,omitempty"`
+	VolumeSource core.VolumeSource `json:"volumeSource,omitempty"`
+	Path         string            `json:"path,omitempty"`
 }
 
 type S3Spec struct {

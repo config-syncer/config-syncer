@@ -6,8 +6,8 @@ import (
 	"reflect"
 
 	"github.com/appscode/kutil"
+	extensions "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	extensions "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 )
 
 func GetGroupVersionKind(v interface{}) schema.GroupVersionKind {
@@ -42,4 +42,13 @@ func AssignTypeKind(v interface{}) error {
 		return nil
 	}
 	return errors.New("unknown api object type")
+}
+
+func IsOwnedByDeployment(rs *extensions.ReplicaSet) bool {
+	for _, ref := range rs.OwnerReferences {
+		if ref.Kind == "Deployment" && ref.Name != "" {
+			return true
+		}
+	}
+	return false
 }

@@ -6,12 +6,12 @@ import (
 	"reflect"
 
 	"github.com/appscode/kutil"
+	batch "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	batchv1 "k8s.io/client-go/pkg/apis/batch/v1"
 )
 
 func GetGroupVersionKind(v interface{}) schema.GroupVersionKind {
-	return batchv1.SchemeGroupVersion.WithKind(kutil.GetKind(v))
+	return batch.SchemeGroupVersion.WithKind(kutil.GetKind(v))
 }
 
 func AssignTypeKind(v interface{}) error {
@@ -20,8 +20,8 @@ func AssignTypeKind(v interface{}) error {
 	}
 
 	switch u := v.(type) {
-	case *batchv1.Job:
-		u.APIVersion = batchv1.SchemeGroupVersion.String()
+	case *batch.Job:
+		u.APIVersion = batch.SchemeGroupVersion.String()
 		u.Kind = kutil.GetKind(v)
 		return nil
 	}

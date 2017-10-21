@@ -23,10 +23,10 @@ package kubedb
 import (
 	reflect "reflect"
 
-	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	core_v1 "k8s.io/api/core/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
-	v1 "k8s.io/client-go/pkg/api/v1"
 )
 
 func init() {
@@ -35,849 +35,1115 @@ func init() {
 
 // RegisterDeepCopies adds deep-copy functions to the given scheme. Public
 // to allow building arbitrary schemes.
+//
+// Deprecated: deepcopy registration will go away when static deepcopy is fully implemented.
 func RegisterDeepCopies(scheme *runtime.Scheme) error {
 	return scheme.AddGeneratedDeepCopyFuncs(
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_AzureSpec, InType: reflect.TypeOf(&AzureSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_BackupScheduleSpec, InType: reflect.TypeOf(&BackupScheduleSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_DormantDatabase, InType: reflect.TypeOf(&DormantDatabase{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_DormantDatabaseList, InType: reflect.TypeOf(&DormantDatabaseList{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_DormantDatabaseSpec, InType: reflect.TypeOf(&DormantDatabaseSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_DormantDatabaseStatus, InType: reflect.TypeOf(&DormantDatabaseStatus{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_Elasticsearch, InType: reflect.TypeOf(&Elasticsearch{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_ElasticsearchList, InType: reflect.TypeOf(&ElasticsearchList{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_ElasticsearchSpec, InType: reflect.TypeOf(&ElasticsearchSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_ElasticsearchStatus, InType: reflect.TypeOf(&ElasticsearchStatus{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_ElasticsearchSummary, InType: reflect.TypeOf(&ElasticsearchSummary{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_GCSSpec, InType: reflect.TypeOf(&GCSSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_InitSpec, InType: reflect.TypeOf(&InitSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_LocalSpec, InType: reflect.TypeOf(&LocalSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_MonitorSpec, InType: reflect.TypeOf(&MonitorSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_Origin, InType: reflect.TypeOf(&Origin{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_OriginSpec, InType: reflect.TypeOf(&OriginSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_Postgres, InType: reflect.TypeOf(&Postgres{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_PostgresList, InType: reflect.TypeOf(&PostgresList{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_PostgresSchemaInfo, InType: reflect.TypeOf(&PostgresSchemaInfo{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_PostgresSpec, InType: reflect.TypeOf(&PostgresSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_PostgresStatus, InType: reflect.TypeOf(&PostgresStatus{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_PostgresSummary, InType: reflect.TypeOf(&PostgresSummary{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_PostgresTableInfo, InType: reflect.TypeOf(&PostgresTableInfo{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_PrometheusSpec, InType: reflect.TypeOf(&PrometheusSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_Report, InType: reflect.TypeOf(&Report{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_ReportStatus, InType: reflect.TypeOf(&ReportStatus{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_ReportSummary, InType: reflect.TypeOf(&ReportSummary{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_S3Spec, InType: reflect.TypeOf(&S3Spec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_ScriptSourceSpec, InType: reflect.TypeOf(&ScriptSourceSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_Snapshot, InType: reflect.TypeOf(&Snapshot{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_SnapshotList, InType: reflect.TypeOf(&SnapshotList{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_SnapshotSourceSpec, InType: reflect.TypeOf(&SnapshotSourceSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_SnapshotSpec, InType: reflect.TypeOf(&SnapshotSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_SnapshotStatus, InType: reflect.TypeOf(&SnapshotStatus{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_SnapshotStorageSpec, InType: reflect.TypeOf(&SnapshotStorageSpec{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_kubedb_SwiftSpec, InType: reflect.TypeOf(&SwiftSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*AzureSpec).DeepCopyInto(out.(*AzureSpec))
+			return nil
+		}, InType: reflect.TypeOf(&AzureSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*BackupScheduleSpec).DeepCopyInto(out.(*BackupScheduleSpec))
+			return nil
+		}, InType: reflect.TypeOf(&BackupScheduleSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*DormantDatabase).DeepCopyInto(out.(*DormantDatabase))
+			return nil
+		}, InType: reflect.TypeOf(&DormantDatabase{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*DormantDatabaseList).DeepCopyInto(out.(*DormantDatabaseList))
+			return nil
+		}, InType: reflect.TypeOf(&DormantDatabaseList{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*DormantDatabaseSpec).DeepCopyInto(out.(*DormantDatabaseSpec))
+			return nil
+		}, InType: reflect.TypeOf(&DormantDatabaseSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*DormantDatabaseStatus).DeepCopyInto(out.(*DormantDatabaseStatus))
+			return nil
+		}, InType: reflect.TypeOf(&DormantDatabaseStatus{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*Elasticsearch).DeepCopyInto(out.(*Elasticsearch))
+			return nil
+		}, InType: reflect.TypeOf(&Elasticsearch{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*ElasticsearchList).DeepCopyInto(out.(*ElasticsearchList))
+			return nil
+		}, InType: reflect.TypeOf(&ElasticsearchList{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*ElasticsearchSpec).DeepCopyInto(out.(*ElasticsearchSpec))
+			return nil
+		}, InType: reflect.TypeOf(&ElasticsearchSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*ElasticsearchStatus).DeepCopyInto(out.(*ElasticsearchStatus))
+			return nil
+		}, InType: reflect.TypeOf(&ElasticsearchStatus{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*GCSSpec).DeepCopyInto(out.(*GCSSpec))
+			return nil
+		}, InType: reflect.TypeOf(&GCSSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*InitSpec).DeepCopyInto(out.(*InitSpec))
+			return nil
+		}, InType: reflect.TypeOf(&InitSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*LocalSpec).DeepCopyInto(out.(*LocalSpec))
+			return nil
+		}, InType: reflect.TypeOf(&LocalSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*MonitorSpec).DeepCopyInto(out.(*MonitorSpec))
+			return nil
+		}, InType: reflect.TypeOf(&MonitorSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*Origin).DeepCopyInto(out.(*Origin))
+			return nil
+		}, InType: reflect.TypeOf(&Origin{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*OriginSpec).DeepCopyInto(out.(*OriginSpec))
+			return nil
+		}, InType: reflect.TypeOf(&OriginSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*Postgres).DeepCopyInto(out.(*Postgres))
+			return nil
+		}, InType: reflect.TypeOf(&Postgres{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*PostgresList).DeepCopyInto(out.(*PostgresList))
+			return nil
+		}, InType: reflect.TypeOf(&PostgresList{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*PostgresSchemaInfo).DeepCopyInto(out.(*PostgresSchemaInfo))
+			return nil
+		}, InType: reflect.TypeOf(&PostgresSchemaInfo{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*PostgresSpec).DeepCopyInto(out.(*PostgresSpec))
+			return nil
+		}, InType: reflect.TypeOf(&PostgresSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*PostgresStatus).DeepCopyInto(out.(*PostgresStatus))
+			return nil
+		}, InType: reflect.TypeOf(&PostgresStatus{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*PostgresSummary).DeepCopyInto(out.(*PostgresSummary))
+			return nil
+		}, InType: reflect.TypeOf(&PostgresSummary{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*PostgresTableInfo).DeepCopyInto(out.(*PostgresTableInfo))
+			return nil
+		}, InType: reflect.TypeOf(&PostgresTableInfo{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*PrometheusSpec).DeepCopyInto(out.(*PrometheusSpec))
+			return nil
+		}, InType: reflect.TypeOf(&PrometheusSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*S3Spec).DeepCopyInto(out.(*S3Spec))
+			return nil
+		}, InType: reflect.TypeOf(&S3Spec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*ScriptSourceSpec).DeepCopyInto(out.(*ScriptSourceSpec))
+			return nil
+		}, InType: reflect.TypeOf(&ScriptSourceSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*Snapshot).DeepCopyInto(out.(*Snapshot))
+			return nil
+		}, InType: reflect.TypeOf(&Snapshot{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*SnapshotList).DeepCopyInto(out.(*SnapshotList))
+			return nil
+		}, InType: reflect.TypeOf(&SnapshotList{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*SnapshotSourceSpec).DeepCopyInto(out.(*SnapshotSourceSpec))
+			return nil
+		}, InType: reflect.TypeOf(&SnapshotSourceSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*SnapshotSpec).DeepCopyInto(out.(*SnapshotSpec))
+			return nil
+		}, InType: reflect.TypeOf(&SnapshotSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*SnapshotStatus).DeepCopyInto(out.(*SnapshotStatus))
+			return nil
+		}, InType: reflect.TypeOf(&SnapshotStatus{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*SnapshotStorageSpec).DeepCopyInto(out.(*SnapshotStorageSpec))
+			return nil
+		}, InType: reflect.TypeOf(&SnapshotStorageSpec{})},
+		conversion.GeneratedDeepCopyFunc{Fn: func(in interface{}, out interface{}, c *conversion.Cloner) error {
+			in.(*SwiftSpec).DeepCopyInto(out.(*SwiftSpec))
+			return nil
+		}, InType: reflect.TypeOf(&SwiftSpec{})},
 	)
 }
 
-// DeepCopy_kubedb_AzureSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_AzureSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*AzureSpec)
-		out := out.(*AzureSpec)
-		*out = *in
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *AzureSpec) DeepCopyInto(out *AzureSpec) {
+	*out = *in
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new AzureSpec.
+func (in *AzureSpec) DeepCopy() *AzureSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(AzureSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *BackupScheduleSpec) DeepCopyInto(out *BackupScheduleSpec) {
+	*out = *in
+	in.SnapshotStorageSpec.DeepCopyInto(&out.SnapshotStorageSpec)
+	in.Resources.DeepCopyInto(&out.Resources)
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new BackupScheduleSpec.
+func (in *BackupScheduleSpec) DeepCopy() *BackupScheduleSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(BackupScheduleSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *DormantDatabase) DeepCopyInto(out *DormantDatabase) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	in.Spec.DeepCopyInto(&out.Spec)
+	in.Status.DeepCopyInto(&out.Status)
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new DormantDatabase.
+func (in *DormantDatabase) DeepCopy() *DormantDatabase {
+	if in == nil {
+		return nil
+	}
+	out := new(DormantDatabase)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyObject is an autogenerated deepcopy function, copying the receiver, creating a new runtime.Object.
+func (in *DormantDatabase) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	} else {
 		return nil
 	}
 }
 
-// DeepCopy_kubedb_BackupScheduleSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_BackupScheduleSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*BackupScheduleSpec)
-		out := out.(*BackupScheduleSpec)
-		*out = *in
-		if err := DeepCopy_kubedb_SnapshotStorageSpec(&in.SnapshotStorageSpec, &out.SnapshotStorageSpec, c); err != nil {
-			return err
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *DormantDatabaseList) DeepCopyInto(out *DormantDatabaseList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	out.ListMeta = in.ListMeta
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]DormantDatabase, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
-		if newVal, err := c.DeepCopy(&in.Resources); err != nil {
-			return err
+	}
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new DormantDatabaseList.
+func (in *DormantDatabaseList) DeepCopy() *DormantDatabaseList {
+	if in == nil {
+		return nil
+	}
+	out := new(DormantDatabaseList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyObject is an autogenerated deepcopy function, copying the receiver, creating a new runtime.Object.
+func (in *DormantDatabaseList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	} else {
+		return nil
+	}
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *DormantDatabaseSpec) DeepCopyInto(out *DormantDatabaseSpec) {
+	*out = *in
+	in.Origin.DeepCopyInto(&out.Origin)
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new DormantDatabaseSpec.
+func (in *DormantDatabaseSpec) DeepCopy() *DormantDatabaseSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(DormantDatabaseSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *DormantDatabaseStatus) DeepCopyInto(out *DormantDatabaseStatus) {
+	*out = *in
+	if in.CreationTime != nil {
+		in, out := &in.CreationTime, &out.CreationTime
+		if *in == nil {
+			*out = nil
 		} else {
-			out.Resources = *newVal.(*v1.ResourceRequirements)
+			*out = new(v1.Time)
+			(*in).DeepCopyInto(*out)
 		}
-		return nil
 	}
-}
-
-// DeepCopy_kubedb_DormantDatabase is an autogenerated deepcopy function.
-func DeepCopy_kubedb_DormantDatabase(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*DormantDatabase)
-		out := out.(*DormantDatabase)
-		*out = *in
-		if newVal, err := c.DeepCopy(&in.ObjectMeta); err != nil {
-			return err
+	if in.PausingTime != nil {
+		in, out := &in.PausingTime, &out.PausingTime
+		if *in == nil {
+			*out = nil
 		} else {
-			out.ObjectMeta = *newVal.(*meta_v1.ObjectMeta)
+			*out = new(v1.Time)
+			(*in).DeepCopyInto(*out)
 		}
-		if err := DeepCopy_kubedb_DormantDatabaseSpec(&in.Spec, &out.Spec, c); err != nil {
-			return err
-		}
-		if err := DeepCopy_kubedb_DormantDatabaseStatus(&in.Status, &out.Status, c); err != nil {
-			return err
-		}
-		return nil
 	}
-}
-
-// DeepCopy_kubedb_DormantDatabaseList is an autogenerated deepcopy function.
-func DeepCopy_kubedb_DormantDatabaseList(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*DormantDatabaseList)
-		out := out.(*DormantDatabaseList)
-		*out = *in
-		if in.Items != nil {
-			in, out := &in.Items, &out.Items
-			*out = make([]DormantDatabase, len(*in))
-			for i := range *in {
-				if err := DeepCopy_kubedb_DormantDatabase(&(*in)[i], &(*out)[i], c); err != nil {
-					return err
-				}
-			}
-		}
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_DormantDatabaseSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_DormantDatabaseSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*DormantDatabaseSpec)
-		out := out.(*DormantDatabaseSpec)
-		*out = *in
-		if err := DeepCopy_kubedb_Origin(&in.Origin, &out.Origin, c); err != nil {
-			return err
-		}
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_DormantDatabaseStatus is an autogenerated deepcopy function.
-func DeepCopy_kubedb_DormantDatabaseStatus(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*DormantDatabaseStatus)
-		out := out.(*DormantDatabaseStatus)
-		*out = *in
-		if in.CreationTime != nil {
-			in, out := &in.CreationTime, &out.CreationTime
-			*out = new(meta_v1.Time)
-			**out = (*in).DeepCopy()
-		}
-		if in.PausingTime != nil {
-			in, out := &in.PausingTime, &out.PausingTime
-			*out = new(meta_v1.Time)
-			**out = (*in).DeepCopy()
-		}
-		if in.WipeOutTime != nil {
-			in, out := &in.WipeOutTime, &out.WipeOutTime
-			*out = new(meta_v1.Time)
-			**out = (*in).DeepCopy()
-		}
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_Elasticsearch is an autogenerated deepcopy function.
-func DeepCopy_kubedb_Elasticsearch(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*Elasticsearch)
-		out := out.(*Elasticsearch)
-		*out = *in
-		if newVal, err := c.DeepCopy(&in.ObjectMeta); err != nil {
-			return err
+	if in.WipeOutTime != nil {
+		in, out := &in.WipeOutTime, &out.WipeOutTime
+		if *in == nil {
+			*out = nil
 		} else {
-			out.ObjectMeta = *newVal.(*meta_v1.ObjectMeta)
+			*out = new(v1.Time)
+			(*in).DeepCopyInto(*out)
 		}
-		if err := DeepCopy_kubedb_ElasticsearchSpec(&in.Spec, &out.Spec, c); err != nil {
-			return err
-		}
-		if err := DeepCopy_kubedb_ElasticsearchStatus(&in.Status, &out.Status, c); err != nil {
-			return err
-		}
+	}
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new DormantDatabaseStatus.
+func (in *DormantDatabaseStatus) DeepCopy() *DormantDatabaseStatus {
+	if in == nil {
+		return nil
+	}
+	out := new(DormantDatabaseStatus)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *Elasticsearch) DeepCopyInto(out *Elasticsearch) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	in.Spec.DeepCopyInto(&out.Spec)
+	in.Status.DeepCopyInto(&out.Status)
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new Elasticsearch.
+func (in *Elasticsearch) DeepCopy() *Elasticsearch {
+	if in == nil {
+		return nil
+	}
+	out := new(Elasticsearch)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyObject is an autogenerated deepcopy function, copying the receiver, creating a new runtime.Object.
+func (in *Elasticsearch) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	} else {
 		return nil
 	}
 }
 
-// DeepCopy_kubedb_ElasticsearchList is an autogenerated deepcopy function.
-func DeepCopy_kubedb_ElasticsearchList(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*ElasticsearchList)
-		out := out.(*ElasticsearchList)
-		*out = *in
-		if in.Items != nil {
-			in, out := &in.Items, &out.Items
-			*out = make([]Elasticsearch, len(*in))
-			for i := range *in {
-				if err := DeepCopy_kubedb_Elasticsearch(&(*in)[i], &(*out)[i], c); err != nil {
-					return err
-				}
-			}
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *ElasticsearchList) DeepCopyInto(out *ElasticsearchList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	out.ListMeta = in.ListMeta
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]Elasticsearch, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
+	}
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new ElasticsearchList.
+func (in *ElasticsearchList) DeepCopy() *ElasticsearchList {
+	if in == nil {
+		return nil
+	}
+	out := new(ElasticsearchList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyObject is an autogenerated deepcopy function, copying the receiver, creating a new runtime.Object.
+func (in *ElasticsearchList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	} else {
 		return nil
 	}
 }
 
-// DeepCopy_kubedb_ElasticsearchSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_ElasticsearchSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*ElasticsearchSpec)
-		out := out.(*ElasticsearchSpec)
-		*out = *in
-		if in.Storage != nil {
-			in, out := &in.Storage, &out.Storage
-			if newVal, err := c.DeepCopy(*in); err != nil {
-				return err
-			} else {
-				*out = newVal.(*v1.PersistentVolumeClaimSpec)
-			}
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *ElasticsearchSpec) DeepCopyInto(out *ElasticsearchSpec) {
+	*out = *in
+	if in.Storage != nil {
+		in, out := &in.Storage, &out.Storage
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(core_v1.PersistentVolumeClaimSpec)
+			(*in).DeepCopyInto(*out)
 		}
-		if in.NodeSelector != nil {
-			in, out := &in.NodeSelector, &out.NodeSelector
-			*out = make(map[string]string)
-			for key, val := range *in {
-				(*out)[key] = val
-			}
+	}
+	if in.NodeSelector != nil {
+		in, out := &in.NodeSelector, &out.NodeSelector
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
 		}
-		if in.Init != nil {
-			in, out := &in.Init, &out.Init
+	}
+	if in.Init != nil {
+		in, out := &in.Init, &out.Init
+		if *in == nil {
+			*out = nil
+		} else {
 			*out = new(InitSpec)
-			if err := DeepCopy_kubedb_InitSpec(*in, *out, c); err != nil {
-				return err
-			}
+			(*in).DeepCopyInto(*out)
 		}
-		if in.BackupSchedule != nil {
-			in, out := &in.BackupSchedule, &out.BackupSchedule
-			*out = new(BackupScheduleSpec)
-			if err := DeepCopy_kubedb_BackupScheduleSpec(*in, *out, c); err != nil {
-				return err
-			}
-		}
-		if in.Monitor != nil {
-			in, out := &in.Monitor, &out.Monitor
-			*out = new(MonitorSpec)
-			if err := DeepCopy_kubedb_MonitorSpec(*in, *out, c); err != nil {
-				return err
-			}
-		}
-		if newVal, err := c.DeepCopy(&in.Resources); err != nil {
-			return err
+	}
+	if in.BackupSchedule != nil {
+		in, out := &in.BackupSchedule, &out.BackupSchedule
+		if *in == nil {
+			*out = nil
 		} else {
-			out.Resources = *newVal.(*v1.ResourceRequirements)
+			*out = new(BackupScheduleSpec)
+			(*in).DeepCopyInto(*out)
 		}
-		if in.Affinity != nil {
-			in, out := &in.Affinity, &out.Affinity
-			if newVal, err := c.DeepCopy(*in); err != nil {
-				return err
-			} else {
-				*out = newVal.(*v1.Affinity)
-			}
-		}
-		if in.Tolerations != nil {
-			in, out := &in.Tolerations, &out.Tolerations
-			*out = make([]v1.Toleration, len(*in))
-			for i := range *in {
-				if newVal, err := c.DeepCopy(&(*in)[i]); err != nil {
-					return err
-				} else {
-					(*out)[i] = *newVal.(*v1.Toleration)
-				}
-			}
-		}
-		return nil
 	}
+	if in.Monitor != nil {
+		in, out := &in.Monitor, &out.Monitor
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(MonitorSpec)
+			(*in).DeepCopyInto(*out)
+		}
+	}
+	in.Resources.DeepCopyInto(&out.Resources)
+	if in.Affinity != nil {
+		in, out := &in.Affinity, &out.Affinity
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(core_v1.Affinity)
+			(*in).DeepCopyInto(*out)
+		}
+	}
+	if in.Tolerations != nil {
+		in, out := &in.Tolerations, &out.Tolerations
+		*out = make([]core_v1.Toleration, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
+	return
 }
 
-// DeepCopy_kubedb_ElasticsearchStatus is an autogenerated deepcopy function.
-func DeepCopy_kubedb_ElasticsearchStatus(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*ElasticsearchStatus)
-		out := out.(*ElasticsearchStatus)
-		*out = *in
-		if in.CreationTime != nil {
-			in, out := &in.CreationTime, &out.CreationTime
-			*out = new(meta_v1.Time)
-			**out = (*in).DeepCopy()
-		}
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new ElasticsearchSpec.
+func (in *ElasticsearchSpec) DeepCopy() *ElasticsearchSpec {
+	if in == nil {
 		return nil
 	}
+	out := new(ElasticsearchSpec)
+	in.DeepCopyInto(out)
+	return out
 }
 
-// DeepCopy_kubedb_ElasticsearchSummary is an autogenerated deepcopy function.
-func DeepCopy_kubedb_ElasticsearchSummary(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*ElasticsearchSummary)
-		out := out.(*ElasticsearchSummary)
-		*out = *in
-		if in.IdCount != nil {
-			in, out := &in.IdCount, &out.IdCount
-			*out = make(map[string]int64)
-			for key, val := range *in {
-				(*out)[key] = val
-			}
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *ElasticsearchStatus) DeepCopyInto(out *ElasticsearchStatus) {
+	*out = *in
+	if in.CreationTime != nil {
+		in, out := &in.CreationTime, &out.CreationTime
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(v1.Time)
+			(*in).DeepCopyInto(*out)
 		}
-		// in.Mapping is kind 'Interface'
-		if in.Mapping != nil {
-			if newVal, err := c.DeepCopy(&in.Mapping); err != nil {
-				return err
-			} else {
-				out.Mapping = *newVal.(*interface{})
-			}
-		}
-		// in.Setting is kind 'Interface'
-		if in.Setting != nil {
-			if newVal, err := c.DeepCopy(&in.Setting); err != nil {
-				return err
-			} else {
-				out.Setting = *newVal.(*interface{})
-			}
-		}
+	}
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new ElasticsearchStatus.
+func (in *ElasticsearchStatus) DeepCopy() *ElasticsearchStatus {
+	if in == nil {
 		return nil
 	}
+	out := new(ElasticsearchStatus)
+	in.DeepCopyInto(out)
+	return out
 }
 
-// DeepCopy_kubedb_GCSSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_GCSSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*GCSSpec)
-		out := out.(*GCSSpec)
-		*out = *in
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *GCSSpec) DeepCopyInto(out *GCSSpec) {
+	*out = *in
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new GCSSpec.
+func (in *GCSSpec) DeepCopy() *GCSSpec {
+	if in == nil {
 		return nil
 	}
+	out := new(GCSSpec)
+	in.DeepCopyInto(out)
+	return out
 }
 
-// DeepCopy_kubedb_InitSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_InitSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*InitSpec)
-		out := out.(*InitSpec)
-		*out = *in
-		if in.ScriptSource != nil {
-			in, out := &in.ScriptSource, &out.ScriptSource
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *InitSpec) DeepCopyInto(out *InitSpec) {
+	*out = *in
+	if in.ScriptSource != nil {
+		in, out := &in.ScriptSource, &out.ScriptSource
+		if *in == nil {
+			*out = nil
+		} else {
 			*out = new(ScriptSourceSpec)
-			if err := DeepCopy_kubedb_ScriptSourceSpec(*in, *out, c); err != nil {
-				return err
-			}
+			(*in).DeepCopyInto(*out)
 		}
-		if in.SnapshotSource != nil {
-			in, out := &in.SnapshotSource, &out.SnapshotSource
+	}
+	if in.SnapshotSource != nil {
+		in, out := &in.SnapshotSource, &out.SnapshotSource
+		if *in == nil {
+			*out = nil
+		} else {
 			*out = new(SnapshotSourceSpec)
 			**out = **in
 		}
-		return nil
 	}
+	return
 }
 
-// DeepCopy_kubedb_LocalSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_LocalSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*LocalSpec)
-		out := out.(*LocalSpec)
-		*out = *in
-		if newVal, err := c.DeepCopy(&in.VolumeSource); err != nil {
-			return err
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new InitSpec.
+func (in *InitSpec) DeepCopy() *InitSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(InitSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *LocalSpec) DeepCopyInto(out *LocalSpec) {
+	*out = *in
+	in.VolumeSource.DeepCopyInto(&out.VolumeSource)
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new LocalSpec.
+func (in *LocalSpec) DeepCopy() *LocalSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(LocalSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *MonitorSpec) DeepCopyInto(out *MonitorSpec) {
+	*out = *in
+	if in.Prometheus != nil {
+		in, out := &in.Prometheus, &out.Prometheus
+		if *in == nil {
+			*out = nil
 		} else {
-			out.VolumeSource = *newVal.(*v1.VolumeSource)
-		}
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_MonitorSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_MonitorSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*MonitorSpec)
-		out := out.(*MonitorSpec)
-		*out = *in
-		if in.Prometheus != nil {
-			in, out := &in.Prometheus, &out.Prometheus
 			*out = new(PrometheusSpec)
-			if err := DeepCopy_kubedb_PrometheusSpec(*in, *out, c); err != nil {
-				return err
-			}
+			(*in).DeepCopyInto(*out)
 		}
-		return nil
 	}
+	return
 }
 
-// DeepCopy_kubedb_Origin is an autogenerated deepcopy function.
-func DeepCopy_kubedb_Origin(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*Origin)
-		out := out.(*Origin)
-		*out = *in
-		if newVal, err := c.DeepCopy(&in.ObjectMeta); err != nil {
-			return err
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new MonitorSpec.
+func (in *MonitorSpec) DeepCopy() *MonitorSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(MonitorSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *Origin) DeepCopyInto(out *Origin) {
+	*out = *in
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	in.Spec.DeepCopyInto(&out.Spec)
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new Origin.
+func (in *Origin) DeepCopy() *Origin {
+	if in == nil {
+		return nil
+	}
+	out := new(Origin)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *OriginSpec) DeepCopyInto(out *OriginSpec) {
+	*out = *in
+	if in.Elasticsearch != nil {
+		in, out := &in.Elasticsearch, &out.Elasticsearch
+		if *in == nil {
+			*out = nil
 		} else {
-			out.ObjectMeta = *newVal.(*meta_v1.ObjectMeta)
-		}
-		if err := DeepCopy_kubedb_OriginSpec(&in.Spec, &out.Spec, c); err != nil {
-			return err
-		}
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_OriginSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_OriginSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*OriginSpec)
-		out := out.(*OriginSpec)
-		*out = *in
-		if in.Elasticsearch != nil {
-			in, out := &in.Elasticsearch, &out.Elasticsearch
 			*out = new(ElasticsearchSpec)
-			if err := DeepCopy_kubedb_ElasticsearchSpec(*in, *out, c); err != nil {
-				return err
-			}
+			(*in).DeepCopyInto(*out)
 		}
-		if in.Postgres != nil {
-			in, out := &in.Postgres, &out.Postgres
+	}
+	if in.Postgres != nil {
+		in, out := &in.Postgres, &out.Postgres
+		if *in == nil {
+			*out = nil
+		} else {
 			*out = new(PostgresSpec)
-			if err := DeepCopy_kubedb_PostgresSpec(*in, *out, c); err != nil {
-				return err
-			}
+			(*in).DeepCopyInto(*out)
 		}
+	}
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new OriginSpec.
+func (in *OriginSpec) DeepCopy() *OriginSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(OriginSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *Postgres) DeepCopyInto(out *Postgres) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	in.Spec.DeepCopyInto(&out.Spec)
+	in.Status.DeepCopyInto(&out.Status)
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new Postgres.
+func (in *Postgres) DeepCopy() *Postgres {
+	if in == nil {
+		return nil
+	}
+	out := new(Postgres)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyObject is an autogenerated deepcopy function, copying the receiver, creating a new runtime.Object.
+func (in *Postgres) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	} else {
 		return nil
 	}
 }
 
-// DeepCopy_kubedb_Postgres is an autogenerated deepcopy function.
-func DeepCopy_kubedb_Postgres(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*Postgres)
-		out := out.(*Postgres)
-		*out = *in
-		if newVal, err := c.DeepCopy(&in.ObjectMeta); err != nil {
-			return err
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *PostgresList) DeepCopyInto(out *PostgresList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	out.ListMeta = in.ListMeta
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]Postgres, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new PostgresList.
+func (in *PostgresList) DeepCopy() *PostgresList {
+	if in == nil {
+		return nil
+	}
+	out := new(PostgresList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyObject is an autogenerated deepcopy function, copying the receiver, creating a new runtime.Object.
+func (in *PostgresList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	} else {
+		return nil
+	}
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *PostgresSchemaInfo) DeepCopyInto(out *PostgresSchemaInfo) {
+	*out = *in
+	if in.Table != nil {
+		in, out := &in.Table, &out.Table
+		*out = make(map[string]*PostgresTableInfo, len(*in))
+		for key, val := range *in {
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				(*out)[key] = new(PostgresTableInfo)
+				val.DeepCopyInto((*out)[key])
+			}
+		}
+	}
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new PostgresSchemaInfo.
+func (in *PostgresSchemaInfo) DeepCopy() *PostgresSchemaInfo {
+	if in == nil {
+		return nil
+	}
+	out := new(PostgresSchemaInfo)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *PostgresSpec) DeepCopyInto(out *PostgresSpec) {
+	*out = *in
+	if in.Storage != nil {
+		in, out := &in.Storage, &out.Storage
+		if *in == nil {
+			*out = nil
 		} else {
-			out.ObjectMeta = *newVal.(*meta_v1.ObjectMeta)
+			*out = new(core_v1.PersistentVolumeClaimSpec)
+			(*in).DeepCopyInto(*out)
 		}
-		if err := DeepCopy_kubedb_PostgresSpec(&in.Spec, &out.Spec, c); err != nil {
-			return err
-		}
-		if err := DeepCopy_kubedb_PostgresStatus(&in.Status, &out.Status, c); err != nil {
-			return err
-		}
-		return nil
 	}
-}
-
-// DeepCopy_kubedb_PostgresList is an autogenerated deepcopy function.
-func DeepCopy_kubedb_PostgresList(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*PostgresList)
-		out := out.(*PostgresList)
-		*out = *in
-		if in.Items != nil {
-			in, out := &in.Items, &out.Items
-			*out = make([]Postgres, len(*in))
-			for i := range *in {
-				if err := DeepCopy_kubedb_Postgres(&(*in)[i], &(*out)[i], c); err != nil {
-					return err
-				}
-			}
+	if in.DatabaseSecret != nil {
+		in, out := &in.DatabaseSecret, &out.DatabaseSecret
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(core_v1.SecretVolumeSource)
+			(*in).DeepCopyInto(*out)
 		}
-		return nil
 	}
-}
-
-// DeepCopy_kubedb_PostgresSchemaInfo is an autogenerated deepcopy function.
-func DeepCopy_kubedb_PostgresSchemaInfo(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*PostgresSchemaInfo)
-		out := out.(*PostgresSchemaInfo)
-		*out = *in
-		if in.Table != nil {
-			in, out := &in.Table, &out.Table
-			*out = make(map[string]*PostgresTableInfo)
-			for key, val := range *in {
-				if newVal, err := c.DeepCopy(&val); err != nil {
-					return err
-				} else {
-					(*out)[key] = *newVal.(**PostgresTableInfo)
-				}
-			}
+	if in.NodeSelector != nil {
+		in, out := &in.NodeSelector, &out.NodeSelector
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
 		}
-		return nil
 	}
-}
-
-// DeepCopy_kubedb_PostgresSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_PostgresSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*PostgresSpec)
-		out := out.(*PostgresSpec)
-		*out = *in
-		if in.Storage != nil {
-			in, out := &in.Storage, &out.Storage
-			if newVal, err := c.DeepCopy(*in); err != nil {
-				return err
-			} else {
-				*out = newVal.(*v1.PersistentVolumeClaimSpec)
-			}
-		}
-		if in.DatabaseSecret != nil {
-			in, out := &in.DatabaseSecret, &out.DatabaseSecret
-			if newVal, err := c.DeepCopy(*in); err != nil {
-				return err
-			} else {
-				*out = newVal.(*v1.SecretVolumeSource)
-			}
-		}
-		if in.NodeSelector != nil {
-			in, out := &in.NodeSelector, &out.NodeSelector
-			*out = make(map[string]string)
-			for key, val := range *in {
-				(*out)[key] = val
-			}
-		}
-		if in.Init != nil {
-			in, out := &in.Init, &out.Init
+	if in.Init != nil {
+		in, out := &in.Init, &out.Init
+		if *in == nil {
+			*out = nil
+		} else {
 			*out = new(InitSpec)
-			if err := DeepCopy_kubedb_InitSpec(*in, *out, c); err != nil {
-				return err
-			}
+			(*in).DeepCopyInto(*out)
 		}
-		if in.BackupSchedule != nil {
-			in, out := &in.BackupSchedule, &out.BackupSchedule
+	}
+	if in.BackupSchedule != nil {
+		in, out := &in.BackupSchedule, &out.BackupSchedule
+		if *in == nil {
+			*out = nil
+		} else {
 			*out = new(BackupScheduleSpec)
-			if err := DeepCopy_kubedb_BackupScheduleSpec(*in, *out, c); err != nil {
-				return err
-			}
+			(*in).DeepCopyInto(*out)
 		}
-		if in.Monitor != nil {
-			in, out := &in.Monitor, &out.Monitor
+	}
+	if in.Monitor != nil {
+		in, out := &in.Monitor, &out.Monitor
+		if *in == nil {
+			*out = nil
+		} else {
 			*out = new(MonitorSpec)
-			if err := DeepCopy_kubedb_MonitorSpec(*in, *out, c); err != nil {
-				return err
-			}
+			(*in).DeepCopyInto(*out)
 		}
-		if newVal, err := c.DeepCopy(&in.Resources); err != nil {
-			return err
+	}
+	in.Resources.DeepCopyInto(&out.Resources)
+	if in.Affinity != nil {
+		in, out := &in.Affinity, &out.Affinity
+		if *in == nil {
+			*out = nil
 		} else {
-			out.Resources = *newVal.(*v1.ResourceRequirements)
+			*out = new(core_v1.Affinity)
+			(*in).DeepCopyInto(*out)
 		}
-		if in.Affinity != nil {
-			in, out := &in.Affinity, &out.Affinity
-			if newVal, err := c.DeepCopy(*in); err != nil {
-				return err
+	}
+	if in.Tolerations != nil {
+		in, out := &in.Tolerations, &out.Tolerations
+		*out = make([]core_v1.Toleration, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new PostgresSpec.
+func (in *PostgresSpec) DeepCopy() *PostgresSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(PostgresSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *PostgresStatus) DeepCopyInto(out *PostgresStatus) {
+	*out = *in
+	if in.CreationTime != nil {
+		in, out := &in.CreationTime, &out.CreationTime
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(v1.Time)
+			(*in).DeepCopyInto(*out)
+		}
+	}
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new PostgresStatus.
+func (in *PostgresStatus) DeepCopy() *PostgresStatus {
+	if in == nil {
+		return nil
+	}
+	out := new(PostgresStatus)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *PostgresSummary) DeepCopyInto(out *PostgresSummary) {
+	*out = *in
+	if in.Schema != nil {
+		in, out := &in.Schema, &out.Schema
+		*out = make(map[string]*PostgresSchemaInfo, len(*in))
+		for key, val := range *in {
+			if val == nil {
+				(*out)[key] = nil
 			} else {
-				*out = newVal.(*v1.Affinity)
+				(*out)[key] = new(PostgresSchemaInfo)
+				val.DeepCopyInto((*out)[key])
 			}
 		}
-		if in.Tolerations != nil {
-			in, out := &in.Tolerations, &out.Tolerations
-			*out = make([]v1.Toleration, len(*in))
-			for i := range *in {
-				if newVal, err := c.DeepCopy(&(*in)[i]); err != nil {
-					return err
-				} else {
-					(*out)[i] = *newVal.(*v1.Toleration)
-				}
-			}
+	}
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new PostgresSummary.
+func (in *PostgresSummary) DeepCopy() *PostgresSummary {
+	if in == nil {
+		return nil
+	}
+	out := new(PostgresSummary)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *PostgresTableInfo) DeepCopyInto(out *PostgresTableInfo) {
+	*out = *in
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new PostgresTableInfo.
+func (in *PostgresTableInfo) DeepCopy() *PostgresTableInfo {
+	if in == nil {
+		return nil
+	}
+	out := new(PostgresTableInfo)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *PrometheusSpec) DeepCopyInto(out *PrometheusSpec) {
+	*out = *in
+	if in.Labels != nil {
+		in, out := &in.Labels, &out.Labels
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
 		}
+	}
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new PrometheusSpec.
+func (in *PrometheusSpec) DeepCopy() *PrometheusSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(PrometheusSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *S3Spec) DeepCopyInto(out *S3Spec) {
+	*out = *in
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new S3Spec.
+func (in *S3Spec) DeepCopy() *S3Spec {
+	if in == nil {
+		return nil
+	}
+	out := new(S3Spec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *ScriptSourceSpec) DeepCopyInto(out *ScriptSourceSpec) {
+	*out = *in
+	in.VolumeSource.DeepCopyInto(&out.VolumeSource)
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new ScriptSourceSpec.
+func (in *ScriptSourceSpec) DeepCopy() *ScriptSourceSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(ScriptSourceSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *Snapshot) DeepCopyInto(out *Snapshot) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	in.Spec.DeepCopyInto(&out.Spec)
+	in.Status.DeepCopyInto(&out.Status)
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new Snapshot.
+func (in *Snapshot) DeepCopy() *Snapshot {
+	if in == nil {
+		return nil
+	}
+	out := new(Snapshot)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyObject is an autogenerated deepcopy function, copying the receiver, creating a new runtime.Object.
+func (in *Snapshot) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	} else {
 		return nil
 	}
 }
 
-// DeepCopy_kubedb_PostgresStatus is an autogenerated deepcopy function.
-func DeepCopy_kubedb_PostgresStatus(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*PostgresStatus)
-		out := out.(*PostgresStatus)
-		*out = *in
-		if in.CreationTime != nil {
-			in, out := &in.CreationTime, &out.CreationTime
-			*out = new(meta_v1.Time)
-			**out = (*in).DeepCopy()
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *SnapshotList) DeepCopyInto(out *SnapshotList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	out.ListMeta = in.ListMeta
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]Snapshot, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
+	}
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new SnapshotList.
+func (in *SnapshotList) DeepCopy() *SnapshotList {
+	if in == nil {
+		return nil
+	}
+	out := new(SnapshotList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyObject is an autogenerated deepcopy function, copying the receiver, creating a new runtime.Object.
+func (in *SnapshotList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	} else {
 		return nil
 	}
 }
 
-// DeepCopy_kubedb_PostgresSummary is an autogenerated deepcopy function.
-func DeepCopy_kubedb_PostgresSummary(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*PostgresSummary)
-		out := out.(*PostgresSummary)
-		*out = *in
-		if in.Schema != nil {
-			in, out := &in.Schema, &out.Schema
-			*out = make(map[string]*PostgresSchemaInfo)
-			for key, val := range *in {
-				if newVal, err := c.DeepCopy(&val); err != nil {
-					return err
-				} else {
-					(*out)[key] = *newVal.(**PostgresSchemaInfo)
-				}
-			}
-		}
-		return nil
-	}
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *SnapshotSourceSpec) DeepCopyInto(out *SnapshotSourceSpec) {
+	*out = *in
+	return
 }
 
-// DeepCopy_kubedb_PostgresTableInfo is an autogenerated deepcopy function.
-func DeepCopy_kubedb_PostgresTableInfo(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*PostgresTableInfo)
-		out := out.(*PostgresTableInfo)
-		*out = *in
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new SnapshotSourceSpec.
+func (in *SnapshotSourceSpec) DeepCopy() *SnapshotSourceSpec {
+	if in == nil {
 		return nil
 	}
+	out := new(SnapshotSourceSpec)
+	in.DeepCopyInto(out)
+	return out
 }
 
-// DeepCopy_kubedb_PrometheusSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_PrometheusSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*PrometheusSpec)
-		out := out.(*PrometheusSpec)
-		*out = *in
-		if in.Labels != nil {
-			in, out := &in.Labels, &out.Labels
-			*out = make(map[string]string)
-			for key, val := range *in {
-				(*out)[key] = val
-			}
-		}
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *SnapshotSpec) DeepCopyInto(out *SnapshotSpec) {
+	*out = *in
+	in.SnapshotStorageSpec.DeepCopyInto(&out.SnapshotStorageSpec)
+	in.Resources.DeepCopyInto(&out.Resources)
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new SnapshotSpec.
+func (in *SnapshotSpec) DeepCopy() *SnapshotSpec {
+	if in == nil {
 		return nil
 	}
+	out := new(SnapshotSpec)
+	in.DeepCopyInto(out)
+	return out
 }
 
-// DeepCopy_kubedb_Report is an autogenerated deepcopy function.
-func DeepCopy_kubedb_Report(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*Report)
-		out := out.(*Report)
-		*out = *in
-		if newVal, err := c.DeepCopy(&in.ObjectMeta); err != nil {
-			return err
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *SnapshotStatus) DeepCopyInto(out *SnapshotStatus) {
+	*out = *in
+	if in.StartTime != nil {
+		in, out := &in.StartTime, &out.StartTime
+		if *in == nil {
+			*out = nil
 		} else {
-			out.ObjectMeta = *newVal.(*meta_v1.ObjectMeta)
+			*out = new(v1.Time)
+			(*in).DeepCopyInto(*out)
 		}
-		if err := DeepCopy_kubedb_ReportSummary(&in.Summary, &out.Summary, c); err != nil {
-			return err
-		}
-		if err := DeepCopy_kubedb_ReportStatus(&in.Status, &out.Status, c); err != nil {
-			return err
-		}
-		return nil
 	}
-}
-
-// DeepCopy_kubedb_ReportStatus is an autogenerated deepcopy function.
-func DeepCopy_kubedb_ReportStatus(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*ReportStatus)
-		out := out.(*ReportStatus)
-		*out = *in
-		if in.StartTime != nil {
-			in, out := &in.StartTime, &out.StartTime
-			*out = new(meta_v1.Time)
-			**out = (*in).DeepCopy()
-		}
-		if in.CompletionTime != nil {
-			in, out := &in.CompletionTime, &out.CompletionTime
-			*out = new(meta_v1.Time)
-			**out = (*in).DeepCopy()
-		}
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_ReportSummary is an autogenerated deepcopy function.
-func DeepCopy_kubedb_ReportSummary(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*ReportSummary)
-		out := out.(*ReportSummary)
-		*out = *in
-		if in.Postgres != nil {
-			in, out := &in.Postgres, &out.Postgres
-			*out = make(map[string]*PostgresSummary)
-			for key, val := range *in {
-				if newVal, err := c.DeepCopy(&val); err != nil {
-					return err
-				} else {
-					(*out)[key] = *newVal.(**PostgresSummary)
-				}
-			}
-		}
-		if in.Elasticsearch != nil {
-			in, out := &in.Elasticsearch, &out.Elasticsearch
-			*out = make(map[string]*ElasticsearchSummary)
-			for key, val := range *in {
-				if newVal, err := c.DeepCopy(&val); err != nil {
-					return err
-				} else {
-					(*out)[key] = *newVal.(**ElasticsearchSummary)
-				}
-			}
-		}
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_S3Spec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_S3Spec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*S3Spec)
-		out := out.(*S3Spec)
-		*out = *in
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_ScriptSourceSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_ScriptSourceSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*ScriptSourceSpec)
-		out := out.(*ScriptSourceSpec)
-		*out = *in
-		if newVal, err := c.DeepCopy(&in.VolumeSource); err != nil {
-			return err
+	if in.CompletionTime != nil {
+		in, out := &in.CompletionTime, &out.CompletionTime
+		if *in == nil {
+			*out = nil
 		} else {
-			out.VolumeSource = *newVal.(*v1.VolumeSource)
+			*out = new(v1.Time)
+			(*in).DeepCopyInto(*out)
 		}
-		return nil
 	}
+	return
 }
 
-// DeepCopy_kubedb_Snapshot is an autogenerated deepcopy function.
-func DeepCopy_kubedb_Snapshot(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*Snapshot)
-		out := out.(*Snapshot)
-		*out = *in
-		if newVal, err := c.DeepCopy(&in.ObjectMeta); err != nil {
-			return err
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new SnapshotStatus.
+func (in *SnapshotStatus) DeepCopy() *SnapshotStatus {
+	if in == nil {
+		return nil
+	}
+	out := new(SnapshotStatus)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *SnapshotStorageSpec) DeepCopyInto(out *SnapshotStorageSpec) {
+	*out = *in
+	if in.Local != nil {
+		in, out := &in.Local, &out.Local
+		if *in == nil {
+			*out = nil
 		} else {
-			out.ObjectMeta = *newVal.(*meta_v1.ObjectMeta)
-		}
-		if err := DeepCopy_kubedb_SnapshotSpec(&in.Spec, &out.Spec, c); err != nil {
-			return err
-		}
-		if err := DeepCopy_kubedb_SnapshotStatus(&in.Status, &out.Status, c); err != nil {
-			return err
-		}
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_SnapshotList is an autogenerated deepcopy function.
-func DeepCopy_kubedb_SnapshotList(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*SnapshotList)
-		out := out.(*SnapshotList)
-		*out = *in
-		if in.Items != nil {
-			in, out := &in.Items, &out.Items
-			*out = make([]Snapshot, len(*in))
-			for i := range *in {
-				if err := DeepCopy_kubedb_Snapshot(&(*in)[i], &(*out)[i], c); err != nil {
-					return err
-				}
-			}
-		}
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_SnapshotSourceSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_SnapshotSourceSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*SnapshotSourceSpec)
-		out := out.(*SnapshotSourceSpec)
-		*out = *in
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_SnapshotSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_SnapshotSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*SnapshotSpec)
-		out := out.(*SnapshotSpec)
-		*out = *in
-		if err := DeepCopy_kubedb_SnapshotStorageSpec(&in.SnapshotStorageSpec, &out.SnapshotStorageSpec, c); err != nil {
-			return err
-		}
-		if newVal, err := c.DeepCopy(&in.Resources); err != nil {
-			return err
-		} else {
-			out.Resources = *newVal.(*v1.ResourceRequirements)
-		}
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_SnapshotStatus is an autogenerated deepcopy function.
-func DeepCopy_kubedb_SnapshotStatus(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*SnapshotStatus)
-		out := out.(*SnapshotStatus)
-		*out = *in
-		if in.StartTime != nil {
-			in, out := &in.StartTime, &out.StartTime
-			*out = new(meta_v1.Time)
-			**out = (*in).DeepCopy()
-		}
-		if in.CompletionTime != nil {
-			in, out := &in.CompletionTime, &out.CompletionTime
-			*out = new(meta_v1.Time)
-			**out = (*in).DeepCopy()
-		}
-		return nil
-	}
-}
-
-// DeepCopy_kubedb_SnapshotStorageSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_SnapshotStorageSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*SnapshotStorageSpec)
-		out := out.(*SnapshotStorageSpec)
-		*out = *in
-		if in.Local != nil {
-			in, out := &in.Local, &out.Local
 			*out = new(LocalSpec)
-			if err := DeepCopy_kubedb_LocalSpec(*in, *out, c); err != nil {
-				return err
-			}
+			(*in).DeepCopyInto(*out)
 		}
-		if in.S3 != nil {
-			in, out := &in.S3, &out.S3
+	}
+	if in.S3 != nil {
+		in, out := &in.S3, &out.S3
+		if *in == nil {
+			*out = nil
+		} else {
 			*out = new(S3Spec)
 			**out = **in
 		}
-		if in.GCS != nil {
-			in, out := &in.GCS, &out.GCS
+	}
+	if in.GCS != nil {
+		in, out := &in.GCS, &out.GCS
+		if *in == nil {
+			*out = nil
+		} else {
 			*out = new(GCSSpec)
 			**out = **in
 		}
-		if in.Azure != nil {
-			in, out := &in.Azure, &out.Azure
+	}
+	if in.Azure != nil {
+		in, out := &in.Azure, &out.Azure
+		if *in == nil {
+			*out = nil
+		} else {
 			*out = new(AzureSpec)
 			**out = **in
 		}
-		if in.Swift != nil {
-			in, out := &in.Swift, &out.Swift
+	}
+	if in.Swift != nil {
+		in, out := &in.Swift, &out.Swift
+		if *in == nil {
+			*out = nil
+		} else {
 			*out = new(SwiftSpec)
 			**out = **in
 		}
-		return nil
 	}
+	return
 }
 
-// DeepCopy_kubedb_SwiftSpec is an autogenerated deepcopy function.
-func DeepCopy_kubedb_SwiftSpec(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*SwiftSpec)
-		out := out.(*SwiftSpec)
-		*out = *in
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new SnapshotStorageSpec.
+func (in *SnapshotStorageSpec) DeepCopy() *SnapshotStorageSpec {
+	if in == nil {
 		return nil
 	}
+	out := new(SnapshotStorageSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *SwiftSpec) DeepCopyInto(out *SwiftSpec) {
+	*out = *in
+	return
+}
+
+// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new SwiftSpec.
+func (in *SwiftSpec) DeepCopy() *SwiftSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(SwiftSpec)
+	in.DeepCopyInto(out)
+	return out
 }

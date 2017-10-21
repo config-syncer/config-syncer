@@ -30,6 +30,7 @@ const (
 	LBTypeHostPort     = "HostPort"
 	LBTypeNodePort     = "NodePort"
 	LBTypeLoadBalancer = "LoadBalancer" // default
+	LBTypeInternal     = "Internal"
 	LBType             = EngressKey + "/" + "type"
 
 	// Runs HAProxy on a specific set of a hosts.
@@ -85,8 +86,6 @@ const (
 	// Annotations applied to resources offshoot from an ingress
 	OriginAPISchema = EngressKey + "/" + "origin-api-schema" // APISchema = {APIGroup}/{APIVersion}
 	OriginName      = EngressKey + "/" + "origin-name"
-
-	EgressPoints = EngressKey + "/" + "egress-points"
 
 	// https://github.com/appscode/voyager/issues/280
 	// Supports all valid timeout option for defaults section of HAProxy
@@ -180,6 +179,15 @@ const (
 	// name of the auth secret
 	AuthSecret = IngressKey + "/auth-secret"
 
+	// Name of secret for TLS client certification validation.
+	AuthTLSSecret = IngressKey + "/auth-tls-secret"
+
+	// The page that user should be redirected in case of Auth error
+	AuthTLSErrorPage = IngressKey + "/auth-tls-error-page"
+
+	// Enables verification of client certificates.
+	AuthTLSVerifyClient = IngressKey + "/auth-tls-verify-client"
+
 	// Enables CORS headers in response.
 	// Setting this annotations in ingress will add CORS headers to all HTTP
 	// frontend. If we need to add cors headers only on specific frontend we can also
@@ -205,6 +213,28 @@ const (
 	HSTSIncludeSubDomains = IngressKey + "/hsts-include-subdomains"
 
 	WhitelistSourceRange = IngressKey + "/whitelist-source-range"
+	MaxConnections       = IngressKey + "/max-connections"
+
+	// https://github.com/appscode/voyager/issues/552
+	ForceServicePort = EngressKey + "/force-service-port"
+	SSLRedirect      = IngressKey + "/ssl-redirect"
+	ForceSSLRedirect = IngressKey + "/force-ssl-redirect"
+
+	// https://github.com/appscode/voyager/issues/525
+	ErrorFiles = EngressKey + "/errorfiles"
+
+	// Limit requests per second per IP address
+	// http://cbonte.github.io/haproxy-dconv/1.8/configuration.html#7.3.3-sc_conn_rate
+	// https://serverfault.com/a/679172/349346
+	// https://discourse.haproxy.org/t/solved-how-to-configure-basic-ddos-protection-when-behind-aws-elb-x-forwarded-for/932
+	// https://www.haproxy.com/blog/use-a-load-balancer-as-a-first-row-of-defense-against-ddos/
+	LimitRPS = IngressKey + "/limit-rps"
+	// Limit requests per minute per IP address
+	LimitRPM = IngressKey + "/limit-rpm"
+
+	// http://cbonte.github.io/haproxy-dconv/1.8/configuration.html#7.3.3-src_conn_cur
+	// https://www.haproxy.com/blog/use-a-load-balancer-as-a-first-row-of-defense-against-ddos/
+	LimitConnection = IngressKey + "/limit-connection"
 )
 
 const (
@@ -272,6 +302,11 @@ func (r Ingress) EnableCORS() bool {
 	return v
 }
 
+func (r Ingress) ForceServicePort() bool {
+	v, _ := GetBool(r.Annotations, ForceServicePort)
+	return v
+}
+
 func (r Ingress) EnableHSTS() bool {
 	v, err := GetBool(r.Annotations, EnableHSTS)
 	if err != nil {
@@ -306,6 +341,25 @@ func (r Ingress) HSTSIncludeSubDomains() bool {
 
 func (r Ingress) WhitelistSourceRange() string {
 	return GetString(r.Annotations, WhitelistSourceRange)
+}
+
+func (r Ingress) MaxConnections() int {
+	v, _ := GetInt(r.Annotations, MaxConnections)
+	return v
+}
+
+func (r Ingress) SSLRedirect() bool {
+	v, err := GetBool(r.Annotations, SSLRedirect)
+	if err == nil && !v {
+		return false
+	}
+	// Sets the global value of redirects (301) to HTTPS if the server has a TLS certificate (defined in an Ingress rule) Default is "true".
+	return r.explicitPodPorts().Has(443)
+}
+
+func (r Ingress) ForceSSLRedirect() bool {
+	v, _ := GetBool(r.Annotations, ForceSSLRedirect)
+	return v
 }
 
 func (r Ingress) ProxyBodySize() string {
@@ -477,7 +531,7 @@ func (r Ingress) HAProxyOptions() map[string]bool {
 	return ret
 }
 
-func (r Ingress) AuthEnabled() bool {
+func (r Ingress) BasicAuthEnabled() bool {
 	if r.Annotations == nil {
 		return false
 	}
@@ -501,6 +555,41 @@ func (r Ingress) AuthRealm() string {
 
 func (r Ingress) AuthSecretName() string {
 	return GetString(r.Annotations, AuthSecret)
+}
+
+func (r Ingress) AuthTLSSecret() string {
+	return GetString(r.Annotations, AuthTLSSecret)
+}
+
+func (r Ingress) AuthTLSVerifyClient() TLSAuthVerifyOption {
+	str := GetString(r.Annotations, AuthTLSVerifyClient)
+	if str == string(TLSAuthVerifyOptional) {
+		return TLSAuthVerifyOptional
+	}
+	return TLSAuthVerifyRequired
+}
+
+func (r Ingress) AuthTLSErrorPage() string {
+	return GetString(r.Annotations, AuthTLSErrorPage)
+}
+
+func (r Ingress) ErrorFilesConfigMapName() string {
+	return GetString(r.Annotations, ErrorFiles)
+}
+
+func (r Ingress) LimitRPS() int {
+	value, _ := GetInt(r.Annotations, LimitRPS)
+	return value
+}
+
+func (r Ingress) LimitRPM() int {
+	value, _ := GetInt(r.Annotations, LimitRPM)
+	return value
+}
+
+func (r Ingress) LimitConnections() int {
+	value, _ := GetInt(r.Annotations, LimitConnection)
+	return value
 }
 
 // ref: https://github.com/kubernetes/kubernetes/blob/078238a461a0872a8eacb887fbb3d0085714604c/staging/src/k8s.io/apiserver/pkg/apis/example/v1/types.go#L134

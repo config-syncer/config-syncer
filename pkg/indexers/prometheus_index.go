@@ -7,7 +7,7 @@ import (
 
 	"github.com/appscode/go/arrays"
 	"github.com/appscode/go/log"
-	kutil "github.com/appscode/kutil/prometheus/v1alpha1"
+	kutil "github.com/appscode/kutil/prometheus/v1"
 	"github.com/appscode/pat"
 	"github.com/blevesearch/bleve"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
