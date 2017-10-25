@@ -28,7 +28,6 @@ import (
 	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
 	vcs "github.com/appscode/voyager/client/typed/voyager/v1beta1"
 	shell "github.com/codeskyblue/go-sh"
-	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	kcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -59,7 +58,7 @@ type Operator struct {
 	VoyagerClient     vcs.VoyagerV1beta1Interface
 	SearchlightClient srch_cs.MonitoringV1alpha1Interface
 	StashClient       scs.StashV1alpha1Interface
-	PromClient        pcm.MonitoringV1Interface
+	PromClient        prom.MonitoringV1Interface
 	KubeDBClient      kcs.KubedbV1alpha1Interface
 
 	Opt    Options

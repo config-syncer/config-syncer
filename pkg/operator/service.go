@@ -8,7 +8,7 @@ import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	kutil "github.com/appscode/kutil/core/v1"
-	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
+	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -54,7 +54,7 @@ func (op *Operator) watchService() {
 								log.Errorln(err)
 								return
 							}
-							if serviceMonitorList, ok := serviceMonitors.(*pcm.ServiceMonitorList); ok {
+							if serviceMonitorList, ok := serviceMonitors.(*prom.ServiceMonitorList); ok {
 								op.ReverseIndex.ServiceMonitor.AddService(res, serviceMonitorList.Items)
 							}
 						}

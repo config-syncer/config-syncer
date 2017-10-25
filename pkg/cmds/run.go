@@ -13,7 +13,7 @@ import (
 	srch_cs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
 	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
 	vcs "github.com/appscode/voyager/client/typed/voyager/v1beta1"
-	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
+	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	kcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
 	"github.com/spf13/cobra"
 	core "k8s.io/api/core/v1"
@@ -71,7 +71,7 @@ func Run(opt operator.Options) {
 		KubeDBClient:      kcs.NewForConfigOrDie(c),
 		Opt:               opt,
 	}
-	op.PromClient, err = pcm.NewForConfig(c)
+	op.PromClient, err = prom.NewForConfig(c)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
