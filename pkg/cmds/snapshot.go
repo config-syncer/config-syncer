@@ -1,10 +1,9 @@
 package cmds
 
 import (
-	"os"
-
+	"fmt"
 	"github.com/appscode/go/flags"
-	"github.com/appscode/kubed/pkg/backup"
+	"github.com/appscode/kutil"
 	"github.com/spf13/cobra"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
@@ -17,28 +16,29 @@ func NewCmdSnapshot() *cobra.Command {
 		backupDir string
 		context   string
 	)
-
 	cmd := &cobra.Command{
 		Use:               "snapshot",
 		Short:             "Takes a snapshot of Kubernetes api objects",
 		DisableAutoGenTag: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			flags.EnsureRequiredFlags(cmd, "context", "backup-dir")
+			flags.EnsureRequiredFlags(cmd, "cluster", "backup-dir")
 
-			err := os.MkdirAll(backupDir, 0777)
-			if err != nil {
-				return err
-			}
 			restConfig, err := createKubeConfig(context)
 			if err != nil {
 				return err
 			}
-			return backup.SnapshotCluster(restConfig, backupDir, sanitize)
+			mgr := kutil.NewBackupManager(context, restConfig, sanitize)
+			filename, err := mgr.BackupToTar(backupDir)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("Cluster objects are stored in %s", filename)
+			fmt.Println()
 		},
 	}
 	cmd.Flags().BoolVar(&sanitize, "sanitize", false, " Sanitize fields in YAML")
 	cmd.Flags().StringVar(&backupDir, "backup-dir", "", "Directory where YAML files will be stored")
-	cmd.Flags().StringVar(&context, "context", "", "The name of the kubeconfig context to use")
+	cmd.Flags().StringVar(&context, "context", "", "Name of the kubeconfig context to use")
 	return cmd
 }
 

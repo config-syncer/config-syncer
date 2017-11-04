@@ -1,5 +1,5 @@
 hash: e1b0f38b18b215baefcfad5b97e6910d04cc440d5827a62d2252b2391c17ee91
-updated: 2017-10-21T16:18:21.960741569-07:00
+updated: 2017-11-04T13:00:31.360983836-07:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -8,8 +8,6 @@ imports:
   - internal
 - name: github.com/appscode/envconfig
   version: 183bbe643a2875eaa69c85627ac6b25813983203
-- name: github.com/appscode/errors
-  version: 748883e321a9f99fe901bd2663c7af3fcae43ea4
 - name: github.com/appscode/go
   version: c01120782e8b487d1c86ab4299241edfe36a3ca2
   subpackages:
@@ -17,7 +15,6 @@ imports:
   - context
   - encoding/json/types
   - encoding/yaml
-  - env
   - errors
   - flags
   - log
@@ -43,7 +40,7 @@ imports:
 - name: github.com/appscode/go-term
   version: d0c677f2d84034b1357d3f69ffd29c5fb81f662f
 - name: github.com/appscode/kutil
-  version: 4d8a2fab71adaeb35394044fae59b03735ea4e39
+  version: e6f6f3cac68409ba53c515ff0e100334f73bbcf5
   subpackages:
   - apps/v1beta1
   - batch/v1
@@ -55,6 +52,8 @@ imports:
   - storage/v1
 - name: github.com/appscode/log
   version: 68e0e42e42c01371f3950571fc87c2298a51dd8f
+- name: github.com/appscode/mergo
+  version: e3000cb3d28c72b837601cac94debd91032d19fe
 - name: github.com/appscode/osm
   version: c4eb9d9f2fa11a22cd4b5f358afa5c89245059b4
   subpackages:
@@ -62,7 +61,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: f0e8f2caefd8f0ce567dac283e8f91fdf6c43c41
+  version: 9a25fc7a28926680a46c8206ad818aa2fe0a1a5a
   subpackages:
   - apis/monitoring
   - apis/monitoring/v1alpha1
@@ -72,7 +71,7 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: 484df6922d34ad84c0244b71722dc3fdb2d0d05d
+  version: edcab803b8465f32270f7feb31bfa601daee413d
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
@@ -80,7 +79,7 @@ imports:
   - client/typed/stash/v1alpha1
   - client/typed/stash/v1alpha1/util
 - name: github.com/appscode/voyager
-  version: 976badf2583243a14037ca437b34330ff1ca54ff
+  version: 01b356eb894b1de67354fa141736a7d2b7ce70a7
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -178,7 +177,7 @@ imports:
 - name: github.com/codeskyblue/go-sh
   version: 703901965097a6b3155c0f6f774efb877b483f64
 - name: github.com/coreos/prometheus-operator
-  version: d239e39e68ac8068ecdfb6854697f1bee777644e
+  version: cbdd1b519796673cd02d53b0e21999acbcbfe6e4
   repo: https://github.com/appscode/prometheus-operator.git
   vcs: git
   subpackages:
@@ -203,8 +202,6 @@ imports:
   version: 944e07253867aacae43c04b2e6a239005443f33a
 - name: github.com/facebookgo/stack
   version: 751773369052141c013c6e827a71e8f35c07879c
-- name: github.com/fatih/color
-  version: 9aae6aaa22315390f03959adca2c4d395b02fcef
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-ini/ini
@@ -235,7 +232,7 @@ imports:
 - name: github.com/google/btree
   version: 7d79101e329e5a3adf994758c578dab82b90c017
 - name: github.com/google/go-cmp
-  version: 7ffe1921f7d789634416694ae7145ebbc1ac82b2
+  version: 98232909528519e571b2e69fbe546b6ef35f5780
   subpackages:
   - cmp
   - cmp/internal/diff
@@ -309,7 +306,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/k8sdb/apimachinery
-  version: ae61cdb0852d8207b15493badc3fc80cad3a4b5d
+  version: 8b792ad591d891f6710ab49aebef47e79cc908bf
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -324,8 +321,6 @@ imports:
   - buffer
   - jlexer
   - jwriter
-- name: github.com/mattn/go-colorable
-  version: ed8eb9e318d7a84ce5915b495b7d35e0cfe7b5a8
 - name: github.com/mattn/go-isatty
   version: 57fdcb988a5c543893cc61bce354a6e24ab70022
 - name: github.com/mattn/go-runewidth
@@ -354,7 +349,7 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 13ba4ddd0caa9c28ca7b7bffe1dfa9ed8d5ef207
+  version: 3233b24a36715a2fe36d162260457857a56d672d
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
@@ -368,7 +363,7 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/robfig/cron
-  version: 736158dc09e10f1911ca3a1e1b01f11b566ce5db
+  version: 2315d5715e36303a941d907f038da7f7c44c773b
 - name: github.com/russross/blackfriday
   version: 300106c228d52c8941d4b3de6054a6062a86dda3
 - name: github.com/satori/uuid
@@ -380,7 +375,7 @@ imports:
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/spf13/cobra
-  version: 7b2c5ac9fc04fc5efafb60700713d4fa609b777b
+  version: b3426bbac13d7110c4d8fce456ea0012f79f3b8b
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -443,14 +438,14 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: 7afc123cf726cd2f253faa3e144d2ab65477b18f
+  version: 292d630dd6cbaf326d3ca4009e294654554f70fb
   subpackages:
   - gensupport
   - googleapi
   - googleapi/internal/uritemplates
   - storage/v1
 - name: google.golang.org/appengine
-  version: 12d5545dc1cfa6047a286d5e853841b6471f4c19
+  version: 4f7eeb5305a4ba1966344836ba4af9996b7b4e05
   subpackages:
   - internal
   - internal/app_identity
@@ -506,7 +501,7 @@ imports:
   - storage/v1
   - storage/v1beta1
 - name: k8s.io/apiextensions-apiserver
-  version: 89b2a556a65053a90552eaed26f810df4a266367
+  version: 5bc0d8f05a92b3a09bcf1a9db442a29c0b7a514d
   subpackages:
   - pkg/apis/apiextensions
   - pkg/apis/apiextensions/v1beta1

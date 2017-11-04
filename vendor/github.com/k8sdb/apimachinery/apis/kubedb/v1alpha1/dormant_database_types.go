@@ -46,6 +46,9 @@ type OriginSpec struct {
 	// Postgres Spec
 	// +optional
 	Postgres *PostgresSpec `json:"postgres,omitempty"`
+	// MySQL Spec
+	// +optional
+	MySQL *MySQLSpec `json:"mysql,omitempty"`
 }
 
 type DormantDatabasePhase string

@@ -13,7 +13,6 @@ import (
 	"github.com/appscode/go/log"
 	v "github.com/appscode/go/version"
 	"github.com/appscode/kubed/pkg/api"
-	"github.com/appscode/kubed/pkg/backup"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
@@ -23,6 +22,7 @@ import (
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/kutil"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
 	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
@@ -323,39 +323,22 @@ func (op *Operator) RunSnapshotter() error {
 	sh.SetDir(op.Opt.ScratchDir)
 	sh.ShowCMD = true
 	snapshotter := func() error {
-		cfg, err := clientcmd.BuildConfigFromFlags(op.Opt.Master, op.Opt.KubeConfig)
+		restConfig, err := clientcmd.BuildConfigFromFlags(op.Opt.Master, op.Opt.KubeConfig)
 		if err != nil {
 			return err
 		}
 
-		t := time.Now().UTC()
-		ts := t.Format(config.TimestampFormat)
-		snapshotRoot := filepath.Join(op.Opt.ScratchDir, "snapshot")
-		snapshotDir := filepath.Join(snapshotRoot, ts)
-		snapshotFile := filepath.Join(snapshotRoot, ts+".tar.gz")
-		err = backup.SnapshotCluster(cfg, snapshotDir, op.Config.Snapshotter.Sanitize)
+		mgr := kutil.NewBackupManager(op.Config.ClusterName, restConfig, op.Config.Snapshotter.Sanitize)
+		snapshotFile, err := mgr.BackupToTar(filepath.Join(op.Opt.ScratchDir, "snapshot"))
 		if err != nil {
 			return err
 		}
 		defer func() {
-			if err := os.RemoveAll(snapshotDir); err != nil {
-				log.Errorln(err)
-			}
 			if err := os.Remove(snapshotFile); err != nil {
 				log.Errorln(err)
 			}
 		}()
-
-		dest, err := op.Config.Snapshotter.Location(t)
-		if err != nil {
-			return err
-		}
-
-		sh := shell.NewSession()
-		sh.SetDir(snapshotRoot)
-		sh.ShowCMD = true
-
-		err = sh.Command("tar", "-czf", ts+".tar.gz", ts).Run()
+		dest, err := op.Config.Snapshotter.Location(filepath.Base(snapshotFile))
 		if err != nil {
 			return err
 		}

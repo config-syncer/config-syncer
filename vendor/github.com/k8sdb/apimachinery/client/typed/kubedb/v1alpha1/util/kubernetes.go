@@ -24,6 +24,10 @@ func AssignTypeKind(v interface{}) error {
 		u.APIVersion = v1alpha1.SchemeGroupVersion.String()
 		u.Kind = kutil.GetKind(v)
 		return nil
+	case *v1alpha1.MySQL:
+		u.APIVersion = v1alpha1.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
+		return nil
 	case *v1alpha1.Elasticsearch:
 		u.APIVersion = v1alpha1.SchemeGroupVersion.String()
 		u.Kind = kutil.GetKind(v)

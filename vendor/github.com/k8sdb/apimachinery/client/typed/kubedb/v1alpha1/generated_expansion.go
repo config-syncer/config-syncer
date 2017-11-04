@@ -20,6 +20,8 @@ type DormantDatabaseExpansion interface{}
 
 type ElasticsearchExpansion interface{}
 
+type MySQLExpansion interface{}
+
 type PostgresExpansion interface{}
 
 type SnapshotExpansion interface{}
