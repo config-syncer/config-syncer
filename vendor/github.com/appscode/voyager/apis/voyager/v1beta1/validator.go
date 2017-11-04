@@ -10,13 +10,16 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation"
 )
 
+// +k8s:openapi-gen=false
 type indices struct {
 	RuleIndex int
 	PathIndex int
 }
 
+// +k8s:openapi-gen=false
 type Paths map[string]indices
 
+// +k8s:openapi-gen=false
 type address struct {
 	Protocol       string // tcp, http
 	PodPort        int
@@ -193,6 +196,7 @@ func (r Ingress) IsValid(cloudProvider string) error {
 		}
 	}
 
+	// If Ingress does not use any HTTP rule but defined a default backend, we need to open port 80
 	if !usesHTTPRule && r.Spec.Backend != nil {
 		addrs[80] = &address{Protocol: "http", PodPort: 80}
 	}
@@ -234,6 +238,7 @@ func (r Ingress) SupportsLBType(cloudProvider string) bool {
 			cloudProvider == "gke" ||
 			cloudProvider == "azure" ||
 			cloudProvider == "acs" ||
+			cloudProvider == "openstack" ||
 			cloudProvider == "minikube"
 	case LBTypeNodePort:
 		return cloudProvider != "acs"
