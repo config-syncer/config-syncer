@@ -42,7 +42,7 @@ The following tables lists the configurable parameters of the Kubed chart and th
 | Parameter                 | Description                                                       | Default            |
 | --------------------------| ------------------------------------------------------------------|--------------------|
 | `replicaCount`            | Number of kubed operator replicas to create (only 1 is supported) | `1`                |
-| `.image`                  | container image                                                   | `appscode/kubed`   |
+| `image`                   | container image                                                   | `appscode/kubed`   |
 | `tag`                     | container image tag                                               | `0.3.0`            |
 | `imagePullSecrets`        | Specify image pull secrets                                        | `nil` (does not add image pull secrets to deployed pods) |
 | `imagePullPolicy`         | Image pull policy                                                 | `IfNotPresent`     |
