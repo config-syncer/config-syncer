@@ -322,10 +322,6 @@ func (op *Operator) RunSnapshotter() error {
 	sh := shell.NewSession()
 	sh.SetDir(op.Opt.ScratchDir)
 	sh.ShowCMD = true
-	err = sh.Command("osm", "lc", "--osmconfig", osmconfigPath).Run()
-	if err != nil {
-		return err
-	}
 	snapshotter := func() error {
 		cfg, err := clientcmd.BuildConfigFromFlags(op.Opt.Master, op.Opt.KubeConfig)
 		if err != nil {
