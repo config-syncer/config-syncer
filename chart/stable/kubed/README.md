@@ -4,7 +4,7 @@
 ## TL;DR;
 
 ```bash
-$ helm install chart/kubed
+$ helm install stable/kubed
 ```
 
 ## Introduction
@@ -18,7 +18,7 @@ This chart bootstraps a [Kubed controller](https://github.com/appscode/kubed) de
 ## Installing the Chart
 To install the chart with the release name `my-release`:
 ```bash
-$ helm install chart/kubed --name my-release
+$ helm install stable/kubed --name my-release
 ```
 The command deploys Kubed operator on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
@@ -44,8 +44,11 @@ The following tables lists the configurable parameters of the Kubed chart and th
 | `replicaCount`            | Number of kubed operator replicas to create (only 1 is supported) | `1`                |
 | `.image`                  | container image                                                   | `appscode/kubed`   |
 | `tag`                     | container image tag                                               | `0.3.0`            |
-| `pullPolicy`              | container image pull policy                                       | `IfNotPresent`     |
+| `imagePullSecrets`        | Specify image pull secrets                                        | `nil` (does not add image pull secrets to deployed pods) |
+| `imagePullPolicy`         | Image pull policy                                                 | `IfNotPresent`     |
 | `criticalAddon`           | If true, installs kubed operator as critical addon                | `false`            |
+| `logLevel`                | Log level for kubed                                               | `3`                |
+| `nodeSelector`            | Node labels for pod assignment                                    | `{}`               |
 | `rbac.create`             | install required rbac service account, roles and rolebindings     | `false`            |
 | `rbac.serviceAccountName` | ServiceAccount Kubed will use (ignored if rbac.create=true)       | `default`          |
 
@@ -53,14 +56,14 @@ The following tables lists the configurable parameters of the Kubed chart and th
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
 
 ```console
-$ helm install --name my-release --set image.tag=v0.2.1 chart/kubed
+$ helm install --name my-release --set image.tag=v0.2.1 stable/kubed
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while
 installing the chart. For example:
 
 ```console
-$ helm install --name my-release --values values.yaml chart/kubed
+$ helm install --name my-release --values values.yaml stable/kubed
 ```
 
 ## RBAC
@@ -81,5 +84,5 @@ If the output contains "beta", you may install the chart with RBAC enabled (see 
 To enable the creation of RBAC resources (On clusters with RBAC). Do the following:
 
 ```console
-$ helm install --name my-release chart/kubed --set rbac.create=true
+$ helm install --name my-release stable/kubed --set rbac.create=true
 ```

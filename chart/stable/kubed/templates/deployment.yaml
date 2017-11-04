@@ -1,10 +1,10 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "kubed.fullname" . }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: "{{ template "name" . }}"
+    app: "{{ template "kubed.name" . }}"
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
 spec:
@@ -12,23 +12,26 @@ spec:
   template:
     metadata:
       labels:
-        app: "{{ template "name" . }}"
+        app: "{{ template "kubed.name" . }}"
         release: "{{ .Release.Name }}"
 {{- if and .Values.criticalAddon (eq .Release.Namespace "kube-system") }}
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
 {{- end }}
     spec:
-      serviceAccountName: {{ if .Values.rbac.create }}{{ template "fullname" . }}{{ else }}"{{ .Values.rbac.serviceAccountName }}"{{ end }}
+      serviceAccountName: {{ if .Values.rbac.create }}{{ template "kubed.fullname" . }}{{ else }}"{{ .Values.rbac.serviceAccountName }}"{{ end }}
       containers:
       - name: kubed
         args:
         - run
-        - --v=3
+        - --v={{ .Values.logLevel }}
         - --api.address=:8080
         - --web.address=:56790
         image: '{{ .Values.kubed.image }}:{{ .Values.kubed.tag }}'
-        imagePullPolicy: '{{ .Values.kubed.pullPolicy }}'
+        imagePullPolicy: {{ default "" .Values.imagePullPolicy | quote }}
+        imagePullSecrets:
+{{ toYaml .Values.imagePullSecrets | indent 8 }}
+        {{- end }}
         ports:
         - containerPort: 8080
           name: api
@@ -51,4 +54,8 @@ spec:
       tolerations:
       - key: "CriticalAddonsOnly"
         operator: "Exists"
+{{- end -}}
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
 {{- end -}}
