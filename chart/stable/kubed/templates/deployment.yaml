@@ -29,6 +29,7 @@ spec:
         - --web.address=:56790
         image: '{{ .Values.kubed.image }}:{{ .Values.kubed.tag }}'
         imagePullPolicy: {{ default "" .Values.imagePullPolicy | quote }}
+        {{- if .Values.imagePullSecrets }}
         imagePullSecrets:
 {{ toYaml .Values.imagePullSecrets | indent 8 }}
         {{- end }}
