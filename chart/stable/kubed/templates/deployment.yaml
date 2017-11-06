@@ -28,7 +28,7 @@ spec:
         - --api.address=:8080
         - --web.address=:56790
         image: '{{ .Values.kubed.image }}:{{ .Values.kubed.tag }}'
-        imagePullPolicy: {{ default "" .Values.imagePullPolicy | quote }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
         {{- if .Values.imagePullSecrets }}
         imagePullSecrets:
 {{ toYaml .Values.imagePullSecrets | indent 8 }}
@@ -47,8 +47,8 @@ spec:
             mountPath: /tmp
       volumes:
         - name: config
-          configMap:
-            name: kubed
+          secret:
+            secretName: {{ template "kubed.fullname" . }}
         - name: scratch
           emptyDir: {}
 {{- if and .Values.criticalAddon (eq .Release.Namespace "kube-system") }}

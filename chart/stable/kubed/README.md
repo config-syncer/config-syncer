@@ -13,7 +13,7 @@ This chart bootstraps a [Kubed controller](https://github.com/appscode/kubed) de
 
 ## Prerequisites
 
-- Kubernetes 1.5+
+- Kubernetes 1.7+
 
 ## Installing the Chart
 To install the chart with the release name `my-release`:
