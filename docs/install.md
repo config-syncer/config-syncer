@@ -89,9 +89,10 @@ $ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.3.0/hack/d
 ```
 
 ## Using Helm
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](/chart/kubed) included in this repository. To install the chart with the release name `my-release`:
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](/chart/stable/kubed) included in this repository. To install the chart with the release name `my-release`:
 ```bash
-$ helm install chart/kubed --name my-release
+$ helm repo update
+$ helm install stable/kubed --name my-release
 ```
 To see the detailed configuration options, visit [here](/chart/kubed/README.md).
 
