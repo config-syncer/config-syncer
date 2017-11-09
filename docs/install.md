@@ -94,7 +94,7 @@ Kubed can be installed via [Helm](https://helm.sh/) using the [chart](/chart/sta
 $ helm repo update
 $ helm install stable/kubed --name my-release
 ```
-To see the detailed configuration options, visit [here](/chart/kubed/README.md).
+To see the detailed configuration options, visit [here](/chart/stable/kubed/README.md).
 
 
 ## Verify installation
