@@ -1,15 +1,14 @@
 package e2e
 
 import (
+	"strings"
+
+	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/test/framework"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/util/homedir"
-	"path/filepath"
-	"io/ioutil"
-	"github.com/appscode/kubed/test/framework"
 )
 
 var _ = Describe("Config-syncer", func() {
@@ -21,20 +20,20 @@ var _ = Describe("Config-syncer", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Eventually(func() int {
-				tmp, err := f.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{LabelSelector: metav1.FormatLabelSelector(configSelector)})
+				cfgmaps, err := f.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
+					LabelSelector: configSelector.String(),
+				})
 				Expect(err).NotTo(HaveOccurred())
 
-				return len(tmp.Items)
+				return len(cfgmaps.Items)
 			}).Should(Equal(len(ns.Items)))
 		}
-		cfgMap = &apiv1.ConfigMap{
+		cfgMap = &core.ConfigMap{
 			TypeMeta: metav1.TypeMeta{
 				APIVersion: "v1",
 				Kind:       "ConfigMap",
 			},
-			ObjectMeta: metav1.ObjectMeta{
-
-			},
+			ObjectMeta: metav1.ObjectMeta{},
 			Data: map[string]string{
 				"you":   "only",
 				"leave": "once",
@@ -44,26 +43,26 @@ var _ = Describe("Config-syncer", func() {
 
 	BeforeEach(func() {
 		f = root.Invoke()
-		file, err := ioutil.ReadFile(filepath.Join(homedir.HomeDir(), "go/src/github.com/appscode/kubed/docs/examples/config-syncer/config.yaml"))
-		Expect(err).NotTo(HaveOccurred())
-		secret := &apiv1.Secret{
+		secret := &core.Secret{
 			TypeMeta: metav1.TypeMeta{
 				APIVersion: "v1",
 				Kind:       "Secret",
 			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "kubed-config",
-				Namespace: "kube-system",
+				Namespace: metav1.NamespaceSystem,
 				Labels: map[string]string{
 					"app": "kubed",
 				},
 			},
-			Data: map[string][]byte{
-				"config.yaml": file,
+			StringData: map[string]string{
+				"config.yaml": strings.TrimSpace(`
+enableConfigSyncer: true
+`),
 			},
 		}
 
-		_, err = f.KubeClient.CoreV1().Secrets("kube-system").Update(secret)
+		_, err := f.KubeClient.CoreV1().Secrets(metav1.NamespaceSystem).Update(secret)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -90,7 +89,7 @@ var _ = Describe("Config-syncer", func() {
 				c, err := root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Create(cfgMap)
 				Expect(err).NotTo(HaveOccurred())
 
-				metav1.SetMetaDataAnnotation(&c.ObjectMeta, "kubed.appscode.com/sync", "true")
+				metav1.SetMetaDataAnnotation(&c.ObjectMeta, config.ConfigSyncKey, "true")
 
 				c, err = root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Update(c)
 				Expect(err).NotTo(HaveOccurred())
@@ -109,7 +108,7 @@ var _ = Describe("Config-syncer", func() {
 				}
 				cfgMap.ObjectMeta.Labels["app"] = f.App()
 
-				metav1.SetMetaDataAnnotation(&cfgMap.ObjectMeta, "kubed.appscode.com/sync", "true")
+				metav1.SetMetaDataAnnotation(&cfgMap.ObjectMeta, config.ConfigSyncKey, "true")
 				c, err := root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Create(cfgMap)
 				Expect(err).NotTo(HaveOccurred())
 

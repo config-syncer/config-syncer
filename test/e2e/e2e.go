@@ -1,12 +1,13 @@
 package e2e
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/onsi/ginkgo/reporters"
 	"testing"
 	"time"
+
 	"github.com/appscode/kubed/test/framework"
+	. "github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/reporters"
+	. "github.com/onsi/gomega"
 )
 
 const TestTimeout = 1 * time.Hour

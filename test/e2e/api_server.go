@@ -1,20 +1,19 @@
 package e2e
 
 import (
-	. "github.com/onsi/gomega"
-	. "github.com/onsi/ginkgo"
-	"github.com/appscode/kubed/test/framework"
-	"path/filepath"
 	"io/ioutil"
-	"k8s.io/client-go/util/homedir"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
-	"k8s.io/apimachinery/pkg/labels"
+	"net/http"
 	"os/exec"
 	"strings"
+
 	"github.com/appscode/go/crypto/rand"
-	"net/http"
+	"github.com/appscode/kubed/test/framework"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	core "k8s.io/api/core/v1"
+	"k8s.io/api/extensions/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 )
 
 var _ = Describe("Kubed api server", func() {
@@ -24,26 +23,29 @@ var _ = Describe("Kubed api server", func() {
 	BeforeEach(func() {
 		Expect(0).Should(Equal(0))
 		f = root.Invoke()
-		file, err := ioutil.ReadFile(filepath.Join(homedir.HomeDir(), "go/src/github.com/appscode/kubed/docs/examples/apiserver/config.yaml"))
-		Expect(err).NotTo(HaveOccurred())
-		secret := &apiv1.Secret{
+		secret := &core.Secret{
 			TypeMeta: metav1.TypeMeta{
 				APIVersion: "v1",
 				Kind:       "Secret",
 			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "kubed-config",
-				Namespace: "kube-system",
+				Namespace: metav1.NamespaceSystem,
 				Labels: map[string]string{
 					"app": "kubed",
 				},
 			},
-			Data: map[string][]byte{
-				"config.yaml": file,
+			StringData: map[string]string{
+				"config.yaml": strings.TrimSpace(`
+apiServer:
+  address: :8080
+  enableReverseIndex: true
+  enableSearchIndex: true
+`),
 			},
 		}
 
-		_, err = f.KubeClient.CoreV1().Secrets("kube-system").Update(secret)
+		_, err := f.KubeClient.CoreV1().Secrets(metav1.NamespaceSystem).Update(secret)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -60,11 +62,11 @@ var _ = Describe("Kubed api server", func() {
 				request      *http.Request
 			)
 			BeforeEach(func() {
-				kubedSvc, err := f.KubeClient.CoreV1().Services("kube-system").Get("kubed-operator", metav1.GetOptions{})
+				kubedSvc, err := f.KubeClient.CoreV1().Services(metav1.NamespaceSystem).Get("kubed-operator", metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())
 
-				kubedSvc.Spec.Type = "LoadBalancer"
-				_, err = f.KubeClient.CoreV1().Services("kube-system").Update(kubedSvc)
+				kubedSvc.Spec.Type = core.ServiceTypeNodePort
+				_, err = f.KubeClient.CoreV1().Services(metav1.NamespaceSystem).Update(kubedSvc)
 				Expect(err).NotTo(HaveOccurred())
 
 				Eventually(func() error {
@@ -75,7 +77,7 @@ var _ = Describe("Kubed api server", func() {
 						"kubed-operator",
 						"--url",
 						"-n",
-						"kube-system",
+						metav1.NamespaceSystem,
 					).CombinedOutput()
 					if err == nil {
 						for _, output := range strings.Split(string(outputs), "\n") {
@@ -89,7 +91,7 @@ var _ = Describe("Kubed api server", func() {
 				}, "5m", "10s").Should(BeNil())
 
 				svcName = rand.WithUniqSuffix("kubed-svc")
-				service := &apiv1.Service{
+				service := &core.Service{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: "v1",
 						Kind:       "Pod",
@@ -101,11 +103,11 @@ var _ = Describe("Kubed api server", func() {
 							"app": svcName,
 						},
 					},
-					Spec: apiv1.ServiceSpec{
+					Spec: core.ServiceSpec{
 						Selector: map[string]string{
 							"app": svcName,
 						},
-						Ports: append([]apiv1.ServicePort{}, apiv1.ServicePort{
+						Ports: append([]core.ServicePort{}, core.ServicePort{
 							Protocol: "TCP",
 							Port:     80,
 						}),
@@ -131,17 +133,17 @@ var _ = Describe("Kubed api server", func() {
 								"app": svcName,
 							},
 						},
-						Template: apiv1.PodTemplateSpec{
+						Template: core.PodTemplateSpec{
 							ObjectMeta: metav1.ObjectMeta{
 								Labels: map[string]string{
 									"app": svcName,
 								},
 							},
-							Spec: apiv1.PodSpec{
-								Containers: append([]apiv1.Container{}, apiv1.Container{
+							Spec: core.PodSpec{
+								Containers: append([]core.Container{}, core.Container{
 									Name:  "nginx",
 									Image: "nginx:1.7.9",
-									Ports: append([]apiv1.ContainerPort{}, apiv1.ContainerPort{
+									Ports: append([]core.ContainerPort{}, core.ContainerPort{
 										ContainerPort: 80,
 									}),
 								}),
