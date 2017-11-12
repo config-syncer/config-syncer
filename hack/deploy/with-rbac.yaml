@@ -102,11 +102,13 @@ spec:
     metadata:
       labels:
         app: kubed
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
       serviceAccountName: kubed-operator
       containers:
       - name: kubed
-        image: appscode/kubed:0.2.0
+        image: appscode/kubed:0.3.0
         imagePullPolicy: IfNotPresent
         args:
         - run
@@ -131,6 +133,9 @@ spec:
             secretName: kubed-config
         - name: scratch
           emptyDir: {}
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
 ---
 apiVersion: v1
 kind: Service

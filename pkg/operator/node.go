@@ -8,18 +8,18 @@ import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	kutil "github.com/appscode/kutil/core/v1"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchNodes() {
-	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "Node") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "Node")
+	if !util.IsPreferredAPIResource(op.KubeClient, core.SchemeGroupVersion.String(), "Node") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", core.SchemeGroupVersion.String(), "Node")
 		return
 	}
 
@@ -34,11 +34,11 @@ func (op *Operator) WatchNodes() {
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.Node{},
+		&core.Node{},
 		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.Node); ok {
+				if res, ok := obj.(*core.Node); ok {
 					log.Infof("Node %s@%s added", res.Name, res.Namespace)
 					kutil.AssignTypeKind(res)
 
@@ -60,7 +60,7 @@ func (op *Operator) WatchNodes() {
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.Node); ok {
+				if res, ok := obj.(*core.Node); ok {
 					log.Infof("Node %s@%s deleted", res.Name, res.Namespace)
 					kutil.AssignTypeKind(res)
 
@@ -75,12 +75,12 @@ func (op *Operator) WatchNodes() {
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldRes, ok := old.(*apiv1.Node)
+				oldRes, ok := old.(*core.Node)
 				if !ok {
 					log.Errorln(errors.New("Invalid Node object"))
 					return
 				}
-				newRes, ok := new.(*apiv1.Node)
+				newRes, ok := new.(*core.Node)
 				if !ok {
 					log.Errorln(errors.New("Invalid Node object"))
 					return

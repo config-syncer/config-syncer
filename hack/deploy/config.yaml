@@ -5,6 +5,8 @@ apiServer:
 clusterName: unicorn
 enableConfigSyncer: true
 eventForwarder:
+  csrEvents:
+    handle: false
   ingressAdded:
     handle: true
   nodeAdded:
@@ -21,8 +23,9 @@ eventForwarder:
     - kube-system
 janitors:
 - elasticsearch:
-    endpoint: http://elasticsearch-logging.kube-system:9200
+    endpoint: https://elasticsearch-logging.kube-system:9200
     logIndexPrefix: logstash-
+    secretName: elasticsearch-logging-cert
   kind: Elasticsearch
   ttl: 2160h0m0s
 - influxdb:

@@ -8,18 +8,18 @@ import (
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
 	kutil "github.com/appscode/kutil/core/v1"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchPersistentVolumes() {
-	if !util.IsPreferredAPIResource(op.KubeClient, apiv1.SchemeGroupVersion.String(), "PersistentVolume") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apiv1.SchemeGroupVersion.String(), "PersistentVolume")
+	if !util.IsPreferredAPIResource(op.KubeClient, core.SchemeGroupVersion.String(), "PersistentVolume") {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", core.SchemeGroupVersion.String(), "PersistentVolume")
 		return
 	}
 
@@ -34,11 +34,11 @@ func (op *Operator) WatchPersistentVolumes() {
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.PersistentVolume{},
+		&core.PersistentVolume{},
 		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.PersistentVolume); ok {
+				if res, ok := obj.(*core.PersistentVolume); ok {
 					log.Infof("PersistentVolume %s@%s added", res.Name, res.Namespace)
 					kutil.AssignTypeKind(res)
 
@@ -60,7 +60,7 @@ func (op *Operator) WatchPersistentVolumes() {
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.PersistentVolume); ok {
+				if res, ok := obj.(*core.PersistentVolume); ok {
 					log.Infof("PersistentVolume %s@%s deleted", res.Name, res.Namespace)
 					kutil.AssignTypeKind(res)
 
@@ -75,12 +75,12 @@ func (op *Operator) WatchPersistentVolumes() {
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldRes, ok := old.(*apiv1.PersistentVolume)
+				oldRes, ok := old.(*core.PersistentVolume)
 				if !ok {
 					log.Errorln(errors.New("Invalid PersistentVolume object"))
 					return
 				}
-				newRes, ok := new.(*apiv1.PersistentVolume)
+				newRes, ok := new.(*core.PersistentVolume)
 				if !ok {
 					log.Errorln(errors.New("Invalid PersistentVolume object"))
 					return

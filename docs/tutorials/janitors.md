@@ -37,6 +37,7 @@ janitors:
 | `ttl`                          | `Required`. Time-to-live for data (eg, 5h30m30s).                       |
 | `elasticsearch.endpoint`       | Required for kind `Elasticsearch`. URL of Elasticsearch cluster.        |
 | `elasticsearch.logIndexPrefix` | Required for kind `Elasticsearch`. Prefix of log index.                 |
+| `elasticsearch.secretName`     | Optional for kind `Elasticsearch`. Name of secret used to pass Elasticsearch authentication . |
 | `influxdb.endpoint`            | Required for kind `InfluxDB`. URL of [InfluxDB server](https://github.com/kubernetes/heapster/blob/master/docs/sink-configuration.md#influxdb). |
 | `influxdb.username`            | Optional for kind `InfluxDB`. InfluxDB username (default: root)         |
 | `influxdb.password`            | Optional for kind `InfluxDB`. InfluxDB password (default: root)         |
@@ -71,6 +72,17 @@ type: Opaque
 ```
 
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, janitor operations are applied within one hour.
+
+
+## Janitor Authentication
+The following keys are supported for Secret passed via `elasticsearch.secretName`.
+
+| Key                    | Description                                                                 |
+-------------------------|-----------------------------------------------------------------------------|
+| `CA_CERT_DATA`         | `Optional` PEM encoded CA certificate used to connect to Elasticsearch.     |
+| `CLIENT_CERT_DATA`     | `Optional` PEM encoded Client certificate used to connect to Elasticsearch. |
+| `CLIENT_KEY_DATA`      | `Optional` PEM encoded Client private key used to connect to Elasticsearch. |
+| `INSECURE_SKIP_VERIFY` | `Optional` If set to `true`, skip certificate verification.                 |
 
 
 ## Disable Janitors

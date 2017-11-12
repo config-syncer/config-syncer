@@ -11,8 +11,8 @@ import (
 	stringz "github.com/appscode/go/strings"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/ghodss/yaml"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 type EventForwarder struct {
@@ -21,7 +21,7 @@ type EventForwarder struct {
 	Loader      envconfig.LoaderFunc
 }
 
-func (f *EventForwarder) ForwardEvent(e *apiv1.Event) error {
+func (f *EventForwarder) ForwardEvent(e *core.Event) error {
 	bytes, err := yaml.Marshal(e)
 	if err != nil {
 		return err

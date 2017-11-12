@@ -4,11 +4,11 @@ import (
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
 	kutil "github.com/appscode/kutil/core/v1"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -24,11 +24,11 @@ func (op *Operator) watchNamespaces() {
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,
-		&apiv1.Namespace{},
+		&core.Namespace{},
 		op.Opt.ResyncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				if res, ok := obj.(*apiv1.Namespace); ok {
+				if res, ok := obj.(*core.Namespace); ok {
 					log.Infof("Namespace %s added", res.Name)
 					kutil.AssignTypeKind(res)
 

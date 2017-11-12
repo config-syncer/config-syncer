@@ -7,22 +7,22 @@ import (
 
 	"github.com/appscode/go/arrays"
 	"github.com/appscode/go/log"
-	kutil "github.com/appscode/kutil/prometheus/v1alpha1"
+	kutil "github.com/appscode/kutil/prometheus/v1"
 	"github.com/appscode/pat"
 	"github.com/blevesearch/bleve"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
+	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	clientset "k8s.io/client-go/kubernetes"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 type ServiceMonitorIndexer interface {
 	Add(svcMonitor *prom.ServiceMonitor) error
 	Delete(svcMonitor *prom.ServiceMonitor) error
-	AddService(*apiv1.Service, []*prom.ServiceMonitor) error
-	DeleteService(*apiv1.Service) error
+	AddService(*core.Service, []*prom.ServiceMonitor) error
+	DeleteService(*core.Service) error
 	Update(old, new *prom.ServiceMonitor) error
 	Key(meta metav1.ObjectMeta) []byte
 	ServeHTTP(w http.ResponseWriter, req *http.Request)
@@ -31,7 +31,7 @@ type ServiceMonitorIndexer interface {
 var _ ServiceMonitorIndexer = &ServiceMonitorIndexerImpl{}
 
 type ServiceMonitorIndexerImpl struct {
-	kubeClient clientset.Interface
+	kubeClient kubernetes.Interface
 	index      bleve.Index
 }
 
@@ -79,7 +79,7 @@ func (ri *ServiceMonitorIndexerImpl) Update(old, new *prom.ServiceMonitor) error
 	return nil
 }
 
-func (ri *ServiceMonitorIndexerImpl) AddService(svc *apiv1.Service, svcMonitor []*prom.ServiceMonitor) error {
+func (ri *ServiceMonitorIndexerImpl) AddService(svc *core.Service, svcMonitor []*prom.ServiceMonitor) error {
 	key := ri.Key(svc.ObjectMeta)
 	for _, monitor := range svcMonitor {
 		selector, err := metav1.LabelSelectorAsSelector(&monitor.Spec.Selector)
@@ -95,7 +95,7 @@ func (ri *ServiceMonitorIndexerImpl) AddService(svc *apiv1.Service, svcMonitor [
 	return nil
 }
 
-func (ri *ServiceMonitorIndexerImpl) DeleteService(svc *apiv1.Service) error {
+func (ri *ServiceMonitorIndexerImpl) DeleteService(svc *core.Service) error {
 	return ri.index.DeleteInternal(ri.Key(svc.ObjectMeta))
 }
 
@@ -172,10 +172,10 @@ func (ri *ServiceMonitorIndexerImpl) remove(key []byte, svcMonitor *prom.Service
 	return nil
 }
 
-func (ri *ServiceMonitorIndexerImpl) serviceForServiceMonitors(svcMonitor *prom.ServiceMonitor) (*apiv1.ServiceList, error) {
+func (ri *ServiceMonitorIndexerImpl) serviceForServiceMonitors(svcMonitor *prom.ServiceMonitor) (*core.ServiceList, error) {
 	selector, err := metav1.LabelSelectorAsSelector(&svcMonitor.Spec.Selector)
 	if err != nil {
-		return &apiv1.ServiceList{}, err
+		return &core.ServiceList{}, err
 	}
 	if svcMonitor.Spec.NamespaceSelector.Any {
 		return ri.kubeClient.CoreV1().Services(metav1.NamespaceAll).List(metav1.ListOptions{
@@ -183,7 +183,7 @@ func (ri *ServiceMonitorIndexerImpl) serviceForServiceMonitors(svcMonitor *prom.
 		})
 	}
 
-	list := &apiv1.ServiceList{Items: make([]apiv1.Service, 0)}
+	list := &core.ServiceList{Items: make([]core.Service, 0)}
 	for _, ns := range svcMonitor.Spec.NamespaceSelector.MatchNames {
 		svc, err := ri.kubeClient.CoreV1().Services(ns).List(metav1.ListOptions{
 			LabelSelector: selector.String(),
@@ -203,7 +203,7 @@ func (ri *ServiceMonitorIndexerImpl) equal(a, b *prom.ServiceMonitor) bool {
 }
 
 func (ri *ServiceMonitorIndexerImpl) Key(meta metav1.ObjectMeta) []byte {
-	return []byte(kutil.GetGroupVersionKind(&apiv1.Service{}).String() + "/" + meta.Namespace + "/" + meta.Name)
+	return []byte(kutil.GetGroupVersionKind(&core.Service{}).String() + "/" + meta.Namespace + "/" + meta.Name)
 }
 
 func (ri *ServiceMonitorIndexerImpl) ServeHTTP(w http.ResponseWriter, req *http.Request) {

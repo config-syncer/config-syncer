@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/appscode/go/log"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
-	"k8s.io/client-go/pkg/api/v1"
 )
 
 func newTestReverseIndexer() *ReverseIndexer {
@@ -36,7 +36,7 @@ func TestNewService(t *testing.T) {
 
 	pod := newPod("foo-pod-1")
 	if rawdata, err := ri.index.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
-		var svc []*v1.Service
+		var svc []*core.Service
 		err := json.Unmarshal(rawdata, &svc)
 		if err != nil {
 			t.Fatal(err)
@@ -50,7 +50,7 @@ func TestNewService(t *testing.T) {
 
 	pod = newPod("foo-pod-2")
 	if rawdata, err := ri.index.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
-		var svc []*v1.Service
+		var svc []*core.Service
 		err := json.Unmarshal(rawdata, &svc)
 		if err != nil {
 			t.Fatal(err)
@@ -80,7 +80,7 @@ func TestRemoveService(t *testing.T) {
 	ri.AddService()
 	pod := newPod("foo-pod-1")
 	if rawdata, err := ri.index.GetInternal(namespacerKey(pod.ObjectMeta)); err == nil {
-		var svc []*v1.Service
+		var svc []*core.Service
 		err := json.Unmarshal(rawdata, &svc)
 		if err != nil {
 			t.Fatal(err)
@@ -111,13 +111,13 @@ func TestRemoveService(t *testing.T) {
 	}
 }
 
-func newService() *v1.Service {
-	return &v1.Service{
+func newService() *core.Service {
+	return &core.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "foo",
 			Namespace: "default",
 		},
-		Spec: v1.ServiceSpec{
+		Spec: core.ServiceSpec{
 			Selector: map[string]string{
 				"service-name": "foo",
 			},
@@ -125,8 +125,8 @@ func newService() *v1.Service {
 	}
 }
 
-func newPod(name string) *v1.Pod {
-	return &v1.Pod{
+func newPod(name string) *core.Pod {
+	return &core.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
 			Namespace: "default",

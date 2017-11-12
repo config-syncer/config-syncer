@@ -8,8 +8,8 @@ import (
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/ghodss/yaml"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	cfgmap := apiv1.Secret{
+	cfgmap := core.Secret{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v1",
 			Kind:       "Secret",
@@ -100,9 +100,10 @@ func CreateClusterConfig() config.ClusterConfig {
 			{
 				Kind: config.JanitorElasticsearch,
 				TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
-				Elasticsearch: &config.ElasticSearchSpec{
-					Endpoint:       "http://elasticsearch-logging.kube-system:9200",
+				Elasticsearch: &config.ElasticsearchSpec{
+					Endpoint:       "https://elasticsearch-logging.kube-system:9200",
 					LogIndexPrefix: "logstash-",
+					SecretName:     "elasticsearch-logging-cert",
 				},
 			},
 			{

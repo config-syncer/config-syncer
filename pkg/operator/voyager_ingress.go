@@ -7,30 +7,30 @@ import (
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/util"
-	kutil "github.com/appscode/kutil/voyager/v1beta1"
-	tapi "github.com/appscode/voyager/api"
+	tapi "github.com/appscode/voyager/apis/voyager/v1beta1"
+	kutil "github.com/appscode/voyager/client/typed/voyager/v1beta1/util"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchVoyagerIngresses() {
-	if !util.IsPreferredAPIResource(op.KubeClient, tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindIngress) {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.V1beta1SchemeGroupVersion.String(), tapi.ResourceKindIngress)
+	if !util.IsPreferredAPIResource(op.KubeClient, tapi.SchemeGroupVersion.String(), tapi.ResourceKindIngress) {
+		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.SchemeGroupVersion.String(), tapi.ResourceKindIngress)
 		return
 	}
 	defer acrt.HandleCrash()
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return op.VoyagerClient.Ingresses(apiv1.NamespaceAll).List(metav1.ListOptions{})
+			return op.VoyagerClient.Ingresses(core.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return op.VoyagerClient.Ingresses(apiv1.NamespaceAll).Watch(metav1.ListOptions{})
+			return op.VoyagerClient.Ingresses(core.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 	_, ctrl := cache.NewInformer(lw,

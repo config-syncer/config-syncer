@@ -2,104 +2,208 @@ package v1
 
 import (
 	"errors"
+	"fmt"
+	"reflect"
 
+	"github.com/appscode/kutil"
+	core "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 func GetGroupVersionKind(v interface{}) schema.GroupVersionKind {
-	switch v.(type) {
-	case *apiv1.Pod:
-		return apiv1.SchemeGroupVersion.WithKind("Pod")
-	case *apiv1.ReplicationController:
-		return apiv1.SchemeGroupVersion.WithKind("ReplicationController")
-	case *apiv1.ConfigMap:
-		return apiv1.SchemeGroupVersion.WithKind("ConfigMap")
-	case *apiv1.Secret:
-		return apiv1.SchemeGroupVersion.WithKind("Secret")
-	case *apiv1.Service:
-		return apiv1.SchemeGroupVersion.WithKind("Service")
-	case *apiv1.PersistentVolumeClaim:
-		return apiv1.SchemeGroupVersion.WithKind("PersistentVolumeClaim")
-	case *apiv1.PersistentVolume:
-		return apiv1.SchemeGroupVersion.WithKind("PersistentVolume")
-	case *apiv1.Node:
-		return apiv1.SchemeGroupVersion.WithKind("Node")
-	case *apiv1.ServiceAccount:
-		return apiv1.SchemeGroupVersion.WithKind("ServiceAccount")
-	case *apiv1.Namespace:
-		return apiv1.SchemeGroupVersion.WithKind("Namespace")
-	case *apiv1.Endpoints:
-		return apiv1.SchemeGroupVersion.WithKind("Endpoints")
-	case *apiv1.ComponentStatus:
-		return apiv1.SchemeGroupVersion.WithKind("ComponentStatus")
-	case *apiv1.LimitRange:
-		return apiv1.SchemeGroupVersion.WithKind("LimitRange")
-	case *apiv1.Event:
-		return apiv1.SchemeGroupVersion.WithKind("Event")
-	default:
-		return schema.GroupVersionKind{}
-	}
+	return core.SchemeGroupVersion.WithKind(kutil.GetKind(v))
 }
 
 func AssignTypeKind(v interface{}) error {
+	if reflect.ValueOf(v).Kind() != reflect.Ptr {
+		return fmt.Errorf("%v must be a pointer", v)
+	}
+
 	switch u := v.(type) {
-	case *apiv1.Pod:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "Pod"
+	case *core.Pod:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.ReplicationController:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "ReplicationController"
+	case *core.ReplicationController:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.ConfigMap:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "ConfigMap"
+	case *core.ConfigMap:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.Secret:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "Secret"
+	case *core.Secret:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.Service:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "Service"
+	case *core.Service:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.PersistentVolumeClaim:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "PersistentVolumeClaim"
+	case *core.PersistentVolumeClaim:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.PersistentVolume:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "PersistentVolume"
+	case *core.PersistentVolume:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.Node:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "Node"
+	case *core.Node:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.ServiceAccount:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "ServiceAccount"
+	case *core.ServiceAccount:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.Namespace:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "Namespace"
+	case *core.Namespace:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.Endpoints:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "Endpoints"
+	case *core.Endpoints:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.ComponentStatus:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "ComponentStatus"
+	case *core.ComponentStatus:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.LimitRange:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "LimitRange"
+	case *core.LimitRange:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
-	case *apiv1.Event:
-		u.APIVersion = apiv1.SchemeGroupVersion.String()
-		u.Kind = "Event"
+	case *core.Event:
+		u.APIVersion = core.SchemeGroupVersion.String()
+		u.Kind = kutil.GetKind(v)
 		return nil
 	}
-	return errors.New("Unknown api object type")
+	return errors.New("unknown api object type")
+}
+
+func RemoveNextInitializer(m metav1.ObjectMeta) metav1.ObjectMeta {
+	if m.GetInitializers() != nil {
+		pendingInitializers := m.GetInitializers().Pending
+		// Remove self from the list of pending Initializers while preserving ordering.
+		if len(pendingInitializers) == 1 {
+			m.Initializers = nil
+		} else {
+			m.Initializers.Pending = append(pendingInitializers[:0], pendingInitializers[1:]...)
+		}
+	}
+	return m
+}
+
+func AddFinalizer(m metav1.ObjectMeta, finalizer string) metav1.ObjectMeta {
+	for _, name := range m.Finalizers {
+		if name == finalizer {
+			return m
+		}
+	}
+	m.Finalizers = append(m.Finalizers, finalizer)
+	return m
+}
+
+func HasFinalizer(m metav1.ObjectMeta, finalizer string) bool {
+	for _, name := range m.Finalizers {
+		if name == finalizer {
+			return true
+		}
+	}
+	return false
+}
+
+func RemoveFinalizer(m metav1.ObjectMeta, finalizer string) metav1.ObjectMeta {
+	// https://github.com/golang/go/wiki/SliceTricks#filtering-without-allocating
+	r := m.Finalizers[:0]
+	for _, name := range m.Finalizers {
+		if name != finalizer {
+			r = append(r, name)
+		}
+	}
+	m.Finalizers = r
+	return m
+}
+
+func EnsureContainerDeleted(containers []core.Container, name string) []core.Container {
+	for i, c := range containers {
+		if c.Name == name {
+			return append(containers[:i], containers[i+1:]...)
+		}
+	}
+	return containers
+}
+
+func UpsertContainer(containers []core.Container, nv core.Container) []core.Container {
+	for i, vol := range containers {
+		if vol.Name == nv.Name {
+			containers[i] = nv
+			return containers
+		}
+	}
+	return append(containers, nv)
+}
+
+func GetString(m map[string]string, key string) string {
+	if m == nil {
+		return ""
+	}
+	return m[key]
+}
+
+func UpsertVolume(volumes []core.Volume, nv core.Volume) []core.Volume {
+	for i, vol := range volumes {
+		if vol.Name == nv.Name {
+			volumes[i] = nv
+			return volumes
+		}
+	}
+	return append(volumes, nv)
+}
+
+func EnsureVolumeDeleted(volumes []core.Volume, name string) []core.Volume {
+	for i, v := range volumes {
+		if v.Name == name {
+			return append(volumes[:i], volumes[i+1:]...)
+		}
+	}
+	return volumes
+}
+
+func UpsertVolumeMount(mounts []core.VolumeMount, nv core.VolumeMount) []core.VolumeMount {
+	for i, vol := range mounts {
+		if vol.Name == nv.Name {
+			mounts[i] = nv
+			return mounts
+		}
+	}
+	return append(mounts, nv)
+}
+
+func EnsureVolumeMountDeleted(mounts []core.VolumeMount, name string) []core.VolumeMount {
+	for i, v := range mounts {
+		if v.Name == name {
+			return append(mounts[:i], mounts[i+1:]...)
+		}
+	}
+	return mounts
+}
+
+func UpsertEnvVar(vars []core.EnvVar, nv core.EnvVar) []core.EnvVar {
+	for i, vol := range vars {
+		if vol.Name == nv.Name {
+			vars[i] = nv
+			return vars
+		}
+	}
+	return append(vars, nv)
+}
+
+func EnsureEnvVarDeleted(vars []core.EnvVar, name string) []core.EnvVar {
+	for i, v := range vars {
+		if v.Name == name {
+			return append(vars[:i], vars[i+1:]...)
+		}
+	}
+	return vars
 }

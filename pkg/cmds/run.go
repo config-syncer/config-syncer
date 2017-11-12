@@ -10,14 +10,14 @@ import (
 	"github.com/appscode/go/log"
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/operator"
-	srch_cs "github.com/appscode/searchlight/client/clientset"
-	scs "github.com/appscode/stash/client/clientset"
-	vcs "github.com/appscode/voyager/client/clientset"
-	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	kcs "github.com/k8sdb/apimachinery/client/clientset"
+	srch_cs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
+	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
+	vcs "github.com/appscode/voyager/client/typed/voyager/v1beta1"
+	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
+	kcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
 	"github.com/spf13/cobra"
-	clientset "k8s.io/client-go/kubernetes"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
+	core "k8s.io/api/core/v1"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -64,14 +64,14 @@ func Run(opt operator.Options) {
 	}
 
 	op := &operator.Operator{
-		KubeClient:        clientset.NewForConfigOrDie(c),
+		KubeClient:        kubernetes.NewForConfigOrDie(c),
 		VoyagerClient:     vcs.NewForConfigOrDie(c),
 		SearchlightClient: srch_cs.NewForConfigOrDie(c),
 		StashClient:       scs.NewForConfigOrDie(c),
 		KubeDBClient:      kcs.NewForConfigOrDie(c),
 		Opt:               opt,
 	}
-	op.PromClient, err = pcm.NewForConfig(c)
+	op.PromClient, err = prom.NewForConfig(c)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -95,5 +95,5 @@ func namespace() string {
 			return ns
 		}
 	}
-	return apiv1.NamespaceDefault
+	return core.NamespaceDefault
 }

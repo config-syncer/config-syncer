@@ -81,21 +81,20 @@ Kubed can be installed using YAML files includes in the [/hack/deploy](/hack/dep
 
 ```console
 # Install without RBAC roles
-$ curl https://raw.githubusercontent.com/appscode/kubed/0.2.0/hack/deploy/without-rbac.yaml \
-  | kubectl apply -f -
+$ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.3.0/hack/deploy/without-rbac.yaml
 
 
 # Install with RBAC roles
-$ curl https://raw.githubusercontent.com/appscode/kubed/0.2.0/hack/deploy/with-rbac.yaml \
-  | kubectl apply -f -
+$ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.3.0/hack/deploy/with-rbac.yaml
 ```
 
 ## Using Helm
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](/chart/kubed) included in this repository. To install the chart with the release name `my-release`:
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](/chart/stable/kubed) included in this repository. To install the chart with the release name `my-release`:
 ```bash
-$ helm install chart/kubed --name my-release
+$ helm repo update
+$ helm install stable/kubed --name my-release
 ```
-To see the detailed configuration options, visit [here](/chart/kubed/README.md).
+To see the detailed configuration options, visit [here](/chart/stable/kubed/README.md).
 
 
 ## Verify installation

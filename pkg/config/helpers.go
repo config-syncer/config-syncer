@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"time"
+	"strconv"
 
 	yc "github.com/appscode/go/encoding/yaml"
 	"github.com/appscode/go/errors"
@@ -46,30 +46,30 @@ func (cfg ClusterConfig) Save(configPath string) error {
 
 func (cfg ClusterConfig) Validate() error {
 	if cfg.EventForwarder != nil && len(cfg.EventForwarder.NodeAdded.Namespaces) > 0 {
-		return fmt.Errorf("Namespeces can't be defined for forwarding `nodeAdded` events.")
+		return fmt.Errorf("namespeces can't be defined for forwarding `nodeAdded` events")
 	}
 
 	for _, j := range cfg.Janitors {
 		switch j.Kind {
 		case JanitorElasticsearch:
 			if j.Elasticsearch == nil {
-				return fmt.Errorf("Missing spec for janitor kind %s", j.Kind)
+				return fmt.Errorf("missing spec for janitor kind %s", j.Kind)
 			}
 		case JanitorInfluxDB:
 			if j.InfluxDB == nil {
-				return fmt.Errorf("Missing spec for janitor kind %s", j.Kind)
+				return fmt.Errorf("missing spec for janitor kind %s", j.Kind)
 			}
 		default:
-			return fmt.Errorf("Unknown janitor kind %s", j.Kind)
+			return fmt.Errorf("unknown janitor kind %s", j.Kind)
 		}
 	}
 	return nil
 }
 
-func (b SnapshotSpec) Location(timestamp time.Time) (string, error) {
-	ts := "snapshot.tar.gz"
+func (b SnapshotSpec) Location(filename string) (string, error) {
+	ts := filename
 	if b.Overwrite {
-		ts = timestamp.UTC().Format(TimestampFormat) + ".tar.gz"
+		ts = "snapshot.tar.gz"
 	}
 	if b.S3 != nil {
 		return filepath.Join(b.S3.Prefix, ts), nil
@@ -98,4 +98,21 @@ func (b Backend) Container() (string, error) {
 		return b.Swift.Container, nil
 	}
 	return "", errors.New("No storage provider is configured.")
+}
+
+func LoadJanitorAuthInfo(data map[string][]byte) *JanitorAuthInfo {
+	if data == nil {
+		return &JanitorAuthInfo{}
+	}
+	insecureSkipVerify, _ := strconv.ParseBool(string(data["INSECURE_SKIP_VERIFY"]))
+
+	return &JanitorAuthInfo{
+		CACertData:         data["CA_CERT_DATA"],
+		ClientCertData:     data["CLIENT_CERT_DATA"],
+		ClientKeyData:      data["CLIENT_KEY_DATA"],
+		InsecureSkipVerify: insecureSkipVerify,
+		Username:           string(data["USERNAME"]),
+		Password:           string(data["PASSWORD"]),
+		Token:              string(data["TOKEN"]),
+	}
 }

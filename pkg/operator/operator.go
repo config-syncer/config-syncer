@@ -13,7 +13,6 @@ import (
 	"github.com/appscode/go/log"
 	v "github.com/appscode/go/version"
 	"github.com/appscode/kubed/pkg/api"
-	"github.com/appscode/kubed/pkg/backup"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
@@ -23,18 +22,19 @@ import (
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/kutil"
 	"github.com/appscode/pat"
-	srch_cs "github.com/appscode/searchlight/client/clientset"
-	scs "github.com/appscode/stash/client/clientset"
-	vcs "github.com/appscode/voyager/client/clientset"
+	srch_cs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
+	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
+	vcs "github.com/appscode/voyager/client/typed/voyager/v1beta1"
 	shell "github.com/codeskyblue/go-sh"
-	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	kcs "github.com/k8sdb/apimachinery/client/clientset"
+	kcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
+	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -54,12 +54,12 @@ type Options struct {
 }
 
 type Operator struct {
-	KubeClient        clientset.Interface
-	VoyagerClient     vcs.ExtensionInterface
-	SearchlightClient srch_cs.ExtensionInterface
-	StashClient       scs.ExtensionInterface
-	PromClient        pcm.MonitoringV1Interface
-	KubeDBClient      kcs.ExtensionInterface
+	KubeClient        kubernetes.Interface
+	VoyagerClient     vcs.VoyagerV1beta1Interface
+	SearchlightClient srch_cs.MonitoringV1alpha1Interface
+	StashClient       scs.StashV1alpha1Interface
+	PromClient        prom.MonitoringV1Interface
+	KubeDBClient      kcs.KubedbV1alpha1Interface
 
 	Opt    Options
 	Config config.ClusterConfig
@@ -176,9 +176,7 @@ func (op *Operator) RunWatchers() {
 	go op.WatchAlertmanagerV1()
 	go op.WatchCertificateSigningRequests()
 	go op.WatchClusterAlerts()
-	go op.WatchClusterRoleBindingV1alpha1()
 	go op.WatchClusterRoleBindingV1beta1()
-	go op.WatchClusterRoleV1alpha1()
 	go op.WatchClusterRoleV1beta1()
 	go op.WatchConfigMaps()
 	go op.WatchDaemonSets()
@@ -200,7 +198,6 @@ func (op *Operator) RunWatchers() {
 	go op.WatchReplicaSets()
 	go op.WatchReplicationControllers()
 	go op.WatchRestics()
-	go op.WatchRoleBindingV1alpha1()
 	go op.WatchRoleBindingV1beta1()
 	go op.WatchRoleV1alpha1()
 	go op.WatchRoleV1beta1()
@@ -210,7 +207,6 @@ func (op *Operator) RunWatchers() {
 	go op.WatchServiceMonitorV1()
 	go op.WatchStatefulSets()
 	go op.WatchStorageClassV1()
-	go op.WatchStorageClassV1beta1()
 	go op.WatchVoyagerCertificates()
 	go op.WatchVoyagerIngresses()
 }
@@ -264,7 +260,20 @@ func (op *Operator) metadataHandler(w http.ResponseWriter, r *http.Request) {
 func (op *Operator) RunElasticsearchCleaner() error {
 	for _, j := range op.Config.Janitors {
 		if j.Kind == config.JanitorElasticsearch {
-			janitor := es.Janitor{Spec: *j.Elasticsearch, TTL: j.TTL.Duration}
+			var authInfo *config.JanitorAuthInfo
+
+			if j.Elasticsearch.SecretName != "" {
+				secret, err := op.KubeClient.CoreV1().Secrets(op.Opt.OperatorNamespace).
+					Get(j.Elasticsearch.SecretName, metav1.GetOptions{})
+				if err != nil && !kerr.IsNotFound(err) {
+					return err
+				}
+				if secret != nil {
+					authInfo = config.LoadJanitorAuthInfo(secret.Data)
+				}
+			}
+
+			janitor := es.Janitor{Spec: *j.Elasticsearch, AuthInfo: authInfo, TTL: j.TTL.Duration}
 			err := janitor.Cleanup()
 			if err != nil {
 				return err
@@ -313,44 +322,23 @@ func (op *Operator) RunSnapshotter() error {
 	sh := shell.NewSession()
 	sh.SetDir(op.Opt.ScratchDir)
 	sh.ShowCMD = true
-	err = sh.Command("osm", "lc", "--osmconfig", osmconfigPath).Run()
-	if err != nil {
-		return err
-	}
 	snapshotter := func() error {
-		cfg, err := clientcmd.BuildConfigFromFlags(op.Opt.Master, op.Opt.KubeConfig)
+		restConfig, err := clientcmd.BuildConfigFromFlags(op.Opt.Master, op.Opt.KubeConfig)
 		if err != nil {
 			return err
 		}
 
-		t := time.Now().UTC()
-		ts := t.Format(config.TimestampFormat)
-		snapshotRoot := filepath.Join(op.Opt.ScratchDir, "snapshot")
-		snapshotDir := filepath.Join(snapshotRoot, ts)
-		snapshotFile := filepath.Join(snapshotRoot, ts+".tar.gz")
-		err = backup.SnapshotCluster(cfg, snapshotDir, op.Config.Snapshotter.Sanitize)
+		mgr := kutil.NewBackupManager(op.Config.ClusterName, restConfig, op.Config.Snapshotter.Sanitize)
+		snapshotFile, err := mgr.BackupToTar(filepath.Join(op.Opt.ScratchDir, "snapshot"))
 		if err != nil {
 			return err
 		}
 		defer func() {
-			if err := os.RemoveAll(snapshotDir); err != nil {
-				log.Errorln(err)
-			}
 			if err := os.Remove(snapshotFile); err != nil {
 				log.Errorln(err)
 			}
 		}()
-
-		dest, err := op.Config.Snapshotter.Location(t)
-		if err != nil {
-			return err
-		}
-
-		sh := shell.NewSession()
-		sh.SetDir(snapshotRoot)
-		sh.ShowCMD = true
-
-		err = sh.Command("tar", "-czf", ts+".tar.gz", ts).Run()
+		dest, err := op.Config.Snapshotter.Location(filepath.Base(snapshotFile))
 		if err != nil {
 			return err
 		}

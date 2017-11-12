@@ -7,14 +7,14 @@ import (
 
 	"github.com/appscode/go/arrays"
 	"github.com/appscode/go/log"
-	kutil "github.com/appscode/kutil/prometheus/v1alpha1"
+	kutil "github.com/appscode/kutil/prometheus/v1"
 	"github.com/appscode/pat"
 	"github.com/blevesearch/bleve"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes"
 )
 
 type PrometheusIndexer interface {
@@ -30,7 +30,7 @@ type PrometheusIndexer interface {
 var _ PrometheusIndexer = &PrometheusIndexerImpl{}
 
 type PrometheusIndexerImpl struct {
-	kubeClient clientset.Interface
+	kubeClient kubernetes.Interface
 	promClient prom.MonitoringV1Interface
 	index      bleve.Index
 }
