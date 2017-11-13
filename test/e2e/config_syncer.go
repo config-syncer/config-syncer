@@ -15,7 +15,7 @@ import (
 var _ = Describe("Config-syncer", func() {
 	var (
 		f                         *framework.Invocation
-		cfgMap *core.ConfigMap
+		cfgMap                    *core.ConfigMap
 		shouldNsAndConfigmapEqual = func() {
 			ns, err := f.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
 			Expect(err).NotTo(HaveOccurred())

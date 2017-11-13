@@ -23,6 +23,7 @@ import (
 	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/kutil"
+	"github.com/appscode/kutil/tools/backup"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
 	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
@@ -328,7 +329,7 @@ func (op *Operator) RunSnapshotter() error {
 			return err
 		}
 
-		mgr := kutil.NewBackupManager(op.Config.ClusterName, restConfig, op.Config.Snapshotter.Sanitize)
+		mgr := backup.NewBackupManager(op.Config.ClusterName, restConfig, op.Config.Snapshotter.Sanitize)
 		snapshotFile, err := mgr.BackupToTar(filepath.Join(op.Opt.ScratchDir, "snapshot"))
 		if err != nil {
 			return err

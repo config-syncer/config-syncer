@@ -38,7 +38,7 @@ func PatchMySQL(c tcs.KubedbV1alpha1Interface, cur *aci.MySQL, transform func(*a
 		return nil, err
 	}
 
-	modJson, err := json.Marshal(transform(cur))
+	modJson, err := json.Marshal(transform(cur.DeepCopy()))
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func TryUpdateMySQL(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, trans
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
-			result, e2 = c.MySQLs(cur.Namespace).Update(transform(cur))
+			result, e2 = c.MySQLs(cur.Namespace).Update(transform(cur.DeepCopy()))
 			return e2 == nil, nil
 		}
 		glog.Errorf("Attempt %d failed to update MySQL %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)
