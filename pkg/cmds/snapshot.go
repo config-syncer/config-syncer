@@ -2,6 +2,7 @@ package cmds
 
 import (
 	"fmt"
+
 	"github.com/appscode/go/flags"
 	"github.com/appscode/kutil"
 	"github.com/spf13/cobra"
@@ -34,6 +35,7 @@ func NewCmdSnapshot() *cobra.Command {
 			}
 			fmt.Printf("Cluster objects are stored in %s", filename)
 			fmt.Println()
+			return nil
 		},
 	}
 	cmd.Flags().BoolVar(&sanitize, "sanitize", false, " Sanitize fields in YAML")

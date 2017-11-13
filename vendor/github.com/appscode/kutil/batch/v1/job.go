@@ -38,7 +38,7 @@ func PatchJob(c kubernetes.Interface, cur *batch.Job, transform func(*batch.Job)
 		return nil, err
 	}
 
-	modJson, err := json.Marshal(transform(cur))
+	modJson, err := json.Marshal(transform(cur.DeepCopy()))
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func TryUpdateJob(c kubernetes.Interface, meta metav1.ObjectMeta, transform func
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
-			result, e2 = c.BatchV1().Jobs(cur.Namespace).Update(transform(cur))
+			result, e2 = c.BatchV1().Jobs(cur.Namespace).Update(transform(cur.DeepCopy()))
 			return e2 == nil, nil
 		}
 		glog.Errorf("Attempt %d failed to update Job %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)
