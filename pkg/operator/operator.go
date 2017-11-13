@@ -22,7 +22,6 @@ import (
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kubed/pkg/util"
-	"github.com/appscode/kutil"
 	"github.com/appscode/kutil/tools/backup"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"

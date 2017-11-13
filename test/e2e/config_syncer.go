@@ -3,6 +3,7 @@ package e2e
 import (
 	"strings"
 
+	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/test/framework"
 	. "github.com/onsi/ginkgo"
@@ -10,28 +11,16 @@ import (
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"github.com/appscode/go/crypto/rand"
 )
 
 var _ = Describe("Config-syncer", func() {
 	var (
-		f              *framework.Invocation
-		cfgMap         *core.ConfigMap
-		namespaceCount = func() int {
+		f               *framework.Invocation
+		cfgMap          *core.ConfigMap
+		numOfNamespaces = func() int {
 			ns, err := f.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
 			Expect(err).NotTo(HaveOccurred())
 			return len(ns.Items)
-		}
-		configmapCounts = func(nsName string) GomegaAsyncAssertion {
-			return Eventually(func() int {
-				cfgmaps, err := f.KubeClient.CoreV1().ConfigMaps(nsName).List(metav1.ListOptions{
-					LabelSelector: labels.Set{
-						"app": f.App(),
-					}.String(),
-				})
-				Expect(err).NotTo(HaveOccurred())
-				return len(cfgmaps.Items)
-			})
 		}
 	)
 
@@ -94,46 +83,46 @@ enableConfigSyncer: true
 
 	Describe("Config-syncer test", func() {
 		Context("Config-sync with update config map", func() {
+			var (
+				namespace string
+			)
+
 			BeforeEach(func() {
+				namespace = rand.WithUniqSuffix("test-ns")
+			})
+
+			It("Check config-syncer works", func() {
 				c, err := root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Create(cfgMap)
 				Expect(err).NotTo(HaveOccurred())
-
-				// TODO: check that it only exists in one namespace
-				cfgmaps, err := root.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
-					LabelSelector: labels.Set{
-						"app": f.App(),
-					}.String(),
-				})
-				Expect(len(cfgmaps.Items)).Should(BeNumerically("==", 1))
+				f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 				metav1.SetMetaDataAnnotation(&c.ObjectMeta, config.ConfigSyncKey, "true")
 				c, err = root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Update(c)
 				Expect(err).NotTo(HaveOccurred())
-			})
 
-			// Now create a NS, check that configmap is copied into that ns
-			// Remove annotations, confirm only the original source is present
-			It("Check config-syncer works", func() {
-				nsName := rand.WithUniqSuffix("test-ns")
 				namespace := &core.Namespace{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: core.SchemeGroupVersion.String(),
 						Kind:       "Namespace",
 					},
 					ObjectMeta: metav1.ObjectMeta{
-						Name: nsName,
+						Name: namespace,
 					},
 				}
-				_, err := root.KubeClient.CoreV1().Namespaces().Create(namespace)
+				_, err = root.KubeClient.CoreV1().Namespaces().Create(namespace)
 				Expect(err).ShouldNot(HaveOccurred())
-				configmapCounts(nsName).Should(BeNumerically("==", 1))
+				f.EventuallyNumOfConfigmaps(namespace).Should(BeNumerically("==", 1))
 
-				nsCount := namespaceCount()
-				configmapCounts("").Should(BeNumerically("==", nsCount))
+				f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
 
 				metav1.SetMetaDataAnnotation(&cfgMap.ObjectMeta, config.ConfigOriginKey, "false")
 				_, err = root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Update(cfgMap)
-				configmapCounts("").Should(BeNumerically("==", 1))
+				f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
+			})
+
+			AfterEach(func() {
+				err := f.KubeClient.CoreV1().Namespaces().Delete(namespace, &metav1.DeleteOptions{})
+				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 	})
