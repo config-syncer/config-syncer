@@ -137,17 +137,6 @@ apiServer:
 				Expect(err).NotTo(HaveOccurred())
 
 				time.Sleep(2 * time.Second)
-
-				pods, err := f.KubeClient.CoreV1().Pods(f.Namespace()).List(metav1.ListOptions{
-					LabelSelector: labels.SelectorFromSet(map[string]string{"app": svcName}).String(),
-				})
-				Expect(err).NotTo(HaveOccurred())
-
-				path := "/api/v1/namespaces/" + pods.Items[0].Namespace + "/pods/" + pods.Items[0].Name + "/services"
-				Expect(len(KubedEnpoint)).Should(BeNumerically(">=", 1))
-
-				request, err = http.NewRequest(http.MethodGet, KubedEnpoint[0]+path, nil)
-				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("Checkout reverse index", func() {
@@ -167,8 +156,19 @@ apiServer:
 								KubedEnpoint = append(KubedEnpoint, output)
 							}
 						}
+						pods, err := f.KubeClient.CoreV1().Pods(f.Namespace()).List(metav1.ListOptions{
+							LabelSelector: labels.SelectorFromSet(map[string]string{"app": svcName}).String(),
+						})
+						Expect(err).NotTo(HaveOccurred())
+
+						path := "/api/v1/namespaces/" + pods.Items[0].Namespace + "/pods/" + pods.Items[0].Name + "/services"
+						Expect(len(KubedEnpoint)).Should(BeNumerically(">=", 1))
+
+						request, err = http.NewRequest(http.MethodGet, KubedEnpoint[0]+path, nil)
+						Expect(err).NotTo(HaveOccurred())
 						return nil
 					}
+
 					return err
 				}, framework.DefaultEventuallyTimeout, framework.DefaultEventuallyPollingInterval).Should(BeNil())
 
