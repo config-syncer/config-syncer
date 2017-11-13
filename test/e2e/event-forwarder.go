@@ -95,7 +95,7 @@ var _ = Describe("Event-forwarder", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 
-			FIt("Check notify kubed", func() {
+			It("Check notify kubed", func() {
 				Eventually(func() bool {
 					for _, val := range requests {
 						wr := httptest.NewRecorder()
@@ -142,7 +142,7 @@ var _ = Describe("Event-forwarder", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 
-			FIt("Check warning event", func() {
+			It("Check warning event", func() {
 				Eventually(func() bool {
 					for _, val := range requests {
 						wr := httptest.NewRecorder()
