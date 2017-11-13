@@ -100,7 +100,7 @@ enableConfigSyncer: true
 				c, err = root.KubeClient.CoreV1().ConfigMaps(root.Config.TestNamespace).Update(c)
 				Expect(err).NotTo(HaveOccurred())
 
-				namespace := &core.Namespace{
+				nsObj := &core.Namespace{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: core.SchemeGroupVersion.String(),
 						Kind:       "Namespace",
@@ -109,7 +109,7 @@ enableConfigSyncer: true
 						Name: namespace,
 					},
 				}
-				_, err = root.KubeClient.CoreV1().Namespaces().Create(namespace)
+				_, err = root.KubeClient.CoreV1().Namespaces().Create(nsObj)
 				Expect(err).ShouldNot(HaveOccurred())
 				f.EventuallyNumOfConfigmaps(namespace).Should(BeNumerically("==", 1))
 
