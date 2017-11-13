@@ -33,21 +33,6 @@ var _ = Describe("Config-syncer", func() {
 				return len(cfgmaps.Items)
 			})
 		}
-
-		shouldNsAndConfigmapEqual = func() {
-			ns, err := f.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
-			Expect(err).NotTo(HaveOccurred())
-
-			Eventually(func() int {
-				cfgmaps, err := f.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
-					LabelSelector: labels.Set{
-						"app": f.App(),
-					}.String(),
-				})
-				Expect(err).NotTo(HaveOccurred())
-				return len(cfgmaps.Items)
-			}).Should(Equal(len(ns.Items)))
-		}
 	)
 
 	BeforeEach(func() {
