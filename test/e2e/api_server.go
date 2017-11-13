@@ -21,7 +21,6 @@ var _ = Describe("Kubed api server", func() {
 		f *framework.Invocation
 	)
 	BeforeEach(func() {
-		Expect(0).Should(Equal(0))
 		f = root.Invoke()
 		secret := &core.Secret{
 			TypeMeta: metav1.TypeMeta{
