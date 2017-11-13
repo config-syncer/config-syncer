@@ -1,10 +1,10 @@
 package e2e
 
 import (
-	"io/ioutil"
 	"net/http"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/kubed/test/framework"
@@ -24,7 +24,7 @@ var _ = Describe("Kubed api server", func() {
 		f = root.Invoke()
 		secret := &core.Secret{
 			TypeMeta: metav1.TypeMeta{
-				APIVersion: "v1",
+				APIVersion: core.SchemeGroupVersion.String(),
 				Kind:       "Secret",
 			},
 			ObjectMeta: metav1.ObjectMeta{
@@ -68,31 +68,10 @@ apiServer:
 				_, err = f.KubeClient.CoreV1().Services(metav1.NamespaceSystem).Update(kubedSvc)
 				Expect(err).NotTo(HaveOccurred())
 
-				Eventually(func() error {
-					var outputs []byte
-					outputs, err = exec.Command(
-						"/usr/local/bin/minikube",
-						"service",
-						"kubed-operator",
-						"--url",
-						"-n",
-						metav1.NamespaceSystem,
-					).CombinedOutput()
-					if err == nil {
-						for _, output := range strings.Split(string(outputs), "\n") {
-							if strings.HasPrefix(output, "http") {
-								KubedEnpoint = append(KubedEnpoint, output)
-							}
-						}
-						return nil
-					}
-					return err
-				}, "5m", "10s").Should(BeNil())
-
 				svcName = rand.WithUniqSuffix("kubed-svc")
 				service := &core.Service{
 					TypeMeta: metav1.TypeMeta{
-						APIVersion: "v1",
+						APIVersion: core.SchemeGroupVersion.String(),
 						Kind:       "Pod",
 					},
 					ObjectMeta: metav1.ObjectMeta{
@@ -116,7 +95,7 @@ apiServer:
 				deployName = rand.WithUniqSuffix("kubed-deploy")
 				deploy := &v1beta1.Deployment{
 					TypeMeta: metav1.TypeMeta{
-						APIVersion: "extensions/v1beta1",
+						APIVersion: v1beta1.SchemeGroupVersion.String(),
 						Kind:       "Deployment",
 					},
 					ObjectMeta: metav1.ObjectMeta{
@@ -157,6 +136,8 @@ apiServer:
 				_, err = f.KubeClient.CoreV1().Services(f.Namespace()).Create(service)
 				Expect(err).NotTo(HaveOccurred())
 
+				time.Sleep(2 * time.Second)
+
 				pods, err := f.KubeClient.CoreV1().Pods(f.Namespace()).List(metav1.ListOptions{
 					LabelSelector: labels.SelectorFromSet(map[string]string{"app": svcName}).String(),
 				})
@@ -170,13 +151,32 @@ apiServer:
 			})
 
 			It("Checkout reverse index", func() {
+				Eventually(func() error {
+					var outputs []byte
+					outputs, err := exec.Command(
+						"/usr/local/bin/minikube",
+						"service",
+						"kubed-operator",
+						"--url",
+						"-n",
+						metav1.NamespaceSystem,
+					).CombinedOutput()
+					if err == nil {
+						for _, output := range strings.Split(string(outputs), "\n") {
+							if strings.HasPrefix(output, "http") {
+								KubedEnpoint = append(KubedEnpoint, output)
+							}
+						}
+						return nil
+					}
+					return err
+				}, framework.DefaultEventuallyTimeout, framework.DefaultEventuallyPollingInterval).Should(BeNil())
+
 				Eventually(func() int {
 					resp, err := http.DefaultClient.Do(request)
 					Expect(err).NotTo(HaveOccurred())
-					_, err = ioutil.ReadAll(resp.Body)
-					Expect(err).NotTo(HaveOccurred())
 					return resp.StatusCode
-				}).Should(BeNumerically("==", 200))
+				}).Should(BeNumerically("==", 200)) // TODO: check response body
 			})
 		})
 	})
