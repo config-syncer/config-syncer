@@ -12,5 +12,5 @@ func (f *Invocation) EventuallyReverseIndex(path string) GomegaAsyncAssertion {
 		resp, err := http.DefaultClient.Do(request)
 		Expect(err).NotTo(HaveOccurred())
 		return resp.StatusCode
-	})
+	}, DefaultEventuallyTimeout, DefaultEventuallyPollingInterval)
 }
