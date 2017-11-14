@@ -29,13 +29,6 @@ var _ = Describe("Kubed api server", func() {
 				deployName string
 			)
 			BeforeEach(func() {
-				kubedSvc, err := f.KubeClient.CoreV1().Services(metav1.NamespaceSystem).Get("kubed-operator", metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-
-				kubedSvc.Spec.Type = core.ServiceTypeNodePort
-				_, err = f.KubeClient.CoreV1().Services(metav1.NamespaceSystem).Update(kubedSvc)
-				Expect(err).NotTo(HaveOccurred())
-
 				svcName = rand.WithUniqSuffix("kubed-svc")
 				service := &core.Service{
 					TypeMeta: metav1.TypeMeta{
@@ -98,7 +91,7 @@ var _ = Describe("Kubed api server", func() {
 					},
 				}
 
-				_, err = f.KubeClient.ExtensionsV1beta1().Deployments(f.Namespace()).Create(deploy)
+				_, err := f.KubeClient.ExtensionsV1beta1().Deployments(f.Namespace()).Create(deploy)
 				Expect(err).NotTo(HaveOccurred())
 
 				_, err = f.KubeClient.CoreV1().Services(f.Namespace()).Create(service)
@@ -164,14 +157,14 @@ var _ = Describe("Kubed api server", func() {
 					LabelSelector: labels.SelectorFromSet(map[string]string{"app": svcName}).String(),
 				})
 				Expect(err).NotTo(HaveOccurred())
-				path = "/apis/" + prom.Group + "/" + prom.Version + "/namespaces/" + svcs.Items[0].Namespace + "/services/" + svcs.Items[0].Name + "/" + prom.ServiceMonitorName
+				path = "/apis/" + prom.Group + "/" + prom.Version + "/namespaces/" + svcs.Items[0].Namespace + "/services/" + svcName + "/" + prom.ServiceMonitorName
 				f.EventuallyReverseIndex(path).Should(BeNumerically("==", 200)) // TODO: check response body
 
 				proms, err := f.KubeClient.CoreV1().Services(f.Namespace()).List(metav1.ListOptions{
 					LabelSelector: labels.SelectorFromSet(map[string]string{"app": svcName}).String(),
 				})
 				Expect(err).NotTo(HaveOccurred())
-				path = "/apis/" + prom.Group + "/" + prom.Version + "/namespaces/" + proms.Items[0].Namespace + "/services/" + proms.Items[0].Name + "/" + prom.PrometheusName
+				path = "/apis/" + prom.Group + "/" + prom.Version + "/namespaces/" + proms.Items[0].Namespace + "/services/" + svcName + "/" + prom.PrometheusName
 				f.EventuallyReverseIndex(path).Should(BeNumerically("==", 200)) // TODO: check response body
 			})
 		})
