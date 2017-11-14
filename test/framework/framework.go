@@ -9,6 +9,7 @@ import (
 	sls "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
 	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
 	vcs "github.com/appscode/voyager/client/typed/voyager/v1beta1"
+	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	kcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
 	. "github.com/onsi/gomega"
 	clientset "k8s.io/client-go/kubernetes"
@@ -43,6 +44,8 @@ func New() *Framework {
 
 	c, err := clientcmd.BuildConfigFromFlags(testConfigs.Master, testConfigs.KubeConfig)
 	Expect(err).NotTo(HaveOccurred())
+	promClient, err := prom.NewForConfig(c)
+	Expect(err).NotTo(HaveOccurred())
 
 	return &Framework{
 		KubeConfig: c,
@@ -55,6 +58,7 @@ func New() *Framework {
 			VoyagerClient:     vcs.NewForConfigOrDie(c),
 			SearchlightClient: sls.NewForConfigOrDie(c),
 			KubeDBClient:      kcs.NewForConfigOrDie(c),
+			PromClient:        promClient,
 		},
 	}
 }
