@@ -14,6 +14,7 @@ import (
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/appscode/go/crypto/rand"
 )
 
 var _ = Describe("Event-forwarder", func() {
@@ -21,6 +22,8 @@ var _ = Describe("Event-forwarder", func() {
 		f        *framework.Invocation
 		requests []*http.Request
 		s        *http.Server
+		pvcName  string
+		podName  string
 		handler  = func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "%q", r.URL)
 		}
@@ -69,13 +72,14 @@ var _ = Describe("Event-forwarder", func() {
 	Describe("Checkout event-forward", func() {
 		Context("Pvc add eventer", func() {
 			BeforeEach(func() {
-				myclaim := &core.PersistentVolumeClaim{
+				pvcName = rand.WithUniqSuffix("test-pvc")
+				pvc := &core.PersistentVolumeClaim{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: metav1.SchemeGroupVersion.String(),
 						Kind:       "PersistentVolumeClaim",
 					},
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      "myclaim",
+						Name:      pvcName,
 						Namespace: metav1.NamespaceSystem,
 					},
 					Spec: core.PersistentVolumeClaimSpec{
@@ -87,11 +91,12 @@ var _ = Describe("Event-forwarder", func() {
 						},
 					},
 				}
-				_, err := f.KubeClient.CoreV1().PersistentVolumeClaims(metav1.NamespaceSystem).Get("myclaim", metav1.GetOptions{})
-				if err == nil {
-					err = f.KubeClient.CoreV1().PersistentVolumeClaims(metav1.NamespaceSystem).Delete("myclaim", &metav1.DeleteOptions{})
-				}
-				_, err = f.KubeClient.CoreV1().PersistentVolumeClaims(metav1.NamespaceSystem).Create(myclaim)
+				_, err := f.KubeClient.CoreV1().PersistentVolumeClaims(metav1.NamespaceSystem).Create(pvc)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				err := f.KubeClient.CoreV1().PersistentVolumeClaims(metav1.NamespaceSystem).Delete(pvcName, &metav1.DeleteOptions{})
 				Expect(err).NotTo(HaveOccurred())
 			})
 
@@ -110,18 +115,18 @@ var _ = Describe("Event-forwarder", func() {
 					}
 					return false
 				}).Should(BeTrue())
-				Expect(0).Should(BeZero())
 			})
 		})
 		Context("Warning Event", func() {
 			BeforeEach(func() {
+				podName = rand.WithUniqSuffix("test-pod")
 				wPod := &core.Pod{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: metav1.SchemeGroupVersion.String(),
 						Kind:       "Pod",
 					},
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      "busybox",
+						Name:      podName,
 						Namespace: metav1.NamespaceSystem,
 					},
 					Spec: core.PodSpec{
@@ -138,7 +143,7 @@ var _ = Describe("Event-forwarder", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 			AfterEach(func() {
-				err := f.KubeClient.CoreV1().Pods(metav1.NamespaceSystem).Delete("busybox", &metav1.DeleteOptions{})
+				err := f.KubeClient.CoreV1().Pods(metav1.NamespaceSystem).Delete(podName, &metav1.DeleteOptions{})
 				Expect(err).NotTo(HaveOccurred())
 			})
 
@@ -151,7 +156,7 @@ var _ = Describe("Event-forwarder", func() {
 						byt, err := ioutil.ReadAll(resp.Body)
 						Expect(err).NotTo(HaveOccurred())
 						respStr := string(byt)
-						if resp.StatusCode == 200 && strings.Contains(respStr, "busybox") {
+						if resp.StatusCode == 200 && strings.Contains(respStr, podName) {
 							return true
 						}
 					}
