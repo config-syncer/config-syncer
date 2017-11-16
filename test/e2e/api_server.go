@@ -2,7 +2,6 @@ package e2e
 
 import (
 	"time"
-
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/kubed/test/framework"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
@@ -33,7 +32,7 @@ var _ = Describe("Kubed api server", func() {
 				service := &core.Service{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: core.SchemeGroupVersion.String(),
-						Kind:       "Pod",
+						Kind:       "Service",
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      svcName,
@@ -104,7 +103,7 @@ var _ = Describe("Kubed api server", func() {
 						Kind:       prom.ServiceMonitorsKind,
 					},
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      rand.WithUniqSuffix("test-svc"),
+						Name:      rand.WithUniqSuffix("test-svcmtr"),
 						Namespace: f.Namespace(),
 						Labels: map[string]string{
 							"app": svcName,
@@ -124,10 +123,10 @@ var _ = Describe("Kubed api server", func() {
 				prometheus := &prom.Prometheus{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: "monitoring.coreos.com/v1",
-						Kind:       prom.ServiceMonitorsKind,
+						Kind:       prom.PrometheusesKind,
 					},
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      rand.WithUniqSuffix("test-svc"),
+						Name:      rand.WithUniqSuffix("test-prom"),
 						Namespace: f.Namespace(),
 						Labels: map[string]string{
 							"app": svcName,

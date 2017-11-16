@@ -124,5 +124,25 @@ func (f *Framework) EnsureCreatedCRDs() error {
 	if err != nil {
 		return err
 	}
+
+	alertMgr := &extensionsobj.CustomResourceDefinition{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: prom.AlertmanagerName + "." + prom.Group,
+		},
+
+		Spec: extensionsobj.CustomResourceDefinitionSpec{
+			Group:   prom.Group,
+			Version: prom.Version,
+			Scope:   extensionsobj.NamespaceScoped,
+			Names: extensionsobj.CustomResourceDefinitionNames{
+				Plural: prom.AlertmanagerName,
+				Kind:   prom.AlertmanagersKind,
+			},
+		},
+	}
+	_, err = f.KubedOperator.CRDClient.CustomResourceDefinitions().Create(alertMgr)
+	if err != nil {
+		return err
+	}
 	return nil
 }

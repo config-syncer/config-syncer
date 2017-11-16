@@ -1,8 +1,6 @@
 package e2e
 
 import (
-	"strings"
-
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/test/framework"
@@ -44,28 +42,6 @@ var _ = Describe("Config-syncer", func() {
 				"leave": "once",
 			},
 		}
-
-		secret := &core.Secret{
-			TypeMeta: metav1.TypeMeta{
-				APIVersion: core.SchemeGroupVersion.String(),
-				Kind:       "Secret",
-			},
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "kubed-config",
-				Namespace: metav1.NamespaceSystem,
-				Labels: map[string]string{
-					"app": "kubed",
-				},
-			},
-			StringData: map[string]string{
-				"config.yaml": strings.TrimSpace(`
-enableConfigSyncer: true
-`),
-			},
-		}
-
-		_, err := f.KubeClient.CoreV1().Secrets(metav1.NamespaceSystem).Update(secret)
-		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
