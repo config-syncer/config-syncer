@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"time"
+
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/kubed/test/framework"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
@@ -45,10 +46,12 @@ var _ = Describe("Kubed api server", func() {
 						Selector: map[string]string{
 							"app": svcName,
 						},
-						Ports: append([]core.ServicePort{}, core.ServicePort{
-							Protocol: "TCP",
-							Port:     80,
-						}),
+						Ports: []core.ServicePort{
+							{
+								Protocol: core.ProtocolTCP,
+								Port:     80,
+							},
+						},
 					},
 				}
 
@@ -78,13 +81,17 @@ var _ = Describe("Kubed api server", func() {
 								},
 							},
 							Spec: core.PodSpec{
-								Containers: append([]core.Container{}, core.Container{
-									Name:  "nginx",
-									Image: "nginx:1.7.9",
-									Ports: append([]core.ContainerPort{}, core.ContainerPort{
-										ContainerPort: 80,
-									}),
-								}),
+								Containers: []core.Container{
+									{
+										Name:  "nginx",
+										Image: "nginx:1.7.9",
+										Ports: []core.ContainerPort{
+											{
+												ContainerPort: 80,
+											},
+										},
+									},
+								},
 							},
 						},
 					},

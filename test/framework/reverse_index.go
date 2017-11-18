@@ -1,8 +1,9 @@
 package framework
 
 import (
-	. "github.com/onsi/gomega"
 	"net/http"
+
+	. "github.com/onsi/gomega"
 )
 
 func (f *Invocation) EventuallyReverseIndex(path string) GomegaAsyncAssertion {

@@ -8,13 +8,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/kubed/test/framework"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/appscode/go/crypto/rand"
 )
 
 var _ = Describe("Event-forwarder", func() {
@@ -83,7 +83,7 @@ var _ = Describe("Event-forwarder", func() {
 						Namespace: metav1.NamespaceSystem,
 					},
 					Spec: core.PersistentVolumeClaimSpec{
-						AccessModes: append([]core.PersistentVolumeAccessMode{}, "ReadWriteOnce"),
+						AccessModes: []core.PersistentVolumeAccessMode{core.ReadWriteOnce},
 						Resources: core.ResourceRequirements{
 							Requests: core.ResourceList{
 								"storage": resource.Quantity{},
@@ -131,12 +131,14 @@ var _ = Describe("Event-forwarder", func() {
 					},
 					Spec: core.PodSpec{
 						RestartPolicy: "Never",
-						Containers: append([]core.Container{}, core.Container{
-							Name:            "busybox",
-							Image:           "busybox",
-							ImagePullPolicy: "IfNotPresent",
-							Command:         []string{"bad", "3600"},
-						}),
+						Containers: []core.Container{
+							{
+								Name:            "busybox",
+								Image:           "busybox",
+								ImagePullPolicy: core.PullIfNotPresent,
+								Command:         []string{"bad", "3600"},
+							},
+						},
 					},
 				}
 				_, err := f.KubeClient.CoreV1().Pods(metav1.NamespaceSystem).Create(wPod)
