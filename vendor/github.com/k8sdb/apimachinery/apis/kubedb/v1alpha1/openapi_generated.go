@@ -391,7 +391,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 						"monitor": {
 							SchemaProps: spec.SchemaProps{
 								Description: "Monitor is used monitor database instance",
-								Ref:         ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MonitorSpec"),
+								Ref:         ref("github.com/appscode/kutil/tools/monitoring/api.AgentSpec"),
 							},
 						},
 						"resources": {
@@ -430,7 +430,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 				},
 			},
 			Dependencies: []string{
-				"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.BackupScheduleSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.InitSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MonitorSpec", "k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.PersistentVolumeClaimSpec", "k8s.io/api/core/v1.ResourceRequirements", "k8s.io/api/core/v1.Toleration"},
+				"github.com/appscode/kutil/tools/monitoring/api.AgentSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.BackupScheduleSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.InitSpec", "k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.PersistentVolumeClaimSpec", "k8s.io/api/core/v1.ResourceRequirements", "k8s.io/api/core/v1.Toleration"},
 		},
 		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.ElasticsearchStatus": {
 			Schema: spec.Schema{
@@ -558,27 +558,413 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 			Dependencies: []string{
 				"k8s.io/api/core/v1.VolumeSource"},
 		},
-		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MonitorSpec": {
+		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.Memcached": {
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
+					Description: "Memcached defines a Memcached database.",
 					Properties: map[string]spec.Schema{
-						"agent": {
+						"kind": {
 							SchemaProps: spec.SchemaProps{
-								Description: "Valid values: coreos-prometheus-operator",
+								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
 								Type:        []string{"string"},
 								Format:      "",
 							},
 						},
-						"prometheus": {
+						"apiVersion": {
 							SchemaProps: spec.SchemaProps{
-								Ref: ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.PrometheusSpec"),
+								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"metadata": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							},
+						},
+						"spec": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MemcachedSpec"),
+							},
+						},
+						"status": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MemcachedStatus"),
 							},
 						},
 					},
 				},
 			},
 			Dependencies: []string{
-				"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.PrometheusSpec"},
+				"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MemcachedSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MemcachedStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+		},
+		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MemcachedList": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"kind": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"apiVersion": {
+							SchemaProps: spec.SchemaProps{
+								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"metadata": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							},
+						},
+						"items": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Items is a list of Memcached TPR objects",
+								Type:        []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Ref: ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.Memcached"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Dependencies: []string{
+				"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.Memcached", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+		},
+		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MemcachedSpec": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"version": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Version of Memcached to be deployed.",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"replicas": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Number of instances to deploy for a Memcached database.",
+								Type:        []string{"integer"},
+								Format:      "int32",
+							},
+						},
+						"nodeSelector": {
+							SchemaProps: spec.SchemaProps{
+								Description: "NodeSelector is a selector which must be true for the pod to fit on a node",
+								Type:        []string{"object"},
+								AdditionalProperties: &spec.SchemaOrBool{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Type:   []string{"string"},
+											Format: "",
+										},
+									},
+								},
+							},
+						},
+						"doNotPause": {
+							SchemaProps: spec.SchemaProps{
+								Description: "If DoNotPause is true, controller will prevent to delete this Postgres object. Controller will create same Postgres object and ignore other process.",
+								Type:        []string{"boolean"},
+								Format:      "",
+							},
+						},
+						"monitor": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Monitor is used monitor database instance",
+								Ref:         ref("github.com/appscode/kutil/tools/monitoring/api.AgentSpec"),
+							},
+						},
+						"resources": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Compute Resources required by the sidecar container.",
+								Ref:         ref("k8s.io/api/core/v1.ResourceRequirements"),
+							},
+						},
+						"affinity": {
+							SchemaProps: spec.SchemaProps{
+								Description: "If specified, the pod's scheduling constraints",
+								Ref:         ref("k8s.io/api/core/v1.Affinity"),
+							},
+						},
+						"schedulerName": {
+							SchemaProps: spec.SchemaProps{
+								Description: "If specified, the pod will be dispatched by specified scheduler. If not specified, the pod will be dispatched by default scheduler.",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"tolerations": {
+							SchemaProps: spec.SchemaProps{
+								Description: "If specified, the pod's tolerations.",
+								Type:        []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Ref: ref("k8s.io/api/core/v1.Toleration"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Dependencies: []string{
+				"github.com/appscode/kutil/tools/monitoring/api.AgentSpec", "k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.ResourceRequirements", "k8s.io/api/core/v1.Toleration"},
+		},
+		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MemcachedStatus": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"creationTime": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+							},
+						},
+						"phase": {
+							SchemaProps: spec.SchemaProps{
+								Type:   []string{"string"},
+								Format: "",
+							},
+						},
+						"reason": {
+							SchemaProps: spec.SchemaProps{
+								Type:   []string{"string"},
+								Format: "",
+							},
+						},
+					},
+				},
+			},
+			Dependencies: []string{
+				"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+		},
+		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MongoDB": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Description: "MongoDB defines a MongoDB database.",
+					Properties: map[string]spec.Schema{
+						"kind": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"apiVersion": {
+							SchemaProps: spec.SchemaProps{
+								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"metadata": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							},
+						},
+						"spec": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MongoDBSpec"),
+							},
+						},
+						"status": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MongoDBStatus"),
+							},
+						},
+					},
+				},
+			},
+			Dependencies: []string{
+				"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MongoDBSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MongoDBStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+		},
+		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MongoDBList": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"kind": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"apiVersion": {
+							SchemaProps: spec.SchemaProps{
+								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"metadata": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							},
+						},
+						"items": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Items is a list of MongoDB TPR objects",
+								Type:        []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Ref: ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MongoDB"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Dependencies: []string{
+				"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MongoDB", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+		},
+		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MongoDBSpec": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"version": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Version of MongoDB to be deployed.",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"replicas": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Number of instances to deploy for a MongoDB database.",
+								Type:        []string{"integer"},
+								Format:      "int32",
+							},
+						},
+						"storage": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Storage spec to specify how storage shall be used.",
+								Ref:         ref("k8s.io/api/core/v1.PersistentVolumeClaimSpec"),
+							},
+						},
+						"databaseSecret": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Database authentication secret",
+								Ref:         ref("k8s.io/api/core/v1.SecretVolumeSource"),
+							},
+						},
+						"nodeSelector": {
+							SchemaProps: spec.SchemaProps{
+								Description: "NodeSelector is a selector which must be true for the pod to fit on a node",
+								Type:        []string{"object"},
+								AdditionalProperties: &spec.SchemaOrBool{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Type:   []string{"string"},
+											Format: "",
+										},
+									},
+								},
+							},
+						},
+						"init": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Init is used to initialize database",
+								Ref:         ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.InitSpec"),
+							},
+						},
+						"backupSchedule": {
+							SchemaProps: spec.SchemaProps{
+								Description: "BackupSchedule spec to specify how database backup will be taken",
+								Ref:         ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.BackupScheduleSpec"),
+							},
+						},
+						"doNotPause": {
+							SchemaProps: spec.SchemaProps{
+								Description: "If DoNotPause is true, controller will prevent to delete this Postgres object. Controller will create same Postgres object and ignore other process.",
+								Type:        []string{"boolean"},
+								Format:      "",
+							},
+						},
+						"monitor": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Monitor is used monitor database instance",
+								Ref:         ref("github.com/appscode/kutil/tools/monitoring/api.AgentSpec"),
+							},
+						},
+						"resources": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Compute Resources required by the sidecar container.",
+								Ref:         ref("k8s.io/api/core/v1.ResourceRequirements"),
+							},
+						},
+						"affinity": {
+							SchemaProps: spec.SchemaProps{
+								Description: "If specified, the pod's scheduling constraints",
+								Ref:         ref("k8s.io/api/core/v1.Affinity"),
+							},
+						},
+						"schedulerName": {
+							SchemaProps: spec.SchemaProps{
+								Description: "If specified, the pod will be dispatched by specified scheduler. If not specified, the pod will be dispatched by default scheduler.",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"tolerations": {
+							SchemaProps: spec.SchemaProps{
+								Description: "If specified, the pod's tolerations.",
+								Type:        []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Ref: ref("k8s.io/api/core/v1.Toleration"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Dependencies: []string{
+				"github.com/appscode/kutil/tools/monitoring/api.AgentSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.BackupScheduleSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.InitSpec", "k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.PersistentVolumeClaimSpec", "k8s.io/api/core/v1.ResourceRequirements", "k8s.io/api/core/v1.SecretVolumeSource", "k8s.io/api/core/v1.Toleration"},
+		},
+		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MongoDBStatus": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"creationTime": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+							},
+						},
+						"phase": {
+							SchemaProps: spec.SchemaProps{
+								Type:   []string{"string"},
+								Format: "",
+							},
+						},
+						"reason": {
+							SchemaProps: spec.SchemaProps{
+								Type:   []string{"string"},
+								Format: "",
+							},
+						},
+					},
+				},
+			},
+			Dependencies: []string{
+				"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 		},
 		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MySQL": {
 			Schema: spec.Schema{
@@ -645,7 +1031,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 						},
 						"items": {
 							SchemaProps: spec.SchemaProps{
-								Description: "Items is a list of Xdb TPR objects",
+								Description: "Items is a list of MySQL TPR objects",
 								Type:        []string{"array"},
 								Items: &spec.SchemaOrArray{
 									Schema: &spec.Schema{
@@ -668,14 +1054,14 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 					Properties: map[string]spec.Schema{
 						"version": {
 							SchemaProps: spec.SchemaProps{
-								Description: "Version of Xdb to be deployed.",
+								Description: "Version of MySQL to be deployed.",
 								Type:        []string{"string"},
 								Format:      "",
 							},
 						},
 						"replicas": {
 							SchemaProps: spec.SchemaProps{
-								Description: "Number of instances to deploy for a Xdb database.",
+								Description: "Number of instances to deploy for a MySQL database.",
 								Type:        []string{"integer"},
 								Format:      "int32",
 							},
@@ -728,7 +1114,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 						"monitor": {
 							SchemaProps: spec.SchemaProps{
 								Description: "Monitor is used monitor database instance",
-								Ref:         ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MonitorSpec"),
+								Ref:         ref("github.com/appscode/kutil/tools/monitoring/api.AgentSpec"),
 							},
 						},
 						"resources": {
@@ -767,7 +1153,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 				},
 			},
 			Dependencies: []string{
-				"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.BackupScheduleSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.InitSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MonitorSpec", "k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.PersistentVolumeClaimSpec", "k8s.io/api/core/v1.ResourceRequirements", "k8s.io/api/core/v1.SecretVolumeSource", "k8s.io/api/core/v1.Toleration"},
+				"github.com/appscode/kutil/tools/monitoring/api.AgentSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.BackupScheduleSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.InitSpec", "k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.PersistentVolumeClaimSpec", "k8s.io/api/core/v1.ResourceRequirements", "k8s.io/api/core/v1.SecretVolumeSource", "k8s.io/api/core/v1.Toleration"},
 		},
 		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MySQLStatus": {
 			Schema: spec.Schema{
@@ -839,11 +1225,29 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 								Ref:         ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MySQLSpec"),
 							},
 						},
+						"mongodb": {
+							SchemaProps: spec.SchemaProps{
+								Description: "MongoDB Spec",
+								Ref:         ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MongoDBSpec"),
+							},
+						},
+						"redis": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Redis Spec",
+								Ref:         ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.RedisSpec"),
+							},
+						},
+						"memcached": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Memcached Spec",
+								Ref:         ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MemcachedSpec"),
+							},
+						},
 					},
 				},
 			},
 			Dependencies: []string{
-				"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.ElasticsearchSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MySQLSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.PostgresSpec"},
+				"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.ElasticsearchSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MemcachedSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MongoDBSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MySQLSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.PostgresSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.RedisSpec"},
 		},
 		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.Postgres": {
 			Schema: spec.Schema{
@@ -1009,7 +1413,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 						"monitor": {
 							SchemaProps: spec.SchemaProps{
 								Description: "Monitor is used monitor database instance",
-								Ref:         ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MonitorSpec"),
+								Ref:         ref("github.com/appscode/kutil/tools/monitoring/api.AgentSpec"),
 							},
 						},
 						"resources": {
@@ -1048,7 +1452,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 				},
 			},
 			Dependencies: []string{
-				"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.BackupScheduleSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.InitSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.MonitorSpec", "k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.PersistentVolumeClaimSpec", "k8s.io/api/core/v1.ResourceRequirements", "k8s.io/api/core/v1.SecretVolumeSource", "k8s.io/api/core/v1.Toleration"},
+				"github.com/appscode/kutil/tools/monitoring/api.AgentSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.BackupScheduleSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.InitSpec", "k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.PersistentVolumeClaimSpec", "k8s.io/api/core/v1.ResourceRequirements", "k8s.io/api/core/v1.SecretVolumeSource", "k8s.io/api/core/v1.Toleration"},
 		},
 		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.PostgresStatus": {
 			Schema: spec.Schema{
@@ -1129,20 +1533,115 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 			},
 			Dependencies: []string{},
 		},
-		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.PrometheusSpec": {
+		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.Redis": {
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
+					Description: "Redis defines a Redis database.",
 					Properties: map[string]spec.Schema{
-						"namespace": {
+						"kind": {
 							SchemaProps: spec.SchemaProps{
-								Description: "Namespace of Prometheus. Service monitors will be created in this namespace.",
+								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
 								Type:        []string{"string"},
 								Format:      "",
 							},
 						},
-						"labels": {
+						"apiVersion": {
 							SchemaProps: spec.SchemaProps{
-								Description: "Labels are key value pairs that is used to select Prometheus instance via ServiceMonitor labels.",
+								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"metadata": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							},
+						},
+						"spec": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.RedisSpec"),
+							},
+						},
+						"status": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.RedisStatus"),
+							},
+						},
+					},
+				},
+			},
+			Dependencies: []string{
+				"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.RedisSpec", "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.RedisStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+		},
+		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.RedisList": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"kind": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"apiVersion": {
+							SchemaProps: spec.SchemaProps{
+								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"metadata": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							},
+						},
+						"items": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Items is a list of Redis TPR objects",
+								Type:        []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Ref: ref("github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.Redis"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Dependencies: []string{
+				"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.Redis", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+		},
+		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.RedisSpec": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"version": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Version of Redis to be deployed.",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"replicas": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Number of instances to deploy for a Redis database.",
+								Type:        []string{"integer"},
+								Format:      "int32",
+							},
+						},
+						"storage": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Storage spec to specify how storage shall be used.",
+								Ref:         ref("k8s.io/api/core/v1.PersistentVolumeClaimSpec"),
+							},
+						},
+						"nodeSelector": {
+							SchemaProps: spec.SchemaProps{
+								Description: "NodeSelector is a selector which must be true for the pod to fit on a node",
 								Type:        []string{"object"},
 								AdditionalProperties: &spec.SchemaOrBool{
 									Schema: &spec.Schema{
@@ -1154,17 +1653,83 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 								},
 							},
 						},
-						"interval": {
+						"doNotPause": {
 							SchemaProps: spec.SchemaProps{
-								Description: "Interval at which metrics should be scraped",
+								Description: "If DoNotPause is true, controller will prevent to delete this Postgres object. Controller will create same Postgres object and ignore other process.",
+								Type:        []string{"boolean"},
+								Format:      "",
+							},
+						},
+						"monitor": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Monitor is used monitor database instance",
+								Ref:         ref("github.com/appscode/kutil/tools/monitoring/api.AgentSpec"),
+							},
+						},
+						"resources": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Compute Resources required by the sidecar container.",
+								Ref:         ref("k8s.io/api/core/v1.ResourceRequirements"),
+							},
+						},
+						"affinity": {
+							SchemaProps: spec.SchemaProps{
+								Description: "If specified, the pod's scheduling constraints",
+								Ref:         ref("k8s.io/api/core/v1.Affinity"),
+							},
+						},
+						"schedulerName": {
+							SchemaProps: spec.SchemaProps{
+								Description: "If specified, the pod will be dispatched by specified scheduler. If not specified, the pod will be dispatched by default scheduler.",
 								Type:        []string{"string"},
 								Format:      "",
+							},
+						},
+						"tolerations": {
+							SchemaProps: spec.SchemaProps{
+								Description: "If specified, the pod's tolerations.",
+								Type:        []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Ref: ref("k8s.io/api/core/v1.Toleration"),
+										},
+									},
+								},
 							},
 						},
 					},
 				},
 			},
-			Dependencies: []string{},
+			Dependencies: []string{
+				"github.com/appscode/kutil/tools/monitoring/api.AgentSpec", "k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.PersistentVolumeClaimSpec", "k8s.io/api/core/v1.ResourceRequirements", "k8s.io/api/core/v1.Toleration"},
+		},
+		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.RedisStatus": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"creationTime": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+							},
+						},
+						"phase": {
+							SchemaProps: spec.SchemaProps{
+								Type:   []string{"string"},
+								Format: "",
+							},
+						},
+						"reason": {
+							SchemaProps: spec.SchemaProps{
+								Type:   []string{"string"},
+								Format: "",
+							},
+						},
+					},
+				},
+			},
+			Dependencies: []string{
+				"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 		},
 		"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1.Report": {
 			Schema: spec.Schema{

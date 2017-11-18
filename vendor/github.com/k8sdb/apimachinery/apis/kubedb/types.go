@@ -26,41 +26,6 @@ type BackupScheduleSpec struct {
 	Resources core.ResourceRequirements `json:"resources,omitempty"`
 }
 
-const (
-	AWS_ACCESS_KEY_ID     = "AWS_ACCESS_KEY_ID"
-	AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
-
-	GOOGLE_PROJECT_ID               = "GOOGLE_PROJECT_ID"
-	GOOGLE_SERVICE_ACCOUNT_JSON_KEY = "GOOGLE_SERVICE_ACCOUNT_JSON_KEY"
-
-	AZURE_ACCOUNT_NAME = "AZURE_ACCOUNT_NAME"
-	AZURE_ACCOUNT_KEY  = "AZURE_ACCOUNT_KEY"
-
-	// swift
-	OS_USERNAME    = "OS_USERNAME"
-	OS_PASSWORD    = "OS_PASSWORD"
-	OS_REGION_NAME = "OS_REGION_NAME"
-	OS_AUTH_URL    = "OS_AUTH_URL"
-
-	// v3 specific
-	OS_USER_DOMAIN_NAME    = "OS_USER_DOMAIN_NAME"
-	OS_PROJECT_NAME        = "OS_PROJECT_NAME"
-	OS_PROJECT_DOMAIN_NAME = "OS_PROJECT_DOMAIN_NAME"
-
-	// v2 specific
-	OS_TENANT_ID   = "OS_TENANT_ID"
-	OS_TENANT_NAME = "OS_TENANT_NAME"
-
-	// v1 specific
-	ST_AUTH = "ST_AUTH"
-	ST_USER = "ST_USER"
-	ST_KEY  = "ST_KEY"
-
-	// Manual authentication
-	OS_STORAGE_URL = "OS_STORAGE_URL"
-	OS_AUTH_TOKEN  = "OS_AUTH_TOKEN"
-)
-
 type SnapshotStorageSpec struct {
 	StorageSecretName string `json:"storageSecretName,omitempty"`
 
@@ -95,26 +60,6 @@ type AzureSpec struct {
 type SwiftSpec struct {
 	Container string `json:"container,omitempty"`
 	Prefix    string `json:"prefix,omitempty"`
-}
-
-type MonitorSpec struct {
-	// Valid values: coreos-prometheus-operator
-	Agent      string          `json:"agent,omitempty"`
-	Prometheus *PrometheusSpec `json:"prometheus,omitempty"`
-}
-
-type PrometheusSpec struct {
-	// Namespace of Prometheus. Service monitors will be created in this namespace.
-	Namespace string `json:"namespace,omitempty"`
-	// Labels are key value pairs that is used to select Prometheus instance via ServiceMonitor labels.
-	// +optional
-	Labels map[string]string `json:"labels,omitempty"`
-
-	// Interval at which metrics should be scraped
-	Interval string `json:"interval,omitempty"`
-
-	// Parameters are key value pairs that are passed as flags to exporters.
-	// Parameters map[string]string `json:"parameters,omitempty"`
 }
 
 type DatabasePhase string
