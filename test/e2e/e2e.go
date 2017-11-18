@@ -30,7 +30,7 @@ var _ = BeforeSuite(func() {
 	By("Ensuring Test Namespace " + root.Config.TestNamespace)
 	err := root.EnsureNamespace()
 	Expect(err).NotTo(HaveOccurred())
-
+	err = root.EnsureCreatedCRDs()
 	Expect(err).NotTo(HaveOccurred())
 })
 

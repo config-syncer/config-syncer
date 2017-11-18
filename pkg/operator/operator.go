@@ -32,6 +32,7 @@ import (
 	kcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
+	ecs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -60,6 +61,7 @@ type Operator struct {
 	StashClient       scs.StashV1alpha1Interface
 	PromClient        prom.MonitoringV1Interface
 	KubeDBClient      kcs.KubedbV1alpha1Interface
+	CRDClient         ecs.ApiextensionsV1beta1Interface
 
 	Opt    Options
 	Config config.ClusterConfig
