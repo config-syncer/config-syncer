@@ -39,6 +39,12 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&PostgresList{},
 		&MySQL{},
 		&MySQLList{},
+		&MongoDB{},
+		&MongoDBList{},
+		&Redis{},
+		&RedisList{},
+		&Memcached{},
+		&MemcachedList{},
 	)
 	return nil
 }

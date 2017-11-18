@@ -20,10 +20,10 @@ import (
 	"encoding/json"
 	"time"
 
-	openapi "k8s.io/kube-openapi/pkg/common"
-
 	"github.com/go-openapi/spec"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/google/gofuzz"
+	openapi "k8s.io/kube-openapi/pkg/common"
 )
 
 // Time is a wrapper around time.Time which supports correct
@@ -143,6 +143,14 @@ func (t Time) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(t.UTC().Format(time.RFC3339))
+}
+
+func (t Time) MarshalJSONPB(_ *jsonpb.Marshaler) ([]byte, error) {
+	return t.MarshalJSON()
+}
+
+func (t *Time) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, jstr []byte) error {
+	return t.UnmarshalJSON(jstr)
 }
 
 func (_ Time) OpenAPIDefinition() openapi.OpenAPIDefinition {

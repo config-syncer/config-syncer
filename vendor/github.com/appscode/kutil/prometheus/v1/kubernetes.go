@@ -2,21 +2,21 @@ package v1
 
 import (
 	"errors"
-	"fmt"
-	"reflect"
 
-	"github.com/appscode/kutil"
+	"github.com/appscode/kutil/meta"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
+	"github.com/kubernetes/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 func GetGroupVersionKind(v interface{}) schema.GroupVersionKind {
-	return schema.GroupVersionKind{Group: prom.Group, Version: prom.Version, Kind: kutil.GetKind(v)}
+	return schema.GroupVersionKind{Group: prom.Group, Version: prom.Version, Kind: meta.GetKind(v)}
 }
 
 func AssignTypeKind(v interface{}) error {
-	if reflect.ValueOf(v).Kind() != reflect.Ptr {
-		return fmt.Errorf("%v must be a pointer", v)
+	_, err := conversion.EnforcePtr(v)
+	if err != nil {
+		return err
 	}
 
 	switch u := v.(type) {

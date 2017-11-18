@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	yc "github.com/appscode/go/encoding/yaml"
-	"github.com/appscode/log"
+	"github.com/appscode/go/log"
 	"github.com/ghodss/yaml"
 	"github.com/graymeta/stow"
 	"github.com/spf13/cobra"

@@ -2,6 +2,7 @@ package kubedb
 
 import (
 	"github.com/appscode/go/encoding/json/types"
+	"github.com/appscode/kutil/tools/monitoring/api"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -46,7 +47,7 @@ type PostgresSpec struct {
 	DoNotPause bool `json:"doNotPause,omitempty"`
 	// Monitor is used monitor database instance
 	// +optional
-	Monitor *MonitorSpec `json:"monitor,omitempty"`
+	Monitor *api.AgentSpec `json:"monitor,omitempty"`
 	// Compute Resources required by the sidecar container.
 	Resources core.ResourceRequirements `json:"resources,omitempty"`
 	// If specified, the pod's scheduling constraints

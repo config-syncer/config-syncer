@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	"github.com/appscode/go/encoding/json/types"
+	"github.com/appscode/kutil/tools/monitoring/api"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -25,9 +26,9 @@ type MySQL struct {
 }
 
 type MySQLSpec struct {
-	// Version of Xdb to be deployed.
+	// Version of MySQL to be deployed.
 	Version types.StrYo `json:"version,omitempty"`
-	// Number of instances to deploy for a Xdb database.
+	// Number of instances to deploy for a MySQL database.
 	Replicas int32 `json:"replicas,omitempty"`
 	// Storage spec to specify how storage shall be used.
 	Storage *core.PersistentVolumeClaimSpec `json:"storage,omitempty"`
@@ -48,7 +49,7 @@ type MySQLSpec struct {
 	DoNotPause bool `json:"doNotPause,omitempty"`
 	// Monitor is used monitor database instance
 	// +optional
-	Monitor *MonitorSpec `json:"monitor,omitempty"`
+	Monitor *api.AgentSpec `json:"monitor,omitempty"`
 	// Compute Resources required by the sidecar container.
 	Resources core.ResourceRequirements `json:"resources,omitempty"`
 	// If specified, the pod's scheduling constraints
@@ -74,6 +75,6 @@ type MySQLStatus struct {
 type MySQLList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	// Items is a list of Xdb TPR objects
-	Items []*MySQL `json:"items,omitempty"`
+	// Items is a list of MySQL TPR objects
+	Items []MySQL `json:"items,omitempty"`
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/appscode/go/flags"
-	"github.com/appscode/kutil"
+	"github.com/appscode/kutil/tools/backup"
 	"github.com/spf13/cobra"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
@@ -28,7 +28,7 @@ func NewCmdSnapshot() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			mgr := kutil.NewBackupManager(context, restConfig, sanitize)
+			mgr := backup.NewBackupManager(context, restConfig, sanitize)
 			filename, err := mgr.BackupToTar(backupDir)
 			if err != nil {
 				return err
