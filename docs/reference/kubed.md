@@ -1,3 +1,19 @@
+---
+title: Kubed
+menu:
+  product_kubed_0.3.0:
+    identifier: kubed
+    name: Kubed
+    parent: reference
+    weight: 0
+
+product_name: kubed
+left_menu: product_kubed_0.3.0
+section_menu_id: reference
+aliases:
+  - products/kubed/0.3.0/reference/
+
+---
 ## kubed
 
 Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
@@ -22,8 +38,8 @@ Kubed is a Kubernetes daemon to perform cluster management tasks. For more infor
 ```
 
 ### SEE ALSO
-* [kubed check](kubed_check.md)	 - Check cluster config
-* [kubed run](kubed_run.md)	 - Run daemon
-* [kubed snapshot](kubed_snapshot.md)	 - Takes a snapshot of Kubernetes api objects
-* [kubed version](kubed_version.md)	 - Prints binary version number.
+* [kubed check](/docs/reference/kubed_check.md)	 - Check cluster config
+* [kubed run](/docs/reference/kubed_run.md)	 - Run daemon
+* [kubed snapshot](/docs/reference/kubed_snapshot.md)	 - Takes a snapshot of Kubernetes api objects
+* [kubed version](/docs/reference/kubed_version.md)	 - Prints binary version number.
 
