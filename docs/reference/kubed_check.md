@@ -1,3 +1,14 @@
+---
+title: Kubed Check
+menu:
+  product_kubed_0.3.0:
+    identifier: kubed-check
+    name: Kubed Check
+    parent: reference
+product_name: kubed
+left_menu: product_kubed_0.3.0
+section_menu_id: reference
+---
 ## kubed check
 
 Check cluster config
@@ -32,5 +43,5 @@ kubed check [flags]
 ```
 
 ### SEE ALSO
-* [kubed](kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
+* [kubed](/docs/reference/kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
 

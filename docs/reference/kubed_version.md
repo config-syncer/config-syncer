@@ -1,3 +1,14 @@
+---
+title: Kubed Version
+menu:
+  product_kubed_0.3.0:
+    identifier: kubed-version
+    name: Kubed Version
+    parent: reference
+product_name: kubed
+left_menu: product_kubed_0.3.0
+section_menu_id: reference
+---
 ## kubed version
 
 Prints binary version number.
@@ -31,5 +42,5 @@ kubed version [flags]
 ```
 
 ### SEE ALSO
-* [kubed](kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
+* [kubed](/docs/reference/kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
 

@@ -1,3 +1,14 @@
+---
+title: Kubed Run
+menu:
+  product_kubed_0.3.0:
+    identifier: kubed-run
+    name: Kubed Run
+    parent: reference
+product_name: kubed
+left_menu: product_kubed_0.3.0
+section_menu_id: reference
+---
 ## kubed run
 
 Run daemon
@@ -38,5 +49,5 @@ kubed run [flags]
 ```
 
 ### SEE ALSO
-* [kubed](kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
+* [kubed](/docs/reference/kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
 

@@ -1,3 +1,14 @@
+---
+title: Kubed Snapshot
+menu:
+  product_kubed_0.3.0:
+    identifier: kubed-snapshot
+    name: Kubed Snapshot
+    parent: reference
+product_name: kubed
+left_menu: product_kubed_0.3.0
+section_menu_id: reference
+---
 ## kubed snapshot
 
 Takes a snapshot of Kubernetes api objects
@@ -15,7 +26,7 @@ kubed snapshot [flags]
 
 ```
       --backup-dir string   Directory where YAML files will be stored
-      --context string      The name of the kubeconfig context to use
+      --context string      Name of the kubeconfig context to use
   -h, --help                help for snapshot
       --sanitize             Sanitize fields in YAML
 ```
@@ -34,5 +45,5 @@ kubed snapshot [flags]
 ```
 
 ### SEE ALSO
-* [kubed](kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
+* [kubed](/docs/reference/kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
 
