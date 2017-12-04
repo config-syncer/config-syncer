@@ -4,7 +4,7 @@ description: Kubed Install
 menu:
   product_kubed_0.3.1:
     identifier: kubed-install
-    name: Overview
+    name: Install
     parent: getting-started
     weight: 25
 product_name: kubed

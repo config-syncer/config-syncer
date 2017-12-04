@@ -4,7 +4,7 @@ description: Kubed Uninstall
 menu:
   product_kubed_0.3.1:
     identifier: kubed-uninstall
-    name: Overview
+    name: Uninstall
     parent: getting-started
     weight: 30
 product_name: kubed
