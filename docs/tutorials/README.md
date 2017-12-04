@@ -9,7 +9,7 @@ menu:
     weight: 5
 product_name: kubed
 menu_name: product_kubed_0.3.1
-section_menu_id: getting-started
+section_menu_id: tutorials
 url: /products/kubed/0.3.1/tutorials/
 aliases:
   - /products/kubed/0.3.1/tutorials/README/

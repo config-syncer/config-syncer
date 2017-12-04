@@ -9,7 +9,7 @@ menu:
     weight: 35
 product_name: kubed
 menu_name: product_kubed_0.3.1
-section_menu_id: getting-started
+section_menu_id: tutorials
 ---
 
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
