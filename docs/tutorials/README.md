@@ -1,3 +1,20 @@
+---
+title: Overview
+description: Overview of Tutorials
+menu:
+  product_kubed_0.3.1:
+    identifier: tutorials-overview
+    name: Overview
+    parent: tutorials
+    weight: 5
+product_name: kubed
+menu_name: product_kubed_0.3.1
+section_menu_id: getting-started
+url: /products/kubed/0.3.1/tutorials/
+aliases:
+  - /products/kubed/0.3.1/tutorials/README/
+---
+
 # Tutorials
 
 This section contains tutorials on how to use Kubed. Please visit the links below to learn more:

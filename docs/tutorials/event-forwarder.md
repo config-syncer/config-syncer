@@ -1,3 +1,17 @@
+---
+title: Event Forwarder
+description: Event Forwarder
+menu:
+  product_kubed_0.3.1:
+    identifier: tutorials-event-forwarder
+    name: Event Forwarder
+    parent: tutorials
+    weight: 30
+product_name: kubed
+menu_name: product_kubed_0.3.1
+section_menu_id: getting-started
+---
+
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 # Forward Cluster Events

@@ -1,3 +1,17 @@
+---
+title: Config Syncer
+description: Config Syncer
+menu:
+  product_kubed_0.3.1:
+    identifier: tutorials-config-syncer
+    name: Config Syncer
+    parent: tutorials
+    weight: 25
+product_name: kubed
+menu_name: product_kubed_0.3.1
+section_menu_id: getting-started
+---
+
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 # Synchronize Configuration across Namespaces
