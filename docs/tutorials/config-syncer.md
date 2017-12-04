@@ -2,13 +2,13 @@
 title: Config Syncer
 description: Config Syncer
 menu:
-  product_kubed_0.3.1:
+  product_kubed_0.3.0:
     identifier: tutorials-config-syncer
     name: Config Syncer
     parent: tutorials
     weight: 25
 product_name: kubed
-menu_name: product_kubed_0.3.1
+menu_name: product_kubed_0.3.0
 section_menu_id: tutorials
 ---
 

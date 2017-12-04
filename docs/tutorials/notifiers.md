@@ -2,13 +2,13 @@
 title: Notifiers
 description: Notifiers
 menu:
-  product_kubed_0.3.1:
+  product_kubed_0.3.0:
     identifier: tutorials-notifiers
     name: Notifiers
     parent: tutorials
     weight: 20
 product_name: kubed
-menu_name: product_kubed_0.3.1
+menu_name: product_kubed_0.3.0
 section_menu_id: tutorials
 ---
 

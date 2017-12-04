@@ -2,17 +2,17 @@
 title: Kubed Install
 description: Kubed Install
 menu:
-  product_kubed_0.3.1:
+  product_kubed_0.3.0:
     identifier: kubed-install
     name: Install
     parent: getting-started
     weight: 25
 product_name: kubed
-menu_name: product_kubed_0.3.1
+menu_name: product_kubed_0.3.0
 section_menu_id: getting-started
-url: /products/kubed/0.3.1/getting-started/install/
+url: /products/kubed/0.3.0/getting-started/install/
 aliases:
-  - /products/kubed/0.3.1/install/
+  - /products/kubed/0.3.0/install/
 ---
 
 > New to Kubed? Please start [here](/docs/tutorials/README.md).

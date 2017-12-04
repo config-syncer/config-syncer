@@ -2,18 +2,18 @@
 title: Overview | Kubed
 description: Kubed Overview
 menu:
-  product_kubed_0.3.1:
+  product_kubed_0.3.0:
     identifier: kubed-overview
     name: Overview
     parent: getting-started
     weight: 20
 product_name: kubed
-menu_name: product_kubed_0.3.1
+menu_name: product_kubed_0.3.0
 section_menu_id: getting-started
-url: /products/kubed/0.3.1/getting-started/
+url: /products/kubed/0.3.0/getting-started/
 aliases:
-  - /products/kubed/0.3.1/
-  - /products/kubed/0.3.1/README/
+  - /products/kubed/0.3.0/
+  - /products/kubed/0.3.0/README/
 ---
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/appscode/kubed)](https://goreportcard.com/report/github.com/appscode/kubed)
