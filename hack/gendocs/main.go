@@ -28,7 +28,7 @@ menu:
     identifier: reference
     name: Reference
     weight: 1000
-left_menu: product_kubed_{{ .Version }}
+menu_name: product_kubed_{{ .Version }}
 ---
 `))
 
@@ -43,7 +43,7 @@ menu:
     weight: 0
 {{ end }}
 product_name: kubed
-left_menu: product_kubed_{{ .Version }}
+menu_name: product_kubed_{{ .Version }}
 section_menu_id: reference
 {{- if .RootCmd }}
 aliases:

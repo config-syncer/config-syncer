@@ -1,3 +1,20 @@
+---
+title: Overview | Developer Guide
+description: Developer Guide Overview
+menu:
+  product_kubed_0.3.0:
+    identifier: developer-guide-readme
+    name: Overview
+    parent: developer-guide
+    weight: 15
+product_name: kubed
+menu_name: product_kubed_0.3.0
+section_menu_id: developer-guide
+url: /products/kubed/0.3.0/developer-guide/
+aliases:
+  - /products/kubed/0.3.0/developer-guide/README/
+---
+
 ## Development Guide
 This document is intended to be the canonical source of truth for things like supported toolchain versions for building Kubed.
 If you find a requirement that this doc does not capture, please submit an issue on github.

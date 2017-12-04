@@ -1,3 +1,17 @@
+---
+title: Recycle Bin
+description: Recycle Bin
+menu:
+  product_kubed_0.3.0:
+    identifier: tutorials-recycle-bin
+    name: Recycle Bin
+    parent: tutorials
+    weight: 35
+product_name: kubed
+menu_name: product_kubed_0.3.0
+section_menu_id: tutorials
+---
+
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 # Kubernetes Recycle Bin

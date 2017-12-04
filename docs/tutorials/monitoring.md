@@ -1,3 +1,17 @@
+---
+title: Monitoring
+description: Monitoring
+menu:
+  product_kubed_0.3.0:
+    identifier: tutorials-monitoring
+    name: Monitoring
+    parent: tutorials
+    weight: 18
+product_name: kubed
+menu_name: product_kubed_0.3.0
+section_menu_id: tutorials
+---
+
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 # Monitoring Kubed

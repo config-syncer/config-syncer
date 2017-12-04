@@ -1,3 +1,17 @@
+---
+title: Janitors
+description: Janitors
+menu:
+  product_kubed_0.3.0:
+    identifier: tutorials-janitors
+    name: janitors
+    parent: tutorials
+    weight: 40
+product_name: kubed
+menu_name: product_kubed_0.3.0
+section_menu_id: tutorials
+---
+
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 
