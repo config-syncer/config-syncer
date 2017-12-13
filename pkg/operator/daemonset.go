@@ -68,12 +68,12 @@ func (op *Operator) WatchDaemonSets() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*extensions.DaemonSet)
 				if !ok {
-					log.Errorln(errors.New("Invalid DaemonSet object"))
+					log.Errorln(errors.New("invalid DaemonSet object"))
 					return
 				}
 				newRes, ok := new.(*extensions.DaemonSet)
 				if !ok {
-					log.Errorln(errors.New("Invalid DaemonSet object"))
+					log.Errorln(errors.New("invalid DaemonSet object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

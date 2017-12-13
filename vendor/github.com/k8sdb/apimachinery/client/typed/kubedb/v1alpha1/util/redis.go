@@ -6,8 +6,8 @@ import (
 
 	"github.com/appscode/kutil"
 	"github.com/golang/glog"
-	aci "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
-	tcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
+	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	cs "github.com/kubedb/apimachinery/client/typed/kubedb/v1alpha1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -15,14 +15,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func CreateOrPatchRedis(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *aci.Redis) *aci.Redis) (*aci.Redis, error) {
+func CreateOrPatchRedis(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Redis) *api.Redis) (*api.Redis, error) {
 	cur, err := c.Redises(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating Redis %s/%s.", meta.Namespace, meta.Name)
-		return c.Redises(meta.Namespace).Create(transform(&aci.Redis{
+		return c.Redises(meta.Namespace).Create(transform(&api.Redis{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "Redis",
-				APIVersion: aci.SchemeGroupVersion.String(),
+				APIVersion: api.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
@@ -32,7 +32,7 @@ func CreateOrPatchRedis(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, t
 	return PatchRedis(c, cur, transform)
 }
 
-func PatchRedis(c tcs.KubedbV1alpha1Interface, cur *aci.Redis, transform func(*aci.Redis) *aci.Redis) (*aci.Redis, error) {
+func PatchRedis(c cs.KubedbV1alpha1Interface, cur *api.Redis, transform func(*api.Redis) *api.Redis) (*api.Redis, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func PatchRedis(c tcs.KubedbV1alpha1Interface, cur *aci.Redis, transform func(*a
 	return result, err
 }
 
-func TryPatchRedis(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*aci.Redis) *aci.Redis) (result *aci.Redis, err error) {
+func TryPatchRedis(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Redis) *api.Redis) (result *api.Redis, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++
@@ -76,7 +76,7 @@ func TryPatchRedis(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transf
 	return
 }
 
-func TryUpdateRedis(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*aci.Redis) *aci.Redis) (result *aci.Redis, err error) {
+func TryUpdateRedis(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Redis) *api.Redis) (result *api.Redis, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++

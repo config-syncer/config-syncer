@@ -67,12 +67,12 @@ func (op *Operator) WatchReplicationControllers() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*core.ReplicationController)
 				if !ok {
-					log.Errorln(errors.New("Invalid ReplicationController object"))
+					log.Errorln(errors.New("invalid ReplicationController object"))
 					return
 				}
 				newRes, ok := new.(*core.ReplicationController)
 				if !ok {
-					log.Errorln(errors.New("Invalid ReplicationController object"))
+					log.Errorln(errors.New("invalid ReplicationController object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

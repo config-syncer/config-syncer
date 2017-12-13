@@ -117,6 +117,9 @@ func (r Ingress) IsValid(cloudProvider string) error {
 				} else {
 					nodePorts[nodePort] = ri
 				}
+				if r.Spec.Rules[ea.FirstRuleIndex].HTTP.NoTLS != rule.HTTP.NoTLS {
+					return fmt.Errorf("spec.rule[%d].http has conflicting TLS spec with spec.rule[%d].http", ri, ea.FirstRuleIndex)
+				}
 				a = ea // paths will be merged into the original one
 			} else {
 				a = &address{
@@ -358,7 +361,7 @@ func (c Certificate) IsValid(cloudProvider string) error {
 			return fmt.Errorf("no dns provider name specified")
 		}
 		if c.Spec.ChallengeProvider.DNS.CredentialSecretName == "" {
-			useCredentialFromEnv := (cloudProvider == "aws" && c.Spec.ChallengeProvider.DNS.Provider == "aws" && c.Spec.ChallengeProvider.DNS.CredentialSecretName == "") ||
+			useCredentialFromEnv := (cloudProvider == "aws" && sets.NewString("aws", "route53").Has(c.Spec.ChallengeProvider.DNS.Provider) && c.Spec.ChallengeProvider.DNS.CredentialSecretName == "") ||
 				(sets.NewString("gce", "gke").Has(cloudProvider) && sets.NewString("googlecloud", "gcloud", "gce", "gke").Has(c.Spec.ChallengeProvider.DNS.Provider) && c.Spec.ChallengeProvider.DNS.CredentialSecretName == "")
 			if !useCredentialFromEnv {
 				return fmt.Errorf("missing dns challenge provider credential")

@@ -67,12 +67,12 @@ func (op *Operator) WatchVoyagerCertificates() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*tapi.Certificate)
 				if !ok {
-					log.Errorln(errors.New("Invalid Certificate object"))
+					log.Errorln(errors.New("invalid Certificate object"))
 					return
 				}
 				newRes, ok := new.(*tapi.Certificate)
 				if !ok {
-					log.Errorln(errors.New("Invalid Certificate object"))
+					log.Errorln(errors.New("invalid Certificate object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

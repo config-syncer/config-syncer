@@ -1,5 +1,5 @@
 hash: 15c9fcec06762cbd61087ad9fba0ab985a9fdcbb88ace69331df564a0d4d8dc0
-updated: 2017-11-18T12:10:19.511850886-08:00
+updated: 2017-12-12T20:37:57.654228502-08:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -9,7 +9,7 @@ imports:
 - name: github.com/appscode/envconfig
   version: 183bbe643a2875eaa69c85627ac6b25813983203
 - name: github.com/appscode/go
-  version: 1cd97c853ad364376f9c792106deb0bfd197bca0
+  version: cb650d0b1a3c04a86595cf2a31fa704dbf1bc42a
   subpackages:
   - arrays
   - context
@@ -41,7 +41,7 @@ imports:
 - name: github.com/appscode/go-term
   version: d0c677f2d84034b1357d3f69ffd29c5fb81f662f
 - name: github.com/appscode/kutil
-  version: c7547d78847930f4b48c4e3b3d6fe1d8b0309bd7
+  version: e0c1936a0ec86173f8278752bef81964b4ffbea5
   subpackages:
   - apps/v1beta1
   - batch/v1
@@ -57,13 +57,13 @@ imports:
 - name: github.com/appscode/mergo
   version: e3000cb3d28c72b837601cac94debd91032d19fe
 - name: github.com/appscode/osm
-  version: 7b0b6f4f329d8d1ed786020d7e7ad865c61f8e7f
+  version: b3ed1c7835d33f312616b260a949589cf33311ee
   subpackages:
   - context
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 41632ce7dd0164dcab5f383dbbb069f3669f6e42
+  version: a4da37720ee3c5803522ca61d25431bce28383f5
   subpackages:
   - apis/monitoring
   - apis/monitoring/v1alpha1
@@ -73,7 +73,7 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: 84238d2c337d2ed8fd5fb7975303640b6a35f66a
+  version: 8d614880fb39315285eb044d6e682c6b567e097e
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
@@ -81,7 +81,7 @@ imports:
   - client/typed/stash/v1alpha1
   - client/typed/stash/v1alpha1/util
 - name: github.com/appscode/voyager
-  version: 3b696d3527c7b63b59db80ebd2fdb70312d25570
+  version: 7de2821423679e9cccfacc22209808bfa9e5cf18
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -185,7 +185,7 @@ imports:
   subpackages:
   - pkg/client/monitoring/v1
 - name: github.com/cpuguy83/go-md2man
-  version: 1d903dcb749992f3741d744c0f8376b4bd7eb3e1
+  version: 71acacd42f85e5e82f70a55327789582a5200a90
   subpackages:
   - md2man
 - name: github.com/davecgh/go-spew
@@ -207,7 +207,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-ini/ini
-  version: 2e44421e256d82ebbf3d4d4fcabe8930b905eff3
+  version: 20b96f641a5ea98f2f8619ff4f3e061cff4833bd
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -222,7 +222,7 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
+  version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/protobuf
   version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
@@ -235,7 +235,7 @@ imports:
 - name: github.com/google/btree
   version: 7d79101e329e5a3adf994758c578dab82b90c017
 - name: github.com/google/go-cmp
-  version: 98232909528519e571b2e69fbe546b6ef35f5780
+  version: 2c05626a068f070bd125e5fde5c4eb2acc2539f0
   subpackages:
   - cmp
   - cmp/internal/diff
@@ -248,7 +248,7 @@ imports:
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/google/uuid
-  version: 8c31c18f31ede9fc8eae72290a7e7a8064e9b3e3
+  version: dec09d789f3dba190787f8b4454c7d3c936fed9e
 - name: github.com/googleapis/gnostic
   version: 0c5108395e2debce0d731cf0287ddf7242066aba
   subpackages:
@@ -309,15 +309,20 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/k8sdb/apimachinery
-  version: dd8a840c5e36e1dcc74933f9bc5e6ae8c839b5bc
+  version: 29d9015df0562fa64b3fd149542bec4317733432
+  subpackages:
+  - apis/kubedb/v1alpha1
+  - client/typed/kubedb/v1alpha1
+  - client/typed/kubedb/v1alpha1/util
+- name: github.com/kubedb/apimachinery
+  version: 29d9015df0562fa64b3fd149542bec4317733432
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
   - client/scheme
   - client/typed/kubedb/v1alpha1
-  - client/typed/kubedb/v1alpha1/util
 - name: github.com/kubernetes/apimachinery
-  version: 18a564baac720819100827c16fdebcadb05b2d0d
+  version: a04e753f5223cf882db01ac64212682ea28767b4
   subpackages:
   - pkg/conversion
 - name: github.com/mailgun/mailgun-go
@@ -416,7 +421,7 @@ imports:
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/spf13/cobra
-  version: d6948b782c9f4799ea3cd225f6de4131c29c243a
+  version: 7b2c5ac9fc04fc5efafb60700713d4fa609b777b
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -491,14 +496,14 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: 790790d1b4a7d6b0d03d3725f980eedf80dc2707
+  version: 8cfdc57a0663729cc2811afefb5b7cd3d901e97c
   subpackages:
   - gensupport
   - googleapi
   - googleapi/internal/uritemplates
   - storage/v1
 - name: google.golang.org/appengine
-  version: 9d8544a6b2c7df9cff240fcf92d7b2f59bc13416
+  version: 4f7eeb5305a4ba1966344836ba4af9996b7b4e05
   subpackages:
   - internal
   - internal/app_identity
@@ -527,7 +532,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/api
-  version: 4df58c811fe2e65feb879227b2b245e4dc26e7ad
+  version: 9b9dca205a15b6ce9ef10091f05d60a13fdcf418
   subpackages:
   - admissionregistration/v1alpha1
   - apps/v1beta1
@@ -554,7 +559,7 @@ imports:
   - storage/v1
   - storage/v1beta1
 - name: k8s.io/apiextensions-apiserver
-  version: 5bc0d8f05a92b3a09bcf1a9db442a29c0b7a514d
+  version: 996a70a27a0dcf53642ca52601b9107cb2ad810a
   subpackages:
   - pkg/apis/apiextensions
   - pkg/apis/apiextensions/v1beta1

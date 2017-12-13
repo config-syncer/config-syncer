@@ -68,12 +68,12 @@ func (op *Operator) WatchStatefulSets() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*apps.StatefulSet)
 				if !ok {
-					log.Errorln(errors.New("Invalid StatefulSet object"))
+					log.Errorln(errors.New("invalid StatefulSet object"))
 					return
 				}
 				newRes, ok := new.(*apps.StatefulSet)
 				if !ok {
-					log.Errorln(errors.New("Invalid StatefulSet object"))
+					log.Errorln(errors.New("invalid StatefulSet object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

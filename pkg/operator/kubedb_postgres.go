@@ -68,12 +68,12 @@ func (op *Operator) WatchPostgreses() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*tapi.Postgres)
 				if !ok {
-					log.Errorln(errors.New("Invalid Postgres object"))
+					log.Errorln(errors.New("invalid Postgres object"))
 					return
 				}
 				newRes, ok := new.(*tapi.Postgres)
 				if !ok {
-					log.Errorln(errors.New("Invalid Postgres object"))
+					log.Errorln(errors.New("invalid Postgres object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

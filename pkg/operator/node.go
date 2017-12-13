@@ -77,12 +77,12 @@ func (op *Operator) WatchNodes() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*core.Node)
 				if !ok {
-					log.Errorln(errors.New("Invalid Node object"))
+					log.Errorln(errors.New("invalid Node object"))
 					return
 				}
 				newRes, ok := new.(*core.Node)
 				if !ok {
-					log.Errorln(errors.New("Invalid Node object"))
+					log.Errorln(errors.New("invalid Node object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

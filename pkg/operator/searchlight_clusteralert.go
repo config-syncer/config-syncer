@@ -68,12 +68,12 @@ func (op *Operator) WatchClusterAlerts() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*tapi.ClusterAlert)
 				if !ok {
-					log.Errorln(errors.New("Invalid ClusterAlert object"))
+					log.Errorln(errors.New("invalid ClusterAlert object"))
 					return
 				}
 				newRes, ok := new.(*tapi.ClusterAlert)
 				if !ok {
-					log.Errorln(errors.New("Invalid ClusterAlert object"))
+					log.Errorln(errors.New("invalid ClusterAlert object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

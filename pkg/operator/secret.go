@@ -73,12 +73,12 @@ func (op *Operator) WatchSecrets() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*core.Secret)
 				if !ok {
-					log.Errorln(errors.New("Invalid Secret object"))
+					log.Errorln(errors.New("invalid Secret object"))
 					return
 				}
 				newRes, ok := new.(*core.Secret)
 				if !ok {
-					log.Errorln(errors.New("Invalid Secret object"))
+					log.Errorln(errors.New("invalid Secret object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

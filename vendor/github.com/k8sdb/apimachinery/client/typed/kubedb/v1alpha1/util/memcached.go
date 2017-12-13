@@ -6,8 +6,8 @@ import (
 
 	"github.com/appscode/kutil"
 	"github.com/golang/glog"
-	aci "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
-	tcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
+	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	cs "github.com/kubedb/apimachinery/client/typed/kubedb/v1alpha1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -15,14 +15,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func CreateOrPatchMemcached(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *aci.Memcached) *aci.Memcached) (*aci.Memcached, error) {
+func CreateOrPatchMemcached(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Memcached) *api.Memcached) (*api.Memcached, error) {
 	cur, err := c.Memcacheds(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating Memcached %s/%s.", meta.Namespace, meta.Name)
-		return c.Memcacheds(meta.Namespace).Create(transform(&aci.Memcached{
+		return c.Memcacheds(meta.Namespace).Create(transform(&api.Memcached{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "Memcached",
-				APIVersion: aci.SchemeGroupVersion.String(),
+				APIVersion: api.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
@@ -32,7 +32,7 @@ func CreateOrPatchMemcached(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMet
 	return PatchMemcached(c, cur, transform)
 }
 
-func PatchMemcached(c tcs.KubedbV1alpha1Interface, cur *aci.Memcached, transform func(*aci.Memcached) *aci.Memcached) (*aci.Memcached, error) {
+func PatchMemcached(c cs.KubedbV1alpha1Interface, cur *api.Memcached, transform func(*api.Memcached) *api.Memcached) (*api.Memcached, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func PatchMemcached(c tcs.KubedbV1alpha1Interface, cur *aci.Memcached, transform
 	return result, err
 }
 
-func TryPatchMemcached(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*aci.Memcached) *aci.Memcached) (result *aci.Memcached, err error) {
+func TryPatchMemcached(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Memcached) *api.Memcached) (result *api.Memcached, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++
@@ -76,7 +76,7 @@ func TryPatchMemcached(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, tr
 	return
 }
 
-func TryUpdateMemcached(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*aci.Memcached) *aci.Memcached) (result *aci.Memcached, err error) {
+func TryUpdateMemcached(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Memcached) *api.Memcached) (result *api.Memcached, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++

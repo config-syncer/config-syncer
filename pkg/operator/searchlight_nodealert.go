@@ -68,12 +68,12 @@ func (op *Operator) WatchNodeAlerts() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*tapi.NodeAlert)
 				if !ok {
-					log.Errorln(errors.New("Invalid NodeAlert object"))
+					log.Errorln(errors.New("invalid NodeAlert object"))
 					return
 				}
 				newRes, ok := new.(*tapi.NodeAlert)
 				if !ok {
-					log.Errorln(errors.New("Invalid NodeAlert object"))
+					log.Errorln(errors.New("invalid NodeAlert object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

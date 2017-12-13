@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/appscode/kutil/meta"
-	"github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
+	"github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	"github.com/kubernetes/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )

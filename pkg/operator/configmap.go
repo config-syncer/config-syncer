@@ -73,12 +73,12 @@ func (op *Operator) WatchConfigMaps() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*core.ConfigMap)
 				if !ok {
-					log.Errorln(errors.New("Invalid ConfigMap object"))
+					log.Errorln(errors.New("invalid ConfigMap object"))
 					return
 				}
 				newRes, ok := new.(*core.ConfigMap)
 				if !ok {
-					log.Errorln(errors.New("Invalid ConfigMap object"))
+					log.Errorln(errors.New("invalid ConfigMap object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

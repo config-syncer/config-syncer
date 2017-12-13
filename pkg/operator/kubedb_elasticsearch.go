@@ -68,12 +68,12 @@ func (op *Operator) WatchElasticsearches() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*tapi.Elasticsearch)
 				if !ok {
-					log.Errorln(errors.New("Invalid Elasticsearch object"))
+					log.Errorln(errors.New("invalid Elasticsearch object"))
 					return
 				}
 				newRes, ok := new.(*tapi.Elasticsearch)
 				if !ok {
-					log.Errorln(errors.New("Invalid Elasticsearch object"))
+					log.Errorln(errors.New("invalid Elasticsearch object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

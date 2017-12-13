@@ -77,12 +77,12 @@ func (op *Operator) WatchPersistentVolumes() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*core.PersistentVolume)
 				if !ok {
-					log.Errorln(errors.New("Invalid PersistentVolume object"))
+					log.Errorln(errors.New("invalid PersistentVolume object"))
 					return
 				}
 				newRes, ok := new.(*core.PersistentVolume)
 				if !ok {
-					log.Errorln(errors.New("Invalid PersistentVolume object"))
+					log.Errorln(errors.New("invalid PersistentVolume object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

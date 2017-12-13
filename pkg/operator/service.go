@@ -85,12 +85,12 @@ func (op *Operator) watchService() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*core.Service)
 				if !ok {
-					log.Errorln(errors.New("Invalid Service object"))
+					log.Errorln(errors.New("invalid Service object"))
 					return
 				}
 				newRes, ok := new.(*core.Service)
 				if !ok {
-					log.Errorln(errors.New("Invalid Service object"))
+					log.Errorln(errors.New("invalid Service object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)
