@@ -68,12 +68,12 @@ func (op *Operator) WatchPodAlerts() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*tapi.PodAlert)
 				if !ok {
-					log.Errorln(errors.New("Invalid PodAlert object"))
+					log.Errorln(errors.New("invalid PodAlert object"))
 					return
 				}
 				newRes, ok := new.(*tapi.PodAlert)
 				if !ok {
-					log.Errorln(errors.New("Invalid PodAlert object"))
+					log.Errorln(errors.New("invalid PodAlert object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

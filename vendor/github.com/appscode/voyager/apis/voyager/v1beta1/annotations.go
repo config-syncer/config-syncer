@@ -244,6 +244,9 @@ const (
 	// https://www.haproxy.com/documentation/aloha/7-0/haproxy/healthchecks/
 	CheckHealth     = EngressKey + "/" + "check"
 	CheckHealthPort = EngressKey + "/" + "check-port"
+
+	// https://github.com/kubernetes/ingress-nginx/blob/master/docs/examples/rewrite/README.md
+	RewriteTarget = IngressKey + "/" + "rewrite-target"
 )
 
 const (
@@ -382,8 +385,7 @@ func (r Ingress) SSLRedirect() bool {
 	if err == nil && !v {
 		return false
 	}
-	// Sets the global value of redirects (301) to HTTPS if the server has a TLS certificate (defined in an Ingress rule) Default is "true".
-	return r.explicitPodPorts().Has(443)
+	return true
 }
 
 func (r Ingress) ForceSSLRedirect() bool {
@@ -576,6 +578,10 @@ func (r Ingress) BasicAuthEnabled() bool {
 	}
 
 	return true
+}
+
+func (r Ingress) RewriteTarget() string {
+	return meta.GetString(r.Annotations, RewriteTarget)
 }
 
 func (r Ingress) AuthRealm() string {

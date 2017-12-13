@@ -68,12 +68,12 @@ func (op *Operator) WatchDormantDatabases() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*tapi.DormantDatabase)
 				if !ok {
-					log.Errorln(errors.New("Invalid DormantDatabase object"))
+					log.Errorln(errors.New("invalid DormantDatabase object"))
 					return
 				}
 				newRes, ok := new.(*tapi.DormantDatabase)
 				if !ok {
-					log.Errorln(errors.New("Invalid DormantDatabase object"))
+					log.Errorln(errors.New("invalid DormantDatabase object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

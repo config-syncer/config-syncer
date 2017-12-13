@@ -6,8 +6,8 @@ import (
 
 	"github.com/appscode/kutil"
 	"github.com/golang/glog"
-	aci "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
-	tcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
+	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	cs "github.com/kubedb/apimachinery/client/typed/kubedb/v1alpha1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -15,18 +15,18 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func EnsurePostgres(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *aci.Postgres) *aci.Postgres) (*aci.Postgres, error) {
+func EnsurePostgres(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Postgres) *api.Postgres) (*api.Postgres, error) {
 	return CreateOrPatchPostgres(c, meta, transform)
 }
 
-func CreateOrPatchPostgres(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *aci.Postgres) *aci.Postgres) (*aci.Postgres, error) {
+func CreateOrPatchPostgres(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Postgres) *api.Postgres) (*api.Postgres, error) {
 	cur, err := c.Postgreses(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating Postgres %s/%s.", meta.Namespace, meta.Name)
-		return c.Postgreses(meta.Namespace).Create(transform(&aci.Postgres{
+		return c.Postgreses(meta.Namespace).Create(transform(&api.Postgres{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "Postgres",
-				APIVersion: aci.SchemeGroupVersion.String(),
+				APIVersion: api.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
@@ -36,7 +36,7 @@ func CreateOrPatchPostgres(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta
 	return PatchPostgres(c, cur, transform)
 }
 
-func PatchPostgres(c tcs.KubedbV1alpha1Interface, cur *aci.Postgres, transform func(*aci.Postgres) *aci.Postgres) (*aci.Postgres, error) {
+func PatchPostgres(c cs.KubedbV1alpha1Interface, cur *api.Postgres, transform func(*api.Postgres) *api.Postgres) (*api.Postgres, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func PatchPostgres(c tcs.KubedbV1alpha1Interface, cur *aci.Postgres, transform f
 	return result, err
 }
 
-func TryPatchPostgres(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*aci.Postgres) *aci.Postgres) (result *aci.Postgres, err error) {
+func TryPatchPostgres(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Postgres) *api.Postgres) (result *api.Postgres, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++
@@ -80,7 +80,7 @@ func TryPatchPostgres(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, tra
 	return
 }
 
-func TryUpdatePostgres(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*aci.Postgres) *aci.Postgres) (result *aci.Postgres, err error) {
+func TryUpdatePostgres(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Postgres) *api.Postgres) (result *api.Postgres, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++

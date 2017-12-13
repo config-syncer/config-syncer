@@ -67,12 +67,12 @@ func (op *Operator) WatchRestics() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*tapi.Restic)
 				if !ok {
-					log.Errorln(errors.New("Invalid Restic object"))
+					log.Errorln(errors.New("invalid Restic object"))
 					return
 				}
 				newRes, ok := new.(*tapi.Restic)
 				if !ok {
-					log.Errorln(errors.New("Invalid Restic object"))
+					log.Errorln(errors.New("invalid Restic object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

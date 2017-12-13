@@ -68,12 +68,12 @@ func (op *Operator) WatchReplicaSets() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*extensions.ReplicaSet)
 				if !ok {
-					log.Errorln(errors.New("Invalid ReplicaSet object"))
+					log.Errorln(errors.New("invalid ReplicaSet object"))
 					return
 				}
 				newRes, ok := new.(*extensions.ReplicaSet)
 				if !ok {
-					log.Errorln(errors.New("Invalid ReplicaSet object"))
+					log.Errorln(errors.New("invalid ReplicaSet object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

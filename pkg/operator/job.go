@@ -69,12 +69,12 @@ func (op *Operator) WatchJobs() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*batch.Job)
 				if !ok {
-					log.Errorln(errors.New("Invalid Job object"))
+					log.Errorln(errors.New("invalid Job object"))
 					return
 				}
 				newRes, ok := new.(*batch.Job)
 				if !ok {
-					log.Errorln(errors.New("Invalid Job object"))
+					log.Errorln(errors.New("invalid Job object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)

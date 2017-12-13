@@ -621,8 +621,10 @@ func (c *Command) Root() *Command {
 	return c
 }
 
-// ArgsLenAtDash will return the length of c.Flags().Args at the moment
-// when a -- was found during args parsing.
+// ArgsLenAtDash will return the length of f.Args at the moment when a -- was
+// found during arg parsing. This allows your program to know which args were
+// before the -- and which came after. (Description from
+// https://godoc.org/github.com/spf13/pflag#FlagSet.ArgsLenAtDash).
 func (c *Command) ArgsLenAtDash() int {
 	return c.Flags().ArgsLenAtDash()
 }
@@ -875,7 +877,7 @@ Simply type ` + c.Name() + ` help [path to command] for full details.`,
 	c.AddCommand(c.helpCommand)
 }
 
-// ResetCommands delete parent, subcommand and help command from c.
+// ResetCommands used for testing.
 func (c *Command) ResetCommands() {
 	c.parent = nil
 	c.commands = nil
@@ -1161,7 +1163,7 @@ func (c *Command) HasAvailableSubCommands() bool {
 		}
 	}
 
-	// the command either has no sub commands, or no available (non deprecated/help/hidden)
+	// the command either has no sub comamnds, or no available (non deprecated/help/hidden)
 	// sub commands
 	return false
 }
@@ -1271,7 +1273,7 @@ func (c *Command) PersistentFlags() *flag.FlagSet {
 	return c.pflags
 }
 
-// ResetFlags deletes all flags from command.
+// ResetFlags is used in testing.
 func (c *Command) ResetFlags() {
 	c.flagErrorBuf = new(bytes.Buffer)
 	c.flagErrorBuf.Reset()

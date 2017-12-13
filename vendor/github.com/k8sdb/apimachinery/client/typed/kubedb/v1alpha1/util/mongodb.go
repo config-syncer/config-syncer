@@ -6,8 +6,8 @@ import (
 
 	"github.com/appscode/kutil"
 	"github.com/golang/glog"
-	aci "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
-	tcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
+	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	cs "github.com/kubedb/apimachinery/client/typed/kubedb/v1alpha1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -15,14 +15,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func CreateOrPatchMongoDB(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *aci.MongoDB) *aci.MongoDB) (*aci.MongoDB, error) {
+func CreateOrPatchMongoDB(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.MongoDB) *api.MongoDB) (*api.MongoDB, error) {
 	cur, err := c.MongoDBs(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating MongoDB %s/%s.", meta.Namespace, meta.Name)
-		return c.MongoDBs(meta.Namespace).Create(transform(&aci.MongoDB{
+		return c.MongoDBs(meta.Namespace).Create(transform(&api.MongoDB{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "MongoDB",
-				APIVersion: aci.SchemeGroupVersion.String(),
+				APIVersion: api.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
@@ -32,7 +32,7 @@ func CreateOrPatchMongoDB(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta,
 	return PatchMongoDB(c, cur, transform)
 }
 
-func PatchMongoDB(c tcs.KubedbV1alpha1Interface, cur *aci.MongoDB, transform func(*aci.MongoDB) *aci.MongoDB) (*aci.MongoDB, error) {
+func PatchMongoDB(c cs.KubedbV1alpha1Interface, cur *api.MongoDB, transform func(*api.MongoDB) *api.MongoDB) (*api.MongoDB, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func PatchMongoDB(c tcs.KubedbV1alpha1Interface, cur *aci.MongoDB, transform fun
 	return result, err
 }
 
-func TryPatchMongoDB(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*aci.MongoDB) *aci.MongoDB) (result *aci.MongoDB, err error) {
+func TryPatchMongoDB(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.MongoDB) *api.MongoDB) (result *api.MongoDB, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++
@@ -76,7 +76,7 @@ func TryPatchMongoDB(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, tran
 	return
 }
 
-func TryUpdateMongoDB(c tcs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*aci.MongoDB) *aci.MongoDB) (result *aci.MongoDB, err error) {
+func TryUpdateMongoDB(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.MongoDB) *api.MongoDB) (result *api.MongoDB, err error) {
 	attempt := 0
 	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
 		attempt++

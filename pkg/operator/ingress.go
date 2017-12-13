@@ -78,12 +78,12 @@ func (op *Operator) WatchIngresses() {
 			UpdateFunc: func(old, new interface{}) {
 				oldRes, ok := old.(*extensions.Ingress)
 				if !ok {
-					log.Errorln(errors.New("Invalid Ingress object"))
+					log.Errorln(errors.New("invalid Ingress object"))
 					return
 				}
 				newRes, ok := new.(*extensions.Ingress)
 				if !ok {
-					log.Errorln(errors.New("Invalid Ingress object"))
+					log.Errorln(errors.New("invalid Ingress object"))
 					return
 				}
 				kutil.AssignTypeKind(oldRes)
