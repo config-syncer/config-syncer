@@ -5,7 +5,7 @@ import (
 
 	"github.com/appscode/kutil/meta"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	"github.com/kubernetes/apimachinery/pkg/conversion"
+	"k8s.io/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 

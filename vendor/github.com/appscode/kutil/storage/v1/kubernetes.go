@@ -4,13 +4,13 @@ import (
 	"errors"
 
 	"github.com/appscode/kutil/meta"
-	"github.com/kubernetes/apimachinery/pkg/conversion"
-	storagev1 "k8s.io/api/storage/v1"
+	"k8s.io/apimachinery/pkg/conversion"
+	storage "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 func GetGroupVersionKind(v interface{}) schema.GroupVersionKind {
-	return storagev1.SchemeGroupVersion.WithKind(meta.GetKind(v))
+	return storage.SchemeGroupVersion.WithKind(meta.GetKind(v))
 }
 
 func AssignTypeKind(v interface{}) error {
@@ -20,8 +20,8 @@ func AssignTypeKind(v interface{}) error {
 	}
 
 	switch u := v.(type) {
-	case *storagev1.StorageClass:
-		u.APIVersion = storagev1.SchemeGroupVersion.String()
+	case *storage.StorageClass:
+		u.APIVersion = storage.SchemeGroupVersion.String()
 		u.Kind = meta.GetKind(v)
 		return nil
 	}

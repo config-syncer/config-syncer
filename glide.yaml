@@ -4,8 +4,6 @@ import:
   version: master
 - package: github.com/appscode/go-notify
   version: master
-- package: github.com/appscode/go-term
-  version: master
 - package: github.com/appscode/go
   version: master
 - package: github.com/appscode/kutil
