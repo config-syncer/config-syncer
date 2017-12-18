@@ -6,9 +6,10 @@ import (
 )
 
 const (
-	TimestampFormat = "20060102T150405"
-	ConfigSyncKey   = "kubed.appscode.com/sync"
-	ConfigOriginKey = "kubed.appscode.com/origin"
+	TimestampFormat      = "20060102T150405"
+	ConfigSyncKey        = "kubed.appscode.com/sync"
+	ConfigSyncNsSelector = "kubed.appscode.com/sync-namespace-selector"
+	ConfigOriginKey      = "kubed.appscode.com/origin"
 
 	JanitorElasticsearch = "Elasticsearch"
 	JanitorInfluxDB      = "InfluxDB"
