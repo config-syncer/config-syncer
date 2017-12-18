@@ -45,7 +45,7 @@ metadata:
 type: Opaque
 ```
 
-Now, to receiver notifications via Hipchat, configure receiver as below:
+Now, to receive notifications via Hipchat, configure receiver as below:
  - notifier: `Hipchat`
  - to: a list of chat room names
 
@@ -103,7 +103,7 @@ metadata:
 type: Opaque
 ```
 
-Now, to receiver notifications via Mailgun, configure receiver as below:
+Now, to receive notifications via Mailgun, configure receiver as below:
  - notifier: `Mailgun`
  - to: a list of email addresses
 
@@ -160,7 +160,7 @@ $ echo -n 'your-gmail-password' > SMTP_PASSWORD
 $ echo -n 'your-gmail-address' > SMTP_FROM
 ```
 
-Now, to receiver notifications via SMTP, configure receiver as below:
+Now, to receive notifications via SMTP, configure receiver as below:
  - notifier: `SMTP`
  - to: a list of email addresses
 
@@ -214,7 +214,7 @@ metadata:
 type: Opaque
 ```
 
-Now, to receiver notifications via SMTP, configure receiver as below:
+Now, to receive notifications via Twilio, configure receiver as below:
  - notifier: `Twilio`
  - to: a list of receiver mobile numbers
 
@@ -260,7 +260,7 @@ metadata:
 type: Opaque
 ```
 
-Now, to receiver notifications via Hipchat, configure receiver as below:
+Now, to receive notifications via Slack, configure receiver as below:
  - notifier: `Slack`
  - to: a list of chat room names
 
@@ -314,7 +314,7 @@ metadata:
 type: Opaque
 ```
 
-Now, to receiver notifications via SMTP, configure receiver as below:
+Now, to receive notifications via Plivo, configure receiver as below:
  - notifier: `Plivo`
  - to: a list of receiver mobile numbers
 
@@ -385,7 +385,7 @@ metadata:
 type: Opaque
 ```
 
-Now, to receiver notifications via Pushover.net, configure receiver as below:
+Now, to receive notifications via Pushover.net, configure receiver as below:
  - notifier: `Pushover`
  - to: a list of devices where notifications will be sent. If list is empty, all devices will be notified.
 
