@@ -62,7 +62,7 @@ var _ = Describe("Config-syncer", func() {
 		f.EventuallyNamespaceDeleted(nsWithLabel.Name).Should(BeTrue())
 	})
 
-	FDescribe("ConfigMap Syncer Test", func() {
+	Describe("ConfigMap Syncer Test", func() {
 		It("Should add configmap to all namespaces", func() {
 			By("Creating configmap")
 			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
@@ -94,7 +94,7 @@ var _ = Describe("Config-syncer", func() {
 		})
 	})
 
-	FDescribe("ConfigMap Syncer With Namespace Selector", func() {
+	Describe("ConfigMap Syncer With Namespace Selector", func() {
 		It("Should add configmap to selected namespaces", func() {
 			By("Creating configmap")
 			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
@@ -146,7 +146,7 @@ var _ = Describe("Config-syncer", func() {
 		})
 	})
 
-	FDescribe("ConfigMap Syncer With Wrong Namespace Selector", func() {
+	Describe("ConfigMap Syncer With Wrong Namespace Selector", func() {
 		It("Should add configmap to selected namespaces", func() {
 			By("Creating configmap")
 			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)

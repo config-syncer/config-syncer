@@ -62,7 +62,7 @@ var _ = Describe("Secret-syncer", func() {
 		f.EventuallyNamespaceDeleted(nsWithLabel.Name).Should(BeTrue())
 	})
 
-	FDescribe("Secret Syncer Test", func() {
+	Describe("Secret Syncer Test", func() {
 		It("Should add secret to all namespaces", func() {
 			By("Creating secret")
 			c, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
@@ -94,7 +94,7 @@ var _ = Describe("Secret-syncer", func() {
 		})
 	})
 
-	FDescribe("Secret Syncer With Namespace Selector", func() {
+	Describe("Secret Syncer With Namespace Selector", func() {
 		It("Should add secret to selected namespaces", func() {
 			By("Creating secret")
 			c, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
@@ -146,7 +146,7 @@ var _ = Describe("Secret-syncer", func() {
 		})
 	})
 
-	FDescribe("Secret Syncer With Wrong Namespace Selector", func() {
+	Describe("Secret Syncer With Wrong Namespace Selector", func() {
 		It("Should add secret to selected namespaces", func() {
 			By("Creating secret")
 			c, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
