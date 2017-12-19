@@ -1,8 +1,6 @@
 package e2e
 
 import (
-	"time"
-
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/test/framework"
@@ -10,8 +8,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
+	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 )
 
 var _ = Describe("Config-syncer", func() {
@@ -45,7 +43,7 @@ var _ = Describe("Config-syncer", func() {
 
 		nsWithLabel = &core.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: rand.WithUniqSuffix("kubed-test-label"),
+				Name: rand.WithUniqSuffix("kubed-e2e-labeled"),
 				Labels: map[string]string{
 					"app": f.App(),
 				},
@@ -54,24 +52,17 @@ var _ = Describe("Config-syncer", func() {
 	})
 
 	AfterEach(func() {
-		cfgMaps, err := f.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
-			LabelSelector: labels.Set{
-				"app": f.App(),
-			}.String(),
-		})
-		Expect(err).NotTo(HaveOccurred())
+		f.DeleteAllConfigmaps()
 
-		for _, value := range cfgMaps.Items {
-			err := f.KubeClient.CoreV1().ConfigMaps(value.Namespace).Delete(value.Name, &metav1.DeleteOptions{})
-			Expect(err).NotTo(HaveOccurred())
+		err := f.KubeClient.CoreV1().Namespaces().Delete(nsWithLabel.Name, &metav1.DeleteOptions{})
+		if kerr.IsNotFound(err) {
+			err = nil
 		}
-
-		err = f.KubeClient.CoreV1().Namespaces().Delete(nsWithLabel.Name, &metav1.DeleteOptions{})
-		time.Sleep(time.Minute) // time to delete namespace. Is there any WaitUntilNamespaceDeleted?
-		// Expect(err).NotTo(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
+		f.EventuallyNamespaceDeleted(nsWithLabel.Name).Should(BeTrue())
 	})
 
-	Describe("ConfigMap Syncer Test", func() {
+	FDescribe("ConfigMap Syncer Test", func() {
 		It("Should add configmap to all namespaces", func() {
 			By("Creating configmap")
 			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
@@ -103,7 +94,7 @@ var _ = Describe("Config-syncer", func() {
 		})
 	})
 
-	Describe("ConfigMap Syncer With Namespace Selector", func() {
+	FDescribe("ConfigMap Syncer With Namespace Selector", func() {
 		It("Should add configmap to selected namespaces", func() {
 			By("Creating configmap")
 			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
@@ -155,7 +146,7 @@ var _ = Describe("Config-syncer", func() {
 		})
 	})
 
-	Describe("ConfigMap Syncer With Wrong Namespace Selector", func() {
+	FDescribe("ConfigMap Syncer With Wrong Namespace Selector", func() {
 		It("Should add configmap to selected namespaces", func() {
 			By("Creating configmap")
 			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
