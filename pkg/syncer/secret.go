@@ -78,7 +78,7 @@ func (s *ConfigSyncer) SyncSecret(oldSrc, newSrc *core.Secret) error {
 	return nil
 }
 
-func (s *ConfigSyncer) SyncSecretIntoNamespace(src *core.Secret, namespace *core.Namespace) error {
+func (s *ConfigSyncer) syncSecretIntoNamespace(src *core.Secret, namespace *core.Namespace) error {
 	opt, err := getSyncOption(src.Annotations)
 	if err != nil {
 		return err

@@ -28,7 +28,7 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 		return err
 	}
 	for _, configMap := range configMaps.Items {
-		s.SyncConfigMapIntoNamespace(&configMap, ns) // ignore error ?
+		s.syncConfigMapIntoNamespace(&configMap, ns) // ignore error ?
 	}
 
 	secrets, err := s.KubeClient.CoreV1().Secrets(core.NamespaceAll).List(metav1.ListOptions{})
@@ -36,7 +36,7 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 		return err
 	}
 	for _, secret := range secrets.Items {
-		s.upsertSecret(&secret, namespace)
+		s.syncSecretIntoNamespace(&secret, ns)
 	}
 	return nil
 }

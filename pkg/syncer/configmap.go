@@ -78,7 +78,7 @@ func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *core.ConfigMap) error {
 	return nil
 }
 
-func (s *ConfigSyncer) SyncConfigMapIntoNamespace(src *core.ConfigMap, namespace *core.Namespace) error {
+func (s *ConfigSyncer) syncConfigMapIntoNamespace(src *core.ConfigMap, namespace *core.Namespace) error {
 	opt, err := getSyncOption(src.Annotations)
 	if err != nil {
 		return err

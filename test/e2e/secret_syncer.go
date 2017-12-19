@@ -72,7 +72,7 @@ var _ = Describe("Secret-syncer", func() {
 	})
 
 	Describe("Secret Syncer Test", func() {
-		FIt("Should add secret to all namespaces", func() {
+		It("Should add secret to all namespaces", func() {
 			By("Creating secret")
 			c, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
 			Expect(err).NotTo(HaveOccurred())
@@ -143,6 +143,58 @@ var _ = Describe("Secret-syncer", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
+
+			By("Removing selector annotation")
+			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncNsSelector, "")
+				return obj
+			})
+			Expect(err).ShouldNot(HaveOccurred())
+			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+		})
+	})
+
+	Describe("Secret Syncer With Wrong Namespace Selector", func() {
+		It("Should add secret to selected namespaces", func() {
+			By("Creating secret")
+			c, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
+			Expect(err).NotTo(HaveOccurred())
+			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
+
+			By("Adding sync annotation")
+			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "true")
+				return obj
+			})
+			Expect(err).ShouldNot(HaveOccurred())
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Adding selector annotation")
+			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncNsSelector, "app=do-not-match")
+				return obj
+			})
+			Expect(err).ShouldNot(HaveOccurred())
+			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
+
+			By("Creating new namespace with label")
+			_, err = root.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
+			Expect(err).ShouldNot(HaveOccurred())
+			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
+
+			By("Changing selector annotation")
+			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncNsSelector, "app="+f.App())
+				return obj
+			})
+			Expect(err).NotTo(HaveOccurred())
+			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfSecrets(nsWithLabel.Name).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 2))
 
 			By("Removing selector annotation")
 			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {

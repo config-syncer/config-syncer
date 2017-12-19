@@ -154,4 +154,56 @@ var _ = Describe("Config-syncer", func() {
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
 		})
 	})
+
+	Describe("ConfigMap Syncer With Wrong Namespace Selector", func() {
+		It("Should add configmap to selected namespaces", func() {
+			By("Creating configmap")
+			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
+			Expect(err).NotTo(HaveOccurred())
+			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
+
+			By("Adding sync annotation")
+			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "true")
+				return obj
+			})
+			Expect(err).ShouldNot(HaveOccurred())
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Adding selector annotation")
+			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncNsSelector, "app=don-not-match"+f.App())
+				return obj
+			})
+			Expect(err).NotTo(HaveOccurred())
+			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
+
+			By("Creating new namespace with label")
+			_, err = root.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
+			Expect(err).ShouldNot(HaveOccurred())
+			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
+
+			By("Changing selector annotation")
+			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncNsSelector, "app="+f.App())
+				return obj
+			})
+			Expect(err).ShouldNot(HaveOccurred())
+			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfConfigmaps(nsWithLabel.Name).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 2))
+
+			By("Removing selector annotation")
+			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncNsSelector, "")
+				return obj
+			})
+			Expect(err).ShouldNot(HaveOccurred())
+			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+		})
+	})
 })
