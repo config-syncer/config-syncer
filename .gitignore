@@ -32,3 +32,4 @@ _testmain.go
 dist/
 .vscode/
 hack/docker/osm
+test/e2e/report.xml
