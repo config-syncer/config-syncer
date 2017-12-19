@@ -16,7 +16,7 @@ var (
 	root *framework.Framework
 )
 
-func TestE2ESuit(t *testing.T) {
+func RunE2ETestSuit(t *testing.T) {
 	RegisterFailHandler(Fail)
 	SetDefaultEventuallyTimeout(TestTimeout)
 

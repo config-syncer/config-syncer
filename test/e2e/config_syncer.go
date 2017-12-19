@@ -87,7 +87,7 @@ var _ = Describe("Config-syncer", func() {
 				}
 				_, err = root.KubeClient.CoreV1().Namespaces().Create(namespace)
 				Expect(err).ShouldNot(HaveOccurred())
-				f.EventuallyNumOfConfigmaps(namespace).Should(BeNumerically("==", 1))
+				f.EventuallyNumOfConfigmaps(namespace.Name).Should(BeNumerically("==", 1))
 
 				f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
 

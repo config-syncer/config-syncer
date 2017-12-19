@@ -5,5 +5,5 @@ import (
 )
 
 func TestE2E(t *testing.T) {
-	TestE2ESuit(t)
+	RunE2ETestSuit(t)
 }
