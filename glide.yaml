@@ -7,7 +7,7 @@ import:
 - package: github.com/appscode/go
   version: master
 - package: github.com/appscode/kutil
-  version: release-5.0
+  version: master
 - package: github.com/appscode/osm
   version: master
 - package: github.com/appscode/pat

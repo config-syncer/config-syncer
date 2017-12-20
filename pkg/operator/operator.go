@@ -116,7 +116,10 @@ func (op *Operator) Setup() error {
 	}
 
 	if op.Config.EnableConfigSyncer {
-		op.ConfigSyncer = &syncer.ConfigSyncer{KubeClient: op.KubeClient}
+		op.ConfigSyncer = &syncer.ConfigSyncer{
+			KubeClient:         op.KubeClient,
+			ExternalKubeConfig: op.Config.ExternalKubeConfig,
+		}
 	}
 
 	op.Cron = cron.New()

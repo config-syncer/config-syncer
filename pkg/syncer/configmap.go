@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 
 	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kutil/tools/clientcmd"
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/kubernetes"
 )
 
 func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *core.ConfigMap) error {
@@ -26,6 +28,10 @@ func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *core.ConfigMap) error {
 		}
 	}
 
+	if err = s.syncConfigMapIntoContexts(newSrc, oldOpt.contexts, newOpt.contexts); err != nil {
+		return err
+	}
+
 	if newOpt.sync {
 		namespaces, err := s.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{
 			LabelSelector: newOpt.nsSelector,
@@ -34,7 +40,7 @@ func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *core.ConfigMap) error {
 			return err
 		}
 		for _, ns := range namespaces.Items {
-			s.upsertConfigMap(newSrc, ns.Name)
+			s.upsertConfigMap(s.KubeClient, newSrc, ns.Name)
 		}
 
 		// if selector changed, delete that were in old but not in new (n^2)
@@ -89,17 +95,17 @@ func (s *ConfigSyncer) syncConfigMapIntoNamespace(src *core.ConfigMap, namespace
 	if selector, err := labels.Parse(opt.nsSelector); err != nil {
 		return err
 	} else if selector.Matches(labels.Set(namespace.Labels)) {
-		return s.upsertConfigMap(src, namespace.Name)
+		return s.upsertConfigMap(s.KubeClient, src, namespace.Name)
 	}
 
 	return nil
 }
 
-func (s *ConfigSyncer) upsertConfigMap(src *core.ConfigMap, namespace string) error {
+func (s *ConfigSyncer) upsertConfigMap(kubeClient kubernetes.Interface, src *core.ConfigMap, namespace string) error {
 	if namespace == src.Namespace {
 		return nil
 	}
-	nu, err := s.KubeClient.CoreV1().ConfigMaps(namespace).Get(src.Name, metav1.GetOptions{})
+	nu, err := kubeClient.CoreV1().ConfigMaps(namespace).Get(src.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		// create
 		n := *src
@@ -122,7 +128,7 @@ func (s *ConfigSyncer) upsertConfigMap(src *core.ConfigMap, namespace string) er
 		})
 		n.Annotations[config.ConfigOriginKey] = string(ref)
 
-		_, err := s.KubeClient.CoreV1().ConfigMaps(namespace).Create(&n)
+		_, err := kubeClient.CoreV1().ConfigMaps(namespace).Create(&n)
 		return err
 	}
 	// update
@@ -143,6 +149,49 @@ func (s *ConfigSyncer) upsertConfigMap(src *core.ConfigMap, namespace string) er
 		ResourceVersion: src.ResourceVersion,
 	})
 	nu.Annotations[config.ConfigOriginKey] = string(ref)
-	_, err = s.KubeClient.CoreV1().ConfigMaps(namespace).Update(nu)
+	_, err = kubeClient.CoreV1().ConfigMaps(namespace).Update(nu)
 	return err
+}
+
+func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, oldContexts, newContexts []string) error {
+	for _, oldContext := range oldContexts {
+		remove := true
+		for _, newContext := range newContexts {
+			if oldContext == newContext {
+				remove = false
+				break
+			}
+		}
+		if remove {
+			config, err := clientcmd.BuildConfigFromContext(s.ExternalKubeConfig, oldContext)
+			if err != nil {
+				return err
+			}
+			client, err := kubernetes.NewForConfig(config)
+			if err != nil {
+				return err
+			}
+
+			if err = client.CoreV1().ConfigMaps("").Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
+				return err
+			}
+		}
+	}
+
+	for _, newContext := range newContexts {
+		config, err := clientcmd.BuildConfigFromContext(s.ExternalKubeConfig, newContext)
+		if err != nil {
+			return err
+		}
+		client, err := kubernetes.NewForConfig(config)
+		if err != nil {
+			return err
+		}
+
+		if err = s.upsertConfigMap(client, src, ""); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

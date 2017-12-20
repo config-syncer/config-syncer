@@ -10,6 +10,7 @@ const (
 	ConfigSyncKey        = "kubed.appscode.com/sync"
 	ConfigSyncNsSelector = "kubed.appscode.com/sync-namespace-selector"
 	ConfigOriginKey      = "kubed.appscode.com/origin"
+	ConfigSyncContexts   = "kubed.appscode.com/sync-contexts"
 
 	JanitorElasticsearch = "Elasticsearch"
 	JanitorInfluxDB      = "InfluxDB"
@@ -24,6 +25,7 @@ type ClusterConfig struct {
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
 	Janitors           []JanitorSpec       `json:"janitors,omitempty"`
 	APIServer          APIServerSpec       `json:"apiServer,omitempty"`
+	ExternalKubeConfig string              `json:"externalKubeConfig,omitempty"`
 }
 
 type APIServerSpec struct {
