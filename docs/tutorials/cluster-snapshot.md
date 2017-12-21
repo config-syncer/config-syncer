@@ -170,7 +170,7 @@ $ cat ./docs/examples/cluster-snapshot/s3/config.yaml
 
 snapshotter:
   s3:
-    endpoint: 's3.amazonaws.com'
+    region: us-west-2
     bucket: kubedb-qa
     prefix: minikube
   storageSecretName: snap-secret
@@ -181,8 +181,10 @@ snapshotter:
 | Key                             | Description                                                                     |
 |---------------------------------|---------------------------------------------------------------------------------|
 | `snapshotter.storageSecretName` | `Required`. Name of storage secret                                              |
+| `snapshotter.s3.endpoint`       | Endpoint of s3 like service. This is optional for AWS S3 service. This should be set if you are using [Minio](https://github.com/minio/cookbook/blob/master/docs/aws-sdk-for-go-with-minio.md).            |
+| `snapshotter.s3.region`         | Name of AWS region where bucket is located. This is required for AWS S3 service. This is optional for [Minio](https://github.com/minio/cookbook/blob/master/docs/aws-sdk-for-go-with-minio.md).            |
 | `snapshotter.s3.bucket`         | `Required`. Name of S3 Bucket                                                   |
-| `snapshotter.s3.prefix`         | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.s3.prefix`         | `Optional`. Sub directory in the bucket where snapshot will be stored           |
 | `snapshotter.overwrite`         | `Optional`. If set to `true`, snapshot folders are reused, otherwise a new folder is created at snapshot timestamp.     |
 | `snapshotter.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
 | `snapshotter.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |

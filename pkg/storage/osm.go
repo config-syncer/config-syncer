@@ -94,7 +94,7 @@ func NewOSMContext(client kubernetes.Interface, spec tapi.Backend, namespace str
 		nc.Provider = s3.Kind
 		nc.Config[s3.ConfigAccessKeyID] = string(config[tapi.AWS_ACCESS_KEY_ID])
 		nc.Config[s3.ConfigEndpoint] = spec.S3.Endpoint
-		nc.Config[s3.ConfigRegion] = "us-east-1" // only used for creating buckets
+		nc.Config[s3.ConfigRegion] = spec.S3.Region
 		nc.Config[s3.ConfigSecretKey] = string(config[tapi.AWS_SECRET_ACCESS_KEY])
 		if u, err := url.Parse(spec.S3.Endpoint); err == nil {
 			nc.Config[s3.ConfigDisableSSL] = strconv.FormatBool(u.Scheme == "http")
