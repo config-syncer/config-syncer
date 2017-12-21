@@ -6,11 +6,13 @@ import (
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/kubed/test/framework"
 	core_util "github.com/appscode/kutil/core/v1"
+	"github.com/appscode/kutil/tools/clientcmd"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 var _ = Describe("Config-syncer", func() {
@@ -162,6 +164,41 @@ var _ = Describe("Config-syncer", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+		})
+	})
+
+	Describe("ConfigMap Context Syncer Test", func() {
+		It("Should add configmap to contexts", func() {
+			By("Creating client for context")
+			kConfig, err := clientcmd.BuildConfigFromContext("/home/dipta/.kube/config", "minikube")
+			Expect(err).ShouldNot(HaveOccurred())
+			client, err := kubernetes.NewForConfig(kConfig)
+			Expect(err).ShouldNot(HaveOccurred())
+
+			By("Creating configmap")
+			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
+			Expect(err).NotTo(HaveOccurred())
+			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
+
+			By("Adding sync annotation")
+			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncContexts, "minikube")
+				return obj
+			})
+			Expect(err).ShouldNot(HaveOccurred())
+			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfConfigmapsForClient(client, metav1.NamespaceDefault).Should(BeNumerically("==", 1))
+
+			By("Removing sync annotation")
+			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+				obj.Annotations = util.RemoveKey(obj.Annotations, config.ConfigSyncContexts)
+				return obj
+			})
+			Expect(err).ShouldNot(HaveOccurred())
+			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfConfigmapsForClient(client, metav1.NamespaceDefault).Should(BeNumerically("==", 0))
+
 		})
 	})
 })

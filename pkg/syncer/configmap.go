@@ -40,7 +40,7 @@ func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *core.ConfigMap) error {
 			return err
 		}
 		for _, ns := range namespaces.Items {
-			s.upsertConfigMap(s.KubeClient, newSrc, ns.Name)
+			s.upsertConfigMap(newSrc, ns.Name)
 		}
 
 		// if selector changed, delete that were in old but not in new (n^2)
@@ -95,7 +95,7 @@ func (s *ConfigSyncer) syncConfigMapIntoNamespace(src *core.ConfigMap, namespace
 	if selector, err := labels.Parse(opt.nsSelector); err != nil {
 		return err
 	} else if selector.Matches(labels.Set(namespace.Labels)) {
-		return s.upsertConfigMap(s.KubeClient, src, namespace.Name)
+		return s.upsertConfigMap(src, namespace.Name)
 	}
 
 	return nil
@@ -120,7 +120,7 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, oldContext
 				return err
 			}
 
-			if err = client.CoreV1().ConfigMaps("").Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
+			if err = client.CoreV1().ConfigMaps(metav1.NamespaceDefault).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
 				return err
 			}
 		}
@@ -136,7 +136,8 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, oldContext
 			return err
 		}
 
-		if err = s.upsertConfigMap(client, src, ""); err != nil {
+		// use default namespace specified in context. Should we use source namespace instead ?
+		if err = s.upsertConfigMapForClient(client, src, metav1.NamespaceDefault); err != nil {
 			return err
 		}
 	}
@@ -144,7 +145,11 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, oldContext
 	return nil
 }
 
-func (s *ConfigSyncer) upsertConfigMap(kubeClient kubernetes.Interface, src *core.ConfigMap, namespace string) error {
+func (s *ConfigSyncer) upsertConfigMap(src *core.ConfigMap, namespace string) error {
+	return s.upsertConfigMapForClient(s.KubeClient, src, namespace)
+}
+
+func (s *ConfigSyncer) upsertConfigMapForClient(kubeClient kubernetes.Interface, src *core.ConfigMap, namespace string) error {
 	if namespace == src.Namespace {
 		return nil
 	}

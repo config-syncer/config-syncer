@@ -5,11 +5,16 @@ import (
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/kubernetes"
 )
 
 func (f *Invocation) EventuallyNumOfConfigmaps(namespace string) GomegaAsyncAssertion {
+	return f.EventuallyNumOfConfigmapsForClient(f.KubeClient, namespace)
+}
+
+func (f *Invocation) EventuallyNumOfConfigmapsForClient(client kubernetes.Interface, namespace string) GomegaAsyncAssertion {
 	return Eventually(func() int {
-		cfgMaps, err := f.KubeClient.CoreV1().ConfigMaps(namespace).List(metav1.ListOptions{
+		cfgMaps, err := client.CoreV1().ConfigMaps(namespace).List(metav1.ListOptions{
 			LabelSelector: labels.Set{
 				"app": f.App(),
 			}.String(),
