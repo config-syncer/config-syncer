@@ -1,6 +1,6 @@
 snapshotter:
   s3:
-    endpoint: 's3.amazonaws.com'
+    region: us-west-2
     bucket: bucket-for-snapshot
     prefix: minikube
   storageSecretName: snap-secret

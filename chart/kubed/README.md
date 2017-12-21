@@ -43,7 +43,7 @@ The following tables lists the configurable parameters of the Kubed chart and th
 | --------------------------| ------------------------------------------------------------------|--------------------|
 | `replicaCount`            | Number of kubed operator replicas to create (only 1 is supported) | `1`                |
 | `.image`                  | container image                                                   | `appscode/kubed`   |
-| `tag`                     | container image tag                                               | `0.3.0`            |
+| `tag`                     | container image tag                                               | `0.3.1`            |
 | `pullPolicy`              | container image pull policy                                       | `IfNotPresent`     |
 | `criticalAddon`           | If true, installs kubed operator as critical addon                | `false`            |
 | `rbac.create`             | install required rbac service account, roles and rolebindings     | `false`            |

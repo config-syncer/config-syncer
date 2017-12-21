@@ -48,7 +48,7 @@ import:
 - package: google.golang.org/api/storage/v1
   version: master
 - package: cloud.google.com/go
-  version: v0.3.0
+  version: v0.3.1
 - package: github.com/Azure/azure-sdk-for-go
   version: v10.2.1-beta
 - package: github.com/Azure/go-autorest
