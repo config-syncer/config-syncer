@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 
 	"github.com/appscode/kubed/pkg/config"
+	core_util "github.com/appscode/kutil/core/v1"
 	"github.com/appscode/kutil/tools/clientcmd"
 	core "k8s.io/api/core/v1"
-	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
@@ -101,58 +101,6 @@ func (s *ConfigSyncer) syncConfigMapIntoNamespace(src *core.ConfigMap, namespace
 	return nil
 }
 
-func (s *ConfigSyncer) upsertConfigMap(kubeClient kubernetes.Interface, src *core.ConfigMap, namespace string) error {
-	if namespace == src.Namespace {
-		return nil
-	}
-	nu, err := kubeClient.CoreV1().ConfigMaps(namespace).Get(src.Name, metav1.GetOptions{})
-	if kerr.IsNotFound(err) {
-		// create
-		n := *src
-		n.Namespace = namespace
-		n.UID = ""
-		n.ResourceVersion = ""
-		n.Annotations = map[string]string{}
-		for k, v := range src.Annotations {
-			if k != config.ConfigSyncKey && k != config.ConfigSyncNsSelector {
-				n.Annotations[k] = v
-			}
-		}
-		ref, _ := json.Marshal(core.ObjectReference{
-			APIVersion:      src.APIVersion,
-			Kind:            src.Kind,
-			Name:            src.Name,
-			Namespace:       src.Namespace,
-			UID:             src.UID,
-			ResourceVersion: src.ResourceVersion,
-		})
-		n.Annotations[config.ConfigOriginKey] = string(ref)
-
-		_, err := kubeClient.CoreV1().ConfigMaps(namespace).Create(&n)
-		return err
-	}
-	// update
-	nu.Data = src.Data
-	nu.Labels = src.Labels
-	nu.Annotations = map[string]string{}
-	for k, v := range src.Annotations {
-		if k != config.ConfigSyncKey && k != config.ConfigSyncNsSelector {
-			nu.Annotations[k] = v
-		}
-	}
-	ref, _ := json.Marshal(core.ObjectReference{
-		APIVersion:      src.APIVersion,
-		Kind:            src.Kind,
-		Name:            src.Name,
-		Namespace:       src.Namespace,
-		UID:             src.UID,
-		ResourceVersion: src.ResourceVersion,
-	})
-	nu.Annotations[config.ConfigOriginKey] = string(ref)
-	_, err = kubeClient.CoreV1().ConfigMaps(namespace).Update(nu)
-	return err
-}
-
 func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, oldContexts, newContexts []string) error {
 	for _, oldContext := range oldContexts {
 		remove := true
@@ -194,4 +142,41 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, oldContext
 	}
 
 	return nil
+}
+
+func (s *ConfigSyncer) upsertConfigMap(kubeClient kubernetes.Interface, src *core.ConfigMap, namespace string) error {
+	if namespace == src.Namespace {
+		return nil
+	}
+
+	meta := metav1.ObjectMeta{
+		Name:      src.Name,
+		Namespace: namespace,
+	}
+
+	_, err := core_util.CreateOrPatchConfigMap(kubeClient, meta, func(obj *core.ConfigMap) *core.ConfigMap {
+		obj.Data = src.Data
+		obj.Labels = src.Labels
+
+		obj.Annotations = map[string]string{}
+		for k, v := range src.Annotations {
+			if k != config.ConfigSyncKey && k != config.ConfigSyncContexts {
+				obj.Annotations[k] = v
+			}
+		}
+
+		ref, _ := json.Marshal(core.ObjectReference{
+			APIVersion:      src.APIVersion,
+			Kind:            src.Kind,
+			Name:            src.Name,
+			Namespace:       src.Namespace,
+			UID:             src.UID,
+			ResourceVersion: src.ResourceVersion,
+		})
+		obj.Annotations[config.ConfigOriginKey] = string(ref)
+
+		return obj
+	})
+
+	return err
 }

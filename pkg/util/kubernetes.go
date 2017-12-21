@@ -59,3 +59,24 @@ func GetString(m map[string]string, key string) string {
 	}
 	return m[key]
 }
+
+func HasKey(m map[string]string, key string) bool {
+	if m == nil {
+		return false
+	}
+	_, ok := m[key]
+	return ok
+}
+
+func RemoveKey(m map[string]string, key string) map[string]string {
+	if m == nil {
+		return nil
+	}
+	mNew := map[string]string{}
+	for k, v := range m {
+		if k != key {
+			mNew[k] = v
+		}
+	}
+	return mNew
+}

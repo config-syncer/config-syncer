@@ -46,11 +46,15 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 }
 
 func getSyncOption(annotations map[string]string) (opt syncOpt, err error) {
-	if opt.sync, err = util.GetBool(annotations, config.ConfigSyncKey); err != nil {
-		return
+	if util.HasKey(annotations, config.ConfigSyncKey) {
+		opt.sync = true
+		opt.nsSelector = util.GetString(annotations, config.ConfigSyncKey)
+		if opt.nsSelector == "true" {
+			opt.nsSelector = ""
+		}
 	}
-	opt.nsSelector = util.GetString(annotations, config.ConfigSyncNsSelector)
-	contexts := util.GetString(annotations, config.ConfigSyncContexts)
-	opt.contexts = strings.Split(contexts, ",")
+	if contexts := util.GetString(annotations, config.ConfigSyncContexts); contexts != "" {
+		opt.contexts = strings.Split(contexts, ",")
+	}
 	return
 }
