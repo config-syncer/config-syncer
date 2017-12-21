@@ -2,18 +2,18 @@
 title: Overview | Kubed
 description: Kubed Overview
 menu:
-  product_kubed_0.3.0:
+  product_kubed_0.3.1:
     identifier: kubed-overview
     name: Overview
     parent: getting-started
     weight: 20
 product_name: kubed
-menu_name: product_kubed_0.3.0
+menu_name: product_kubed_0.3.1
 section_menu_id: getting-started
-url: /products/kubed/0.3.0/getting-started/
+url: /products/kubed/0.3.1/getting-started/
 aliases:
-  - /products/kubed/0.3.0/
-  - /products/kubed/0.3.0/README/
+  - /products/kubed/0.3.1/
+  - /products/kubed/0.3.1/README/
 ---
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/appscode/kubed)](https://goreportcard.com/report/github.com/appscode/kubed)
@@ -34,7 +34,7 @@ Please pick a version of Kubed that matches your Kubernetes installation.
 
 | Kubed Version                                                 | Docs                                                            | Kubernetes Version |
 |---------------------------------------------------------------|-----------------------------------------------------------------|--------------------|
-| [0.3.0](https://github.com/appscode/kubed/releases/tag/0.3.0) | [User Guide](https://github.com/appscode/kubed/tree/0.3.0/docs) | 1.7.x+             |
+| [0.3.1](https://github.com/appscode/kubed/releases/tag/0.3.1) | [User Guide](https://github.com/appscode/kubed/tree/0.3.1/docs) | 1.7.x+             |
 | [0.2.0](https://github.com/appscode/kubed/releases/tag/0.2.0) | [User Guide](https://github.com/appscode/kubed/tree/0.2.0/docs) | 1.5.x - 1.7.x      |
 
 ## Installation

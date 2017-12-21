@@ -2,13 +2,13 @@
 title: Recycle Bin
 description: Recycle Bin
 menu:
-  product_kubed_0.3.0:
+  product_kubed_0.3.1:
     identifier: tutorials-recycle-bin
     name: Recycle Bin
     parent: tutorials
     weight: 35
 product_name: kubed
-menu_name: product_kubed_0.3.0
+menu_name: product_kubed_0.3.1
 section_menu_id: tutorials
 ---
 

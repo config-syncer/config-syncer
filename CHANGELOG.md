@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.3.1](https://github.com/appscode/kubed/tree/0.3.0) (2017-12-21)
+Kubed 0.3.1 supports buckets in regions other than us-east-1.
+
+__Changelog__
+- Support region for s3 backend [\#159](https://github.com/appscode/kubed/issues/159)
+- Avoid listing buckets [\#141](https://github.com/appscode/kubed/issues/141)
+
+
 ## [0.3.0](https://github.com/appscode/kubed/tree/0.3.0) (2017-09-26)
 Kubed 0.3.0 supports auth for Elasticsearch janitors and annotates copied configmaps & secrets.
 
