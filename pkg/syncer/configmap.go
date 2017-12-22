@@ -40,7 +40,9 @@ func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *core.ConfigMap) error {
 			return err
 		}
 		for _, ns := range namespaces.Items {
-			s.upsertConfigMap(newSrc, ns.Name)
+			if err = s.upsertConfigMap(newSrc, ns.Name); err != nil {
+				return err
+			}
 		}
 
 		// if selector changed, delete that were in old but not in new (n^2)

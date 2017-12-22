@@ -1,2 +1,2 @@
 enableConfigSyncer: true
-externalKubeConfig: /home/dipta/.kube/config
+externalKubeConfig: /home/dipta/.kube/kubed-e2e

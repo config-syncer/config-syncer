@@ -1,6 +1,9 @@
 package e2e
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/util"
@@ -11,6 +14,8 @@ import (
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/util/homedir"
 )
 
 var _ = Describe("Config-syncer", func() {
@@ -166,42 +171,78 @@ var _ = Describe("Config-syncer", func() {
 	})
 
 	Describe("ConfigMap Context Syncer Test", func() {
-		It("Should add configmap to contexts", func() {
-			kubeConfigPath := "/home/dipta/.kube/config"
-			context := "kubed-test"
+		var (
+			kubeConfigPath = filepath.Join(homedir.HomeDir(), ".kube/config")
+			newConfigPath  = filepath.Join(homedir.HomeDir(), ".kube/kubed-e2e")
+			contexts       = []string{"kubed-e2e-ctx-1", "kubed-e2e-ctx-2"}
+			namespaces     = []string{"kubed-e2e-ns-1", "kubed-e2e-ns-2"}
+			contextsJoined = "kubed-e2e-ctx-1,kubed-e2e-ctx-2"
+		)
 
-			By("Creating client for context")
-			client, ns, err := util.ClientAndNamespaceForContext(kubeConfigPath, context)
+		BeforeEach(func() {
+			By("Ensuring contexts")
+			kConfig, err := clientcmd.LoadFromFile(kubeConfigPath)
 			Expect(err).ShouldNot(HaveOccurred())
 
-			if ns == "" {
-				ns = f.Namespace()
+			for i, context := range contexts {
+				curContext := *kConfig.Contexts[kConfig.CurrentContext]
+				curContext.Namespace = namespaces[i]
+				kConfig.Contexts[context] = &curContext
 			}
-			By("Using external context " + context + " with namespace " + ns)
 
+			By("Creating external kubeconfig file")
+			file, err := os.OpenFile(newConfigPath, os.O_RDWR|os.O_CREATE, 0666)
+			Expect(err).ShouldNot(HaveOccurred())
+			err = file.Close()
+			Expect(err).ShouldNot(HaveOccurred())
+
+			err = clientcmd.WriteToFile(*kConfig, newConfigPath)
+			Expect(err).ShouldNot(HaveOccurred())
+
+			By("Ensuring namespaces for contexts")
+			for _, context := range contexts {
+				f.EnsureNamespaceForContext(newConfigPath, context)
+			}
+		})
+
+		AfterEach(func() {
+			By("Deleting namespaces for contexts")
+			for _, context := range contexts {
+				f.DeleteNamespaceForContext(newConfigPath, context)
+			}
+			By("Removing external kubeconfig file")
+			err := os.Remove(newConfigPath)
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+
+		It("Should add configmap to contexts", func() {
 			By("Creating configmap")
-			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
+			cfgMap, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
 			Expect(err).NotTo(HaveOccurred())
-			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
-			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Adding sync annotation")
-			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncContexts, context)
+			cfgMap, err = core_util.PatchConfigMap(f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncContexts, contextsJoined)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
-			f.EventuallyNumOfConfigmapsForClient(client, ns).Should(BeNumerically("==", 1))
+
+			By("Checking configmap added to contexts")
+			for _, context := range contexts {
+				f.EventuallyNumOfConfigmapsForContext(newConfigPath, context).Should(BeNumerically("==", 1))
+			}
 
 			By("Removing sync annotation")
-			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+			cfgMap, err = core_util.PatchConfigMap(f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
 				obj.Annotations = util.RemoveKey(obj.Annotations, config.ConfigSyncContexts)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
-			f.EventuallyNumOfConfigmapsForClient(client, ns).Should(BeNumerically("==", 0))
+
+			By("Checking configmap removed from contexts")
+			for _, context := range contexts {
+				f.EventuallyNumOfConfigmapsForContext(newConfigPath, context).Should(BeNumerically("==", 0))
+			}
 		})
 	})
 })

@@ -1,6 +1,7 @@
 package framework
 
 import (
+	"github.com/appscode/kubed/pkg/util"
 	. "github.com/onsi/gomega"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -10,6 +11,17 @@ import (
 
 func (f *Invocation) EventuallyNumOfConfigmaps(namespace string) GomegaAsyncAssertion {
 	return f.EventuallyNumOfConfigmapsForClient(f.KubeClient, namespace)
+}
+
+func (f *Invocation) EventuallyNumOfConfigmapsForContext(kubeConfigPath string, context string) GomegaAsyncAssertion {
+	client, ns, err := util.ClientAndNamespaceForContext(kubeConfigPath, context)
+	Expect(err).ShouldNot(HaveOccurred())
+
+	if ns == "" {
+		ns = f.Namespace()
+	}
+
+	return f.EventuallyNumOfConfigmapsForClient(client, ns)
 }
 
 func (f *Invocation) EventuallyNumOfConfigmapsForClient(client kubernetes.Interface, namespace string) GomegaAsyncAssertion {

@@ -1,6 +1,7 @@
 package framework
 
 import (
+	"github.com/appscode/kubed/pkg/util"
 	. "github.com/onsi/gomega"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -10,6 +11,17 @@ import (
 
 func (f *Invocation) EventuallyNumOfSecrets(namespace string) GomegaAsyncAssertion {
 	return f.EventuallyNumOfSecretsForClient(f.KubeClient, namespace)
+}
+
+func (f *Invocation) EventuallyNumOfSecretsForContext(kubeConfigPath string, context string) GomegaAsyncAssertion {
+	client, ns, err := util.ClientAndNamespaceForContext(kubeConfigPath, context)
+	Expect(err).ShouldNot(HaveOccurred())
+
+	if ns == "" {
+		ns = f.Namespace()
+	}
+
+	return f.EventuallyNumOfSecretsForClient(client, ns)
 }
 
 func (f *Invocation) EventuallyNumOfSecretsForClient(client kubernetes.Interface, namespace string) GomegaAsyncAssertion {

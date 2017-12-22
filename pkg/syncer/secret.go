@@ -40,7 +40,9 @@ func (s *ConfigSyncer) SyncSecret(oldSrc, newSrc *core.Secret) error {
 			return err
 		}
 		for _, ns := range namespaces.Items {
-			s.upsertSecret(newSrc, ns.Name)
+			if err = s.upsertSecret(newSrc, ns.Name); err != nil {
+				return err
+			}
 		}
 
 		// if selector changed, delete that were in old but not in new (n^2)
