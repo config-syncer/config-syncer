@@ -23,7 +23,7 @@ package v1alpha1
 import (
 	reflect "reflect"
 
-	api "github.com/appscode/kutil/tools/monitoring/api"
+	api "github.com/appscode/kube-mon/api"
 	core_v1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"

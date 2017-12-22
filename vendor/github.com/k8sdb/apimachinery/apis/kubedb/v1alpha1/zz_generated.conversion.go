@@ -24,7 +24,7 @@ import (
 	unsafe "unsafe"
 
 	types "github.com/appscode/go/encoding/json/types"
-	api "github.com/appscode/kutil/tools/monitoring/api"
+	api "github.com/appscode/kube-mon/api"
 	kubedb "github.com/kubedb/apimachinery/apis/kubedb"
 	core_v1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

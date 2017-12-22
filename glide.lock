@@ -1,5 +1,5 @@
-hash: e57edcd78055d2843394083db436fad49fe8f457950aa3be40d3073bbb4ee197
-updated: 2017-12-18T16:19:00.602028176-05:00
+hash: 405456dbe9602b6394c9a0cb90b8d8f2a834b2f9af4906f646c985db92b1f774
+updated: 2017-12-21T21:41:48.025639347-05:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -9,7 +9,7 @@ imports:
 - name: github.com/appscode/envconfig
   version: 183bbe643a2875eaa69c85627ac6b25813983203
 - name: github.com/appscode/go
-  version: cb650d0b1a3c04a86595cf2a31fa704dbf1bc42a
+  version: f08cee5a2aa53a1ab6d30e4ae11e381d1b265f81
   subpackages:
   - analytics
   - arrays
@@ -40,8 +40,13 @@ imports:
   - twilio
   - unified
   - webhook
+- name: github.com/appscode/kube-mon
+  version: 10b8a840c201d97eb04fe83fb8875761d12feec6
+  subpackages:
+  - api
+  - prometheus/v1
 - name: github.com/appscode/kutil
-  version: 582273a0791d4d99ab1345d9e4867bec460aaf5a
+  version: dfc5ff861bb2f5e80629103d821b9dfe317abfec
   subpackages:
   - apps/v1beta1
   - batch/v1
@@ -49,16 +54,14 @@ imports:
   - core/v1
   - extensions/v1beta1
   - meta
-  - prometheus/v1
   - rbac/v1beta1
   - storage/v1
   - tools/analytics
   - tools/backup
-  - tools/monitoring/api
 - name: github.com/appscode/mergo
   version: e3000cb3d28c72b837601cac94debd91032d19fe
 - name: github.com/appscode/osm
-  version: b3ed1c7835d33f312616b260a949589cf33311ee
+  version: 8e933dfca7c6a2730d77a63282369d843b1db1f4
   subpackages:
   - context
 - name: github.com/appscode/pat
@@ -74,7 +77,7 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: afa4f8fa82009f53295e0f3551010284e57aa4c5
+  version: fad6e8bbe03c7fb74b93eafdb4c32e851b19eedf
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
@@ -82,7 +85,7 @@ imports:
   - client/typed/stash/v1alpha1
   - client/typed/stash/v1alpha1/util
 - name: github.com/appscode/voyager
-  version: 95fc2f93b5956f6325a080bcecfd6b274592d612
+  version: 76728e03f314e98f7d738732182655b5d25ab9a8
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -236,7 +239,7 @@ imports:
 - name: github.com/google/btree
   version: 7d79101e329e5a3adf994758c578dab82b90c017
 - name: github.com/google/go-cmp
-  version: ab3beb0f1673c5cab43e36db4ea73c2613100e69
+  version: 97a1ff3c48253a51c601f6e4420181273b6ca0ea
   subpackages:
   - cmp
   - cmp/internal/diff
@@ -310,20 +313,20 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/k8sdb/apimachinery
-  version: 30878870d62af296af35878361b833b3df6bdabb
+  version: b3e4d6828bb8fbca59fa319ea9d6573bb9af4fb8
   subpackages:
   - apis/kubedb/v1alpha1
   - client/typed/kubedb/v1alpha1
   - client/typed/kubedb/v1alpha1/util
 - name: github.com/kubedb/apimachinery
-  version: 30878870d62af296af35878361b833b3df6bdabb
+  version: b3e4d6828bb8fbca59fa319ea9d6573bb9af4fb8
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
   - client/scheme
   - client/typed/kubedb/v1alpha1
 - name: github.com/kubernetes/apimachinery
-  version: e7ad5e783d5cc59c1aa137f0b13c51baee6ee7c1
+  version: 20bbfef868144faf29af69ddb2f01646ead5c1a1
   subpackages:
   - pkg/conversion
 - name: github.com/mailgun/mailgun-go
@@ -422,7 +425,7 @@ imports:
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/spf13/cobra
-  version: 7b2c5ac9fc04fc5efafb60700713d4fa609b777b
+  version: ccaecb155a2177302cb56cae929251a256d0f646
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -497,14 +500,14 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: 03a4a4fe3d2c5fb0d1a116cf20784fffa259a3d4
+  version: 905d2b6c9443c02c46229c39d60442903a68c229
   subpackages:
   - gensupport
   - googleapi
   - googleapi/internal/uritemplates
   - storage/v1
 - name: google.golang.org/appengine
-  version: 4f7eeb5305a4ba1966344836ba4af9996b7b4e05
+  version: 5bee14b453b4c71be47ec1781b0fa61c2ea182db
   subpackages:
   - internal
   - internal/app_identity
@@ -533,7 +536,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/api
-  version: 9b9dca205a15b6ce9ef10091f05d60a13fdcf418
+  version: 4df58c811fe2e65feb879227b2b245e4dc26e7ad
   subpackages:
   - admissionregistration/v1alpha1
   - apps/v1beta1
@@ -616,7 +619,7 @@ imports:
   - third_party/forked/golang/json
   - third_party/forked/golang/reflect
 - name: k8s.io/client-go
-  version: 60bf397d7966ab2285d3ba7701ead2cc376111d4
+  version: 7656f45ccb3db63d177f734a9e5f6a116f08ad4f
   subpackages:
   - discovery
   - discovery/fake
