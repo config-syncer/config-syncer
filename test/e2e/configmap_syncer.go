@@ -6,13 +6,11 @@ import (
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/kubed/test/framework"
 	core_util "github.com/appscode/kutil/core/v1"
-	"github.com/appscode/kutil/tools/clientcmd"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 )
 
 var _ = Describe("Config-syncer", func() {
@@ -169,11 +167,17 @@ var _ = Describe("Config-syncer", func() {
 
 	Describe("ConfigMap Context Syncer Test", func() {
 		It("Should add configmap to contexts", func() {
+			kubeConfigPath := "/home/dipta/.kube/config"
+			context := "kubed-test"
+
 			By("Creating client for context")
-			kConfig, err := clientcmd.BuildConfigFromContext("/home/dipta/.kube/config", "minikube")
+			client, ns, err := util.ClientAndNamespaceForContext(kubeConfigPath, context)
 			Expect(err).ShouldNot(HaveOccurred())
-			client, err := kubernetes.NewForConfig(kConfig)
-			Expect(err).ShouldNot(HaveOccurred())
+
+			if ns == "" {
+				ns = f.Namespace()
+			}
+			By("Using external context " + context + " with namespace " + ns)
 
 			By("Creating configmap")
 			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
@@ -183,12 +187,12 @@ var _ = Describe("Config-syncer", func() {
 
 			By("Adding sync annotation")
 			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncContexts, "minikube")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncContexts, context)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
 			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
-			f.EventuallyNumOfConfigmapsForClient(client, metav1.NamespaceDefault).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfConfigmapsForClient(client, ns).Should(BeNumerically("==", 1))
 
 			By("Removing sync annotation")
 			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
@@ -197,8 +201,7 @@ var _ = Describe("Config-syncer", func() {
 			})
 			Expect(err).ShouldNot(HaveOccurred())
 			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
-			f.EventuallyNumOfConfigmapsForClient(client, metav1.NamespaceDefault).Should(BeNumerically("==", 0))
-
+			f.EventuallyNumOfConfigmapsForClient(client, ns).Should(BeNumerically("==", 0))
 		})
 	})
 })

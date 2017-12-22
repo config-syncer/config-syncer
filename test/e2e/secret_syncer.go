@@ -164,4 +164,44 @@ var _ = Describe("Secret-syncer", func() {
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
 		})
 	})
+
+	Describe("Secret Context Syncer Test", func() {
+		It("Should add secret to contexts", func() {
+			kubeConfigPath := "/home/dipta/.kube/config"
+			context := "kubed-test"
+
+			By("Creating client for context")
+			client, ns, err := util.ClientAndNamespaceForContext(kubeConfigPath, context)
+			Expect(err).ShouldNot(HaveOccurred())
+
+			if ns == "" {
+				ns = f.Namespace()
+			}
+			By("Using external context " + context + " with namespace " + ns)
+
+			By("Creating secret")
+			c, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
+			Expect(err).NotTo(HaveOccurred())
+			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
+
+			By("Adding sync annotation")
+			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncContexts, context)
+				return obj
+			})
+			Expect(err).ShouldNot(HaveOccurred())
+			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfSecretsForClient(client, ns).Should(BeNumerically("==", 1))
+
+			By("Removing sync annotation")
+			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+				obj.Annotations = util.RemoveKey(obj.Annotations, config.ConfigSyncContexts)
+				return obj
+			})
+			Expect(err).ShouldNot(HaveOccurred())
+			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
+			f.EventuallyNumOfSecretsForClient(client, ns).Should(BeNumerically("==", 0))
+		})
+	})
 })

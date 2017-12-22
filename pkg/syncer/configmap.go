@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 
 	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/util"
 	core_util "github.com/appscode/kutil/core/v1"
-	"github.com/appscode/kutil/tools/clientcmd"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -111,33 +111,28 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, oldContext
 			}
 		}
 		if remove {
-			config, err := clientcmd.BuildConfigFromContext(s.ExternalKubeConfig, oldContext)
+			client, ns, err := util.ClientAndNamespaceForContext(s.ExternalKubeConfig, oldContext)
 			if err != nil {
 				return err
 			}
-			client, err := kubernetes.NewForConfig(config)
-			if err != nil {
-				return err
+			if ns == "" {
+				ns = src.Namespace
 			}
-
-			if err = client.CoreV1().ConfigMaps(metav1.NamespaceDefault).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
+			if err = client.CoreV1().ConfigMaps(ns).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
 				return err
 			}
 		}
 	}
 
 	for _, newContext := range newContexts {
-		config, err := clientcmd.BuildConfigFromContext(s.ExternalKubeConfig, newContext)
+		client, ns, err := util.ClientAndNamespaceForContext(s.ExternalKubeConfig, newContext)
 		if err != nil {
 			return err
 		}
-		client, err := kubernetes.NewForConfig(config)
-		if err != nil {
-			return err
+		if ns == "" {
+			ns = src.Namespace
 		}
-
-		// use default namespace specified in context. Should we use source namespace instead ?
-		if err = s.upsertConfigMapForClient(client, src, metav1.NamespaceDefault); err != nil {
+		if err = s.upsertConfigMapForClient(client, src, ns); err != nil {
 			return err
 		}
 	}

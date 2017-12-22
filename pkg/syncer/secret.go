@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 
 	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/util"
 	core_util "github.com/appscode/kutil/core/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/kubernetes"
 )
 
 func (s *ConfigSyncer) SyncSecret(oldSrc, newSrc *core.Secret) error {
@@ -24,6 +26,10 @@ func (s *ConfigSyncer) SyncSecret(oldSrc, newSrc *core.Secret) error {
 		if err != nil {
 			return err // Don't remove by mistake
 		}
+	}
+
+	if err = s.syncSecretIntoContexts(newSrc, oldOpt.contexts, newOpt.contexts); err != nil {
+		return err
 	}
 
 	if newOpt.sync {
@@ -95,7 +101,50 @@ func (s *ConfigSyncer) syncSecretIntoNamespace(src *core.Secret, namespace *core
 	return nil
 }
 
+func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, oldContexts, newContexts []string) error {
+	for _, oldContext := range oldContexts {
+		remove := true
+		for _, newContext := range newContexts {
+			if oldContext == newContext {
+				remove = false
+				break
+			}
+		}
+		if remove {
+			client, ns, err := util.ClientAndNamespaceForContext(s.ExternalKubeConfig, oldContext)
+			if err != nil {
+				return err
+			}
+			if ns == "" {
+				ns = src.Namespace
+			}
+			if err = client.CoreV1().Secrets(ns).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
+				return err
+			}
+		}
+	}
+
+	for _, newContext := range newContexts {
+		client, ns, err := util.ClientAndNamespaceForContext(s.ExternalKubeConfig, newContext)
+		if err != nil {
+			return err
+		}
+		if ns == "" {
+			ns = src.Namespace
+		}
+		if err = s.upsertSecretForClient(client, src, ns); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (s *ConfigSyncer) upsertSecret(src *core.Secret, namespace string) error {
+	return s.upsertSecretForClient(s.KubeClient, src, namespace)
+}
+
+func (s *ConfigSyncer) upsertSecretForClient(kubeClient kubernetes.Interface, src *core.Secret, namespace string) error {
 	if namespace == src.Namespace {
 		return nil
 	}
@@ -105,7 +154,7 @@ func (s *ConfigSyncer) upsertSecret(src *core.Secret, namespace string) error {
 		Namespace: namespace,
 	}
 
-	_, err := core_util.CreateOrPatchSecret(s.KubeClient, meta, func(obj *core.Secret) *core.Secret {
+	_, err := core_util.CreateOrPatchSecret(kubeClient, meta, func(obj *core.Secret) *core.Secret {
 		obj.Data = src.Data
 		obj.Labels = src.Labels
 
