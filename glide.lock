@@ -1,5 +1,5 @@
 hash: 405456dbe9602b6394c9a0cb90b8d8f2a834b2f9af4906f646c985db92b1f774
-updated: 2017-12-22T21:03:34.004927067-05:00
+updated: 2017-12-22T21:45:55.096419099-05:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -46,7 +46,7 @@ imports:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: f784d214c1ad888458cb663c56c329cc5bd2f035
+  version: e5c3cba960d607c3a2fcce50dad4ba14097a2a37
   subpackages:
   - apps/v1beta1
   - batch/v1
@@ -327,7 +327,7 @@ imports:
   - client/scheme
   - client/typed/kubedb/v1alpha1
 - name: github.com/kubernetes/apimachinery
-  version: 225bb542e4893032448551fed105b077172c3340
+  version: dcc11a9b153f8007ca6618ebc9e7e185f2eaaac6
   subpackages:
   - pkg/conversion
 - name: github.com/mailgun/mailgun-go

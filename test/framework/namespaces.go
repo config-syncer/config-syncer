@@ -1,7 +1,7 @@
 package framework
 
 import (
-	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/kutil/tools/clientcmd"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -37,7 +37,9 @@ func (f *Framework) EventuallyNamespaceDeleted(ns string) GomegaAsyncAssertion {
 }
 
 func (f *Invocation) EnsureNamespaceForContext(kubeConfigPath string, context string) {
-	client, ns, err := util.ClientAndNamespaceForContext(kubeConfigPath, context)
+	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
+	Expect(err).ShouldNot(HaveOccurred())
+	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 
 	if ns == "" {
@@ -61,7 +63,9 @@ func (f *Invocation) EnsureNamespaceForContext(kubeConfigPath string, context st
 }
 
 func (f *Invocation) DeleteNamespaceForContext(kubeConfigPath string, context string) {
-	client, ns, err := util.ClientAndNamespaceForContext(kubeConfigPath, context)
+	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
+	Expect(err).ShouldNot(HaveOccurred())
+	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 
 	if ns == "" {

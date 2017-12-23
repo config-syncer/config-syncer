@@ -1,7 +1,7 @@
 package framework
 
 import (
-	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/kutil/tools/clientcmd"
 	. "github.com/onsi/gomega"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -14,9 +14,10 @@ func (f *Invocation) EventuallyNumOfConfigmaps(namespace string) GomegaAsyncAsse
 }
 
 func (f *Invocation) EventuallyNumOfConfigmapsForContext(kubeConfigPath string, context string) GomegaAsyncAssertion {
-	client, ns, err := util.ClientAndNamespaceForContext(kubeConfigPath, context)
+	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
-
+	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
+	Expect(err).ShouldNot(HaveOccurred())
 	if ns == "" {
 		ns = f.Namespace()
 	}

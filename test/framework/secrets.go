@@ -1,7 +1,7 @@
 package framework
 
 import (
-	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/kutil/tools/clientcmd"
 	. "github.com/onsi/gomega"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -14,7 +14,9 @@ func (f *Invocation) EventuallyNumOfSecrets(namespace string) GomegaAsyncAsserti
 }
 
 func (f *Invocation) EventuallyNumOfSecretsForContext(kubeConfigPath string, context string) GomegaAsyncAssertion {
-	client, ns, err := util.ClientAndNamespaceForContext(kubeConfigPath, context)
+	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
+	Expect(err).ShouldNot(HaveOccurred())
+	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 
 	if ns == "" {

@@ -7,18 +7,33 @@ import (
 	"github.com/appscode/kubed/pkg/util"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 )
 
 type ConfigSyncer struct {
-	KubeClient         kubernetes.Interface
-	ExternalKubeConfig string
+	KubeClient kubernetes.Interface
+	KubeConfig string
 }
 
 type syncOpt struct {
 	sync       bool
 	nsSelector string // should we parse and store as Selector ?
-	contexts   []string
+	contexts   sets.String
+}
+
+func getSyncOption(annotations map[string]string) (opt syncOpt, err error) {
+	if util.HasKey(annotations, config.ConfigSyncKey) {
+		opt.sync = true
+		opt.nsSelector = util.GetString(annotations, config.ConfigSyncKey)
+		if opt.nsSelector == "true" {
+			opt.nsSelector = ""
+		}
+	}
+	if contexts := util.GetString(annotations, config.ConfigSyncContexts); contexts != "" {
+		opt.contexts = sets.NewString(strings.Split(contexts, ",")...)
+	}
+	return
 }
 
 func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
@@ -47,18 +62,4 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 		}
 	}
 	return nil
-}
-
-func getSyncOption(annotations map[string]string) (opt syncOpt, err error) {
-	if util.HasKey(annotations, config.ConfigSyncKey) {
-		opt.sync = true
-		opt.nsSelector = util.GetString(annotations, config.ConfigSyncKey)
-		if opt.nsSelector == "true" {
-			opt.nsSelector = ""
-		}
-	}
-	if contexts := util.GetString(annotations, config.ConfigSyncContexts); contexts != "" {
-		opt.contexts = strings.Split(contexts, ",")
-	}
-	return
 }

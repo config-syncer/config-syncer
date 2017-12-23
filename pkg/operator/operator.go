@@ -117,8 +117,8 @@ func (op *Operator) Setup() error {
 
 	if op.Config.EnableConfigSyncer {
 		op.ConfigSyncer = &syncer.ConfigSyncer{
-			KubeClient:         op.KubeClient,
-			ExternalKubeConfig: op.Config.ExternalKubeConfig,
+			KubeClient: op.KubeClient,
+			KubeConfig: op.Config.KubeConfig,
 		}
 	}
 
