@@ -1,5 +1,7 @@
 package api
 
+import "github.com/appscode/kutil"
+
 type AgentType string
 
 const (
@@ -31,9 +33,8 @@ type PrometheusSpec struct {
 }
 
 type Agent interface {
-	Add(sp StatsAccessor, spec *AgentSpec) error
-	Update(sp StatsAccessor, old, new *AgentSpec) error
-	Delete(sp StatsAccessor, spec *AgentSpec) error
+	CreateOrUpdate(sp StatsAccessor, spec *AgentSpec) (kutil.VerbType, error)
+	Delete(sp StatsAccessor) (kutil.VerbType, error)
 }
 
 type StatsAccessor interface {

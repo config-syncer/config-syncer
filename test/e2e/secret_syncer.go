@@ -77,7 +77,7 @@ var _ = Describe("Secret-syncer", func() {
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Adding sync annotation")
-			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "true")
 				return obj
 			})
@@ -90,7 +90,7 @@ var _ = Describe("Secret-syncer", func() {
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
 
 			By("Removing sync annotation")
-			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
 				obj.Annotations = util.RemoveKey(obj.Annotations, config.ConfigSyncKey)
 				return obj
 			})
@@ -109,7 +109,7 @@ var _ = Describe("Secret-syncer", func() {
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Adding sync annotation")
-			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "true")
 				return obj
 			})
@@ -127,7 +127,7 @@ var _ = Describe("Secret-syncer", func() {
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Adding sync annotation")
-			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "true")
 				return obj
 			})
@@ -135,7 +135,7 @@ var _ = Describe("Secret-syncer", func() {
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
 
 			By("Adding selector annotation")
-			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "app="+f.App())
 				return obj
 			})
@@ -151,7 +151,7 @@ var _ = Describe("Secret-syncer", func() {
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 2))
 
 			By("Changing selector annotation")
-			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "app=do-not-match")
 				return obj
 			})
@@ -160,7 +160,7 @@ var _ = Describe("Secret-syncer", func() {
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Removing selector annotation")
-			c, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "")
 				return obj
 			})
@@ -223,7 +223,7 @@ var _ = Describe("Secret-syncer", func() {
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Adding sync annotation")
-			secret, err = core_util.PatchSecret(f.KubeClient, secret, func(obj *core.Secret) *core.Secret {
+			secret, _, err = core_util.PatchSecret(f.KubeClient, secret, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncContexts, contextsJoined)
 				return obj
 			})
@@ -235,7 +235,7 @@ var _ = Describe("Secret-syncer", func() {
 			}
 
 			By("Removing sync annotation")
-			secret, err = core_util.PatchSecret(f.KubeClient, secret, func(obj *core.Secret) *core.Secret {
+			secret, _, err = core_util.PatchSecret(f.KubeClient, secret, func(obj *core.Secret) *core.Secret {
 				obj.Annotations = util.RemoveKey(obj.Annotations, config.ConfigSyncContexts)
 				return obj
 			})

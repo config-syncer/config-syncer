@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	. "github.com/appscode/go/types"
+	atypes "github.com/appscode/go/types"
 	"github.com/appscode/kutil"
+	core_util "github.com/appscode/kutil/core/v1"
 	"github.com/golang/glog"
 	apps "k8s.io/api/apps/v1beta1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
@@ -16,43 +18,45 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-func CreateOrPatchStatefulSet(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*apps.StatefulSet) *apps.StatefulSet) (*apps.StatefulSet, error) {
+func CreateOrPatchStatefulSet(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*apps.StatefulSet) *apps.StatefulSet) (*apps.StatefulSet, kutil.VerbType, error) {
 	cur, err := c.AppsV1beta1().StatefulSets(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating StatefulSet %s/%s.", meta.Namespace, meta.Name)
-		return c.AppsV1beta1().StatefulSets(meta.Namespace).Create(transform(&apps.StatefulSet{
+		out, err := c.AppsV1beta1().StatefulSets(meta.Namespace).Create(transform(&apps.StatefulSet{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "StatefulSet",
 				APIVersion: apps.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
+		return out, kutil.VerbCreated, err
 	} else if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	return PatchStatefulSet(c, cur, transform)
 }
 
-func PatchStatefulSet(c kubernetes.Interface, cur *apps.StatefulSet, transform func(*apps.StatefulSet) *apps.StatefulSet) (*apps.StatefulSet, error) {
+func PatchStatefulSet(c kubernetes.Interface, cur *apps.StatefulSet, transform func(*apps.StatefulSet) *apps.StatefulSet) (*apps.StatefulSet, kutil.VerbType, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	modJson, err := json.Marshal(transform(cur.DeepCopy()))
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	patch, err := strategicpatch.CreateTwoWayMergePatch(curJson, modJson, apps.StatefulSet{})
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	if len(patch) == 0 || string(patch) == "{}" {
-		return cur, nil
+		return cur, kutil.VerbUnchanged, nil
 	}
 	glog.V(3).Infof("Patching StatefulSet %s/%s with %s.", cur.Namespace, cur.Name, string(patch))
-	return c.AppsV1beta1().StatefulSets(cur.Namespace).Patch(cur.Name, types.StrategicMergePatchType, patch)
+	out, err := c.AppsV1beta1().StatefulSets(cur.Namespace).Patch(cur.Name, types.StrategicMergePatchType, patch)
+	return out, kutil.VerbPatched, err
 }
 
 func TryPatchStatefulSet(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*apps.StatefulSet) *apps.StatefulSet) (result *apps.StatefulSet, err error) {
@@ -63,7 +67,7 @@ func TryPatchStatefulSet(c kubernetes.Interface, meta metav1.ObjectMeta, transfo
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
-			result, e2 = PatchStatefulSet(c, cur, transform)
+			result, _, e2 = PatchStatefulSet(c, cur, transform)
 			return e2 == nil, nil
 		}
 		glog.Errorf("Attempt %d failed to patch StatefulSet %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)
@@ -104,4 +108,31 @@ func WaitUntilStatefulSetReady(kubeClient kubernetes.Interface, meta metav1.Obje
 		}
 		return false, nil
 	})
+}
+
+func DeleteStatefulSet(kubeClient kubernetes.Interface, meta metav1.ObjectMeta) error {
+	statefulSet, err := kubeClient.AppsV1beta1().StatefulSets(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
+	if err != nil {
+		if kerr.IsNotFound(err) {
+			return nil
+		} else {
+			return err
+		}
+	}
+
+	// Update StatefulSet
+	_, _, err = PatchStatefulSet(kubeClient, statefulSet, func(in *apps.StatefulSet) *apps.StatefulSet {
+		in.Spec.Replicas = atypes.Int32P(0)
+		return in
+	})
+	if err != nil {
+		return err
+	}
+
+	err = core_util.WaitUntilPodDeletedBySelector(kubeClient, statefulSet.Namespace, statefulSet.Spec.Selector)
+	if err != nil {
+		return err
+	}
+
+	return kubeClient.AppsV1beta1().StatefulSets(statefulSet.Namespace).Delete(statefulSet.Name, nil)
 }

@@ -15,43 +15,45 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-func CreateOrPatchConfigMap(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*core.ConfigMap) *core.ConfigMap) (*core.ConfigMap, error) {
+func CreateOrPatchConfigMap(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*core.ConfigMap) *core.ConfigMap) (*core.ConfigMap, kutil.VerbType, error) {
 	cur, err := c.CoreV1().ConfigMaps(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating ConfigMap %s/%s.", meta.Namespace, meta.Name)
-		return c.CoreV1().ConfigMaps(meta.Namespace).Create(transform(&core.ConfigMap{
+		out, err := c.CoreV1().ConfigMaps(meta.Namespace).Create(transform(&core.ConfigMap{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "ConfigMap",
 				APIVersion: core.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
+		return out, kutil.VerbCreated, err
 	} else if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	return PatchConfigMap(c, cur, transform)
 }
 
-func PatchConfigMap(c kubernetes.Interface, cur *core.ConfigMap, transform func(*core.ConfigMap) *core.ConfigMap) (*core.ConfigMap, error) {
+func PatchConfigMap(c kubernetes.Interface, cur *core.ConfigMap, transform func(*core.ConfigMap) *core.ConfigMap) (*core.ConfigMap, kutil.VerbType, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	modJson, err := json.Marshal(transform(cur.DeepCopy()))
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	patch, err := strategicpatch.CreateTwoWayMergePatch(curJson, modJson, core.ConfigMap{})
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	if len(patch) == 0 || string(patch) == "{}" {
-		return cur, nil
+		return cur, kutil.VerbUnchanged, nil
 	}
 	glog.V(3).Infof("Patching ConfigMap %s/%s with %s", cur.Namespace, cur.Name, string(patch))
-	return c.CoreV1().ConfigMaps(cur.Namespace).Patch(cur.Name, types.StrategicMergePatchType, patch)
+	out, err := c.CoreV1().ConfigMaps(cur.Namespace).Patch(cur.Name, types.StrategicMergePatchType, patch)
+	return out, kutil.VerbPatched, err
 }
 
 func TryPatchConfigMap(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*core.ConfigMap) *core.ConfigMap) (result *core.ConfigMap, err error) {
@@ -62,7 +64,7 @@ func TryPatchConfigMap(c kubernetes.Interface, meta metav1.ObjectMeta, transform
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
-			result, e2 = PatchConfigMap(c, cur, transform)
+			result, _, e2 = PatchConfigMap(c, cur, transform)
 			return e2 == nil, nil
 		}
 		glog.Errorf("Attempt %d failed to patch ConfigMap %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)

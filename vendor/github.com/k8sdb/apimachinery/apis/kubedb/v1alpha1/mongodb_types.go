@@ -2,7 +2,7 @@ package v1alpha1
 
 import (
 	"github.com/appscode/go/encoding/json/types"
-	"github.com/appscode/kutil/tools/monitoring/api"
+	"github.com/appscode/kube-mon/api"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

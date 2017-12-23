@@ -15,48 +15,45 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func EnsureDormantDatabase(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.DormantDatabase) *api.DormantDatabase) (*api.DormantDatabase, error) {
-	return CreateOrPatchDormantDatabase(c, meta, transform)
-}
-
-func CreateOrPatchDormantDatabase(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.DormantDatabase) *api.DormantDatabase) (*api.DormantDatabase, error) {
+func CreateOrPatchDormantDatabase(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.DormantDatabase) *api.DormantDatabase) (*api.DormantDatabase, kutil.VerbType, error) {
 	cur, err := c.DormantDatabases(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating DormantDatabase %s/%s.", meta.Namespace, meta.Name)
-		return c.DormantDatabases(meta.Namespace).Create(transform(&api.DormantDatabase{
+		out, err := c.DormantDatabases(meta.Namespace).Create(transform(&api.DormantDatabase{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "DormantDatabase",
 				APIVersion: api.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
+		return out, kutil.VerbCreated, err
 	} else if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	return PatchDormantDatabase(c, cur, transform)
 }
 
-func PatchDormantDatabase(c cs.KubedbV1alpha1Interface, cur *api.DormantDatabase, transform func(*api.DormantDatabase) *api.DormantDatabase) (*api.DormantDatabase, error) {
+func PatchDormantDatabase(c cs.KubedbV1alpha1Interface, cur *api.DormantDatabase, transform func(*api.DormantDatabase) *api.DormantDatabase) (*api.DormantDatabase, kutil.VerbType, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	modJson, err := json.Marshal(transform(cur.DeepCopy()))
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	patch, err := jsonmergepatch.CreateThreeWayJSONMergePatch(curJson, modJson, curJson)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	if len(patch) == 0 || string(patch) == "{}" {
-		return cur, nil
+		return cur, kutil.VerbUnchanged, nil
 	}
 	glog.V(3).Infof("Patching DormantDatabase %s/%s with %s.", cur.Namespace, cur.Name, string(patch))
-	result, err := c.DormantDatabases(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
-	return result, err
+	out, err := c.DormantDatabases(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
+	return out, kutil.VerbPatched, err
 }
 
 func TryPatchDormantDatabase(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.DormantDatabase) *api.DormantDatabase) (result *api.DormantDatabase, err error) {
@@ -67,7 +64,7 @@ func TryPatchDormantDatabase(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMet
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
-			result, e2 = PatchDormantDatabase(c, cur, transform)
+			result, _, e2 = PatchDormantDatabase(c, cur, transform)
 			return e2 == nil, nil
 		}
 		glog.Errorf("Attempt %d failed to patch DormantDatabase %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)

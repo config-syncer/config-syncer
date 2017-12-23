@@ -15,48 +15,45 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func EnsureSnapshot(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Snapshot) *api.Snapshot) (*api.Snapshot, error) {
-	return CreateOrPatchSnapshot(c, meta, transform)
-}
-
-func CreateOrPatchSnapshot(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Snapshot) *api.Snapshot) (*api.Snapshot, error) {
+func CreateOrPatchSnapshot(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Snapshot) *api.Snapshot) (*api.Snapshot, kutil.VerbType, error) {
 	cur, err := c.Snapshots(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating Snapshot %s/%s.", meta.Namespace, meta.Name)
-		return c.Snapshots(meta.Namespace).Create(transform(&api.Snapshot{
+		out, err := c.Snapshots(meta.Namespace).Create(transform(&api.Snapshot{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "Snapshot",
 				APIVersion: api.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
+		return out, kutil.VerbCreated, err
 	} else if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	return PatchSnapshot(c, cur, transform)
 }
 
-func PatchSnapshot(c cs.KubedbV1alpha1Interface, cur *api.Snapshot, transform func(*api.Snapshot) *api.Snapshot) (*api.Snapshot, error) {
+func PatchSnapshot(c cs.KubedbV1alpha1Interface, cur *api.Snapshot, transform func(*api.Snapshot) *api.Snapshot) (*api.Snapshot, kutil.VerbType, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	modJson, err := json.Marshal(transform(cur.DeepCopy()))
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	patch, err := jsonmergepatch.CreateThreeWayJSONMergePatch(curJson, modJson, curJson)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	if len(patch) == 0 || string(patch) == "{}" {
-		return cur, nil
+		return cur, kutil.VerbUnchanged, nil
 	}
 	glog.V(3).Infof("Patching Snapshot %s/%s with %s.", cur.Namespace, cur.Name, string(patch))
-	result, err := c.Snapshots(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
-	return result, err
+	out, err := c.Snapshots(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
+	return out, kutil.VerbPatched, err
 }
 
 func TryPatchSnapshot(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Snapshot) *api.Snapshot) (result *api.Snapshot, err error) {
@@ -67,7 +64,7 @@ func TryPatchSnapshot(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, tran
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
-			result, e2 = PatchSnapshot(c, cur, transform)
+			result, _, e2 = PatchSnapshot(c, cur, transform)
 			return e2 == nil, nil
 		}
 		glog.Errorf("Attempt %d failed to patch Snapshot %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)

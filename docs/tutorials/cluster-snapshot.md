@@ -2,13 +2,13 @@
 title: Cluster Snapshots
 description: Cluster Snapshots
 menu:
-  product_kubed_0.3.0:
+  product_kubed_0.3.1:
     identifier: tutorials-cluster-snapshots
     name: Cluster Snapshots
     parent: tutorials
     weight: 15
 product_name: kubed
-menu_name: product_kubed_0.3.0
+menu_name: product_kubed_0.3.1
 section_menu_id: tutorials
 ---
 
@@ -16,12 +16,6 @@ section_menu_id: tutorials
 
 # Cluster Snapshots
 Kubed supports taking periodic snapshot of a Kubernetes cluster objects. The snapshot data can be stored in various cloud providers, eg, [Amazon S3](#aws-s3), [Google Cloud Storage](#google-cloud-storage-gcs), [Microsoft Azure](#microsoft-azure-storage), [OpenStack Swift](#openstack-swift) and any [locally mounted volumes](#local-backend) like NFS, GlusterFS, etc. Kubed uses Kubernetes discovery api to find all available resources in a cluster and stores them in a file matching the `selfLink` URL for an object. Kubed uses [appscode/osm](https://github.com/appscode/osm) to interact with various cloud providers. This tutorial will show you how to use Kubed to take periodic snapshots of a Kubernetes cluster objects.
-
-----
-
-Kubed does not support the latest CustomResourceDefinition (CRD) yet. This is planned for [4.0.0 release](https://github.com/appscode/kubed/milestone/3).
-
-----
 
 ## Before You Begin
 At first, you need to have a Kubernetes cluster, and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [Minikube](https://github.com/kubernetes/minikube).
@@ -170,7 +164,7 @@ $ cat ./docs/examples/cluster-snapshot/s3/config.yaml
 
 snapshotter:
   s3:
-    endpoint: 's3.amazonaws.com'
+    region: us-west-2
     bucket: kubedb-qa
     prefix: minikube
   storageSecretName: snap-secret
@@ -181,8 +175,10 @@ snapshotter:
 | Key                             | Description                                                                     |
 |---------------------------------|---------------------------------------------------------------------------------|
 | `snapshotter.storageSecretName` | `Required`. Name of storage secret                                              |
+| `snapshotter.s3.endpoint`       | Endpoint of s3 like service. This is optional for AWS S3 service. This should be set if you are using [Minio](https://github.com/minio/cookbook/blob/master/docs/aws-sdk-for-go-with-minio.md).            |
+| `snapshotter.s3.region`         | Name of AWS region where bucket is located. This is required for AWS S3 service. This is optional for [Minio](https://github.com/minio/cookbook/blob/master/docs/aws-sdk-for-go-with-minio.md).            |
 | `snapshotter.s3.bucket`         | `Required`. Name of S3 Bucket                                                   |
-| `snapshotter.s3.prefix`         | `Optional`. Path prefix into bucket where snapshot will be stored               |
+| `snapshotter.s3.prefix`         | `Optional`. Sub directory in the bucket where snapshot will be stored           |
 | `snapshotter.overwrite`         | `Optional`. If set to `true`, snapshot folders are reused, otherwise a new folder is created at snapshot timestamp.     |
 | `snapshotter.sanitize`          | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots |
 | `snapshotter.schedule`          | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |

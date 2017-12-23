@@ -15,48 +15,45 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func EnsureNodeAlert(c cs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *api.NodeAlert) *api.NodeAlert) (*api.NodeAlert, error) {
-	return CreateOrPatchNodeAlert(c, meta, transform)
-}
-
-func CreateOrPatchNodeAlert(c cs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *api.NodeAlert) *api.NodeAlert) (*api.NodeAlert, error) {
+func CreateOrPatchNodeAlert(c cs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *api.NodeAlert) *api.NodeAlert) (*api.NodeAlert, kutil.VerbType, error) {
 	cur, err := c.NodeAlerts(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating NodeAlert %s/%s.", meta.Namespace, meta.Name)
-		return c.NodeAlerts(meta.Namespace).Create(transform(&api.NodeAlert{
+		out, err := c.NodeAlerts(meta.Namespace).Create(transform(&api.NodeAlert{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "NodeAlert",
 				APIVersion: api.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
+		return out, kutil.VerbCreated, err
 	} else if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	return PatchNodeAlert(c, cur, transform)
 }
 
-func PatchNodeAlert(c cs.MonitoringV1alpha1Interface, cur *api.NodeAlert, transform func(*api.NodeAlert) *api.NodeAlert) (*api.NodeAlert, error) {
+func PatchNodeAlert(c cs.MonitoringV1alpha1Interface, cur *api.NodeAlert, transform func(*api.NodeAlert) *api.NodeAlert) (*api.NodeAlert, kutil.VerbType, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	modJson, err := json.Marshal(transform(cur.DeepCopy()))
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	patch, err := jsonmergepatch.CreateThreeWayJSONMergePatch(curJson, modJson, curJson)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	if len(patch) == 0 || string(patch) == "{}" {
-		return cur, nil
+		return cur, kutil.VerbUnchanged, nil
 	}
 	glog.V(3).Infof("Patching NodeAlert %s/%s with %s.", cur.Namespace, cur.Name, string(patch))
-	result, err := c.NodeAlerts(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
-	return result, err
+	out, err := c.NodeAlerts(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
+	return out, kutil.VerbPatched, err
 }
 
 func TryPatchNodeAlert(c cs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.NodeAlert) *api.NodeAlert) (result *api.NodeAlert, err error) {
@@ -67,7 +64,7 @@ func TryPatchNodeAlert(c cs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta,
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
-			result, e2 = PatchNodeAlert(c, cur, transform)
+			result, _, e2 = PatchNodeAlert(c, cur, transform)
 			return e2 == nil, nil
 		}
 		glog.Errorf("Attempt %d failed to patch NodeAlert %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)

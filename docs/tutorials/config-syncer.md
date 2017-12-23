@@ -2,13 +2,13 @@
 title: Config Syncer
 description: Config Syncer
 menu:
-  product_kubed_0.3.0:
+  product_kubed_0.3.1:
     identifier: tutorials-config-syncer
     name: Config Syncer
     parent: tutorials
     weight: 25
 product_name: kubed
-menu_name: product_kubed_0.3.0
+menu_name: product_kubed_0.3.1
 section_menu_id: tutorials
 ---
 
@@ -200,7 +200,7 @@ demo          omni                                 2         18m
 ```
 
 ## Origin annotation
-Since 0.3.0, kubed operator will apply `kubed.appscode.com/origin` annotation on ConfigMap or Secret copies.
+Since 0.3.1, kubed operator will apply `kubed.appscode.com/origin` annotation on ConfigMap or Secret copies.
 
 ![origin annotation](/docs/images/config-syncer/config-origin.png)
 

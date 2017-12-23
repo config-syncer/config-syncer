@@ -15,43 +15,45 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-func CreateOrPatchJob(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*batch.Job) *batch.Job) (*batch.Job, error) {
+func CreateOrPatchJob(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*batch.Job) *batch.Job) (*batch.Job, kutil.VerbType, error) {
 	cur, err := c.BatchV1().Jobs(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating Job %s/%s.", meta.Namespace, meta.Name)
-		return c.BatchV1().Jobs(meta.Namespace).Create(transform(&batch.Job{
+		out, err := c.BatchV1().Jobs(meta.Namespace).Create(transform(&batch.Job{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "Job",
 				APIVersion: batch.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
+		return out, kutil.VerbCreated, err
 	} else if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	return PatchJob(c, cur, transform)
 }
 
-func PatchJob(c kubernetes.Interface, cur *batch.Job, transform func(*batch.Job) *batch.Job) (*batch.Job, error) {
+func PatchJob(c kubernetes.Interface, cur *batch.Job, transform func(*batch.Job) *batch.Job) (*batch.Job, kutil.VerbType, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	modJson, err := json.Marshal(transform(cur.DeepCopy()))
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	patch, err := strategicpatch.CreateTwoWayMergePatch(curJson, modJson, batch.Job{})
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	if len(patch) == 0 || string(patch) == "{}" {
-		return cur, nil
+		return cur, kutil.VerbUnchanged, nil
 	}
 	glog.V(3).Infof("Patching Job %s/%s with %s.", cur.Namespace, cur.Name, string(patch))
-	return c.BatchV1().Jobs(cur.Namespace).Patch(cur.Name, types.StrategicMergePatchType, patch)
+	out, err := c.BatchV1().Jobs(cur.Namespace).Patch(cur.Name, types.StrategicMergePatchType, patch)
+	return out, kutil.VerbPatched, err
 }
 
 func TryPatchJob(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*batch.Job) *batch.Job) (result *batch.Job, err error) {
@@ -62,7 +64,7 @@ func TryPatchJob(c kubernetes.Interface, meta metav1.ObjectMeta, transform func(
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
-			result, e2 = PatchJob(c, cur, transform)
+			result, _, e2 = PatchJob(c, cur, transform)
 			return e2 == nil, nil
 		}
 		glog.Errorf("Attempt %d failed to patch Job %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)

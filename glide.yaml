@@ -7,6 +7,8 @@ import:
 - package: github.com/appscode/go
   version: master
 - package: github.com/appscode/kutil
+  version: release-5.0
+- package: github.com/appscode/kube-mon
   version: master
 - package: github.com/appscode/osm
   version: master
@@ -49,13 +51,13 @@ import:
 - package: gopkg.in/olivere/elastic.v3
   version: v3.0.59
 - package: k8s.io/api
-  version: release-1.8
+  version: kubernetes-1.8.3
 - package: k8s.io/apimachinery
   repo: https://github.com/tamalsaha/apimachinery.git
   version: release-1.8
   vcs: git
 - package: k8s.io/client-go
-  version: kubernetes-1.8.3-beta.0
+  version: kubernetes-1.8.3
 - package: k8s.io/apiextensions-apiserver
   version: release-1.8
 - package: k8s.io/kubernetes

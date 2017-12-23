@@ -77,7 +77,7 @@ var _ = Describe("Config-syncer", func() {
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Adding sync annotation")
-			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "")
 				return obj
 			})
@@ -90,7 +90,7 @@ var _ = Describe("Config-syncer", func() {
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
 
 			By("Removing sync annotation")
-			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
 				obj.Annotations = util.RemoveKey(obj.Annotations, config.ConfigSyncKey)
 				return obj
 			})
@@ -109,7 +109,7 @@ var _ = Describe("Config-syncer", func() {
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Adding sync=true annotation")
-			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "true")
 				return obj
 			})
@@ -127,7 +127,7 @@ var _ = Describe("Config-syncer", func() {
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Adding sync annotation")
-			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "")
 				return obj
 			})
@@ -135,7 +135,7 @@ var _ = Describe("Config-syncer", func() {
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
 
 			By("Adding selector annotation")
-			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "app="+f.App())
 				return obj
 			})
@@ -151,7 +151,7 @@ var _ = Describe("Config-syncer", func() {
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 2))
 
 			By("Changing selector annotation")
-			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "app=do-not-match")
 				return obj
 			})
@@ -160,7 +160,7 @@ var _ = Describe("Config-syncer", func() {
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Removing selector annotation")
-			c, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
+			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "")
 				return obj
 			})
@@ -221,7 +221,7 @@ var _ = Describe("Config-syncer", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Adding sync annotation")
-			cfgMap, err = core_util.PatchConfigMap(f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
+			cfgMap, _, err = core_util.PatchConfigMap(f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncContexts, contextsJoined)
 				return obj
 			})
@@ -233,7 +233,7 @@ var _ = Describe("Config-syncer", func() {
 			}
 
 			By("Removing sync annotation")
-			cfgMap, err = core_util.PatchConfigMap(f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
+			cfgMap, _, err = core_util.PatchConfigMap(f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
 				obj.Annotations = util.RemoveKey(obj.Annotations, config.ConfigSyncContexts)
 				return obj
 			})

@@ -15,44 +15,45 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func CreateOrPatchMySQL(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.MySQL) *api.MySQL) (*api.MySQL, error) {
+func CreateOrPatchMySQL(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.MySQL) *api.MySQL) (*api.MySQL, kutil.VerbType, error) {
 	cur, err := c.MySQLs(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating MySQL %s/%s.", meta.Namespace, meta.Name)
-		return c.MySQLs(meta.Namespace).Create(transform(&api.MySQL{
+		out, err := c.MySQLs(meta.Namespace).Create(transform(&api.MySQL{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "MySQL",
 				APIVersion: api.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
+		return out, kutil.VerbCreated, err
 	} else if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	return PatchMySQL(c, cur, transform)
 }
 
-func PatchMySQL(c cs.KubedbV1alpha1Interface, cur *api.MySQL, transform func(*api.MySQL) *api.MySQL) (*api.MySQL, error) {
+func PatchMySQL(c cs.KubedbV1alpha1Interface, cur *api.MySQL, transform func(*api.MySQL) *api.MySQL) (*api.MySQL, kutil.VerbType, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	modJson, err := json.Marshal(transform(cur.DeepCopy()))
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	patch, err := jsonmergepatch.CreateThreeWayJSONMergePatch(curJson, modJson, curJson)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	if len(patch) == 0 || string(patch) == "{}" {
-		return cur, nil
+		return cur, kutil.VerbUnchanged, nil
 	}
 	glog.V(3).Infof("Patching MySQL %s/%s with %s.", cur.Namespace, cur.Name, string(patch))
-	result, err := c.MySQLs(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
-	return result, err
+	out, err := c.MySQLs(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
+	return out, kutil.VerbPatched, err
 }
 
 func TryPatchMySQL(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.MySQL) *api.MySQL) (result *api.MySQL, err error) {
@@ -63,7 +64,7 @@ func TryPatchMySQL(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transfo
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
-			result, e2 = PatchMySQL(c, cur, transform)
+			result, _, e2 = PatchMySQL(c, cur, transform)
 			return e2 == nil, nil
 		}
 		glog.Errorf("Attempt %d failed to patch MySQL %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)

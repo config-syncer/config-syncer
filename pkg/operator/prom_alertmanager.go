@@ -6,8 +6,8 @@ import (
 
 	"github.com/appscode/go/log"
 	acrt "github.com/appscode/go/runtime"
+	kutil "github.com/appscode/kube-mon/prometheus/v1"
 	"github.com/appscode/kubed/pkg/util"
-	kutil "github.com/appscode/kutil/prometheus/v1"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

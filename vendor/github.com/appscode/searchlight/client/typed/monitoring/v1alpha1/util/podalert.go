@@ -15,48 +15,45 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func EnsurePodAlert(c cs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *api.PodAlert) *api.PodAlert) (*api.PodAlert, error) {
-	return CreateOrPatchPodAlert(c, meta, transform)
-}
-
-func CreateOrPatchPodAlert(c cs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *api.PodAlert) *api.PodAlert) (*api.PodAlert, error) {
+func CreateOrPatchPodAlert(c cs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(alert *api.PodAlert) *api.PodAlert) (*api.PodAlert, kutil.VerbType, error) {
 	cur, err := c.PodAlerts(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating PodAlert %s/%s.", meta.Namespace, meta.Name)
-		return c.PodAlerts(meta.Namespace).Create(transform(&api.PodAlert{
+		out, err := c.PodAlerts(meta.Namespace).Create(transform(&api.PodAlert{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "PodAlert",
 				APIVersion: api.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
+		return out, kutil.VerbCreated, err
 	} else if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	return PatchPodAlert(c, cur, transform)
 }
 
-func PatchPodAlert(c cs.MonitoringV1alpha1Interface, cur *api.PodAlert, transform func(*api.PodAlert) *api.PodAlert) (*api.PodAlert, error) {
+func PatchPodAlert(c cs.MonitoringV1alpha1Interface, cur *api.PodAlert, transform func(*api.PodAlert) *api.PodAlert) (*api.PodAlert, kutil.VerbType, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	modJson, err := json.Marshal(transform(cur.DeepCopy()))
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	patch, err := jsonmergepatch.CreateThreeWayJSONMergePatch(curJson, modJson, curJson)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	if len(patch) == 0 || string(patch) == "{}" {
-		return cur, nil
+		return cur, kutil.VerbUnchanged, nil
 	}
 	glog.V(3).Infof("Patching PodAlert %s/%s with %s.", cur.Namespace, cur.Name, string(patch))
-	result, err := c.PodAlerts(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
-	return result, err
+	out, err := c.PodAlerts(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
+	return out, kutil.VerbPatched, err
 }
 
 func TryPatchPodAlert(c cs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.PodAlert) *api.PodAlert) (result *api.PodAlert, err error) {
@@ -67,7 +64,7 @@ func TryPatchPodAlert(c cs.MonitoringV1alpha1Interface, meta metav1.ObjectMeta, 
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
-			result, e2 = PatchPodAlert(c, cur, transform)
+			result, _, e2 = PatchPodAlert(c, cur, transform)
 			return e2 == nil, nil
 		}
 		glog.Errorf("Attempt %d failed to patch PodAlert %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)

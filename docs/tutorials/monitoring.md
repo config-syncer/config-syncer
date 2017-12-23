@@ -2,13 +2,13 @@
 title: Monitoring
 description: Monitoring
 menu:
-  product_kubed_0.3.0:
+  product_kubed_0.3.1:
     identifier: tutorials-monitoring
     name: Monitoring
     parent: tutorials
     weight: 18
 product_name: kubed
-menu_name: product_kubed_0.3.0
+menu_name: product_kubed_0.3.1
 section_menu_id: tutorials
 ---
 

@@ -15,48 +15,45 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func EnsurePostgres(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Postgres) *api.Postgres) (*api.Postgres, error) {
-	return CreateOrPatchPostgres(c, meta, transform)
-}
-
-func CreateOrPatchPostgres(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Postgres) *api.Postgres) (*api.Postgres, error) {
+func CreateOrPatchPostgres(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Postgres) *api.Postgres) (*api.Postgres, kutil.VerbType, error) {
 	cur, err := c.Postgreses(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if kerr.IsNotFound(err) {
 		glog.V(3).Infof("Creating Postgres %s/%s.", meta.Namespace, meta.Name)
-		return c.Postgreses(meta.Namespace).Create(transform(&api.Postgres{
+		out, err := c.Postgreses(meta.Namespace).Create(transform(&api.Postgres{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "Postgres",
 				APIVersion: api.SchemeGroupVersion.String(),
 			},
 			ObjectMeta: meta,
 		}))
+		return out, kutil.VerbCreated, err
 	} else if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	return PatchPostgres(c, cur, transform)
 }
 
-func PatchPostgres(c cs.KubedbV1alpha1Interface, cur *api.Postgres, transform func(*api.Postgres) *api.Postgres) (*api.Postgres, error) {
+func PatchPostgres(c cs.KubedbV1alpha1Interface, cur *api.Postgres, transform func(*api.Postgres) *api.Postgres) (*api.Postgres, kutil.VerbType, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	modJson, err := json.Marshal(transform(cur.DeepCopy()))
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	patch, err := jsonmergepatch.CreateThreeWayJSONMergePatch(curJson, modJson, curJson)
 	if err != nil {
-		return nil, err
+		return nil, kutil.VerbUnchanged, err
 	}
 	if len(patch) == 0 || string(patch) == "{}" {
-		return cur, nil
+		return cur, kutil.VerbUnchanged, nil
 	}
 	glog.V(3).Infof("Patching Postgres %s/%s with %s.", cur.Namespace, cur.Name, string(patch))
-	result, err := c.Postgreses(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
-	return result, err
+	out, err := c.Postgreses(cur.Namespace).Patch(cur.Name, types.MergePatchType, patch)
+	return out, kutil.VerbPatched, err
 }
 
 func TryPatchPostgres(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, transform func(*api.Postgres) *api.Postgres) (result *api.Postgres, err error) {
@@ -67,7 +64,7 @@ func TryPatchPostgres(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta, tran
 		if kerr.IsNotFound(e2) {
 			return false, e2
 		} else if e2 == nil {
-			result, e2 = PatchPostgres(c, cur, transform)
+			result, _, e2 = PatchPostgres(c, cur, transform)
 			return e2 == nil, nil
 		}
 		glog.Errorf("Attempt %d failed to patch Postgres %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)

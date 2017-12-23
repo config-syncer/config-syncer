@@ -2,17 +2,17 @@
 title: Kubed Install
 description: Kubed Install
 menu:
-  product_kubed_0.3.0:
+  product_kubed_0.3.1:
     identifier: kubed-install
     name: Install
     parent: getting-started
     weight: 25
 product_name: kubed
-menu_name: product_kubed_0.3.0
+menu_name: product_kubed_0.3.1
 section_menu_id: getting-started
-url: /products/kubed/0.3.0/getting-started/install/
+url: /products/kubed/0.3.1/getting-started/install/
 aliases:
-  - /products/kubed/0.3.0/install/
+  - /products/kubed/0.3.1/install/
 ---
 
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
@@ -98,11 +98,11 @@ Kubed can be installed using YAML files includes in the [/hack/deploy](/hack/dep
 
 ```console
 # Install without RBAC roles
-$ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.3.0/hack/deploy/without-rbac.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.3.1/hack/deploy/without-rbac.yaml
 
 
 # Install with RBAC roles
-$ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.3.0/hack/deploy/with-rbac.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.3.1/hack/deploy/with-rbac.yaml
 ```
 
 ## Using Helm

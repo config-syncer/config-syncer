@@ -156,7 +156,7 @@ func (s *ConfigSyncer) upsertSecretForClient(kubeClient kubernetes.Interface, sr
 		Namespace: namespace,
 	}
 
-	_, err := core_util.CreateOrPatchSecret(kubeClient, meta, func(obj *core.Secret) *core.Secret {
+	_, _, err := core_util.CreateOrPatchSecret(kubeClient, meta, func(obj *core.Secret) *core.Secret {
 		obj.Data = src.Data
 		obj.Labels = src.Labels
 

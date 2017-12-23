@@ -156,7 +156,7 @@ func (s *ConfigSyncer) upsertConfigMapForClient(kubeClient kubernetes.Interface,
 		Namespace: namespace,
 	}
 
-	_, err := core_util.CreateOrPatchConfigMap(kubeClient, meta, func(obj *core.ConfigMap) *core.ConfigMap {
+	_, _, err := core_util.CreateOrPatchConfigMap(kubeClient, meta, func(obj *core.ConfigMap) *core.ConfigMap {
 		obj.Data = src.Data
 		obj.Labels = src.Labels
 
