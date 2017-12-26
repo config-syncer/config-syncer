@@ -18,7 +18,7 @@ import (
 	"k8s.io/client-go/util/homedir"
 )
 
-var _ = Describe("Config-syncer", func() {
+var _ = FDescribe("Config-syncer", func() {
 	var (
 		f               *framework.Invocation
 		cfgMap          *core.ConfigMap

@@ -85,3 +85,40 @@ func ContextNameSet(kubeConfigPath string) (sets.String, error) {
 	}
 	return sets.StringKeySet(kConfig.Contexts), nil
 }
+
+func ConfigMapNamespaceSet(k8sClient kubernetes.Interface, selector string) (sets.String, error) {
+	cfgMaps, err := k8sClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
+		LabelSelector: selector,
+	})
+	if err != nil {
+		return nil, err
+	}
+	ns := sets.NewString()
+	for _, obj := range cfgMaps.Items {
+		ns.Insert(obj.Namespace)
+	}
+	return ns, nil
+}
+
+func NamespaceSetForSelector(k8sClient kubernetes.Interface, selector string) (sets.String, error) {
+	namespaces, err := k8sClient.CoreV1().Namespaces().List(metav1.ListOptions{
+		LabelSelector: selector,
+	})
+	if err != nil {
+		return nil, err
+	}
+	ns := sets.NewString()
+	for _, obj := range namespaces.Items {
+		ns.Insert(obj.Name)
+	}
+	return ns, nil
+}
+
+func DeleteConfigMapFromNamespaces(k8sClient kubernetes.Interface, name string, namespaces []string) error {
+	for _, ns := range namespaces {
+		if err := k8sClient.CoreV1().ConfigMaps(ns).Delete(name, &metav1.DeleteOptions{}); err != nil {
+			return err
+		}
+	}
+	return nil
+}

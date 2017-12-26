@@ -48,7 +48,9 @@ func (op *Operator) WatchConfigMaps() {
 						}
 					}
 					if op.ConfigSyncer != nil {
-						op.ConfigSyncer.SyncConfigMap(nil, res)
+						if err := op.ConfigSyncer.SyncConfigMap(res); err != nil {
+							log.Infoln(err)
+						}
 					}
 				}
 			},
@@ -66,7 +68,9 @@ func (op *Operator) WatchConfigMaps() {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, obj)
 					}
 					if op.ConfigSyncer != nil {
-						op.ConfigSyncer.SyncConfigMap(res, nil)
+						if err := op.ConfigSyncer.SyncDeletedConfigMap(res); err != nil {
+							log.Infoln(err)
+						}
 					}
 				}
 			},
@@ -95,7 +99,9 @@ func (op *Operator) WatchConfigMaps() {
 					}
 
 					if op.ConfigSyncer != nil {
-						op.ConfigSyncer.SyncConfigMap(oldRes, newRes)
+						if err := op.ConfigSyncer.SyncConfigMap(newRes); err != nil {
+							log.Infoln(err)
+						}
 					}
 				}
 			},

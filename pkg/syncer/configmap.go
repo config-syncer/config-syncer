@@ -9,96 +9,84 @@ import (
 	core_util "github.com/appscode/kutil/core/v1"
 	"github.com/appscode/kutil/tools/clientcmd"
 	core "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 )
 
-func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *core.ConfigMap) error {
-	var (
-		oldOpt, newOpt syncOpt
-		err            error
-	)
+func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
+	opt, _ := getSyncOption(src.Annotations)
 
-	if oldSrc != nil {
-		oldOpt, _ = getSyncOption(oldSrc.Annotations)
+	oldNs, err := util.ConfigMapNamespaceSet(s.KubeClient, config.ConfigOriginKey+"="+src.Name+"."+src.Namespace)
+	if err != nil {
+		return err
 	}
-	if newSrc != nil {
-		newOpt, err = getSyncOption(newSrc.Annotations)
+
+	if opt.sync {
+		newNs, err := util.NamespaceSetForSelector(s.KubeClient, opt.nsSelector)
 		if err != nil {
-			return err // Don't remove by mistake
+			return err
+		}
+		oldNs = oldNs.Difference(newNs) // delete that were in old but not in new
+		oldNs.Delete(src.Namespace)     // skip source
+		if err := util.DeleteConfigMapFromNamespaces(s.KubeClient, src.Name, oldNs.List()); err != nil {
+			return err
+		}
+
+		// upsert to new
+		for _, ns := range newNs.List() {
+			if err = s.upsertConfigMap(s.KubeClient, src, ns); err != nil {
+				return err
+			}
+		}
+	} else { // sync removed, delete that were in old
+		oldNs.Delete(src.Namespace) // skip source
+		if err := util.DeleteConfigMapFromNamespaces(s.KubeClient, src.Name, oldNs.List()); err != nil {
+			return err
 		}
 	}
 
+	// sync to contexts
 	if allContexts, err := util.ContextNameSet(s.KubeConfig); err != nil {
 		log.Errorf("Failed to parse context list. Reason: %s\n", err.Error())
 	} else {
 		for _, context := range allContexts.List() {
-			if newSrc != nil {
-				if err = s.syncConfigMapIntoContext(newSrc, context, newOpt.contexts); err != nil {
-					log.Errorf("Failed to sync configmap %s into context %s. Reason: %s\n", newSrc.Name, context, err.Error())
-				}
-			} else {
-				if err = s.syncConfigMapIntoContext(oldSrc, context, newOpt.contexts); err != nil {
-					log.Errorf("Failed to sync configmap %s into context %s. Reason: %s\n", oldSrc.Name, context, err.Error())
-				}
+			if err = s.syncConfigMapIntoContext(src, context, opt.contexts); err != nil {
+				log.Errorf("Failed to sync configmap %s into context %s. Reason: %s\n", src.Name, context, err.Error())
 			}
 		}
 	}
 
-	if newOpt.sync {
-		namespaces, err := s.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{
-			LabelSelector: newOpt.nsSelector,
-		})
-		if err != nil {
-			return err
-		}
-		for _, ns := range namespaces.Items {
-			if err = s.upsertConfigMap(s.KubeClient, newSrc, ns.Name); err != nil {
-				return err
-			}
-		}
+	return nil
+}
 
-		// if selector changed, delete that were in old but not in new (n^2)
-		if oldOpt.sync && newOpt.nsSelector != oldOpt.nsSelector {
-			oldNamespaces, err := s.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{
-				LabelSelector: oldOpt.nsSelector,
-			})
-			if err != nil {
-				return err
-			}
-			for _, oldNs := range oldNamespaces.Items {
-				if oldNs.Name == newSrc.Namespace {
-					continue
-				}
-				remove := true
-				for _, ns := range namespaces.Items {
-					if oldNs.Name == ns.Name {
-						remove = false
-						break
-					}
-				}
-				if remove {
-					s.KubeClient.CoreV1().ConfigMaps(oldNs.Name).Delete(newSrc.Name, &metav1.DeleteOptions{})
-				}
-			}
-		}
-	} else if oldOpt.sync {
-		namespaces, err := s.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{
-			LabelSelector: oldOpt.nsSelector,
-		})
-		if err != nil {
+func (s *ConfigSyncer) SyncDeletedConfigMap(src *core.ConfigMap) error {
+	opt, _ := getSyncOption(src.Annotations)
+
+	// sync to namespaces
+	if opt.sync {
+		if err := s.KubeClient.CoreV1().ConfigMaps(src.Namespace).DeleteCollection(
+			&metav1.DeleteOptions{},
+			metav1.ListOptions{
+				LabelSelector: config.ConfigOriginKey + "=" + src.Name + "." + src.Namespace,
+			},
+		); err != nil {
 			return err
-		}
-		for _, ns := range namespaces.Items {
-			if ns.Name == oldSrc.Namespace {
-				continue
-			}
-			s.KubeClient.CoreV1().ConfigMaps(ns.Name).Delete(oldSrc.Name, &metav1.DeleteOptions{})
 		}
 	}
+
+	// sync to contexts
+	if allContexts, err := util.ContextNameSet(s.KubeConfig); err != nil {
+		log.Errorf("Failed to parse context list. Reason: %s\n", err.Error())
+	} else {
+		for _, context := range allContexts.List() {
+			if err = s.syncConfigMapIntoContext(src, context, sets.NewString()); err != nil {
+				log.Errorf("Failed to sync configmap %s into context %s. Reason: %s\n", src.Name, context, err.Error())
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -114,35 +102,42 @@ func (s *ConfigSyncer) syncConfigMapIntoNamespace(src *core.ConfigMap, namespace
 		return err
 	} else if selector.Matches(labels.Set(namespace.Labels)) {
 		return s.upsertConfigMap(s.KubeClient, src, namespace.Name)
+	} else {
+
 	}
 
 	return nil
 }
 
-func (s *ConfigSyncer) syncConfigMapIntoContext(src *core.ConfigMap, context string, newContexts sets.String) error {
+func (s *ConfigSyncer) syncConfigMapIntoContext(src *core.ConfigMap, context string, contexts sets.String) error {
 	client, err := clientcmd.ClientFromContext(s.KubeConfig, context)
 	if err != nil {
 		return err
 	}
 
-	ns, err := clientcmd.NamespaceFromContext(s.KubeConfig, context)
+	newNs, err := clientcmd.NamespaceFromContext(s.KubeConfig, context)
 	if err != nil {
 		return err
 	}
-	if ns == "" {
-		ns = src.Namespace
+	if newNs == "" {
+		newNs = src.Namespace
 	}
 
-	if newContexts.Has(context) {
-		if err = s.upsertConfigMap(client, src, ns); err != nil {
+	oldNs, err := util.ConfigMapNamespaceSet(client, config.ConfigOriginKey+"="+src.Name+"."+src.Namespace)
+	if err != nil {
+		return err
+	}
+
+	if contexts.Has(context) {
+		// in case kubeconfig changes, delete that were in old but not in new
+		oldNs.Delete(newNs)
+		util.DeleteConfigMapFromNamespaces(client, src.Name, oldNs.List())
+		// add to new
+		if err = s.upsertConfigMap(client, src, newNs); err != nil {
 			return err
 		}
-	} else {
-		if cfgMap, err := client.CoreV1().ConfigMaps(ns).Get(src.Name, metav1.GetOptions{}); err != nil {
-			if !errors.IsNotFound(err) {
-				return err
-			}
-		} else if metav1.HasAnnotation(cfgMap.ObjectMeta, config.ConfigOriginKey) { // delete only if it was added by kubed
+	} else { // no sync for this context, delete that were in old
+		for _, ns := range oldNs.List() {
 			if err = client.CoreV1().ConfigMaps(ns).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
 				return err
 			}
@@ -166,12 +161,21 @@ func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core
 		obj.Data = src.Data
 		obj.Labels = src.Labels
 
-		obj.Annotations = map[string]string{}
+		obj.Labels[config.ConfigOriginKey] = src.Name + "." + src.Namespace
+
+		newAnnotations := map[string]string{}
+		if metav1.HasAnnotation(obj.ObjectMeta, config.ConfigSyncKey) {
+			newAnnotations[config.ConfigSyncKey] = obj.Annotations[config.ConfigSyncKey]
+		}
+		if metav1.HasAnnotation(obj.ObjectMeta, config.ConfigSyncContexts) {
+			newAnnotations[config.ConfigSyncContexts] = obj.Annotations[config.ConfigSyncContexts]
+		}
 		for k, v := range src.Annotations {
 			if k != config.ConfigSyncKey && k != config.ConfigSyncContexts {
-				obj.Annotations[k] = v
+				newAnnotations[k] = v
 			}
 		}
+		obj.Annotations = newAnnotations
 
 		ref, _ := json.Marshal(core.ObjectReference{
 			APIVersion:      src.APIVersion,
