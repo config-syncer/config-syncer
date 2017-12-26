@@ -6,7 +6,9 @@ import (
 
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 func IsPreferredAPIResource(kubeClient kubernetes.Interface, groupVersion, kind string) bool {
@@ -74,4 +76,12 @@ func RemoveKey(m map[string]string, key string) map[string]string {
 	}
 	delete(m, key)
 	return m
+}
+
+func ContextNameSet(kubeConfigPath string) (sets.String, error) {
+	kConfig, err := clientcmd.LoadFromFile(kubeConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	return sets.StringKeySet(kConfig.Contexts), nil
 }

@@ -3,10 +3,13 @@ package syncer
 import (
 	"encoding/json"
 
+	"github.com/appscode/go/log"
 	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/util"
 	core_util "github.com/appscode/kutil/core/v1"
 	"github.com/appscode/kutil/tools/clientcmd"
 	core "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -29,8 +32,20 @@ func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *core.ConfigMap) error {
 		}
 	}
 
-	if err = s.syncConfigMapIntoContexts(newSrc, oldOpt.contexts, newOpt.contexts); err != nil {
-		return err
+	if allContexts, err := util.ContextNameSet(s.KubeConfig); err != nil {
+		log.Errorf("Failed to parse context list. Reason: %s\n", err.Error())
+	} else {
+		for _, context := range allContexts.List() {
+			if newSrc != nil {
+				if err = s.syncConfigMapIntoContext(newSrc, context, newOpt.contexts); err != nil {
+					log.Errorf("Failed to sync configmap %s into context %s. Reason: %s\n", newSrc.Name, context, err.Error())
+				}
+			} else {
+				if err = s.syncConfigMapIntoContext(oldSrc, context, newOpt.contexts); err != nil {
+					log.Errorf("Failed to sync configmap %s into context %s. Reason: %s\n", oldSrc.Name, context, err.Error())
+				}
+			}
+		}
 	}
 
 	if newOpt.sync {
@@ -104,38 +119,33 @@ func (s *ConfigSyncer) syncConfigMapIntoNamespace(src *core.ConfigMap, namespace
 	return nil
 }
 
-func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, oldContexts, newContexts sets.String) error {
-	for _, oldContext := range oldContexts.Difference(newContexts).List() {
-		client, err := clientcmd.ClientFromContext(s.KubeConfig, oldContext)
-		if err != nil {
-			return err
-		}
-		ns, err := clientcmd.NamespaceFromContext(s.KubeConfig, oldContext)
-		if err != nil {
-			return err
-		}
-		if ns == "" {
-			ns = src.Namespace
-		}
-		if err = client.CoreV1().ConfigMaps(ns).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
-			return err
-		}
+func (s *ConfigSyncer) syncConfigMapIntoContext(src *core.ConfigMap, context string, newContexts sets.String) error {
+	client, err := clientcmd.ClientFromContext(s.KubeConfig, context)
+	if err != nil {
+		return err
 	}
 
-	for _, newContext := range newContexts.List() {
-		client, err := clientcmd.ClientFromContext(s.KubeConfig, newContext)
-		if err != nil {
-			return err
-		}
-		ns, err := clientcmd.NamespaceFromContext(s.KubeConfig, newContext)
-		if err != nil {
-			return err
-		}
-		if ns == "" {
-			ns = src.Namespace
-		}
+	ns, err := clientcmd.NamespaceFromContext(s.KubeConfig, context)
+	if err != nil {
+		return err
+	}
+	if ns == "" {
+		ns = src.Namespace
+	}
+
+	if newContexts.Has(context) {
 		if err = s.upsertConfigMap(client, src, ns); err != nil {
 			return err
+		}
+	} else {
+		if cfgMap, err := client.CoreV1().ConfigMaps(ns).Get(src.Name, metav1.GetOptions{}); err != nil {
+			if !errors.IsNotFound(err) {
+				return err
+			}
+		} else if metav1.HasAnnotation(cfgMap.ObjectMeta, config.ConfigOriginKey) { // delete only if it was added by kubed
+			if err = client.CoreV1().ConfigMaps(ns).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
+				return err
+			}
 		}
 	}
 
