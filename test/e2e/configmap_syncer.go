@@ -16,9 +16,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
+	"time"
 )
 
-var _ = FDescribe("Config-syncer", func() {
+var _ = Describe("Config-syncer", func() {
 	var (
 		f               *framework.Invocation
 		cfgMap          *core.ConfigMap
@@ -68,7 +69,7 @@ var _ = FDescribe("Config-syncer", func() {
 		f.EventuallyNamespaceDeleted(nsWithLabel.Name).Should(BeTrue())
 	})
 
-	Describe("ConfigMap Syncer Test", func() {
+	FDescribe("ConfigMap Syncer Test", func() {
 		It("Should add configmap to all namespaces", func() {
 			By("Creating configmap")
 			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
@@ -88,6 +89,8 @@ var _ = FDescribe("Config-syncer", func() {
 			_, err = root.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
 			Expect(err).ShouldNot(HaveOccurred())
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			time.Sleep(time.Hour)
 
 			By("Removing sync annotation")
 			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {

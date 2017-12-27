@@ -37,6 +37,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	clientcmd_util "github.com/appscode/kutil/tools/clientcmd"
 )
 
 type Options struct {
@@ -116,9 +117,30 @@ func (op *Operator) Setup() error {
 	}
 
 	if op.Config.EnableConfigSyncer {
+		// Parse external kubeconfig file, assume that it doesn't include source cluster
+		contexts := map[string]syncer.ClusterContext{}
+		if allContexts, err := util.ContextNameSet(op.Config.KubeConfig); err != nil {
+			log.Errorf("Failed to parse context list. Reason: %s\n", err.Error())
+		} else {
+			context := syncer.ClusterContext{}
+			for _, ctx := range allContexts.List() {
+				if context.Client, err = clientcmd_util.ClientFromContext(op.Config.KubeConfig, ctx); err != nil {
+					continue
+				}
+				if context.Namespace, err = clientcmd_util.NamespaceFromContext(op.Config.KubeConfig, ctx); err != nil {
+					continue
+				}
+				if context.Address, err = util.AddressFromContext(op.Config.KubeConfig, ctx); err != nil {
+					continue
+				}
+				contexts[ctx] = context
+			}
+		}
+
 		op.ConfigSyncer = &syncer.ConfigSyncer{
 			KubeClient: op.KubeClient,
-			KubeConfig: op.Config.KubeConfig,
+			ClusterName: op.Config.ClusterName,
+			Contexts: contexts,
 		}
 	}
 

@@ -19,17 +19,13 @@ import (
 func (s *ConfigSyncer) SyncSecret(oldSrc, newSrc *core.Secret) error {
 	var (
 		oldOpt, newOpt syncOpt
-		err            error
 	)
 
 	if oldSrc != nil {
-		oldOpt, _ = getSyncOption(oldSrc.Annotations)
+		oldOpt = getSyncOption(oldSrc.Annotations)
 	}
 	if newSrc != nil {
-		newOpt, err = getSyncOption(newSrc.Annotations)
-		if err != nil {
-			return err // Don't remove by mistake
-		}
+		newOpt = getSyncOption(newSrc.Annotations)
 	}
 
 	if allContexts, err := util.ContextNameSet(s.KubeConfig); err != nil {
@@ -103,11 +99,9 @@ func (s *ConfigSyncer) SyncSecret(oldSrc, newSrc *core.Secret) error {
 }
 
 func (s *ConfigSyncer) syncSecretIntoNamespace(src *core.Secret, namespace *core.Namespace) error {
-	opt, err := getSyncOption(src.Annotations)
-	if err != nil {
-		return err
-	} else if !opt.sync {
-		return nil // nothing to sync
+	opt := getSyncOption(src.Annotations)
+	if !opt.sync {
+		return nil
 	}
 
 	if selector, err := labels.Parse(opt.nsSelector); err != nil {

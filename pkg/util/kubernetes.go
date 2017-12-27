@@ -9,6 +9,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	"fmt"
 )
 
 func IsPreferredAPIResource(kubeClient kubernetes.Interface, groupVersion, kind string) bool {
@@ -114,11 +115,27 @@ func NamespaceSetForSelector(k8sClient kubernetes.Interface, selector string) (s
 	return ns, nil
 }
 
-func DeleteConfigMapFromNamespaces(k8sClient kubernetes.Interface, name string, namespaces []string) error {
-	for _, ns := range namespaces {
+func DeleteConfigMapFromNamespaces(k8sClient kubernetes.Interface, name string, namespaces sets.String) error {
+	for _, ns := range namespaces.List() {
 		if err := k8sClient.CoreV1().ConfigMaps(ns).Delete(name, &metav1.DeleteOptions{}); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func AddressFromContext(kubeConfigPath, contextName string) (string, error){
+	kConfig, err := clientcmd.LoadFromFile(kubeConfigPath)
+	if err != nil {
+		return "", err
+	}
+	ctx, found := kConfig.Contexts[contextName]
+	if !found {
+		return "", fmt.Errorf("context %s not found in kubeconfig file %s", contextName, kubeConfigPath)
+	}
+	cluster, found := kConfig.Clusters[ctx.Cluster]
+	if !found {
+		return "", fmt.Errorf("cluster %s not found in kubeconfig file %s", ctx.Cluster, kubeConfigPath)
+	}
+	return cluster.Server, nil
 }

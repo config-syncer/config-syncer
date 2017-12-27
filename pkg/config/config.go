@@ -13,6 +13,10 @@ const (
 
 	JanitorElasticsearch = "Elasticsearch"
 	JanitorInfluxDB      = "InfluxDB"
+
+	OriginNameLabelKey      = "kubed.appscode.com/origin.name"
+	OriginNamespaceLabelKey = "kubed.appscode.com/origin.namespace"
+	OriginClusterLabelKey   = "kubed.appscode.com/origin.cluster"
 )
 
 type ClusterConfig struct {
