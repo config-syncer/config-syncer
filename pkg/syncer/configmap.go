@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/appscode/go/log"
+	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/util"
 	core_util "github.com/appscode/kutil/core/v1"
 	core "k8s.io/api/core/v1"
@@ -11,7 +12,6 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
-	"github.com/appscode/kubed/pkg/config"
 )
 
 func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {

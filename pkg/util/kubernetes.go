@@ -2,10 +2,9 @@ package util
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
 	"time"
-
-	"net/url"
 
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
