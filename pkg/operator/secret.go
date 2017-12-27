@@ -42,7 +42,9 @@ func (op *Operator) WatchSecrets() {
 						}
 					}
 					if op.ConfigSyncer != nil {
-						op.ConfigSyncer.SyncSecret(nil, res)
+						if err := op.ConfigSyncer.SyncSecret(res); err != nil {
+							log.Infoln(err)
+						}
 					}
 				}
 			},
@@ -60,7 +62,9 @@ func (op *Operator) WatchSecrets() {
 						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, kutil.ObfuscateSecret(*res))
 					}
 					if op.ConfigSyncer != nil {
-						op.ConfigSyncer.SyncSecret(res, nil)
+						if err := op.ConfigSyncer.SyncDeletedSecret(res); err != nil {
+							log.Infoln(err)
+						}
 					}
 				}
 			},
@@ -89,7 +93,9 @@ func (op *Operator) WatchSecrets() {
 					}
 
 					if op.ConfigSyncer != nil {
-						op.ConfigSyncer.SyncSecret(oldRes, newRes)
+						if err := op.ConfigSyncer.SyncSecret(newRes); err != nil {
+							log.Infoln(err)
+						}
 					}
 				}
 			},

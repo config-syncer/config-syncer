@@ -1,5 +1,5 @@
 hash: 405456dbe9602b6394c9a0cb90b8d8f2a834b2f9af4906f646c985db92b1f774
-updated: 2017-12-27T16:36:57.015034039-05:00
+updated: 2017-12-27T16:48:16.16433274-05:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -58,6 +58,7 @@ imports:
   - storage/v1
   - tools/analytics
   - tools/backup
+  - tools/clientcmd
 - name: github.com/appscode/mergo
   version: e3000cb3d28c72b837601cac94debd91032d19fe
 - name: github.com/appscode/osm

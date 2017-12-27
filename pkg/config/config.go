@@ -6,12 +6,17 @@ import (
 )
 
 const (
-	TimestampFormat = "20060102T150405"
-	ConfigSyncKey   = "kubed.appscode.com/sync"
-	ConfigOriginKey = "kubed.appscode.com/origin"
+	TimestampFormat    = "20060102T150405"
+	ConfigSyncKey      = "kubed.appscode.com/sync"
+	ConfigOriginKey    = "kubed.appscode.com/origin"
+	ConfigSyncContexts = "kubed.appscode.com/sync-contexts"
 
 	JanitorElasticsearch = "Elasticsearch"
 	JanitorInfluxDB      = "InfluxDB"
+
+	OriginNameLabelKey      = "kubed.appscode.com/origin.name"
+	OriginNamespaceLabelKey = "kubed.appscode.com/origin.namespace"
+	OriginClusterLabelKey   = "kubed.appscode.com/origin.cluster"
 )
 
 type ClusterConfig struct {
@@ -23,6 +28,7 @@ type ClusterConfig struct {
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
 	Janitors           []JanitorSpec       `json:"janitors,omitempty"`
 	APIServer          APIServerSpec       `json:"apiServer,omitempty"`
+	KubeConfig         string              `json:"kubeConfig,omitempty"`
 }
 
 type APIServerSpec struct {

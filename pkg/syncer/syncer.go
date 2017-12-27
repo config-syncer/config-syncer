@@ -2,221 +2,63 @@ package syncer
 
 import (
 	"encoding/json"
+	"strings"
 
+	"github.com/appscode/go/types"
 	"github.com/appscode/kubed/pkg/config"
-	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/kutil/meta"
 	core "k8s.io/api/core/v1"
-	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 )
 
 type ConfigSyncer struct {
-	KubeClient kubernetes.Interface
+	KubeClient  kubernetes.Interface
+	ClusterName string
+	Contexts    map[string]ClusterContext
 }
 
-func (s *ConfigSyncer) SyncConfigMap(oldSrc, newSrc *core.ConfigMap) error {
-	var oldSynced, newSynced bool
-	if oldSrc != nil {
-		oldSynced, _ = util.GetBool(oldSrc.Annotations, config.ConfigSyncKey)
-	}
-	if newSrc != nil {
-		if ok, err := util.GetBool(newSrc.Annotations, config.ConfigSyncKey); err != nil {
-			return err // Don't remove by mistake
-		} else {
-			newSynced = ok
-		}
-	}
-	if newSynced {
-		namespaces, err := s.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
-		if err != nil {
-			return err
-		}
-		for _, ns := range namespaces.Items {
-			s.upsertConfigMap(newSrc, ns.Name)
-		}
-	} else if oldSynced {
-		namespaces, err := s.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
-		if err != nil {
-			return err
-		}
-		for _, ns := range namespaces.Items {
-			if ns.Name == oldSrc.Namespace {
-				continue
-			}
-			s.KubeClient.CoreV1().ConfigMaps(ns.Name).Delete(oldSrc.Name, &metav1.DeleteOptions{})
-		}
-	}
-	return nil
+type ClusterContext struct {
+	Client    kubernetes.Interface
+	Namespace string
+	Address   string
 }
 
-func (s *ConfigSyncer) upsertConfigMap(src *core.ConfigMap, namespace string) error {
-	ok, err := util.GetBool(src.Annotations, config.ConfigSyncKey)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return nil // nothing to sync
-	}
-
-	if namespace == src.Namespace {
-		return nil
-	}
-	nu, err := s.KubeClient.CoreV1().ConfigMaps(namespace).Get(src.Name, metav1.GetOptions{})
-	if kerr.IsNotFound(err) {
-		// create
-		n := *src
-		n.Namespace = namespace
-		n.UID = ""
-		n.ResourceVersion = ""
-		n.Annotations = map[string]string{}
-		for k, v := range src.Annotations {
-			if k != config.ConfigSyncKey {
-				n.Annotations[k] = v
-			}
-		}
-		ref, _ := json.Marshal(core.ObjectReference{
-			APIVersion:      src.APIVersion,
-			Kind:            src.Kind,
-			Name:            src.Name,
-			Namespace:       src.Namespace,
-			UID:             src.UID,
-			ResourceVersion: src.ResourceVersion,
-		})
-		n.Annotations[config.ConfigOriginKey] = string(ref)
-
-		_, err := s.KubeClient.CoreV1().ConfigMaps(namespace).Create(&n)
-		return err
-	}
-	// update
-	nu.Data = src.Data
-	nu.Labels = src.Labels
-	nu.Annotations = map[string]string{}
-	for k, v := range src.Annotations {
-		if k != config.ConfigSyncKey {
-			nu.Annotations[k] = v
-		}
-	}
-	ref, _ := json.Marshal(core.ObjectReference{
-		APIVersion:      src.APIVersion,
-		Kind:            src.Kind,
-		Name:            src.Name,
-		Namespace:       src.Namespace,
-		UID:             src.UID,
-		ResourceVersion: src.ResourceVersion,
-	})
-	nu.Annotations[config.ConfigOriginKey] = string(ref)
-	_, err = s.KubeClient.CoreV1().ConfigMaps(namespace).Update(nu)
-	return err
+type options struct {
+	nsSelector *string // if nil, delete from cluster
+	contexts   sets.String
 }
 
-func (s *ConfigSyncer) SyncSecret(oldSrc, newSrc *core.Secret) error {
-	var oldSynced, newSynced bool
-	if oldSrc != nil {
-		oldSynced, _ = util.GetBool(oldSrc.Annotations, config.ConfigSyncKey)
-	}
-	if newSrc != nil {
-		if ok, err := util.GetBool(newSrc.Annotations, config.ConfigSyncKey); err != nil {
-			return err // Don't remove by mistake
-		} else {
-			newSynced = ok
+func getSyncOptions(annotations map[string]string) options {
+	opts := options{}
+	if meta.HasKey(annotations, config.ConfigSyncKey) {
+		opts.nsSelector = types.StringP(meta.GetString(annotations, config.ConfigSyncKey))
+		if *opts.nsSelector == "true" {
+			opts.nsSelector = types.StringP(labels.Everything().String())
 		}
 	}
-	if newSynced {
-		namespaces, err := s.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
-		if err != nil {
-			return err
-		}
-		for _, ns := range namespaces.Items {
-			s.upsertSecret(newSrc, ns.Name)
-		}
-	} else if oldSynced {
-		namespaces, err := s.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
-		if err != nil {
-			return err
-		}
-		for _, ns := range namespaces.Items {
-			if ns.Name == oldSrc.Namespace {
-				continue
-			}
-			s.KubeClient.CoreV1().Secrets(ns.Name).Delete(oldSrc.Name, &metav1.DeleteOptions{})
-		}
+	if contexts := meta.GetString(annotations, config.ConfigSyncContexts); contexts != "" {
+		opts.contexts = sets.NewString(strings.Split(contexts, ",")...)
 	}
-	return nil
-}
-
-func (s *ConfigSyncer) upsertSecret(src *core.Secret, namespace string) error {
-	ok, err := util.GetBool(src.Annotations, config.ConfigSyncKey)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return nil // nothing to sync
-	}
-
-	if namespace == src.Namespace {
-		return nil
-	}
-	nu, err := s.KubeClient.CoreV1().Secrets(namespace).Get(src.Name, metav1.GetOptions{})
-	if kerr.IsNotFound(err) {
-		// create
-		n := *src
-		n.Namespace = namespace
-		n.UID = ""
-		n.ResourceVersion = ""
-		n.Annotations = map[string]string{}
-		for k, v := range src.Annotations {
-			if k != config.ConfigSyncKey {
-				n.Annotations[k] = v
-			}
-		}
-		ref, _ := json.Marshal(core.ObjectReference{
-			APIVersion:      src.APIVersion,
-			Kind:            src.Kind,
-			Name:            src.Name,
-			Namespace:       src.Namespace,
-			UID:             src.UID,
-			ResourceVersion: src.ResourceVersion,
-		})
-		n.Annotations[config.ConfigOriginKey] = string(ref)
-		_, err := s.KubeClient.CoreV1().Secrets(namespace).Create(&n)
-		return err
-	}
-
-	// update
-	nu.Data = src.Data
-	nu.Labels = src.Labels
-	nu.Annotations = map[string]string{}
-	for k, v := range src.Annotations {
-		if k != config.ConfigSyncKey {
-			nu.Annotations[k] = v
-		}
-	}
-	ref, _ := json.Marshal(core.ObjectReference{
-		APIVersion:      src.APIVersion,
-		Kind:            src.Kind,
-		Name:            src.Name,
-		Namespace:       src.Namespace,
-		UID:             src.UID,
-		ResourceVersion: src.ResourceVersion,
-	})
-	nu.Annotations[config.ConfigOriginKey] = string(ref)
-	_, err = s.KubeClient.CoreV1().Secrets(namespace).Update(nu)
-	return err
+	return opts
 }
 
 func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
-	_, err := s.KubeClient.CoreV1().Namespaces().Get(namespace, metav1.GetOptions{})
+	ns, err := s.KubeClient.CoreV1().Namespaces().Get(namespace, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
 
-	cfgmaps, err := s.KubeClient.CoreV1().ConfigMaps(core.NamespaceAll).List(metav1.ListOptions{})
+	configMaps, err := s.KubeClient.CoreV1().ConfigMaps(core.NamespaceAll).List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
-	for _, cfgmap := range cfgmaps.Items {
-		s.upsertConfigMap(&cfgmap, namespace)
+	for _, configMap := range configMaps.Items {
+		if err = s.syncConfigMapIntoNewNamespace(&configMap, ns); err != nil {
+			return err
+		}
 	}
 
 	secrets, err := s.KubeClient.CoreV1().Secrets(core.NamespaceAll).List(metav1.ListOptions{})
@@ -224,7 +66,59 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 		return err
 	}
 	for _, secret := range secrets.Items {
-		s.upsertSecret(&secret, namespace)
+		if err = s.syncSecretIntoNewNamespace(&secret, ns); err != nil {
+			return err
+		}
 	}
 	return nil
+}
+
+func (s *ConfigSyncer) syncerLabels(name, namespace, cluster string) labels.Set {
+	return labels.Set{
+		config.OriginNameLabelKey:      name,
+		config.OriginNamespaceLabelKey: namespace,
+		config.OriginClusterLabelKey:   cluster,
+	}
+}
+
+func (s *ConfigSyncer) syncerLabelSelector(name, namespace, cluster string) string {
+	return labels.SelectorFromSet(s.syncerLabels(name, namespace, cluster)).String()
+}
+
+func (s *ConfigSyncer) syncerAnnotations(oldAnnotations, srcAnnotations map[string]string, srcRef core.ObjectReference) map[string]string {
+	newAnnotations := map[string]string{}
+
+	// preserve sync annotations
+	if v, ok := oldAnnotations[config.ConfigSyncKey]; ok {
+		newAnnotations[config.ConfigSyncKey] = v
+	}
+	if v, ok := oldAnnotations[config.ConfigSyncContexts]; ok {
+		newAnnotations[config.ConfigSyncContexts] = v
+	}
+
+	for k, v := range srcAnnotations {
+		if k != config.ConfigSyncKey && k != config.ConfigSyncContexts {
+			newAnnotations[k] = v
+		}
+	}
+
+	// set origin reference
+	ref, _ := json.Marshal(srcRef)
+	newAnnotations[config.ConfigOriginKey] = string(ref)
+
+	return newAnnotations
+}
+
+func (s *ConfigSyncer) namespacesForSelector(selector string) (sets.String, error) {
+	namespaces, err := s.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{
+		LabelSelector: selector,
+	})
+	if err != nil {
+		return nil, err
+	}
+	ns := sets.NewString()
+	for _, obj := range namespaces.Items {
+		ns.Insert(obj.Name)
+	}
+	return ns, nil
 }

@@ -9,44 +9,45 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-func (f *Invocation) EventuallyNumOfConfigmaps(namespace string) GomegaAsyncAssertion {
-	return f.EventuallyNumOfConfigmapsForClient(f.KubeClient, namespace)
+func (f *Invocation) EventuallyNumOfSecrets(namespace string) GomegaAsyncAssertion {
+	return f.EventuallyNumOfSecretsForClient(f.KubeClient, namespace)
 }
 
-func (f *Invocation) EventuallyNumOfConfigmapsForContext(kubeConfigPath string, context string) GomegaAsyncAssertion {
+func (f *Invocation) EventuallyNumOfSecretsForContext(kubeConfigPath string, context string) GomegaAsyncAssertion {
 	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
+
 	if ns == "" {
 		ns = f.Namespace()
 	}
 
-	return f.EventuallyNumOfConfigmapsForClient(client, ns)
+	return f.EventuallyNumOfSecretsForClient(client, ns)
 }
 
-func (f *Invocation) EventuallyNumOfConfigmapsForClient(client kubernetes.Interface, namespace string) GomegaAsyncAssertion {
+func (f *Invocation) EventuallyNumOfSecretsForClient(client kubernetes.Interface, namespace string) GomegaAsyncAssertion {
 	return Eventually(func() int {
-		cfgMaps, err := client.CoreV1().ConfigMaps(namespace).List(metav1.ListOptions{
+		secrets, err := client.CoreV1().Secrets(namespace).List(metav1.ListOptions{
 			LabelSelector: labels.Set{
 				"app": f.App(),
 			}.String(),
 		})
 		Expect(err).NotTo(HaveOccurred())
-		return len(cfgMaps.Items)
+		return len(secrets.Items)
 	})
 }
 
-func (f *Invocation) DeleteAllConfigmaps() {
-	cfgMaps, err := f.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
+func (f *Invocation) DeleteAllSecrets() {
+	secrets, err := f.KubeClient.CoreV1().Secrets(metav1.NamespaceAll).List(metav1.ListOptions{
 		LabelSelector: labels.Set{
 			"app": f.App(),
 		}.String(),
 	})
 	Expect(err).NotTo(HaveOccurred())
 
-	for _, value := range cfgMaps.Items {
-		err := f.KubeClient.CoreV1().ConfigMaps(value.Namespace).Delete(value.Name, &metav1.DeleteOptions{})
+	for _, value := range secrets.Items {
+		err := f.KubeClient.CoreV1().Secrets(value.Namespace).Delete(value.Name, &metav1.DeleteOptions{})
 		if kerr.IsNotFound(err) {
 			err = nil
 		}
