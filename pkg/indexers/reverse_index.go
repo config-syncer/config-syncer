@@ -3,7 +3,7 @@ package indexers
 import (
 	"path/filepath"
 
-	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/kutil/meta"
 	"github.com/blevesearch/bleve"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	"k8s.io/client-go/kubernetes"
@@ -31,11 +31,11 @@ func NewReverseIndexer(cl kubernetes.Interface, pm prom.MonitoringV1Interface, d
 		index:      index,
 	}
 	ri.Service = &ServiceIndexerImpl{kubeClient: cl, index: index}
-	if util.IsPreferredAPIResource(cl, prom.Group+"/"+prom.Version, prom.ServiceMonitorsKind) {
+	if meta.IsPreferredAPIResource(cl, prom.Group+"/"+prom.Version, prom.ServiceMonitorsKind) {
 		// Add Indexer only if Server support this resource
 		ri.ServiceMonitor = &ServiceMonitorIndexerImpl{kubeClient: cl, index: index}
 	}
-	if util.IsPreferredAPIResource(cl, prom.Group+"/"+prom.Version, prom.PrometheusesKind) {
+	if meta.IsPreferredAPIResource(cl, prom.Group+"/"+prom.Version, prom.PrometheusesKind) {
 		// Add Indexer only if Server support this resource
 		ri.Prometheus = &PrometheusIndexerImpl{kubeClient: cl, promClient: pm, index: index}
 	}

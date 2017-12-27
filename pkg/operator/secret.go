@@ -5,12 +5,11 @@ import (
 	"reflect"
 
 	"github.com/appscode/go/log"
-	acrt "github.com/appscode/go/runtime"
-	"github.com/appscode/kubed/pkg/util"
 	kutil "github.com/appscode/kutil/core/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	rt "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/tools/cache"
@@ -18,12 +17,7 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchSecrets() {
-	if !util.IsPreferredAPIResource(op.KubeClient, core.SchemeGroupVersion.String(), "Secret") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", core.SchemeGroupVersion.String(), "Secret")
-		return
-	}
-
-	defer acrt.HandleCrash()
+	defer rt.HandleCrash()
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
@@ -43,7 +37,7 @@ func (op *Operator) WatchSecrets() {
 					kutil.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
-						if err := op.SearchIndex.HandleAdd(util.ObfuscateSecret(*res)); err != nil {
+						if err := op.SearchIndex.HandleAdd(kutil.ObfuscateSecret(*res)); err != nil {
 							log.Errorln(err)
 						}
 					}
@@ -60,12 +54,12 @@ func (op *Operator) WatchSecrets() {
 					kutil.AssignTypeKind(res)
 
 					if op.Config.APIServer.EnableSearchIndex {
-						if err := op.SearchIndex.HandleDelete(util.ObfuscateSecret(*res)); err != nil {
+						if err := op.SearchIndex.HandleDelete(kutil.ObfuscateSecret(*res)); err != nil {
 							log.Errorln(err)
 						}
 					}
 					if op.TrashCan != nil {
-						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, util.ObfuscateSecret(*res))
+						op.TrashCan.Delete(res.TypeMeta, res.ObjectMeta, kutil.ObfuscateSecret(*res))
 					}
 					if op.ConfigSyncer != nil {
 						if err := op.ConfigSyncer.SyncDeletedSecret(res); err != nil {
@@ -89,13 +83,13 @@ func (op *Operator) WatchSecrets() {
 				kutil.AssignTypeKind(newRes)
 
 				if op.Config.APIServer.EnableSearchIndex {
-					op.SearchIndex.HandleUpdate(util.ObfuscateSecret(*oldRes), util.ObfuscateSecret(*newRes))
+					op.SearchIndex.HandleUpdate(kutil.ObfuscateSecret(*oldRes), kutil.ObfuscateSecret(*newRes))
 				}
 				if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 					!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
 					!reflect.DeepEqual(oldRes.Data, newRes.Data) {
 					if op.TrashCan != nil && op.Config.RecycleBin.HandleUpdates {
-						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, util.ObfuscateSecret(*oldRes), util.ObfuscateSecret(*newRes))
+						op.TrashCan.Update(newRes.TypeMeta, newRes.ObjectMeta, kutil.ObfuscateSecret(*oldRes), kutil.ObfuscateSecret(*newRes))
 					}
 
 					if op.ConfigSyncer != nil {

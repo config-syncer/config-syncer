@@ -11,6 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
+	"github.com/appscode/kutil/meta"
 )
 
 type ConfigSyncer struct {
@@ -33,14 +34,14 @@ type syncOpt struct {
 
 func getSyncOption(annotations map[string]string) syncOpt {
 	opt := syncOpt{}
-	if util.HasKey(annotations, config.ConfigSyncKey) {
+	if meta.HasKey(annotations, config.ConfigSyncKey) {
 		opt.sync = true
-		opt.nsSelector = util.GetString(annotations, config.ConfigSyncKey)
+		opt.nsSelector = meta.GetString(annotations, config.ConfigSyncKey)
 		if opt.nsSelector == "true" {
 			opt.nsSelector = ""
 		}
 	}
-	if contexts := util.GetString(annotations, config.ConfigSyncContexts); contexts != "" {
+	if contexts := meta.GetString(annotations, config.ConfigSyncContexts); contexts != "" {
 		opt.contexts = sets.NewString(strings.Split(contexts, ",")...)
 	}
 	return opt

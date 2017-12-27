@@ -5,25 +5,20 @@ import (
 	"reflect"
 
 	"github.com/appscode/go/log"
-	acrt "github.com/appscode/go/runtime"
-	"github.com/appscode/kubed/pkg/util"
 	kutil "github.com/appscode/kutil/core/v1"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	rt "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/tools/cache"
 )
 
 func (op *Operator) watchService() {
-	if !util.IsPreferredAPIResource(op.KubeClient, core.SchemeGroupVersion.String(), "Service") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", core.SchemeGroupVersion.String(), "Service")
-		return
-	}
+	defer rt.HandleCrash()
 
-	defer acrt.HandleCrash()
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 			return op.KubeClient.CoreV1().Services(core.NamespaceAll).List(metav1.ListOptions{})

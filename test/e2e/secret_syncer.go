@@ -11,6 +11,7 @@ import (
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/appscode/kutil/meta"
 )
 
 var _ = Describe("Secret-syncer", func() {
@@ -86,7 +87,7 @@ var _ = Describe("Secret-syncer", func() {
 
 			By("Removing sync annotation")
 			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
-				obj.Annotations = util.RemoveKey(obj.Annotations, config.ConfigSyncKey)
+				obj.Annotations = meta.RemoveKey(obj.Annotations, config.ConfigSyncKey)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -229,7 +230,7 @@ var _ = Describe("Secret-syncer", func() {
 
 			By("Removing sync annotation")
 			secret, _, err = core_util.PatchSecret(f.KubeClient, secret, func(obj *core.Secret) *core.Secret {
-				obj.Annotations = util.RemoveKey(obj.Annotations, config.ConfigSyncContexts)
+				obj.Annotations = meta.RemoveKey(obj.Annotations, config.ConfigSyncContexts)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
