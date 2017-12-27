@@ -11,6 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
+	"github.com/appscode/kubed/pkg/config"
 )
 
 func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
@@ -125,6 +126,11 @@ func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core
 		Namespace: namespace,
 	}
 	_, _, err := core_util.CreateOrPatchConfigMap(k8sClient, meta, func(obj *core.ConfigMap) *core.ConfigMap {
+		// check origin cluster, if not match overwrite and create an event
+		if v, ok := obj.Labels[config.OriginClusterLabelKey]; ok && v != s.ClusterName {
+			// TODO @ Dipta: where to write event ?
+		}
+
 		obj.Data = src.Data
 		obj.Labels = labels.Merge(src.Labels, s.SyncerLabels(src.Name, src.Namespace, s.ClusterName))
 
