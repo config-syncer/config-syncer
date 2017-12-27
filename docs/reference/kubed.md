@@ -20,7 +20,6 @@ Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
 
 ### Synopsis
 
-
 Kubed is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/appscode/kubed/tree/master/docs
 
 ### Options
@@ -38,6 +37,7 @@ Kubed is a Kubernetes daemon to perform cluster management tasks. For more infor
 ```
 
 ### SEE ALSO
+
 * [kubed check](/docs/reference/kubed_check.md)	 - Check cluster config
 * [kubed run](/docs/reference/kubed_run.md)	 - Run daemon
 * [kubed snapshot](/docs/reference/kubed_snapshot.md)	 - Takes a snapshot of Kubernetes api objects

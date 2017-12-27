@@ -5,26 +5,20 @@ import (
 	"reflect"
 
 	"github.com/appscode/go/log"
-	acrt "github.com/appscode/go/runtime"
-	"github.com/appscode/kubed/pkg/util"
 	kutil "github.com/appscode/kutil/apps/v1beta1"
 	apps "k8s.io/api/apps/v1beta1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	rt "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/tools/cache"
 )
 
 // Blocks caller. Intended to be called as a Go routine.
-func (op *Operator) WatchDeploymentApps() {
-	if !util.IsPreferredAPIResource(op.KubeClient, apps.SchemeGroupVersion.String(), "Deployment") {
-		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", apps.SchemeGroupVersion.String(), "Deployment")
-		return
-	}
-
-	defer acrt.HandleCrash()
+func (op *Operator) WatchDeployment() {
+	defer rt.HandleCrash()
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {

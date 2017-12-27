@@ -15,7 +15,6 @@ Prints binary version number.
 
 ### Synopsis
 
-
 Prints binary version number.
 
 ```
@@ -42,5 +41,6 @@ kubed version [flags]
 ```
 
 ### SEE ALSO
+
 * [kubed](/docs/reference/kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
 
