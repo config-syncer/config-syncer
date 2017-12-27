@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/appscode/go/types"
 	"github.com/appscode/kubed/pkg/config"
-	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/kutil/meta"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
-	"github.com/appscode/kutil/meta"
 )
 
 type ConfigSyncer struct {
@@ -26,25 +26,23 @@ type ClusterContext struct {
 	Address   string
 }
 
-type syncOpt struct {
-	sync       bool
-	nsSelector string // should we parse and store as Selector ?
+type options struct {
+	nsSelector *string // if nil, delete from cluster
 	contexts   sets.String
 }
 
-func getSyncOption(annotations map[string]string) syncOpt {
-	opt := syncOpt{}
+func getSyncOptions(annotations map[string]string) options {
+	opts := options{}
 	if meta.HasKey(annotations, config.ConfigSyncKey) {
-		opt.sync = true
-		opt.nsSelector = meta.GetString(annotations, config.ConfigSyncKey)
-		if opt.nsSelector == "true" {
-			opt.nsSelector = ""
+		opts.nsSelector = types.StringP(meta.GetString(annotations, config.ConfigSyncKey))
+		if *opts.nsSelector == "true" {
+			opts.nsSelector = types.StringP(labels.Everything().String())
 		}
 	}
 	if contexts := meta.GetString(annotations, config.ConfigSyncContexts); contexts != "" {
-		opt.contexts = sets.NewString(strings.Split(contexts, ",")...)
+		opts.contexts = sets.NewString(strings.Split(contexts, ",")...)
 	}
-	return opt
+	return opts
 }
 
 func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
@@ -75,7 +73,7 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 	return nil
 }
 
-func (s *ConfigSyncer) SyncerLabels(name, namespace, cluster string) labels.Set {
+func (s *ConfigSyncer) syncerLabels(name, namespace, cluster string) labels.Set {
 	return labels.Set{
 		config.OriginNameLabelKey:      name,
 		config.OriginNamespaceLabelKey: namespace,
@@ -83,11 +81,11 @@ func (s *ConfigSyncer) SyncerLabels(name, namespace, cluster string) labels.Set 
 	}
 }
 
-func (s *ConfigSyncer) SyncerLabelSelector(name, namespace, cluster string) string {
-	return labels.SelectorFromSet(s.SyncerLabels(name, namespace, cluster)).String()
+func (s *ConfigSyncer) syncerLabelSelector(name, namespace, cluster string) string {
+	return labels.SelectorFromSet(s.syncerLabels(name, namespace, cluster)).String()
 }
 
-func (s *ConfigSyncer) SyncerAnnotations(oldAnnotations, srcAnnotations map[string]string, srcRef core.ObjectReference) map[string]string {
+func (s *ConfigSyncer) syncerAnnotations(oldAnnotations, srcAnnotations map[string]string, srcRef core.ObjectReference) map[string]string {
 	newAnnotations := map[string]string{}
 
 	// preserve sync annotations
@@ -111,8 +109,8 @@ func (s *ConfigSyncer) SyncerAnnotations(oldAnnotations, srcAnnotations map[stri
 	return newAnnotations
 }
 
-func NamespaceSetForSelector(k8sClient kubernetes.Interface, selector string) (sets.String, error) {
-	namespaces, err := k8sClient.CoreV1().Namespaces().List(metav1.ListOptions{
+func (s *ConfigSyncer) namespacesForSelector(selector string) (sets.String, error) {
+	namespaces, err := s.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {

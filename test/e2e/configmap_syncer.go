@@ -3,15 +3,14 @@ package e2e
 import (
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/kubed/pkg/config"
-	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/kubed/test/framework"
 	core_util "github.com/appscode/kutil/core/v1"
+	"github.com/appscode/kutil/meta"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/appscode/kutil/meta"
 )
 
 var _ = Describe("Config-syncer", func() {

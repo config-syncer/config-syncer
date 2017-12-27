@@ -14,10 +14,10 @@ import (
 )
 
 func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
-	opt := getSyncOption(src.Annotations)
+	opts := getSyncOptions(src.Annotations)
 
-	if opt.sync { // delete that were in old-ns but not in new-ns and upsert to new-ns
-		newNs, err := NamespaceSetForSelector(s.KubeClient, opt.nsSelector)
+	if opts.nsSelector != nil { // delete that were in old-ns but not in new-ns and upsert to new-ns
+		newNs, err := s.namespacesForSelector(*opts.nsSelector)
 		if err != nil {
 			return err
 		}
@@ -30,7 +30,7 @@ func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
 		}
 	}
 
-	return s.syncConfigMapIntoContexts(src, opt.contexts)
+	return s.syncConfigMapIntoContexts(src, opts.contexts)
 }
 
 // source deleted, delete that were previously added
@@ -68,8 +68,16 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 	}
 
 	// delete from other contexts, ignore errors here
-	allContexts := sets.StringKeySet(s.Contexts)
-	oldContexts := allContexts.Difference(contexts)
+	oldContexts := sets.NewString()
+	for name, ctx := range s.Contexts {
+		if _, found := contexts[name]; found {
+			continue // delete context provided in annotation
+		}
+		if _, found := taken[ctx.Address]; found {
+			continue // delete other contexts from clusters found in annotation
+		}
+		oldContexts.Insert(name)
+	}
 	for _, ctx := range oldContexts.List() {
 		context, _ := s.Contexts[ctx]
 		err := s.syncConfigMapIntoNamespaces(context.Client, src, sets.NewString(), false)
@@ -84,7 +92,7 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 // upsert into newNs set, delete from (oldNs-newNs) set
 // use skipSrcNs = true for sync in source cluster
 func (s *ConfigSyncer) syncConfigMapIntoNamespaces(k8sClient kubernetes.Interface, src *core.ConfigMap, newNs sets.String, skipSrcNs bool) error {
-	oldNs, err := NamespaceSetForConfigMapSelector(k8sClient, s.SyncerLabelSelector(src.Name, src.Namespace, s.ClusterName))
+	oldNs, err := namespaceSetForConfigMapSelector(k8sClient, s.syncerLabelSelector(src.Name, src.Namespace, s.ClusterName))
 	if err != nil {
 		return err
 	}
@@ -107,11 +115,11 @@ func (s *ConfigSyncer) syncConfigMapIntoNamespaces(k8sClient kubernetes.Interfac
 }
 
 func (s *ConfigSyncer) syncConfigMapIntoNewNamespace(src *core.ConfigMap, namespace *core.Namespace) error {
-	opt := getSyncOption(src.Annotations)
-	if !opt.sync {
+	opts := getSyncOptions(src.Annotations)
+	if opts.nsSelector == nil {
 		return nil
 	}
-	if selector, err := labels.Parse(opt.nsSelector); err != nil {
+	if selector, err := labels.Parse(*opts.nsSelector); err != nil {
 		return err
 	} else if selector.Matches(labels.Set(namespace.Labels)) {
 		return s.upsertConfigMap(s.KubeClient, src, namespace.Name)
@@ -131,7 +139,7 @@ func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core
 		}
 
 		obj.Data = src.Data
-		obj.Labels = labels.Merge(src.Labels, s.SyncerLabels(src.Name, src.Namespace, s.ClusterName))
+		obj.Labels = labels.Merge(src.Labels, s.syncerLabels(src.Name, src.Namespace, s.ClusterName))
 
 		ref := core.ObjectReference{
 			APIVersion:      src.APIVersion,
@@ -141,7 +149,7 @@ func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core
 			UID:             src.UID,
 			ResourceVersion: src.ResourceVersion,
 		}
-		obj.Annotations = s.SyncerAnnotations(obj.Annotations, src.Annotations, ref)
+		obj.Annotations = s.syncerAnnotations(obj.Annotations, src.Annotations, ref)
 
 		return obj
 	})
@@ -149,7 +157,7 @@ func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core
 	return err
 }
 
-func NamespaceSetForConfigMapSelector(k8sClient kubernetes.Interface, selector string) (sets.String, error) {
+func namespaceSetForConfigMapSelector(k8sClient kubernetes.Interface, selector string) (sets.String, error) {
 	cfgMaps, err := k8sClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
 		LabelSelector: selector,
 	})
