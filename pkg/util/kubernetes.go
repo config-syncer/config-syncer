@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"time"
 
+	"net/url"
+
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -142,5 +144,18 @@ func AddressFromContext(kubeConfigPath, contextName string) (string, error) {
 	if !found {
 		return "", fmt.Errorf("cluster %s not found in kubeconfig file %s", ctx.Cluster, kubeConfigPath)
 	}
-	return cluster.Server, nil
+	serverUrl, err := url.Parse(cluster.Server)
+	if err != nil {
+		return "", err
+	}
+	if serverUrl.Port() == "" {
+		if serverUrl.Scheme == "https" {
+			return serverUrl.Host + ":443", nil
+		} else if serverUrl.Scheme == "http" {
+			return serverUrl.Host + ":80", nil
+		} else {
+			return "", fmt.Errorf("port/scheme not found for context %s", contextName)
+		}
+	}
+	return serverUrl.Host, nil
 }
