@@ -15,7 +15,6 @@ Run daemon
 
 ### Synopsis
 
-
 Run daemon
 
 ```
@@ -49,5 +48,6 @@ kubed run [flags]
 ```
 
 ### SEE ALSO
+
 * [kubed](/docs/reference/kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
 

@@ -5,13 +5,13 @@ import (
 	"reflect"
 
 	"github.com/appscode/go/log"
-	acrt "github.com/appscode/go/runtime"
-	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/kutil/meta"
 	tapi "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
 	kutil "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1/util"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	rt "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/tools/cache"
@@ -19,12 +19,12 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchPostgreses() {
-	if !util.IsPreferredAPIResource(op.KubeClient, tapi.SchemeGroupVersion.String(), tapi.ResourceKindPostgres) {
+	if !meta.IsPreferredAPIResource(op.KubeClient, tapi.SchemeGroupVersion.String(), tapi.ResourceKindPostgres) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.SchemeGroupVersion.String(), tapi.ResourceKindPostgres)
 		return
 	}
 
-	defer acrt.HandleCrash()
+	defer rt.HandleCrash()
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/appscode/go/log"
-	"github.com/appscode/go/runtime"
 	"github.com/appscode/kubed/pkg/operator"
 	srch_cs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
 	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
@@ -17,6 +16,7 @@ import (
 	kcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
 	"github.com/spf13/cobra"
 	core "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )

@@ -5,13 +5,13 @@ import (
 	"reflect"
 
 	"github.com/appscode/go/log"
-	acrt "github.com/appscode/go/runtime"
-	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/kutil/meta"
 	tapi "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	kutil "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1/util"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	rt "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/tools/cache"
@@ -19,12 +19,12 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchPodAlerts() {
-	if !util.IsPreferredAPIResource(op.KubeClient, tapi.SchemeGroupVersion.String(), tapi.ResourceKindPodAlert) {
+	if !meta.IsPreferredAPIResource(op.KubeClient, tapi.SchemeGroupVersion.String(), tapi.ResourceKindPodAlert) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.SchemeGroupVersion.String(), tapi.ResourceKindPodAlert)
 		return
 	}
 
-	defer acrt.HandleCrash()
+	defer rt.HandleCrash()
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {

@@ -5,13 +5,13 @@ import (
 	"reflect"
 
 	"github.com/appscode/go/log"
-	acrt "github.com/appscode/go/runtime"
-	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/kutil/meta"
 	tapi "github.com/appscode/stash/apis/stash/v1alpha1"
 	kutil "github.com/appscode/stash/client/typed/stash/v1alpha1/util"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	rt "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/tools/cache"
@@ -19,11 +19,11 @@ import (
 
 // Blocks caller. Intended to be called as a Go routine.
 func (op *Operator) WatchRestics() {
-	if !util.IsPreferredAPIResource(op.KubeClient, tapi.SchemeGroupVersion.String(), tapi.ResourceKindRestic) {
+	if !meta.IsPreferredAPIResource(op.KubeClient, tapi.SchemeGroupVersion.String(), tapi.ResourceKindRestic) {
 		log.Warningf("Skipping watching non-preferred GroupVersion:%s Kind:%s", tapi.SchemeGroupVersion.String(), tapi.ResourceKindRestic)
 		return
 	}
-	defer acrt.HandleCrash()
+	defer rt.HandleCrash()
 
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {

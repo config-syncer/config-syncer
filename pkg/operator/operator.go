@@ -21,7 +21,7 @@ import (
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
-	"github.com/appscode/kubed/pkg/util"
+	"github.com/appscode/kutil/meta"
 	"github.com/appscode/kutil/tools/backup"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
@@ -182,7 +182,7 @@ func (op *Operator) RunWatchers() {
 	go op.WatchClusterRole()
 	go op.WatchConfigMaps()
 	go op.WatchDaemonSets()
-	go op.WatchDeploymentApps()
+	go op.WatchDeployment()
 	go op.WatchDormantDatabases()
 	go op.WatchElasticsearches()
 	go op.WatchEvents()
@@ -226,11 +226,11 @@ func (op *Operator) RunAPIServer() {
 	// Enable pod -> service, service -> serviceMonitor indexing
 	if op.Config.APIServer.EnableReverseIndex {
 		router.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(op.ReverseIndex.Service.ServeHTTP))
-		if util.IsPreferredAPIResource(op.KubeClient, prom.Group+"/"+prom.Version, prom.ServiceMonitorsKind) {
+		if meta.IsPreferredAPIResource(op.KubeClient, prom.Group+"/"+prom.Version, prom.ServiceMonitorsKind) {
 			// Add Indexer only if Server support this resource
 			router.Get("/apis/"+prom.Group+"/"+prom.Version+"/namespaces/:namespace/:resource/:name/"+prom.ServiceMonitorName, http.HandlerFunc(op.ReverseIndex.ServiceMonitor.ServeHTTP))
 		}
-		if util.IsPreferredAPIResource(op.KubeClient, prom.Group+"/"+prom.Version, prom.PrometheusesKind) {
+		if meta.IsPreferredAPIResource(op.KubeClient, prom.Group+"/"+prom.Version, prom.PrometheusesKind) {
 			// Add Indexer only if Server support this resource
 			router.Get("/apis/"+prom.Group+"/"+prom.Version+"/namespaces/:namespace/:resource/:name/"+prom.PrometheusName, http.HandlerFunc(op.ReverseIndex.Prometheus.ServeHTTP))
 		}
