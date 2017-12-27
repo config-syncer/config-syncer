@@ -14,13 +14,13 @@ import (
 )
 
 type ConfigSyncer struct {
-	KubeClient kubernetes.Interface
+	KubeClient  kubernetes.Interface
 	ClusterName string
 	Contexts    map[string]ClusterContext
 }
 
 type ClusterContext struct {
-	Client kubernetes.Interface
+	Client    kubernetes.Interface
 	Namespace string
 	Address   string
 }
@@ -67,7 +67,7 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 		return err
 	}
 	for _, secret := range secrets.Items {
-		if err = s.syncSecretIntoNamespace(&secret, ns); err != nil {
+		if err = s.syncSecretIntoNewNamespace(&secret, ns); err != nil {
 			return err
 		}
 	}

@@ -1,2 +1,2 @@
 enableConfigSyncer: true
-kubeConfig: /home/dipta/.kube/kubed-e2e
+kubeConfig: /home/dipta/all/kubed-test/kubeconfig

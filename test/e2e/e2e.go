@@ -14,7 +14,7 @@ import (
 	"k8s.io/client-go/util/homedir"
 )
 
-const TestTimeout = 10 * time.Minute
+const TestTimeout = 3 * time.Minute
 
 var (
 	root *framework.Framework

@@ -23,6 +23,7 @@ import (
 	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kubed/pkg/util"
 	"github.com/appscode/kutil/tools/backup"
+	clientcmd_util "github.com/appscode/kutil/tools/clientcmd"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
 	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
@@ -37,7 +38,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	clientcmd_util "github.com/appscode/kutil/tools/clientcmd"
 )
 
 type Options struct {
@@ -138,9 +138,9 @@ func (op *Operator) Setup() error {
 		}
 
 		op.ConfigSyncer = &syncer.ConfigSyncer{
-			KubeClient: op.KubeClient,
+			KubeClient:  op.KubeClient,
 			ClusterName: op.Config.ClusterName,
-			Contexts: contexts,
+			Contexts:    contexts,
 		}
 	}
 

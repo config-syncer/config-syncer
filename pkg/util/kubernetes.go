@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -9,7 +10,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	"fmt"
 )
 
 func IsPreferredAPIResource(kubeClient kubernetes.Interface, groupVersion, kind string) bool {
@@ -87,7 +87,7 @@ func ContextNameSet(kubeConfigPath string) (sets.String, error) {
 	return sets.StringKeySet(kConfig.Contexts), nil
 }
 
-func ConfigMapNamespaceSet(k8sClient kubernetes.Interface, selector string) (sets.String, error) {
+func NamespaceSetForConfigMapSelector(k8sClient kubernetes.Interface, selector string) (sets.String, error) {
 	cfgMaps, err := k8sClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
 		LabelSelector: selector,
 	})
@@ -96,6 +96,20 @@ func ConfigMapNamespaceSet(k8sClient kubernetes.Interface, selector string) (set
 	}
 	ns := sets.NewString()
 	for _, obj := range cfgMaps.Items {
+		ns.Insert(obj.Namespace)
+	}
+	return ns, nil
+}
+
+func NamespaceSetForSecretSelector(k8sClient kubernetes.Interface, selector string) (sets.String, error) {
+	secret, err := k8sClient.CoreV1().Secrets(metav1.NamespaceAll).List(metav1.ListOptions{
+		LabelSelector: selector,
+	})
+	if err != nil {
+		return nil, err
+	}
+	ns := sets.NewString()
+	for _, obj := range secret.Items {
 		ns.Insert(obj.Namespace)
 	}
 	return ns, nil
@@ -115,16 +129,7 @@ func NamespaceSetForSelector(k8sClient kubernetes.Interface, selector string) (s
 	return ns, nil
 }
 
-func DeleteConfigMapFromNamespaces(k8sClient kubernetes.Interface, name string, namespaces sets.String) error {
-	for _, ns := range namespaces.List() {
-		if err := k8sClient.CoreV1().ConfigMaps(ns).Delete(name, &metav1.DeleteOptions{}); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func AddressFromContext(kubeConfigPath, contextName string) (string, error){
+func AddressFromContext(kubeConfigPath, contextName string) (string, error) {
 	kConfig, err := clientcmd.LoadFromFile(kubeConfigPath)
 	if err != nil {
 		return "", err
