@@ -109,3 +109,17 @@ func (s *ConfigSyncer) SyncerAnnotations(oldAnnotations, srcAnnotations map[stri
 
 	return newAnnotations
 }
+
+func NamespaceSetForSelector(k8sClient kubernetes.Interface, selector string) (sets.String, error) {
+	namespaces, err := k8sClient.CoreV1().Namespaces().List(metav1.ListOptions{
+		LabelSelector: selector,
+	})
+	if err != nil {
+		return nil, err
+	}
+	ns := sets.NewString()
+	for _, obj := range namespaces.Items {
+		ns.Insert(obj.Name)
+	}
+	return ns, nil
+}

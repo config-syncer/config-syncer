@@ -15,7 +15,6 @@ Takes a snapshot of Kubernetes api objects
 
 ### Synopsis
 
-
 Takes a snapshot of Kubernetes api objects
 
 ```
@@ -45,5 +44,6 @@ kubed snapshot [flags]
 ```
 
 ### SEE ALSO
+
 * [kubed](/docs/reference/kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
 

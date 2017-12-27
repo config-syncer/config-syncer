@@ -5,7 +5,6 @@ import (
 
 	"github.com/appscode/go/log"
 	"github.com/appscode/kubed/pkg/config"
-	"github.com/appscode/kubed/pkg/util"
 	core_util "github.com/appscode/kutil/core/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -18,7 +17,7 @@ func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
 	opt := getSyncOption(src.Annotations)
 
 	if opt.sync { // delete that were in old-ns but not in new-ns and upsert to new-ns
-		newNs, err := util.NamespaceSetForSelector(s.KubeClient, opt.nsSelector)
+		newNs, err := NamespaceSetForSelector(s.KubeClient, opt.nsSelector)
 		if err != nil {
 			return err
 		}
@@ -85,7 +84,7 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 // upsert into newNs set, delete from (oldNs-newNs) set
 // use skipSrcNs = true for sync in source cluster
 func (s *ConfigSyncer) syncConfigMapIntoNamespaces(k8sClient kubernetes.Interface, src *core.ConfigMap, newNs sets.String, skipSrcNs bool) error {
-	oldNs, err := util.NamespaceSetForConfigMapSelector(k8sClient, s.SyncerLabelSelector(src.Name, src.Namespace, s.ClusterName))
+	oldNs, err := NamespaceSetForConfigMapSelector(k8sClient, s.SyncerLabelSelector(src.Name, src.Namespace, s.ClusterName))
 	if err != nil {
 		return err
 	}
@@ -148,4 +147,18 @@ func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core
 	})
 
 	return err
+}
+
+func NamespaceSetForConfigMapSelector(k8sClient kubernetes.Interface, selector string) (sets.String, error) {
+	cfgMaps, err := k8sClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
+		LabelSelector: selector,
+	})
+	if err != nil {
+		return nil, err
+	}
+	ns := sets.NewString()
+	for _, obj := range cfgMaps.Items {
+		ns.Insert(obj.Namespace)
+	}
+	return ns, nil
 }

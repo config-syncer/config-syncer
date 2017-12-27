@@ -15,7 +15,6 @@ Check cluster config
 
 ### Synopsis
 
-
 Check cluster config
 
 ```
@@ -43,5 +42,6 @@ kubed check [flags]
 ```
 
 ### SEE ALSO
+
 * [kubed](/docs/reference/kubed.md)	 - Kubed by AppsCode - A Kubernetes Cluster Operator Daemon
 

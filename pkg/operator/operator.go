@@ -2,8 +2,10 @@ package operator
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	_ "net/http/pprof"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sync"
@@ -118,23 +120,41 @@ func (op *Operator) Setup() error {
 
 	if op.Config.EnableConfigSyncer {
 		// Parse external kubeconfig file, assume that it doesn't include source cluster
+		kConfig, err := clientcmd.LoadFromFile(op.Config.KubeConfig)
+		if err != nil {
+			return fmt.Errorf("failed to parse context list. Reason: %v", err)
+		}
+
 		contexts := map[string]syncer.ClusterContext{}
-		if allContexts, err := util.ContextNameSet(op.Config.KubeConfig); err != nil {
-			log.Errorf("Failed to parse context list. Reason: %s\n", err.Error())
-		} else {
-			context := syncer.ClusterContext{}
-			for _, ctx := range allContexts.List() {
-				if context.Client, err = clientcmd_util.ClientFromContext(op.Config.KubeConfig, ctx); err != nil {
-					continue
-				}
-				if context.Namespace, err = clientcmd_util.NamespaceFromContext(op.Config.KubeConfig, ctx); err != nil {
-					continue
-				}
-				if context.Address, err = util.AddressFromContext(op.Config.KubeConfig, ctx); err != nil {
-					continue
-				}
-				contexts[ctx] = context
+		for contextName := range kConfig.Contexts {
+			ctx := syncer.ClusterContext{}
+
+			cfg, err := clientcmd_util.BuildConfigFromContext(op.Config.KubeConfig, contextName)
+			if err != nil {
+				continue
 			}
+			if ctx.Client, err = kubernetes.NewForConfig(cfg); err != nil {
+				continue
+			}
+			if ctx.Namespace, err = clientcmd_util.NamespaceFromContext(op.Config.KubeConfig, contextName); err != nil {
+				continue
+			}
+
+			u, err := url.Parse(cfg.Host)
+			if err != nil {
+				continue
+			}
+			host := u.Host
+			port := u.Port()
+			if port == "" {
+				if u.Scheme == "https" {
+					port = "443"
+				} else if u.Scheme == "http" {
+					port = "80"
+				}
+			}
+			ctx.Address = host + ":" + port
+			contexts[contextName] = ctx
 		}
 
 		op.ConfigSyncer = &syncer.ConfigSyncer{
