@@ -20,9 +20,12 @@ Kubed can send notifications via Email, SMS or Chat for various operations using
 ## Hipchat
 To receive chat notifications in Hipchat, create a Secret with the following key:
 
-| Name                | Description                               |
-|---------------------|-------------------------------------------|
-| HIPCHAT_AUTH_TOKEN  | `Required` Hipchat [api access token](https://developer.atlassian.com/hipchat/guide/hipchat-rest-api/api-access-tokens). You can use room notification tokens, if you are planning to send notifications to a single room.   |
+| Name                         | Description                               |
+|------------------------------|-------------------------------------------|
+| HIPCHAT_AUTH_TOKEN           | `Required` Hipchat [api access token](https://developer.atlassian.com/hipchat/guide/hipchat-rest-api/api-access-tokens). You can use room notification tokens, if you are planning to send notifications to a single room.   |
+| HIPCHAT_BASE_URL             | `Optional` Base url of Hipchat server                        |
+| HIPCHAT_CA_CERT_DATA         | `Optional` PEM encoded CA certificate used by Hipchat server |
+| HIPCHAT_INSECURE_SKIP_VERIFY | `Optional` If set to `true`, skips SSL verification          |
 
 ```console
 $ echo -n 'your-hipchat-auth-token' > HIPCHAT_AUTH_TOKEN

@@ -1,5 +1,5 @@
 hash: 405456dbe9602b6394c9a0cb90b8d8f2a834b2f9af4906f646c985db92b1f774
-updated: 2017-12-27T16:48:16.16433274-05:00
+updated: 2017-12-28T17:09:01.133430394-05:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -28,7 +28,7 @@ imports:
   - types
   - version
 - name: github.com/appscode/go-notify
-  version: c1f627b4151ce1f8b5b80eeab2eb94c2561af00c
+  version: 5aa1e264b9e59775cd2ea6053cb46f46d66821d0
   subpackages:
   - hipchat
   - log
@@ -78,7 +78,7 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: d66a53df8ef10b43d23c315b7d788689b07d5d42
+  version: cde4f1373aeab5deaba14714f4725a3164ad3e94
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
@@ -86,7 +86,7 @@ imports:
   - client/typed/stash/v1alpha1
   - client/typed/stash/v1alpha1/util
 - name: github.com/appscode/voyager
-  version: d0bbe33149c09682b1c668a6d3597daa61db518c
+  version: e89ad35f032ac5267214c4df225b3edfcd588e8e
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -182,7 +182,7 @@ imports:
 - name: github.com/codegangsta/inject
   version: 33e0aa1cb7c019ccc3fbe049a8262a6403d30504
 - name: github.com/codeskyblue/go-sh
-  version: 703901965097a6b3155c0f6f774efb877b483f64
+  version: cf804ac79dffabb6b16342e24362cc744afc144f
 - name: github.com/coreos/prometheus-operator
   version: cbdd1b519796673cd02d53b0e21999acbcbfe6e4
   repo: https://github.com/appscode/prometheus-operator.git
@@ -212,7 +212,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-ini/ini
-  version: 20b96f641a5ea98f2f8619ff4f3e061cff4833bd
+  version: 2e44421e256d82ebbf3d4d4fcabe8930b905eff3
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -228,6 +228,10 @@ imports:
   - sortkeys
 - name: github.com/golang/glog
   version: 44145f04b68cf362d9c4df2182967c2275eaefed
+- name: github.com/golang/groupcache
+  version: 02826c3e79038b59d737d3b1c0a1d937f71a4433
+  subpackages:
+  - lru
 - name: github.com/golang/protobuf
   version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
@@ -694,6 +698,7 @@ imports:
   - tools/clientcmd/api/v1
   - tools/metrics
   - tools/pager
+  - tools/record
   - tools/reference
   - transport
   - util/cert
