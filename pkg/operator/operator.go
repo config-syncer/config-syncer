@@ -150,7 +150,7 @@ func (op *Operator) Setup() error {
 				if err != nil {
 					continue
 				}
-				host := u.Host
+				host := u.Hostname()
 				port := u.Port()
 				if port == "" {
 					if u.Scheme == "https" {
