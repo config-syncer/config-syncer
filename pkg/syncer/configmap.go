@@ -22,11 +22,11 @@ func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
 		if err != nil {
 			return err
 		}
-		if err := s.syncConfigMapIntoNamespaces(s.KubeClient, src, newNs, true); err != nil {
+		if err := s.syncConfigMapIntoNamespaces(s.KubeClient, src, newNs, true, ""); err != nil {
 			return err
 		}
 	} else { // no sync, delete that were previously added
-		if err := s.syncConfigMapIntoNamespaces(s.KubeClient, src, sets.NewString(), true); err != nil {
+		if err := s.syncConfigMapIntoNamespaces(s.KubeClient, src, sets.NewString(), true, ""); err != nil {
 			return err
 		}
 	}
@@ -36,7 +36,7 @@ func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
 
 // source deleted, delete that were previously added
 func (s *ConfigSyncer) SyncDeletedConfigMap(src *core.ConfigMap) error {
-	if err := s.syncConfigMapIntoNamespaces(s.KubeClient, src, sets.NewString(), true); err != nil {
+	if err := s.syncConfigMapIntoNamespaces(s.KubeClient, src, sets.NewString(), true, ""); err != nil {
 		return err
 	}
 	return s.syncConfigMapIntoContexts(src, sets.NewString())
@@ -62,16 +62,16 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 		if context.Namespace == "" { // use source namespace if not specified via context
 			context.Namespace = src.Namespace
 		}
-		err := s.syncConfigMapIntoNamespaces(context.Client, src, sets.NewString(context.Namespace), false)
+		err := s.syncConfigMapIntoNamespaces(context.Client, src, sets.NewString(context.Namespace), false, ctx)
 		if err != nil {
 			return err
 		}
 	}
 
 	// delete from other contexts, ignore errors here
-	for _, ctx := range s.Contexts {
+	for ctxName, ctx := range s.Contexts {
 		if _, found := taken[ctx.Address]; !found {
-			err := s.syncConfigMapIntoNamespaces(ctx.Client, src, sets.NewString(), false)
+			err := s.syncConfigMapIntoNamespaces(ctx.Client, src, sets.NewString(), false, ctxName)
 			if err != nil {
 				log.Infoln(err)
 			}
@@ -84,7 +84,7 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 
 // upsert into newNs set, delete from (oldNs-newNs) set
 // use skipSrcNs = true for sync in source cluster
-func (s *ConfigSyncer) syncConfigMapIntoNamespaces(k8sClient kubernetes.Interface, src *core.ConfigMap, newNs sets.String, skipSrcNs bool) error {
+func (s *ConfigSyncer) syncConfigMapIntoNamespaces(k8sClient kubernetes.Interface, src *core.ConfigMap, newNs sets.String, skipSrcNs bool, context string) error {
 	oldNs, err := namespaceSetForConfigMapSelector(k8sClient, s.syncerLabelSelector(src.Name, src.Namespace, s.ClusterName))
 	if err != nil {
 		return err
@@ -100,7 +100,7 @@ func (s *ConfigSyncer) syncConfigMapIntoNamespaces(k8sClient kubernetes.Interfac
 		}
 	}
 	for _, ns := range newNs.List() {
-		if err = s.upsertConfigMap(k8sClient, src, ns); err != nil {
+		if err = s.upsertConfigMap(k8sClient, src, ns, context); err != nil {
 			return err
 		}
 	}
@@ -115,12 +115,12 @@ func (s *ConfigSyncer) syncConfigMapIntoNewNamespace(src *core.ConfigMap, namesp
 	if selector, err := labels.Parse(*opts.nsSelector); err != nil {
 		return err
 	} else if selector.Matches(labels.Set(namespace.Labels)) {
-		return s.upsertConfigMap(s.KubeClient, src, namespace.Name)
+		return s.upsertConfigMap(s.KubeClient, src, namespace.Name, "")
 	}
 	return nil
 }
 
-func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core.ConfigMap, namespace string) error {
+func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core.ConfigMap, namespace, context string) error {
 	meta := metav1.ObjectMeta{
 		Name:      src.Name,
 		Namespace: namespace,
@@ -132,7 +132,7 @@ func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core
 				src,
 				core.EventTypeWarning,
 				eventer.EventReasonOriginConflict,
-				"configmap %s previously synced by %s, overwriting by %s", obj.Name, v, s.ClusterName,
+				"Origin cluster changed from %s in context %s", v, context,
 			)
 		}
 

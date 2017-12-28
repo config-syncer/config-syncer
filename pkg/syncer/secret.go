@@ -22,11 +22,11 @@ func (s *ConfigSyncer) SyncSecret(src *core.Secret) error {
 		if err != nil {
 			return err
 		}
-		if err := s.syncSecretIntoNamespaces(s.KubeClient, src, newNs, true); err != nil {
+		if err := s.syncSecretIntoNamespaces(s.KubeClient, src, newNs, true, ""); err != nil {
 			return err
 		}
 	} else { // no sync, delete that were previously added
-		if err := s.syncSecretIntoNamespaces(s.KubeClient, src, sets.NewString(), true); err != nil {
+		if err := s.syncSecretIntoNamespaces(s.KubeClient, src, sets.NewString(), true, ""); err != nil {
 			return err
 		}
 	}
@@ -36,7 +36,7 @@ func (s *ConfigSyncer) SyncSecret(src *core.Secret) error {
 
 // source deleted, delete that were previously added
 func (s *ConfigSyncer) SyncDeletedSecret(src *core.Secret) error {
-	if err := s.syncSecretIntoNamespaces(s.KubeClient, src, sets.NewString(), true); err != nil {
+	if err := s.syncSecretIntoNamespaces(s.KubeClient, src, sets.NewString(), true, ""); err != nil {
 		return err
 	}
 	return s.syncSecretIntoContexts(src, sets.NewString())
@@ -62,16 +62,16 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 		if context.Namespace == "" { // use source namespace if not specified via context
 			context.Namespace = src.Namespace
 		}
-		err := s.syncSecretIntoNamespaces(context.Client, src, sets.NewString(context.Namespace), false)
+		err := s.syncSecretIntoNamespaces(context.Client, src, sets.NewString(context.Namespace), false, ctx)
 		if err != nil {
 			return err
 		}
 	}
 
 	// delete from other contexts, ignore errors here
-	for _, ctx := range s.Contexts {
+	for ctxName, ctx := range s.Contexts {
 		if _, found := taken[ctx.Address]; !found {
-			err := s.syncSecretIntoNamespaces(ctx.Client, src, sets.NewString(), false)
+			err := s.syncSecretIntoNamespaces(ctx.Client, src, sets.NewString(), false, ctxName)
 			if err != nil {
 				log.Infoln(err)
 			}
@@ -84,7 +84,7 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 
 // upsert into newNs set, delete from (oldNs-newNs) set
 // use skipSrcNs = true for sync in source cluster
-func (s *ConfigSyncer) syncSecretIntoNamespaces(k8sClient kubernetes.Interface, src *core.Secret, newNs sets.String, skipSrcNs bool) error {
+func (s *ConfigSyncer) syncSecretIntoNamespaces(k8sClient kubernetes.Interface, src *core.Secret, newNs sets.String, skipSrcNs bool, context string) error {
 	oldNs, err := namespaceSetForSecretSelector(k8sClient, s.syncerLabelSelector(src.Name, src.Namespace, s.ClusterName))
 	if err != nil {
 		return err
@@ -100,7 +100,7 @@ func (s *ConfigSyncer) syncSecretIntoNamespaces(k8sClient kubernetes.Interface, 
 		}
 	}
 	for _, ns := range newNs.List() {
-		if err = s.upsertSecret(k8sClient, src, ns); err != nil {
+		if err = s.upsertSecret(k8sClient, src, ns, context); err != nil {
 			return err
 		}
 	}
@@ -115,12 +115,12 @@ func (s *ConfigSyncer) syncSecretIntoNewNamespace(src *core.Secret, namespace *c
 	if selector, err := labels.Parse(*opts.nsSelector); err != nil {
 		return err
 	} else if selector.Matches(labels.Set(namespace.Labels)) {
-		return s.upsertSecret(s.KubeClient, src, namespace.Name)
+		return s.upsertSecret(s.KubeClient, src, namespace.Name, "")
 	}
 	return nil
 }
 
-func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Secret, namespace string) error {
+func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Secret, namespace, context string) error {
 	meta := metav1.ObjectMeta{
 		Name:      src.Name,
 		Namespace: namespace,
@@ -132,7 +132,7 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 				src,
 				core.EventTypeWarning,
 				eventer.EventReasonOriginConflict,
-				"secret %s previously synced by %s, overwriting by %s", obj.Name, v, s.ClusterName,
+				"Origin cluster changed from %s in context %s", v, context,
 			)
 		}
 
