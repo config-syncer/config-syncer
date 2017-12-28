@@ -40,6 +40,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/record"
 )
 
 type Options struct {
@@ -73,6 +74,7 @@ type Operator struct {
 	ReverseIndex   *indexers.ReverseIndexer
 	TrashCan       *rbin.RecycleBin
 	Eventer        *eventer.EventForwarder
+	Recorder       record.EventRecorder
 	Cron           *cron.Cron
 	NotifierLoader envconfig.LoaderFunc
 	ConfigSyncer   *syncer.ConfigSyncer
@@ -118,11 +120,14 @@ func (op *Operator) Setup() error {
 		}
 	}
 
+	op.Recorder = eventer.NewEventRecorder(op.KubeClient, "kubed-operator")
+
 	if op.Config.EnableConfigSyncer {
 		op.ConfigSyncer = &syncer.ConfigSyncer{
 			KubeClient:  op.KubeClient,
 			ClusterName: op.Config.ClusterName,
 			Contexts:    map[string]syncer.ClusterContext{},
+			Recorder:    op.Recorder,
 		}
 
 		// Parse external kubeconfig file, assume that it doesn't include source cluster
