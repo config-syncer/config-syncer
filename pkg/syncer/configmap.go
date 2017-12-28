@@ -5,6 +5,7 @@ import (
 
 	"github.com/appscode/go/log"
 	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/eventer"
 	core_util "github.com/appscode/kutil/core/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -127,12 +128,12 @@ func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core
 	_, _, err := core_util.CreateOrPatchConfigMap(k8sClient, meta, func(obj *core.ConfigMap) *core.ConfigMap {
 		// check origin cluster, if not match overwrite and create an event
 		if v, ok := obj.Labels[config.OriginClusterLabelKey]; ok && v != s.ClusterName {
-			s.createEvent(
-				"kubed-operator",
+			s.Recorder.Event(
 				src,
 				core.EventTypeWarning,
-				"origin-conflict",
-				fmt.Sprintf("configmap %s previously synced by origin %s, overwriting by %s", obj.Name, v, s.ClusterName))
+				eventer.EventReasonOriginConflict,
+				fmt.Sprintf("configmap %s previously synced by %s, overwriting by %s", obj.Name, v, s.ClusterName),
+			)
 		}
 
 		obj.Data = src.Data
