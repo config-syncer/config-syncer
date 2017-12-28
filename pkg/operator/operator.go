@@ -119,48 +119,49 @@ func (op *Operator) Setup() error {
 	}
 
 	if op.Config.EnableConfigSyncer {
-		// Parse external kubeconfig file, assume that it doesn't include source cluster
-		kConfig, err := clientcmd.LoadFromFile(op.Config.KubeConfig)
-		if err != nil {
-			return fmt.Errorf("failed to parse context list. Reason: %v", err)
-		}
-
-		contexts := map[string]syncer.ClusterContext{}
-		for contextName := range kConfig.Contexts {
-			ctx := syncer.ClusterContext{}
-
-			cfg, err := clientcmd_util.BuildConfigFromContext(op.Config.KubeConfig, contextName)
-			if err != nil {
-				continue
-			}
-			if ctx.Client, err = kubernetes.NewForConfig(cfg); err != nil {
-				continue
-			}
-			if ctx.Namespace, err = clientcmd_util.NamespaceFromContext(op.Config.KubeConfig, contextName); err != nil {
-				continue
-			}
-
-			u, err := url.Parse(cfg.Host)
-			if err != nil {
-				continue
-			}
-			host := u.Host
-			port := u.Port()
-			if port == "" {
-				if u.Scheme == "https" {
-					port = "443"
-				} else if u.Scheme == "http" {
-					port = "80"
-				}
-			}
-			ctx.Address = host + ":" + port
-			contexts[contextName] = ctx
-		}
-
 		op.ConfigSyncer = &syncer.ConfigSyncer{
 			KubeClient:  op.KubeClient,
 			ClusterName: op.Config.ClusterName,
-			Contexts:    contexts,
+			Contexts:    map[string]syncer.ClusterContext{},
+		}
+
+		// Parse external kubeconfig file, assume that it doesn't include source cluster
+		if op.Config.KubeConfig != "" {
+			kConfig, err := clientcmd.LoadFromFile(op.Config.KubeConfig)
+			if err != nil {
+				return fmt.Errorf("failed to parse context list. Reason: %v", err)
+			}
+
+			for contextName := range kConfig.Contexts {
+				ctx := syncer.ClusterContext{}
+
+				cfg, err := clientcmd_util.BuildConfigFromContext(op.Config.KubeConfig, contextName)
+				if err != nil {
+					continue
+				}
+				if ctx.Client, err = kubernetes.NewForConfig(cfg); err != nil {
+					continue
+				}
+				if ctx.Namespace, err = clientcmd_util.NamespaceFromContext(op.Config.KubeConfig, contextName); err != nil {
+					continue
+				}
+
+				u, err := url.Parse(cfg.Host)
+				if err != nil {
+					continue
+				}
+				host := u.Host
+				port := u.Port()
+				if port == "" {
+					if u.Scheme == "https" {
+						port = "443"
+					} else if u.Scheme == "http" {
+						port = "80"
+					}
+				}
+				ctx.Address = host + ":" + port
+				op.ConfigSyncer.Contexts[contextName] = ctx
+			}
 		}
 	}
 
