@@ -128,11 +128,11 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 	_, _, err := core_util.CreateOrPatchSecret(k8sClient, meta, func(obj *core.Secret) *core.Secret {
 		// check origin cluster, if not match overwrite and create an event
 		if v, ok := obj.Labels[config.OriginClusterLabelKey]; ok && v != s.ClusterName {
-			s.Recorder.Event(
+			s.Recorder.Eventf(
 				src,
 				core.EventTypeWarning,
 				eventer.EventReasonOriginConflict,
-				fmt.Sprintf("secret %s previously synced by %s, overwriting by %s", obj.Name, v, s.ClusterName),
+				"secret %s previously synced by %s, overwriting by %s", obj.Name, v, s.ClusterName,
 			)
 		}
 

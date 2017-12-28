@@ -128,11 +128,11 @@ func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core
 	_, _, err := core_util.CreateOrPatchConfigMap(k8sClient, meta, func(obj *core.ConfigMap) *core.ConfigMap {
 		// check origin cluster, if not match overwrite and create an event
 		if v, ok := obj.Labels[config.OriginClusterLabelKey]; ok && v != s.ClusterName {
-			s.Recorder.Event(
+			s.Recorder.Eventf(
 				src,
 				core.EventTypeWarning,
 				eventer.EventReasonOriginConflict,
-				fmt.Sprintf("configmap %s previously synced by %s, overwriting by %s", obj.Name, v, s.ClusterName),
+				"configmap %s previously synced by %s, overwriting by %s", obj.Name, v, s.ClusterName,
 			)
 		}
 
