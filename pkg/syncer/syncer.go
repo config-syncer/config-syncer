@@ -2,7 +2,9 @@ package syncer
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
+	"time"
 
 	"github.com/appscode/go/types"
 	"github.com/appscode/kubed/pkg/config"
@@ -10,8 +12,11 @@ import (
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/tools/reference"
 )
 
 type ConfigSyncer struct {
@@ -121,4 +126,28 @@ func (s *ConfigSyncer) namespacesForSelector(selector string) (sets.String, erro
 		ns.Insert(obj.Name)
 	}
 	return ns, nil
+}
+
+func (s *ConfigSyncer) createEvent(component string, obj runtime.Object, eventType, reason, message string) (*core.Event, error) {
+	ref, err := reference.GetReference(scheme.Scheme, obj)
+	if err != nil {
+		return nil, err
+	}
+
+	t := metav1.Time{Time: time.Now()}
+
+	return s.KubeClient.CoreV1().Events(ref.Namespace).Create(&core.Event{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fmt.Sprintf("%v.%x", ref.Name, t.UnixNano()),
+			Namespace: ref.Namespace,
+		},
+		InvolvedObject: *ref,
+		Reason:         reason,
+		Message:        message,
+		FirstTimestamp: t,
+		LastTimestamp:  t,
+		Count:          1,
+		Type:           eventType,
+		Source:         core.EventSource{Component: component},
+	})
 }

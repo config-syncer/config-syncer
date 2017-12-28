@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/appscode/go/log"
+	"github.com/appscode/kubed/pkg/config"
 	core_util "github.com/appscode/kutil/core/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -124,6 +125,16 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 		Namespace: namespace,
 	}
 	_, _, err := core_util.CreateOrPatchSecret(k8sClient, meta, func(obj *core.Secret) *core.Secret {
+		// check origin cluster, if not match overwrite and create an event
+		if v, ok := obj.Labels[config.OriginClusterLabelKey]; ok && v != s.ClusterName {
+			s.createEvent(
+				"kubed-operator",
+				src,
+				core.EventTypeWarning,
+				"origin-conflict",
+				fmt.Sprintf("secret %s previously synced by origin %s, overwriting by %s", obj.Name, v, s.ClusterName))
+		}
+
 		obj.Data = src.Data
 		obj.Labels = labels.Merge(src.Labels, s.syncerLabels(src.Name, src.Namespace, s.ClusterName))
 
