@@ -1,7 +1,14 @@
 package hipchat
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
+	"net"
+	"net/http"
+	"net/url"
+	"time"
+
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
 	"github.com/tbruyelle/hipchat-go/hipchat"
@@ -10,8 +17,11 @@ import (
 const UID = "hipchat"
 
 type Options struct {
-	AuthToken string   `envconfig:"AUTH_TOKEN" required:"true"`
-	To        []string `envconfig:"TO"`
+	AuthToken          string   `envconfig:"AUTH_TOKEN" required:"true"`
+	To                 []string `envconfig:"TO"`
+	BaseURL            string   `envconfig:"BASE_URL"`
+	CACertData         string   `envconfig:"CA_CERT_DATA"`
+	InsecureSkipVerify bool     `envconfig:"INSECURE_SKIP_VERIFY"`
 }
 
 type client struct {
@@ -59,10 +69,41 @@ func (c client) To(to string, cc ...string) notify.ByChat {
 
 func (c *client) Send() error {
 	if len(c.opt.To) == 0 {
-		return errors.New("Missing to")
+		return errors.New("missing to")
 	}
 
 	h := hipchat.NewClient(c.opt.AuthToken)
+	if c.opt.BaseURL != "" {
+		u, err := url.Parse(c.opt.BaseURL)
+		if err != nil {
+			return err
+		}
+		h.BaseURL = u
+	}
+	if c.opt.CACertData != "" {
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM([]byte(c.opt.CACertData))
+
+		tlsConfig := &tls.Config{
+			RootCAs: caCertPool,
+		}
+		tlsConfig.BuildNameToCertificate()
+
+		transport := newTransport()
+		transport.TLSClientConfig = tlsConfig
+		h.SetHTTPClient(&http.Client{Transport: transport})
+	}
+	if c.opt.InsecureSkipVerify {
+		tlsConfig := &tls.Config{
+			InsecureSkipVerify: c.opt.InsecureSkipVerify,
+		}
+		tlsConfig.BuildNameToCertificate()
+
+		transport := newTransport()
+		transport.TLSClientConfig = tlsConfig
+		h.SetHTTPClient(&http.Client{Transport: transport})
+	}
+
 	for _, room := range c.opt.To {
 		_, err := h.Room.Notification(room, &hipchat.NotificationRequest{Message: c.body})
 		if err != nil {
@@ -70,4 +111,23 @@ func (c *client) Send() error {
 		}
 	}
 	return nil
+}
+
+// Copied from http.DefaultTransport. It establishes network connections as needed
+// and caches them for reuse by subsequent calls. It uses HTTP proxies
+// as directed by the $HTTP_PROXY and $NO_PROXY (or $http_proxy and
+// $no_proxy) environment variables.
+func newTransport() *http.Transport {
+	return &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+	}
 }
