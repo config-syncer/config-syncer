@@ -67,21 +67,13 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 	}
 
 	// delete from other contexts, ignore errors here
-	oldContexts := sets.NewString()
-	for name, ctx := range s.Contexts {
-		if _, found := contexts[name]; found {
-			continue // delete context provided in annotation
-		}
-		if _, found := taken[ctx.Address]; found {
-			continue // delete other contexts from clusters found in annotation
-		}
-		oldContexts.Insert(name)
-	}
-	for _, ctx := range oldContexts.List() {
-		context, _ := s.Contexts[ctx]
-		err := s.syncSecretIntoNamespaces(context.Client, src, sets.NewString(), false)
-		if err != nil {
-			log.Infoln(err)
+	for _, ctx := range s.Contexts {
+		if _, found := taken[ctx.Address]; !found {
+			err := s.syncSecretIntoNamespaces(ctx.Client, src, sets.NewString(), false)
+			if err != nil {
+				log.Infoln(err)
+			}
+			taken[ctx.Address] = struct{}{} // to avoid deleting form same cluster twice
 		}
 	}
 
