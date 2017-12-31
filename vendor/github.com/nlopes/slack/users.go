@@ -15,24 +15,26 @@ const (
 
 // UserProfile contains all the information details of a given user
 type UserProfile struct {
-	FirstName          string `json:"first_name"`
-	LastName           string `json:"last_name"`
-	RealName           string `json:"real_name"`
-	RealNameNormalized string `json:"real_name_normalized"`
-	Email              string `json:"email"`
-	Skype              string `json:"skype"`
-	Phone              string `json:"phone"`
-	Image24            string `json:"image_24"`
-	Image32            string `json:"image_32"`
-	Image48            string `json:"image_48"`
-	Image72            string `json:"image_72"`
-	Image192           string `json:"image_192"`
-	ImageOriginal      string `json:"image_original"`
-	Title              string `json:"title"`
-	BotID              string `json:"bot_id,omitempty"`
-	ApiAppID           string `json:"api_app_id,omitempty"`
-	StatusText         string `json:"status_text,omitempty"`
-	StatusEmoji        string `json:"status_emoji,omitempty"`
+  FirstName             string `json:"first_name"`
+  LastName              string `json:"last_name"`
+  RealName              string `json:"real_name"`
+  RealNameNormalized    string `json:"real_name_normalized"`
+  DisplayName           string `json:"display_name"`
+  DisplayNameNormalized string `json:"display_name_normalized"`
+  Email                 string `json:"email"`
+  Skype                 string `json:"skype"`
+  Phone                 string `json:"phone"`
+  Image24               string `json:"image_24"`
+  Image32               string `json:"image_32"`
+  Image48               string `json:"image_48"`
+  Image72               string `json:"image_72"`
+  Image192              string `json:"image_192"`
+  ImageOriginal         string `json:"image_original"`
+  Title                 string `json:"title"`
+  BotID                 string `json:"bot_id,omitempty"`
+  ApiAppID              string `json:"api_app_id,omitempty"`
+  StatusText            string `json:"status_text,omitempty"`
+  StatusEmoji           string `json:"status_emoji,omitempty"`
 }
 
 // User contains all the information of a user
@@ -198,10 +200,7 @@ func (api *Client) SetUserAsActiveContext(ctx context.Context) error {
 		"token": {api.config.token},
 	}
 	_, err := userRequest(ctx, "users.setActive", values, api.debug)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // SetUserPresence changes the currently authenticated user presence
@@ -245,7 +244,7 @@ func (api *Client) GetUserIdentityContext(ctx context.Context) (*UserIdentityRes
 }
 
 // SetUserPhoto changes the currently authenticated user's profile image
-func (api *Client) SetUserPhoto(ctx context.Context, image string, params UserSetPhotoParams) error {
+func (api *Client) SetUserPhoto(image string, params UserSetPhotoParams) error {
 	return api.SetUserPhotoContext(context.Background(), image, params)
 }
 

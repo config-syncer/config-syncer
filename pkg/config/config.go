@@ -153,7 +153,6 @@ type LocalSpec struct {
 
 type S3Spec struct {
 	Endpoint string `json:"endpoint,omitempty"`
-	Region   string `json:"region,omitempty"`
 	Bucket   string `json:"bucket,omiempty"`
 	Prefix   string `json:"prefix,omitempty"`
 }

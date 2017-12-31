@@ -583,7 +583,8 @@ func Convert_kubedb_InitSpec_To_v1alpha1_InitSpec(in *kubedb.InitSpec, out *Init
 
 func autoConvert_v1alpha1_LocalSpec_To_kubedb_LocalSpec(in *LocalSpec, out *kubedb.LocalSpec, s conversion.Scope) error {
 	out.VolumeSource = in.VolumeSource
-	out.Path = in.Path
+	out.MountPath = in.MountPath
+	out.SubPath = in.SubPath
 	return nil
 }
 
@@ -594,7 +595,8 @@ func Convert_v1alpha1_LocalSpec_To_kubedb_LocalSpec(in *LocalSpec, out *kubedb.L
 
 func autoConvert_kubedb_LocalSpec_To_v1alpha1_LocalSpec(in *kubedb.LocalSpec, out *LocalSpec, s conversion.Scope) error {
 	out.VolumeSource = in.VolumeSource
-	out.Path = in.Path
+	out.MountPath = in.MountPath
+	out.SubPath = in.SubPath
 	return nil
 }
 
