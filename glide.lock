@@ -1,5 +1,5 @@
 hash: 405456dbe9602b6394c9a0cb90b8d8f2a834b2f9af4906f646c985db92b1f774
-updated: 2017-12-28T17:09:01.133430394-05:00
+updated: 2017-12-31T16:50:45.380276185-05:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -46,7 +46,7 @@ imports:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: c393406fbcc65765c04935bfe3a6770a51d61fbb
+  version: a506fd42d3c4d688675c639c9c14c27b79275e73
   subpackages:
   - apps/v1beta1
   - batch/v1
@@ -68,7 +68,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 9534cb20c51d12c925d036ac1f7b6ca9a76e5d1f
+  version: 2a5ccfbe0442f47916551038c7a40e2842cf14a1
   subpackages:
   - apis/monitoring
   - apis/monitoring/v1alpha1
@@ -78,7 +78,7 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: cde4f1373aeab5deaba14714f4725a3164ad3e94
+  version: f472517e6fc3bd2aa4d16ab0f4e66e229840ad09
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
@@ -86,7 +86,7 @@ imports:
   - client/typed/stash/v1alpha1
   - client/typed/stash/v1alpha1/util
 - name: github.com/appscode/voyager
-  version: e89ad35f032ac5267214c4df225b3edfcd588e8e
+  version: 513caf21983e0e7941a4f39f51c3d456d685c621
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -318,13 +318,13 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/k8sdb/apimachinery
-  version: 5ad590fbe339019d94212e48ee04af0115b396d5
+  version: 80bc10aedbdce787bca6f580602c62a62c2e325c
   subpackages:
   - apis/kubedb/v1alpha1
   - client/typed/kubedb/v1alpha1
   - client/typed/kubedb/v1alpha1/util
 - name: github.com/kubedb/apimachinery
-  version: 5ad590fbe339019d94212e48ee04af0115b396d5
+  version: 80bc10aedbdce787bca6f580602c62a62c2e325c
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -353,7 +353,7 @@ imports:
 - name: github.com/ncw/swift
   version: 067578e41c8dd06bf557d02a92a77bd35e97c05a
 - name: github.com/nlopes/slack
-  version: ccf0351050c69b08f9c48f3e876f4cd5564463e8
+  version: cd00933611d778bfac4ef1d32b7d3176c6c870d0
 - name: github.com/olekukonko/tablewriter
   version: cca8bbc0798408af109aaaa239cbd2634846b340
 - name: github.com/onsi/ginkgo
@@ -430,7 +430,7 @@ imports:
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/spf13/cobra
-  version: ccaecb155a2177302cb56cae929251a256d0f646
+  version: b95ab734e27d33e0d8fbabf71ca990568d4e2020
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -505,7 +505,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: 272e2963aad1a56aba54e1167c47abff8d37ac08
+  version: 92c31202d4179425301c9ad5a63abd8df45a9674
   subpackages:
   - gensupport
   - googleapi

@@ -38,8 +38,9 @@ type SnapshotStorageSpec struct {
 }
 
 type LocalSpec struct {
-	VolumeSource core.VolumeSource `json:"volumeSource,omitempty"`
-	Path         string            `json:"path,omitempty"`
+	VolumeSource core.VolumeSource `json:",inline"`
+	MountPath    string            `json:"mountPath,omitempty"`
+	SubPath      string            `json:"subPath,omitempty"`
 }
 
 type S3Spec struct {
