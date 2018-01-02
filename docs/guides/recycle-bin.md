@@ -12,7 +12,7 @@ menu_name: product_kubed_0.3.1
 section_menu_id: tutorials
 ---
 
-> New to Kubed? Please start [here](/docs/tutorials/README.md).
+> New to Kubed? Please start [here](/docs/guides/README.md).
 
 # Kubernetes Recycle Bin
 Kubed provides a recycle bin for deleted and/or updated Kubernetes objects. Once activated, any deleted and/or updated object is stored in YAML format in folder mounted inside Kubed pod. This tutorial will show you how to use Kubed to setup a recycle bin for Kubernetes cluster objects.
@@ -45,7 +45,7 @@ recycleBin:
 | `recycleBin.path`          | `Required`. Path to folder where deleted and/or updated objects are stored. |
 | `recycleBin.ttl`           | `Required`. Duration for which deleted and/or updated objects are stored before purging. |
 | `recycleBin.handleUpdates` | `Optional`. If set to `true`, past version of supported objects are stored when updated. We recommend that you keep this set to `false` on an active cluster. |
-| `recycleBin.receiver`      | `Optional`. If set, a notification will be sent when any supported object is deleted and/or updated. To learn how to use various notifiers, please visit [here](/docs/tutorials/notifiers.md). |
+| `recycleBin.receiver`      | `Optional`. If set, a notification will be sent when any supported object is deleted and/or updated. To learn how to use various notifiers, please visit [here](/docs/guides/notifiers.md). |
 | `clusterName`              | `Optional`. A meaningful identifer for cluster. This cluster name will be prefixed to any notification sent via Email/SMS/Chat so that you can identify the source easily. |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
@@ -76,7 +76,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, go to the next section.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md). Once the operator pod is running, go to the next section.
 
 
 ## Using Recycle Bin
@@ -227,13 +227,13 @@ $ kubectl delete ns demo
 namespace "demo" deleted
 ```
 
-To uninstall Kubed operator, please follow the steps [here](/docs/uninstall.md).
+To uninstall Kubed operator, please follow the steps [here](/docs/setup/uninstall.md).
 
 ## Next Steps
- - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/tutorials/cluster-snapshot.md).
- - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/tutorials/config-syncer.md).
- - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/tutorials/event-forwarder.md).
- - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/tutorials/janitors.md) to delete old data.
- - See the list of supported notifiers [here](/docs/tutorials/notifiers.md).
+ - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/guides/cluster-snapshot.md).
+ - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/guides/config-syncer.md).
+ - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/event-forwarder.md).
+ - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
+ - See the list of supported notifiers [here](/docs/guides/notifiers.md).
  - Wondering what features are coming next? Please visit [here](/ROADMAP.md).
- - Want to hack on Kubed? Check our [contribution guidelines](/CONTRIBUTING.md).
+ - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).

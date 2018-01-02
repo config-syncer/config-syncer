@@ -12,7 +12,7 @@ menu_name: product_kubed_0.3.1
 section_menu_id: tutorials
 ---
 
-> New to Kubed? Please start [here](/docs/tutorials/README.md).
+> New to Kubed? Please start [here](/docs/guides/README.md).
 
 # Synchronize Configuration across Namespaces
 Say, you are using some Docker private registry. You want to keep its image pull secret synchronized across all namespaces of a Kubernetes cluster. Kubed can do that for you. If a ConfigMap or a Secret has the annotation __`kubed.appscode.com/sync: ""`__, Kubed will create a copy of that ConfigMap/Secret in all existing namespaces. Kubed will also create this ConfigMap/Secret, when you create a new namespace.
@@ -68,7 +68,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, go to the next section.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md). Once the operator pod is running, go to the next section.
 
 ## Synchronize ConfigMap
 In this tutorial, a ConfigMap will be synced across all Kubernetes namespaces using Kubed. You can do the same for Secrets.
@@ -261,15 +261,15 @@ $ kubectl delete ns demo
 namespace "demo" deleted
 ```
 
-To uninstall Kubed operator, please follow the steps [here](/docs/uninstall.md).
+To uninstall Kubed operator, please follow the steps [here](/docs/setup/uninstall.md).
 
 
 ## Next Steps
- - Learn how to sync config-maps or secrets across multiple cluster [here](/docs/tutorials/cluster-syncer.md).
- - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/tutorials/cluster-snapshot.md).
- - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/tutorials/recycle-bin.md).
- - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/tutorials/event-forwarder.md).
- - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/tutorials/janitors.md) to delete old data.
- - See the list of supported notifiers [here](/docs/tutorials/notifiers.md).
+ - Learn how to sync config-maps or secrets across multiple cluster [here](/docs/guides/cluster-syncer.md).
+ - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/guides/cluster-snapshot.md).
+ - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/guides/recycle-bin.md).
+ - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/event-forwarder.md).
+ - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
+ - See the list of supported notifiers [here](/docs/guides/notifiers.md).
  - Wondering what features are coming next? Please visit [here](/ROADMAP.md).
- - Want to hack on Kubed? Check our [contribution guidelines](/CONTRIBUTING.md).
+ - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).

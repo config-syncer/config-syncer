@@ -5,17 +5,17 @@ menu:
   product_kubed_0.3.1:
     identifier: kubed-uninstall
     name: Uninstall
-    parent: getting-started
+    parent: welcome
     weight: 30
 product_name: kubed
 menu_name: product_kubed_0.3.1
-section_menu_id: getting-started
-url: /products/kubed/0.3.1/getting-started/uninstall/
+section_menu_id: welcome
+url: /products/kubed/0.3.1/welcome/uninstall/
 aliases:
   - /products/kubed/0.3.1/uninstall/
 ---
 
-> New to Kubed? Please start [here](/docs/tutorials/README.md).
+> New to Kubed? Please start [here](/docs/guides/README.md).
 
 # Uninstall Kubed
 Please follow the steps below to uninstall Kubed:

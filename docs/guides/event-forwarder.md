@@ -12,7 +12,7 @@ menu_name: product_kubed_0.3.1
 section_menu_id: tutorials
 ---
 
-> New to Kubed? Please start [here](/docs/tutorials/README.md).
+> New to Kubed? Please start [here](/docs/guides/README.md).
 
 # Forward Cluster Events
 Kubed can send notifications via Email, SMS or Chat for various cluster events. This tutorial will show you how to use Kubed to setup an event forwarder.
@@ -59,7 +59,7 @@ notifierSecretName: notifier-config
 | `eventForwarder.storageAdded.namespaces`  | `Optional`. If set, notifications are sent only when PVC are added in these namespaces. Otherwise, notifications are sent when PVC added in any namespace. Since StorageClass and PV are non-namespaced resource, this field has not effect on these. |
 | `eventForwarder.warningEvents.handle`     | `Optional`. If set to true, notifications are sent when a `Warning` Event is added.                   |
 | `eventForwarder.warningEvents.namespaces` | `Optional`. If set, notifications are sent only when warning events are added in these namespaces. Otherwise, notifications are sent when warning events are added in any namespace |
-| `eventForwarder.receiver`                 | `Required`. To learn how to use various notifiers, please visit [here](/docs/tutorials/notifiers.md). |
+| `eventForwarder.receiver`                 | `Required`. To learn how to use various notifiers, please visit [here](/docs/guides/notifiers.md). |
 | `clusterName`                             | `Optional`. A meaningful identifer for cluster. This cluster name will be prefixed to any notification sent via Email/SMS/Chat so that you can identify the source easily. |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
@@ -90,7 +90,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, go to the next section.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md). Once the operator pod is running, go to the next section.
 
 
 ## Test Forwarder
@@ -229,14 +229,14 @@ $ kubectl delete ns demo
 namespace "demo" deleted
 ```
 
-To uninstall Kubed operator, please follow the steps [here](/docs/uninstall.md).
+To uninstall Kubed operator, please follow the steps [here](/docs/setup/uninstall.md).
 
 
 ## Next Steps
- - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/tutorials/cluster-snapshot.md).
- - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/tutorials/recycle-bin.md).
- - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/tutorials/config-syncer.md).
- - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/tutorials/janitors.md) to delete old data.
- - See the list of supported notifiers [here](/docs/tutorials/notifiers.md).
+ - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/guides/cluster-snapshot.md).
+ - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/guides/recycle-bin.md).
+ - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/guides/config-syncer.md).
+ - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
+ - See the list of supported notifiers [here](/docs/guides/notifiers.md).
  - Wondering what features are coming next? Please visit [here](/ROADMAP.md).
- - Want to hack on Kubed? Check our [contribution guidelines](/CONTRIBUTING.md).
+ - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).

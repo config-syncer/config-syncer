@@ -12,7 +12,7 @@ menu_name: product_kubed_0.3.1
 section_menu_id: tutorials
 ---
 
-> New to Kubed? Please start [here](/docs/tutorials/README.md).
+> New to Kubed? Please start [here](/docs/guides/README.md).
 
 # Cluster Snapshots
 Kubed supports taking periodic snapshot of a Kubernetes cluster objects. The snapshot data can be stored in various cloud providers, eg, [Amazon S3](#aws-s3), [Google Cloud Storage](#google-cloud-storage-gcs), [Microsoft Azure](#microsoft-azure-storage), [OpenStack Swift](#openstack-swift) and any [locally mounted volumes](#local-backend) like NFS, GlusterFS, etc. Kubed uses Kubernetes discovery api to find all available resources in a cluster and stores them in a file matching the `selfLink` URL for an object. Kubed uses [appscode/osm](https://github.com/appscode/osm) to interact with various cloud providers. This tutorial will show you how to use Kubed to take periodic snapshots of a Kubernetes cluster objects.
@@ -112,7 +112,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md). Once the operator pod is running, check your bucket from Google Cloud console. You should see the data from initial snapshot operation.
 
 ![GCS Snapshot](/docs/images/cluster-snapshot/gcs-snapshot.png)
 
@@ -210,7 +210,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your bucket from S3 console. You should see the data from initial snapshot operation.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md). Once the operator pod is running, check your bucket from S3 console. You should see the data from initial snapshot operation.
 
 
 ## Microsoft Azure Storage
@@ -306,7 +306,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your container from Azure portal. You should see the data from initial snapshot operation.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md). Once the operator pod is running, check your container from Azure portal. You should see the data from initial snapshot operation.
 
 
 ## OpenStack Swift
@@ -431,7 +431,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, check your container. You should see the data from initial snapshot operation.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md). Once the operator pod is running, check your container. You should see the data from initial snapshot operation.
 
 
 ## Local Backend
@@ -507,14 +507,14 @@ If you would like to disable this feature, remove the `snapshotter` portion of y
 
 
 ## Cleaning up
-To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed operator following the steps [here](/docs/uninstall.md).
+To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed operator following the steps [here](/docs/setup/uninstall.md).
 
 
 ## Next Steps
- - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/tutorials/recycle-bin.md).
- - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/tutorials/config-syncer.md).
- - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/tutorials/event-forwarder.md).
- - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/tutorials/janitors.md) to delete old data.
- - See the list of supported notifiers [here](/docs/tutorials/notifiers.md).
+ - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/guides/recycle-bin.md).
+ - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/guides/config-syncer.md).
+ - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/event-forwarder.md).
+ - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
+ - See the list of supported notifiers [here](/docs/guides/notifiers.md).
  - Wondering what features are coming next? Please visit [here](/ROADMAP.md).
- - Want to hack on Kubed? Check our [contribution guidelines](/CONTRIBUTING.md).
+ - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).

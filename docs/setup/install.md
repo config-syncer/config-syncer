@@ -5,17 +5,17 @@ menu:
   product_kubed_0.3.1:
     identifier: kubed-install
     name: Install
-    parent: getting-started
+    parent: welcome
     weight: 25
 product_name: kubed
 menu_name: product_kubed_0.3.1
-section_menu_id: getting-started
-url: /products/kubed/0.3.1/getting-started/install/
+section_menu_id: welcome
+url: /products/kubed/0.3.1/welcome/install/
 aliases:
   - /products/kubed/0.3.1/install/
 ---
 
-> New to Kubed? Please start [here](/docs/tutorials/README.md).
+> New to Kubed? Please start [here](/docs/guides/README.md).
 
 # Installation Guide
 
@@ -74,9 +74,9 @@ snapshotter:
   storageSecretName: snap-secret
 ```
 
-To understand the various configuration options, check Kubed [tutorials](/docs/tutorials/README.md). Once you are satisfied with the configuration, create a Secret with the Kubed cluster config under `config.yaml` key.
+To understand the various configuration options, check Kubed [tutorials](/docs/guides/README.md). Once you are satisfied with the configuration, create a Secret with the Kubed cluster config under `config.yaml` key.
 
-You may have to create another [Secret for notifiers](/docs/tutorials/notifiers.md), usually called `notifier-config`. If you are [storing cluster snapshots](/docs/tutorials/cluster-snapshot.md) in cloud storage, you have to create another Secret to provide cloud credentials.
+You may have to create another [Secret for notifiers](/docs/guides/notifiers.md), usually called `notifier-config`. If you are [storing cluster snapshots](/docs/guides/cluster-snapshot.md) in cloud storage, you have to create another Secret to provide cloud credentials.
 
 ### Generate Config using script
 If you are familiar with GO, you can use the [./hack/config/main.go](/hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config in [./hack/deploy/config.yaml](/hack/deploy/config.yaml).
