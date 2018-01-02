@@ -3,42 +3,37 @@
 # Kubed
 Kubed (pronounced Cube-Dee) by AppsCode is a Kubernetes Cluster Operator Daemon. Kubed can do the following things for you:
 
- - Kubed can take periodic [snapshot](/docs/guides/cluster-snapshot.md) of a Kubernetes cluster objects.
- - Kubed provides a [recycle bin](/docs/guides/recycle-bin.md) for deleted and/or updated Kubernetes objects.
- - Kubed can keep [ConfigMaps and Secrets synchronized across Namespaces](/docs/guides/config-syncer.md).
- - Kubed can [forward cluster events](/docs/guides/event-forwarder.md) to various destinations.
- - Kubed can setup [janitors](/docs/guides/janitors.md) for Elasticsearch and InfluxDB.
- - Kubed can [send notifications](/docs/guides/notifiers.md) via Email, SMS or Chat.
- - Kubed has a built-in [search engine](/docs/guides/apiserver.md) for your cluster objects using [bleve](https://github.com/blevesearch/bleve).
+ - Kubed can protect your Kubernetes cluster from [various disasters scenarios](https://appscode.com/products/kubed/0.4.0/guides/disaster-recovery/).
+ - Kubed can keep [ConfigMaps and Secrets synchronized across Namespaces](https://appscode.com/products/kubed/0.4.0/guides/config-syncer/).
+ - Kubed can [forward cluster events](https://appscode.com/products/kubed/0.4.0/guides/cluster-events/) to various destinations.
+ - Kubed can setup [janitors](https://appscode.com/products/kubed/0.4.0/guides/janitors.md) for Elasticsearch and InfluxDB.
+ - Kubed can [send notifications](https://appscode.com/products/kubed/0.4.0/guides/cluster-events/notifiers.md) via Email, SMS or Chat.
+ - Kubed has a built-in [search engine](https://appscode.com/products/kubed/0.4.0/guides/apiserver.md) for your cluster objects using [bleve](https://github.com/blevesearch/bleve).
 
 ## Supported Versions
 Please pick a version of Kubed that matches your Kubernetes installation.
 
 | Kubed Version                                                 | Docs                                                            | Kubernetes Version |
 |---------------------------------------------------------------|-----------------------------------------------------------------|--------------------|
-| [0.3.0](https://github.com/appscode/kubed/releases/tag/0.3.0) | [User Guide](https://github.com/appscode/kubed/tree/0.3.0/docs) | 1.7.x+             |
+| [0.3.0](https://github.com/appscode/kubed/releases/tag/0.3.0) | [User Guide](https://appscode.com/products/kubed/0.4.0/)        | 1.7.x+             |
 | [0.2.0](https://github.com/appscode/kubed/releases/tag/0.2.0) | [User Guide](https://github.com/appscode/kubed/tree/0.2.0/docs) | 1.5.x - 1.7.x      |
 
 ## Installation
-To install Kubed, please follow the guide [here](/docs/setup/install.md).
+To install Kubed, please follow the guide [here](https://appscode.com/products/kubed/0.4.0/setup/install/).
 
 ## Using Kubed
-Want to learn how to use Kubed? Please start [here](/docs/guides/README.md).
+Want to learn how to use Kubed? Please start [here](https://appscode.com/products/kubed/0.4.0/).
 
 ## Contribution guidelines
-Want to help improve Kubed? Please start [here](/docs/CONTRIBUTING.md).
-
-## Project Status
-Wondering what features are coming next? Please visit [here](/docs/roadmap.md).
+Want to help improve Kubed? Please start [here](https://appscode.com/products/kubed/0.4.0/welcome/contributing/).
 
 ---
 
-**The kubed operator collects anonymous usage statistics to help us learn how the software is being used and how we can improve it. To disable stats collection, run the operator with the flag** `--analytics=false`.
+**Kubed binaries collects anonymous usage statistics to help us learn how the software is being used and how we can improve it. To disable stats collection, run the operator with the flag** `--analytics=false`.
 
 ---
 
 ## Support
-If you have any questions, you can reach out to us.
-* [Slack](https://slack.appscode.com)
-* [Twitter](https://twitter.com/AppsCodeHQ)
-* [Website](https://appscode.com)
+We use Slack for public discussions. To chit chat with us or the rest of the community, join us in the [AppsCode Slack team](https://appscode.slack.com/messages/C6HSHCKBL/details/) channel `#stash`. To sign up, use our [Slack inviter](https://slack.appscode.com/).
+
+If you have found a bug with Searchlight or want to request for new features, please [file an issue](https://github.com/appscode/stash/issues/new).

@@ -2,17 +2,17 @@
 title: Janitors
 description: Janitors
 menu:
-  product_kubed_0.3.1:
-    identifier: tutorials-janitors
-    name: janitors
-    parent: tutorials
-    weight: 40
+  product_kubed_0.4.0:
+    identifier: janitor-guide
+    name: Janitors
+    parent: guides
+    weight: 25
 product_name: kubed
-menu_name: product_kubed_0.3.1
-section_menu_id: tutorials
+menu_name: product_kubed_0.4.0
+section_menu_id: guides
 ---
 
-> New to Kubed? Please start [here](/docs/guides/README.md).
+> New to Kubed? Please start [here](/docs/concepts/README.md).
 
 
 # Using Janitors
@@ -38,7 +38,7 @@ janitors:
   ttl: 2160h
   elasticsearch:
     endpoint: http://elasticsearch-logging.kube-system:9200
-    logIndexPrefix: logstash-
+    logIndexPrefix: logkubed-
 - kind: InfluxDB
   ttl: 2160h
   influxdb:
@@ -108,10 +108,8 @@ To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed op
 
 
 ## Next Steps
- - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/guides/cluster-snapshot.md).
- - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/guides/recycle-bin.md).
- - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/guides/config-syncer.md).
- - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/event-forwarder.md).
- - See the list of supported notifiers [here](/docs/guides/notifiers.md).
- - Wondering what features are coming next? Please visit [here](/ROADMAP.md).
+ - Learn how to use Kubed to protect your Kubernetes cluster from disasters [here](/docs/guides/disaster-recovery/).
+ - Need to keep configmaps/secrets synchronized across namespaces or clusters? Try [Kubed config syncer](/docs/guides/config-syncer/).
+ - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/cluster-events/).
+ - Wondering what features are coming next? Please visit [here](/docs/roadmap.md).
  - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).

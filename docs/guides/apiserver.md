@@ -2,17 +2,17 @@
 title: API Server
 description: API Server
 menu:
-  product_kubed_0.3.1:
-    identifier: tutorials-apiserver
+  product_kubed_0.4.0:
+    identifier: guides-apiserver
     name: API Server
-    parent: tutorials
-    weight: 10
+    parent: guides
+    weight: 30
 product_name: kubed
-menu_name: product_kubed_0.3.1
-section_menu_id: tutorials
+menu_name: product_kubed_0.4.0
+section_menu_id: guides
 ---
 
-> New to Kubed? Please start [here](/docs/guides/README.md).
+> New to Kubed? Please start [here](/docs/concepts/README.md).
 
 # Kubed API Server
 Kubed includes an api server. It has 2 categories of endpoints:
@@ -171,6 +171,10 @@ Following Kubernetes objects are supported by search index:
   - Elasticsearch
   - Postgres
   - Snapshot
+  - MySQL
+  - MongoDB
+  - Memcached
+  - Redis
 - __monitoring.coreos.com:__
   - Prometheus
   - ServiceMonitor
@@ -188,7 +192,7 @@ Following Kubernetes objects are supported by search index:
   - ClusterAlert
   - NodeAlert
   - PodAlert
-- __stash.appscode.com/v1alpha1:__
+- __kubed.appscode.com/v1alpha1:__
   - Restic
 - __storage/v1:__
   - StorageClass
@@ -206,11 +210,9 @@ To cleanup the Kubernetes resources created by this tutorial, uninstall Kubed op
 
 
 ## Next Steps
- - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/guides/cluster-snapshot.md).
- - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/guides/recycle-bin.md).
- - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/guides/config-syncer.md).
- - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/event-forwarder.md).
+ - Learn how to use Kubed to protect your Kubernetes cluster from disasters [here](/docs/guides/disaster-recovery/).
+ - Need to keep configmaps/secrets synchronized across namespaces or clusters? Try [Kubed config syncer](/docs/guides/config-syncer/).
+ - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/cluster-events/).
  - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
- - See the list of supported notifiers [here](/docs/guides/notifiers.md).
- - Wondering what features are coming next? Please visit [here](/ROADMAP.md).
+ - Wondering what features are coming next? Please visit [here](/docs/roadmap.md).
  - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).

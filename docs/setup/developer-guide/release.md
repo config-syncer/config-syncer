@@ -2,14 +2,14 @@
 title: Release | Kubed
 description: kubed Release
 menu:
-  product_kubed_0.3.1:
-    identifier: release    
+  product_kubed_0.4.0:
+    identifier: release
     name: Release
     parent: developer-guide
     weight: 15
 product_name: kubed
-menu_name: product_kubed_0.3.1
-section_menu_id: developer-guide
+menu_name: product_kubed_0.4.0
+section_menu_id: setup
 ---
 
 # Release Process

@@ -2,17 +2,17 @@
 title: Event Forwarder
 description: Event Forwarder
 menu:
-  product_kubed_0.3.1:
-    identifier: tutorials-event-forwarder
+  product_kubed_0.4.0:
+    identifier: event-forwarder
     name: Event Forwarder
-    parent: tutorials
-    weight: 30
+    parent: cluster-events
+    weight: 10
 product_name: kubed
-menu_name: product_kubed_0.3.1
-section_menu_id: tutorials
+menu_name: product_kubed_0.4.0
+section_menu_id: guides
 ---
 
-> New to Kubed? Please start [here](/docs/guides/README.md).
+> New to Kubed? Please start [here](/docs/concepts/README.md).
 
 # Forward Cluster Events
 Kubed can send notifications via Email, SMS or Chat for various cluster events. This tutorial will show you how to use Kubed to setup an event forwarder.
@@ -59,7 +59,7 @@ notifierSecretName: notifier-config
 | `eventForwarder.storageAdded.namespaces`  | `Optional`. If set, notifications are sent only when PVC are added in these namespaces. Otherwise, notifications are sent when PVC added in any namespace. Since StorageClass and PV are non-namespaced resource, this field has not effect on these. |
 | `eventForwarder.warningEvents.handle`     | `Optional`. If set to true, notifications are sent when a `Warning` Event is added.                   |
 | `eventForwarder.warningEvents.namespaces` | `Optional`. If set, notifications are sent only when warning events are added in these namespaces. Otherwise, notifications are sent when warning events are added in any namespace |
-| `eventForwarder.receiver`                 | `Required`. To learn how to use various notifiers, please visit [here](/docs/guides/notifiers.md). |
+| `eventForwarder.receiver`                 | `Required`. To learn how to use various notifiers, please visit [here](/docs/guides/cluster-events/notifiers.md). |
 | `clusterName`                             | `Optional`. A meaningful identifer for cluster. This cluster name will be prefixed to any notification sent via Email/SMS/Chat so that you can identify the source easily. |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
@@ -233,10 +233,9 @@ To uninstall Kubed operator, please follow the steps [here](/docs/setup/uninstal
 
 
 ## Next Steps
- - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/guides/cluster-snapshot.md).
- - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/guides/recycle-bin.md).
- - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/guides/config-syncer.md).
+ - See the list of supported notifiers [here](/docs/guides/cluster-events/notifiers.md).
+ - Learn how to use Kubed to protect your Kubernetes cluster from disasters [here](/docs/guides/disaster-recovery/).
+ - Need to keep configmaps/secrets synchronized across namespaces or clusters? Try [Kubed config syncer](/docs/guides/config-syncer/).
  - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
- - See the list of supported notifiers [here](/docs/guides/notifiers.md).
- - Wondering what features are coming next? Please visit [here](/ROADMAP.md).
+ - Wondering what features are coming next? Please visit [here](/docs/roadmap.md).
  - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).

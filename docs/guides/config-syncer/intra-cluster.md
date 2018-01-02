@@ -1,18 +1,18 @@
 ---
-title: Config Syncer
-description: Config Syncer
+title: Synchronize Configuration across Kubernetes Clusters
+description: Synchronize Configuration across Kubernetes Clusters
 menu:
-  product_kubed_0.3.1:
-    identifier: tutorials-config-syncer
-    name: Config Syncer
-    parent: tutorials
-    weight: 25
+  product_kubed_0.4.0:
+    identifier: intra-cluster-syncer
+    name: Across Clusters
+    parent: config-syncer
+    weight: 15
 product_name: kubed
-menu_name: product_kubed_0.3.1
-section_menu_id: tutorials
+menu_name: product_kubed_0.4.0
+section_menu_id: guides
 ---
 
-> New to Kubed? Please start [here](/docs/tutorials/README.md).
+> New to Kubed? Please start [here](/docs/concepts/README.md).
 
 # Synchronize Configuration across Clusters
 
@@ -40,11 +40,11 @@ enableConfigSyncer: true
 kubeConfigFile: /srv/kubed/kubeconfig
 ```
 
-| Key                   | Description                                                                               |
-|-----------------------|-------------------------------------------------------------------------------------------|
-| `clusterName`  | `Optional`. Specifies the source cluster name used in label `kubed.appscode.com/origin.cluster`. |
-| `enableConfigSyncer`  | `Required`. If set to `true`, ConfigMap/Secret synchronization operation will be enabled. |
-| `kubeConfigFile`  | `Required`. Specifies the path of `kube-config` file. |
+| Key                  | Description                                                                                      |
+|----------------------|--------------------------------------------------------------------------------------------------|
+| `clusterName`        | `Optional`. Specifies the source cluster name used in label `kubed.appscode.com/origin.cluster`. |
+| `enableConfigSyncer` | `Required`. If set to `true`, ConfigMap/Secret synchronization operation will be enabled.        |
+| `kubeConfigFile`     | `Required`. Specifies the path of `kube-config` file.                                            |
 
 Lets' consider following demo `kube-config` file:
 
@@ -88,7 +88,7 @@ Now, create a Secret with the Kubed cluster config under `config.yaml` key. Also
 ```yaml
 $ kubectl create secret generic kubed-config -n kube-system \
     --from-file=./docs/examples/cluster-syncer/config.yaml \
-    --from-file=kubeconfigFile=./docs/examples/cluster-syncer/demo-kubeconfig.yaml
+    --from-file=kubeConfigFile=./docs/examples/cluster-syncer/demo-kubeconfig.yaml
 secret "kubed-config" created
 
 # apply app=kubed label to easily cleanup later
@@ -113,7 +113,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md).  It will mount the secret inside operator pod in path `/srv/kubed`. So kubed cluster config file will be available in path `/srv/kubed/config.yaml` and `kube-config` file will be available in path `/srv/kubed/kubeconfig`.  Once the operator pod is running, go to the next section.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md).  It will mount the secret inside operator pod in path `/srv/kubed`. So kubed cluster config file will be available in path `/srv/kubed/config.yaml` and `kube-config` file will be available in path `/srv/kubed/kubeconfig`.  Once the operator pod is running, go to the next section.
 
 ## Synchronize ConfigMap
 
@@ -139,11 +139,9 @@ It will create configmap "omni" in `cluster-1` and `cluster-2`. For `cluster-1` 
 Other concepts like updating source configmap, removing annotation, origin annotation, origin labels, etc. are similar to the tutorial described [here]().
 
 ## Next Steps
- - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/tutorials/config-syncer.md).
- - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/tutorials/cluster-snapshot.md).
- - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/tutorials/recycle-bin.md).
- - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/tutorials/event-forwarder.md).
- - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/tutorials/janitors.md) to delete old data.
- - See the list of supported notifiers [here](/docs/tutorials/notifiers.md).
- - Wondering what features are coming next? Please visit [here](/ROADMAP.md).
- - Want to hack on Kubed? Check our [contribution guidelines](/CONTRIBUTING.md).
+ - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/guides/config-syncer/intra-cluster.md).
+ - Learn how to use Kubed to protect your Kubernetes cluster from disasters [here](/docs/guides/disaster-recovery/).
+ - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/cluster-events/).
+ - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
+ - Wondering what features are coming next? Please visit [here](/docs/roadmap.md).
+ - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).
