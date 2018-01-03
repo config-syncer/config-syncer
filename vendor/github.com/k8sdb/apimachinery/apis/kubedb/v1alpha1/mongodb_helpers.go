@@ -38,7 +38,6 @@ func (p MongoDB) StatefulSetAnnotations() map[string]string {
 			annotations[key] = val
 		}
 	}
-	annotations[MongoDBDatabaseVersion] = string(p.Spec.Version)
 	return annotations
 }
 

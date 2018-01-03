@@ -38,7 +38,6 @@ func (e Elasticsearch) StatefulSetAnnotations() map[string]string {
 			annotations[key] = val
 		}
 	}
-	annotations[ElasticsearchDatabaseVersion] = string(e.Spec.Version)
 	return annotations
 }
 

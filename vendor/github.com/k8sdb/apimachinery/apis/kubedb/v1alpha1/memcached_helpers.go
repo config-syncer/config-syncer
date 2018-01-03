@@ -38,7 +38,6 @@ func (r Memcached) DeploymentAnnotations() map[string]string {
 			annotations[key] = val
 		}
 	}
-	annotations[MemcachedDatabaseVersion] = string(r.Spec.Version)
 	return annotations
 }
 

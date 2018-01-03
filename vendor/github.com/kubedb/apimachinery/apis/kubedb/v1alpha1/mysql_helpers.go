@@ -38,7 +38,6 @@ func (m MySQL) StatefulSetAnnotations() map[string]string {
 			annotations[key] = val
 		}
 	}
-	annotations[MySQLDatabaseVersion] = string(m.Spec.Version)
 	return annotations
 }
 
