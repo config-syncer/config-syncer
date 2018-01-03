@@ -38,7 +38,6 @@ func (r Redis) StatefulSetAnnotations() map[string]string {
 			annotations[key] = val
 		}
 	}
-	annotations[RedisDatabaseVersion] = string(r.Spec.Version)
 	return annotations
 }
 

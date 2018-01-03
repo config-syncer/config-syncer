@@ -76,3 +76,19 @@ func TryUpdateDormantDatabase(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMe
 	}
 	return
 }
+
+func DeleteDormantDatabase(c cs.KubedbV1alpha1Interface, meta metav1.ObjectMeta) (err error) {
+	err = c.DormantDatabases(meta.Namespace).Delete(meta.Name, nil)
+	if err != nil {
+		return
+	}
+	return wait.PollImmediate(kutil.RetryInterval, kutil.ReadinessTimeout, func() (bool, error) {
+		_, err := c.DormantDatabases(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
+		if err != nil {
+			if kerr.IsNotFound(err) {
+				return true, nil
+			}
+		}
+		return false, nil
+	})
+}

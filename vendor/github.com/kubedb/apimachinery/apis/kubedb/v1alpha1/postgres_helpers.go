@@ -38,7 +38,6 @@ func (p Postgres) StatefulSetAnnotations() map[string]string {
 			annotations[key] = val
 		}
 	}
-	annotations[PostgresDatabaseVersion] = string(p.Spec.Version)
 	return annotations
 }
 

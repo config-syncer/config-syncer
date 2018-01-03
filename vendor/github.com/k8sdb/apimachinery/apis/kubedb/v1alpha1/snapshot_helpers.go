@@ -27,7 +27,7 @@ func (s Snapshot) Location() (string, error) {
 	} else if spec.Swift != nil {
 		return filepath.Join(spec.Swift.Prefix, DatabaseNamePrefix, s.Namespace, s.Spec.DatabaseName), nil
 	}
-	return "", errors.New("No storage provider is configured.")
+	return "", errors.New("no storage provider is configured")
 }
 
 func (s Snapshot) ResourceCode() string {

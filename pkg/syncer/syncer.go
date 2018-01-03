@@ -35,13 +35,14 @@ type options struct {
 
 func getSyncOptions(annotations map[string]string) options {
 	opts := options{}
-	if meta.HasKey(annotations, config.ConfigSyncKey) {
-		opts.nsSelector = types.StringP(meta.GetString(annotations, config.ConfigSyncKey))
-		if *opts.nsSelector == "true" {
+	if v, err := meta.GetString(annotations, config.ConfigSyncKey); err == nil {
+		if v == "true" {
 			opts.nsSelector = types.StringP(labels.Everything().String())
+		} else {
+			opts.nsSelector = &v
 		}
 	}
-	if contexts := meta.GetString(annotations, config.ConfigSyncContexts); contexts != "" {
+	if contexts, _ := meta.GetString(annotations, config.ConfigSyncContexts); contexts != "" {
 		opts.contexts = sets.NewString(strings.Split(contexts, ",")...)
 	}
 	return opts
