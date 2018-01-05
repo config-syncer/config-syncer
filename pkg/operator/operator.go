@@ -131,8 +131,8 @@ func (op *Operator) Setup() error {
 		}
 
 		// Parse external kubeconfig file, assume that it doesn't include source cluster
-		if op.Config.KubeConfig != "" {
-			kConfig, err := clientcmd.LoadFromFile(op.Config.KubeConfig)
+		if op.Config.KubeConfigFile != "" {
+			kConfig, err := clientcmd.LoadFromFile(op.Config.KubeConfigFile)
 			if err != nil {
 				return fmt.Errorf("failed to parse context list. Reason: %v", err)
 			}
@@ -140,14 +140,14 @@ func (op *Operator) Setup() error {
 			for contextName := range kConfig.Contexts {
 				ctx := syncer.ClusterContext{}
 
-				cfg, err := clientcmd_util.BuildConfigFromContext(op.Config.KubeConfig, contextName)
+				cfg, err := clientcmd_util.BuildConfigFromContext(op.Config.KubeConfigFile, contextName)
 				if err != nil {
 					continue
 				}
 				if ctx.Client, err = kubernetes.NewForConfig(cfg); err != nil {
 					continue
 				}
-				if ctx.Namespace, err = clientcmd_util.NamespaceFromContext(op.Config.KubeConfig, contextName); err != nil {
+				if ctx.Namespace, err = clientcmd_util.NamespaceFromContext(op.Config.KubeConfigFile, contextName); err != nil {
 					continue
 				}
 
