@@ -16,7 +16,7 @@ section_menu_id: tutorials
 
 # Synchronize Configuration across Clusters
 
-You can synchronize a ConfigMap or a Secret into different clusters using Kubed. For this you need to provide a `kube-config` file consisting cluster contexts and specify context names in comma separated format using __`kubed.appscode.com/sync-contexts`__ annotation. Kubed will create a copy of that ConfigMap/Secret in all clusters specified by the annotation. For each cluster, it will sync into source namespace by default, but if namespace specified in the context (in the `kube-config` file), it will sync into that namespace. Note that, Kubed will not create any namespace, it has to be created before.
+You can synchronize a ConfigMap or a Secret into different clusters using Kubed. For this you need to provide a `kube-config` file consisting cluster contexts and specify context names in comma separated format using __`kubed.appscode.com/sync-contexts`__ annotation. Kubed will create a copy of that ConfigMap/Secret in all clusters specified by the annotation. _For each cluster, it will sync into source namespace by default, but if namespace specified in the context (in the `kube-config` file), it will sync into that namespace._ Note that, Kubed will not create any namespace, it has to be created beforehand.
 
 If the data in the source ConfigMap/Secret is updated, all the copies will be updated. Either delete the source ConfigMap/Secret or remove the annotation from the source ConfigMap/Secret to remove the copies.
 
@@ -37,14 +37,14 @@ $ cat ./docs/examples/cluster-syncer/config.yaml
 
 clusterName: minikube
 enableConfigSyncer: true
-kubeConfig: /srv/kubed/kubeconfig
+kubeConfigFile: /srv/kubed/kubeconfig
 ```
 
 | Key                   | Description                                                                               |
 |-----------------------|-------------------------------------------------------------------------------------------|
 | `clusterName`  | `Optional`. Specifies the source cluster name used in label `kubed.appscode.com/origin.cluster`. |
 | `enableConfigSyncer`  | `Required`. If set to `true`, ConfigMap/Secret synchronization operation will be enabled. |
-| `kubeConfig`  | `Required`. Specifies the path of `kube-config` file. |
+| `kubeConfigFile`  | `Required`. Specifies the path of `kube-config` file. |
 
 Lets' consider following demo `kube-config` file:
 
@@ -81,7 +81,6 @@ contexts:
     cluster: cluster-2
     user: user-2
     namespace: demo-cluster-2
-current-context: context-1
 ```
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key. Also include required `kube-config` file under `kubeconfig` key. You can use separate secret for `kube-config`.
@@ -89,7 +88,7 @@ Now, create a Secret with the Kubed cluster config under `config.yaml` key. Also
 ```yaml
 $ kubectl create secret generic kubed-config -n kube-system \
     --from-file=./docs/examples/cluster-syncer/config.yaml \
-    --from-file=kubeconfig=./docs/examples/cluster-syncer/demo-kubeconfig.yaml
+    --from-file=kubeconfigFile=./docs/examples/cluster-syncer/demo-kubeconfig.yaml
 secret "kubed-config" created
 
 # apply app=kubed label to easily cleanup later
@@ -100,7 +99,7 @@ $ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
   config.yaml: ZW5hYmxlQ29uZmlnU3luY2VyOiB0cnVlCg==
-  kubeconfig: base64 endoded contents of kube-config file
+  kubeconfigFile: base64 endoded contents of kube-config file
 kind: Secret
 metadata:
   creationTimestamp: 2017-07-26T10:25:33Z
