@@ -1,3 +1,4 @@
+
 ---
 title: Config Syncer
 description: Config Syncer
@@ -15,10 +16,16 @@ section_menu_id: tutorials
 > New to Kubed? Please start [here](/docs/tutorials/README.md).
 
 # Synchronize Configuration across Namespaces
-Say, you are using some Docker private registry. You want to keep its image pull secret synchronized across all namespaces of a Kubernetes cluster. Kubed can do that for you. If a ConfigMap or a Secret has the annotation __`kubed.appscode.com/sync:true`__, Kubed will create a copy of that  ConfigMap / Secret in all existing namespaces. Kubed will also create this ConfigMap/Secret, when you create a new namespace. If the data in the source ConfigMap/Secret is updated, all the copies will be updated. Either delete the source ConfigMap/Secret or remove the annotation from the source ConfigMap/Secret to remove the copies. If the namespace with the source ConfigMap/Secret is deleted, the copies are left intact.
+Say, you are using some Docker private registry. You want to keep its image pull secret synchronized across all namespaces of a Kubernetes cluster. Kubed can do that for you. If a ConfigMap or a Secret has the annotation __`kubed.appscode.com/sync: ""`__, Kubed will create a copy of that ConfigMap/Secret in all existing namespaces. Kubed will also create this ConfigMap/Secret, when you create a new namespace.
+
+If you want to synchronize ConfigMap/Secret to some selected namespaces instead of all namespaces, you can do that by specifying namespace label-selector in the annotation. For example: __`kubed.appscode.com/sync: "app=kubed"`__. Kubed will create a copy of that  ConfigMap/Secret in all namespaces that matches the label-selector. Kubed will also create this Configmap/Secret in newly created namespace if it matches the label-selector.
+
+If the data in the source ConfigMap/Secret is updated, all the copies will be updated. Either delete the source ConfigMap/Secret or remove the annotation from the source ConfigMap/Secret to remove the copies. If the namespace with the source ConfigMap/Secret is deleted, the copies are left intact.
+
+If the value of label-selector specified by annotation is updated, Kubed will synchronize the ConfigMap/Secret accordingly, ie. it will create ConfigMap/Secret in the namespaces that are selected by new label-selector (if not already exists) and delete from namespaces that were synced before but not selected by new label-selector.
 
 ## Before You Begin
-At first, you need to have a Kubernetes cluster, and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [Minikube](https://github.com/kubernetes/minikube).
+At first, you need to have a Kubernetes cluster and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [Minikube](https://github.com/kubernetes/minikube).
 
 ## Deploy Kubed
 To enable config syncer, you need a cluster config like below.
@@ -65,7 +72,7 @@ type: Opaque
 Now, deploy Kubed operator in your cluster following the steps [here](/docs/install.md). Once the operator pod is running, go to the next section.
 
 ## Synchronize ConfigMap
-In this tutorial, a ConfigMap will be synced across Kubernetes namespaces using Kubed. You can do the same using Secrets.
+In this tutorial, a ConfigMap will be synced across all Kubernetes namespaces using Kubed. You can do the same for Secrets.
 
 To keep things isolated, this tutorial uses a separate namespace called `demo` throughout this tutorial. Run the following command to prepare your cluster for this tutorial:
 
@@ -90,6 +97,7 @@ configmap "omni" created
 $ kubectl get configmaps --all-namespaces | grep omni
 demo          omni                                 2         7m
 ```
+
 ```yaml
 $ kubectl get configmaps omni -n demo -o yaml
 apiVersion: v1
@@ -109,10 +117,10 @@ metadata:
   uid: 2988e9d5-7205-11e7-af79-08002738e55e
 ```
 
-Now, apply the `kubed.appscode.com/sync: true` annotaiotn to ConfigMap `omni`. Kubed operator will notice that and copy the ConfigMap in all existing namespaces.
+Now, apply the `kubed.appscode.com/sync: ""` annotation to ConfigMap `omni`. Kubed operator will notice that and copy the ConfigMap in all existing namespaces.
 
 ```console
-$ kubectl annotate configmap omni kubed.appscode.com/sync=true -n demo
+$ kubectl annotate configmap omni kubed.appscode.com/sync="" -n demo
 configmap "omni" annotated
 
 $ kubectl get configmaps --all-namespaces | grep omni
@@ -121,6 +129,7 @@ demo          omni                                 2         8m
 kube-public   omni                                 2         1m
 kube-system   omni                                 2         1m
 ```
+
 ```yaml
 $ kubectl get configmaps omni -n demo -o yaml
 apiVersion: v1
@@ -168,6 +177,7 @@ kube-public   omni                                 2         9m
 kube-system   omni                                 2         9m
 other         omni                                 2         5m
 ```
+
 ```yaml
 $ kubectl get configmaps omni -n other -o yaml
 apiVersion: v1
@@ -187,7 +197,32 @@ metadata:
   uid: b193f40f-7206-11e7-af79-08002738e55e
 ```
 
-Kubed operation notices that the source ConfigMap `omni` has been updated and propagated the change to all the copies in other namespaces.
+Kubed operator notices that the source ConfigMap `omni` has been updated and propagates the change to all the copies in other namespaces.
+
+## Namespace Selector
+Lets' change annotation value of source ConfigMap `omni`.
+
+```console
+$ kubectl annotate configmap omni kubed.appscode.com/sync="app=kubed" -n demo --overwrite
+configmap "omni" annotated
+
+$ kubectl get configmaps --all-namespaces | grep omni
+demo          omni                                 2         8m
+```
+
+Kubed operator removes the ConfigMap from all namespaces (except source) since no namespace matches the label-selector `app=kubed`.
+Now, lets' apply `app=kubed` annotation to `other` namespace. Kubed operator will then sync the ConfigMap to `other` namespace.
+
+```console
+$ kubectl label namespace other app=kubed
+namespace "other" labeled
+
+$ kubectl get configmaps --all-namespaces | grep omni
+demo          omni                                 2         8m
+other         omni                                 2         5m
+```
+
+## Remove Annotation
 
 Now, lets' remove the annotation from source ConfigMap `omni`. Please note that `-` after annotation key `kubed.appscode.com/sync-`. This tells kubectl to remove this annotation from ConfigMap `omni`.
 
@@ -199,11 +234,19 @@ $ kubectl get configmaps --all-namespaces | grep omni
 demo          omni                                 2         18m
 ```
 
-## Origin annotation
-Since 0.3.1, kubed operator will apply `kubed.appscode.com/origin` annotation on ConfigMap or Secret copies.
+## Origin Annotation
+Since 0.3.1, Kubed operator will apply `kubed.appscode.com/origin` annotation on ConfigMap or Secret copies.
 
 ![origin annotation](/docs/images/config-syncer/config-origin.png)
 
+## Origin Labels
+Kubed  operator will apply following labels on ConfigMap or Secret copies:
+
+ - `kubed.appscode.com/origin.name`
+ - `kubed.appscode.com/origin.namespace`
+ - `kubed.appscode.com/origin.cluster`
+
+This annotations are used by Kubed operator to list the copies for a specific source ConfigMap/Secret.
 
 ## Disable Syncer
 If you would like to disable this feature, either remove the `enableConfigSyncer` field in your Kubed cluster config or set `enableConfigSyncer` to false. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
@@ -223,6 +266,7 @@ To uninstall Kubed operator, please follow the steps [here](/docs/uninstall.md).
 
 
 ## Next Steps
+ - Learn how to sync config-maps or secrets across multiple cluster [here]().
  - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/tutorials/cluster-snapshot.md).
  - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/tutorials/recycle-bin.md).
  - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/tutorials/event-forwarder.md).
