@@ -28,7 +28,7 @@ type ClusterConfig struct {
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
 	Janitors           []JanitorSpec       `json:"janitors,omitempty"`
 	APIServer          APIServerSpec       `json:"apiServer,omitempty"`
-	KubeConfig         string              `json:"kubeConfig,omitempty"`
+	KubeConfigFile     string              `json:"kubeConfigFile,omitempty"`
 }
 
 type APIServerSpec struct {
