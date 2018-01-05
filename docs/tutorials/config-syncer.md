@@ -265,7 +265,7 @@ To uninstall Kubed operator, please follow the steps [here](/docs/uninstall.md).
 
 
 ## Next Steps
- - Learn how to sync config-maps or secrets across multiple cluster [here]().
+ - Learn how to sync config-maps or secrets across multiple cluster [here](/docs/tutorials/cluster-syncer.md).
  - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/tutorials/cluster-snapshot.md).
  - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/tutorials/recycle-bin.md).
  - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/tutorials/event-forwarder.md).
