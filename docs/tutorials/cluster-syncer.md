@@ -1,5 +1,3 @@
-
-
 ---
 title: Config Syncer
 description: Config Syncer
