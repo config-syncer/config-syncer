@@ -15,7 +15,7 @@ Please pick a version of Kubed that matches your Kubernetes installation.
 
 | Kubed Version                                                 | Docs                                                            | Kubernetes Version |
 |---------------------------------------------------------------|-----------------------------------------------------------------|--------------------|
-| [0.3.0](https://github.com/appscode/kubed/releases/tag/0.3.0) | [User Guide](https://appscode.com/products/kubed/0.4.0/)        | 1.7.x+             |
+| [0.4.0](https://github.com/appscode/kubed/releases/tag/0.4.0) | [User Guide](https://appscode.com/products/kubed/0.4.0/)        | 1.7.x+             |
 | [0.2.0](https://github.com/appscode/kubed/releases/tag/0.2.0) | [User Guide](https://github.com/appscode/kubed/tree/0.2.0/docs) | 1.5.x - 1.7.x      |
 
 ## Installation
@@ -34,6 +34,6 @@ Want to help improve Kubed? Please start [here](https://appscode.com/products/ku
 ---
 
 ## Support
-We use Slack for public discussions. To chit chat with us or the rest of the community, join us in the [AppsCode Slack team](https://appscode.slack.com/messages/C6HSHCKBL/details/) channel `#stash`. To sign up, use our [Slack inviter](https://slack.appscode.com/).
+We use Slack for public discussions. To chit chat with us or the rest of the community, join us in the [AppsCode Slack team](https://appscode.slack.com/messages/C6HSHCKBL/details/) channel `#kubed`. To sign up, use our [Slack inviter](https://slack.appscode.com/).
 
-If you have found a bug with Searchlight or want to request for new features, please [file an issue](https://github.com/appscode/stash/issues/new).
+If you have found a bug with Searchlight or want to request for new features, please [file an issue](https://github.com/appscode/kubed/issues/new).

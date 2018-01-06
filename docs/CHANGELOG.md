@@ -1,7 +1,40 @@
+---
+title: Changelog | Kubed
+description: Changelog
+menu:
+  product_kubed_0.4.0:
+    identifier: changelog-kubed
+    name: Changelog
+    parent: welcome
+    weight: 10
+product_name: kubed
+menu_name: product_kubed_0.4.0
+section_menu_id: welcome
+url: /products/kubed/0.4.0/welcome/changelog/
+aliases:
+  - /products/kubed/0.4.0/CHANGELOG/
+---
+
 # Change Log
 
-## [0.3.1](https://github.com/appscode/kubed/tree/0.3.0) (2017-12-21)
-Kubed 0.3.1 supports buckets in regions other than us-east-1.
+## [0.4.0](https://github.com/appscode/kubed/tree/0.4.0) (2018-01-05)
+Kubed 0.4.0 can sync confgimaps/secrets across clusters.
+
+__Changelog__
+- Reorganize docs for hosting on product site [\#173](https://github.com/appscode/kubed/pull/173)
+- Add support for new DB types [\#172](https://github.com/appscode/kubed/pull/172)
+- Update docs for syncer [\#170](https://github.com/appscode/kubed/pull/170)
+- Fix analytics client-id detection [\#168](https://github.com/appscode/kubed/pull/168)
+- Auto detect AWS bucket region [\#166](https://github.com/appscode/kubed/pull/166)
+- Support hipchat server [\#165](https://github.com/appscode/kubed/pull/165)
+- Write event for syncer origin conflict [\#164](https://github.com/appscode/kubed/pull/164)
+- Fix Syncer [\#163](https://github.com/appscode/kubed/pull/163)
+- Remove unnecessary IsPreferredAPIResource api calls [\#162](https://github.com/appscode/kubed/pull/162)
+- Sync configmap/secret to selected namespaces/contexts [\#154](https://github.com/appscode/kubed/pull/154)
+
+
+## [0.3.1](https://github.com/appscode/kubed/tree/0.3.1) (2017-12-21)
+Kubed 0.3.1 supports AWS S3 buckets in regions other than us-east-1.
 
 __Changelog__
 - Support region for s3 backend [\#159](https://github.com/appscode/kubed/issues/159)

@@ -6,7 +6,7 @@ menu:
     identifier: roadmap-kubed
     name: Roadmap
     parent: welcome
-    weight: 15
+    weight: 20
 product_name: kubed
 menu_name: product_kubed_0.4.0
 section_menu_id: welcome
