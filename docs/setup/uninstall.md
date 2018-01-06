@@ -2,27 +2,26 @@
 title: Kubed Uninstall
 description: Kubed Uninstall
 menu:
-  product_kubed_0.3.1:
+  product_kubed_0.4.0:
     identifier: kubed-uninstall
     name: Uninstall
-    parent: getting-started
-    weight: 30
+    parent: setup
+    weight: 20
 product_name: kubed
-menu_name: product_kubed_0.3.1
-section_menu_id: getting-started
-url: /products/kubed/0.3.1/getting-started/uninstall/
-aliases:
-  - /products/kubed/0.3.1/uninstall/
+menu_name: product_kubed_0.4.0
+section_menu_id: setup
 ---
 
-> New to Kubed? Please start [here](/docs/tutorials/README.md).
+> New to Kubed? Please start [here](/docs/concepts/README.md).
 
 # Uninstall Kubed
 Please follow the steps below to uninstall Kubed:
 
-1. Delete the various objects created for Kubed operator.
+- Delete the various objects created for Kubed operator.
+
 ```console
-$ ./hack/deploy/uninstall.sh
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.4.0/hack/deploy/uninstall.sh | bash
+
 + kubectl delete deployment -l app=kubed -n kube-system
 deployment "kubed-operator" deleted
 + kubectl delete service -l app=kubed -n kube-system
@@ -38,7 +37,8 @@ No resources found
 No resources found
 ```
 
-2. Now, wait several seconds for Kubed to stop running. To confirm that Kubed operator pod(s) have stopped running, run:
+- Now, wait several seconds for Kubed to stop running. To confirm that Kubed operator pod(s) have stopped running, run:
+
 ```console
 $ kubectl get pods --all-namespaces -l app=kubed
 ```

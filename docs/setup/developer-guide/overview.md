@@ -2,17 +2,14 @@
 title: Overview | Developer Guide
 description: Developer Guide Overview
 menu:
-  product_kubed_0.3.1:
+  product_kubed_0.4.0:
     identifier: developer-guide-readme
     name: Overview
     parent: developer-guide
     weight: 15
 product_name: kubed
-menu_name: product_kubed_0.3.1
-section_menu_id: developer-guide
-url: /products/kubed/0.3.1/developer-guide/
-aliases:
-  - /products/kubed/0.3.1/developer-guide/README/
+menu_name: product_kubed_0.4.0
+section_menu_id: setup
 ---
 
 ## Development Guide
@@ -57,7 +54,7 @@ $ glide slow
 ```
 
 #### Build Docker images
-To build and push your custom Docker image, follow the steps below. To release a new version of Kubed, please follow the [release guide](/docs/developer-guide/release.md).
+To build and push your custom Docker image, follow the steps below. To release a new version of Kubed, please follow the [release guide](/docs/setup/developer-guide/release.md).
 
 ```console
 # Build Docker image

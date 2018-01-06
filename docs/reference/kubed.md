@@ -1,17 +1,17 @@
 ---
 title: Kubed
 menu:
-  product_kubed_0.3.1:
+  product_kubed_0.4.0:
     identifier: kubed
     name: Kubed
     parent: reference
     weight: 0
 
 product_name: kubed
-menu_name: product_kubed_0.3.1
+menu_name: product_kubed_0.4.0
 section_menu_id: reference
 aliases:
-  - products/kubed/0.3.1/reference/
+  - products/kubed/0.4.0/reference/
 
 ---
 ## kubed

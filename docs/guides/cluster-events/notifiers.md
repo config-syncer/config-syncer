@@ -2,19 +2,20 @@
 title: Notifiers
 description: Notifiers
 menu:
-  product_kubed_0.3.1:
-    identifier: tutorials-notifiers
+  product_kubed_0.4.0:
+    identifier: events-notifier
     name: Notifiers
-    parent: tutorials
-    weight: 20
+    parent: cluster-events
+    weight: 15
 product_name: kubed
-menu_name: product_kubed_0.3.1
-section_menu_id: tutorials
+menu_name: product_kubed_0.4.0
+section_menu_id: guides
 ---
 
-> New to Kubed? Please start [here](/docs/tutorials/README.md).
+> New to Kubed? Please start [here](/docs/concepts/README.md).
 
 # Supported Notifiers
+
 Kubed can send notifications via Email, SMS or Chat for various operations using [appscode/go-notify](https://github.com/appscode/go-notify) library. To connect to these services, you need to create a Secret with the appropriate keys. Then pass the secret name to Kubed by setting `notifierSecretName` field in Kubed cluster config. Also, set `clusterName` to a meaningful name for you. This cluster name will be prefixed to any notification sent via Email/SMS/Chat so that you can identify the source easily.
 
 ## Hipchat
@@ -49,6 +50,7 @@ type: Opaque
 ```
 
 Now, to receive notifications via Hipchat, configure receiver as below:
+
  - notifier: `Hipchat`
  - to: a list of chat room names
 
@@ -164,6 +166,7 @@ $ echo -n 'your-gmail-address' > SMTP_FROM
 ```
 
 Now, to receive notifications via SMTP, configure receiver as below:
+
  - notifier: `SMTP`
  - to: a list of email addresses
 
@@ -218,6 +221,7 @@ type: Opaque
 ```
 
 Now, to receive notifications via Twilio, configure receiver as below:
+
  - notifier: `Twilio`
  - to: a list of receiver mobile numbers
 
@@ -264,6 +268,7 @@ type: Opaque
 ```
 
 Now, to receive notifications via Slack, configure receiver as below:
+
  - notifier: `Slack`
  - to: a list of chat room names
 
@@ -318,6 +323,7 @@ type: Opaque
 ```
 
 Now, to receive notifications via Plivo, configure receiver as below:
+
  - notifier: `Plivo`
  - to: a list of receiver mobile numbers
 
@@ -389,6 +395,7 @@ type: Opaque
 ```
 
 Now, to receive notifications via Pushover.net, configure receiver as below:
+
  - notifier: `Pushover`
  - to: a list of devices where notifications will be sent. If list is empty, all devices will be notified.
 
@@ -455,10 +462,9 @@ notifierSecretName: notifier-config
 ```
 
 ## Next Steps
- - Learn how to use Kubed to take periodic snapshots of a Kubernetes cluster [here](/docs/tutorials/cluster-snapshot.md).
- - To setup a recycle bin for deleted and/or updated Kubernetes objects, please visit [here](/docs/tutorials/recycle-bin.md).
- - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/tutorials/config-syncer.md).
- - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/tutorials/event-forwarder.md).
- - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/tutorials/janitors.md) to delete old data.
- - Wondering what features are coming next? Please visit [here](/ROADMAP.md).
- - Want to hack on Kubed? Check our [contribution guidelines](/CONTRIBUTING.md).
+ - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/cluster-events/event-forwarder.md).
+ - Learn how to use Kubed to protect your Kubernetes cluster from disasters [here](/docs/guides/disaster-recovery/).
+ - Need to keep configmaps/secrets synchronized across namespaces or clusters? Try [Kubed config syncer](/docs/guides/config-syncer/).
+ - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
+ - Wondering what features are coming next? Please visit [here](/docs/roadmap.md).
+ - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).

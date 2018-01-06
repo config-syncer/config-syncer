@@ -1,12 +1,12 @@
 ---
 title: Kubed Snapshot
 menu:
-  product_kubed_0.3.1:
+  product_kubed_0.4.0:
     identifier: kubed-snapshot
     name: Kubed Snapshot
     parent: reference
 product_name: kubed
-menu_name: product_kubed_0.3.1
+menu_name: product_kubed_0.4.0
 section_menu_id: reference
 ---
 ## kubed snapshot
