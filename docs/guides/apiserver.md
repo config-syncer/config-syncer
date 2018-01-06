@@ -16,6 +16,7 @@ section_menu_id: guides
 
 # Kubed API Server
 Kubed includes an api server. It has 2 categories of endpoints:
+
  - Search objects
  - Reverse Lookup
 
@@ -107,6 +108,7 @@ Now, open the URL [http://127.0.0.1:8080/search?q=dashboard](http://127.0.0.1:80
 
 ## Reverse Lookup of Objects
 Sometimes you may want to know which [Prometheus stores metrics for a given Pod X](https://github.com/coreos/prometheus-operator/issues/230). Using reverse indices maintained by Kubed, answering questions like this become easier. Kubed maintains the following types of reverse indices:
+
  - List all Services for a given Pod.
  - List all ServiceMonitors for a given Service.
  - List all Prometheus objects for a given ServiceMonitor.
@@ -138,6 +140,7 @@ Now, open the URL [http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods/{pod
 
 ## Supported Kubernetes Objects
 Following Kubernetes objects are supported by search index:
+
 - __v1:__
   - ComponentStatus
   - ConfigMap
