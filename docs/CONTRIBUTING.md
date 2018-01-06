@@ -6,7 +6,7 @@ menu:
     identifier: contributing-kubed
     name: Contributing
     parent: welcome
-    weight: 10
+    weight: 15
 product_name: kubed
 menu_name: product_kubed_0.4.0
 section_menu_id: welcome
