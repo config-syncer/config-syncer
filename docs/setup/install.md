@@ -10,8 +10,6 @@ menu:
 product_name: kubed
 menu_name: product_kubed_0.4.0
 section_menu_id: setup
-aliases:
-  - /products/kubed/0.4.0/setup/
 ---
 
 > New to Kubed? Please start [here](/docs/concepts/README.md).
@@ -75,7 +73,7 @@ snapshotter:
 
 To understand the various configuration options, check Kubed [tutorials](/docs/guides/README.md). Once you are satisfied with the configuration, create a Secret with the Kubed cluster config under `config.yaml` key.
 
-You may have to create another [Secret for notifiers](/docs/guides/cluster-events/notifiers.md), usually called `notifier-config`. If you are [storing cluster snapshots](/docs/guides/cluster-snapshot.md) in cloud storage, you have to create another Secret to provide cloud credentials.
+You may have to create another [Secret for notifiers](/docs/guides/cluster-events/notifiers.md), usually called `notifier-config`. If you are [storing cluster snapshots](/docs/guides/disaster-recovery/cluster-snapshot.md) in cloud storage, you have to create another Secret to provide cloud credentials.
 
 ### Generate Config using script
 If you are familiar with GO, you can use the [./hack/config/main.go](https://github.com/appscode/kubed/blob/0.4.0/hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/0.4.0/hack/deploy/config.yaml).

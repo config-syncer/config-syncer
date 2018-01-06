@@ -6,9 +6,10 @@ Kubed (pronounced Cube-Dee) by AppsCode is a Kubernetes Cluster Operator Daemon.
  - Kubed can protect your Kubernetes cluster from [various disasters scenarios](https://appscode.com/products/kubed/0.4.0/guides/disaster-recovery/).
  - Kubed can keep [ConfigMaps and Secrets synchronized across Namespaces](https://appscode.com/products/kubed/0.4.0/guides/config-syncer/).
  - Kubed can [forward cluster events](https://appscode.com/products/kubed/0.4.0/guides/cluster-events/) to various destinations.
- - Kubed can setup [janitors](https://appscode.com/products/kubed/0.4.0/guides/janitors.md) for Elasticsearch and InfluxDB.
- - Kubed can [send notifications](https://appscode.com/products/kubed/0.4.0/guides/cluster-events/notifiers.md) via Email, SMS or Chat.
- - Kubed has a built-in [search engine](https://appscode.com/products/kubed/0.4.0/guides/apiserver.md) for your cluster objects using [bleve](https://github.com/blevesearch/bleve).
+ - Kubed can setup [janitors](https://appscode.com/products/kubed/0.4.0/guides/janitors/) for Elasticsearch and InfluxDB.
+ - Kubed can [send notifications](https://appscode.com/products/kubed/0.4.0/guides/cluster-events/notifiers/) via Email, SMS or Chat.
+ - Kubed has a built-in [search engine](https://appscode.com/products/kubed/0.4.0/guides/apiserver/) for your cluster objects using [bleve](https://github.com/blevesearch/bleve).
+
 
 ## Supported Versions
 Please pick a version of Kubed that matches your Kubernetes installation.
