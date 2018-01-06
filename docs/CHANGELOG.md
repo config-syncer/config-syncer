@@ -17,10 +17,11 @@ aliases:
 
 # Change Log
 
-## [0.4.0](https://github.com/appscode/kubed/tree/0.4.0) (2018-01-05)
+## [0.4.0](https://github.com/appscode/kubed/releases/tag/0.4.0) (2018-01-05)
 Kubed 0.4.0 can sync confgimaps/secrets across clusters.
 
 __Changelog__
+
 - Reorganize docs for hosting on product site [\#173](https://github.com/appscode/kubed/pull/173)
 - Add support for new DB types [\#172](https://github.com/appscode/kubed/pull/172)
 - Update docs for syncer [\#170](https://github.com/appscode/kubed/pull/170)
@@ -33,18 +34,20 @@ __Changelog__
 - Sync configmap/secret to selected namespaces/contexts [\#154](https://github.com/appscode/kubed/pull/154)
 
 
-## [0.3.1](https://github.com/appscode/kubed/tree/0.3.1) (2017-12-21)
+## [0.3.1](https://github.com/appscode/kubed/releases/tag/0.3.1) (2017-12-21)
 Kubed 0.3.1 supports AWS S3 buckets in regions other than us-east-1.
 
 __Changelog__
+
 - Support region for s3 backend [\#159](https://github.com/appscode/kubed/issues/159)
 - Avoid listing buckets [\#141](https://github.com/appscode/kubed/issues/141)
 
 
-## [0.3.0](https://github.com/appscode/kubed/tree/0.3.0) (2017-09-26)
+## [0.3.0](https://github.com/appscode/kubed/releases/tag/0.3.0) (2017-09-26)
 Kubed 0.3.0 supports auth for Elasticsearch janitors and annotates copied configmaps & secrets.
 
 __Changelog__
+
 - Support auth for Elasticsearch janitor [\#64](https://github.com/appscode/kubed/issues/64)
 - Install kubed as a critical addon [\#129](https://github.com/appscode/kubed/pull/129)
 - Update chart to match recent convention [\#123](https://github.com/appscode/kubed/pull/123)
@@ -56,18 +59,20 @@ __Changelog__
 - Fix config object. [\#105](https://github.com/appscode/kubed/pull/105)
 
 
-## [0.2.0](https://github.com/appscode/kubed/tree/0.2.0) (2017-08-04)
+## [0.2.0](https://github.com/appscode/kubed/releases/tag/0.2.0) (2017-08-04)
 Kubed 0.2.0 can send push notifications.
 
 __Notable Features__
+
  - Send [push notification](/docs/tutorials/notifiers.md#pushovernet) via [pushover.net](https://pushover.net/) Thanks [Sean Johnson](https://github.com/pirogoeth) !
  - Add `clusterName` in config. This cluster name will be prefixed to any notification sent via Email/SMS/Chat/Push so that you can identify the source easily.
 
 
-## [0.1.0](https://github.com/appscode/kubed/tree/0.1.0) (2017-08-01)
+## [0.1.0](https://github.com/appscode/kubed/releases/tag/0.1.0) (2017-08-01)
 First public release of Kubed.
 
 __Notable Features__
+
  - Takes periodic [snapshot](/docs/tutorials/cluster-snapshot.md) of a Kubernetes cluster objects.
  - Provides a [recycle bin](/docs/tutorials/recycle-bin.md) for deleted and/or updated Kubernetes objects.
  - Keep [ConfigMaps and Secrets synchronized across Namespaces](/docs/tutorials/config-syncer.md).
