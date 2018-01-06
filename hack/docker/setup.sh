@@ -15,7 +15,7 @@ source "$REPO_ROOT/hack/libbuild/common/public_image.sh"
 
 APPSCODE_ENV=${APPSCODE_ENV:-dev}
 IMG=kubed
-OSM_VER=${OSM_VER:-0.6.0}
+OSM_VER=${OSM_VER:-0.6.2}
 
 DIST=$REPO_ROOT/dist
 mkdir -p $DIST
