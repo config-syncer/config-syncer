@@ -19,5 +19,5 @@ aliases:
 
 This section contains guides on how to use Kubed to keep an eye on your cluster with automated notifications.
 
-- [Forward Cluster Events](/docs/guides/event-forwarder.md): This tutorial will show you how to use Kubed to send notifications via Email, SMS or Chat for various cluster events.
+- [Forward Cluster Events](/docs/guides/cluster-events/event-forwarder.md): This tutorial will show you how to use Kubed to send notifications via Email, SMS or Chat for various cluster events.
 - [Supported Notifiers](/docs/guides/cluster-events/notifiers.md): This article documents how to configure Kubed to send notifications via Email, SMS or Chat
