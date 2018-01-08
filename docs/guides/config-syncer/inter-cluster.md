@@ -37,7 +37,7 @@ $ cat ./docs/examples/cluster-syncer/config.yaml
 
 clusterName: minikube
 enableConfigSyncer: true
-kubeConfigFile: /srv/kubed/kubeconfig
+kubeConfigFile: /srv/kubed/kubeConfigFile
 ```
 
 | Key                  | Description                                                                                      |
@@ -83,7 +83,7 @@ contexts:
     namespace: demo-cluster-2
 ```
 
-Now, create a Secret with the Kubed cluster config under `config.yaml` key. Also include required `kube-config` file under `kubeconfig` key. You can use separate secret for `kube-config`.
+Now, create a Secret with the Kubed cluster config under `config.yaml` key. Also include required `kube-config` file under `kubeConfigFile` key. You can use separate secret for `kube-config`.
 
 ```yaml
 $ kubectl create secret generic kubed-config -n kube-system \
@@ -99,7 +99,7 @@ $ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
   config.yaml: ZW5hYmxlQ29uZmlnU3luY2VyOiB0cnVlCg==
-  kubeconfigFile: base64 endoded contents of kube-config file
+  kubeConfigFile: base64 endoded contents of kube-config file
 kind: Secret
 metadata:
   creationTimestamp: 2017-07-26T10:25:33Z
@@ -113,7 +113,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md).  It will mount the secret inside operator pod in path `/srv/kubed`. So kubed cluster config file will be available in path `/srv/kubed/config.yaml` and `kube-config` file will be available in path `/srv/kubed/kubeconfig`.  Once the operator pod is running, go to the next section.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md).  It will mount the secret inside operator pod in path `/srv/kubed`. So kubed cluster config file will be available in path `/srv/kubed/config.yaml` and `kube-config` file will be available in path `/srv/kubed/kubeConfigFile`.  Once the operator pod is running, go to the next section.
 
 ## Synchronize ConfigMap
 
