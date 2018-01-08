@@ -3,7 +3,7 @@ title: Synchronize Configuration across Kubernetes Clusters
 description: Synchronize Configuration across Kubernetes Clusters
 menu:
   product_kubed_0.4.0:
-    identifier: intra-cluster-syncer
+    identifier: inter-cluster-syncer
     name: Across Clusters
     parent: config-syncer
     weight: 15
@@ -136,7 +136,7 @@ configmap "omni" annotated
 
 It will create configmap "omni" in `cluster-1` and `cluster-2`. For `cluster-1` it will sync into source namespace `demo`  since no namespace specified in `context-1` and for `cluster-2` it will sync into `demo-cluster-2` namespace since namespace specified in `context-2`. Here we assume that those namespaces already exits in the respective clusters.
 
-Other concepts like updating source configmap, removing annotation, origin annotation, origin labels, etc. are similar to the tutorial described [here]().
+Other concepts like updating source configmap, removing annotation, origin annotation, origin labels, etc. are similar to the tutorial described [here](/docs/guides/config-syncer/intra-cluster.md).
 
 ## Next Steps
  - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/guides/config-syncer/intra-cluster.md).

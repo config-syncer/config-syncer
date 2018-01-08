@@ -3,7 +3,7 @@ title: Synchronize Configuration across Namespaces
 description: Synchronize Configuration across Namespaces
 menu:
   product_kubed_0.4.0:
-    identifier: inter-cluster-syncer
+    identifier: intra-cluster-syncer
     name: Across Namespaces
     parent: config-syncer
     weight: 10
@@ -267,7 +267,7 @@ To uninstall Kubed operator, please follow the steps [here](/docs/setup/uninstal
 
 
 ## Next Steps
- - Learn how to sync config-maps or secrets across multiple cluster [here](/docs/guides/config-syncer/intra-cluster.md).
+ - Learn how to sync config-maps or secrets across multiple cluster [here](/docs/guides/config-syncer/inter-cluster.md).
  - Learn how to use Kubed to protect your Kubernetes cluster from disasters [here](/docs/guides/disaster-recovery/).
  - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/cluster-events/).
  - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
