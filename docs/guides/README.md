@@ -24,8 +24,8 @@ This section contains guides on how to use Kubed. Please visit the links below t
   - [Kubernetes Recycle Bin](/docs/guides/disaster-recovery/recycle-bin.md): Kubed provides a recycle bin for deleted and/or updated Kubernetes objects. This tutorial will show you how to use Kubed to setup a recycle bin for Kubernetes cluster objects.
   - [Backup & Restore Persistent Volumes](/docs/guides/disaster-recovery/stash.md). Use [Stash](https://appscode.com/products/stash) to backup & restore Persistent Volumes.
 - Configuration Syncer
-  - [Synchronize Configuration across Namespaces](/docs/guides/config-syncer/inter-cluster.md): This tutorial will show you how Kubed can sync ConfigMaps/Secrets across Kubernetes namespaces.
-  - [Synchronize Configuration across Clusters](/docs/guides/config-syncer/intra-cluster.md): This tutorial will show you how Kubed can sync ConfigMaps/Secrets across Kubernetes cluster.
+  - [Synchronize Configuration across Namespaces](/docs/guides/config-syncer/intra-cluster.md): This tutorial will show you how Kubed can sync ConfigMaps/Secrets across Kubernetes namespaces.
+  - [Synchronize Configuration across Clusters](/docs/guides/config-syncer/inter-cluster.md): This tutorial will show you how Kubed can sync ConfigMaps/Secrets across Kubernetes cluster.
 - Cluster Events
   - [Forward Cluster Events](/docs/guides/cluster-events/event-forwarder.md): This tutorial will show you how to use Kubed to send notifications via Email, SMS or Chat for various cluster events.
   - [Supported Notifiers](/docs/guides/cluster-events/notifiers.md): This article documents how to configure Kubed to send notifications via Email, SMS or Chat

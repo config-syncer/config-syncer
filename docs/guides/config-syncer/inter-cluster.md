@@ -1,12 +1,12 @@
 ---
-title: Synchronize Configuration across Namespaces
-description: Synchronize Configuration across Namespaces
+title: Synchronize Configuration across Kubernetes Clusters
+description: Synchronize Configuration across Kubernetes Clusters
 menu:
   product_kubed_0.4.0:
     identifier: inter-cluster-syncer
-    name: Across Namespaces
+    name: Across Clusters
     parent: config-syncer
-    weight: 10
+    weight: 15
 product_name: kubed
 menu_name: product_kubed_0.4.0
 section_menu_id: guides
@@ -14,38 +14,81 @@ section_menu_id: guides
 
 > New to Kubed? Please start [here](/docs/concepts/README.md).
 
-# Synchronize Configuration across Namespaces
+# Synchronize Configuration across Clusters
 
-Say, you are using some Docker private registry. You want to keep its image pull secret synchronized across all namespaces of a Kubernetes cluster. Kubed can do that for you. If a ConfigMap or a Secret has the annotation __`kubed.appscode.com/sync: ""`__, Kubed will create a copy of that ConfigMap/Secret in all existing namespaces. Kubed will also create this ConfigMap/Secret, when you create a new namespace.
+You can synchronize a ConfigMap or a Secret into different clusters using Kubed. For this you need to provide a `kube-config` file consisting cluster contexts and specify context names in comma separated format using __`kubed.appscode.com/sync-contexts`__ annotation. Kubed will create a copy of that ConfigMap/Secret in all clusters specified by the annotation. _For each cluster, it will sync into source namespace by default, but if namespace specified in the context (in the `kube-config` file), it will sync into that namespace._ Note that, Kubed will not create any namespace, it has to be created beforehand.
 
-If you want to synchronize ConfigMap/Secret to some selected namespaces instead of all namespaces, you can do that by specifying namespace label-selector in the annotation. For example: __`kubed.appscode.com/sync: "app=kubed"`__. Kubed will create a copy of that  ConfigMap/Secret in all namespaces that matches the label-selector. Kubed will also create this Configmap/Secret in newly created namespace if it matches the label-selector.
+If the data in the source ConfigMap/Secret is updated, all the copies will be updated. Either delete the source ConfigMap/Secret or remove the annotation from the source ConfigMap/Secret to remove the copies.
 
-If the data in the source ConfigMap/Secret is updated, all the copies will be updated. Either delete the source ConfigMap/Secret or remove the annotation from the source ConfigMap/Secret to remove the copies. If the namespace with the source ConfigMap/Secret is deleted, the copies are left intact.
+If the list of contexts specified by the annotation is updated, Kubed will synchronize the ConfigMap/Secret accordingly, ie. it will create ConfigMap/Secret  in the clusters listed in new annotation (if not already exists) and delete ConfigMap/Secret from the clusters that were synced before but not listed in new annotation.
 
-If the value of label-selector specified by annotation is updated, Kubed will synchronize the ConfigMap/Secret accordingly, ie. it will create ConfigMap/Secret in the namespaces that are selected by new label-selector (if not already exists) and delete from namespaces that were synced before but not selected by new label-selector.
+Note that, Kubed will error out if multiple contexts listed in annotation point same cluster. Also Kubed assumes that none of cluster contexts in `kube-config` file points the source cluster.
 
 ## Before You Begin
-At first, you need to have a Kubernetes cluster and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [Minikube](https://github.com/kubernetes/minikube).
+
+At first, you need to have a Kubernetes cluster and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [Minikube](https://github.com/kubernetes/minikube). You also need a `kube-config` file consisting cluster contexts where you want to sync your ConfigMap/Secret.
 
 ## Deploy Kubed
-To enable config syncer, you need a cluster config like below.
+
+To enable config syncer for different clusters, you need a cluster config like below.
 
 ```yaml
-$ cat ./docs/examples/config-syncer/config.yaml
+$ cat ./docs/examples/cluster-syncer/config.yaml
 
+clusterName: minikube
 enableConfigSyncer: true
+kubeConfigFile: /srv/kubed/kubeConfigFile
 ```
 
-| Key                   | Description                                                                               |
-|-----------------------|-------------------------------------------------------------------------------------------|
-| `enableConfigSyncer`  | `Required`. If set to `true`, ConfigMap/Secret synchronization operation will be enabled. |
+| Key                  | Description                                                                                      |
+|----------------------|--------------------------------------------------------------------------------------------------|
+| `clusterName`        | `Optional`. Specifies the source cluster name used in label `kubed.appscode.com/origin.cluster`. |
+| `enableConfigSyncer` | `Required`. If set to `true`, ConfigMap/Secret synchronization operation will be enabled.        |
+| `kubeConfigFile`     | `Required`. Specifies the path of `kube-config` file.                                            |
 
+Lets' consider following demo `kube-config` file:
 
-Now, create a Secret with the Kubed cluster config under `config.yaml` key.
+```yaml
+$ cat ./docs/examples/config-syncer/demo-kubeconfig.yaml
+
+apiVersion: v1
+kind: Config
+clusters:
+- name: cluster-1
+  cluster:
+    certificate-authority-data: ...
+    server: https://1.2.3.4
+- name: cluster-2
+  cluster:
+    certificate-authority-data: ...
+    server: https://2.3.4.5
+users:
+- name: user-1
+  user:
+    client-certificate: ...
+    client-key: ...
+- name: user-2
+  user:
+    client-certificate: ...
+    client-key: ...
+contexts:
+- name: context-1
+  context:
+    cluster: cluster-1
+    user: user-1
+- name: context-2
+  context:
+    cluster: cluster-2
+    user: user-2
+    namespace: demo-cluster-2
+```
+
+Now, create a Secret with the Kubed cluster config under `config.yaml` key. Also include required `kube-config` file under `kubeConfigFile` key. You can use separate secret for `kube-config`.
 
 ```yaml
 $ kubectl create secret generic kubed-config -n kube-system \
-    --from-file=./docs/examples/config-syncer/config.yaml
+    --from-file=./docs/examples/cluster-syncer/config.yaml \
+    --from-file=kubeConfigFile=./docs/examples/cluster-syncer/demo-kubeconfig.yaml
 secret "kubed-config" created
 
 # apply app=kubed label to easily cleanup later
@@ -56,6 +99,7 @@ $ kubectl get secret kubed-config -n kube-system -o yaml
 apiVersion: v1
 data:
   config.yaml: ZW5hYmxlQ29uZmlnU3luY2VyOiB0cnVlCg==
+  kubeConfigFile: base64 endoded contents of kube-config file
 kind: Secret
 metadata:
   creationTimestamp: 2017-07-26T10:25:33Z
@@ -69,205 +113,33 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md). Once the operator pod is running, go to the next section.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md).  It will mount the secret inside operator pod in path `/srv/kubed`. So kubed cluster config file will be available in path `/srv/kubed/config.yaml` and `kube-config` file will be available in path `/srv/kubed/kubeConfigFile`.  Once the operator pod is running, go to the next section.
 
 ## Synchronize ConfigMap
-In this tutorial, a ConfigMap will be synced across all Kubernetes namespaces using Kubed. You can do the same for Secrets.
 
-To keep things isolated, this tutorial uses a separate namespace called `demo` throughout this tutorial. Run the following command to prepare your cluster for this tutorial:
+At first, create a ConfigMap called `omni` in the `demo` namespace. This will be our source ConfigMap.
 
 ```console
 $ kubectl create namespace demo
 namespace "demo" created
 
-~ $ kubectl get namespaces
-NAME          STATUS    AGE
-default       Active    6h
-kube-public   Active    6h
-kube-system   Active    6h
-demo          Active    4m
-```
-
-Now, create a ConfigMap called `omni` in the `demo` namespace. This will be our source ConfigMap.
-
-```console
-$ kubectl apply -f ./docs/examples/config-syncer/demo-0.yaml
+$ kubectl apply -f ./docs/examples/config-syncer/demo.yaml
 configmap "omni" created
-
-$ kubectl get configmaps --all-namespaces | grep omni
-demo          omni                                 2         7m
 ```
 
-```yaml
-$ kubectl get configmaps omni -n demo -o yaml
-apiVersion: v1
-data:
-  you: only
-  leave: once
-kind: ConfigMap
-metadata:
-  annotations:
-    kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"v1","data":{"leave":"once","you":"only"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"omni","namespace":"demo"}}
-  creationTimestamp: 2017-07-26T13:20:15Z
-  name: omni
-  namespace: demo
-  resourceVersion: "10598"
-  selfLink: /api/v1/namespaces/demo/configmaps/omni
-  uid: 2988e9d5-7205-11e7-af79-08002738e55e
-```
-
-Now, apply the `kubed.appscode.com/sync: ""` annotation to ConfigMap `omni`. Kubed operator will notice that and copy the ConfigMap in all existing namespaces.
+Now, apply the `kubed.appscode.com/sync-contexts: "context-1,context-2"` annotation to ConfigMap `omni`.
 
 ```console
-$ kubectl annotate configmap omni kubed.appscode.com/sync="" -n demo
+$ kubectl annotate configmap omni kubed.appscode.com/sync="context-1,context-2" -n demo
 configmap "omni" annotated
-
-$ kubectl get configmaps --all-namespaces | grep omni
-default       omni                                 2         1m
-demo          omni                                 2         8m
-kube-public   omni                                 2         1m
-kube-system   omni                                 2         1m
 ```
 
-```yaml
-$ kubectl get configmaps omni -n demo -o yaml
-apiVersion: v1
-data:
-  you: only
-  leave: once
-kind: ConfigMap
-metadata:
-  annotations:
-    kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"v1","data":{"leave":"once","you":"only"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"omni","namespace":"demo"}}
-    kubed.appscode.com/sync: "true"
-  creationTimestamp: 2017-07-26T13:20:15Z
-  name: omni
-  namespace: demo
-  resourceVersion: "11053"
-  selfLink: /api/v1/namespaces/demo/configmaps/omni
-  uid: 2988e9d5-7205-11e7-af79-08002738e55e
-```
+It will create configmap "omni" in `cluster-1` and `cluster-2`. For `cluster-1` it will sync into source namespace `demo`  since no namespace specified in `context-1` and for `cluster-2` it will sync into `demo-cluster-2` namespace since namespace specified in `context-2`. Here we assume that those namespaces already exits in the respective clusters.
 
-Now, create a new namespace called `other`. Kubed will copy ConfigMap `omni` into that namespace.
-
-```console
-$ kubectl create ns other
-namespace "other" created
-
-$ kubectl get configmaps --all-namespaces | grep omni
-default       omni                                 2         5m
-demo          omni                                 2         12m
-kube-public   omni                                 2         5m
-kube-system   omni                                 2         5m
-other         omni                                 2         1m
-```
-
-Alas! there is a typo is the ConfigMap data. Let's fix that.
-
-```console
-$ kubectl apply -f ./docs/examples/config-syncer/demo-1.yaml
-configmap "omni" configured
-
-$ kubectl get configmaps --all-namespaces | grep omni
-default       omni                                 2         9m
-demo          omni                                 2         16m
-kube-public   omni                                 2         9m
-kube-system   omni                                 2         9m
-other         omni                                 2         5m
-```
-
-```yaml
-$ kubectl get configmaps omni -n other -o yaml
-apiVersion: v1
-data:
-  you: only
-  live: once
-kind: ConfigMap
-metadata:
-  annotations:
-    kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"v1","data":{"live":"once","you":"only"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"omni","namespace":"demo"}}
-  creationTimestamp: 2017-07-26T13:31:13Z
-  name: omni
-  namespace: other
-  resourceVersion: "11594"
-  selfLink: /api/v1/namespaces/other/configmaps/omni
-  uid: b193f40f-7206-11e7-af79-08002738e55e
-```
-
-Kubed operator notices that the source ConfigMap `omni` has been updated and propagates the change to all the copies in other namespaces.
-
-## Namespace Selector
-Lets' change annotation value of source ConfigMap `omni`.
-
-```console
-$ kubectl annotate configmap omni kubed.appscode.com/sync="app=kubed" -n demo --overwrite
-configmap "omni" annotated
-
-$ kubectl get configmaps --all-namespaces | grep omni
-demo          omni                                 2         8m
-```
-
-Kubed operator removes the ConfigMap from all namespaces (except source) since no namespace matches the label-selector `app=kubed`.
-Now, lets' apply `app=kubed` annotation to `other` namespace. Kubed operator will then sync the ConfigMap to `other` namespace.
-
-```console
-$ kubectl label namespace other app=kubed
-namespace "other" labeled
-
-$ kubectl get configmaps --all-namespaces | grep omni
-demo          omni                                 2         8m
-other         omni                                 2         5m
-```
-
-## Remove Annotation
-
-Now, lets' remove the annotation from source ConfigMap `omni`. Please note that `-` after annotation key `kubed.appscode.com/sync-`. This tells kubectl to remove this annotation from ConfigMap `omni`.
-
-```console
-$ kubectl annotate configmap omni kubed.appscode.com/sync- -n demo
-configmap "omni" annotated
-
-$ kubectl get configmaps --all-namespaces | grep omni
-demo          omni                                 2         18m
-```
-
-## Origin Annotation
-Since 0.4.0, Kubed operator will apply `kubed.appscode.com/origin` annotation on ConfigMap or Secret copies.
-
-![origin annotation](/docs/images/config-syncer/config-origin.png)
-
-## Origin Labels
-Kubed  operator will apply following labels on ConfigMap or Secret copies:
-
- - `kubed.appscode.com/origin.name`
- - `kubed.appscode.com/origin.namespace`
- - `kubed.appscode.com/origin.cluster`
-
-This annotations are used by Kubed operator to list the copies for a specific source ConfigMap/Secret.
-
-## Disable Syncer
-If you would like to disable this feature, either remove the `enableConfigSyncer` field in your Kubed cluster config or set `enableConfigSyncer` to false. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
-
-
-## Cleaning up
-To cleanup the Kubernetes resources created by this tutorial, run the following commands:
-
-```console
-$ kubectl delete ns other
-namespace "other" deleted
-
-$ kubectl delete ns demo
-namespace "demo" deleted
-```
-
-To uninstall Kubed operator, please follow the steps [here](/docs/setup/uninstall.md).
-
+Other concepts like updating source configmap, removing annotation, origin annotation, origin labels, etc. are similar to the tutorial described [here](/docs/guides/config-syncer/intra-cluster.md).
 
 ## Next Steps
- - Learn how to sync config-maps or secrets across multiple cluster [here](/docs/guides/config-syncer/intra-cluster.md).
+ - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/guides/config-syncer/intra-cluster.md).
  - Learn how to use Kubed to protect your Kubernetes cluster from disasters [here](/docs/guides/disaster-recovery/).
  - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/cluster-events/).
  - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
