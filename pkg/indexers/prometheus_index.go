@@ -37,7 +37,7 @@ type PrometheusIndexerImpl struct {
 
 func (ri *PrometheusIndexerImpl) Add(prom *prom.Prometheus) error {
 	log.Infof("New Prometheus: %v", prom.Name)
-	log.V(5).Infof("Prometheus details: %v", prom)
+	log.Debugf("Prometheus details: %v", prom)
 
 	svcMonitors, err := ri.serviceMonitorsForPrometheus(prom)
 	if err != nil {

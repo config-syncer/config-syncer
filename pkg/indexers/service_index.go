@@ -37,7 +37,7 @@ type ServiceIndexerImpl struct {
 
 func (ri *ServiceIndexerImpl) Add(svc *core.Service) error {
 	log.Infof("New service: %v", svc.Name)
-	log.V(5).Infof("Service details: %v", svc)
+	log.Debugf("Service details: %v", svc)
 
 	pods, err := ri.podsForService(svc)
 	if err != nil {

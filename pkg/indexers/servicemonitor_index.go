@@ -37,7 +37,7 @@ type ServiceMonitorIndexerImpl struct {
 
 func (ri *ServiceMonitorIndexerImpl) Add(svcMonitor *prom.ServiceMonitor) error {
 	log.Infof("New svcMonitor: %v", svcMonitor.Name)
-	log.V(5).Infof("svcMonitor details: %v", svcMonitor)
+	log.Debugf("svcMonitor details: %v", svcMonitor)
 
 	svc, err := ri.serviceForServiceMonitors(svcMonitor)
 	if err != nil {
