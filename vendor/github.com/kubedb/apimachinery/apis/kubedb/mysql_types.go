@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	ResourceCodeMySQL = "ms"
+	ResourceCodeMySQL = "my"
 	ResourceKindMySQL = "MySQL"
 	ResourceNameMySQL = "mysql"
 	ResourceTypeMySQL = "mysqls"

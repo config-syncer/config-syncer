@@ -1,5 +1,5 @@
 hash: 405456dbe9602b6394c9a0cb90b8d8f2a834b2f9af4906f646c985db92b1f774
-updated: 2018-01-05T14:44:30.896590497-08:00
+updated: 2018-01-14T21:01:07.735155191-08:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -9,7 +9,7 @@ imports:
 - name: github.com/appscode/envconfig
   version: 183bbe643a2875eaa69c85627ac6b25813983203
 - name: github.com/appscode/go
-  version: f08cee5a2aa53a1ab6d30e4ae11e381d1b265f81
+  version: 702364e848d80e8f4d6af7045aef800f36b3db80
   subpackages:
   - analytics
   - arrays
@@ -41,12 +41,12 @@ imports:
   - unified
   - webhook
 - name: github.com/appscode/kube-mon
-  version: 7f7ea00b96f4fe39dbcc4fbe405768eae032ba2f
+  version: bb1241cf66767ebcca781fef3bdd2c2769e11658
   subpackages:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: 4a8306c9183a0dbebfc98327238735a1fb015e6a
+  version: 1246ec828f2f5024b54a1fe84ad4afaf3de0ed37
   subpackages:
   - apps/v1beta1
   - batch/v1
@@ -62,7 +62,7 @@ imports:
 - name: github.com/appscode/mergo
   version: e3000cb3d28c72b837601cac94debd91032d19fe
 - name: github.com/appscode/osm
-  version: bd094241594e26fce6d54e17db21ff253df8cd22
+  version: 8175dd853f6f3d4530b14018901c79140e305f3a
   subpackages:
   - context
 - name: github.com/appscode/pat
@@ -86,7 +86,7 @@ imports:
   - client/typed/stash/v1alpha1
   - client/typed/stash/v1alpha1/util
 - name: github.com/appscode/voyager
-  version: 956abb859e2bdb438a7d07ad211775d499554665
+  version: dc56133f7b722f40f04795f083088b2c54064677
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -212,7 +212,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-ini/ini
-  version: 20b96f641a5ea98f2f8619ff4f3e061cff4833bd
+  version: 2e44421e256d82ebbf3d4d4fcabe8930b905eff3
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -318,20 +318,20 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/k8sdb/apimachinery
-  version: c62e5c9ee18651a8183c708df55ec8abd6ee2083
+  version: 0fbe2f9c300e9af33fb64b4edc11ea9de226ce6d
   subpackages:
   - apis/kubedb/v1alpha1
   - client/typed/kubedb/v1alpha1
   - client/typed/kubedb/v1alpha1/util
 - name: github.com/kubedb/apimachinery
-  version: c62e5c9ee18651a8183c708df55ec8abd6ee2083
+  version: 0fbe2f9c300e9af33fb64b4edc11ea9de226ce6d
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
   - client/scheme
   - client/typed/kubedb/v1alpha1
 - name: github.com/kubernetes/apimachinery
-  version: 91d8586aac31d9086939d077ba556d2c7fb157b4
+  version: d40b72863885248607ceac2631cd78de166f51c3
   subpackages:
   - pkg/conversion
 - name: github.com/mailgun/mailgun-go
@@ -353,7 +353,7 @@ imports:
 - name: github.com/ncw/swift
   version: 067578e41c8dd06bf557d02a92a77bd35e97c05a
 - name: github.com/nlopes/slack
-  version: 107290b5bbaf3e634833346bb4ff389b1c782bc7
+  version: d86785d50d4be9c2e11cfbb0ed601f5dcb22899c
 - name: github.com/olekukonko/tablewriter
   version: cca8bbc0798408af109aaaa239cbd2634846b340
 - name: github.com/onsi/ginkgo
@@ -430,7 +430,7 @@ imports:
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/spf13/cobra
-  version: 7b2c5ac9fc04fc5efafb60700713d4fa609b777b
+  version: b95ab734e27d33e0d8fbabf71ca990568d4e2020
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -505,7 +505,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: 251495678c7835dbcdc35027844ab32f2fcee7a0
+  version: b1c0f9b3aa8fac163224fab909402d49c6dce50a
   subpackages:
   - gensupport
   - googleapi
@@ -568,7 +568,7 @@ imports:
   - storage/v1
   - storage/v1beta1
 - name: k8s.io/apiextensions-apiserver
-  version: 996a70a27a0dcf53642ca52601b9107cb2ad810a
+  version: d0becfa6529e20309bd6684f8486abc265cf0b59
   subpackages:
   - pkg/apis/apiextensions
   - pkg/apis/apiextensions/v1beta1
