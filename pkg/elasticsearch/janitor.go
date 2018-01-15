@@ -3,9 +3,9 @@ package es
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"fmt"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/appscode/go/log"
@@ -66,22 +66,38 @@ func (j *Janitor) Cleanup() error {
 		return err
 	}
 
+	indices, err := client.IndexNames()
+	if err != nil {
+		return err
+	}
+
+	indicesToDelete := make([]string, 0)
+
 	now := time.Now().UTC()
 	oldDate := now.Add(-j.TTL)
 
-	// how many index should we check to delete? I set it to 7
-	for i := 1; i <= 7; i++ {
-		date := oldDate.AddDate(0, 0, -i)
-		prefix := fmt.Sprintf("%s%s", j.Spec.LogIndexPrefix, date.Format("2006.01.02"))
-
-		if _, err := client.Search(prefix).Do(); err == nil {
-			if _, err := client.DeleteIndex(prefix).Do(); err != nil {
-				log.Errorln(err)
-				return err
+	for _, index := range indices {
+		if strings.HasPrefix(index, j.Spec.LogIndexPrefix) {
+			timeString := strings.TrimLeft(index, j.Spec.LogIndexPrefix)
+			t, err := time.Parse("2006.01.02", timeString)
+			if err != nil {
+				log.Debugf("Invalid format for Index [%s]", index)
+				continue
 			}
-			log.Debugf("Index [%s] deleted", prefix)
+			if oldDate.After(t) {
+				indicesToDelete = append(indicesToDelete, index)
+			}
 		}
 	}
+
+	if len(indicesToDelete) > 0 {
+		if _, err := client.DeleteIndex(indicesToDelete...).Do(); err != nil {
+			log.Errorln(err)
+			return err
+		}
+		log.Debugf("Old Indices [%s] deleted", strings.Join(indicesToDelete, ","))
+	}
+
 	log.Debugf("ElasticSearch cleanup process complete")
 	return nil
 }
