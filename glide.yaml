@@ -33,7 +33,7 @@ import:
   version: master
   vcs: git
 - package: github.com/influxdata/influxdb
-  version: v0.11.0
+  version: v1.1.1
 - package: github.com/jpillora/go-ogle-analytics
 - package: github.com/k8sdb/apimachinery
   version: master
