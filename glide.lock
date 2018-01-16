@@ -1,5 +1,5 @@
-hash: 75050bea0b01950baa3ab685ab68c18987198223da0b44786ba25be2950c42ef
-updated: 2018-01-16T07:20:00.941930583-08:00
+hash: f3a1f20814d39db8d54ef58f3e3920d0deed1fd67c53ae963fed947ce7b2cbae
+updated: 2018-01-16T12:30:19.320268776-08:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -330,13 +330,13 @@ imports:
   - client/scheme
   - client/typed/kubedb/v1alpha1
 - name: github.com/kubernetes/apimachinery
-  version: d0c8c1c78cacdef77dfcc0ff70d9b7b01faeaf08
+  version: bc918d4f73e11cb3110730ec8e8ee02c58d6267c
   subpackages:
   - pkg/conversion
 - name: github.com/mailgun/mailgun-go
   version: 369a1fa57ce6fb314e627087b9fff0db5c266c0f
 - name: github.com/mailru/easyjson
-  version: d5b7844b561a7bc640052f1b935f7b800330d7e0
+  version: 32fa128f234d041f196a9f3e0fea5ac9772c08e1
   subpackages:
   - buffer
   - jlexer
@@ -504,7 +504,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: de3aa2cfa7f1c18dcb7f91738099bad280117b8e
+  version: ff5d3c38820f8fd8bd04f917bc656d894edf390d
   subpackages:
   - gensupport
   - googleapi
@@ -528,10 +528,10 @@ imports:
   version: 81ebce5c23dfd25c6c67194b37d3dd3f338c98b1
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
-- name: gopkg.in/olivere/elastic.v3
-  version: 060365a7e27c56c938b234824ef7f9a3a7834b99
+- name: gopkg.in/olivere/elastic.v5
+  version: 0eca603795dd69d8270bba3383358c074044d8fc
   subpackages:
-  - backoff
+  - config
   - uritemplates
 - name: gopkg.in/robfig/cron.v2
   version: ca60c6d796d4b1f7bb2a8fd5271d8a59aeffb4bf

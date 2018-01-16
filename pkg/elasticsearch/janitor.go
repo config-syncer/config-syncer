@@ -1,6 +1,7 @@
 package es
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"net"
@@ -10,7 +11,7 @@ import (
 
 	"github.com/appscode/go/log"
 	"github.com/appscode/kubed/pkg/config"
-	elastic "gopkg.in/olivere/elastic.v3"
+	"gopkg.in/olivere/elastic.v5"
 )
 
 type Janitor struct {
@@ -59,7 +60,7 @@ func (j *Janitor) Cleanup() error {
 
 	client, err := elastic.NewClient(
 		elastic.SetHttpClient(httpClient),
-		// elastic.SetSniff(false),
+		elastic.SetSniff(true),
 		elastic.SetURL(j.Spec.Endpoint),
 	)
 	if err != nil {
@@ -90,7 +91,7 @@ func (j *Janitor) Cleanup() error {
 	}
 
 	if len(indicesToDelete) > 0 {
-		if _, err := client.DeleteIndex(indicesToDelete...).Do(); err != nil {
+		if _, err := client.DeleteIndex(indicesToDelete...).Do(context.Background()); err != nil {
 			log.Errorln(err)
 			return err
 		}
