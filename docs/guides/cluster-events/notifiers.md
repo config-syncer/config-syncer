@@ -413,6 +413,91 @@ notifierSecretName: notifier-config
 ```
 
 
+## Telegram
+To receive notifications in your Telegram app, please follow the steps below:
+
+- Sign up for [Telegram](https://telegram.org/).
+- Now, use [@botfather](https://t.me/botfather) to create your own Telegram Bot and get the authorization token.
+- Create a Kubernetes Secret with the following keys:
+
+| Name               | Description                                                                    |
+|--------------------|--------------------------------------------------------------------------------|
+| TELEGRAM_TOKEN     | `Required` Telegram Bot authorization token.                                   |
+
+
+```console
+$ echo -n 'your-telegram-bot-token' > TELEGRAM_TOKEN
+$ kubectl create secret generic notifier-config -n kube-system \
+    --from-file=./TELEGRAM_TOKEN
+secret "notifier-config" created
+```
+```yaml
+apiVersion: v1
+data:
+  TELEGRAM_TOKEN: NDkxoooooooooooooooooxJ
+kind: Secret
+metadata:
+  creationTimestamp: 2018-01-16T13:41:04Z
+  name: notifier-config
+  namespace: kube-system
+  resourceVersion: "768"
+  selfLink: /api/v1/namespaces/kube-system/secrets/notifier-config
+  uid: e6066076-fac2-11e7-b3e7-0800276ee39b
+type: Opaque
+```
+
+- Add the Bot as an Admin for your channel where notifications will be sent.
+
+![telegram-bot](/docs/images/event-forwarder/telegram-bot.png)
+
+Now, to receiver notifications in your **public** Telegram channels, configure receiver as below:
+
+- notifier: `Telegram`
+- to: a list of channels where notifications will be sent.
+
+```yaml
+clusterName: unicorn
+recycleBin:
+  handleUpdates: false
+  path: /tmp/kubed/trash
+  receivers:
+  - notifier: Telegram
+    to:
+    - '@my-channel'
+  ttl: 168h
+notifierSecretName: notifier-config
+```
+
+To receive notifications if your **private** channel, follow the steps below:
+
+- Create a new public channel or change your private channel to public temporarily and assign a link.
+- Now, run the following command to determine the `id` for your channel.
+
+```console
+TOKEN=<token>
+curl -X POST https://api.telegram.org/bot${TOKEN}/sendMessage -d "chat_id=@channelusername&text=hello"
+
+{"ok":true,"result":{"message_id":10,"chat":{"id":-1001210429328,"title":"mytest","username":"mytest123489","type":"channel"},"date":1516103121,"text":"hello"}}
+```
+
+- Make your channel private.
+
+Now, to receiver notifications in your private Telegram channels, configure channle id as receiver like below:
+
+```yaml
+clusterName: unicorn
+recycleBin:
+  handleUpdates: false
+  path: /tmp/kubed/trash
+  receivers:
+  - notifier: Telegram
+    to:
+    - '-1001210429328'
+  ttl: 168h
+notifierSecretName: notifier-config
+```
+
+
 ## Using multiple notifiers
 Kubed supports using different notifiers in different scenarios. First add the credentials for the different notifiers in the same Secret `notifier-config` and deploy that to Kubernetes. Then in the Kubed cluster config, specify the appropriate notifier for each feature.
 

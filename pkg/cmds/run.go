@@ -1,6 +1,7 @@
 package cmds
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -19,6 +20,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+)
+
+var (
+	prometheusCrdGroup = prom.Group
+	prometheusCrdKinds = prom.DefaultCrdKinds
 )
 
 // runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml"
@@ -42,6 +48,11 @@ func NewCmdRun() *cobra.Command {
 		},
 	}
 
+	fs := flag.NewFlagSet("prometheus", flag.ExitOnError)
+	fs.StringVar(&prometheusCrdGroup, "prometheus-crd-apigroup", prometheusCrdGroup, "prometheus CRD  API group name")
+	fs.Var(&prometheusCrdKinds, "prometheus-crd-kinds", " - EXPERIMENTAL (could be removed in future releases) - customize CRD kind names")
+	cmd.Flags().AddGoFlagSet(fs)
+
 	cmd.Flags().StringVar(&opt.KubeConfig, "kubeconfig", opt.KubeConfig, "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
 	cmd.Flags().StringVar(&opt.Master, "master", opt.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig)")
 	cmd.Flags().StringVar(&opt.ConfigPath, "clusterconfig", opt.ConfigPath, "Path to cluster config file")
@@ -57,21 +68,21 @@ func Run(opt operator.Options) {
 	log.Infoln("configurations provided for kubed", opt)
 	defer runtime.HandleCrash()
 
-	c, err := clientcmd.BuildConfigFromFlags(opt.Master, opt.KubeConfig)
+	config, err := clientcmd.BuildConfigFromFlags(opt.Master, opt.KubeConfig)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	op := &operator.Operator{
-		KubeClient:        kubernetes.NewForConfigOrDie(c),
-		VoyagerClient:     vcs.NewForConfigOrDie(c),
-		SearchlightClient: srch_cs.NewForConfigOrDie(c),
-		StashClient:       scs.NewForConfigOrDie(c),
-		KubeDBClient:      kcs.NewForConfigOrDie(c),
+		KubeClient:        kubernetes.NewForConfigOrDie(config),
+		VoyagerClient:     vcs.NewForConfigOrDie(config),
+		SearchlightClient: srch_cs.NewForConfigOrDie(config),
+		StashClient:       scs.NewForConfigOrDie(config),
+		KubeDBClient:      kcs.NewForConfigOrDie(config),
 		Opt:               opt,
 	}
-	op.PromClient, err = prom.NewForConfig(c)
+	op.PromClient, err = prom.NewForConfig(&prometheusCrdKinds, prometheusCrdGroup, config)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

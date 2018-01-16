@@ -14,6 +14,7 @@ import (
 	"github.com/appscode/go-notify/pushover"
 	"github.com/appscode/go-notify/slack"
 	"github.com/appscode/go-notify/smtp"
+	"github.com/appscode/go-notify/telegram"
 	"github.com/appscode/go-notify/twilio"
 	"github.com/appscode/go-notify/webhook"
 )
@@ -50,6 +51,8 @@ func DefaultVia(via string) (interface{}, error) {
 		return webhook.Default()
 	case pushover.UID:
 		return pushover.Default()
+	case telegram.UID:
+		return telegram.Default()
 	}
 	return nil, fmt.Errorf("Unknown notifier %s", via)
 }
@@ -82,6 +85,8 @@ func LoadVia(via string, loader envconfig.LoaderFunc) (interface{}, error) {
 		return webhook.Load(loader)
 	case pushover.UID:
 		return pushover.Load(loader)
+	case telegram.UID:
+		return telegram.Load(loader)
 	}
 	return nil, fmt.Errorf("Unknown notifier %s", via)
 }

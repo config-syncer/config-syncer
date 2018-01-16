@@ -1,5 +1,5 @@
-hash: 405456dbe9602b6394c9a0cb90b8d8f2a834b2f9af4906f646c985db92b1f774
-updated: 2018-01-14T21:01:07.735155191-08:00
+hash: 75050bea0b01950baa3ab685ab68c18987198223da0b44786ba25be2950c42ef
+updated: 2018-01-16T07:20:00.941930583-08:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -28,7 +28,7 @@ imports:
   - types
   - version
 - name: github.com/appscode/go-notify
-  version: 5aa1e264b9e59775cd2ea6053cb46f46d66821d0
+  version: f8dbe1f69aa594edb7a385617d949a73edadd71d
   subpackages:
   - hipchat
   - log
@@ -37,11 +37,12 @@ imports:
   - pushover
   - slack
   - smtp
+  - telegram
   - twilio
   - unified
   - webhook
 - name: github.com/appscode/kube-mon
-  version: bb1241cf66767ebcca781fef3bdd2c2769e11658
+  version: bbf9306e9c161e411f0ddc5d946e67a3685530ee
   subpackages:
   - api
   - prometheus/v1
@@ -68,7 +69,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: c91c4e2e63c5068bdcee400dc33769e6e080edcc
+  version: 81bf7b826345d8e43b4d3d1a97d4ed73c81d97c2
   subpackages:
   - apis/monitoring
   - apis/monitoring/v1alpha1
@@ -184,9 +185,7 @@ imports:
 - name: github.com/codeskyblue/go-sh
   version: cf804ac79dffabb6b16342e24362cc744afc144f
 - name: github.com/coreos/prometheus-operator
-  version: cbdd1b519796673cd02d53b0e21999acbcbfe6e4
-  repo: https://github.com/appscode/prometheus-operator.git
-  vcs: git
+  version: 0b87bfa150cf57bdc7b081d9b48ef48a9350b47b
   subpackages:
   - pkg/client/monitoring/v1
 - name: github.com/cpuguy83/go-md2man
@@ -318,20 +317,20 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/k8sdb/apimachinery
-  version: 0fbe2f9c300e9af33fb64b4edc11ea9de226ce6d
+  version: d8312d3dac5933b603138bdfb9e7418655960f2b
   subpackages:
   - apis/kubedb/v1alpha1
   - client/typed/kubedb/v1alpha1
   - client/typed/kubedb/v1alpha1/util
 - name: github.com/kubedb/apimachinery
-  version: 0fbe2f9c300e9af33fb64b4edc11ea9de226ce6d
+  version: d8312d3dac5933b603138bdfb9e7418655960f2b
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
   - client/scheme
   - client/typed/kubedb/v1alpha1
 - name: github.com/kubernetes/apimachinery
-  version: d40b72863885248607ceac2631cd78de166f51c3
+  version: d0c8c1c78cacdef77dfcc0ff70d9b7b01faeaf08
   subpackages:
   - pkg/conversion
 - name: github.com/mailgun/mailgun-go
@@ -351,7 +350,7 @@ imports:
   subpackages:
   - pbutil
 - name: github.com/ncw/swift
-  version: 067578e41c8dd06bf557d02a92a77bd35e97c05a
+  version: ae9f0ea1605b9aa6434ed5c731ca35d83ba67c55
 - name: github.com/nlopes/slack
   version: d86785d50d4be9c2e11cfbb0ed601f5dcb22899c
 - name: github.com/olekukonko/tablewriter
@@ -393,7 +392,7 @@ imports:
 - name: github.com/peterbourgon/diskv
   version: 5f041e8faa004a95c88a202771f4cc3e991971e6
 - name: github.com/pkg/errors
-  version: 645ef00459ed84a119197bfb8d8205042c6df63d
+  version: a22138067af1c4942683050411a841ade67fe1eb
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -430,7 +429,7 @@ imports:
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/spf13/cobra
-  version: b95ab734e27d33e0d8fbabf71ca990568d4e2020
+  version: 0c34d16c3123764e413b9ed982ada58b1c3d53ea
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -505,7 +504,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: b1c0f9b3aa8fac163224fab909402d49c6dce50a
+  version: de3aa2cfa7f1c18dcb7f91738099bad280117b8e
   subpackages:
   - gensupport
   - googleapi
