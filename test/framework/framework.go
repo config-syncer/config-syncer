@@ -45,24 +45,24 @@ type Invocation struct {
 func New() *Framework {
 	testConfigs.validate()
 
-	c, err := clientcmd.BuildConfigFromFlags(testConfigs.Master, testConfigs.KubeConfig)
+	config, err := clientcmd.BuildConfigFromFlags(testConfigs.Master, testConfigs.KubeConfig)
 	Expect(err).NotTo(HaveOccurred())
-	promClient, err := prom.NewForConfig(c)
+	promClient, err := prom.NewForConfig(&prom.DefaultCrdKinds, prom.Group, config)
 	Expect(err).NotTo(HaveOccurred())
-	crdClient, err := ecs.NewForConfig(c)
+	crdClient, err := ecs.NewForConfig(config)
 	Expect(err).NotTo(HaveOccurred())
 
 	return &Framework{
-		KubeConfig: c,
-		KubeClient: clientset.NewForConfigOrDie(c),
+		KubeConfig: config,
+		KubeClient: clientset.NewForConfigOrDie(config),
 		namespace:  testConfigs.TestNamespace,
 		Config:     testConfigs,
 		KubedOperator: &operator.Operator{
-			KubeClient:        clientset.NewForConfigOrDie(c),
-			StashClient:       scs.NewForConfigOrDie(c),
-			VoyagerClient:     vcs.NewForConfigOrDie(c),
-			SearchlightClient: sls.NewForConfigOrDie(c),
-			KubeDBClient:      kcs.NewForConfigOrDie(c),
+			KubeClient:        clientset.NewForConfigOrDie(config),
+			StashClient:       scs.NewForConfigOrDie(config),
+			VoyagerClient:     vcs.NewForConfigOrDie(config),
+			SearchlightClient: sls.NewForConfigOrDie(config),
+			KubeDBClient:      kcs.NewForConfigOrDie(config),
 			PromClient:        promClient,
 			CRDClient:         crdClient,
 		},

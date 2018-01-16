@@ -25,9 +25,7 @@ import:
 - package: github.com/codeskyblue/go-sh
   version: master
 - package: github.com/coreos/prometheus-operator
-  repo: https://github.com/appscode/prometheus-operator.git
-  vcs: git
-  version: client-go-5
+  version: v0.16.0
 - package: github.com/ghodss/yaml
   version: v1.0.0
 - package: github.com/graymeta/stow
