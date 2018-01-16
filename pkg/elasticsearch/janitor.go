@@ -77,11 +77,10 @@ func (j *Janitor) Cleanup() error {
 	oldDate := now.Add(-j.TTL)
 
 	for _, index := range indices {
-		if strings.HasPrefix(index, j.Spec.LogIndexPrefix) {
-			timeString := strings.TrimLeft(index, j.Spec.LogIndexPrefix)
-			t, err := time.Parse("2006.01.02", timeString)
+		if strings.HasPrefix(index, j.Spec.LogIndexPrefix) && len(index) >= 10 { // len("2006.01.02") == 10
+			t, err := time.Parse("2006.01.02", index[len(index)-10:])
 			if err != nil {
-				log.Debugf("Invalid format for Index [%s]", index)
+				log.Warningf("Invalid format for Index [%s]", index)
 				continue
 			}
 			if oldDate.After(t) {
