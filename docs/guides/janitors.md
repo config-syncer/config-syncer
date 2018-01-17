@@ -48,7 +48,7 @@ janitors:
 | Key                            | Description                                                             |
 |--------------------------------|-------------------------------------------------------------------------|
 | `kind`                         | `Required`. Set this to either `Elasticseach` or `InfluxDB`.            |
-| `ttl`                          | `Required`. Time-to-live for data (eg, 5h30m30s).                       |
+| `ttl`                          | `Required`. Time-to-live for data (eg, 5h30m30s). Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". |
 | `elasticsearch.endpoint`       | Required for kind `Elasticsearch`. URL of Elasticsearch cluster.        |
 | `elasticsearch.logIndexPrefix` | Required for kind `Elasticsearch`. Prefix of log index.                 |
 | `elasticsearch.secretName`     | Optional for kind `Elasticsearch`. Name of secret used to pass Elasticsearch authentication . |
