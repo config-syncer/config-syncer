@@ -155,8 +155,7 @@ func (mgr BackupManager) Backup(process processorFunc) error {
 			request := client.Get().Resource(r.Name).Param("pretty", "true")
 			resp, err := request.DoRaw()
 			if err != nil {
-				glog.Errorln(err)
-				continue
+				return err
 			}
 			items := &ItemList{}
 			err = yaml.Unmarshal(resp, &items)

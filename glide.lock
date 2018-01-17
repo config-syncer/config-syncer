@@ -1,5 +1,5 @@
-hash: 1fe5ccd034b55433bb850b5d8274df5cb7af1694a4528ae132848d0e509aa23a
-updated: 2018-01-16T12:42:35.454979436-08:00
+hash: ede7f9292c6325c9507174ce543ce395c682b6ec0026a8140eee30423657fe87
+updated: 2018-01-17T00:19:23.065845031-08:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -47,7 +47,7 @@ imports:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: 1246ec828f2f5024b54a1fe84ad4afaf3de0ed37
+  version: de69f2e242cc9e4df5dcf41d0d314e5fce818154
   subpackages:
   - apps/v1beta1
   - batch/v1
@@ -69,7 +69,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 81bf7b826345d8e43b4d3d1a97d4ed73c81d97c2
+  version: c5a32fa81c9ae339949eeac6c103b1d28b910c15
   subpackages:
   - apis/monitoring
   - apis/monitoring/v1alpha1
@@ -79,7 +79,7 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: f8c6641e83e3239242e319f70694ab691389c8a8
+  version: b9526600984bf32a7e299b4ae8ba55c51b5cdc2c
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
@@ -87,7 +87,7 @@ imports:
   - client/typed/stash/v1alpha1
   - client/typed/stash/v1alpha1/util
 - name: github.com/appscode/voyager
-  version: dc56133f7b722f40f04795f083088b2c54064677
+  version: 1912bdb0314519815bd4fc7fccd41512b529ea0e
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -301,7 +301,7 @@ imports:
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/influxdata/influxdb
-  version: e47cf1f2e83a02443d7115c54f838be8ee959644
+  version: e37afaf09bdd91fab4713536c7bdbdc549ee7dc6
   subpackages:
   - client
   - models
@@ -317,13 +317,13 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/k8sdb/apimachinery
-  version: d8312d3dac5933b603138bdfb9e7418655960f2b
+  version: 2d0777c52da98b5efaa6fbfcfd45dcbdabb2fa84
   subpackages:
   - apis/kubedb/v1alpha1
   - client/typed/kubedb/v1alpha1
   - client/typed/kubedb/v1alpha1/util
 - name: github.com/kubedb/apimachinery
-  version: d8312d3dac5933b603138bdfb9e7418655960f2b
+  version: 2d0777c52da98b5efaa6fbfcfd45dcbdabb2fa84
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1

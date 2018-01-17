@@ -88,6 +88,13 @@ func (p *MongoDB) StatsAccessor() api.StatsAccessor {
 	return p
 }
 
+func (m *MongoDB) GetMonitoringVendor() string {
+	if m.Spec.Monitor != nil {
+		return m.Spec.Monitor.Agent.Vendor()
+	}
+	return ""
+}
+
 func (p MongoDB) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
 	resourceName := ResourceTypeMongoDB + "." + SchemeGroupVersion.Group
 	return &crd_api.CustomResourceDefinition{

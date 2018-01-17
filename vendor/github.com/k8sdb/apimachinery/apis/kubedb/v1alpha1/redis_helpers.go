@@ -88,6 +88,13 @@ func (r *Redis) StatsAccessor() api.StatsAccessor {
 	return r
 }
 
+func (r *Redis) GetMonitoringVendor() string {
+	if r.Spec.Monitor != nil {
+		return r.Spec.Monitor.Agent.Vendor()
+	}
+	return ""
+}
+
 func (r Redis) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
 	resourceName := ResourceTypeRedis + "." + SchemeGroupVersion.Group
 

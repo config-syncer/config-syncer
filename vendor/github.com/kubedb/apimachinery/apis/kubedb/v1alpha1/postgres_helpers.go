@@ -90,6 +90,13 @@ func (p *Postgres) StatsAccessor() api.StatsAccessor {
 	return p
 }
 
+func (p *Postgres) GetMonitoringVendor() string {
+	if p.Spec.Monitor != nil {
+		return p.Spec.Monitor.Agent.Vendor()
+	}
+	return ""
+}
+
 func (p Postgres) PrimaryName() string {
 	return fmt.Sprintf("%v-primary", p.Name)
 }

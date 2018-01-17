@@ -94,6 +94,13 @@ func (r *Elasticsearch) StatsAccessor() api.StatsAccessor {
 	return r
 }
 
+func (e *Elasticsearch) GetMonitoringVendor() string {
+	if e.Spec.Monitor != nil {
+		return e.Spec.Monitor.Agent.Vendor()
+	}
+	return ""
+}
+
 func (r Elasticsearch) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
 	resourceName := ResourceTypeElasticsearch + "." + SchemeGroupVersion.Group
 
