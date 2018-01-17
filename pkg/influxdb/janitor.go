@@ -40,16 +40,20 @@ func (j *Janitor) Cleanup() error {
 		ttl = 60 * time.Minute
 		log.Infof("influx janitor [%s]: resetting retention duration to minimum %s", j.Spec.Endpoint, ttl)
 	}
-	query := fmt.Sprintf("ALTER RETENTION POLICY default ON k8s DURATION %s", ttl)
+	query := fmt.Sprintf("ALTER RETENTION POLICY default ON k8s DURATION %s SHARD DURATION 0s DEFAULT", ttl)
 	log.Infof("influx janitor [%s]: %s", j.Spec.Endpoint, query)
-	_, err = client.Query(influxdb.Query{
+	resp, err := client.Query(influxdb.Query{
 		Command:  query,
 		Database: "k8s",
 	})
+	if err == nil && resp.Err != nil {
+		err = resp.Err
+	}
 	if err != nil {
 		log.Warningf("failed to ALTER RETENTION POLICY for k8s database. Reason: %v", err)
-	} else {
-		log.Infoln("successfully ALTER-ed RETENTION POLICY for k8s database")
+		return err
 	}
-	return err
+
+	log.Infoln("successfully altered retention policy for k8s database")
+	return nil
 }
