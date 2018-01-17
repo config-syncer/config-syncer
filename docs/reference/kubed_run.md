@@ -25,12 +25,14 @@ kubed run [flags]
 
 ```
       --api.address string               The address of the Kubed API Server (overrides any value in clusterconfig) (default ":8080")
+      --burst int                        The maximum burst for throttle (default 1000000)
       --clusterconfig string             Path to cluster config file (default "/srv/kubed/config.yaml")
   -h, --help                             help for run
       --kubeconfig string                Path to kubeconfig file with authorization information (the master location is set by the master flag).
       --master string                    The address of the Kubernetes API server (overrides any value in kubeconfig)
       --prometheus-crd-apigroup string   prometheus CRD  API group name (default "monitoring.coreos.com")
       --prometheus-crd-kinds CrdKinds     - EXPERIMENTAL (could be removed in future releases) - customize CRD kind names
+      --qps float32                      The maximum QPS to the master from this client (default 1e+06)
       --resync-period duration           If non-zero, will re-list this often. Otherwise, re-list will be delayed aslong as possible (until the upstream source closes the watch or times out. (default 5m0s)
       --scratch-dir emptyDir             Directory used to store temporary files. Use an emptyDir in Kubernetes. (default "/tmp")
       --web.address string               Address to listen on for web interface and telemetry. (default ":56790")
