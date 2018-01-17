@@ -90,6 +90,13 @@ func (m *MySQL) StatsAccessor() api.StatsAccessor {
 	return m
 }
 
+func (m *MySQL) GetMonitoringVendor() string {
+	if m.Spec.Monitor != nil {
+		return m.Spec.Monitor.Agent.Vendor()
+	}
+	return ""
+}
+
 func (m MySQL) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
 	resourceName := ResourceTypeMySQL + "." + SchemeGroupVersion.Group
 

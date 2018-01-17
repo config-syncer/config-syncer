@@ -88,6 +88,13 @@ func (m *Memcached) StatsAccessor() api.StatsAccessor {
 	return m
 }
 
+func (m *Memcached) GetMonitoringVendor() string {
+	if m.Spec.Monitor != nil {
+		return m.Spec.Monitor.Agent.Vendor()
+	}
+	return ""
+}
+
 func (m Memcached) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
 	resourceName := ResourceTypeMemcached + "." + SchemeGroupVersion.Group
 

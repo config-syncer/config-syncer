@@ -20,7 +20,6 @@ const (
 
 	GenericInitSpec = GenericKey + "/init"
 
-	AgentCoreosPrometheus        = "coreos-prometheus-operator"
 	PrometheusExporterPortNumber = 56790
 	PrometheusExporterPortName   = "prom-http"
 )
