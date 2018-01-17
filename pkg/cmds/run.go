@@ -36,6 +36,11 @@ func NewCmdRun() *cobra.Command {
 		ScratchDir:        "/tmp",
 		OperatorNamespace: namespace(),
 		ResyncPeriod:      5 * time.Minute,
+		// ref: https://github.com/kubernetes/ingress-nginx/blob/e4d53786e771cc6bdd55f180674b79f5b692e552/pkg/ingress/controller/launch.go#L252-L259
+		// High enough QPS to fit all expected use cases. QPS=0 is not set here, because client code is overriding it.
+		QPS: 1e6,
+		// High enough Burst to fit all expected use cases. Burst=0 is not set here, because client code is overriding it.
+		Burst: 1e6,
 	}
 	cmd := &cobra.Command{
 		Use:               "run",
@@ -60,6 +65,8 @@ func NewCmdRun() *cobra.Command {
 	cmd.Flags().StringVar(&opt.APIAddress, "api.address", opt.APIAddress, "The address of the Kubed API Server (overrides any value in clusterconfig)")
 	cmd.Flags().StringVar(&opt.WebAddress, "web.address", opt.WebAddress, "Address to listen on for web interface and telemetry.")
 	cmd.Flags().DurationVar(&opt.ResyncPeriod, "resync-period", opt.ResyncPeriod, "If non-zero, will re-list this often. Otherwise, re-list will be delayed aslong as possible (until the upstream source closes the watch or times out.")
+	cmd.Flags().Float32Var(&opt.QPS, "qps", opt.QPS, "The maximum QPS to the master from this client")
+	cmd.Flags().IntVar(&opt.Burst, "burst", opt.Burst, "The maximum burst for throttle")
 
 	return cmd
 }
@@ -73,6 +80,8 @@ func Run(opt operator.Options) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	config.Burst = opt.Burst
+	config.QPS = opt.QPS
 
 	op := &operator.Operator{
 		KubeClient:        kubernetes.NewForConfigOrDie(config),

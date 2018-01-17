@@ -56,6 +56,8 @@ type Options struct {
 	OperatorNamespace string
 
 	ResyncPeriod time.Duration
+	QPS          float32
+	Burst        int
 }
 
 type Operator struct {
