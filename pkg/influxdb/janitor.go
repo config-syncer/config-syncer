@@ -2,7 +2,6 @@ package influx
 
 import (
 	"fmt"
-	"math"
 	"net/url"
 	"time"
 
@@ -35,11 +34,18 @@ func (j *Janitor) Cleanup() error {
 		// ref: https://docs.influxdata.com/influxdb/v1.4/query_language/schema_exploration/#example-2-run-a-show-retention-policies-query-without-the-on-clause
 		$ curl -G "http://localhost:8086/query?db=k8s&pretty=true" --data-urlencode "q=SHOW RETENTION POLICIES"
 	*/
-	query := influxdb.Query{
-		Command:  fmt.Sprintf("ALTER RETENTION POLICY default ON k8s DURATION %vs", int(math.Ceil(j.TTL.Seconds()))),
-		Database: "k8s",
+	ttl := j.TTL
+	// https://docs.influxdata.com/influxdb/v1.3/query_language/database_management/#create-retention-policies-with-create-retention-policy
+	if ttl < 60*time.Minute {
+		ttl = 60 * time.Minute
+		log.Infof("influx janitor [%s]: resetting retention duration to minimum %s", j.Spec.Endpoint, ttl)
 	}
-	_, err = client.Query(query)
+	query := fmt.Sprintf("ALTER RETENTION POLICY default ON k8s DURATION %s", ttl)
+	log.Infof("influx janitor [%s]: %s", j.Spec.Endpoint, query)
+	_, err = client.Query(influxdb.Query{
+		Command:  query,
+		Database: "k8s",
+	})
 	if err != nil {
 		log.Warningf("failed to ALTER RETENTION POLICY for k8s database. Reason: %v", err)
 	} else {
