@@ -2,30 +2,27 @@ package influx
 
 import (
 	"fmt"
-	"net/url"
 	"testing"
+	"time"
 
-	influxdb "github.com/influxdata/influxdb/client"
+	"github.com/appscode/kubed/pkg/config"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInfluxJanitor(t *testing.T) {
 	host := ""
-	port := ""
 	user := ""
 	pass := ""
-	u, _ := url.Parse(fmt.Sprintf("http://%v:%v", host, port))
-	iConfig := influxdb.Config{
-		URL:       *u,
-		Username:  user,
-		Password:  pass,
-		UserAgent: fmt.Sprintf("%v/%v", "kubed", 1.0),
+
+	j := Janitor{
+		Spec: config.InfluxDBSpec{
+			Endpoint: fmt.Sprintf("http://%s:8086", host),
+			Username: user,
+			Password: pass,
+		},
 	}
+	j.TTL, _ = time.ParseDuration("24h")
 
-	// InfluxDB client
-	influxClient, err := influxdb.NewClient(iConfig)
-	assert.Nil(t, err)
-
-	err = UpdateRetentionPolicy(influxClient, 6*60*60)
+	err := j.Cleanup()
 	assert.Nil(t, err)
 }
