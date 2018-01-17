@@ -2,13 +2,13 @@
 title: Kubed Uninstall
 description: Kubed Uninstall
 menu:
-  product_kubed_0.4.0:
+  product_kubed_0.5.0:
     identifier: kubed-uninstall
     name: Uninstall
     parent: setup
     weight: 20
 product_name: kubed
-menu_name: product_kubed_0.4.0
+menu_name: product_kubed_0.5.0
 section_menu_id: setup
 ---
 
@@ -20,7 +20,7 @@ Please follow the steps below to uninstall Kubed:
 - Delete the various objects created for Kubed operator.
 
 ```console
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.4.0/hack/deploy/uninstall.sh | bash
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/uninstall.sh | bash
 
 + kubectl delete deployment -l app=kubed -n kube-system
 deployment "kubed-operator" deleted

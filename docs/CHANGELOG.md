@@ -2,17 +2,17 @@
 title: Changelog | Kubed
 description: Changelog
 menu:
-  product_kubed_0.4.0:
+  product_kubed_0.5.0:
     identifier: changelog-kubed
     name: Changelog
     parent: welcome
     weight: 10
 product_name: kubed
-menu_name: product_kubed_0.4.0
+menu_name: product_kubed_0.5.0
 section_menu_id: welcome
-url: /products/kubed/0.4.0/welcome/changelog/
+url: /products/kubed/0.5.0/welcome/changelog/
 aliases:
-  - /products/kubed/0.4.0/CHANGELOG/
+  - /products/kubed/0.5.0/CHANGELOG/
 ---
 
 # Change Log

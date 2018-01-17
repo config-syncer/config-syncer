@@ -2,13 +2,13 @@
 title: Kubed Install
 description: Kubed Install
 menu:
-  product_kubed_0.4.0:
+  product_kubed_0.5.0:
     identifier: kubed-install
     name: Install
     parent: setup
     weight: 10
 product_name: kubed
-menu_name: product_kubed_0.4.0
+menu_name: product_kubed_0.5.0
 section_menu_id: setup
 ---
 
@@ -17,7 +17,7 @@ section_menu_id: setup
 # Installation Guide
 
 ## Create Cluster Config
-Before you can install Kubed, you need a cluster config for Kubed. Cluster config is defined in YAML format. You find an example config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/0.4.0/hack/deploy/config.yaml).
+Before you can install Kubed, you need a cluster config for Kubed. Cluster config is defined in YAML format. You find an example config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/config.yaml).
 
 ```yaml
 $ cat ./hack/deploy/config.yaml
@@ -76,7 +76,7 @@ To understand the various configuration options, check Kubed [tutorials](/docs/g
 You may have to create another [Secret for notifiers](/docs/guides/cluster-events/notifiers.md), usually called `notifier-config`. If you are [storing cluster snapshots](/docs/guides/disaster-recovery/cluster-snapshot.md) in cloud storage, you have to create another Secret to provide cloud credentials.
 
 ### Generate Config using script
-If you are familiar with GO, you can use the [./hack/config/main.go](https://github.com/appscode/kubed/blob/0.4.0/hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/0.4.0/hack/deploy/config.yaml).
+If you are familiar with GO, you can use the [./hack/config/main.go](https://github.com/appscode/kubed/blob/0.5.0/hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/config.yaml).
 
 ```console
 go run ./hack/config/main.go
@@ -91,24 +91,24 @@ Cluster config was parsed successfully.
 ```
 
 ## Using YAML
-Kubed can be installed using YAML files includes in the [/hack/deploy](https://github.com/appscode/kubed/tree/0.4.0/hack/deploy) folder.
+Kubed can be installed using YAML files includes in the [/hack/deploy](https://github.com/appscode/kubed/tree/0.5.0/hack/deploy) folder.
 
 ```console
 # Install without RBAC roles
-$ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.4.0/hack/deploy/without-rbac.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/without-rbac.yaml
 
 
 # Install with RBAC roles
-$ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.4.0/hack/deploy/with-rbac.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/with-rbac.yaml
 ```
 
 ## Using Helm
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/0.4.0/chart/stable/kubed) included in this repository. To install the chart with the release name `my-release`:
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/0.5.0/chart/stable/kubed) included in this repository. To install the chart with the release name `my-release`:
 ```bash
 $ helm repo update
 $ helm install stable/kubed --name my-release
 ```
-To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/0.4.0/chart/stable/kubed).
+To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/0.5.0/chart/stable/kubed).
 
 
 ## Verify installation

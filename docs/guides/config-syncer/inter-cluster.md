@@ -2,13 +2,13 @@
 title: Synchronize Configuration across Kubernetes Clusters
 description: Synchronize Configuration across Kubernetes Clusters
 menu:
-  product_kubed_0.4.0:
+  product_kubed_0.5.0:
     identifier: inter-cluster-syncer
     name: Across Clusters
     parent: config-syncer
     weight: 15
 product_name: kubed
-menu_name: product_kubed_0.4.0
+menu_name: product_kubed_0.5.0
 section_menu_id: guides
 ---
 
