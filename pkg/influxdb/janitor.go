@@ -50,7 +50,7 @@ func (j *Janitor) Cleanup() error {
 		err = resp.Err
 	}
 	if err != nil {
-		log.Warningf("failed to ALTER RETENTION POLICY for k8s database. Reason: %v", err)
+		log.Warningf("failed to alter retention policy for k8s database. Reason: %v", err)
 		return err
 	}
 
