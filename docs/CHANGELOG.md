@@ -17,6 +17,24 @@ aliases:
 
 # Change Log
 
+## [0.5.0](https://github.com/appscode/kubed/releases/tag/0.5.0) (2018-01-16)
+Kubed 0.5.0 can send notifications to Telegram and fixes various issues related to janitors and cluster backup.
+
+__Changelog__
+
+- Document valid time units for janitor TTL [\#188](https://github.com/appscode/kubed/pull/188)
+- Reset shard duration for influx janitor [\#187](https://github.com/appscode/kubed/pull/187)
+- Set min retention policy for kubed influx janitor [\#186](https://github.com/appscode/kubed/pull/186)
+- Log influx janitor result [\#185](https://github.com/appscode/kubed/pull/185)
+- Update github.com/influxdata/influxdb to v1.3.3 [\#184](https://github.com/appscode/kubed/pull/184)
+- Increase burst and qps for kube client [\#183](https://github.com/appscode/kubed/pull/183)
+- Update github.com/influxdata/influxdb to v1.1.1 [\#182](https://github.com/appscode/kubed/pull/182)
+- Update Elasticsearch client to olivere/elastic.v5 [\#181](https://github.com/appscode/kubed/pull/181)
+- Add Telegram as notifier [\#180](https://github.com/appscode/kubed/pull/180)
+- Delete all older indices prior to a date [\#179](https://github.com/appscode/kubed/pull/179)
+- Ensure bad backups are not used to overwrite last good backup [\#178](https://github.com/appscode/kubed/pull/178)
+
+
 ## [0.4.0](https://github.com/appscode/kubed/releases/tag/0.4.0) (2018-01-05)
 Kubed 0.4.0 can sync confgimaps/secrets across clusters.
 
