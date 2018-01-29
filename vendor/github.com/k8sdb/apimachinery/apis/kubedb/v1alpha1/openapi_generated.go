@@ -698,7 +698,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 						},
 						"flexVolume": {
 							SchemaProps: spec.SchemaProps{
-								Description: "FlexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin. This is an alpha feature and may change in future.",
+								Description: "FlexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin.",
 								Ref:         ref("k8s.io/api/core/v1.FlexVolumeSource"),
 							},
 						},
@@ -2342,7 +2342,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 						},
 						"flexVolume": {
 							SchemaProps: spec.SchemaProps{
-								Description: "FlexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin. This is an alpha feature and may change in future.",
+								Description: "FlexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin.",
 								Ref:         ref("k8s.io/api/core/v1.FlexVolumeSource"),
 							},
 						},

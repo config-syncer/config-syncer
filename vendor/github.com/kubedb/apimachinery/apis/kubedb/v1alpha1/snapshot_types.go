@@ -38,7 +38,7 @@ const (
 	// used for Snapshots that are currently running
 	SnapshotPhaseRunning SnapshotPhase = "Running"
 	// used for Snapshots that are Succeeded
-	SnapshotPhaseSuccessed SnapshotPhase = "Succeeded"
+	SnapshotPhaseSucceeded SnapshotPhase = "Succeeded"
 	// used for Snapshots that are Failed
 	SnapshotPhaseFailed SnapshotPhase = "Failed"
 )

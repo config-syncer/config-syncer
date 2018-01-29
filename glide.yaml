@@ -6,10 +6,6 @@ import:
   version: master
 - package: github.com/appscode/go
   version: master
-- package: github.com/appscode/kutil
-  version: release-5.0
-- package: github.com/appscode/kube-mon
-  version: master
 - package: github.com/appscode/osm
   version: master
 - package: github.com/appscode/pat
@@ -25,7 +21,10 @@ import:
 - package: github.com/codeskyblue/go-sh
   version: master
 - package: github.com/coreos/prometheus-operator
-  version: v0.16.0
+  repo: https://github.com/tamalsaha/prometheus-operator.git
+  version: k-1.9
+- package: github.com/appscode/kube-mon
+  version: release-6.0
 - package: github.com/ghodss/yaml
   version: v1.0.0
 - package: github.com/graymeta/stow
@@ -51,19 +50,17 @@ import:
 - package: github.com/mailru/easyjson
   version: 32fa128f234d041f196a9f3e0fea5ac9772c08e1
 - package: k8s.io/api
-  version: kubernetes-1.8.3
+  version: kubernetes-1.9.0
 - package: k8s.io/apimachinery
-  repo: https://github.com/tamalsaha/apimachinery.git
-  version: release-1.8
-  vcs: git
+  version: kubernetes-1.9.0
 - package: k8s.io/client-go
-  version: kubernetes-1.8.3
+  version: v6.0.0
+- package: github.com/appscode/kutil
+  version: release-6.0
 - package: k8s.io/apiextensions-apiserver
-  version: release-1.8
+  version: kubernetes-1.9.0
 - package: k8s.io/kubernetes
-  repo: https://github.com/appscode/kubernetes.git
-  version: v1.8.3
-  vcs: git
+  version: v1.9.0
 - package: google.golang.org/api/storage/v1
   version: master
 - package: cloud.google.com/go
@@ -85,3 +82,11 @@ import:
 testImport:
 - package: github.com/stretchr/testify
   version: v1.1.4
+
+
+
+
+
+
+
+
