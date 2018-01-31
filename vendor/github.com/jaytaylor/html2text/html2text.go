@@ -16,7 +16,7 @@ import (
 // Options provide toggles and overrides to control specific rendering behaviors.
 type Options struct {
 	PrettyTables bool // Turns on pretty ASCII rendering for table elements.
-	OmitLinks bool    // Turns on omitting links
+	OmitLinks    bool // Turns on omitting links
 }
 
 // FromHTMLNode renders text output from a pre-parsed HTML document.

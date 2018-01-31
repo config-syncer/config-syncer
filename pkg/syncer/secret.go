@@ -22,11 +22,11 @@ func (s *ConfigSyncer) SyncSecret(src *core.Secret) error {
 		if err != nil {
 			return err
 		}
-		if err := s.syncSecretIntoNamespaces(s.KubeClient, src, newNs, true, ""); err != nil {
+		if err := s.syncSecretIntoNamespaces(s.kubeClient, src, newNs, true, ""); err != nil {
 			return err
 		}
 	} else { // no sync, delete that were previously added
-		if err := s.syncSecretIntoNamespaces(s.KubeClient, src, sets.NewString(), true, ""); err != nil {
+		if err := s.syncSecretIntoNamespaces(s.kubeClient, src, sets.NewString(), true, ""); err != nil {
 			return err
 		}
 	}
@@ -36,7 +36,7 @@ func (s *ConfigSyncer) SyncSecret(src *core.Secret) error {
 
 // source deleted, delete that were previously added
 func (s *ConfigSyncer) SyncDeletedSecret(src *core.Secret) error {
-	if err := s.syncSecretIntoNamespaces(s.KubeClient, src, sets.NewString(), true, ""); err != nil {
+	if err := s.syncSecretIntoNamespaces(s.kubeClient, src, sets.NewString(), true, ""); err != nil {
 		return err
 	}
 	return s.syncSecretIntoContexts(src, sets.NewString())
@@ -46,7 +46,7 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 	// validate contexts specified via annotation
 	taken := map[string]struct{}{}
 	for _, ctx := range contexts.List() {
-		context, found := s.Contexts[ctx]
+		context, found := s.contexts[ctx]
 		if !found {
 			return fmt.Errorf("context %s not found in kubeconfig file", ctx)
 		}
@@ -58,7 +58,7 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 
 	// sync to contexts specified via annotation, do not ignore errors here
 	for _, ctx := range contexts.List() {
-		context, _ := s.Contexts[ctx]
+		context, _ := s.contexts[ctx]
 		if context.Namespace == "" { // use source namespace if not specified via context
 			context.Namespace = src.Namespace
 		}
@@ -69,7 +69,7 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 	}
 
 	// delete from other contexts, ignore errors here
-	for ctxName, ctx := range s.Contexts {
+	for ctxName, ctx := range s.contexts {
 		if _, found := taken[ctx.Address]; !found {
 			err := s.syncSecretIntoNamespaces(ctx.Client, src, sets.NewString(), false, ctxName)
 			if err != nil {
@@ -85,7 +85,7 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 // upsert into newNs set, delete from (oldNs-newNs) set
 // use skipSrcNs = true for sync in source cluster
 func (s *ConfigSyncer) syncSecretIntoNamespaces(k8sClient kubernetes.Interface, src *core.Secret, newNs sets.String, skipSrcNs bool, context string) error {
-	oldNs, err := namespaceSetForSecretSelector(k8sClient, s.syncerLabelSelector(src.Name, src.Namespace, s.ClusterName))
+	oldNs, err := namespaceSetForSecretSelector(k8sClient, s.syncerLabelSelector(src.Name, src.Namespace, s.clusterName))
 	if err != nil {
 		return err
 	}
@@ -115,7 +115,7 @@ func (s *ConfigSyncer) syncSecretIntoNewNamespace(src *core.Secret, namespace *c
 	if selector, err := labels.Parse(*opts.nsSelector); err != nil {
 		return err
 	} else if selector.Matches(labels.Set(namespace.Labels)) {
-		return s.upsertSecret(s.KubeClient, src, namespace.Name, "")
+		return s.upsertSecret(s.kubeClient, src, namespace.Name, "")
 	}
 	return nil
 }
@@ -127,8 +127,8 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 	}
 	_, _, err := core_util.CreateOrPatchSecret(k8sClient, meta, func(obj *core.Secret) *core.Secret {
 		// check origin cluster, if not match overwrite and create an event
-		if v, ok := obj.Labels[config.OriginClusterLabelKey]; ok && v != s.ClusterName {
-			s.Recorder.Eventf(
+		if v, ok := obj.Labels[config.OriginClusterLabelKey]; ok && v != s.clusterName {
+			s.recorder.Eventf(
 				src,
 				core.EventTypeWarning,
 				eventer.EventReasonOriginConflict,
@@ -137,7 +137,7 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 		}
 
 		obj.Data = src.Data
-		obj.Labels = labels.Merge(src.Labels, s.syncerLabels(src.Name, src.Namespace, s.ClusterName))
+		obj.Labels = labels.Merge(src.Labels, s.syncerLabels(src.Name, src.Namespace, s.clusterName))
 
 		ref := core.ObjectReference{
 			APIVersion:      src.APIVersion,

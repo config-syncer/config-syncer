@@ -2,27 +2,91 @@ package syncer
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/url"
 	"strings"
+	"sync"
 
 	"github.com/appscode/go/types"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kutil/meta"
+	clientcmd_util "github.com/appscode/kutil/tools/clientcmd"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/record"
 )
 
 type ConfigSyncer struct {
-	KubeClient  kubernetes.Interface
-	ClusterName string
-	Contexts    map[string]ClusterContext
-	Recorder    record.EventRecorder
+	kubeClient kubernetes.Interface
+	recorder   record.EventRecorder
+
+	clusterName string
+	contexts    map[string]clusterContext
+	enable      bool
+	lock        sync.RWMutex
 }
 
-type ClusterContext struct {
+func New(KubeClient kubernetes.Interface, Recorder record.EventRecorder) *ConfigSyncer {
+	return &ConfigSyncer{
+		kubeClient: KubeClient,
+		recorder:   Recorder,
+	}
+}
+
+func (s *ConfigSyncer) Configure(clusterName string, kubeconfigFile string, enable bool) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	s.clusterName = clusterName
+	s.contexts = map[string]clusterContext{}
+	s.enable = enable
+
+	// Parse external kubeconfig file, assume that it doesn't include source cluster
+	if kubeconfigFile != "" {
+		kConfig, err := clientcmd.LoadFromFile(kubeconfigFile)
+		if err != nil {
+			return fmt.Errorf("failed to parse context list. Reason: %v", err)
+		}
+
+		for contextName := range kConfig.Contexts {
+			ctx := clusterContext{}
+
+			cfg, err := clientcmd_util.BuildConfigFromContext(kubeconfigFile, contextName)
+			if err != nil {
+				continue
+			}
+			if ctx.Client, err = kubernetes.NewForConfig(cfg); err != nil {
+				continue
+			}
+			if ctx.Namespace, err = clientcmd_util.NamespaceFromContext(kubeconfigFile, contextName); err != nil {
+				continue
+			}
+
+			u, err := url.Parse(cfg.Host)
+			if err != nil {
+				continue
+			}
+			host := u.Hostname()
+			port := u.Port()
+			if port == "" {
+				if u.Scheme == "https" {
+					port = "443"
+				} else if u.Scheme == "http" {
+					port = "80"
+				}
+			}
+			ctx.Address = host + ":" + port
+			s.contexts[contextName] = ctx
+		}
+	}
+	return nil
+}
+
+type clusterContext struct {
 	Client    kubernetes.Interface
 	Namespace string
 	Address   string
@@ -49,12 +113,12 @@ func getSyncOptions(annotations map[string]string) options {
 }
 
 func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
-	ns, err := s.KubeClient.CoreV1().Namespaces().Get(namespace, metav1.GetOptions{})
+	ns, err := s.kubeClient.CoreV1().Namespaces().Get(namespace, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
 
-	configMaps, err := s.KubeClient.CoreV1().ConfigMaps(core.NamespaceAll).List(metav1.ListOptions{})
+	configMaps, err := s.kubeClient.CoreV1().ConfigMaps(core.NamespaceAll).List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
@@ -64,7 +128,7 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 		}
 	}
 
-	secrets, err := s.KubeClient.CoreV1().Secrets(core.NamespaceAll).List(metav1.ListOptions{})
+	secrets, err := s.kubeClient.CoreV1().Secrets(core.NamespaceAll).List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
@@ -113,7 +177,7 @@ func (s *ConfigSyncer) syncerAnnotations(oldAnnotations, srcAnnotations map[stri
 }
 
 func (s *ConfigSyncer) namespacesForSelector(selector string) (sets.String, error) {
-	namespaces, err := s.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{
+	namespaces, err := s.kubeClient.CoreV1().Namespaces().List(metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {

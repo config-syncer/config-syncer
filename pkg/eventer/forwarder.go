@@ -3,6 +3,7 @@ package eventer
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
@@ -16,9 +17,20 @@ import (
 )
 
 type EventForwarder struct {
-	ClusterName string
-	Receivers   []config.Receiver
-	Loader      envconfig.LoaderFunc
+	clusterName  string
+	spec         *config.EventForwarderSpec
+	notifierCred envconfig.LoaderFunc
+
+	lock sync.RWMutex
+}
+
+func (f *EventForwarder) Configure(clusterName string, spec *config.EventForwarderSpec, notifierCred envconfig.LoaderFunc) {
+	f.lock.Lock()
+	defer f.lock.Unlock()
+
+	f.clusterName = clusterName
+	f.spec = spec
+	f.notifierCred = notifierCred
 }
 
 func (f *EventForwarder) ForwardEvent(e *core.Event) error {
@@ -30,9 +42,9 @@ func (f *EventForwarder) ForwardEvent(e *core.Event) error {
 	if e.Source.Host != "" {
 		host = "on host " + e.Source.Host
 	}
-	for _, receiver := range f.Receivers {
-		emailSub := fmt.Sprintf("[%s, %s]: %s %s/%s %s %s", stringz.Val(f.ClusterName, "?"), e.Source.Component, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason, host)
-		chatSub := fmt.Sprintf("[%s, %s] %s %s/%s %s %s: %s", stringz.Val(f.ClusterName, "?"), e.Source.Component, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason, host, e.Message)
+	for _, receiver := range f.spec.Receivers {
+		emailSub := fmt.Sprintf("[%s, %s]: %s %s/%s %s %s", stringz.Val(f.clusterName, "?"), e.Source.Component, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason, host)
+		chatSub := fmt.Sprintf("[%s, %s] %s %s/%s %s %s: %s", stringz.Val(f.clusterName, "?"), e.Source.Component, e.InvolvedObject.Kind, e.InvolvedObject.Namespace, e.InvolvedObject.Name, e.Reason, host, e.Message)
 		if err := f.send(emailSub, chatSub, string(bytes), receiver); err != nil {
 			log.Errorln(err)
 		}
@@ -45,8 +57,8 @@ func (f *EventForwarder) Forward(t metav1.TypeMeta, meta metav1.ObjectMeta, even
 	if err != nil {
 		return err
 	}
-	for _, receiver := range f.Receivers {
-		sub := fmt.Sprintf("[%s]: %s %s %s/%s %s", stringz.Val(f.ClusterName, "?"), t.APIVersion, t.Kind, meta.Namespace, meta.Name, eventType)
+	for _, receiver := range f.spec.Receivers {
+		sub := fmt.Sprintf("[%s]: %s %s %s/%s %s", stringz.Val(f.clusterName, "?"), t.APIVersion, t.Kind, meta.Namespace, meta.Name, eventType)
 		if err := f.send(sub, sub, string(bytes), receiver); err != nil {
 			log.Errorln(err)
 		}
@@ -55,7 +67,7 @@ func (f *EventForwarder) Forward(t metav1.TypeMeta, meta metav1.ObjectMeta, even
 }
 
 func (f *EventForwarder) send(emailSub, chatSub, body string, receiver config.Receiver) error {
-	notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), f.Loader)
+	notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), f.notifierCred)
 	if err != nil {
 		return err
 	}

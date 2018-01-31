@@ -3,16 +3,24 @@ package indexers
 import (
 	"encoding/json"
 	"path/filepath"
+	"sync"
 
 	"github.com/appscode/go/errors"
+	"github.com/appscode/go/log"
 	"github.com/blevesearch/bleve"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/tools/cache"
 )
 
 type ResourceIndexer struct {
 	// Full text indexer client
 	index bleve.Index
+
+	enable bool
+	lock   sync.RWMutex
 }
+
+var _ cache.ResourceEventHandler = &ResourceIndexer{}
 
 func NewResourceIndexer(dst string) (*ResourceIndexer, error) {
 	c, err := ensureIndex(filepath.Join(dst, "resource.indexer"), "search")
@@ -24,36 +32,55 @@ func NewResourceIndexer(dst string) (*ResourceIndexer, error) {
 	}, nil
 }
 
-func ensureIndex(dst, doctype string) (bleve.Index, error) {
-	c, err := bleve.Open(dst)
-	if err != nil {
-		documentMapping := bleve.NewDocumentMapping()
-		mapping := bleve.NewIndexMapping()
-		mapping.AddDocumentMapping(doctype, documentMapping)
-		c, err := bleve.New(dst, mapping)
-		if err != nil {
-			return nil, err
-		}
-		return c, nil
+func (ri *ResourceIndexer) Configure(enable bool) {
+	ri.lock.Lock()
+	defer ri.lock.Unlock()
+	ri.enable = enable
+}
+
+func (ri *ResourceIndexer) OnAdd(obj interface{}) {
+	ri.lock.RLock()
+	defer ri.lock.RUnlock()
+
+	if !ri.enable {
+		return
 	}
-	return c, nil
+
+	if err := ri.indexDocument(obj); err != nil {
+		log.Errorln(err)
+	}
 }
 
-func (ri *ResourceIndexer) HandleAdd(obj interface{}) error {
-	return ri.indexDocument(obj)
-}
+func (ri *ResourceIndexer) OnDelete(obj interface{}) {
+	ri.lock.RLock()
+	defer ri.lock.RUnlock()
 
-func (ri *ResourceIndexer) HandleDelete(obj interface{}) error {
+	if !ri.enable {
+		return
+	}
+
 	key := keyFunction(obj)
-	err := ri.index.Delete(key)
-	if err != nil {
-		return err
+	if err := ri.index.Delete(key); err != nil {
+		log.Errorln(err)
+		return
 	}
-	return ri.index.DeleteInternal([]byte(key))
+	if err := ri.index.DeleteInternal([]byte(key)); err != nil {
+		log.Errorln(err)
+		return
+	}
 }
 
-func (ri *ResourceIndexer) HandleUpdate(oldObj, newObj interface{}) error {
-	return ri.indexDocument(newObj)
+func (ri *ResourceIndexer) OnUpdate(oldObj, newObj interface{}) {
+	ri.lock.RLock()
+	defer ri.lock.RUnlock()
+
+	if !ri.enable {
+		return
+	}
+
+	if err := ri.indexDocument(newObj); err != nil {
+		log.Errorln(err)
+	}
 }
 
 func (ri *ResourceIndexer) indexDocument(obj interface{}) error {

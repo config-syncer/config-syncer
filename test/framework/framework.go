@@ -6,11 +6,11 @@ import (
 
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/kubed/pkg/operator"
-	sls "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
-	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
-	vcs "github.com/appscode/voyager/client/typed/voyager/v1beta1"
+	sls "github.com/appscode/searchlight/client"
+	scs "github.com/appscode/stash/client"
+	vcs "github.com/appscode/voyager/client"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	kcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
+	kcs "github.com/k8sdb/apimachinery/client"
 	. "github.com/onsi/gomega"
 	extensionsobj "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	ecs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
@@ -31,6 +31,7 @@ const (
 type Framework struct {
 	KubeConfig    *rest.Config
 	KubeClient    clientset.Interface
+	crdClient     ecs.ApiextensionsV1beta1Interface
 	KubedOperator *operator.Operator
 	Config        E2EConfig
 	namespace     string
@@ -55,6 +56,7 @@ func New() *Framework {
 	return &Framework{
 		KubeConfig: config,
 		KubeClient: clientset.NewForConfigOrDie(config),
+		crdClient:  crdClient,
 		namespace:  testConfigs.TestNamespace,
 		Config:     testConfigs,
 		KubedOperator: &operator.Operator{
@@ -64,7 +66,6 @@ func New() *Framework {
 			SearchlightClient: sls.NewForConfigOrDie(config),
 			KubeDBClient:      kcs.NewForConfigOrDie(config),
 			PromClient:        promClient,
-			CRDClient:         crdClient,
 		},
 	}
 }
@@ -101,7 +102,7 @@ func (f *Framework) EnsureCreatedCRDs() error {
 			},
 		},
 	}
-	_, err := f.KubedOperator.CRDClient.CustomResourceDefinitions().Create(promCrd)
+	_, err := f.crdClient.CustomResourceDefinitions().Create(promCrd)
 	if err != nil {
 		return err
 	}
@@ -120,7 +121,7 @@ func (f *Framework) EnsureCreatedCRDs() error {
 			},
 		},
 	}
-	_, err = f.KubedOperator.CRDClient.CustomResourceDefinitions().Create(svcMonitorCrd)
+	_, err = f.crdClient.CustomResourceDefinitions().Create(svcMonitorCrd)
 	if err != nil {
 		return err
 	}
@@ -140,7 +141,7 @@ func (f *Framework) EnsureCreatedCRDs() error {
 			},
 		},
 	}
-	_, err = f.KubedOperator.CRDClient.CustomResourceDefinitions().Create(alertMgr)
+	_, err = f.crdClient.CustomResourceDefinitions().Create(alertMgr)
 	if err != nil {
 		return err
 	}

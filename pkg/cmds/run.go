@@ -9,12 +9,13 @@ import (
 	"time"
 
 	"github.com/appscode/go/log"
+	"github.com/appscode/go/signals"
 	"github.com/appscode/kubed/pkg/operator"
-	srch_cs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
-	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
-	vcs "github.com/appscode/voyager/client/typed/voyager/v1beta1"
+	srch_cs "github.com/appscode/searchlight/client"
+	scs "github.com/appscode/stash/client"
+	vcs "github.com/appscode/voyager/client"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	kcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
+	kcs "github.com/kubedb/apimachinery/client"
 	"github.com/spf13/cobra"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
@@ -35,7 +36,7 @@ func NewCmdRun() *cobra.Command {
 		WebAddress:        ":56790",
 		ScratchDir:        "/tmp",
 		OperatorNamespace: namespace(),
-		ResyncPeriod:      5 * time.Minute,
+		ResyncPeriod:      10 * time.Minute,
 		// ref: https://github.com/kubernetes/ingress-nginx/blob/e4d53786e771cc6bdd55f180674b79f5b692e552/pkg/ingress/controller/launch.go#L252-L259
 		// High enough QPS to fit all expected use cases. QPS=0 is not set here, because client code is overriding it.
 		QPS: 1e6,
@@ -102,8 +103,10 @@ func Run(opt operator.Options) {
 		log.Fatalln(err)
 	}
 
+	stopCh := signals.SetupSignalHandler()
+
 	log.Infoln("Running kubed watcher")
-	op.RunAndHold()
+	op.RunAndHold(stopCh)
 }
 
 func namespace() string {
