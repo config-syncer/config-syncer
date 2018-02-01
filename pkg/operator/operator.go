@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"net/http"
 	_ "net/http/pprof"
-	"net/url"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sync"
 	"time"
 
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go/log"
 	v "github.com/appscode/go/version"
+	prom_util "github.com/appscode/kube-mon/prometheus/v1"
 	"github.com/appscode/kubed/pkg/api"
 	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/elasticsearch"
@@ -25,20 +26,28 @@ import (
 	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kutil/meta"
 	"github.com/appscode/kutil/tools/backup"
-	clientcmd_util "github.com/appscode/kutil/tools/clientcmd"
 	"github.com/appscode/pat"
-	srch_cs "github.com/appscode/searchlight/client/typed/monitoring/v1alpha1"
-	scs "github.com/appscode/stash/client/typed/stash/v1alpha1"
-	vcs "github.com/appscode/voyager/client/typed/voyager/v1beta1"
+	srch_cs "github.com/appscode/searchlight/client"
+	searchlightinformers "github.com/appscode/searchlight/informers/externalversions"
+	scs "github.com/appscode/stash/client"
+	stashinformers "github.com/appscode/stash/informers/externalversions"
+	vcs "github.com/appscode/voyager/client"
+	voyagerinformers "github.com/appscode/voyager/informers/externalversions"
 	shell "github.com/codeskyblue/go-sh"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	kcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
+	kcs "github.com/k8sdb/apimachinery/client"
+	kubedbinformers "github.com/kubedb/apimachinery/informers/externalversions"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
-	ecs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
+	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/fields"
+	"k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/client-go/informers"
+	core_informers "k8s.io/client-go/informers/core/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/record"
 )
@@ -61,25 +70,38 @@ type Options struct {
 }
 
 type Operator struct {
-	KubeClient        kubernetes.Interface
-	VoyagerClient     vcs.VoyagerV1beta1Interface
-	SearchlightClient srch_cs.MonitoringV1alpha1Interface
-	StashClient       scs.StashV1alpha1Interface
-	PromClient        prom.MonitoringV1Interface
-	KubeDBClient      kcs.KubedbV1alpha1Interface
-	CRDClient         ecs.ApiextensionsV1beta1Interface
-
 	Opt    Options
-	Config config.ClusterConfig
+	config config.ClusterConfig
 
-	SearchIndex    *indexers.ResourceIndexer
-	ReverseIndex   *indexers.ReverseIndexer
-	TrashCan       *rbin.RecycleBin
-	Eventer        *eventer.EventForwarder
-	Recorder       record.EventRecorder
-	Cron           *cron.Cron
-	NotifierLoader envconfig.LoaderFunc
-	ConfigSyncer   *syncer.ConfigSyncer
+	notifierCred   envconfig.LoaderFunc
+	recorder       record.EventRecorder
+	trashCan       *rbin.RecycleBin
+	eventProcessor *eventer.EventForwarder
+	configSyncer   *syncer.ConfigSyncer
+
+	cron *cron.Cron
+
+	KubeClient        kubernetes.Interface
+	VoyagerClient     vcs.Interface
+	SearchlightClient srch_cs.Interface
+	StashClient       scs.Interface
+	KubeDBClient      kcs.Interface
+	PromClient        prom.MonitoringV1Interface
+
+	kubeInformerFactory        informers.SharedInformerFactory
+	voyagerInformerFactory     voyagerinformers.SharedInformerFactory
+	stashInformerFactory       stashinformers.SharedInformerFactory
+	searchlightInformerFactory searchlightinformers.SharedInformerFactory
+	kubedbInformerFactory      kubedbinformers.SharedInformerFactory
+	promInf                    cache.SharedIndexInformer
+	smonInf                    cache.SharedIndexInformer
+	amgrInf                    cache.SharedIndexInformer
+
+	searchIndexer *indexers.ResourceIndexer
+	// reverse indices
+	serviceIndexer    indexers.ServiceIndexer
+	smonIndexer       indexers.ServiceMonitorIndexer
+	prometheusIndexer indexers.PrometheusIndexer
 
 	sync.Mutex
 }
@@ -96,84 +118,32 @@ func (op *Operator) Setup() error {
 	if err != nil {
 		return err
 	}
-	op.Config = *cfg
+	op.config = *cfg
 
-	op.NotifierLoader, err = op.getLoader()
+	op.notifierCred, err = op.getLoader()
 	if err != nil {
 		return err
 	}
 
-	if op.Config.RecycleBin != nil {
-		if op.Config.RecycleBin.Path == "" {
-			op.Config.RecycleBin.Path = filepath.Join(op.Opt.ScratchDir, "transhcan")
-		}
-		op.TrashCan = &rbin.RecycleBin{
-			ClusterName: op.Config.ClusterName,
-			Spec:        *op.Config.RecycleBin,
-			Loader:      op.NotifierLoader,
-		}
+	op.recorder = eventer.NewEventRecorder(op.KubeClient, "kubed")
+
+	if op.config.RecycleBin != nil && op.config.RecycleBin.Path == "" {
+		op.config.RecycleBin.Path = filepath.Join(op.Opt.ScratchDir, "transhcan")
+	}
+	op.trashCan = &rbin.RecycleBin{}
+	op.trashCan.Configure(op.config.ClusterName, op.config.RecycleBin, op.notifierCred)
+
+	op.eventProcessor = &eventer.EventForwarder{}
+	op.eventProcessor.Configure(op.config.ClusterName, op.config.EventForwarder, op.notifierCred)
+
+	op.configSyncer = syncer.New(op.KubeClient, op.recorder)
+	err = op.configSyncer.Configure(op.config.ClusterName, op.config.KubeConfigFile, op.config.EnableConfigSyncer)
+	if err != nil {
+		return err
 	}
 
-	if op.Config.EventForwarder != nil {
-		op.Eventer = &eventer.EventForwarder{
-			ClusterName: op.Config.ClusterName,
-			Receivers:   op.Config.EventForwarder.Receivers,
-			Loader:      op.NotifierLoader,
-		}
-	}
-
-	op.Recorder = eventer.NewEventRecorder(op.KubeClient, "kubed-operator")
-
-	if op.Config.EnableConfigSyncer {
-		op.ConfigSyncer = &syncer.ConfigSyncer{
-			KubeClient:  op.KubeClient,
-			ClusterName: op.Config.ClusterName,
-			Contexts:    map[string]syncer.ClusterContext{},
-			Recorder:    op.Recorder,
-		}
-
-		// Parse external kubeconfig file, assume that it doesn't include source cluster
-		if op.Config.KubeConfigFile != "" {
-			kConfig, err := clientcmd.LoadFromFile(op.Config.KubeConfigFile)
-			if err != nil {
-				return fmt.Errorf("failed to parse context list. Reason: %v", err)
-			}
-
-			for contextName := range kConfig.Contexts {
-				ctx := syncer.ClusterContext{}
-
-				cfg, err := clientcmd_util.BuildConfigFromContext(op.Config.KubeConfigFile, contextName)
-				if err != nil {
-					continue
-				}
-				if ctx.Client, err = kubernetes.NewForConfig(cfg); err != nil {
-					continue
-				}
-				if ctx.Namespace, err = clientcmd_util.NamespaceFromContext(op.Config.KubeConfigFile, contextName); err != nil {
-					continue
-				}
-
-				u, err := url.Parse(cfg.Host)
-				if err != nil {
-					continue
-				}
-				host := u.Hostname()
-				port := u.Port()
-				if port == "" {
-					if u.Scheme == "https" {
-						port = "443"
-					} else if u.Scheme == "http" {
-						port = "80"
-					}
-				}
-				ctx.Address = host + ":" + port
-				op.ConfigSyncer.Contexts[contextName] = ctx
-			}
-		}
-	}
-
-	op.Cron = cron.New()
-	op.Cron.Start()
+	op.cron = cron.New()
+	op.cron.Start()
 
 	for _, j := range cfg.Janitors {
 		if j.Kind == config.JanitorInfluxDB {
@@ -185,37 +155,269 @@ func (op *Operator) Setup() error {
 		}
 	}
 
-	// Enable full text indexing to have search feature
-	indexDir := filepath.Join(op.Opt.ScratchDir, "bleve")
-	if op.Config.APIServer.EnableSearchIndex {
-		si, err := indexers.NewResourceIndexer(indexDir)
-		if err != nil {
-			return err
-		}
-		op.SearchIndex = si
-	}
-	// Enable pod -> service, service -> serviceMonitor indexing
-	if op.Config.APIServer.EnableReverseIndex {
-		ri, err := indexers.NewReverseIndexer(op.KubeClient, op.PromClient, indexDir)
-		if err != nil {
-			return err
-		}
-		op.ReverseIndex = ri
-	}
+	// ---------------------------
+	op.kubeInformerFactory = informers.NewSharedInformerFactory(op.KubeClient, op.Opt.ResyncPeriod)
+	op.voyagerInformerFactory = voyagerinformers.NewSharedInformerFactory(op.VoyagerClient, op.Opt.ResyncPeriod)
+	op.stashInformerFactory = stashinformers.NewSharedInformerFactory(op.StashClient, op.Opt.ResyncPeriod)
+	op.searchlightInformerFactory = searchlightinformers.NewSharedInformerFactory(op.SearchlightClient, op.Opt.ResyncPeriod)
+	op.kubedbInformerFactory = kubedbinformers.NewSharedInformerFactory(op.KubeDBClient, op.Opt.ResyncPeriod)
+	// ---------------------------
+	op.setupWorkloadInformers()
+	op.setupNetworkInformers()
+	op.setupConfigInformers()
+	op.setupRBACInformers()
+	op.setupNodeInformers()
+	op.setupEventInformers()
+	op.setupCertificateInformers()
+	// ---------------------------
+	op.setupVoyagerInformers()
+	op.setupStashInformers()
+	op.setupSearchlightInformers()
+	op.setupKubeDBInformers()
+	op.setupPrometheusInformers()
+	// ---------------------------
 
-	op.Opt.ResyncPeriod = time.Minute * 2
-	return nil
+	return op.setupIndexers()
+}
+
+func (op *Operator) setupIndexers() error {
+	// Enable full text indexing to have search feature
+	indexDir := filepath.Join(op.Opt.ScratchDir, "indices")
+	si, err := indexers.NewResourceIndexer(indexDir)
+	if err != nil {
+		return err
+	}
+	si.Configure(op.config.APIServer.EnableSearchIndex)
+	op.searchIndexer = si
+
+	// pod -> service
+	op.serviceIndexer, err = indexers.NewServiceIndexer(
+		indexDir,
+		op.kubeInformerFactory.InformerFor(&core.Pod{}, nil).GetIndexer(),
+		op.kubeInformerFactory.InformerFor(&core.Service{}, nil).GetIndexer(),
+	)
+	if err != nil {
+		return err
+	}
+	op.serviceIndexer.Configure(op.config.APIServer.EnableReverseIndex)
+
+	// service -> serviceMonitor
+	op.smonIndexer, err = indexers.NewServiceMonitorIndexer(
+		indexDir,
+		op.kubeInformerFactory.InformerFor(&core.Service{}, nil).GetIndexer(),
+		op.smonInf.GetIndexer(),
+	)
+	if err != nil {
+		return err
+	}
+	op.smonIndexer.Configure(op.config.APIServer.EnableReverseIndex &&
+		meta.IsPreferredAPIResource(op.KubeClient, prom_util.SchemeGroupVersion.String(), prom.ServiceMonitorsKind))
+
+	// serviceMonitor -> prometheus
+	op.prometheusIndexer, err = indexers.NewPrometheusIndexer(indexDir, op.promInf.GetIndexer(), op.smonInf.GetIndexer())
+	if err != nil {
+		return err
+	}
+	op.prometheusIndexer.Configure(op.config.APIServer.EnableReverseIndex &&
+		meta.IsPreferredAPIResource(op.KubeClient, prom_util.SchemeGroupVersion.String(), prom.PrometheusesKind))
+
+	return err
+}
+
+func (op *Operator) setupWorkloadInformers() {
+	deploymentInformer := op.kubeInformerFactory.Apps().V1beta1().Deployments().Informer()
+	op.addEventHandlers(deploymentInformer)
+
+	rcInformer := op.kubeInformerFactory.Core().V1().ReplicationControllers().Informer()
+	op.addEventHandlers(rcInformer)
+
+	rsInformer := op.kubeInformerFactory.Extensions().V1beta1().ReplicaSets().Informer()
+	op.addEventHandlers(rsInformer)
+
+	daemonSetInformer := op.kubeInformerFactory.Extensions().V1beta1().DaemonSets().Informer()
+	op.addEventHandlers(daemonSetInformer)
+
+	jobInformer := op.kubeInformerFactory.Batch().V1().Jobs().Informer()
+	op.addEventHandlers(jobInformer)
+
+	op.kubeInformerFactory.Core().V1().Pods().Informer()
+}
+
+func (op *Operator) setupNetworkInformers() {
+	svcInformer := op.kubeInformerFactory.Core().V1().Services().Informer()
+	op.addEventHandlers(svcInformer)
+	svcInformer.AddEventHandler(op.serviceIndexer.ServiceHandler())
+	svcInformer.AddEventHandler(op.smonIndexer.ServiceHandler())
+
+	endpointInformer := op.kubeInformerFactory.Core().V1().Endpoints().Informer()
+	endpointInformer.AddEventHandler(op.serviceIndexer.EndpointHandler())
+
+	ingressInformer := op.kubeInformerFactory.Extensions().V1beta1().Ingresses().Informer()
+	op.addEventHandlers(ingressInformer)
+}
+
+func (op *Operator) setupConfigInformers() {
+	configMapInformer := op.kubeInformerFactory.Core().V1().ConfigMaps().Informer()
+	op.addEventHandlers(configMapInformer)
+	configMapInformer.AddEventHandler(op.configSyncer.ConfigMapHandler())
+
+	secretInformer := op.kubeInformerFactory.Core().V1().Secrets().Informer()
+	op.addEventHandlers(secretInformer)
+	secretInformer.AddEventHandler(op.configSyncer.SecretHandler())
+
+	nsInformer := op.kubeInformerFactory.Core().V1().Namespaces().Informer()
+	nsInformer.AddEventHandler(op.configSyncer.NamespaceHandler())
+}
+
+func (op *Operator) setupRBACInformers() {
+	clusterRoleInformer := op.kubeInformerFactory.Rbac().V1beta1().ClusterRoles().Informer()
+	op.addEventHandlers(clusterRoleInformer)
+
+	clusterRoleBindingInformer := op.kubeInformerFactory.Rbac().V1beta1().ClusterRoleBindings().Informer()
+	op.addEventHandlers(clusterRoleBindingInformer)
+
+	roleInformer := op.kubeInformerFactory.Rbac().V1beta1().Roles().Informer()
+	op.addEventHandlers(roleInformer)
+
+	roleBindingInformer := op.kubeInformerFactory.Rbac().V1beta1().RoleBindings().Informer()
+	op.addEventHandlers(roleBindingInformer)
+}
+
+func (op *Operator) setupNodeInformers() {
+	nodeInformer := op.kubeInformerFactory.Core().V1().Nodes().Informer()
+	op.addEventHandlers(nodeInformer)
+}
+
+func (op *Operator) setupEventInformers() {
+	eventInformer := op.kubeInformerFactory.InformerFor(&core.Event{}, func(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+		return core_informers.NewFilteredEventInformer(
+			client,
+			core.NamespaceAll,
+			resyncPeriod,
+			cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+			func(options *metav1.ListOptions) {
+				options.FieldSelector = fields.OneTermEqualSelector("type", core.EventTypeWarning).String()
+			},
+		)
+	})
+	op.addEventHandlers(eventInformer)
+}
+
+func (op *Operator) setupCertificateInformers() {
+	csrInformer := op.kubeInformerFactory.Certificates().V1beta1().CertificateSigningRequests().Informer()
+	op.addEventHandlers(csrInformer)
+}
+
+func (op *Operator) setupStorageInformers() {
+	pvInformer := op.kubeInformerFactory.Core().V1().PersistentVolumes().Informer()
+	op.addEventHandlers(pvInformer)
+
+	pvcInformer := op.kubeInformerFactory.Core().V1().PersistentVolumeClaims().Informer()
+	op.addEventHandlers(pvcInformer)
+
+	storageClassInformer := op.kubeInformerFactory.Storage().V1().StorageClasses().Informer()
+	op.addEventHandlers(storageClassInformer)
+}
+
+func (op *Operator) setupVoyagerInformers() {
+	voyagerIngressInformer := op.voyagerInformerFactory.Voyager().V1beta1().Ingresses().Informer()
+	op.addEventHandlers(voyagerIngressInformer)
+
+	voyagerCertificateInformer := op.voyagerInformerFactory.Voyager().V1beta1().Certificates().Informer()
+	op.addEventHandlers(voyagerCertificateInformer)
+}
+
+func (op *Operator) setupStashInformers() {
+	resticsInformer := op.stashInformerFactory.Stash().V1alpha1().Restics().Informer()
+	op.addEventHandlers(resticsInformer)
+
+	recoveryInformer := op.stashInformerFactory.Stash().V1alpha1().Recoveries().Informer()
+	op.addEventHandlers(recoveryInformer)
+}
+
+func (op *Operator) setupSearchlightInformers() {
+	clusterAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().ClusterAlerts().Informer()
+	op.addEventHandlers(clusterAlertInformer)
+
+	nodeAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().NodeAlerts().Informer()
+	op.addEventHandlers(nodeAlertInformer)
+
+	podAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().PodAlerts().Informer()
+	op.addEventHandlers(podAlertInformer)
+}
+
+func (op *Operator) setupKubeDBInformers() {
+	pgInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Postgreses().Informer()
+	op.addEventHandlers(pgInformer)
+
+	esInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Postgreses().Informer()
+	op.addEventHandlers(esInformer)
+
+	myInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().MySQLs().Informer()
+	op.addEventHandlers(myInformer)
+
+	mgInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().MongoDBs().Informer()
+	op.addEventHandlers(mgInformer)
+
+	rdInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Redises().Informer()
+	op.addEventHandlers(rdInformer)
+
+	mcInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Memcacheds().Informer()
+	op.addEventHandlers(mcInformer)
+
+	dbSnapshotInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Snapshots().Informer()
+	op.addEventHandlers(dbSnapshotInformer)
+
+	dormantDatabaseInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().DormantDatabases().Informer()
+	op.addEventHandlers(dormantDatabaseInformer)
+}
+
+func (op *Operator) setupPrometheusInformers() {
+	promInf := cache.NewSharedIndexInformer(
+		&cache.ListWatch{
+			ListFunc:  op.PromClient.Prometheuses(core.NamespaceAll).List,
+			WatchFunc: op.PromClient.Prometheuses(core.NamespaceAll).Watch,
+		},
+		&prom.Prometheus{}, op.Opt.ResyncPeriod, cache.Indexers{},
+	)
+	op.addEventHandlers(promInf)
+	promInf.AddEventHandler(op.prometheusIndexer.PrometheusHandler())
+
+	smonInf := cache.NewSharedIndexInformer(
+		&cache.ListWatch{
+			ListFunc:  op.PromClient.ServiceMonitors(core.NamespaceAll).List,
+			WatchFunc: op.PromClient.ServiceMonitors(core.NamespaceAll).Watch,
+		},
+		&prom.ServiceMonitor{}, op.Opt.ResyncPeriod, cache.Indexers{},
+	)
+	op.addEventHandlers(smonInf)
+	smonInf.AddEventHandler(op.smonIndexer.ServiceMonitorHandler())
+
+	amgrInf := cache.NewSharedIndexInformer(
+		&cache.ListWatch{
+			ListFunc:  op.PromClient.Alertmanagers(core.NamespaceAll).List,
+			WatchFunc: op.PromClient.Alertmanagers(core.NamespaceAll).Watch,
+		},
+		&prom.Alertmanager{}, op.Opt.ResyncPeriod, cache.Indexers{},
+	)
+	op.addEventHandlers(amgrInf)
+}
+
+func (op *Operator) addEventHandlers(informer cache.SharedIndexInformer) {
+	informer.AddEventHandler(op.trashCan)
+	informer.AddEventHandler(op.eventProcessor)
+	informer.AddEventHandler(op.searchIndexer)
 }
 
 func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {
-	if op.Config.NotifierSecretName == "" {
+	if op.config.NotifierSecretName == "" {
 		return func(key string) (string, bool) {
 			return "", false
 		}, nil
 	}
 	cfg, err := op.KubeClient.CoreV1().
 		Secrets(op.Opt.OperatorNamespace).
-		Get(op.Config.NotifierSecretName, metav1.GetOptions{})
+		Get(op.config.NotifierSecretName, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -227,48 +429,70 @@ func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {
 	}, nil
 }
 
-func (op *Operator) RunWatchers() {
-	go op.WatchAlertmanager()
-	go op.WatchCertificateSigningRequests()
-	go op.WatchClusterAlerts()
-	go op.WatchClusterRoleBinding()
-	go op.WatchClusterRole()
-	go op.WatchConfigMaps()
-	go op.WatchDaemonSets()
-	go op.WatchDeployment()
+func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
+	op.kubeInformerFactory.Start(stopCh)
+	op.voyagerInformerFactory.Start(stopCh)
+	op.stashInformerFactory.Start(stopCh)
+	op.searchlightInformerFactory.Start(stopCh)
+	op.kubedbInformerFactory.Start(stopCh)
+	go op.promInf.Run(stopCh)
+	go op.smonInf.Run(stopCh)
+	go op.amgrInf.Run(stopCh)
 
-	go op.WatchPostgreses()
-	go op.WatchElasticsearches()
-	go op.WatchMySQLs()
-	go op.WatchMongoDBs()
-	go op.WatchMemcacheds()
-	go op.WatchRedises()
-	go op.WatchSnapshots()
-	go op.WatchDormantDatabases()
+	var res map[reflect.Type]bool
 
-	go op.WatchEvents()
-	go op.WatchIngresses()
-	go op.WatchJobs()
-	go op.watchNamespaces()
-	go op.WatchNodeAlerts()
-	go op.WatchNodes()
-	go op.WatchPersistentVolumeClaims()
-	go op.WatchPersistentVolumes()
-	go op.WatchPodAlerts()
-	go op.WatchPrometheus()
-	go op.WatchReplicaSets()
-	go op.WatchReplicationControllers()
-	go op.WatchRestics()
-	go op.WatchRoleBinding()
-	go op.WatchRole()
-	go op.WatchSecrets()
-	go op.watchService()
-	go op.WatchEndpoints()
-	go op.WatchServiceMonitor()
-	go op.WatchStatefulSets()
-	go op.WatchStorageClass()
-	go op.WatchVoyagerCertificates()
-	go op.WatchVoyagerIngresses()
+	res = op.kubeInformerFactory.WaitForCacheSync(stopCh)
+	for _, v := range res {
+		if !v {
+			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			return
+		}
+	}
+
+	res = op.voyagerInformerFactory.WaitForCacheSync(stopCh)
+	for _, v := range res {
+		if !v {
+			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			return
+		}
+	}
+
+	res = op.stashInformerFactory.WaitForCacheSync(stopCh)
+	for _, v := range res {
+		if !v {
+			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			return
+		}
+	}
+
+	res = op.searchlightInformerFactory.WaitForCacheSync(stopCh)
+	for _, v := range res {
+		if !v {
+			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			return
+		}
+	}
+
+	res = op.kubedbInformerFactory.WaitForCacheSync(stopCh)
+	for _, v := range res {
+		if !v {
+			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			return
+		}
+	}
+
+	if !cache.WaitForCacheSync(stopCh, op.promInf.HasSynced) {
+		runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+		return
+	}
+	if !cache.WaitForCacheSync(stopCh, op.smonInf.HasSynced) {
+		runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+		return
+	}
+	if !cache.WaitForCacheSync(stopCh, op.amgrInf.HasSynced) {
+		runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+		return
+	}
 }
 
 func (op *Operator) RunAPIServer() {
@@ -280,32 +504,32 @@ func (op *Operator) RunAPIServer() {
 	// Pattern matching attempts each pattern in the order in which they were
 	// registered.
 	router := pat.New()
-	if op.Config.APIServer.EnableSearchIndex {
-		op.SearchIndex.RegisterRouters(router)
+	if op.config.APIServer.EnableSearchIndex {
+		op.searchIndexer.RegisterRouters(router)
 	}
 	// Enable pod -> service, service -> serviceMonitor indexing
-	if op.Config.APIServer.EnableReverseIndex {
-		router.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(op.ReverseIndex.Service.ServeHTTP))
+	if op.config.APIServer.EnableReverseIndex {
+		router.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(op.serviceIndexer.ServeHTTP))
 		if meta.IsPreferredAPIResource(op.KubeClient, prom.Group+"/"+prom.Version, prom.ServiceMonitorsKind) {
 			// Add Indexer only if Server support this resource
-			router.Get("/apis/"+prom.Group+"/"+prom.Version+"/namespaces/:namespace/:resource/:name/"+prom.ServiceMonitorName, http.HandlerFunc(op.ReverseIndex.ServiceMonitor.ServeHTTP))
+			router.Get("/apis/"+prom.Group+"/"+prom.Version+"/namespaces/:namespace/:resource/:name/"+prom.ServiceMonitorName, http.HandlerFunc(op.smonIndexer.ServeHTTP))
 		}
 		if meta.IsPreferredAPIResource(op.KubeClient, prom.Group+"/"+prom.Version, prom.PrometheusesKind) {
 			// Add Indexer only if Server support this resource
-			router.Get("/apis/"+prom.Group+"/"+prom.Version+"/namespaces/:namespace/:resource/:name/"+prom.PrometheusName, http.HandlerFunc(op.ReverseIndex.Prometheus.ServeHTTP))
+			router.Get("/apis/"+prom.Group+"/"+prom.Version+"/namespaces/:namespace/:resource/:name/"+prom.PrometheusName, http.HandlerFunc(op.prometheusIndexer.ServeHTTP))
 		}
 	}
 
 	router.Get("/health", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) }))
 	router.Get("/metadata", http.HandlerFunc(op.metadataHandler))
-	log.Fatalln(http.ListenAndServe(op.Config.APIServer.Address, router))
+	log.Fatalln(http.ListenAndServe(op.config.APIServer.Address, router))
 }
 
 func (op *Operator) metadataHandler(w http.ResponseWriter, r *http.Request) {
 	resp := &api.KubedMetadata{
 		OperatorNamespace:   op.Opt.OperatorNamespace,
-		SearchEnabled:       op.Config.APIServer.EnableSearchIndex,
-		ReverseIndexEnabled: op.Config.APIServer.EnableReverseIndex,
+		SearchEnabled:       op.config.APIServer.EnableSearchIndex,
+		ReverseIndexEnabled: op.config.APIServer.EnableReverseIndex,
 		Version:             &v.Version,
 	}
 	err := json.NewEncoder(w).Encode(resp)
@@ -318,7 +542,7 @@ func (op *Operator) metadataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (op *Operator) RunElasticsearchCleaner() error {
-	for _, j := range op.Config.Janitors {
+	for _, j := range op.config.Janitors {
 		if j.Kind == config.JanitorElasticsearch {
 			var authInfo *config.JanitorAuthInfo
 
@@ -338,7 +562,7 @@ func (op *Operator) RunElasticsearchCleaner() error {
 			if err != nil {
 				return err
 			}
-			op.Cron.AddFunc("@every 1h", func() {
+			op.cron.AddFunc("@every 1h", func() {
 				err := janitor.Cleanup()
 				if err != nil {
 					log.Errorln(err)
@@ -350,12 +574,12 @@ func (op *Operator) RunElasticsearchCleaner() error {
 }
 
 func (op *Operator) RunTrashCanCleaner() error {
-	if op.TrashCan == nil {
+	if op.trashCan == nil {
 		return nil
 	}
 
-	return op.Cron.AddFunc("@every 1h", func() {
-		err := op.TrashCan.Cleanup()
+	return op.cron.AddFunc("@every 1h", func() {
+		err := op.trashCan.Cleanup()
 		if err != nil {
 			log.Errorln(err)
 		}
@@ -363,17 +587,17 @@ func (op *Operator) RunTrashCanCleaner() error {
 }
 
 func (op *Operator) RunSnapshotter() error {
-	if op.Config.Snapshotter == nil {
+	if op.config.Snapshotter == nil {
 		return nil
 	}
 
 	osmconfigPath := filepath.Join(op.Opt.ScratchDir, "osm", "config.yaml")
-	err := storage.WriteOSMConfig(op.KubeClient, op.Config.Snapshotter.Backend, op.Opt.OperatorNamespace, osmconfigPath)
+	err := storage.WriteOSMConfig(op.KubeClient, op.config.Snapshotter.Backend, op.Opt.OperatorNamespace, osmconfigPath)
 	if err != nil {
 		return err
 	}
 
-	container, err := op.Config.Snapshotter.Backend.Container()
+	container, err := op.config.Snapshotter.Backend.Container()
 	if err != nil {
 		return err
 	}
@@ -388,7 +612,7 @@ func (op *Operator) RunSnapshotter() error {
 			return err
 		}
 
-		mgr := backup.NewBackupManager(op.Config.ClusterName, restConfig, op.Config.Snapshotter.Sanitize)
+		mgr := backup.NewBackupManager(op.config.ClusterName, restConfig, op.config.Snapshotter.Sanitize)
 		snapshotFile, err := mgr.BackupToTar(filepath.Join(op.Opt.ScratchDir, "snapshot"))
 		if err != nil {
 			return err
@@ -398,7 +622,7 @@ func (op *Operator) RunSnapshotter() error {
 				log.Errorln(err)
 			}
 		}()
-		dest, err := op.Config.Snapshotter.Location(filepath.Base(snapshotFile))
+		dest, err := op.config.Snapshotter.Location(filepath.Base(snapshotFile))
 		if err != nil {
 			return err
 		}
@@ -411,7 +635,7 @@ func (op *Operator) RunSnapshotter() error {
 			log.Errorln(err)
 		}
 	}()
-	return op.Cron.AddFunc(op.Config.Snapshotter.Schedule, func() {
+	return op.cron.AddFunc(op.config.Snapshotter.Schedule, func() {
 		err := snapshotter()
 		if err != nil {
 			log.Errorln(err)
@@ -419,7 +643,7 @@ func (op *Operator) RunSnapshotter() error {
 	})
 }
 
-func (op *Operator) RunAndHold() {
+func (op *Operator) RunAndHold(stopCh <-chan struct{}) {
 	var err error
 
 	err = op.RunElasticsearchCleaner()
@@ -437,7 +661,7 @@ func (op *Operator) RunAndHold() {
 		log.Fatalln(err)
 	}
 
-	op.RunWatchers()
+	op.RunWatchers(stopCh)
 	go op.RunAPIServer()
 
 	m := pat.New()

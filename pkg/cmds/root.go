@@ -6,11 +6,17 @@ import (
 	"strings"
 
 	v "github.com/appscode/go/version"
+	prom_util "github.com/appscode/kube-mon/prometheus/v1"
 	"github.com/appscode/kutil/tools/analytics"
+	searchlightcheme "github.com/appscode/searchlight/client/scheme"
+	stashscheme "github.com/appscode/stash/client/scheme"
+	voyagerscheme "github.com/appscode/voyager/client/scheme"
 	"github.com/jpillora/go-ogle-analytics"
+	kubedbscheme "github.com/kubedb/apimachinery/client/scheme"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	_ "k8s.io/client-go/kubernetes/fake"
+	clientsetscheme "k8s.io/client-go/kubernetes/scheme"
 )
 
 const (
@@ -37,6 +43,11 @@ func NewCmdKubed(version string) *cobra.Command {
 					client.Send(ga.NewEvent(parts[0], strings.Join(parts[1:], "/")).Label(version))
 				}
 			}
+			voyagerscheme.AddToScheme(clientsetscheme.Scheme)
+			searchlightcheme.AddToScheme(clientsetscheme.Scheme)
+			stashscheme.AddToScheme(clientsetscheme.Scheme)
+			kubedbscheme.AddToScheme(clientsetscheme.Scheme)
+			prom_util.AddToScheme(clientsetscheme.Scheme)
 		},
 	}
 	cmd.PersistentFlags().AddGoFlagSet(flag.CommandLine)
