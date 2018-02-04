@@ -1,12 +1,26 @@
+//  Copyright (c) 2014 Couchbase, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 		http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package search
 
 import (
 	"math"
 )
 
-func LevenshteinDistance(a, b *string) int {
-	la := len(*a)
-	lb := len(*b)
+func LevenshteinDistance(a, b string) int {
+	la := len(a)
+	lb := len(b)
 	d := make([]int, la+1)
 	var lastdiag, olddiag, temp int
 
@@ -22,7 +36,7 @@ func LevenshteinDistance(a, b *string) int {
 			if (d[j-1] + 1) < min {
 				min = d[j-1] + 1
 			}
-			if (*a)[j-1] == (*b)[i-1] {
+			if a[j-1] == b[i-1] {
 				temp = 0
 			} else {
 				temp = 1
@@ -37,14 +51,14 @@ func LevenshteinDistance(a, b *string) int {
 	return d[la]
 }
 
-// levenshteinDistanceMax same as levenshteinDistance but
+// LevenshteinDistanceMax same as LevenshteinDistance but
 // attempts to bail early once we know the distance
 // will be greater than max
 // in which case the first return val will be the max
 // and the second will be true, indicating max was exceeded
-func LevenshteinDistanceMax(a, b *string, max int) (int, bool) {
-	la := len(*a)
-	lb := len(*b)
+func LevenshteinDistanceMax(a, b string, max int) (int, bool) {
+	la := len(a)
+	lb := len(b)
 
 	ld := int(math.Abs(float64(la - lb)))
 	if ld > max {
@@ -67,7 +81,7 @@ func LevenshteinDistanceMax(a, b *string, max int) (int, bool) {
 			if (d[j-1] + 1) < min {
 				min = d[j-1] + 1
 			}
-			if (*a)[j-1] == (*b)[i-1] {
+			if a[j-1] == b[i-1] {
 				temp = 0
 			} else {
 				temp = 1

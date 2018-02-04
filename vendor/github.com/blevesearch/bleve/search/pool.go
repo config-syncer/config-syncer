@@ -1,11 +1,16 @@
 //  Copyright (c) 2014 Couchbase, Inc.
-//  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
-//  except in compliance with the License. You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//  Unless required by applicable law or agreed to in writing, software distributed under the
-//  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
-//  either express or implied. See the License for the specific language governing permissions
-//  and limitations under the License.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 		http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package search
 
@@ -29,16 +34,20 @@ func defaultDocumentMatchPoolTooSmall(p *DocumentMatchPool) *DocumentMatch {
 }
 
 // NewDocumentMatchPool will build a DocumentMatchPool with memory
-// pre-allocated to accomodate the requested number of DocumentMatch
+// pre-allocated to accommodate the requested number of DocumentMatch
 // instances
 func NewDocumentMatchPool(size, sortsize int) *DocumentMatchPool {
-	avail := make(DocumentMatchCollection, 0, size)
+	avail := make(DocumentMatchCollection, size)
 	// pre-allocate the expected number of instances
 	startBlock := make([]DocumentMatch, size)
+	startSorts := make([]string, size*sortsize)
 	// make these initial instances available
-	for i := range startBlock {
-		startBlock[i].Sort = make([]string, 0, sortsize)
-		avail = append(avail, &startBlock[i])
+	i, j := 0, 0
+	for i < size {
+		avail[i] = &startBlock[i]
+		avail[i].Sort = startSorts[j:j]
+		i += 1
+		j += sortsize
 	}
 	return &DocumentMatchPool{
 		avail:    avail,

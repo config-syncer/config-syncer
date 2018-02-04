@@ -1,11 +1,16 @@
 //  Copyright (c) 2014 Couchbase, Inc.
-//  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
-//  except in compliance with the License. You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//  Unless required by applicable law or agreed to in writing, software distributed under the
-//  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
-//  either express or implied. See the License for the specific language governing permissions
-//  and limitations under the License.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 		http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package bleve
 
@@ -15,11 +20,6 @@ const (
 	ErrorIndexPathDoesNotExist
 	ErrorIndexMetaMissing
 	ErrorIndexMetaCorrupt
-	ErrorDisjunctionFewerThanMinClauses
-	ErrorBooleanQueryNeedsMustOrShouldOrNotMust
-	ErrorNumericQueryNoBounds
-	ErrorPhraseQueryNoTerms
-	ErrorUnknownQueryType
 	ErrorUnknownStorageType
 	ErrorIndexClosed
 	ErrorAliasMulti
@@ -38,20 +38,15 @@ func (e Error) Error() string {
 }
 
 var errorMessages = map[Error]string{
-	ErrorIndexPathExists:                        "cannot create new index, path already exists",
-	ErrorIndexPathDoesNotExist:                  "cannot open index, path does not exist",
-	ErrorIndexMetaMissing:                       "cannot open index, metadata missing",
-	ErrorIndexMetaCorrupt:                       "cannot open index, metadata corrupt",
-	ErrorDisjunctionFewerThanMinClauses:         "disjunction query has fewer than the minimum number of clauses to satisfy",
-	ErrorBooleanQueryNeedsMustOrShouldOrNotMust: "boolean query must contain at least one must or should or not must clause",
-	ErrorNumericQueryNoBounds:                   "numeric range query must specify min or max",
-	ErrorPhraseQueryNoTerms:                     "phrase query must contain at least one term",
-	ErrorUnknownQueryType:                       "unknown query type",
-	ErrorUnknownStorageType:                     "unknown storage type",
-	ErrorIndexClosed:                            "index is closed",
-	ErrorAliasMulti:                             "cannot perform single index operation on multiple index alias",
-	ErrorAliasEmpty:                             "cannot perform operation on empty alias",
-	ErrorUnknownIndexType:                       "unknown index type",
-	ErrorEmptyID:                                "document ID cannot be empty",
-	ErrorIndexReadInconsistency:                 "index read inconsistency detected",
+	ErrorIndexPathExists:        "cannot create new index, path already exists",
+	ErrorIndexPathDoesNotExist:  "cannot open index, path does not exist",
+	ErrorIndexMetaMissing:       "cannot open index, metadata missing",
+	ErrorIndexMetaCorrupt:       "cannot open index, metadata corrupt",
+	ErrorUnknownStorageType:     "unknown storage type",
+	ErrorIndexClosed:            "index is closed",
+	ErrorAliasMulti:             "cannot perform single index operation on multiple index alias",
+	ErrorAliasEmpty:             "cannot perform operation on empty alias",
+	ErrorUnknownIndexType:       "unknown index type",
+	ErrorEmptyID:                "document ID cannot be empty",
+	ErrorIndexReadInconsistency: "index read inconsistency detected",
 }
