@@ -14,7 +14,6 @@ import (
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go/log"
 	v "github.com/appscode/go/version"
-	prom_util "github.com/appscode/kube-mon/prometheus/v1"
 	"github.com/appscode/kubed/pkg/api"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
@@ -23,7 +22,6 @@ import (
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
-	"github.com/appscode/kutil/discovery"
 	"github.com/appscode/kutil/tools/backup"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client"
@@ -97,10 +95,6 @@ type Operator struct {
 	amgrInf                    cache.SharedIndexInformer
 
 	searchIndexer *indexers.ResourceIndexer
-	// reverse indices
-	serviceIndexer    indexers.ServiceIndexer
-	smonIndexer       indexers.ServiceMonitorIndexer
-	prometheusIndexer indexers.PrometheusIndexer
 
 	sync.Mutex
 }
@@ -189,37 +183,6 @@ func (op *Operator) setupIndexers() error {
 	si.Configure(op.config.APIServer.EnableSearchIndex)
 	op.searchIndexer = si
 
-	// pod -> service
-	op.serviceIndexer, err = indexers.NewServiceIndexer(
-		indexDir,
-		op.kubeInformerFactory.InformerFor(&core.Pod{}, nil).GetIndexer(),
-		op.kubeInformerFactory.InformerFor(&core.Service{}, nil).GetIndexer(),
-	)
-	if err != nil {
-		return err
-	}
-	op.serviceIndexer.Configure(op.config.APIServer.EnableReverseIndex)
-
-	// service -> serviceMonitor
-	op.smonIndexer, err = indexers.NewServiceMonitorIndexer(
-		indexDir,
-		op.kubeInformerFactory.InformerFor(&core.Service{}, nil).GetIndexer(),
-		op.smonInf.GetIndexer(),
-	)
-	if err != nil {
-		return err
-	}
-	op.smonIndexer.Configure(op.config.APIServer.EnableReverseIndex &&
-		discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), prom_util.SchemeGroupVersion.String(), prom.ServiceMonitorsKind))
-
-	// serviceMonitor -> prometheus
-	op.prometheusIndexer, err = indexers.NewPrometheusIndexer(indexDir, op.promInf.GetIndexer(), op.smonInf.GetIndexer())
-	if err != nil {
-		return err
-	}
-	op.prometheusIndexer.Configure(op.config.APIServer.EnableReverseIndex &&
-		discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), prom_util.SchemeGroupVersion.String(), prom.PrometheusesKind))
-
 	return err
 }
 
@@ -245,11 +208,6 @@ func (op *Operator) setupWorkloadInformers() {
 func (op *Operator) setupNetworkInformers() {
 	svcInformer := op.kubeInformerFactory.Core().V1().Services().Informer()
 	op.addEventHandlers(svcInformer)
-	svcInformer.AddEventHandler(op.serviceIndexer.ServiceHandler())
-	svcInformer.AddEventHandler(op.smonIndexer.ServiceHandler())
-
-	endpointInformer := op.kubeInformerFactory.Core().V1().Endpoints().Informer()
-	endpointInformer.AddEventHandler(op.serviceIndexer.EndpointHandler())
 
 	ingressInformer := op.kubeInformerFactory.Extensions().V1beta1().Ingresses().Informer()
 	op.addEventHandlers(ingressInformer)
@@ -380,7 +338,6 @@ func (op *Operator) setupPrometheusInformers() {
 		&prom.Prometheus{}, op.Opt.ResyncPeriod, cache.Indexers{},
 	)
 	op.addEventHandlers(promInf)
-	promInf.AddEventHandler(op.prometheusIndexer.PrometheusHandler())
 
 	smonInf := cache.NewSharedIndexInformer(
 		&cache.ListWatch{
@@ -390,7 +347,6 @@ func (op *Operator) setupPrometheusInformers() {
 		&prom.ServiceMonitor{}, op.Opt.ResyncPeriod, cache.Indexers{},
 	)
 	op.addEventHandlers(smonInf)
-	smonInf.AddEventHandler(op.smonIndexer.ServiceMonitorHandler())
 
 	amgrInf := cache.NewSharedIndexInformer(
 		&cache.ListWatch{
@@ -506,18 +462,6 @@ func (op *Operator) RunAPIServer() {
 	if op.config.APIServer.EnableSearchIndex {
 		op.searchIndexer.RegisterRouters(router)
 	}
-	// Enable pod -> service, service -> serviceMonitor indexing
-	if op.config.APIServer.EnableReverseIndex {
-		router.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(op.serviceIndexer.ServeHTTP))
-		if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), prom_util.SchemeGroupVersion.String(), prom.ServiceMonitorsKind) {
-			// Add Indexer only if Server support this resource
-			router.Get("/apis/"+prom.Group+"/"+prom.Version+"/namespaces/:namespace/:resource/:name/"+prom.ServiceMonitorName, http.HandlerFunc(op.smonIndexer.ServeHTTP))
-		}
-		if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), prom_util.SchemeGroupVersion.String(), prom.PrometheusesKind) {
-			// Add Indexer only if Server support this resource
-			router.Get("/apis/"+prom.Group+"/"+prom.Version+"/namespaces/:namespace/:resource/:name/"+prom.PrometheusName, http.HandlerFunc(op.prometheusIndexer.ServeHTTP))
-		}
-	}
 
 	router.Get("/health", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) }))
 	router.Get("/metadata", http.HandlerFunc(op.metadataHandler))
@@ -526,10 +470,9 @@ func (op *Operator) RunAPIServer() {
 
 func (op *Operator) metadataHandler(w http.ResponseWriter, r *http.Request) {
 	resp := &api.KubedMetadata{
-		OperatorNamespace:   op.Opt.OperatorNamespace,
-		SearchEnabled:       op.config.APIServer.EnableSearchIndex,
-		ReverseIndexEnabled: op.config.APIServer.EnableReverseIndex,
-		Version:             &v.Version,
+		OperatorNamespace: op.Opt.OperatorNamespace,
+		SearchEnabled:     op.config.APIServer.EnableSearchIndex,
+		Version:           &v.Version,
 	}
 	err := json.NewEncoder(w).Encode(resp)
 	if err != nil {
