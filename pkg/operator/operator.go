@@ -24,7 +24,7 @@ import (
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
-	"github.com/appscode/kutil/meta"
+	"github.com/appscode/kutil/discovery"
 	"github.com/appscode/kutil/tools/backup"
 	"github.com/appscode/pat"
 	srch_cs "github.com/appscode/searchlight/client"
@@ -211,7 +211,7 @@ func (op *Operator) setupIndexers() error {
 		return err
 	}
 	op.smonIndexer.Configure(op.config.APIServer.EnableReverseIndex &&
-		meta.IsPreferredAPIResource(op.KubeClient, prom_util.SchemeGroupVersion.String(), prom.ServiceMonitorsKind))
+		discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), prom_util.SchemeGroupVersion.String(), prom.ServiceMonitorsKind))
 
 	// serviceMonitor -> prometheus
 	op.prometheusIndexer, err = indexers.NewPrometheusIndexer(indexDir, op.promInf.GetIndexer(), op.smonInf.GetIndexer())
@@ -219,7 +219,7 @@ func (op *Operator) setupIndexers() error {
 		return err
 	}
 	op.prometheusIndexer.Configure(op.config.APIServer.EnableReverseIndex &&
-		meta.IsPreferredAPIResource(op.KubeClient, prom_util.SchemeGroupVersion.String(), prom.PrometheusesKind))
+		discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), prom_util.SchemeGroupVersion.String(), prom.PrometheusesKind))
 
 	return err
 }
@@ -510,11 +510,11 @@ func (op *Operator) RunAPIServer() {
 	// Enable pod -> service, service -> serviceMonitor indexing
 	if op.config.APIServer.EnableReverseIndex {
 		router.Get("/api/v1/namespaces/:namespace/:resource/:name/services", http.HandlerFunc(op.serviceIndexer.ServeHTTP))
-		if meta.IsPreferredAPIResource(op.KubeClient, prom.Group+"/"+prom.Version, prom.ServiceMonitorsKind) {
+		if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), prom_util.SchemeGroupVersion.String(), prom.ServiceMonitorsKind) {
 			// Add Indexer only if Server support this resource
 			router.Get("/apis/"+prom.Group+"/"+prom.Version+"/namespaces/:namespace/:resource/:name/"+prom.ServiceMonitorName, http.HandlerFunc(op.smonIndexer.ServeHTTP))
 		}
-		if meta.IsPreferredAPIResource(op.KubeClient, prom.Group+"/"+prom.Version, prom.PrometheusesKind) {
+		if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), prom_util.SchemeGroupVersion.String(), prom.PrometheusesKind) {
 			// Add Indexer only if Server support this resource
 			router.Get("/apis/"+prom.Group+"/"+prom.Version+"/namespaces/:namespace/:resource/:name/"+prom.PrometheusName, http.HandlerFunc(op.prometheusIndexer.ServeHTTP))
 		}

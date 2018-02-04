@@ -1,5 +1,5 @@
 hash: 99f1636714ee401582989968a8a42d241ed159160e1796e344237b75e406db5b
-updated: 2018-01-31T19:39:22.261247707-08:00
+updated: 2018-02-04T00:31:21.059850783-08:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -48,9 +48,10 @@ imports:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: eae83543706680e70bf902428b43551cf7f1519b
+  version: ead2921da48b0ee35528e1f8f895c9b0d42281ad
   subpackages:
   - core/v1
+  - discovery
   - meta
   - tools/analytics
   - tools/backup
@@ -79,7 +80,7 @@ imports:
   - informers/externalversions/monitoring/v1alpha1
   - listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: 603c42a1910eba630af8cfdf68a41276e4a73eb1
+  version: b5d67a6705ffad5404ad0aa42ab0e6b6888a458e
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
@@ -249,7 +250,7 @@ imports:
 - name: github.com/google/btree
   version: 7d79101e329e5a3adf994758c578dab82b90c017
 - name: github.com/google/go-cmp
-  version: 97aa668b73e764ccdd786bc3ccd2edffe621150e
+  version: 3af367b6b30c263d47e8895973edcca9a49cf029
   subpackages:
   - cmp
   - cmp/internal/diff
@@ -329,7 +330,7 @@ imports:
   subpackages:
   - client
 - name: github.com/kubedb/apimachinery
-  version: 0de29010181b4b361fb210d5a85de7a4ff56e9df
+  version: 1f787b4302ed6655f5295638cfaab5acfc1b6189
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -360,7 +361,7 @@ imports:
 - name: github.com/ncw/swift
   version: ae9f0ea1605b9aa6434ed5c731ca35d83ba67c55
 - name: github.com/nlopes/slack
-  version: 280245264a9d8c496e95ead447421d37cd95f93a
+  version: db1988bcee7431c807305524daebdfaa323dbb6a
 - name: github.com/olekukonko/tablewriter
   version: cca8bbc0798408af109aaaa239cbd2634846b340
 - name: github.com/onsi/ginkgo
@@ -440,7 +441,7 @@ imports:
 - name: github.com/sirupsen/logrus
   version: f006c2ac4710855cf0f916dd6b77acf6b048dc6e
 - name: github.com/spf13/cobra
-  version: f91529fc609202eededff4de2dc0ba2f662240a3
+  version: 3a7eb146bae5ebf9be598570234cde56c82d16cc
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -516,7 +517,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: 987caa2d3895c188c40784ad94fe1dd681a8cf68
+  version: 4c1b07210d562506ab52117997c3b7e294627ac9
   subpackages:
   - gensupport
   - googleapi
