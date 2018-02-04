@@ -1,5 +1,5 @@
-hash: 99f1636714ee401582989968a8a42d241ed159160e1796e344237b75e406db5b
-updated: 2018-02-04T00:31:21.059850783-08:00
+hash: 4d297a6b050a535d3c7a2726aa6bbfacab8eb4e718bbe82a7a67de8883da3984
+updated: 2018-02-04T04:35:20.012322782-08:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -151,35 +151,43 @@ imports:
   subpackages:
   - quantile
 - name: github.com/blevesearch/bleve
-  version: 97393d027342f43b17da2f02c090a4e728ac929f
+  version: 0456569b6240ce13fc7bfed00e10b3f99e68a3e2
   subpackages:
   - analysis
-  - analysis/analyzers/standard_analyzer
-  - analysis/datetime_parsers/datetime_optional
-  - analysis/datetime_parsers/flexible_go
-  - analysis/language/en
-  - analysis/token_filters/lower_case_filter
-  - analysis/token_filters/porter
-  - analysis/token_filters/stop_tokens_filter
-  - analysis/tokenizers/unicode
+  - analysis/analyzer/standard
+  - analysis/datetime/flexible
+  - analysis/datetime/optional
+  - analysis/lang/en
+  - analysis/token/lowercase
+  - analysis/token/porter
+  - analysis/token/stop
+  - analysis/tokenizer/unicode
   - document
+  - geo
   - index
+  - index/scorch
+  - index/scorch/mergeplan
+  - index/scorch/segment
+  - index/scorch/segment/mem
+  - index/scorch/segment/zap
   - index/store
   - index/store/boltdb
   - index/store/gtreap
-  - index/upside_down
-  - numeric_util
+  - index/upsidedown
+  - mapping
+  - numeric
   - registry
   - search
-  - search/collectors
-  - search/facets
+  - search/collector
+  - search/facet
   - search/highlight
-  - search/highlight/fragment_formatters/html
-  - search/highlight/fragmenters/simple
-  - search/highlight/highlighters/html
-  - search/highlight/highlighters/simple
-  - search/scorers
-  - search/searchers
+  - search/highlight/format/html
+  - search/highlight/fragmenter/simple
+  - search/highlight/highlighter/html
+  - search/highlight/highlighter/simple
+  - search/query
+  - search/scorer
+  - search/searcher
 - name: github.com/blevesearch/go-porterstemmer
   version: 23a2c8e5cf1f380f27722c6d2ae8896431dc7d0e
   repo: https://github.com/blevesearch/go-porterstemmer
@@ -187,7 +195,7 @@ imports:
   version: db70c57796cc8c310613541dfade3dce627d09c7
   repo: https://github.com/blevesearch/segment
 - name: github.com/boltdb/bolt
-  version: 144418e1475d8bf7abbdc48583500f1a20c62ea7
+  version: 9da31745363232bc1e27dbab3569e77383a51585
   repo: https://github.com/boltdb/bolt
 - name: github.com/cenkalti/backoff
   version: 61153c768f31ee5f130071d08fc82b85208528de
@@ -200,6 +208,11 @@ imports:
   repo: https://github.com/tamalsaha/prometheus-operator.git
   subpackages:
   - pkg/client/monitoring/v1
+- name: github.com/couchbase/vellum
+  version: ed84a675e24ed0a0bf6859b1ddec7e7c858354bd
+  subpackages:
+  - regexp
+  - utf8
 - name: github.com/cpuguy83/go-md2man
   version: 71acacd42f85e5e82f70a55327789582a5200a90
   subpackages:
@@ -210,6 +223,8 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
+- name: github.com/edsrzf/mmap-go
+  version: 935e0e8a636ca4ba70b713f3e38a19e1b77739e8
 - name: github.com/emicklei/go-restful
   version: ff4f55a206334ef123e4f79bbf348980da81ca46
   subpackages:
@@ -218,6 +233,8 @@ imports:
   version: 751773369052141c013c6e827a71e8f35c07879c
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
+- name: github.com/glycerine/go-unsnap-stream
+  version: 62a9a9eb44fd8932157b1a8ace2149eff5971af6
 - name: github.com/go-ini/ini
   version: 300e940a926eb277d3901b20bdfcc54928ad3642
 - name: github.com/go-openapi/jsonpointer
@@ -247,6 +264,9 @@ imports:
   - ptypes/any
   - ptypes/duration
   - ptypes/timestamp
+- name: github.com/golang/snappy
+  version: cef980a12b316c5b7e5bb3a8e168eb43ae999a88
+  repo: https://github.com/golang/snappy
 - name: github.com/google/btree
   version: 7d79101e329e5a3adf994758c578dab82b90c017
 - name: github.com/google/go-cmp
@@ -358,6 +378,8 @@ imports:
   version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
   subpackages:
   - pbutil
+- name: github.com/mschoch/smat
+  version: 90eadee771aeab36e8bf796039b8c261bebebe4f
 - name: github.com/ncw/swift
   version: ae9f0ea1605b9aa6434ed5c731ca35d83ba67c55
 - name: github.com/nlopes/slack
@@ -400,6 +422,8 @@ imports:
   - types
 - name: github.com/peterbourgon/diskv
   version: 5f041e8faa004a95c88a202771f4cc3e991971e6
+- name: github.com/philhofer/fwd
+  version: bb6d471dc95d4fe11e432687f8b70ff496cf3136
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/prometheus/client_golang
@@ -426,6 +450,8 @@ imports:
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
+- name: github.com/RoaringBitmap/roaring
+  version: cad71620c66d29aaa33d384cf746d08a600968c0
 - name: github.com/robfig/cron
   version: 2315d5715e36303a941d907f038da7f7c44c773b
 - name: github.com/russross/blackfriday
@@ -440,6 +466,8 @@ imports:
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/sirupsen/logrus
   version: f006c2ac4710855cf0f916dd6b77acf6b048dc6e
+- name: github.com/Smerity/govarint
+  version: 7265e41f48f15fd61751e16da866af3c704bb3ab
 - name: github.com/spf13/cobra
   version: 3a7eb146bae5ebf9be598570234cde56c82d16cc
   subpackages:
@@ -455,6 +483,13 @@ imports:
   version: 749fb9e14beb9995f677c101a754393cecb64b0f
   subpackages:
   - hipchat
+- name: github.com/tinylib/msgp
+  version: 03a79185462ad029a6e7e05b2f3f3e0498d0a6c0
+  subpackages:
+  - msgp
+- name: github.com/willf/bitset
+  version: 2e6e8094ef4745224150c88c16191c7dceaad16f
+  repo: https://github.com/willf/bitset
 - name: github.com/yudai/gojsondiff
   version: 7b1b7adf999dab73a6eb02669c3d82dbb27a3dd6
   subpackages:

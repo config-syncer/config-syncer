@@ -1,17 +1,24 @@
 //  Copyright (c) 2014 Couchbase, Inc.
-//  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
-//  except in compliance with the License. You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//  Unless required by applicable law or agreed to in writing, software distributed under the
-//  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
-//  either express or implied. See the License for the specific language governing permissions
-//  and limitations under the License.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 		http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package store
 
 import "encoding/json"
 
-// KVStore is an abstraction for working with KV stores
+// KVStore is an abstraction for working with KV stores.  Note that
+// in order to be used with the bleve.registry, it must also implement
+// a constructor function of the registry.KVStoreConstructor type.
 type KVStore interface {
 
 	// Writer returns a KVWriter which can be used to
@@ -125,7 +132,7 @@ type KVBatchOptions struct {
 	// the KVBatch.
 	NumSets int
 
-	// NumMerges is the number of Merge() calls the caller will invoke
+	// NumDeletes is the number of Delete() calls the caller will invoke
 	// on the KVBatch.
 	NumDeletes int
 
