@@ -16,7 +16,6 @@ import (
 	v "github.com/appscode/go/version"
 	prom_util "github.com/appscode/kube-mon/prometheus/v1"
 	"github.com/appscode/kubed/pkg/api"
-	"github.com/appscode/kubed/pkg/config"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
 	"github.com/appscode/kubed/pkg/indexers"
@@ -71,7 +70,7 @@ type Options struct {
 
 type Operator struct {
 	Opt    Options
-	config config.ClusterConfig
+	config api.ClusterConfig
 
 	notifierCred   envconfig.LoaderFunc
 	recorder       record.EventRecorder
@@ -107,7 +106,7 @@ type Operator struct {
 }
 
 func (op *Operator) Setup() error {
-	cfg, err := config.LoadConfig(op.Opt.ConfigPath)
+	cfg, err := api.LoadConfig(op.Opt.ConfigPath)
 	if err != nil {
 		return err
 	}
@@ -146,7 +145,7 @@ func (op *Operator) Setup() error {
 	op.cron.Start()
 
 	for _, j := range cfg.Janitors {
-		if j.Kind == config.JanitorInfluxDB {
+		if j.Kind == api.JanitorInfluxDB {
 			janitor := influx.Janitor{Spec: *j.InfluxDB, TTL: j.TTL.Duration}
 			err = janitor.Cleanup()
 			if err != nil {
@@ -543,8 +542,8 @@ func (op *Operator) metadataHandler(w http.ResponseWriter, r *http.Request) {
 
 func (op *Operator) RunElasticsearchCleaner() error {
 	for _, j := range op.config.Janitors {
-		if j.Kind == config.JanitorElasticsearch {
-			var authInfo *config.JanitorAuthInfo
+		if j.Kind == api.JanitorElasticsearch {
+			var authInfo *api.JanitorAuthInfo
 
 			if j.Elasticsearch.SecretName != "" {
 				secret, err := op.KubeClient.CoreV1().Secrets(op.Opt.OperatorNamespace).
@@ -553,7 +552,7 @@ func (op *Operator) RunElasticsearchCleaner() error {
 					return err
 				}
 				if secret != nil {
-					authInfo = config.LoadJanitorAuthInfo(secret.Data)
+					authInfo = api.LoadJanitorAuthInfo(secret.Data)
 				}
 			}
 

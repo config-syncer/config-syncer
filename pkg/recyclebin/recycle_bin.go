@@ -13,7 +13,7 @@ import (
 	"github.com/appscode/go-notify"
 	"github.com/appscode/go-notify/unified"
 	stringz "github.com/appscode/go/strings"
-	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/api"
 	meta_util "github.com/appscode/kutil/meta"
 	"github.com/ghodss/yaml"
 	"github.com/prometheus/common/log"
@@ -23,7 +23,7 @@ import (
 
 type RecycleBin struct {
 	clusterName  string
-	spec         *config.RecycleBinSpec
+	spec         *api.RecycleBinSpec
 	notifierCred envconfig.LoaderFunc
 
 	lock sync.RWMutex
@@ -31,7 +31,7 @@ type RecycleBin struct {
 
 var _ cache.ResourceEventHandler = &RecycleBin{}
 
-func (c *RecycleBin) Configure(clusterName string, spec *config.RecycleBinSpec, notifierCred envconfig.LoaderFunc) {
+func (c *RecycleBin) Configure(clusterName string, spec *api.RecycleBinSpec, notifierCred envconfig.LoaderFunc) {
 	c.clusterName = clusterName
 	c.spec = spec
 	c.notifierCred = notifierCred
@@ -78,7 +78,7 @@ func (c *RecycleBin) update(oldObj, newObj interface{}) error {
 		return err
 	}
 	name := filepath.Base(p)
-	fn := fmt.Sprintf("%s.%s.yaml", name, om.GetCreationTimestamp().UTC().Format(config.TimestampFormat))
+	fn := fmt.Sprintf("%s.%s.yaml", name, om.GetCreationTimestamp().UTC().Format(api.TimestampFormat))
 
 	fullPath := filepath.Join(dir, fn)
 	bytes, err := yaml.Marshal(newObj)
@@ -136,7 +136,7 @@ func (c *RecycleBin) delete(obj interface{}) error {
 		return err
 	}
 	name := filepath.Base(p)
-	fn := fmt.Sprintf("%s.%s.yaml", name, om.GetCreationTimestamp().UTC().Format(config.TimestampFormat))
+	fn := fmt.Sprintf("%s.%s.yaml", name, om.GetCreationTimestamp().UTC().Format(api.TimestampFormat))
 
 	fullPath := filepath.Join(dir, fn)
 	bytes, err := yaml.Marshal(obj)

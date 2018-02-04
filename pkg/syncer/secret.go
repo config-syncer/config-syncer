@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/appscode/go/log"
-	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/api"
 	"github.com/appscode/kubed/pkg/eventer"
 	core_util "github.com/appscode/kutil/core/v1"
 	core "k8s.io/api/core/v1"
@@ -127,7 +127,7 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 	}
 	_, _, err := core_util.CreateOrPatchSecret(k8sClient, meta, func(obj *core.Secret) *core.Secret {
 		// check origin cluster, if not match overwrite and create an event
-		if v, ok := obj.Labels[config.OriginClusterLabelKey]; ok && v != s.clusterName {
+		if v, ok := obj.Labels[api.OriginClusterLabelKey]; ok && v != s.clusterName {
 			s.recorder.Eventf(
 				src,
 				core.EventTypeWarning,

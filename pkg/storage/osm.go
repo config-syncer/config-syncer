@@ -12,7 +12,7 @@ import (
 
 	stringz "github.com/appscode/go/strings"
 	"github.com/appscode/go/types"
-	api "github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/api"
 	otx "github.com/appscode/osm/context"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"

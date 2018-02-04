@@ -2,7 +2,7 @@ package e2e
 
 import (
 	"github.com/appscode/go/crypto/rand"
-	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/api"
 	"github.com/appscode/kubed/test/framework"
 	core_util "github.com/appscode/kutil/core/v1"
 	"github.com/appscode/kutil/meta"
@@ -73,7 +73,7 @@ var _ = Describe("Secret-syncer", func() {
 
 			By("Adding sync annotation")
 			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "true")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "true")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -86,7 +86,7 @@ var _ = Describe("Secret-syncer", func() {
 
 			By("Removing sync annotation")
 			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
-				obj.Annotations = meta.RemoveKey(obj.Annotations, config.ConfigSyncKey)
+				obj.Annotations = meta.RemoveKey(obj.Annotations, api.ConfigSyncKey)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -105,7 +105,7 @@ var _ = Describe("Secret-syncer", func() {
 
 			By("Adding sync annotation")
 			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "true")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "true")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -123,7 +123,7 @@ var _ = Describe("Secret-syncer", func() {
 
 			By("Adding sync annotation")
 			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "true")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "true")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -131,7 +131,7 @@ var _ = Describe("Secret-syncer", func() {
 
 			By("Adding selector annotation")
 			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "app="+f.App())
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "app="+f.App())
 				return obj
 			})
 			Expect(err).NotTo(HaveOccurred())
@@ -147,7 +147,7 @@ var _ = Describe("Secret-syncer", func() {
 
 			By("Changing selector annotation")
 			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "app=do-not-match")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "app=do-not-match")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -156,7 +156,7 @@ var _ = Describe("Secret-syncer", func() {
 
 			By("Removing selector annotation")
 			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -175,7 +175,7 @@ var _ = Describe("Secret-syncer", func() {
 
 			By("Adding sync annotation")
 			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncKey, "")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -219,7 +219,7 @@ var _ = Describe("Secret-syncer", func() {
 
 			By("Adding sync annotation")
 			secret, _, err = core_util.PatchSecret(f.KubeClient, secret, func(obj *core.Secret) *core.Secret {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, config.ConfigSyncContexts, context)
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncContexts, context)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -229,7 +229,7 @@ var _ = Describe("Secret-syncer", func() {
 
 			By("Removing sync annotation")
 			secret, _, err = core_util.PatchSecret(f.KubeClient, secret, func(obj *core.Secret) *core.Secret {
-				obj.Annotations = meta.RemoveKey(obj.Annotations, config.ConfigSyncContexts)
+				obj.Annotations = meta.RemoveKey(obj.Annotations, api.ConfigSyncContexts)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())

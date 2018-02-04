@@ -6,7 +6,7 @@ import (
 
 	"github.com/appscode/go/log"
 	stringz "github.com/appscode/go/strings"
-	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/api"
 	"github.com/appscode/kutil/discovery"
 	meta_util "github.com/appscode/kutil/meta"
 	"github.com/ghodss/yaml"
@@ -27,7 +27,7 @@ func (f *EventForwarder) OnAdd(obj interface{}) {
 	f.lock.RLock()
 	defer f.lock.RUnlock()
 
-	if err := f.forward(config.Create, obj); err != nil {
+	if err := f.forward(api.Create, obj); err != nil {
 		log.Errorln(err)
 		return
 	}
@@ -39,7 +39,7 @@ func (f *EventForwarder) OnDelete(obj interface{}) {
 	f.lock.RLock()
 	defer f.lock.RUnlock()
 
-	if err := f.forward(config.Create, obj); err != nil {
+	if err := f.forward(api.Create, obj); err != nil {
 		log.Errorln(err)
 		return
 	}
@@ -50,7 +50,7 @@ func recentEvent(t metav1.Time) bool {
 }
 
 // Check whether the rule's resource fields match the request attrs.
-func ruleMatchesResource(r config.PolicyRule, attrs attributes) bool {
+func ruleMatchesResource(r api.PolicyRule, attrs attributes) bool {
 	if len(r.Namespaces) > 0 {
 		if !hasString(r.Namespaces, attrs.accessor.GetNamespace()) { // Non-namespaced resources use the empty string.
 			return false
@@ -84,7 +84,7 @@ func ruleMatchesResource(r config.PolicyRule, attrs attributes) bool {
 
 type attributes struct {
 	gvr      schema.GroupVersionResource
-	op       config.Operation
+	op       api.Operation
 	accessor metav1.Object
 }
 
@@ -98,7 +98,7 @@ func hasString(slice []string, value string) bool {
 	return false
 }
 
-func (f *EventForwarder) forward(op config.Operation, obj interface{}) error {
+func (f *EventForwarder) forward(op api.Operation, obj interface{}) error {
 	if f.spec == nil {
 		return nil
 	}
@@ -120,7 +120,7 @@ func (f *EventForwarder) forward(op config.Operation, obj interface{}) error {
 
 	attrs := attributes{
 		gvr:      resource,
-		op:       config.Create,
+		op:       api.Create,
 		accessor: accessor,
 	}
 
