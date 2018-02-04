@@ -10,7 +10,7 @@ import (
 	"github.com/appscode/go/arrays"
 	"github.com/appscode/go/errors"
 	"github.com/appscode/go/log"
-	kutil "github.com/appscode/kutil/core/v1"
+	core_util "github.com/appscode/kutil/core/v1"
 	"github.com/appscode/pat"
 	"github.com/blevesearch/bleve"
 	core "k8s.io/api/core/v1"
@@ -149,7 +149,7 @@ func (ri *ServiceIndexerImpl) equal(a, b *core.Service) bool {
 }
 
 func (ri *ServiceIndexerImpl) Key(meta metav1.ObjectMeta) []byte {
-	return []byte(kutil.GetGroupVersionKind(&core.Pod{}).String() + "/" + meta.Namespace + "/" + meta.Name)
+	return []byte(core_util.GetGroupVersionKind(&core.Pod{}).String() + "/" + meta.Namespace + "/" + meta.Name)
 }
 
 func (ri *ServiceIndexerImpl) ServeHTTP(w http.ResponseWriter, req *http.Request) {

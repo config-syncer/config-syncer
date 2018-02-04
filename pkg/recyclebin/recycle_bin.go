@@ -71,11 +71,6 @@ func (c *RecycleBin) update(oldObj, newObj interface{}) error {
 		return err
 	}
 
-	tm, err := meta.TypeAccessor(newObj)
-	if err != nil {
-		return err
-	}
-
 	p := filepath.Join(c.spec.Path, om.GetSelfLink())
 	dir := filepath.Dir(p)
 	err = os.MkdirAll(dir, 0755)
@@ -93,7 +88,7 @@ func (c *RecycleBin) update(oldObj, newObj interface{}) error {
 
 	for _, receiver := range c.spec.Receivers {
 		if len(receiver.To) > 0 {
-			sub := fmt.Sprintf("[%s]: %s %s %s/%s updated", stringz.Val(c.clusterName, "?"), tm.GetAPIVersion(), tm.GetKind(), om.GetNamespace(), om.GetName())
+			sub := fmt.Sprintf("[%s]: %s %s/%s updated", stringz.Val(c.clusterName, "?"), meta_util.GetKind(newObj), om.GetNamespace(), om.GetName())
 			if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), c.notifierCred); err == nil {
 				switch n := notifier.(type) {
 				case notify.ByEmail:

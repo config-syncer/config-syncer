@@ -2,7 +2,7 @@ package slack
 
 // OutgoingMessage is used for the realtime API, and seems incomplete.
 type OutgoingMessage struct {
-	ID              int    `json:"id"`
+	ID int `json:"id"`
 	// channel ID
 	Channel         string `json:"channel,omitempty"`
 	Text            string `json:"text,omitempty"`
@@ -29,6 +29,9 @@ type Msg struct {
 	PinnedTo        []string     `json:"pinned_to, omitempty"`
 	Attachments     []Attachment `json:"attachments,omitempty"`
 	Edited          *Edited      `json:"edited,omitempty"`
+	LastRead        string       `json:"last_read,omitempty"`
+	Subscribed      bool         `json:"subscribed,omitempty"`
+	UnreadCount     int          `json:"unread_count,omitempty"`
 
 	// Message Subtypes
 	SubType string `json:"subtype,omitempty"`
@@ -82,6 +85,10 @@ type Msg struct {
 
 	// reactions
 	Reactions []ItemReaction `json:"reactions,omitempty"`
+
+	// slash commands and interactive messages
+	ResponseType    string `json:"response_type,omitempty"`
+	ReplaceOriginal bool   `json:"replace_original,omitempty"`
 }
 
 // Icon is used for bot messages

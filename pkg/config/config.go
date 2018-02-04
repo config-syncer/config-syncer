@@ -78,34 +78,41 @@ type EventForwarderSpec struct {
 	CSREvents ForwarderSpec `json:"csrEvents,omitempty"`
 	Receivers []Receiver    `json:"receivers,omitempty"`
 
-	ResourceRules []ResourceRule `json:"resourceRules"`
+	Rules []PolicyRule `json:"rules"`
 }
 
-type ResourceRule struct {
+type PolicyRule struct {
 	// Operation is the operation being performed
 	Operations []Operation `json:"operation"`
 
-	// APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of
-	// the enumerated resources in any API group will be allowed.  "*" means all.
+	// Resources that this rule matches. An empty list implies all kinds in all API groups.
 	// +optional
-	APIGroups []string `json:"apiGroups,omitempty"`
+	Resources []GroupResources
 
-	// Resources is a list of resources this rule applies to.  "*" means all in the specified apiGroups.
-	//  "*/foo" represents the subresource 'foo' for all resources in the specified apiGroups.
+	// Namespaces that this rule matches.
+	// The empty string "" matches non-namespaced resources.
+	// An empty list implies every namespace.
 	// +optional
-	Resources []string `json:"resources,omitempty"`
+	Namespaces []string
+}
 
-	// NamespaceSelector decides whether to forward notifications on an object based
-	// on whether the namespace for that object matches the selector. If the
-	// object itself is a namespace, the matching is performed on
-	// object.metadata.labels.
-	// ResourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.  "*" means all.
+// GroupResources represents resource kinds in an API group.
+type GroupResources struct {
+	// Group is the name of the API group that contains the resources.
+	// The empty string represents the core API group.
 	// +optional
-	ResourceNames []string `json:"resourceNames,omitempty"`
-
-	// Default to the empty LabelSelector, which matches everything.
+	Group string
+	// Resources is a list of resources within the API group. Subresources are
+	// matched using a "/" to indicate the subresource. For example, "pods/log"
+	// would match request to the log subresource of pods. The top level resource
+	// does not match subresources, "pods" doesn't match "pods/log".
 	// +optional
-	NamespaceSelector *metav1.LabelSelector `json:"namespaceSelector,omitempty"`
+	Resources []string
+	// ResourceNames is a list of resource instance names that the policy matches.
+	// Using this field requires Resources to be specified.
+	// An empty list implies that every instance of the resource is matched.
+	// +optional
+	ResourceNames []string
 }
 
 // Operation is the type of resource operation being checked for admission control
@@ -114,7 +121,6 @@ type Operation string
 // Operation constants
 const (
 	Create Operation = "CREATE"
-	Update Operation = "UPDATE"
 	Delete Operation = "DELETE"
 )
 
