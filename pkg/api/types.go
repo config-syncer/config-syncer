@@ -34,9 +34,8 @@ type ClusterConfig struct {
 }
 
 type APIServerSpec struct {
-	Address            string `json:"address"`
-	EnableSearchIndex  bool   `json:"enableSearchIndex"`
-	EnableReverseIndex bool   `json:"enableReverseIndex"`
+	Address           string `json:"address"`
+	EnableSearchIndex bool   `json:"enableSearchIndex"`
 }
 
 type JanitorSpec struct {
@@ -236,8 +235,7 @@ type JanitorAuthInfo struct {
 }
 
 type KubedMetadata struct {
-	OperatorNamespace   string      `json:"operatorNamespace,omitempty"`
-	SearchEnabled       bool        `json:"searchEnabled"`
-	ReverseIndexEnabled bool        `json:"reverseIndexEnabled"`
-	Version             interface{} `json:"version,omitempty"`
+	OperatorNamespace string      `json:"operatorNamespace,omitempty"`
+	SearchEnabled     bool        `json:"searchEnabled"`
+	Version           interface{} `json:"version,omitempty"`
 }
