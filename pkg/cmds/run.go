@@ -3,29 +3,17 @@ package cmds
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/appscode/go/log"
 	"github.com/appscode/go/signals"
 	"github.com/appscode/kubed/pkg/operator"
-	srch_cs "github.com/appscode/searchlight/client"
-	scs "github.com/appscode/stash/client"
-	vcs "github.com/appscode/voyager/client"
+	"github.com/appscode/kutil/meta"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	kcs "github.com/kubedb/apimachinery/client"
 	"github.com/spf13/cobra"
-	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-)
-
-var (
-	prometheusCrdGroup = prom.Group
-	prometheusCrdKinds = prom.DefaultCrdKinds
 )
 
 // runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml"
@@ -35,13 +23,15 @@ func NewCmdRun() *cobra.Command {
 		APIAddress:        ":8080",
 		WebAddress:        ":56790",
 		ScratchDir:        "/tmp",
-		OperatorNamespace: namespace(),
+		OperatorNamespace: meta.Namespace(),
 		ResyncPeriod:      10 * time.Minute,
 		// ref: https://github.com/kubernetes/ingress-nginx/blob/e4d53786e771cc6bdd55f180674b79f5b692e552/pkg/ingress/controller/launch.go#L252-L259
 		// High enough QPS to fit all expected use cases. QPS=0 is not set here, because client code is overriding it.
 		QPS: 1e6,
 		// High enough Burst to fit all expected use cases. Burst=0 is not set here, because client code is overriding it.
-		Burst: 1e6,
+		Burst:              1e6,
+		PrometheusCrdGroup: prom.Group,
+		PrometheusCrdKinds: prom.DefaultCrdKinds,
 	}
 	cmd := &cobra.Command{
 		Use:               "run",
@@ -55,8 +45,8 @@ func NewCmdRun() *cobra.Command {
 	}
 
 	fs := flag.NewFlagSet("prometheus", flag.ExitOnError)
-	fs.StringVar(&prometheusCrdGroup, "prometheus-crd-apigroup", prometheusCrdGroup, "prometheus CRD  API group name")
-	fs.Var(&prometheusCrdKinds, "prometheus-crd-kinds", " - EXPERIMENTAL (could be removed in future releases) - customize CRD kind names")
+	fs.StringVar(&opt.PrometheusCrdGroup, "prometheus-crd-apigroup", opt.PrometheusCrdGroup, "prometheus CRD  API group name")
+	fs.Var(&opt.PrometheusCrdKinds, "prometheus-crd-kinds", " - EXPERIMENTAL (could be removed in future releases) - customize CRD kind names")
 	cmd.Flags().AddGoFlagSet(fs)
 
 	cmd.Flags().StringVar(&opt.KubeConfig, "kubeconfig", opt.KubeConfig, "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
@@ -84,21 +74,12 @@ func Run(opt operator.Options) {
 	config.Burst = opt.Burst
 	config.QPS = opt.QPS
 
-	op := &operator.Operator{
-		KubeClient:        kubernetes.NewForConfigOrDie(config),
-		VoyagerClient:     vcs.NewForConfigOrDie(config),
-		SearchlightClient: srch_cs.NewForConfigOrDie(config),
-		StashClient:       scs.NewForConfigOrDie(config),
-		KubeDBClient:      kcs.NewForConfigOrDie(config),
-		Opt:               opt,
-	}
-	op.PromClient, err = prom.NewForConfig(&prometheusCrdKinds, prometheusCrdGroup, config)
+	op, err := operator.New(config, opt)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		log.Fatalln(err)
 	}
 
-	err = op.Setup()
+	err = op.Configure()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -107,16 +88,4 @@ func Run(opt operator.Options) {
 
 	log.Infoln("Running kubed watcher")
 	op.RunAndHold(stopCh)
-}
-
-func namespace() string {
-	if ns := os.Getenv("OPERATOR_NAMESPACE"); ns != "" {
-		return ns
-	}
-	if data, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace"); err == nil {
-		if ns := strings.TrimSpace(string(data)); len(ns) > 0 {
-			return ns
-		}
-	}
-	return core.NamespaceDefault
 }

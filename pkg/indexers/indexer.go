@@ -32,10 +32,12 @@ func NewResourceIndexer(dst string) (*ResourceIndexer, error) {
 	}, nil
 }
 
-func (ri *ResourceIndexer) Configure(enable bool) {
+func (ri *ResourceIndexer) Configure(enable bool) error {
 	ri.lock.Lock()
 	defer ri.lock.Unlock()
+
 	ri.enable = enable
+	return nil
 }
 
 func (ri *ResourceIndexer) OnAdd(obj interface{}) {

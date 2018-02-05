@@ -6,7 +6,7 @@ import (
 
 	"github.com/appscode/go/log"
 	"github.com/appscode/go/runtime"
-	"github.com/appscode/kubed/pkg/config"
+	"github.com/appscode/kubed/pkg/api"
 	"github.com/ghodss/yaml"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,72 +44,71 @@ func main() {
 	ioutil.WriteFile(p, bytes, 0644)
 }
 
-func CreateClusterConfig() config.ClusterConfig {
-	return config.ClusterConfig{
+func CreateClusterConfig() api.ClusterConfig {
+	return api.ClusterConfig{
 		ClusterName: "unicorn",
-		APIServer: config.APIServerSpec{
-			Address:            ":8080",
-			EnableSearchIndex:  true,
-			EnableReverseIndex: true,
+		APIServer: api.APIServerSpec{
+			Address:           ":8080",
+			EnableSearchIndex: true,
 		},
-		Snapshotter: &config.SnapshotSpec{
+		Snapshotter: &api.SnapshotSpec{
 			Schedule: "@every 6h",
 			Sanitize: true,
-			Backend: config.Backend{
+			Backend: api.Backend{
 				StorageSecretName: "snap-secret",
-				GCS: &config.GCSSpec{
+				GCS: &api.GCSSpec{
 					Bucket: "restic",
 					Prefix: "minikube",
 				},
 			},
 		},
-		RecycleBin: &config.RecycleBinSpec{
+		RecycleBin: &api.RecycleBinSpec{
 			Path:          "/tmp/kubed/trash",
 			TTL:           metav1.Duration{Duration: 7 * 24 * time.Hour},
 			HandleUpdates: false,
-			Receivers: []config.Receiver{{
+			Receivers: []api.Receiver{{
 				To:       []string{"ops@example.com"},
 				Notifier: "Mailgun",
 			},
 			},
 		},
 		EnableConfigSyncer: true,
-		EventForwarder: &config.EventForwarderSpec{
-			NodeAdded: config.ForwarderSpec{
+		EventForwarder: &api.EventForwarderSpec{
+			NodeAdded: api.ForwarderSpec{
 				Handle: true,
 			},
-			StorageAdded: config.ForwarderSpec{
+			StorageAdded: api.ForwarderSpec{
 				Handle: true,
 			},
-			IngressAdded: config.ForwarderSpec{
+			IngressAdded: api.ForwarderSpec{
 				Handle: true,
 			},
-			WarningEvents: config.ForwarderSpec{
+			WarningEvents: api.ForwarderSpec{
 				Handle: true,
 				Namespaces: []string{
 					"kube-system",
 				},
 			},
-			Receivers: []config.Receiver{{
+			Receivers: []api.Receiver{{
 				To:       []string{"ops@example.com"},
 				Notifier: "Mailgun",
 			},
 			},
 		},
-		Janitors: []config.JanitorSpec{
+		Janitors: []api.JanitorSpec{
 			{
-				Kind: config.JanitorElasticsearch,
+				Kind: api.JanitorElasticsearch,
 				TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
-				Elasticsearch: &config.ElasticsearchSpec{
+				Elasticsearch: &api.ElasticsearchSpec{
 					Endpoint:       "https://elasticsearch-logging.kube-system:9200",
 					LogIndexPrefix: "logstash-",
 					SecretName:     "elasticsearch-logging-cert",
 				},
 			},
 			{
-				Kind: config.JanitorInfluxDB,
+				Kind: api.JanitorInfluxDB,
 				TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
-				InfluxDB: &config.InfluxDBSpec{
+				InfluxDB: &api.InfluxDBSpec{
 					Endpoint: "https://monitoring-influxdb.kube-system:8086",
 				},
 			},
