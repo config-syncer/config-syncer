@@ -1,5 +1,5 @@
-hash: 743e75098ef1339f49d668a2b90c63590b81d38ef38bb14ec5460a3676c72b9f
-updated: 2018-02-04T21:51:44.472865165-08:00
+hash: dd268f568a245b35234f7443d87cbadc4a309f28cf49f667c139a0826a78287c
+updated: 2018-02-05T01:58:03.186968219-08:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -9,7 +9,7 @@ imports:
 - name: github.com/appscode/envconfig
   version: 183bbe643a2875eaa69c85627ac6b25813983203
 - name: github.com/appscode/go
-  version: 437df2b94ce2ea60464ff580c10462fbeb3e8f52
+  version: fe2dd84a755c383d0516595f4537c2298be9fce5
   subpackages:
   - analytics
   - context
@@ -19,10 +19,12 @@ imports:
   - errors
   - flags
   - homedir
+  - ioutil
   - log
   - log/golog
   - net/httpclient
   - runtime
+  - sets
   - signals
   - strings
   - types
@@ -79,7 +81,7 @@ imports:
   - informers/externalversions/monitoring/v1alpha1
   - listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: b5d67a6705ffad5404ad0aa42ab0e6b6888a458e
+  version: 2b0cf064d011721772cea3a5eab28d3be9a95d48
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
