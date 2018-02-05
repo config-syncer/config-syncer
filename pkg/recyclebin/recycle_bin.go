@@ -31,10 +31,15 @@ type RecycleBin struct {
 
 var _ cache.ResourceEventHandler = &RecycleBin{}
 
-func (c *RecycleBin) Configure(clusterName string, spec *api.RecycleBinSpec, notifierCred envconfig.LoaderFunc) {
+func (c *RecycleBin) Configure(clusterName string, spec *api.RecycleBinSpec, notifierCred envconfig.LoaderFunc) error {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
 	c.clusterName = clusterName
 	c.spec = spec
 	c.notifierCred = notifierCred
+
+	return nil
 }
 
 func (c *RecycleBin) OnAdd(obj interface{}) {}

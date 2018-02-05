@@ -20,13 +20,15 @@ type EventForwarder struct {
 	lock sync.RWMutex
 }
 
-func (f *EventForwarder) Configure(clusterName string, spec *api.EventForwarderSpec, notifierCred envconfig.LoaderFunc) {
+func (f *EventForwarder) Configure(clusterName string, spec *api.EventForwarderSpec, notifierCred envconfig.LoaderFunc) error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
 	f.clusterName = clusterName
 	f.spec = spec
 	f.notifierCred = notifierCred
+
+	return nil
 }
 
 func (f *EventForwarder) notify(emailSub, chatSub, body string, receiver api.Receiver) error {

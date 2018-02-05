@@ -10,7 +10,7 @@ import (
 	scs "github.com/appscode/stash/client"
 	vcs "github.com/appscode/voyager/client"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	kcs "github.com/k8sdb/apimachinery/client"
+	kcs "github.com/kubedb/apimachinery/client"
 	. "github.com/onsi/gomega"
 	extensionsobj "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	ecs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
