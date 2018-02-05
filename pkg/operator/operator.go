@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/appscode/envconfig"
+	"github.com/appscode/go/ioutil"
 	"github.com/appscode/go/log"
 	v "github.com/appscode/go/version"
 	"github.com/appscode/kubed/pkg/api"
@@ -99,6 +100,8 @@ type Operator struct {
 
 	searchIndexer *indexers.ResourceIndexer
 
+	watcher *ioutil.Watcher
+
 	config api.ClusterConfig
 	lock   sync.RWMutex
 }
@@ -163,6 +166,12 @@ func New(config *rest.Config, opt Options) (*Operator, error) {
 	op.searchIndexer, err = indexers.NewResourceIndexer(indexDir)
 	if err != nil {
 		return nil, err
+	}
+
+	op.watcher = &ioutil.Watcher{
+		WatchDir:   filepath.Dir(opt.ConfigPath),
+		WatchFiles: []string{opt.ConfigPath},
+		Reload:     op.Configure,
 	}
 
 	return op, nil
@@ -643,6 +652,8 @@ func (op *Operator) RunAndHold(stopCh <-chan struct{}) {
 
 	op.RunWatchers(stopCh)
 	go op.RunAPIServer()
+
+	go op.watcher.Run(stopCh)
 
 	m := pat.New()
 	m.Get("/metrics", promhttp.Handler())

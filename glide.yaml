@@ -81,6 +81,8 @@ import:
   vcs: git
 - package: github.com/mattn/go-isatty
   version: 57fdcb988a5c543893cc61bce354a6e24ab70022
+- package: github.com/fsnotify/fsnotify
+  version: v1.4.7
 testImport:
 - package: github.com/stretchr/testify
   version: v1.1.4
