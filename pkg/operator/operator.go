@@ -257,7 +257,7 @@ func (op *Operator) setupEventInformers() {
 			},
 		)
 	})
-	op.addEventHandlers(eventInformer)
+	eventInformer.AddEventHandler(op.eventProcessor)
 }
 
 func (op *Operator) setupCertificateInformers() {
