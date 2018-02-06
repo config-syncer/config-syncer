@@ -66,33 +66,33 @@ type RecycleBinSpec struct {
 
 type EventForwarderSpec struct {
 	// Deprecated
-	NodeAdded ForwarderSpec `json:"nodeAdded,omitempty"`
+	NodeAdded *ForwarderSpec `json:"nodeAdded,omitempty"`
 	// Deprecated
-	StorageAdded ForwarderSpec `json:"storageAdded,omitempty"`
+	StorageAdded *ForwarderSpec `json:"storageAdded,omitempty"`
 	// Deprecated
-	IngressAdded ForwarderSpec `json:"ingressAdded,omitempty"`
+	IngressAdded *ForwarderSpec `json:"ingressAdded,omitempty"`
 	// Deprecated
-	WarningEvents ForwarderSpec `json:"warningEvents,omitempty"`
+	WarningEvents *ForwarderSpec `json:"warningEvents,omitempty"`
 	// Deprecated
-	CSREvents ForwarderSpec `json:"csrEvents,omitempty"`
-	Receivers []Receiver    `json:"receivers,omitempty"`
+	CSREvents *ForwarderSpec `json:"csrEvents,omitempty"`
 
-	Rules []PolicyRule `json:"rules"`
+	Rules     []PolicyRule `json:"rules"`
+	Receivers []Receiver   `json:"receivers,omitempty"`
 }
 
 type PolicyRule struct {
 	// Operation is the operation being performed
-	Operations []Operation `json:"operation"`
+	Operations []Operation `json:"operations"`
 
 	// Resources that this rule matches. An empty list implies all kinds in all API groups.
 	// +optional
-	Resources []GroupResources
+	Resources []GroupResources `json:"resources,omitempty"`
 
 	// Namespaces that this rule matches.
 	// The empty string "" matches non-namespaced resources.
 	// An empty list implies every namespace.
 	// +optional
-	Namespaces []string
+	Namespaces []string `json:"namespaces,omitempty"`
 }
 
 // GroupResources represents resource kinds in an API group.
@@ -100,18 +100,18 @@ type GroupResources struct {
 	// Group is the name of the API group that contains the resources.
 	// The empty string represents the core API group.
 	// +optional
-	Group string
+	Group string`json:"apiGroup"`
 	// Resources is a list of resources within the API group. Subresources are
 	// matched using a "/" to indicate the subresource. For example, "pods/log"
 	// would match request to the log subresource of pods. The top level resource
 	// does not match subresources, "pods" doesn't match "pods/log".
 	// +optional
-	Resources []string
+	Resources []string `json:"resources,omitempty"`
 	// ResourceNames is a list of resource instance names that the policy matches.
 	// Using this field requires Resources to be specified.
 	// An empty list implies that every instance of the resource is matched.
 	// +optional
-	ResourceNames []string
+	ResourceNames []string `json:"resourceNames,omitempty"`
 }
 
 // Operation is the type of resource operation being checked for admission control

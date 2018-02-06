@@ -1,26 +1,48 @@
 apiServer:
   address: :8080
-  enableReverseIndex: true
   enableSearchIndex: true
 clusterName: unicorn
 enableConfigSyncer: true
 eventForwarder:
-  csrEvents:
-    handle: false
-  ingressAdded:
-    handle: true
-  nodeAdded:
-    handle: true
   receivers:
   - notifier: Mailgun
     to:
     - ops@example.com
-  storageAdded:
-    handle: true
-  warningEvents:
-    handle: true
-    namespaces:
+  rules:
+  - namespaces:
     - kube-system
+    operations:
+    - CREATE
+    resources:
+    - apiGroup: ""
+      resources:
+      - events
+  - operations:
+    - CREATE
+    resources:
+    - apiGroup: ""
+      resources:
+      - nodes
+      - persistentvolumes
+      - persistentvolumeclaims
+  - operations:
+    - CREATE
+    resources:
+    - apiGroup: storage.k8s.io
+      resources:
+      - storageclasses
+  - operations:
+    - CREATE
+    resources:
+    - apiGroup: extensions
+      resources:
+      - ingresses
+  - operations:
+    - CREATE
+    resources:
+    - apiGroup: voyager.appscode.com
+      resources:
+      - ingresses
 janitors:
 - elasticsearch:
     endpoint: https://elasticsearch-logging.kube-system:9200
