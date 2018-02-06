@@ -1,5 +1,5 @@
 hash: dd268f568a245b35234f7443d87cbadc4a309f28cf49f667c139a0826a78287c
-updated: 2018-02-06T07:50:47.584881082-08:00
+updated: 2018-02-06T13:35:24.754353554-08:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -47,7 +47,7 @@ imports:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: d0cefa00d7bb02cc2cd4b037ae82698181944900
+  version: b67888a28f3159c43de722ff5590eee8932bdcbe
   subpackages:
   - core/v1
   - discovery
@@ -229,6 +229,8 @@ imports:
   version: ff4f55a206334ef123e4f79bbf348980da81ca46
   subpackages:
   - log
+- name: github.com/evanphx/json-patch
+  version: 944e07253867aacae43c04b2e6a239005443f33a
 - name: github.com/facebookgo/stack
   version: 751773369052141c013c6e827a71e8f35c07879c
 - name: github.com/fsnotify/fsnotify
@@ -449,7 +451,7 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/RoaringBitmap/roaring
-  version: cad71620c66d29aaa33d384cf746d08a600968c0
+  version: c89f23babccf87370a8ced0011a3283a865525eb
 - name: github.com/robfig/cron
   version: 2315d5715e36303a941d907f038da7f7c44c773b
 - name: github.com/russross/blackfriday
@@ -654,6 +656,7 @@ imports:
   - pkg/util/framer
   - pkg/util/intstr
   - pkg/util/json
+  - pkg/util/jsonmergepatch
   - pkg/util/mergepatch
   - pkg/util/net
   - pkg/util/runtime
