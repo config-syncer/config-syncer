@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/appscode/kubed/pkg/api"
+	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
 	"github.com/ghodss/yaml"
 	"github.com/prometheus/common/log"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -17,14 +17,14 @@ import (
 
 type RecycleBin struct {
 	clusterName string
-	spec        *api.RecycleBinSpec
+	spec        *apis.RecycleBinSpec
 
 	lock sync.RWMutex
 }
 
 var _ cache.ResourceEventHandler = &RecycleBin{}
 
-func (c *RecycleBin) Configure(clusterName string, spec *api.RecycleBinSpec) error {
+func (c *RecycleBin) Configure(clusterName string, spec *apis.RecycleBinSpec) error {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -75,7 +75,7 @@ func (c *RecycleBin) update(oldObj, newObj interface{}) error {
 		return err
 	}
 	name := filepath.Base(p)
-	fn := fmt.Sprintf("%s.%s.yaml", name, om.GetCreationTimestamp().UTC().Format(api.TimestampFormat))
+	fn := fmt.Sprintf("%s.%s.yaml", name, om.GetCreationTimestamp().UTC().Format(apis.TimestampFormat))
 
 	fullPath := filepath.Join(dir, fn)
 	data, err := yaml.Marshal(newObj)
@@ -99,7 +99,7 @@ func (c *RecycleBin) delete(obj interface{}) error {
 		return err
 	}
 	name := filepath.Base(p)
-	fn := fmt.Sprintf("%s.%s.yaml", name, om.GetCreationTimestamp().UTC().Format(api.TimestampFormat))
+	fn := fmt.Sprintf("%s.%s.yaml", name, om.GetCreationTimestamp().UTC().Format(apis.TimestampFormat))
 
 	fullPath := filepath.Join(dir, fn)
 	data, err := yaml.Marshal(obj)

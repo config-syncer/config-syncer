@@ -14,7 +14,7 @@ import (
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go/log"
 	prom_util "github.com/appscode/kube-mon/prometheus/v1"
-	"github.com/appscode/kubed/pkg/api"
+	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
 	"github.com/appscode/kubed/pkg/indexers"
@@ -107,7 +107,7 @@ type Operator struct {
 
 	watcher *fsnotify.Watcher
 
-	config api.ClusterConfig
+	config apis.ClusterConfig
 	lock   sync.RWMutex
 }
 
@@ -187,7 +187,7 @@ func (op *Operator) Configure() error {
 
 	var err error
 
-	cfg, err := api.LoadConfig(op.options.ConfigPath)
+	cfg, err := apis.LoadConfig(op.options.ConfigPath)
 	if err != nil {
 		return err
 	}
@@ -225,7 +225,7 @@ func (op *Operator) Configure() error {
 	}
 
 	for _, j := range op.config.Janitors {
-		if j.Kind == api.JanitorInfluxDB {
+		if j.Kind == apis.JanitorInfluxDB {
 			janitor := influx.Janitor{Spec: *j.InfluxDB, TTL: j.TTL.Duration}
 			err = janitor.Cleanup()
 			if err != nil {
@@ -534,7 +534,7 @@ func (op *Operator) RunAPIServer() {
 }
 
 func (op *Operator) metadataHandler(w http.ResponseWriter, r *http.Request) {
-	resp := &api.KubedMetadata{
+	resp := &apis.KubedMetadata{
 		OperatorNamespace: op.options.OperatorNamespace,
 		SearchEnabled:     op.config.APIServer.EnableSearchIndex,
 	}
@@ -549,8 +549,8 @@ func (op *Operator) metadataHandler(w http.ResponseWriter, r *http.Request) {
 
 func (op *Operator) RunElasticsearchCleaner() error {
 	for _, j := range op.config.Janitors {
-		if j.Kind == api.JanitorElasticsearch {
-			var authInfo *api.JanitorAuthInfo
+		if j.Kind == apis.JanitorElasticsearch {
+			var authInfo *apis.JanitorAuthInfo
 
 			if j.Elasticsearch.SecretName != "" {
 				secret, err := op.KubeClient.CoreV1().Secrets(op.options.OperatorNamespace).
@@ -559,7 +559,7 @@ func (op *Operator) RunElasticsearchCleaner() error {
 					return err
 				}
 				if secret != nil {
-					authInfo = api.LoadJanitorAuthInfo(secret.Data)
+					authInfo = apis.LoadJanitorAuthInfo(secret.Data)
 				}
 			}
 

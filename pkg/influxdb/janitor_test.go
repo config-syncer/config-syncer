@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/appscode/kubed/pkg/api"
+	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +15,7 @@ func TestInfluxJanitor(t *testing.T) {
 	pass := ""
 
 	j := Janitor{
-		Spec: api.InfluxDBSpec{
+		Spec: apis.InfluxDBSpec{
 			Endpoint: fmt.Sprintf("http://%s:8086", host),
 			Username: user,
 			Password: pass,
