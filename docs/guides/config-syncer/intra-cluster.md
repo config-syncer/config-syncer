@@ -80,7 +80,7 @@ To keep things isolated, this tutorial uses a separate namespace called `demo` t
 $ kubectl create namespace demo
 namespace "demo" created
 
-~ $ kubectl get namespaces
+$ kubectl get namespaces
 NAME          STATUS    AGE
 default       Active    6h
 kube-public   Active    6h
