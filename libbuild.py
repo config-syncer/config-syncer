@@ -224,7 +224,7 @@ def go_build(name, goos, goarch, main, compress=False, upx=False):
         if goos in ['windows']:
             cmd = "zip {name}-{goos}-{goarch}.zip {name}-{goos}-{goarch}{ext}"
         else:
-            cmd = "tar -cjvf {name}-{goos}-{goarch}.tar.bz2 {name}-{goos}-{goarch}{ext}"
+            cmd = "bzip2 -vf {name}-{goos}-{goarch}{ext}"
         cmd = cmd.format(
                 name=name,
                 goos=goos,
