@@ -74,25 +74,71 @@ func CreateClusterConfig() api.ClusterConfig {
 		},
 		EnableConfigSyncer: true,
 		EventForwarder: &api.EventForwarderSpec{
-			NodeAdded: api.ForwarderSpec{
-				Handle: true,
-			},
-			StorageAdded: api.ForwarderSpec{
-				Handle: true,
-			},
-			IngressAdded: api.ForwarderSpec{
-				Handle: true,
-			},
-			WarningEvents: api.ForwarderSpec{
-				Handle: true,
-				Namespaces: []string{
-					"kube-system",
+			Rules: []api.PolicyRule{
+				{
+					Operations: []api.Operation{api.Create},
+					Resources: []api.GroupResources{
+						{
+							Group: "",
+							Resources: []string{
+								"events",
+							},
+						},
+					},
+					Namespaces: []string{"kube-system"},
+				},
+				{
+					Operations: []api.Operation{api.Create},
+					Resources: []api.GroupResources{
+						{
+							Group: "",
+							Resources: []string{
+								"nodes",
+								"persistentvolumes",
+								"persistentvolumeclaims",
+							},
+						},
+					},
+				},
+				{
+					Operations: []api.Operation{api.Create},
+					Resources: []api.GroupResources{
+						{
+							Group: "storage.k8s.io",
+							Resources: []string{
+								"storageclasses",
+							},
+						},
+					},
+				},
+				{
+					Operations: []api.Operation{api.Create},
+					Resources: []api.GroupResources{
+						{
+							Group: "extensions",
+							Resources: []string{
+								"ingresses",
+							},
+						},
+					},
+				},
+				{
+					Operations: []api.Operation{api.Create},
+					Resources: []api.GroupResources{
+						{
+							Group: "voyager.appscode.com",
+							Resources: []string{
+								"ingresses",
+							},
+						},
+					},
 				},
 			},
-			Receivers: []api.Receiver{{
-				To:       []string{"ops@example.com"},
-				Notifier: "Mailgun",
-			},
+			Receivers: []api.Receiver{
+				{
+					To:       []string{"ops@example.com"},
+					Notifier: "Mailgun",
+				},
 			},
 		},
 		Janitors: []api.JanitorSpec{
