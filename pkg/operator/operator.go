@@ -25,6 +25,7 @@ import (
 	"github.com/appscode/kutil/discovery"
 	"github.com/appscode/kutil/tools/backup"
 	"github.com/appscode/kutil/tools/fsnotify"
+	"github.com/appscode/kutil/tools/queue"
 	"github.com/appscode/pat"
 	searchlight_api "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	srch_cs "github.com/appscode/searchlight/client"
@@ -42,10 +43,17 @@ import (
 	kubedbinformers "github.com/kubedb/apimachinery/informers/externalversions"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
+	apps "k8s.io/api/apps/v1"
+	batch "k8s.io/api/batch/v1"
+	certificates "k8s.io/api/certificates/v1beta1"
 	core "k8s.io/api/core/v1"
+	extensions "k8s.io/api/extensions/v1beta1"
+	rbac "k8s.io/api/rbac/v1"
+	storage_v1 "k8s.io/api/storage/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/informers"
 	core_informers "k8s.io/client-go/informers/core/v1"
@@ -239,38 +247,38 @@ func (op *Operator) Configure() error {
 
 func (op *Operator) setupWorkloadInformers() {
 	deploymentInformer := op.kubeInformerFactory.Apps().V1beta1().Deployments().Informer()
-	op.addEventHandlers(deploymentInformer)
+	op.addEventHandlers(deploymentInformer, apps.SchemeGroupVersion.WithKind("Deployment"))
 
 	rcInformer := op.kubeInformerFactory.Core().V1().ReplicationControllers().Informer()
-	op.addEventHandlers(rcInformer)
+	op.addEventHandlers(rcInformer, core.SchemeGroupVersion.WithKind("ReplicationController"))
 
 	rsInformer := op.kubeInformerFactory.Extensions().V1beta1().ReplicaSets().Informer()
-	op.addEventHandlers(rsInformer)
+	op.addEventHandlers(rsInformer, extensions.SchemeGroupVersion.WithKind("ReplicaSet"))
 
 	daemonSetInformer := op.kubeInformerFactory.Extensions().V1beta1().DaemonSets().Informer()
-	op.addEventHandlers(daemonSetInformer)
+	op.addEventHandlers(daemonSetInformer, extensions.SchemeGroupVersion.WithKind("DaemonSet"))
 
 	jobInformer := op.kubeInformerFactory.Batch().V1().Jobs().Informer()
-	op.addEventHandlers(jobInformer)
+	op.addEventHandlers(jobInformer, batch.SchemeGroupVersion.WithKind("Job"))
 
 	op.kubeInformerFactory.Core().V1().Pods().Informer()
 }
 
 func (op *Operator) setupNetworkInformers() {
 	svcInformer := op.kubeInformerFactory.Core().V1().Services().Informer()
-	op.addEventHandlers(svcInformer)
+	op.addEventHandlers(svcInformer, core.SchemeGroupVersion.WithKind("Service"))
 
 	ingressInformer := op.kubeInformerFactory.Extensions().V1beta1().Ingresses().Informer()
-	op.addEventHandlers(ingressInformer)
+	op.addEventHandlers(ingressInformer, extensions.SchemeGroupVersion.WithKind("Ingress"))
 }
 
 func (op *Operator) setupConfigInformers() {
 	configMapInformer := op.kubeInformerFactory.Core().V1().ConfigMaps().Informer()
-	op.addEventHandlers(configMapInformer)
+	op.addEventHandlers(configMapInformer, core.SchemeGroupVersion.WithKind("ConfigMap"))
 	configMapInformer.AddEventHandler(op.configSyncer.ConfigMapHandler())
 
 	secretInformer := op.kubeInformerFactory.Core().V1().Secrets().Informer()
-	op.addEventHandlers(secretInformer)
+	op.addEventHandlers(secretInformer, core.SchemeGroupVersion.WithKind("Secret"))
 	secretInformer.AddEventHandler(op.configSyncer.SecretHandler())
 
 	nsInformer := op.kubeInformerFactory.Core().V1().Namespaces().Informer()
@@ -279,21 +287,21 @@ func (op *Operator) setupConfigInformers() {
 
 func (op *Operator) setupRBACInformers() {
 	clusterRoleInformer := op.kubeInformerFactory.Rbac().V1beta1().ClusterRoles().Informer()
-	op.addEventHandlers(clusterRoleInformer)
+	op.addEventHandlers(clusterRoleInformer, rbac.SchemeGroupVersion.WithKind("ClusterRole"))
 
 	clusterRoleBindingInformer := op.kubeInformerFactory.Rbac().V1beta1().ClusterRoleBindings().Informer()
-	op.addEventHandlers(clusterRoleBindingInformer)
+	op.addEventHandlers(clusterRoleBindingInformer, rbac.SchemeGroupVersion.WithKind("ClusterRoleBinding"))
 
 	roleInformer := op.kubeInformerFactory.Rbac().V1beta1().Roles().Informer()
-	op.addEventHandlers(roleInformer)
+	op.addEventHandlers(roleInformer, rbac.SchemeGroupVersion.WithKind("Role"))
 
 	roleBindingInformer := op.kubeInformerFactory.Rbac().V1beta1().RoleBindings().Informer()
-	op.addEventHandlers(roleBindingInformer)
+	op.addEventHandlers(roleBindingInformer, rbac.SchemeGroupVersion.WithKind("RoleBinding"))
 }
 
 func (op *Operator) setupNodeInformers() {
 	nodeInformer := op.kubeInformerFactory.Core().V1().Nodes().Informer()
-	op.addEventHandlers(nodeInformer)
+	op.addEventHandlers(nodeInformer, core.SchemeGroupVersion.WithKind("Node"))
 }
 
 func (op *Operator) setupEventInformers() {
@@ -313,78 +321,78 @@ func (op *Operator) setupEventInformers() {
 
 func (op *Operator) setupCertificateInformers() {
 	csrInformer := op.kubeInformerFactory.Certificates().V1beta1().CertificateSigningRequests().Informer()
-	op.addEventHandlers(csrInformer)
+	op.addEventHandlers(csrInformer, certificates.SchemeGroupVersion.WithKind("CertificateSigningRequest"))
 }
 
 func (op *Operator) setupStorageInformers() {
 	pvInformer := op.kubeInformerFactory.Core().V1().PersistentVolumes().Informer()
-	op.addEventHandlers(pvInformer)
+	op.addEventHandlers(pvInformer, core.SchemeGroupVersion.WithKind("PersistentVolume"))
 
 	pvcInformer := op.kubeInformerFactory.Core().V1().PersistentVolumeClaims().Informer()
-	op.addEventHandlers(pvcInformer)
+	op.addEventHandlers(pvcInformer, core.SchemeGroupVersion.WithKind("PersistentVolumeClaim"))
 
 	storageClassInformer := op.kubeInformerFactory.Storage().V1().StorageClasses().Informer()
-	op.addEventHandlers(storageClassInformer)
+	op.addEventHandlers(storageClassInformer, storage_v1.SchemeGroupVersion.WithKind("StorageClass"))
 }
 
 func (op *Operator) setupVoyagerInformers() {
 	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), voyager_api.SchemeGroupVersion.String(), voyager_api.ResourceKindIngress) {
 		voyagerIngressInformer := op.voyagerInformerFactory.Voyager().V1beta1().Ingresses().Informer()
-		op.addEventHandlers(voyagerIngressInformer)
+		op.addEventHandlers(voyagerIngressInformer, voyager_api.SchemeGroupVersion.WithKind(voyager_api.ResourceKindIngress))
 
 		voyagerCertificateInformer := op.voyagerInformerFactory.Voyager().V1beta1().Certificates().Informer()
-		op.addEventHandlers(voyagerCertificateInformer)
+		op.addEventHandlers(voyagerCertificateInformer, voyager_api.SchemeGroupVersion.WithKind(voyager_api.ResourceKindCertificate))
 	}
 }
 
 func (op *Operator) setupStashInformers() {
 	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), stash_api.SchemeGroupVersion.String(), stash_api.ResourceKindRestic) {
 		resticsInformer := op.stashInformerFactory.Stash().V1alpha1().Restics().Informer()
-		op.addEventHandlers(resticsInformer)
+		op.addEventHandlers(resticsInformer, stash_api.SchemeGroupVersion.WithKind(stash_api.ResourceKindRestic))
 
 		recoveryInformer := op.stashInformerFactory.Stash().V1alpha1().Recoveries().Informer()
-		op.addEventHandlers(recoveryInformer)
+		op.addEventHandlers(recoveryInformer, stash_api.SchemeGroupVersion.WithKind(stash_api.ResourceKindRecovery))
 	}
 }
 
 func (op *Operator) setupSearchlightInformers() {
 	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), searchlight_api.SchemeGroupVersion.String(), searchlight_api.ResourceKindClusterAlert) {
 		clusterAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().ClusterAlerts().Informer()
-		op.addEventHandlers(clusterAlertInformer)
+		op.addEventHandlers(clusterAlertInformer, searchlight_api.SchemeGroupVersion.WithKind(searchlight_api.ResourceKindClusterAlert))
 
 		nodeAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().NodeAlerts().Informer()
-		op.addEventHandlers(nodeAlertInformer)
+		op.addEventHandlers(nodeAlertInformer, searchlight_api.SchemeGroupVersion.WithKind(searchlight_api.ResourceKindNodeAlert))
 
 		podAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().PodAlerts().Informer()
-		op.addEventHandlers(podAlertInformer)
+		op.addEventHandlers(podAlertInformer, searchlight_api.SchemeGroupVersion.WithKind(searchlight_api.ResourceKindPodAlert))
 	}
 }
 
 func (op *Operator) setupKubeDBInformers() {
 	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), kubedb_api.SchemeGroupVersion.String(), kubedb_api.ResourceKindPostgres) {
 		pgInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Postgreses().Informer()
-		op.addEventHandlers(pgInformer)
+		op.addEventHandlers(pgInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindPostgres))
 
-		esInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Postgreses().Informer()
-		op.addEventHandlers(esInformer)
+		esInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Elasticsearchs().Informer()
+		op.addEventHandlers(esInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindElasticsearch))
 
 		myInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().MySQLs().Informer()
-		op.addEventHandlers(myInformer)
+		op.addEventHandlers(myInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindMySQL))
 
 		mgInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().MongoDBs().Informer()
-		op.addEventHandlers(mgInformer)
+		op.addEventHandlers(mgInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindMongoDB))
 
 		rdInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Redises().Informer()
-		op.addEventHandlers(rdInformer)
+		op.addEventHandlers(rdInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindRedis))
 
 		mcInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Memcacheds().Informer()
-		op.addEventHandlers(mcInformer)
+		op.addEventHandlers(mcInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindMemcached))
 
 		dbSnapshotInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Snapshots().Informer()
-		op.addEventHandlers(dbSnapshotInformer)
+		op.addEventHandlers(dbSnapshotInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindSnapshot))
 
 		dormantDatabaseInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().DormantDatabases().Informer()
-		op.addEventHandlers(dormantDatabaseInformer)
+		op.addEventHandlers(dormantDatabaseInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindDormantDatabase))
 	}
 }
 
@@ -397,7 +405,7 @@ func (op *Operator) setupPrometheusInformers() {
 			},
 			&prom.Prometheus{}, op.options.ResyncPeriod, cache.Indexers{},
 		)
-		op.addEventHandlers(op.promInf)
+		op.addEventHandlers(op.promInf, prom_util.SchemeGroupVersion.WithKind(prom.PrometheusesKind))
 
 		op.smonInf = cache.NewSharedIndexInformer(
 			&cache.ListWatch{
@@ -406,7 +414,7 @@ func (op *Operator) setupPrometheusInformers() {
 			},
 			&prom.ServiceMonitor{}, op.options.ResyncPeriod, cache.Indexers{},
 		)
-		op.addEventHandlers(op.smonInf)
+		op.addEventHandlers(op.smonInf, prom_util.SchemeGroupVersion.WithKind(prom.ServiceMonitorsKind))
 
 		op.amgrInf = cache.NewSharedIndexInformer(
 			&cache.ListWatch{
@@ -415,14 +423,14 @@ func (op *Operator) setupPrometheusInformers() {
 			},
 			&prom.Alertmanager{}, op.options.ResyncPeriod, cache.Indexers{},
 		)
-		op.addEventHandlers(op.amgrInf)
+		op.addEventHandlers(op.amgrInf, prom_util.SchemeGroupVersion.WithKind(prom.AlertmanagersKind))
 	}
 }
 
-func (op *Operator) addEventHandlers(informer cache.SharedIndexInformer) {
-	informer.AddEventHandler(op.trashCan)
-	informer.AddEventHandler(op.eventProcessor)
-	informer.AddEventHandler(op.searchIndexer)
+func (op *Operator) addEventHandlers(informer cache.SharedIndexInformer, gvk schema.GroupVersionKind) {
+	informer.AddEventHandler(queue.NewVersionedHandler(op.trashCan, gvk))
+	informer.AddEventHandler(queue.NewVersionedHandler(op.eventProcessor, gvk))
+	informer.AddEventHandler(queue.NewVersionedHandler(op.searchIndexer, gvk))
 }
 
 func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {
