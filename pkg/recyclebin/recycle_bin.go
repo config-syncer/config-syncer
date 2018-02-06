@@ -5,16 +5,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"time"
 
-	"github.com/appscode/envconfig"
-	"github.com/appscode/go-notify"
-	"github.com/appscode/go-notify/unified"
-	stringz "github.com/appscode/go/strings"
 	"github.com/appscode/kubed/pkg/api"
-	meta_util "github.com/appscode/kutil/meta"
 	"github.com/ghodss/yaml"
 	"github.com/prometheus/common/log"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -22,22 +16,20 @@ import (
 )
 
 type RecycleBin struct {
-	clusterName  string
-	spec         *api.RecycleBinSpec
-	notifierCred envconfig.LoaderFunc
+	clusterName string
+	spec        *api.RecycleBinSpec
 
 	lock sync.RWMutex
 }
 
 var _ cache.ResourceEventHandler = &RecycleBin{}
 
-func (c *RecycleBin) Configure(clusterName string, spec *api.RecycleBinSpec, notifierCred envconfig.LoaderFunc) error {
+func (c *RecycleBin) Configure(clusterName string, spec *api.RecycleBinSpec) error {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
 	c.clusterName = clusterName
 	c.spec = spec
-	c.notifierCred = notifierCred
 
 	return nil
 }
@@ -48,7 +40,7 @@ func (c *RecycleBin) OnUpdate(oldObj, newObj interface{}) {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 
-	if c.spec == nil {
+	if c.spec == nil || !c.spec.HandleUpdates {
 		return
 	}
 
@@ -86,50 +78,16 @@ func (c *RecycleBin) update(oldObj, newObj interface{}) error {
 	fn := fmt.Sprintf("%s.%s.yaml", name, om.GetCreationTimestamp().UTC().Format(api.TimestampFormat))
 
 	fullPath := filepath.Join(dir, fn)
-	bytes, err := yaml.Marshal(newObj)
+	data, err := yaml.Marshal(newObj)
 	if err != nil {
 		return err
 	}
 
-	for _, receiver := range c.spec.Receivers {
-		if len(receiver.To) > 0 {
-			sub := fmt.Sprintf("[%s]: %s %s/%s updated", stringz.Val(c.clusterName, "?"), meta_util.GetKind(newObj), om.GetNamespace(), om.GetName())
-			if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), c.notifierCred); err == nil {
-				switch n := notifier.(type) {
-				case notify.ByEmail:
-					n = n.To(receiver.To[0], receiver.To[1:]...)
-					if diff, err := meta_util.JsonDiff(oldObj, newObj); err == nil {
-						n.WithSubject(sub).WithBody(diff).WithNoTracking().Send()
-					} else {
-						n.WithSubject(sub).WithBody(string(bytes)).WithNoTracking().Send()
-					}
-				case notify.BySMS:
-					n.To(receiver.To[0], receiver.To[1:]...).
-						WithBody(sub).
-						Send()
-				case notify.ByChat:
-					n.To(receiver.To[0], receiver.To[1:]...).
-						WithBody(sub).
-						Send()
-				case notify.ByPush:
-					n.To(receiver.To...).
-						WithBody(sub).
-						Send()
-				}
-			}
-		}
-	}
-
-	return ioutil.WriteFile(fullPath, bytes, 0644)
+	return ioutil.WriteFile(fullPath, data, 0644)
 }
 
 func (c *RecycleBin) delete(obj interface{}) error {
 	om, err := meta.Accessor(obj)
-	if err != nil {
-		return err
-	}
-
-	tm, err := meta.TypeAccessor(obj)
 	if err != nil {
 		return err
 	}
@@ -144,40 +102,12 @@ func (c *RecycleBin) delete(obj interface{}) error {
 	fn := fmt.Sprintf("%s.%s.yaml", name, om.GetCreationTimestamp().UTC().Format(api.TimestampFormat))
 
 	fullPath := filepath.Join(dir, fn)
-	bytes, err := yaml.Marshal(obj)
+	data, err := yaml.Marshal(obj)
 	if err != nil {
 		return err
 	}
 
-	for _, receiver := range c.spec.Receivers {
-		if len(receiver.To) > 0 {
-			sub := fmt.Sprintf("[%s]: %s %s %s/%s deleted", stringz.Val(c.clusterName, "?"), tm.GetAPIVersion(), tm.GetKind(), om.GetNamespace(), om.GetName())
-			if notifier, err := unified.LoadVia(strings.ToLower(receiver.Notifier), c.notifierCred); err == nil {
-				switch n := notifier.(type) {
-				case notify.ByEmail:
-					n.To(receiver.To[0], receiver.To[1:]...).
-						WithSubject(sub).
-						WithBody(string(bytes)).
-						WithNoTracking().
-						Send()
-				case notify.BySMS:
-					n.To(receiver.To[0], receiver.To[1:]...).
-						WithBody(sub).
-						Send()
-				case notify.ByChat:
-					n.To(receiver.To[0], receiver.To[1:]...).
-						WithBody(sub).
-						Send()
-				case notify.ByPush:
-					n.To(receiver.To...).
-						WithBody(sub).
-						Send()
-				}
-			}
-		}
-	}
-
-	return ioutil.WriteFile(fullPath, bytes, 0644)
+	return ioutil.WriteFile(fullPath, data, 0644)
 }
 
 func (c *RecycleBin) Cleanup() error {
