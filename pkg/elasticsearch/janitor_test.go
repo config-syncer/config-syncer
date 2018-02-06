@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/appscode/kubed/pkg/api"
+	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -17,13 +17,13 @@ func TestEsJanitor(t *testing.T) {
 
 	kubeClient := kubernetes.NewForConfigOrDie(c)
 
-	var authInfo *api.JanitorAuthInfo
+	var authInfo *apis.JanitorAuthInfo
 	secret, err := kubeClient.CoreV1().Secrets("").Get("", metav1.GetOptions{})
 	assert.Nil(t, err)
 
-	authInfo = api.LoadJanitorAuthInfo(secret.Data)
+	authInfo = apis.LoadJanitorAuthInfo(secret.Data)
 
-	esSpec := api.ElasticsearchSpec{
+	esSpec := apis.ElasticsearchSpec{
 		Endpoint:       "https://localhost:32317",
 		LogIndexPrefix: "logstash-",
 	}

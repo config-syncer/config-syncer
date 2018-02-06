@@ -6,7 +6,7 @@ import (
 
 	"github.com/appscode/go/log"
 	"github.com/appscode/go/runtime"
-	"github.com/appscode/kubed/pkg/api"
+	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
 	"github.com/ghodss/yaml"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,40 +44,40 @@ func main() {
 	ioutil.WriteFile(p, bytes, 0644)
 }
 
-func CreateClusterConfig() api.ClusterConfig {
-	return api.ClusterConfig{
+func CreateClusterConfig() apis.ClusterConfig {
+	return apis.ClusterConfig{
 		ClusterName: "unicorn",
-		APIServer: api.APIServerSpec{
+		APIServer: apis.APIServerSpec{
 			Address:           ":8080",
 			EnableSearchIndex: true,
 		},
-		Snapshotter: &api.SnapshotSpec{
+		Snapshotter: &apis.SnapshotSpec{
 			Schedule: "@every 6h",
 			Sanitize: true,
-			Backend: api.Backend{
+			Backend: apis.Backend{
 				StorageSecretName: "snap-secret",
-				GCS: &api.GCSSpec{
+				GCS: &apis.GCSSpec{
 					Bucket: "restic",
 					Prefix: "minikube",
 				},
 			},
 		},
-		RecycleBin: &api.RecycleBinSpec{
+		RecycleBin: &apis.RecycleBinSpec{
 			Path:          "/tmp/kubed/trash",
 			TTL:           metav1.Duration{Duration: 7 * 24 * time.Hour},
 			HandleUpdates: false,
-			Receivers: []api.Receiver{{
+			Receivers: []apis.Receiver{{
 				To:       []string{"ops@example.com"},
 				Notifier: "Mailgun",
 			},
 			},
 		},
 		EnableConfigSyncer: true,
-		EventForwarder: &api.EventForwarderSpec{
-			Rules: []api.PolicyRule{
+		EventForwarder: &apis.EventForwarderSpec{
+			Rules: []apis.PolicyRule{
 				{
-					Operations: []api.Operation{api.Create},
-					Resources: []api.GroupResources{
+					Operations: []apis.Operation{apis.Create},
+					Resources: []apis.GroupResources{
 						{
 							Group: "",
 							Resources: []string{
@@ -88,8 +88,8 @@ func CreateClusterConfig() api.ClusterConfig {
 					Namespaces: []string{"kube-system"},
 				},
 				{
-					Operations: []api.Operation{api.Create},
-					Resources: []api.GroupResources{
+					Operations: []apis.Operation{apis.Create},
+					Resources: []apis.GroupResources{
 						{
 							Group: "",
 							Resources: []string{
@@ -101,8 +101,8 @@ func CreateClusterConfig() api.ClusterConfig {
 					},
 				},
 				{
-					Operations: []api.Operation{api.Create},
-					Resources: []api.GroupResources{
+					Operations: []apis.Operation{apis.Create},
+					Resources: []apis.GroupResources{
 						{
 							Group: "storage.k8s.io",
 							Resources: []string{
@@ -112,8 +112,8 @@ func CreateClusterConfig() api.ClusterConfig {
 					},
 				},
 				{
-					Operations: []api.Operation{api.Create},
-					Resources: []api.GroupResources{
+					Operations: []apis.Operation{apis.Create},
+					Resources: []apis.GroupResources{
 						{
 							Group: "extensions",
 							Resources: []string{
@@ -123,8 +123,8 @@ func CreateClusterConfig() api.ClusterConfig {
 					},
 				},
 				{
-					Operations: []api.Operation{api.Create},
-					Resources: []api.GroupResources{
+					Operations: []apis.Operation{apis.Create},
+					Resources: []apis.GroupResources{
 						{
 							Group: "voyager.appscode.com",
 							Resources: []string{
@@ -134,8 +134,8 @@ func CreateClusterConfig() api.ClusterConfig {
 					},
 				},
 				{
-					Operations: []api.Operation{api.Create},
-					Resources: []api.GroupResources{
+					Operations: []apis.Operation{apis.Create},
+					Resources: []apis.GroupResources{
 						{
 							Group: "certificates.k8s.io",
 							Resources: []string{
@@ -145,27 +145,27 @@ func CreateClusterConfig() api.ClusterConfig {
 					},
 				},
 			},
-			Receivers: []api.Receiver{
+			Receivers: []apis.Receiver{
 				{
 					To:       []string{"ops@example.com"},
 					Notifier: "Mailgun",
 				},
 			},
 		},
-		Janitors: []api.JanitorSpec{
+		Janitors: []apis.JanitorSpec{
 			{
-				Kind: api.JanitorElasticsearch,
+				Kind: apis.JanitorElasticsearch,
 				TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
-				Elasticsearch: &api.ElasticsearchSpec{
+				Elasticsearch: &apis.ElasticsearchSpec{
 					Endpoint:       "https://elasticsearch-logging.kube-system:9200",
 					LogIndexPrefix: "logstash-",
 					SecretName:     "elasticsearch-logging-cert",
 				},
 			},
 			{
-				Kind: api.JanitorInfluxDB,
+				Kind: apis.JanitorInfluxDB,
 				TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
-				InfluxDB: &api.InfluxDBSpec{
+				InfluxDB: &apis.InfluxDBSpec{
 					Endpoint: "https://monitoring-influxdb.kube-system:8086",
 				},
 			},

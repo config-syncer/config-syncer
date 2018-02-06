@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/appscode/go/log"
-	"github.com/appscode/kubed/pkg/api"
+	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
 	influxdb "github.com/influxdata/influxdb/client"
 )
 
 type Janitor struct {
-	Spec api.InfluxDBSpec
+	Spec apis.InfluxDBSpec
 	TTL  time.Duration
 }
 

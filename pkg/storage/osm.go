@@ -12,7 +12,7 @@ import (
 
 	stringz "github.com/appscode/go/strings"
 	"github.com/appscode/go/types"
-	"github.com/appscode/kubed/pkg/api"
+	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
 	otx "github.com/appscode/osm/context"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -34,7 +34,7 @@ const (
 	SecretMountPath = "/etc/osm"
 )
 
-func WriteOSMConfig(client kubernetes.Interface, snapshot api.Backend, namespace string, path string) error {
+func WriteOSMConfig(client kubernetes.Interface, snapshot apis.Backend, namespace string, path string) error {
 	osmCtx, err := NewOSMContext(client, snapshot, namespace)
 	if err != nil {
 		return err
@@ -54,7 +54,7 @@ func WriteOSMConfig(client kubernetes.Interface, snapshot api.Backend, namespace
 	return ioutil.WriteFile(path, osmBytes, 0644)
 }
 
-func CheckBucketAccess(client kubernetes.Interface, spec api.Backend, namespace string) error {
+func CheckBucketAccess(client kubernetes.Interface, spec apis.Backend, namespace string) error {
 	cfg, err := NewOSMContext(client, spec, namespace)
 	if err != nil {
 		return err
@@ -82,7 +82,7 @@ func CheckBucketAccess(client kubernetes.Interface, spec api.Backend, namespace 
 	return nil
 }
 
-func NewOSMContext(client kubernetes.Interface, spec api.Backend, namespace string) (*otx.Context, error) {
+func NewOSMContext(client kubernetes.Interface, spec apis.Backend, namespace string) (*otx.Context, error) {
 	config := make(map[string][]byte)
 
 	if spec.StorageSecretName != "" {
@@ -101,8 +101,8 @@ func NewOSMContext(client kubernetes.Interface, spec api.Backend, namespace stri
 	if spec.S3 != nil {
 		nc.Provider = s3.Kind
 
-		keyID, foundKeyID := config[api.AWS_ACCESS_KEY_ID]
-		key, foundKey := config[api.AWS_SECRET_ACCESS_KEY]
+		keyID, foundKeyID := config[apis.AWS_ACCESS_KEY_ID]
+		key, foundKey := config[apis.AWS_SECRET_ACCESS_KEY]
 		if foundKey && foundKeyID {
 			nc.Config[s3.ConfigAccessKeyID] = string(keyID)
 			nc.Config[s3.ConfigSecretKey] = string(key)
@@ -150,13 +150,13 @@ func NewOSMContext(client kubernetes.Interface, spec api.Backend, namespace stri
 		return nc, nil
 	} else if spec.GCS != nil {
 		nc.Provider = gcs.Kind
-		nc.Config[gcs.ConfigProjectId] = string(config[api.GOOGLE_PROJECT_ID])
-		nc.Config[gcs.ConfigJSON] = string(config[api.GOOGLE_SERVICE_ACCOUNT_JSON_KEY])
+		nc.Config[gcs.ConfigProjectId] = string(config[apis.GOOGLE_PROJECT_ID])
+		nc.Config[gcs.ConfigJSON] = string(config[apis.GOOGLE_SERVICE_ACCOUNT_JSON_KEY])
 		return nc, nil
 	} else if spec.Azure != nil {
 		nc.Provider = azure.Kind
-		nc.Config[azure.ConfigAccount] = string(config[api.AZURE_ACCOUNT_NAME])
-		nc.Config[azure.ConfigKey] = string(config[api.AZURE_ACCOUNT_KEY])
+		nc.Config[azure.ConfigAccount] = string(config[apis.AZURE_ACCOUNT_NAME])
+		nc.Config[azure.ConfigKey] = string(config[apis.AZURE_ACCOUNT_KEY])
 		return nc, nil
 	} else if spec.Local != nil {
 		nc.Provider = local.Kind
@@ -170,28 +170,28 @@ func NewOSMContext(client kubernetes.Interface, spec api.Backend, namespace stri
 			secretKey string
 		}{
 			// v2/v3 specific
-			{swift.ConfigUsername, api.OS_USERNAME},
-			{swift.ConfigKey, api.OS_PASSWORD},
-			{swift.ConfigRegion, api.OS_REGION_NAME},
-			{swift.ConfigTenantAuthURL, api.OS_AUTH_URL},
+			{swift.ConfigUsername, apis.OS_USERNAME},
+			{swift.ConfigKey, apis.OS_PASSWORD},
+			{swift.ConfigRegion, apis.OS_REGION_NAME},
+			{swift.ConfigTenantAuthURL, apis.OS_AUTH_URL},
 
 			// v3 specific
-			{swift.ConfigDomain, api.OS_USER_DOMAIN_NAME},
-			{swift.ConfigTenantName, api.OS_PROJECT_NAME},
-			{swift.ConfigTenantDomain, api.OS_PROJECT_DOMAIN_NAME},
+			{swift.ConfigDomain, apis.OS_USER_DOMAIN_NAME},
+			{swift.ConfigTenantName, apis.OS_PROJECT_NAME},
+			{swift.ConfigTenantDomain, apis.OS_PROJECT_DOMAIN_NAME},
 
 			// v2 specific
-			{swift.ConfigTenantId, api.OS_TENANT_ID},
-			{swift.ConfigTenantName, api.OS_TENANT_NAME},
+			{swift.ConfigTenantId, apis.OS_TENANT_ID},
+			{swift.ConfigTenantName, apis.OS_TENANT_NAME},
 
 			// v1 specific
-			{swift.ConfigTenantAuthURL, api.ST_AUTH},
-			{swift.ConfigUsername, api.ST_USER},
-			{swift.ConfigKey, api.ST_KEY},
+			{swift.ConfigTenantAuthURL, apis.ST_AUTH},
+			{swift.ConfigUsername, apis.ST_USER},
+			{swift.ConfigKey, apis.ST_KEY},
 
 			// Manual authentication
-			{swift.ConfigStorageURL, api.OS_STORAGE_URL},
-			{swift.ConfigAuthToken, api.OS_AUTH_TOKEN},
+			{swift.ConfigStorageURL, apis.OS_STORAGE_URL},
+			{swift.ConfigAuthToken, apis.OS_AUTH_TOKEN},
 		} {
 			if _, exists := nc.Config.Config(val.stowKey); !exists {
 				nc.Config[val.stowKey] = string(config[val.secretKey])
