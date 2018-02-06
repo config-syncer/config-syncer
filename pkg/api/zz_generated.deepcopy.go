@@ -136,7 +136,7 @@ func (in *ClusterConfig) DeepCopyInto(out *ClusterConfig) {
 			*out = nil
 		} else {
 			*out = new(RecycleBinSpec)
-			(*in).DeepCopyInto(*out)
+			**out = **in
 		}
 	}
 	if in.EventForwarder != nil {
@@ -525,13 +525,6 @@ func (in *Receiver) DeepCopy() *Receiver {
 func (in *RecycleBinSpec) DeepCopyInto(out *RecycleBinSpec) {
 	*out = *in
 	out.TTL = in.TTL
-	if in.Receivers != nil {
-		in, out := &in.Receivers, &out.Receivers
-		*out = make([]Receiver, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
-	}
 	return
 }
 

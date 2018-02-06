@@ -63,7 +63,6 @@ type RecycleBinSpec struct {
 	Path          string          `json:"path,omitempty"`
 	TTL           metav1.Duration `json:"ttl,omitempty"`
 	HandleUpdates bool            `json:"handleUpdates"`
-	Receivers     []Receiver      `json:"receivers,omitempty"`
 }
 
 type EventForwarderSpec struct {

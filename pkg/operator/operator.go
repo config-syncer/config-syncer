@@ -209,7 +209,7 @@ func (op *Operator) Configure() error {
 		return err
 	}
 
-	err = op.trashCan.Configure(op.config.ClusterName, op.config.RecycleBin, op.notifierCred)
+	err = op.trashCan.Configure(op.config.ClusterName, op.config.RecycleBin)
 	if err != nil {
 		return err
 	}
