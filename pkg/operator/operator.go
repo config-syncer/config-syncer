@@ -14,6 +14,7 @@ import (
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go/ioutil"
 	"github.com/appscode/go/log"
+	prom_util "github.com/appscode/kube-mon/prometheus/v1"
 	"github.com/appscode/kubed/pkg/api"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
@@ -22,16 +23,21 @@ import (
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
+	"github.com/appscode/kutil/discovery"
 	"github.com/appscode/kutil/tools/backup"
 	"github.com/appscode/pat"
+	searchlight_api "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	srch_cs "github.com/appscode/searchlight/client"
 	searchlightinformers "github.com/appscode/searchlight/informers/externalversions"
+	stash_api "github.com/appscode/stash/apis/stash/v1alpha1"
 	scs "github.com/appscode/stash/client"
 	stashinformers "github.com/appscode/stash/informers/externalversions"
+	voyager_api "github.com/appscode/voyager/apis/voyager/v1beta1"
 	vcs "github.com/appscode/voyager/client"
 	voyagerinformers "github.com/appscode/voyager/informers/externalversions"
 	shell "github.com/codeskyblue/go-sh"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
+	kubedb_api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	kcs "github.com/kubedb/apimachinery/client"
 	kubedbinformers "github.com/kubedb/apimachinery/informers/externalversions"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -132,11 +138,24 @@ func New(config *rest.Config, opt Options) (*Operator, error) {
 
 	op.recorder = eventer.NewEventRecorder(op.KubeClient, "kubed")
 	op.trashCan = &rbin.RecycleBin{}
-	op.eventProcessor = &eventer.EventForwarder{}
+	op.eventProcessor = &eventer.EventForwarder{Client: op.KubeClient.Discovery()}
 	op.configSyncer = syncer.New(op.KubeClient, op.recorder)
 
 	op.cron = cron.New()
 	op.cron.Start()
+
+	// Enable full text indexing to have search feature
+	indexDir := filepath.Join(op.options.ScratchDir, "indices")
+	op.searchIndexer, err = indexers.NewResourceIndexer(indexDir)
+	if err != nil {
+		return nil, err
+	}
+
+	op.watcher = &ioutil.Watcher{
+		WatchDir:   filepath.Dir(opt.ConfigPath),
+		WatchFiles: []string{opt.ConfigPath},
+		Reload:     op.Configure,
+	}
 
 	// ---------------------------
 	op.kubeInformerFactory = informers.NewSharedInformerFactory(op.KubeClient, op.options.ResyncPeriod)
@@ -159,19 +178,6 @@ func New(config *rest.Config, opt Options) (*Operator, error) {
 	op.setupKubeDBInformers()
 	op.setupPrometheusInformers()
 	// ---------------------------
-
-	// Enable full text indexing to have search feature
-	indexDir := filepath.Join(op.options.ScratchDir, "indices")
-	op.searchIndexer, err = indexers.NewResourceIndexer(indexDir)
-	if err != nil {
-		return nil, err
-	}
-
-	op.watcher = &ioutil.Watcher{
-		WatchDir:   filepath.Dir(opt.ConfigPath),
-		WatchFiles: []string{opt.ConfigPath},
-		Reload:     op.Configure,
-	}
 
 	return op, nil
 }
@@ -323,85 +329,95 @@ func (op *Operator) setupStorageInformers() {
 }
 
 func (op *Operator) setupVoyagerInformers() {
-	voyagerIngressInformer := op.voyagerInformerFactory.Voyager().V1beta1().Ingresses().Informer()
-	op.addEventHandlers(voyagerIngressInformer)
+	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), voyager_api.SchemeGroupVersion.String(), voyager_api.ResourceKindIngress) {
+		voyagerIngressInformer := op.voyagerInformerFactory.Voyager().V1beta1().Ingresses().Informer()
+		op.addEventHandlers(voyagerIngressInformer)
 
-	voyagerCertificateInformer := op.voyagerInformerFactory.Voyager().V1beta1().Certificates().Informer()
-	op.addEventHandlers(voyagerCertificateInformer)
+		voyagerCertificateInformer := op.voyagerInformerFactory.Voyager().V1beta1().Certificates().Informer()
+		op.addEventHandlers(voyagerCertificateInformer)
+	}
 }
 
 func (op *Operator) setupStashInformers() {
-	resticsInformer := op.stashInformerFactory.Stash().V1alpha1().Restics().Informer()
-	op.addEventHandlers(resticsInformer)
+	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), stash_api.SchemeGroupVersion.String(), stash_api.ResourceKindRestic) {
+		resticsInformer := op.stashInformerFactory.Stash().V1alpha1().Restics().Informer()
+		op.addEventHandlers(resticsInformer)
 
-	recoveryInformer := op.stashInformerFactory.Stash().V1alpha1().Recoveries().Informer()
-	op.addEventHandlers(recoveryInformer)
+		recoveryInformer := op.stashInformerFactory.Stash().V1alpha1().Recoveries().Informer()
+		op.addEventHandlers(recoveryInformer)
+	}
 }
 
 func (op *Operator) setupSearchlightInformers() {
-	clusterAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().ClusterAlerts().Informer()
-	op.addEventHandlers(clusterAlertInformer)
+	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), searchlight_api.SchemeGroupVersion.String(), searchlight_api.ResourceKindClusterAlert) {
+		clusterAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().ClusterAlerts().Informer()
+		op.addEventHandlers(clusterAlertInformer)
 
-	nodeAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().NodeAlerts().Informer()
-	op.addEventHandlers(nodeAlertInformer)
+		nodeAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().NodeAlerts().Informer()
+		op.addEventHandlers(nodeAlertInformer)
 
-	podAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().PodAlerts().Informer()
-	op.addEventHandlers(podAlertInformer)
+		podAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().PodAlerts().Informer()
+		op.addEventHandlers(podAlertInformer)
+	}
 }
 
 func (op *Operator) setupKubeDBInformers() {
-	pgInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Postgreses().Informer()
-	op.addEventHandlers(pgInformer)
+	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), kubedb_api.SchemeGroupVersion.String(), kubedb_api.ResourceKindPostgres) {
+		pgInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Postgreses().Informer()
+		op.addEventHandlers(pgInformer)
 
-	esInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Postgreses().Informer()
-	op.addEventHandlers(esInformer)
+		esInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Postgreses().Informer()
+		op.addEventHandlers(esInformer)
 
-	myInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().MySQLs().Informer()
-	op.addEventHandlers(myInformer)
+		myInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().MySQLs().Informer()
+		op.addEventHandlers(myInformer)
 
-	mgInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().MongoDBs().Informer()
-	op.addEventHandlers(mgInformer)
+		mgInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().MongoDBs().Informer()
+		op.addEventHandlers(mgInformer)
 
-	rdInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Redises().Informer()
-	op.addEventHandlers(rdInformer)
+		rdInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Redises().Informer()
+		op.addEventHandlers(rdInformer)
 
-	mcInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Memcacheds().Informer()
-	op.addEventHandlers(mcInformer)
+		mcInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Memcacheds().Informer()
+		op.addEventHandlers(mcInformer)
 
-	dbSnapshotInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Snapshots().Informer()
-	op.addEventHandlers(dbSnapshotInformer)
+		dbSnapshotInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Snapshots().Informer()
+		op.addEventHandlers(dbSnapshotInformer)
 
-	dormantDatabaseInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().DormantDatabases().Informer()
-	op.addEventHandlers(dormantDatabaseInformer)
+		dormantDatabaseInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().DormantDatabases().Informer()
+		op.addEventHandlers(dormantDatabaseInformer)
+	}
 }
 
 func (op *Operator) setupPrometheusInformers() {
-	promInf := cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc:  op.PromClient.Prometheuses(core.NamespaceAll).List,
-			WatchFunc: op.PromClient.Prometheuses(core.NamespaceAll).Watch,
-		},
-		&prom.Prometheus{}, op.options.ResyncPeriod, cache.Indexers{},
-	)
-	op.addEventHandlers(promInf)
+	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), prom_util.SchemeGroupVersion.String(), prom.PrometheusesKind) {
+		op.promInf = cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc:  op.PromClient.Prometheuses(core.NamespaceAll).List,
+				WatchFunc: op.PromClient.Prometheuses(core.NamespaceAll).Watch,
+			},
+			&prom.Prometheus{}, op.options.ResyncPeriod, cache.Indexers{},
+		)
+		op.addEventHandlers(op.promInf)
 
-	smonInf := cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc:  op.PromClient.ServiceMonitors(core.NamespaceAll).List,
-			WatchFunc: op.PromClient.ServiceMonitors(core.NamespaceAll).Watch,
-		},
-		&prom.ServiceMonitor{}, op.options.ResyncPeriod, cache.Indexers{},
-	)
-	op.addEventHandlers(smonInf)
+		op.smonInf = cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc:  op.PromClient.ServiceMonitors(core.NamespaceAll).List,
+				WatchFunc: op.PromClient.ServiceMonitors(core.NamespaceAll).Watch,
+			},
+			&prom.ServiceMonitor{}, op.options.ResyncPeriod, cache.Indexers{},
+		)
+		op.addEventHandlers(op.smonInf)
 
-	amgrInf := cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc:  op.PromClient.Alertmanagers(core.NamespaceAll).List,
-			WatchFunc: op.PromClient.Alertmanagers(core.NamespaceAll).Watch,
-		},
-		&prom.Alertmanager{}, op.options.ResyncPeriod, cache.Indexers{},
-	)
-	op.addEventHandlers(amgrInf)
+		op.amgrInf = cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc:  op.PromClient.Alertmanagers(core.NamespaceAll).List,
+				WatchFunc: op.PromClient.Alertmanagers(core.NamespaceAll).Watch,
+			},
+			&prom.Alertmanager{}, op.options.ResyncPeriod, cache.Indexers{},
+		)
+		op.addEventHandlers(op.amgrInf)
+	}
 }
 
 func (op *Operator) addEventHandlers(informer cache.SharedIndexInformer) {
@@ -436,9 +452,11 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 	op.stashInformerFactory.Start(stopCh)
 	op.searchlightInformerFactory.Start(stopCh)
 	op.kubedbInformerFactory.Start(stopCh)
-	go op.promInf.Run(stopCh)
-	go op.smonInf.Run(stopCh)
-	go op.amgrInf.Run(stopCh)
+	if op.promInf != nil {
+		go op.promInf.Run(stopCh)
+		go op.smonInf.Run(stopCh)
+		go op.amgrInf.Run(stopCh)
+	}
 
 	var res map[reflect.Type]bool
 
@@ -482,17 +500,19 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 		}
 	}
 
-	if !cache.WaitForCacheSync(stopCh, op.promInf.HasSynced) {
-		runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
-		return
-	}
-	if !cache.WaitForCacheSync(stopCh, op.smonInf.HasSynced) {
-		runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
-		return
-	}
-	if !cache.WaitForCacheSync(stopCh, op.amgrInf.HasSynced) {
-		runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
-		return
+	if op.promInf != nil {
+		if !cache.WaitForCacheSync(stopCh, op.promInf.HasSynced) {
+			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			return
+		}
+		if !cache.WaitForCacheSync(stopCh, op.smonInf.HasSynced) {
+			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			return
+		}
+		if !cache.WaitForCacheSync(stopCh, op.amgrInf.HasSynced) {
+			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			return
+		}
 	}
 }
 
