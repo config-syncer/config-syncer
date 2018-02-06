@@ -14,7 +14,6 @@ import (
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go/ioutil"
 	"github.com/appscode/go/log"
-	v "github.com/appscode/go/version"
 	"github.com/appscode/kubed/pkg/api"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
@@ -519,7 +518,6 @@ func (op *Operator) metadataHandler(w http.ResponseWriter, r *http.Request) {
 	resp := &api.KubedMetadata{
 		OperatorNamespace: op.options.OperatorNamespace,
 		SearchEnabled:     op.config.APIServer.EnableSearchIndex,
-		Version:           &v.Version,
 	}
 	err := json.NewEncoder(w).Encode(resp)
 	if err != nil {
