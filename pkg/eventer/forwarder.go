@@ -8,14 +8,17 @@ import (
 	"github.com/appscode/go-notify"
 	"github.com/appscode/go-notify/unified"
 	"github.com/appscode/kubed/pkg/api"
-	"github.com/appscode/kutil/discovery"
+	discovery_util "github.com/appscode/kutil/discovery"
+	"k8s.io/client-go/discovery"
 )
 
 type EventForwarder struct {
+	Client discovery.DiscoveryInterface
+
 	clusterName  string
 	spec         *api.EventForwarderSpec
 	notifierCred envconfig.LoaderFunc
-	restmapper   *discovery.DefaultRESTMapper
+	restmapper   *discovery_util.DefaultRESTMapper
 
 	lock sync.RWMutex
 }
@@ -24,11 +27,14 @@ func (f *EventForwarder) Configure(clusterName string, spec *api.EventForwarderS
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
+	var err error
+
 	f.clusterName = clusterName
 	f.spec = spec
 	f.notifierCred = notifierCred
+	f.restmapper, err = discovery_util.LoadRestMapper(f.Client)
 
-	return nil
+	return err
 }
 
 func (f *EventForwarder) notify(emailSub, chatSub, body string, receiver api.Receiver) error {

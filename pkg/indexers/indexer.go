@@ -23,13 +23,11 @@ type ResourceIndexer struct {
 var _ cache.ResourceEventHandler = &ResourceIndexer{}
 
 func NewResourceIndexer(dst string) (*ResourceIndexer, error) {
-	c, err := ensureIndex(filepath.Join(dst, "resource.indexer"), "search")
+	idx, err := ensureIndex(filepath.Join(dst, "resource.indexer"), "search")
 	if err != nil {
 		return nil, err
 	}
-	return &ResourceIndexer{
-		index: c,
-	}, nil
+	return &ResourceIndexer{index: idx}, nil
 }
 
 func (ri *ResourceIndexer) Configure(enable bool) error {
