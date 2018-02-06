@@ -19,6 +19,8 @@ const (
 	OriginClusterLabelKey   = "kubed.appscode.com/origin.cluster"
 )
 
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
 type ClusterConfig struct {
 	metav1.TypeMeta `json:",inline"`
 
@@ -235,7 +237,6 @@ type JanitorAuthInfo struct {
 }
 
 type KubedMetadata struct {
-	OperatorNamespace string      `json:"operatorNamespace,omitempty"`
-	SearchEnabled     bool        `json:"searchEnabled"`
-	Version           interface{} `json:"version,omitempty"`
+	OperatorNamespace string `json:"operatorNamespace,omitempty"`
+	SearchEnabled     bool   `json:"searchEnabled"`
 }
