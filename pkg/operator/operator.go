@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/appscode/envconfig"
-	"github.com/appscode/go/ioutil"
 	"github.com/appscode/go/log"
 	prom_util "github.com/appscode/kube-mon/prometheus/v1"
 	"github.com/appscode/kubed/pkg/api"
@@ -25,6 +24,7 @@ import (
 	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kutil/discovery"
 	"github.com/appscode/kutil/tools/backup"
+	"github.com/appscode/kutil/tools/fsnotify"
 	"github.com/appscode/pat"
 	searchlight_api "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	srch_cs "github.com/appscode/searchlight/client"
@@ -105,7 +105,7 @@ type Operator struct {
 
 	searchIndexer *indexers.ResourceIndexer
 
-	watcher *ioutil.Watcher
+	watcher *fsnotify.Watcher
 
 	config api.ClusterConfig
 	lock   sync.RWMutex
@@ -151,10 +151,9 @@ func New(config *rest.Config, opt Options) (*Operator, error) {
 		return nil, err
 	}
 
-	op.watcher = &ioutil.Watcher{
-		WatchDir:   filepath.Dir(opt.ConfigPath),
-		WatchFiles: []string{opt.ConfigPath},
-		Reload:     op.Configure,
+	op.watcher = &fsnotify.Watcher{
+		WatchDir: filepath.Dir(opt.ConfigPath),
+		Reload:   op.Configure,
 	}
 
 	// ---------------------------

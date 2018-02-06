@@ -1,4 +1,4 @@
-package ioutil
+package fsnotify
 
 import (
 	"fmt"
@@ -6,14 +6,12 @@ import (
 	"sync/atomic"
 
 	"github.com/appscode/go/log"
-	"github.com/appscode/go/sets"
 	"github.com/fsnotify/fsnotify"
 )
 
 type Watcher struct {
-	WatchFiles []string
-	WatchDir   string
-	Reload     func() error
+	WatchDir string
+	Reload   func() error
 
 	reloadCount uint64
 }
@@ -24,8 +22,6 @@ func (w *Watcher) incReloadCount(filename string) {
 }
 
 func (w *Watcher) Run(stopCh <-chan struct{}) error {
-	fileset := sets.NewString(w.WatchFiles...)
-
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return err
@@ -39,27 +35,14 @@ func (w *Watcher) Run(stopCh <-chan struct{}) error {
 		for {
 			select {
 			case event := <-watcher.Events:
-				log.Infoln("file watcher event: --------------------------------------", event)
+				log.Debugln("file watcher event: --------------------------------------", event)
 
 				filename := filepath.Clean(event.Name)
-				if !fileset.Has(filename) {
-					continue
-				}
-
-				switch event.Op {
-				case fsnotify.Create:
-					if err = watcher.Add(filename); err != nil {
-						log.Errorln("error:", err)
-					}
-				case fsnotify.Write:
+				if filename == filepath.Join(w.WatchDir, "..data") && event.Op == fsnotify.Create {
 					if err := w.Reload(); err != nil {
-						log.Errorln(err)
+						log.Errorf("error[%s]: %s", filename, err)
 					} else {
 						w.incReloadCount(filename)
-					}
-				case fsnotify.Remove, fsnotify.Rename:
-					if err = watcher.Remove(filename); err != nil {
-						log.Errorln("error:", err)
 					}
 				}
 			case err := <-watcher.Errors:
@@ -68,11 +51,6 @@ func (w *Watcher) Run(stopCh <-chan struct{}) error {
 		}
 	}()
 
-	for _, filename := range w.WatchFiles {
-		if err = watcher.Add(filename); err != nil {
-			log.Errorf("error watching file %s. Reason: %s", filename, err)
-		}
-	}
 	if err = watcher.Add(w.WatchDir); err != nil {
 		return fmt.Errorf("error watching dir %s. Reason: %s", w.WatchDir, err)
 	}

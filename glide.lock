@@ -1,5 +1,5 @@
 hash: dd268f568a245b35234f7443d87cbadc4a309f28cf49f667c139a0826a78287c
-updated: 2018-02-06T06:07:04.224133397-08:00
+updated: 2018-02-06T07:50:47.584881082-08:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -19,12 +19,10 @@ imports:
   - errors
   - flags
   - homedir
-  - ioutil
   - log
   - log/golog
   - net/httpclient
   - runtime
-  - sets
   - signals
   - strings
   - types
@@ -49,7 +47,7 @@ imports:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: 3037bd8a4c122f37b93108e0ef1f7b874079b93a
+  version: d0cefa00d7bb02cc2cd4b037ae82698181944900
   subpackages:
   - core/v1
   - discovery
@@ -57,6 +55,7 @@ imports:
   - tools/analytics
   - tools/backup
   - tools/clientcmd
+  - tools/fsnotify
 - name: github.com/appscode/mergo
   version: e3000cb3d28c72b837601cac94debd91032d19fe
 - name: github.com/appscode/osm
@@ -551,7 +550,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: 778ecc7e1a521e75638be98345220b14a1856f5f
+  version: d476d6e92dcf611f322cced73d8bd2842daff90b
   subpackages:
   - gensupport
   - googleapi
