@@ -100,7 +100,7 @@ type GroupResources struct {
 	// Group is the name of the API group that contains the resources.
 	// The empty string represents the core API group.
 	// +optional
-	Group string`json:"apiGroup"`
+	Group string `json:"group"`
 	// Resources is a list of resources within the API group. Subresources are
 	// matched using a "/" to indicate the subresource. For example, "pods/log"
 	// would match request to the log subresource of pods. The top level resource

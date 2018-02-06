@@ -133,6 +133,17 @@ func CreateClusterConfig() api.ClusterConfig {
 						},
 					},
 				},
+				{
+					Operations: []api.Operation{api.Create},
+					Resources: []api.GroupResources{
+						{
+							Group: "certificates.k8s.io",
+							Resources: []string{
+								"certificatesigningrequests",
+							},
+						},
+					},
+				},
 			},
 			Receivers: []api.Receiver{
 				{

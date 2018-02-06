@@ -39,7 +39,7 @@ func (f *EventForwarder) OnDelete(obj interface{}) {
 	f.lock.RLock()
 	defer f.lock.RUnlock()
 
-	if err := f.forward(api.Create, obj); err != nil {
+	if err := f.forward(api.Delete, obj); err != nil {
 		log.Errorln(err)
 		return
 	}
@@ -53,6 +53,11 @@ func recentEvent(t metav1.Time) bool {
 func ruleMatchesResource(r api.PolicyRule, attrs attributes) bool {
 	if len(r.Namespaces) > 0 {
 		if !hasString(r.Namespaces, attrs.accessor.GetNamespace()) { // Non-namespaced resources use the empty string.
+			return false
+		}
+	}
+	if len(r.Operations) > 0 {
+		if !hasOperation(r.Operations, attrs.operation) {
 			return false
 		}
 	}
@@ -83,13 +88,22 @@ func ruleMatchesResource(r api.PolicyRule, attrs attributes) bool {
 }
 
 type attributes struct {
-	gvr      schema.GroupVersionResource
-	op       api.Operation
-	accessor metav1.Object
+	gvr       schema.GroupVersionResource
+	operation api.Operation
+	accessor  metav1.Object
 }
 
 // Utility function to check whether a string slice contains a string.
 func hasString(slice []string, value string) bool {
+	for _, s := range slice {
+		if s == value {
+			return true
+		}
+	}
+	return false
+}
+
+func hasOperation(slice []api.Operation, value api.Operation) bool {
 	for _, s := range slice {
 		if s == value {
 			return true
@@ -119,9 +133,9 @@ func (f *EventForwarder) forward(op api.Operation, obj interface{}) error {
 	gvk := resource.GroupVersion().WithKind(meta_util.GetKind(obj))
 
 	attrs := attributes{
-		gvr:      resource,
-		op:       api.Create,
-		accessor: accessor,
+		gvr:       resource,
+		operation: op,
+		accessor:  accessor,
 	}
 
 	matches := false
