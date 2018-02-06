@@ -48,7 +48,7 @@ func (c *RecycleBin) OnUpdate(oldObj, newObj interface{}) {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 
-	if c.spec == nil {
+	if c.spec == nil || !c.spec.HandleUpdates {
 		return
 	}
 
