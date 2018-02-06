@@ -33,7 +33,7 @@ kubed run [flags]
       --prometheus-crd-apigroup string   prometheus CRD  API group name (default "monitoring.coreos.com")
       --prometheus-crd-kinds CrdKinds     - EXPERIMENTAL (could be removed in future releases) - customize CRD kind names
       --qps float32                      The maximum QPS to the master from this client (default 1e+06)
-      --resync-period duration           If non-zero, will re-list this often. Otherwise, re-list will be delayed aslong as possible (until the upstream source closes the watch or times out. (default 5m0s)
+      --resync-period duration           If non-zero, will re-list this often. Otherwise, re-list will be delayed aslong as possible (until the upstream source closes the watch or times out. (default 10m0s)
       --scratch-dir emptyDir             Directory used to store temporary files. Use an emptyDir in Kubernetes. (default "/tmp")
       --web.address string               Address to listen on for web interface and telemetry. (default ":56790")
 ```
@@ -43,6 +43,8 @@ kubed run [flags]
 ```
       --alsologtostderr                  log to standard error as well as files
       --analytics                        Send analytical events to Google Analytics (default true)
+      --log.format logFormatFlag         Set the log target and format. Example: "logger:syslog?appname=bob&local=7" or "logger:stdout?json=true" (default "logger:stderr")
+      --log.level levelFlag              Only log messages with the given severity or above. Valid levels: [debug, info, warn, error, fatal] (default "info")
       --log_backtrace_at traceLocation   when logging hits line file:N, emit a stack trace (default :0)
       --log_dir string                   If non-empty, write log files in this directory
       --logtostderr                      log to standard error instead of files
