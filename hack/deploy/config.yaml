@@ -14,13 +14,13 @@ eventForwarder:
     operations:
     - CREATE
     resources:
-    - apiGroup: ""
+    - group: ""
       resources:
       - events
   - operations:
     - CREATE
     resources:
-    - apiGroup: ""
+    - group: ""
       resources:
       - nodes
       - persistentvolumes
@@ -28,21 +28,27 @@ eventForwarder:
   - operations:
     - CREATE
     resources:
-    - apiGroup: storage.k8s.io
+    - group: storage.k8s.io
       resources:
       - storageclasses
   - operations:
     - CREATE
     resources:
-    - apiGroup: extensions
+    - group: extensions
       resources:
       - ingresses
   - operations:
     - CREATE
     resources:
-    - apiGroup: voyager.appscode.com
+    - group: voyager.appscode.com
       resources:
       - ingresses
+  - operations:
+    - CREATE
+    resources:
+    - group: certificates.k8s.io
+      resources:
+      - certificatesigningrequests
 janitors:
 - elasticsearch:
     endpoint: https://elasticsearch-logging.kube-system:9200

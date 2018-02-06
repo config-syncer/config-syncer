@@ -45,8 +45,22 @@ func (cfg ClusterConfig) Save(configPath string) error {
 }
 
 func (cfg ClusterConfig) Validate() error {
-	if cfg.EventForwarder != nil && len(cfg.EventForwarder.NodeAdded.Namespaces) > 0 {
-		return fmt.Errorf("namespeces can't be defined for forwarding `nodeAdded` events")
+	if cfg.EventForwarder != nil {
+		if cfg.EventForwarder.NodeAdded != nil {
+			return fmt.Errorf("convert `nodeAdded` spec to eventForwarder.rules format")
+		}
+		if cfg.EventForwarder.StorageAdded != nil {
+			return fmt.Errorf("convert `storageAdded` spec to eventForwarder.rules format")
+		}
+		if cfg.EventForwarder.IngressAdded != nil {
+			return fmt.Errorf("convert `ingressAdded` spec to eventForwarder.rules format")
+		}
+		if cfg.EventForwarder.WarningEvents != nil {
+			return fmt.Errorf("convert `warningEvents` spec to eventForwarder.rules format")
+		}
+		if cfg.EventForwarder.CSREvents != nil {
+			return fmt.Errorf("convert `csrEvents` spec to eventForwarder.rules format")
+		}
 	}
 
 	for _, j := range cfg.Janitors {
