@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"sync"
 	"time"
-	_ "github.com/appscode/kutil/apiextensions/v1beta1"
+
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go/log"
 	prom_util "github.com/appscode/kube-mon/prometheus/v1"
@@ -22,6 +22,7 @@ import (
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
+	_ "github.com/appscode/kutil/apiextensions/v1beta1"
 	"github.com/appscode/kutil/discovery"
 	"github.com/appscode/kutil/tools/backup"
 	"github.com/appscode/kutil/tools/fsnotify"
@@ -50,6 +51,7 @@ import (
 	extensions "k8s.io/api/extensions/v1beta1"
 	rbac "k8s.io/api/rbac/v1"
 	storage_v1 "k8s.io/api/storage/v1"
+	_ "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -62,7 +64,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/record"
-	_ "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 )
 
 type Options struct {
