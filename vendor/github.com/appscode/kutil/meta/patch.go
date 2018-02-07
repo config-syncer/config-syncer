@@ -3,33 +3,32 @@ package meta
 import (
 	"encoding/json"
 
-	apps "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/jsonmergepatch"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
 )
 
-func CreateStrategicPatch(cur runtime.Object, transform func(runtime.Object) runtime.Object) ([]byte, error) {
+func CreateStrategicPatch(cur runtime.Object, mod runtime.Object) ([]byte, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
 		return nil, err
 	}
 
-	modJson, err := json.Marshal(transform(cur.DeepCopyObject()))
+	modJson, err := json.Marshal(mod)
 	if err != nil {
 		return nil, err
 	}
 
-	return strategicpatch.CreateTwoWayMergePatch(curJson, modJson, apps.DaemonSet{})
+	return strategicpatch.CreateTwoWayMergePatch(curJson, modJson, mod)
 }
 
-func CreateJSONMergePatch(cur runtime.Object, transform func(runtime.Object) runtime.Object) ([]byte, error) {
+func CreateJSONMergePatch(cur runtime.Object, mod runtime.Object) ([]byte, error) {
 	curJson, err := json.Marshal(cur)
 	if err != nil {
 		return nil, err
 	}
 
-	modJson, err := json.Marshal(transform(cur.DeepCopyObject()))
+	modJson, err := json.Marshal(mod)
 	if err != nil {
 		return nil, err
 	}

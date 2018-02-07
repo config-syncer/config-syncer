@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"sync"
 	"time"
-
+	_ "github.com/appscode/kutil/apiextensions/v1beta1"
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go/log"
 	prom_util "github.com/appscode/kube-mon/prometheus/v1"
@@ -62,6 +62,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/record"
+	_ "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 )
 
 type Options struct {
