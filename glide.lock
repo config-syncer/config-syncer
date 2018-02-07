@@ -1,5 +1,5 @@
 hash: dd268f568a245b35234f7443d87cbadc4a309f28cf49f667c139a0826a78287c
-updated: 2018-02-06T13:35:24.754353554-08:00
+updated: 2018-02-07T05:48:41.925558967-08:00
 imports:
 - name: cloud.google.com/go
   version: 44b3a7d2be2df066b6625227cf4e4988d35a2cd1
@@ -47,8 +47,9 @@ imports:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: b67888a28f3159c43de722ff5590eee8932bdcbe
+  version: 00e710324bf796cf7bf40abdf15b523418000d7b
   subpackages:
+  - apiextensions/v1beta1
   - core/v1
   - discovery
   - meta
@@ -56,6 +57,7 @@ imports:
   - tools/backup
   - tools/clientcmd
   - tools/fsnotify
+  - tools/queue
 - name: github.com/appscode/mergo
   version: e3000cb3d28c72b837601cac94debd91032d19fe
 - name: github.com/appscode/osm
@@ -93,7 +95,7 @@ imports:
   - informers/externalversions/stash/v1alpha1
   - listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 236786f7a890a90a704ee83c66de3faa3b241a37
+  version: 185a082e1b7f1329a3d0480f4251a72a3ace7314
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -451,7 +453,7 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/RoaringBitmap/roaring
-  version: c89f23babccf87370a8ced0011a3283a865525eb
+  version: 579959187317130bda443ec40f81c914e24b1396
 - name: github.com/robfig/cron
   version: 2315d5715e36303a941d907f038da7f7c44c773b
 - name: github.com/russross/blackfriday
@@ -552,7 +554,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: d476d6e92dcf611f322cced73d8bd2842daff90b
+  version: 386d4e5f4f92f86e6aec85985761bba4b938a2d5
   subpackages:
   - gensupport
   - googleapi
@@ -826,6 +828,7 @@ imports:
   - util/homedir
   - util/integer
   - util/jsonpath
+  - util/workqueue
 - name: k8s.io/kube-openapi
   version: 39a7bf85c140f972372c2a0d1ee40adbf0c8bfe1
   subpackages:
