@@ -10,32 +10,21 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 )
 
-type Indexer struct {
+type ResourceIndexer struct {
 	indices map[string]bleve.Index
 	dir     string
 
-	enable bool
-
 	idxLock sync.RWMutex
-	cfgLock sync.RWMutex
 }
 
-func NewIndexer(dir string) *Indexer {
-	return &Indexer{
+func NewIndexer(dir string) *ResourceIndexer {
+	return &ResourceIndexer{
 		indices: map[string]bleve.Index{},
 		dir:     dir,
 	}
 }
 
-func (ri *Indexer) Configure(enable bool) error {
-	ri.cfgLock.Lock()
-	defer ri.cfgLock.Unlock()
-
-	ri.enable = enable
-	return nil
-}
-
-func (ri *Indexer) indexFor(ns string) (bleve.Index, error) {
+func (ri *ResourceIndexer) indexFor(ns string) (bleve.Index, error) {
 	ri.idxLock.RLock()
 	if idx, ok := ri.indices[ns]; ok {
 		ri.idxLock.RUnlock()
@@ -60,7 +49,7 @@ func (ri *Indexer) indexFor(ns string) (bleve.Index, error) {
 	return idx, nil
 }
 
-func (ri *Indexer) insert(obj interface{}) error {
+func (ri *ResourceIndexer) insert(obj interface{}) error {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
 		return err
@@ -89,7 +78,7 @@ func (ri *Indexer) insert(obj interface{}) error {
 	return nil
 }
 
-func (ri *Indexer) delete(obj interface{}) error {
+func (ri *ResourceIndexer) delete(obj interface{}) error {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
 		return err

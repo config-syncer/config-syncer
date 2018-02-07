@@ -23,15 +23,18 @@ spec:
       imagePullSecrets: [$KUBED_IMAGE_PULL_SECRET]
       containers:
       - name: operator
-        image: $KUBED_DOCKER_REGISTRY/kubed:0.5.0
+        image: $KUBED_DOCKER_REGISTRY/kubed:api
         imagePullPolicy: IfNotPresent
         args:
         - run
+        - --secure-port=8443
+        - --audit-log-path=-
+        - --tls-cert-file=/var/serving-cert/tls.crt
+        - --tls-private-key-file=/var/serving-cert/tls.key
+        - --ops-address=:56790
         - --v=3
-        - --api.address=:8080
-        - --web.address=:56790
         ports:
-        - containerPort: 8080
+        - containerPort: 8443
           name: api
           protocol: TCP
         - containerPort: 56790
@@ -42,16 +45,41 @@ spec:
           mountPath: /srv/kubed
         - name: scratch
           mountPath: /tmp
+        - mountPath: /var/serving-cert
+          name: serving-cert
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8443
+            scheme: HTTPS
       volumes:
       - name: config
         secret:
           secretName: kubed-config
       - name: scratch
         emptyDir: {}
+      - name: serving-cert
+        secret:
+          defaultMode: 420
+          secretName: kubed-apiserver-cert
       tolerations:
       - key: CriticalAddonsOnly
         operator: Exists
 ---
+# kube lacks the service serving cert signer, so provide a manual secret for it
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kubed-apiserver-cert
+  namespace: $STASH_NAMESPACE
+  labels:
+    app: kubed
+type: kubernetes.io/tls
+data:
+  tls.crt: $TLS_SERVING_CERT
+  tls.key: $TLS_SERVING_KEY
+---
+# to be able to expose TSB inside the cluster
 apiVersion: v1
 kind: Service
 metadata:
@@ -69,3 +97,20 @@ spec:
     targetPort: web
   selector:
     app: kubed
+---
+# register as aggregated apiserver
+apiVersion: apiregistration.k8s.io/v1beta1
+kind: APIService
+metadata:
+  name: v1alpha1.kubed.appscode.com
+  labels:
+    app: kubed
+spec:
+  caBundle: $SERVICE_SERVING_CERT_CA
+  group: kubed.appscode.com
+  groupPriorityMinimum: 1000
+  versionPriority: 15
+  service:
+    name: kubed-operator
+    namespace: $STASH_NAMESPACE
+  version: v1alpha1

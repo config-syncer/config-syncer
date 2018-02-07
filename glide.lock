@@ -1,5 +1,5 @@
-hash: dd268f568a245b35234f7443d87cbadc4a309f28cf49f667c139a0826a78287c
-updated: 2018-02-06T14:17:23.329179906-08:00
+hash: 63e3728fb73924ca81bd062958274a78e08390cbc95b65e2243deb53bfd1d0db
+updated: 2018-02-08T00:09:57.440266972-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -25,7 +25,6 @@ imports:
   - log/golog
   - net/httpclient
   - runtime
-  - signals
   - strings
   - types
   - version
@@ -44,12 +43,12 @@ imports:
   - unified
   - webhook
 - name: github.com/appscode/kube-mon
-  version: 15a002ed77ecf95b7b291d24334ccea138048176
+  version: 69036cc40b44a7ba97be91d530f421e3adaba407
   subpackages:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: 00e710324bf796cf7bf40abdf15b523418000d7b
+  version: 4ab7a342c2a4ee464d28146b8c9330c266336fba
   subpackages:
   - apiextensions/v1beta1
   - core/v1
@@ -84,7 +83,7 @@ imports:
   - informers/externalversions/monitoring/v1alpha1
   - listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: 4238fabc8d613a070e8d38fbd5a04b24310813d1
+  version: 29c489e5d30b41abf7de48c2236fbc7ab3b244a5
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
@@ -96,9 +95,8 @@ imports:
   - informers/externalversions/stash
   - informers/externalversions/stash/v1alpha1
   - listers/stash/v1alpha1
-  - pkg/registry/admissionreview
 - name: github.com/appscode/voyager
-  version: 185a082e1b7f1329a3d0480f4251a72a3ace7314
+  version: 9118c63814c3150ed66cb08d976c7599f9443497
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -350,8 +348,7 @@ imports:
   - ptypes/struct
   - ptypes/timestamp
 - name: github.com/golang/snappy
-  version: cef980a12b316c5b7e5bb3a8e168eb43ae999a88
-  repo: https://github.com/golang/snappy
+  version: d9eb7a3d35ec988b8585d4a0068e462c27d28380
 - name: github.com/google/btree
   version: 7d79101e329e5a3adf994758c578dab82b90c017
 - name: github.com/google/go-cmp
@@ -656,7 +653,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: 386d4e5f4f92f86e6aec85985761bba4b938a2d5
+  version: e771abbff930c1ae3c6e2c35117fc88856f11b2f
   subpackages:
   - gensupport
   - googleapi
@@ -890,7 +887,6 @@ imports:
   - pkg/util/feature
   - pkg/util/flag
   - pkg/util/flushwriter
-  - pkg/util/logs
   - pkg/util/trace
   - pkg/util/webhook
   - pkg/util/wsstream

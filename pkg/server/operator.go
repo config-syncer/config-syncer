@@ -1,10 +1,8 @@
-package operator
+package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
-	_ "net/http/pprof"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -19,7 +17,7 @@ import (
 	"github.com/appscode/kubed/pkg/eventer"
 	"github.com/appscode/kubed/pkg/influxdb"
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
-	rdx "github.com/appscode/kubed/pkg/registry/resource"
+	indexers "github.com/appscode/kubed/pkg/registry/resource"
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
 	_ "github.com/appscode/kutil/apiextensions/v1beta1"
@@ -60,34 +58,16 @@ import (
 	"k8s.io/client-go/informers"
 	core_informers "k8s.io/client-go/informers/core/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/record"
 )
 
-type Options struct {
-	Master     string
-	KubeConfig string
-
-	ConfigPath string
-	APIAddress string
-	WebAddress string
-
-	EnableConfigSync  bool
-	ScratchDir        string
-	OperatorNamespace string
-
-	ResyncPeriod time.Duration
-	QPS          float32
-	Burst        int
-
-	PrometheusCrdGroup string
-	PrometheusCrdKinds prom.CrdKinds
-}
-
 type Operator struct {
-	options Options
+	ScratchDir        string
+	ConfigPath        string
+	OperatorNamespace string
+	WebAddress        string
 
 	notifierCred   envconfig.LoaderFunc
 	recorder       record.EventRecorder
@@ -113,79 +93,12 @@ type Operator struct {
 	smonInf                    cache.SharedIndexInformer
 	amgrInf                    cache.SharedIndexInformer
 
-	searchIndexer *rdx.Indexer
+	searchIndexer *indexers.ResourceIndexer
 
 	watcher *fsnotify.Watcher
 
 	config apis.ClusterConfig
 	lock   sync.RWMutex
-}
-
-func New(config *rest.Config, opt Options) (*Operator, error) {
-	var err error
-	op := &Operator{options: opt}
-
-	if op.KubeClient, err = kubernetes.NewForConfig(config); err != nil {
-		return nil, err
-	}
-	if op.VoyagerClient, err = vcs.NewForConfig(config); err != nil {
-		return nil, err
-	}
-	if op.SearchlightClient, err = srch_cs.NewForConfig(config); err != nil {
-		return nil, err
-	}
-	if op.StashClient, err = scs.NewForConfig(config); err != nil {
-		return nil, err
-	}
-	if op.KubeDBClient, err = kcs.NewForConfig(config); err != nil {
-		return nil, err
-	}
-
-	op.PromClient, err = prom.NewForConfig(&opt.PrometheusCrdKinds, opt.PrometheusCrdGroup, config)
-	if err != nil {
-		return nil, err
-	}
-
-	op.recorder = eventer.NewEventRecorder(op.KubeClient, "kubed")
-	op.trashCan = &rbin.RecycleBin{}
-	op.eventProcessor = &eventer.EventForwarder{Client: op.KubeClient.Discovery()}
-	op.configSyncer = syncer.New(op.KubeClient, op.recorder)
-
-	op.cron = cron.New()
-	op.cron.Start()
-
-	// Enable full text indexing to have search feature
-	indexDir := filepath.Join(op.options.ScratchDir, "indices")
-	op.searchIndexer = rdx.NewIndexer(indexDir)
-
-	op.watcher = &fsnotify.Watcher{
-		WatchDir: filepath.Dir(opt.ConfigPath),
-		Reload:   op.Configure,
-	}
-
-	// ---------------------------
-	op.kubeInformerFactory = informers.NewSharedInformerFactory(op.KubeClient, op.options.ResyncPeriod)
-	op.voyagerInformerFactory = voyagerinformers.NewSharedInformerFactory(op.VoyagerClient, op.options.ResyncPeriod)
-	op.stashInformerFactory = stashinformers.NewSharedInformerFactory(op.StashClient, op.options.ResyncPeriod)
-	op.searchlightInformerFactory = searchlightinformers.NewSharedInformerFactory(op.SearchlightClient, op.options.ResyncPeriod)
-	op.kubedbInformerFactory = kubedbinformers.NewSharedInformerFactory(op.KubeDBClient, op.options.ResyncPeriod)
-	// ---------------------------
-	op.setupWorkloadInformers()
-	op.setupNetworkInformers()
-	op.setupConfigInformers()
-	op.setupRBACInformers()
-	op.setupNodeInformers()
-	op.setupEventInformers()
-	op.setupCertificateInformers()
-	// ---------------------------
-	op.setupVoyagerInformers()
-	op.setupStashInformers()
-	op.setupSearchlightInformers()
-	op.setupKubeDBInformers()
-	op.setupPrometheusInformers()
-	// ---------------------------
-
-	return op, nil
 }
 
 func (op *Operator) Configure() error {
@@ -196,12 +109,9 @@ func (op *Operator) Configure() error {
 
 	var err error
 
-	cfg, err := apis.LoadConfig(op.options.ConfigPath)
+	cfg, err := apis.LoadConfig(op.ConfigPath)
 	if err != nil {
 		return err
-	}
-	if op.options.APIAddress != "" {
-		cfg.APIServer.Address = op.options.APIAddress
 	}
 	err = cfg.Validate()
 	if err != nil {
@@ -210,7 +120,7 @@ func (op *Operator) Configure() error {
 	op.config = *cfg
 
 	if op.config.RecycleBin != nil && op.config.RecycleBin.Path == "" {
-		op.config.RecycleBin.Path = filepath.Join(op.options.ScratchDir, "transhcan")
+		op.config.RecycleBin.Path = filepath.Join(op.ScratchDir, "transhcan")
 	}
 
 	op.notifierCred, err = op.getLoader()
@@ -243,7 +153,7 @@ func (op *Operator) Configure() error {
 		}
 	}
 
-	return op.searchIndexer.Configure(op.config.APIServer.EnableSearchIndex)
+	return nil
 }
 
 func (op *Operator) setupWorkloadInformers() {
@@ -404,7 +314,7 @@ func (op *Operator) setupPrometheusInformers() {
 				ListFunc:  op.PromClient.Prometheuses(core.NamespaceAll).List,
 				WatchFunc: op.PromClient.Prometheuses(core.NamespaceAll).Watch,
 			},
-			&prom.Prometheus{}, op.options.ResyncPeriod, cache.Indexers{},
+			&prom.Prometheus{}, 10*time.Minute, cache.Indexers{},
 		)
 		op.addEventHandlers(op.promInf, prom_util.SchemeGroupVersion.WithKind(prom.PrometheusesKind))
 
@@ -413,7 +323,7 @@ func (op *Operator) setupPrometheusInformers() {
 				ListFunc:  op.PromClient.ServiceMonitors(core.NamespaceAll).List,
 				WatchFunc: op.PromClient.ServiceMonitors(core.NamespaceAll).Watch,
 			},
-			&prom.ServiceMonitor{}, op.options.ResyncPeriod, cache.Indexers{},
+			&prom.ServiceMonitor{}, 10*time.Minute, cache.Indexers{},
 		)
 		op.addEventHandlers(op.smonInf, prom_util.SchemeGroupVersion.WithKind(prom.ServiceMonitorsKind))
 
@@ -422,7 +332,7 @@ func (op *Operator) setupPrometheusInformers() {
 				ListFunc:  op.PromClient.Alertmanagers(core.NamespaceAll).List,
 				WatchFunc: op.PromClient.Alertmanagers(core.NamespaceAll).Watch,
 			},
-			&prom.Alertmanager{}, op.options.ResyncPeriod, cache.Indexers{},
+			&prom.Alertmanager{}, 10*time.Minute, cache.Indexers{},
 		)
 		op.addEventHandlers(op.amgrInf, prom_util.SchemeGroupVersion.WithKind(prom.AlertmanagersKind))
 	}
@@ -441,7 +351,7 @@ func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {
 		}, nil
 	}
 	cfg, err := op.KubeClient.CoreV1().
-		Secrets(op.options.OperatorNamespace).
+		Secrets(op.OperatorNamespace).
 		Get(op.config.NotifierSecretName, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -524,45 +434,13 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 	}
 }
 
-func (op *Operator) RunAPIServer() {
-	// router is default HTTP request multiplexer for kubed. It matches the URL of each
-	// incoming request against a list of registered patterns with their associated
-	// methods and calls the handler for the pattern that most closely matches the
-	// URL.
-	//
-	// Pattern matching attempts each pattern in the order in which they were
-	// registered.
-	router := pat.New()
-	if op.config.APIServer.EnableSearchIndex {
-		op.searchIndexer.RegisterRouters(router)
-	}
-
-	router.Get("/health", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) }))
-	router.Get("/metadata", http.HandlerFunc(op.metadataHandler))
-	log.Fatalln(http.ListenAndServe(op.config.APIServer.Address, router))
-}
-
-func (op *Operator) metadataHandler(w http.ResponseWriter, r *http.Request) {
-	resp := &apis.KubedMetadata{
-		OperatorNamespace: op.options.OperatorNamespace,
-		SearchEnabled:     op.config.APIServer.EnableSearchIndex,
-	}
-	err := json.NewEncoder(w).Encode(resp)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("x-content-type-options", "nosniff")
-}
-
 func (op *Operator) RunElasticsearchCleaner() error {
 	for _, j := range op.config.Janitors {
 		if j.Kind == apis.JanitorElasticsearch {
 			var authInfo *apis.JanitorAuthInfo
 
 			if j.Elasticsearch.SecretName != "" {
-				secret, err := op.KubeClient.CoreV1().Secrets(op.options.OperatorNamespace).
+				secret, err := op.KubeClient.CoreV1().Secrets(op.OperatorNamespace).
 					Get(j.Elasticsearch.SecretName, metav1.GetOptions{})
 				if err != nil && !kerr.IsNotFound(err) {
 					return err
@@ -606,8 +484,8 @@ func (op *Operator) RunSnapshotter() error {
 		return nil
 	}
 
-	osmconfigPath := filepath.Join(op.options.ScratchDir, "osm", "config.yaml")
-	err := storage.WriteOSMConfig(op.KubeClient, op.config.Snapshotter.Backend, op.options.OperatorNamespace, osmconfigPath)
+	osmconfigPath := filepath.Join(op.ScratchDir, "osm", "config.yaml")
+	err := storage.WriteOSMConfig(op.KubeClient, op.config.Snapshotter.Backend, op.OperatorNamespace, osmconfigPath)
 	if err != nil {
 		return err
 	}
@@ -619,16 +497,16 @@ func (op *Operator) RunSnapshotter() error {
 
 	// test credentials
 	sh := shell.NewSession()
-	sh.SetDir(op.options.ScratchDir)
+	sh.SetDir(op.ScratchDir)
 	sh.ShowCMD = true
 	snapshotter := func() error {
-		restConfig, err := clientcmd.BuildConfigFromFlags(op.options.Master, op.options.KubeConfig)
+		restConfig, err := clientcmd.BuildConfigFromFlags("op.options.Master", "op.options.KubeConfig")
 		if err != nil {
 			return err
 		}
 
 		mgr := backup.NewBackupManager(op.config.ClusterName, restConfig, op.config.Snapshotter.Sanitize)
-		snapshotFile, err := mgr.BackupToTar(filepath.Join(op.options.ScratchDir, "snapshot"))
+		snapshotFile, err := mgr.BackupToTar(filepath.Join(op.ScratchDir, "snapshot"))
 		if err != nil {
 			return err
 		}
@@ -658,7 +536,7 @@ func (op *Operator) RunSnapshotter() error {
 	})
 }
 
-func (op *Operator) RunAndHold(stopCh <-chan struct{}) {
+func (op *Operator) Run(stopCh <-chan struct{}) {
 	var err error
 
 	err = op.RunElasticsearchCleaner()
@@ -677,13 +555,12 @@ func (op *Operator) RunAndHold(stopCh <-chan struct{}) {
 	}
 
 	op.RunWatchers(stopCh)
-	go op.RunAPIServer()
 
 	go op.watcher.Run(stopCh)
 
 	m := pat.New()
 	m.Get("/metrics", promhttp.Handler())
 	http.Handle("/", m)
-	log.Infoln("Listening on", op.options.WebAddress)
-	log.Fatal(http.ListenAndServe(op.options.WebAddress, nil))
+	log.Infoln("Listening on", op.WebAddress)
+	log.Fatal(http.ListenAndServe(op.WebAddress, nil))
 }

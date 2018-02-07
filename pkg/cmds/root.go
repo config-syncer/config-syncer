@@ -3,6 +3,7 @@ package cmds
 import (
 	"flag"
 	"log"
+	"os"
 	"strings"
 
 	v "github.com/appscode/go/version"
@@ -15,6 +16,7 @@ import (
 	kubedbscheme "github.com/kubedb/apimachinery/client/scheme"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	genericapiserver "k8s.io/apiserver/pkg/server"
 	_ "k8s.io/client-go/kubernetes/fake"
 	clientsetscheme "k8s.io/client-go/kubernetes/scheme"
 )
@@ -55,7 +57,8 @@ func NewCmdKubed(version string) *cobra.Command {
 	flag.CommandLine.Parse([]string{})
 	cmd.PersistentFlags().BoolVar(&enableAnalytics, "analytics", enableAnalytics, "Send analytical events to Google Analytics")
 
-	cmd.AddCommand(NewCmdRun())
+	stopCh := genericapiserver.SetupSignalHandler()
+	cmd.AddCommand(NewCmdRun(os.Stdout, os.Stderr, stopCh))
 	cmd.AddCommand(NewCmdSnapshot())
 	cmd.AddCommand(NewCmdCheck())
 	cmd.AddCommand(v.NewCmdVersion())

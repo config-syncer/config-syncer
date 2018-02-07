@@ -113,15 +113,15 @@ export TLS_SERVING_KEY=$(cat server.key | $ONESSL base64)
 export KUBE_CA=$($ONESSL get kube-ca | $ONESSL base64)
 rm -rf $ONESSL ca.crt ca.key server.crt server.key
 
-curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/operator.yaml | envsubst | kubectl apply -f -
+curl -fsSL https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/operator.yaml | envsubst | kubectl apply -f -
 
 if [ "$KUBED_ENABLE_RBAC" = true ]; then
     kubectl create serviceaccount $KUBED_SERVICE_ACCOUNT --namespace $KUBED_NAMESPACE
     kubectl label serviceaccount $KUBED_SERVICE_ACCOUNT app=kubed --namespace $KUBED_NAMESPACE
-    curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/rbac-list.yaml | envsubst | kubectl auth reconcile -f -
+    curl -fsSL https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/rbac-list.yaml | envsubst | kubectl auth reconcile -f -
 fi
 
 if [ "$KUBED_RUN_ON_MASTER" -eq 1 ]; then
     kubectl patch deploy kubed-operator -n $KUBED_NAMESPACE \
-      --patch="$(curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/run-on-master.yaml)"
+      --patch="$(curl -fsSL https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/run-on-master.yaml)"
 fi

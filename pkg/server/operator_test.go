@@ -1,4 +1,4 @@
-package operator
+package server
 
 import (
 	"path/filepath"
@@ -14,7 +14,6 @@ import (
 	storage_v1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 	// admission "k8s.io/api/admission/v1beta1"

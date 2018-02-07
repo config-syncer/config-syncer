@@ -80,3 +80,46 @@ subjects:
 - kind: ServiceAccount
   name: $KUBED_SERVICE_ACCOUNT
   namespace: $KUBED_NAMESPACE
+---
+# to read the config for terminating authentication
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: kubed-apiserver-extension-server-authentication-reader
+  namespace: kube-system
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: extension-apiserver-authentication-reader
+subjects:
+- kind: ServiceAccount
+  name: $STASH_SERVICE_ACCOUNT
+  namespace: $STASH_NAMESPACE
+---
+# to delegate authentication and authorization
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: kubed-apiserver-auth-delegator
+  labels:
+    app: kubed
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: system:auth-delegator
+subjects:
+- kind: ServiceAccount
+  name: $STASH_SERVICE_ACCOUNT
+  namespace: $STASH_NAMESPACE
+---
+# to let aggregated apiservers create admission reviews
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: appscode:kubed:apiserver-requester
+  labels:
+    app: kubed
+rules:
+- apiGroups: ['kubed.appscode.com']
+  resources: ['*']
+  verbs: ['get']

@@ -17,10 +17,10 @@ section_menu_id: setup
 # Installation Guide
 
 ## Create Cluster Config
-Before you can install Kubed, you need a cluster config for Kubed. Cluster config is defined in YAML format. You find an example config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/config.yaml).
+Before you can install Kubed, you need a cluster config for Kubed. Cluster config is defined in YAML format. You find an example config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/config.yaml).
 
 ```yaml
-$ cat https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/config.yaml
+$ cat https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/config.yaml
 
 apiServer:
   address: :8080
@@ -87,7 +87,7 @@ secret "kubed-config" labeled
 You may have to create another [Secret for notifiers](/docs/guides/cluster-events/notifiers.md), usually called `notifier-config`. If you are [storing cluster snapshots](/docs/guides/disaster-recovery/cluster-snapshot.md) in cloud storage, you have to create another Secret to provide cloud credentials.
 
 ### Generate Config using script
-If you are familiar with GO, you can use the [./hack/config/main.go](https://github.com/appscode/kubed/blob/0.5.0/hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/config.yaml).
+If you are familiar with GO, you can use the [./hack/config/main.go](https://github.com/appscode/kubed/blob/0.5.0/hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/config.yaml).
 
 ```console
 go run ./hack/config/main.go
@@ -106,7 +106,7 @@ Cluster config was parsed successfully.
 Kubed can be installed via installer script included in the [/hack/deploy](https://github.com/appscode/kubed/tree/0.5.0/hack/deploy) folder.
 
 ```console
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh | bash -s -- -h
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/kubed.sh | bash -s -- -h
 kubed.sh - install Kubernetes cluster daemon
 
 kubed.sh [options]
@@ -120,18 +120,18 @@ options:
     --run-on-master                run kubed operator on master
 
 # install without RBAC roles
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh \
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/kubed.sh \
     | bash
 
 # Install with RBAC roles
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh \
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/kubed.sh \
     | bash -s -- --rbac
 ```
 
 If you would like to run Kubed operator pod in `master` instances, pass the `--run-on-master` flag:
 
 ```console
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh \
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/kubed.sh \
     | bash -s -- --run-on-master [--rbac]
 ```
 
@@ -139,7 +139,7 @@ Kubed operator will be installed in a `kube-system` namespace by default. If you
 
 ```console
 $ kubectl create namespace kubed
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh \
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/kubed.sh \
     | bash -s -- --namespace=kubed [--run-on-master] [--rbac]
 ```
 
@@ -151,7 +151,7 @@ To pass the address of your private registry and optionally a image pull secret 
 
 ```console
 $ kubectl create namespace kubed
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh \
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/kubed.sh \
     | bash -s -- --docker-registry=MY_REGISTRY [--image-pull-secret=SECRET_NAME] [--rbac]
 ```
 

@@ -14,22 +14,22 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 )
 
-var _ rest.Getter = &Indexer{}
-var _ rest.GroupVersionKindProvider = &Indexer{}
+var _ rest.Getter = &ResourceIndexer{}
+var _ rest.GroupVersionKindProvider = &ResourceIndexer{}
 
-func (ri *Indexer) NewREST() rest.Storage {
+func (ri *ResourceIndexer) NewREST() rest.Storage {
 	return ri
 }
 
-func (ri *Indexer) New() runtime.Object {
+func (ri *ResourceIndexer) New() runtime.Object {
 	return &apis.SearchResult{}
 }
 
-func (ri *Indexer) GroupVersionKind(containingGV schema.GroupVersion) schema.GroupVersionKind {
+func (ri *ResourceIndexer) GroupVersionKind(containingGV schema.GroupVersion) schema.GroupVersionKind {
 	return admission.SchemeGroupVersion.WithKind("SearchResult")
 }
 
-func (ri *Indexer) Get(ctx apirequest.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
+func (ri *ResourceIndexer) Get(ctx apirequest.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
 	ns, ok := request.NamespaceFrom(ctx)
 	if !ok {
 		return nil, errors.New("missing namespace")

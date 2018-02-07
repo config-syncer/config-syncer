@@ -32,13 +32,7 @@ type ClusterConfig struct {
 	EnableConfigSyncer bool                `json:"enableConfigSyncer"`
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
 	Janitors           []JanitorSpec       `json:"janitors,omitempty"`
-	APIServer          APIServerSpec       `json:"apiServer,omitempty"`
 	KubeConfigFile     string              `json:"kubeConfigFile,omitempty"`
-}
-
-type APIServerSpec struct {
-	Address           string `json:"address"`
-	EnableSearchIndex bool   `json:"enableSearchIndex"`
 }
 
 type JanitorSpec struct {

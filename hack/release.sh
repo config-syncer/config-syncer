@@ -13,6 +13,6 @@ rm -rf dist
 ./hack/docker/setup.sh
 ./hack/docker/setup.sh release
 
-rm dist/.tag
+rm -rf dist/.tag
 
 popd
