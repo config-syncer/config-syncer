@@ -1,0 +1,79 @@
+package resource
+
+import (
+	"errors"
+
+	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
+	"github.com/blevesearch/bleve"
+	admission "k8s.io/api/admission/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apiserver/pkg/endpoints/request"
+	apirequest "k8s.io/apiserver/pkg/endpoints/request"
+	"k8s.io/apiserver/pkg/registry/rest"
+)
+
+var _ rest.Getter = &Indexer{}
+var _ rest.GroupVersionKindProvider = &Indexer{}
+
+func (ri *Indexer) NewREST() rest.Storage {
+	return ri
+}
+
+func (ri *Indexer) New() runtime.Object {
+	return &apis.SearchResult{}
+}
+
+func (ri *Indexer) GroupVersionKind(containingGV schema.GroupVersion) schema.GroupVersionKind {
+	return admission.SchemeGroupVersion.WithKind("SearchResult")
+}
+
+func (ri *Indexer) Get(ctx apirequest.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
+	ns, ok := request.NamespaceFrom(ctx)
+	if !ok {
+		return nil, errors.New("missing namespace")
+	}
+	if len(name) == 0 {
+		return nil, errors.New("missing search query")
+	}
+
+	index, err := ri.indexFor(ns)
+	if err != nil {
+		return nil, err
+	}
+
+	req := bleve.NewSearchRequest(bleve.NewMatchQuery(name))
+	result, err := index.Search(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &apis.SearchResult{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "kubed.appscode.com/v1alpha1",
+			Kind:       "Resource",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: ns,
+		},
+		Hits:     make([]apis.ResultEntry, 0, result.Total),
+		Total:    result.Total,
+		MaxScore: result.MaxScore,
+		Took:     metav1.Duration{Duration: result.Took},
+	}
+
+	for _, hit := range result.Hits {
+		raw, err := index.GetInternal([]byte(hit.ID))
+		if err != nil {
+			// log.Errorf("failed to load document with id %s. Reason: %s", hit.ID, err)
+			continue
+		}
+		resp.Hits = append(resp.Hits, apis.ResultEntry{
+			Object: runtime.RawExtension{Raw: raw},
+			Score:  hit.Score,
+		})
+	}
+	return resp, nil
+}

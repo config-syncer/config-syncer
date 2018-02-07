@@ -17,9 +17,9 @@ import (
 	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
-	"github.com/appscode/kubed/pkg/indexers"
 	"github.com/appscode/kubed/pkg/influxdb"
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
+	rdx "github.com/appscode/kubed/pkg/registry/resource"
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
 	_ "github.com/appscode/kutil/apiextensions/v1beta1"
@@ -113,7 +113,7 @@ type Operator struct {
 	smonInf                    cache.SharedIndexInformer
 	amgrInf                    cache.SharedIndexInformer
 
-	searchIndexer *indexers.ResourceIndexer
+	searchIndexer *rdx.Indexer
 
 	watcher *fsnotify.Watcher
 
@@ -156,10 +156,7 @@ func New(config *rest.Config, opt Options) (*Operator, error) {
 
 	// Enable full text indexing to have search feature
 	indexDir := filepath.Join(op.options.ScratchDir, "indices")
-	op.searchIndexer, err = indexers.NewResourceIndexer(indexDir)
-	if err != nil {
-		return nil, err
-	}
+	op.searchIndexer = rdx.NewIndexer(indexDir)
 
 	op.watcher = &fsnotify.Watcher{
 		WatchDir: filepath.Dir(opt.ConfigPath),

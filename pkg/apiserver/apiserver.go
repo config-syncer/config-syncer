@@ -124,7 +124,7 @@ func (c completedConfig) New() (*AdmissionServer, error) {
 		}
 		restMapper := meta.NewDefaultRESTMapper([]schema.GroupVersion{admission.SchemeGroupVersion}, interfacesFor)
 		// TODO we're going to need a later k8s.io/apiserver so that we can get discovery to list a different group version for
-		// our endpoint which we'll use to back some custom storage which will consume the AdmissionReview type and give back the correct response
+		// our endpoint which we'll use to back some custom storage which will consume the SearchResult type and give back the correct response
 		apiGroupInfo := genericapiserver.APIGroupInfo{
 			GroupMeta: apimachinery.GroupMeta{
 				// filled in later
@@ -153,7 +153,7 @@ func (c completedConfig) New() (*AdmissionServer, error) {
 				admissionVersion := admissionResource.GroupVersion()
 
 				restMapper.AddSpecific(
-					admission.SchemeGroupVersion.WithKind("AdmissionReview"),
+					admission.SchemeGroupVersion.WithKind("SearchResult"),
 					admissionResource,
 					admissionVersion.WithResource(singularResourceType),
 					meta.RESTScopeRoot)

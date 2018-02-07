@@ -244,7 +244,8 @@ type KubedMetadata struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type SearchResult struct {
-	metav1.TypeMeta `json:",inline"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Hits     []ResultEntry   `json:"hits,omitempty"`
 	Total    uint64          `json:"totalHits"`
@@ -256,3 +257,5 @@ type ResultEntry struct {
 	Score  float64              `json:"score"`
 	Object runtime.RawExtension `json:"object,omitempty"`
 }
+
+var _ runtime.Object = &SearchResult{}

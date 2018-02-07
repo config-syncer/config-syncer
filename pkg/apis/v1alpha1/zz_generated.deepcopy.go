@@ -575,6 +575,7 @@ func (in *S3Spec) DeepCopy() *S3Spec {
 func (in *SearchResult) DeepCopyInto(out *SearchResult) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
 	if in.Hits != nil {
 		in, out := &in.Hits, &out.Hits
 		*out = make([]ResultEntry, len(*in))
