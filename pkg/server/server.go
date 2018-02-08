@@ -11,6 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
+	"github.com/appscode/kubed/pkg/apis/kubed/install"
 )
 
 var (
@@ -21,7 +22,7 @@ var (
 )
 
 func init() {
-	v1alpha1.AddToScheme(Scheme)
+	install.Install(groupFactoryRegistry, registry, Scheme)
 
 	// we need to add the options to empty v1
 	// TODO fix the server code to avoid this
