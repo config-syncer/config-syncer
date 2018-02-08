@@ -12,7 +12,7 @@ import (
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go/log"
 	prom_util "github.com/appscode/kube-mon/prometheus/v1"
-	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
+	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
 	"github.com/appscode/kubed/pkg/influxdb"
@@ -98,7 +98,7 @@ type Operator struct {
 
 	watcher *fsnotify.Watcher
 
-	config apis.ClusterConfig
+	config api.ClusterConfig
 	lock   sync.RWMutex
 }
 
@@ -110,7 +110,7 @@ func (op *Operator) Configure() error {
 
 	var err error
 
-	cfg, err := apis.LoadConfig(op.ConfigPath)
+	cfg, err := api.LoadConfig(op.ConfigPath)
 	if err != nil {
 		return err
 	}
@@ -145,7 +145,7 @@ func (op *Operator) Configure() error {
 	}
 
 	for _, j := range op.config.Janitors {
-		if j.Kind == apis.JanitorInfluxDB {
+		if j.Kind == api.JanitorInfluxDB {
 			janitor := influx.Janitor{Spec: *j.InfluxDB, TTL: j.TTL.Duration}
 			err = janitor.Cleanup()
 			if err != nil {
@@ -437,8 +437,8 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 
 func (op *Operator) RunElasticsearchCleaner() error {
 	for _, j := range op.config.Janitors {
-		if j.Kind == apis.JanitorElasticsearch {
-			var authInfo *apis.JanitorAuthInfo
+		if j.Kind == api.JanitorElasticsearch {
+			var authInfo *api.JanitorAuthInfo
 
 			if j.Elasticsearch.SecretName != "" {
 				secret, err := op.KubeClient.CoreV1().Secrets(op.OperatorNamespace).
@@ -447,7 +447,7 @@ func (op *Operator) RunElasticsearchCleaner() error {
 					return err
 				}
 				if secret != nil {
-					authInfo = apis.LoadJanitorAuthInfo(secret.Data)
+					authInfo = api.LoadJanitorAuthInfo(secret.Data)
 				}
 			}
 

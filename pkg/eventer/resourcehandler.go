@@ -6,7 +6,7 @@ import (
 
 	"github.com/appscode/go/log"
 	stringz "github.com/appscode/go/strings"
-	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
+	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	"github.com/appscode/kutil/discovery"
 	meta_util "github.com/appscode/kutil/meta"
 	"github.com/ghodss/yaml"
@@ -27,7 +27,7 @@ func (f *EventForwarder) OnAdd(obj interface{}) {
 	f.lock.RLock()
 	defer f.lock.RUnlock()
 
-	if err := f.forward(apis.Create, obj); err != nil {
+	if err := f.forward(api.Create, obj); err != nil {
 		log.Errorln(err)
 		return
 	}
@@ -39,7 +39,7 @@ func (f *EventForwarder) OnDelete(obj interface{}) {
 	f.lock.RLock()
 	defer f.lock.RUnlock()
 
-	if err := f.forward(apis.Delete, obj); err != nil {
+	if err := f.forward(api.Delete, obj); err != nil {
 		log.Errorln(err)
 		return
 	}
@@ -50,7 +50,7 @@ func recentEvent(t metav1.Time) bool {
 }
 
 // Check whether the rule's resource fields match the request attrs.
-func ruleMatchesResource(r apis.PolicyRule, attrs attributes) bool {
+func ruleMatchesResource(r api.PolicyRule, attrs attributes) bool {
 	if len(r.Namespaces) > 0 {
 		if !hasString(r.Namespaces, attrs.accessor.GetNamespace()) { // Non-namespaced resources use the empty string.
 			return false
@@ -89,7 +89,7 @@ func ruleMatchesResource(r apis.PolicyRule, attrs attributes) bool {
 
 type attributes struct {
 	gvr       schema.GroupVersionResource
-	operation apis.Operation
+	operation api.Operation
 	accessor  metav1.Object
 }
 
@@ -103,7 +103,7 @@ func hasString(slice []string, value string) bool {
 	return false
 }
 
-func hasOperation(slice []apis.Operation, value apis.Operation) bool {
+func hasOperation(slice []api.Operation, value api.Operation) bool {
 	for _, s := range slice {
 		if s == value {
 			return true
@@ -112,7 +112,7 @@ func hasOperation(slice []apis.Operation, value apis.Operation) bool {
 	return false
 }
 
-func (f *EventForwarder) forward(op apis.Operation, obj interface{}) error {
+func (f *EventForwarder) forward(op api.Operation, obj interface{}) error {
 	if f.spec == nil {
 		return nil
 	}

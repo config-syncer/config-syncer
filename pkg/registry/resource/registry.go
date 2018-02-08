@@ -3,7 +3,7 @@ package resource
 import (
 	"errors"
 
-	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
+	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	"github.com/blevesearch/bleve"
 	admission "k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,7 +22,7 @@ func (ri *ResourceIndexer) NewREST() rest.Storage {
 }
 
 func (ri *ResourceIndexer) New() runtime.Object {
-	return &apis.SearchResult{}
+	return &api.SearchResult{}
 }
 
 func (ri *ResourceIndexer) GroupVersionKind(containingGV schema.GroupVersion) schema.GroupVersionKind {
@@ -49,16 +49,16 @@ func (ri *ResourceIndexer) Get(ctx apirequest.Context, name string, options *met
 		return nil, err
 	}
 
-	resp := &apis.SearchResult{
+	resp := &api.SearchResult{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "kubed.appscode.com/v1alpha1",
-			Kind:       "Resource",
+			Kind:       "SearchResult",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
 			Namespace: ns,
 		},
-		Hits:     make([]apis.ResultEntry, 0, result.Total),
+		Hits:     make([]api.ResultEntry, 0, result.Total),
 		Total:    result.Total,
 		MaxScore: result.MaxScore,
 		Took:     metav1.Duration{Duration: result.Took},
@@ -70,7 +70,7 @@ func (ri *ResourceIndexer) Get(ctx apirequest.Context, name string, options *met
 			// log.Errorf("failed to load document with id %s. Reason: %s", hit.ID, err)
 			continue
 		}
-		resp.Hits = append(resp.Hits, apis.ResultEntry{
+		resp.Hits = append(resp.Hits, api.ResultEntry{
 			Object: runtime.RawExtension{Raw: raw},
 			Score:  hit.Score,
 		})

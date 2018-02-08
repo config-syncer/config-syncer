@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/appscode/kubed/pkg/apis/v1alpha1"
+	"github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	"k8s.io/apimachinery/pkg/apimachinery/announced"
 	"k8s.io/apimachinery/pkg/apimachinery/registered"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -98,7 +98,7 @@ func (c completedConfig) New() (*KubedServer, error) {
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(v1alpha1.GroupName, registry, Scheme, metav1.ParameterCodec, Codecs)
 	apiGroupInfo.GroupMeta.GroupVersion = v1alpha1.SchemeGroupVersion
 	v1alpha1storage := map[string]rest.Storage{}
-	v1alpha1storage["resources"] = operator.searchIndexer.NewREST()
+	v1alpha1storage["searchresults"] = operator.searchIndexer.NewREST()
 	apiGroupInfo.VersionedResourcesStorageMap["v1alpha1"] = v1alpha1storage
 
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {

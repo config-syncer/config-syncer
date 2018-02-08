@@ -6,7 +6,7 @@ import (
 
 	"github.com/appscode/go/log"
 	"github.com/appscode/go/runtime"
-	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
+	apis "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	"github.com/ghodss/yaml"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

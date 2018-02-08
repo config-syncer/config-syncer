@@ -59,14 +59,14 @@ func (o KubedOptions) Config() (*server.KubedConfig, error) {
 		return nil, err
 	}
 
-	opertorConfig := server.NewOperatorConfig(serverConfig.ClientConfig)
-	if err := o.OperatorOptions.ApplyTo(opertorConfig); err != nil {
+	operatorConfig := server.NewOperatorConfig(serverConfig.ClientConfig)
+	if err := o.OperatorOptions.ApplyTo(operatorConfig); err != nil {
 		return nil, err
 	}
 
 	config := &server.KubedConfig{
 		GenericConfig:  serverConfig,
-		OperatorConfig: opertorConfig,
+		OperatorConfig: operatorConfig,
 	}
 	return config, nil
 }

@@ -2,7 +2,7 @@ package e2e
 
 import (
 	"github.com/appscode/go/crypto/rand"
-	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
+	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/test/framework"
 	core_util "github.com/appscode/kutil/core/v1"
 	"github.com/appscode/kutil/meta"
@@ -73,7 +73,7 @@ var _ = Describe("Config-syncer", func() {
 
 			By("Adding sync annotation")
 			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, apis.ConfigSyncKey, "")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -86,7 +86,7 @@ var _ = Describe("Config-syncer", func() {
 
 			By("Removing sync annotation")
 			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
-				obj.Annotations = meta.RemoveKey(obj.Annotations, apis.ConfigSyncKey)
+				obj.Annotations = meta.RemoveKey(obj.Annotations, api.ConfigSyncKey)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -105,7 +105,7 @@ var _ = Describe("Config-syncer", func() {
 
 			By("Adding sync=true annotation")
 			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, apis.ConfigSyncKey, "true")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "true")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -123,7 +123,7 @@ var _ = Describe("Config-syncer", func() {
 
 			By("Adding sync annotation")
 			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, apis.ConfigSyncKey, "")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -131,7 +131,7 @@ var _ = Describe("Config-syncer", func() {
 
 			By("Adding selector annotation")
 			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, apis.ConfigSyncKey, "app="+f.App())
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "app="+f.App())
 				return obj
 			})
 			Expect(err).NotTo(HaveOccurred())
@@ -147,7 +147,7 @@ var _ = Describe("Config-syncer", func() {
 
 			By("Changing selector annotation")
 			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, apis.ConfigSyncKey, "app=do-not-match")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "app=do-not-match")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -156,7 +156,7 @@ var _ = Describe("Config-syncer", func() {
 
 			By("Removing selector annotation")
 			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, apis.ConfigSyncKey, "")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -175,7 +175,7 @@ var _ = Describe("Config-syncer", func() {
 
 			By("Adding sync annotation")
 			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, apis.ConfigSyncKey, "")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -219,7 +219,7 @@ var _ = Describe("Config-syncer", func() {
 
 			By("Adding sync annotation")
 			cfgMap, _, err = core_util.PatchConfigMap(f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, apis.ConfigSyncContexts, context)
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncContexts, context)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -229,7 +229,7 @@ var _ = Describe("Config-syncer", func() {
 
 			By("Removing sync annotation")
 			cfgMap, _, err = core_util.PatchConfigMap(f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
-				obj.Annotations = meta.RemoveKey(obj.Annotations, apis.ConfigSyncContexts)
+				obj.Annotations = meta.RemoveKey(obj.Annotations, api.ConfigSyncContexts)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
