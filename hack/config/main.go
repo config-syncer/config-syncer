@@ -46,32 +46,7 @@ func main() {
 
 func CreateClusterConfig() apis.ClusterConfig {
 	return apis.ClusterConfig{
-		ClusterName: "unicorn",
-		APIServer: apis.APIServerSpec{
-			Address:           ":8080",
-			EnableSearchIndex: true,
-		},
-		Snapshotter: &apis.SnapshotSpec{
-			Schedule: "@every 6h",
-			Sanitize: true,
-			Backend: apis.Backend{
-				StorageSecretName: "snap-secret",
-				GCS: &apis.GCSSpec{
-					Bucket: "restic",
-					Prefix: "minikube",
-				},
-			},
-		},
-		RecycleBin: &apis.RecycleBinSpec{
-			Path:          "/tmp/kubed/trash",
-			TTL:           metav1.Duration{Duration: 7 * 24 * time.Hour},
-			HandleUpdates: false,
-			Receivers: []apis.Receiver{{
-				To:       []string{"ops@example.com"},
-				Notifier: "Mailgun",
-			},
-			},
-		},
+		ClusterName:        "unicorn",
 		EnableConfigSyncer: true,
 		EventForwarder: &apis.EventForwarderSpec{
 			Rules: []apis.PolicyRule{
@@ -152,24 +127,40 @@ func CreateClusterConfig() apis.ClusterConfig {
 				},
 			},
 		},
-		Janitors: []apis.JanitorSpec{
-			{
-				Kind: apis.JanitorElasticsearch,
-				TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
-				Elasticsearch: &apis.ElasticsearchSpec{
-					Endpoint:       "https://elasticsearch-logging.kube-system:9200",
-					LogIndexPrefix: "logstash-",
-					SecretName:     "elasticsearch-logging-cert",
-				},
-			},
-			{
-				Kind: apis.JanitorInfluxDB,
-				TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
-				InfluxDB: &apis.InfluxDBSpec{
-					Endpoint: "https://monitoring-influxdb.kube-system:8086",
-				},
-			},
-		},
 		NotifierSecretName: "notifier-config",
+		RecycleBin: &apis.RecycleBinSpec{
+			Path:          "/tmp/kubed/trash",
+			TTL:           metav1.Duration{Duration: 7 * 24 * time.Hour},
+			HandleUpdates: false,
+		},
+		//Snapshotter: &api.SnapshotSpec{
+		//	Schedule: "@every 6h",
+		//	Sanitize: true,
+		//	Backend: api.Backend{
+		//		StorageSecretName: "snap-secret",
+		//		GCS: &api.GCSSpec{
+		//			Bucket: "restic",
+		//			Prefix: "minikube",
+		//		},
+		//	},
+		//},
+		//Janitors: []api.JanitorSpec{
+		//	{
+		//		Kind: api.JanitorElasticsearch,
+		//		TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
+		//		Elasticsearch: &api.ElasticsearchSpec{
+		//			Endpoint:       "https://elasticsearch-logging.kube-system:9200",
+		//			LogIndexPrefix: "logstash-",
+		//			SecretName:     "elasticsearch-logging-cert",
+		//		},
+		//	},
+		//	{
+		//		Kind: api.JanitorInfluxDB,
+		//		TTL:  metav1.Duration{Duration: 90 * 24 * time.Hour},
+		//		InfluxDB: &api.InfluxDBSpec{
+		//			Endpoint: "https://monitoring-influxdb.kube-system:8086",
+		//		},
+		//	},
+		//},
 	}
 }

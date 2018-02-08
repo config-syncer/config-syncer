@@ -24,7 +24,7 @@ spec:
       containers:
       - name: operator
         image: $KUBED_DOCKER_REGISTRY/kubed:api
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         args:
         - run
         - --secure-port=8443
@@ -71,7 +71,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: kubed-apiserver-cert
-  namespace: $STASH_NAMESPACE
+  namespace: $KUBED_NAMESPACE
   labels:
     app: kubed
 type: kubernetes.io/tls
@@ -112,5 +112,5 @@ spec:
   versionPriority: 15
   service:
     name: kubed-operator
-    namespace: $STASH_NAMESPACE
+    namespace: $KUBED_NAMESPACE
   version: v1alpha1

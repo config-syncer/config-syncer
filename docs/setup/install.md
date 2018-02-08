@@ -22,60 +22,66 @@ Before you can install Kubed, you need a cluster config for Kubed. Cluster confi
 ```yaml
 $ cat https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/config.yaml
 
-apiServer:
-  address: :8080
-  enableReverseIndex: true
-  enableSearchIndex: true
 clusterName: unicorn
 enableConfigSyncer: true
 eventForwarder:
-  ingressAdded:
-    handle: true
-  nodeAdded:
-    handle: true
   receivers:
   - notifier: Mailgun
     to:
     - ops@example.com
-  storageAdded:
-    handle: true
-  warningEvents:
-    handle: true
-    namespaces:
+  rules:
+  - namespaces:
     - kube-system
-janitors:
-- elasticsearch:
-    endpoint: http://elasticsearch-logging.kube-system:9200
-    logIndexPrefix: logstash-
-  kind: Elasticsearch
-  ttl: 2160h0m0s
-- influxdb:
-    endpoint: https://monitoring-influxdb.kube-system:8086
-  kind: InfluxDB
-  ttl: 2160h0m0s
+    operations:
+    - CREATE
+    resources:
+    - group: ""
+      resources:
+      - events
+  - operations:
+    - CREATE
+    resources:
+    - group: ""
+      resources:
+      - nodes
+      - persistentvolumes
+      - persistentvolumeclaims
+  - operations:
+    - CREATE
+    resources:
+    - group: storage.k8s.io
+      resources:
+      - storageclasses
+  - operations:
+    - CREATE
+    resources:
+    - group: extensions
+      resources:
+      - ingresses
+  - operations:
+    - CREATE
+    resources:
+    - group: voyager.appscode.com
+      resources:
+      - ingresses
+  - operations:
+    - CREATE
+    resources:
+    - group: certificates.k8s.io
+      resources:
+      - certificatesigningrequests
 notifierSecretName: notifier-config
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
-  receivers:
-  - notifier: Mailgun
-    to:
-    - ops@example.com
   ttl: 168h0m0s
-snapshotter:
-  gcs:
-    bucket: restic
-    prefix: minikube
-  sanitize: true
-  schedule: '@every 6h'
-  storageSecretName: snap-secret
 ```
 
 To understand the various configuration options, check Kubed [tutorials](/docs/guides/README.md). Once you are satisfied with the configuration, create a Secret with the Kubed cluster config under `config.yaml` key.
 
 ```console
 $ kubectl create secret generic kubed-config -n kube-system \
-    --from-file=./hack/deploy/config.yaml
+    --from-literal=config.yaml=$(curl -fsSL https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/config.yaml)
 secret "kubed-config" created
 
 # apply app=kubed label to easily cleanup later
