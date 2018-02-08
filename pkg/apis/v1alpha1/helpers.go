@@ -15,7 +15,7 @@ import (
 
 func LoadConfig(configPath string) (*ClusterConfig, error) {
 	if _, err := os.Stat(configPath); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to find file %s. Reason: %s", configPath, err)
 	}
 	os.Chmod(configPath, 0600)
 
