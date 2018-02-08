@@ -8,6 +8,7 @@ import (
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	resource_indexer "github.com/appscode/kubed/pkg/registry/resource"
 	"github.com/appscode/kubed/pkg/syncer"
+	"github.com/appscode/kutil/meta"
 	"github.com/appscode/kutil/tools/fsnotify"
 	srch_cs "github.com/appscode/searchlight/client"
 	searchlightinformers "github.com/appscode/searchlight/informers/externalversions"
@@ -53,6 +54,12 @@ func (c *OperatorConfig) New() (*Operator, error) {
 		StashClient:       c.StashClient,
 		KubeDBClient:      c.KubeDBClient,
 		PromClient:        c.PromClient,
+
+		ClientConfig:      c.ClientConfig,
+		ScratchDir:        c.ScratchDir,
+		ConfigPath:        c.ConfigPath,
+		OperatorNamespace: meta.Namespace(),
+		OpsAddress:        c.OpsAddress,
 	}
 
 	op.recorder = eventer.NewEventRecorder(op.KubeClient, "kubed")

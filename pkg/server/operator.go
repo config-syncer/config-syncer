@@ -58,16 +58,17 @@ import (
 	"k8s.io/client-go/informers"
 	core_informers "k8s.io/client-go/informers/core/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/record"
 )
 
 type Operator struct {
+	ClientConfig      *rest.Config
 	ScratchDir        string
 	ConfigPath        string
 	OperatorNamespace string
-	WebAddress        string
+	OpsAddress        string
 
 	notifierCred   envconfig.LoaderFunc
 	recorder       record.EventRecorder
@@ -500,12 +501,7 @@ func (op *Operator) RunSnapshotter() error {
 	sh.SetDir(op.ScratchDir)
 	sh.ShowCMD = true
 	snapshotter := func() error {
-		restConfig, err := clientcmd.BuildConfigFromFlags("op.options.Master", "op.options.KubeConfig")
-		if err != nil {
-			return err
-		}
-
-		mgr := backup.NewBackupManager(op.config.ClusterName, restConfig, op.config.Snapshotter.Sanitize)
+		mgr := backup.NewBackupManager(op.config.ClusterName, op.ClientConfig, op.config.Snapshotter.Sanitize)
 		snapshotFile, err := mgr.BackupToTar(filepath.Join(op.ScratchDir, "snapshot"))
 		if err != nil {
 			return err
@@ -561,6 +557,6 @@ func (op *Operator) Run(stopCh <-chan struct{}) {
 	m := pat.New()
 	m.Get("/metrics", promhttp.Handler())
 	http.Handle("/", m)
-	log.Infoln("Listening on", op.WebAddress)
-	log.Fatal(http.ListenAndServe(op.WebAddress, nil))
+	log.Infoln("Listening on", op.OpsAddress)
+	log.Fatal(http.ListenAndServe(op.OpsAddress, nil))
 }
