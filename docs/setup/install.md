@@ -175,4 +175,4 @@ Once the operator pods are running, you can cancel the above command by typing `
 
 
 ## Update Cluster Config
-If you would like to update cluster config, update the `kubed-config` Secret and restart Kubed operator pod(s).
+If you would like to update cluster config, update the `kubed-config` Secret. Kubed will notice the change in config file and automatically apply the updated configuration.
