@@ -1,12 +1,17 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: kubed-operator
-  namespace: kube-system
+  namespace: $KUBED_NAMESPACE
   labels:
     app: kubed
+  initializers:
+    pending: []
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: kubed
   template:
     metadata:
       labels:
@@ -14,9 +19,11 @@ spec:
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
+      serviceAccountName: $KUBED_SERVICE_ACCOUNT
+      imagePullSecrets: [$KUBED_IMAGE_PULL_SECRET]
       containers:
-      - name: kubed
-        image: appscode/kubed:0.5.0
+      - name: operator
+        image: $KUBED_DOCKER_REGISTRY/kubed:0.5.0
         imagePullPolicy: IfNotPresent
         args:
         - run
@@ -31,25 +38,25 @@ spec:
           name: web
           protocol: TCP
         volumeMounts:
-          - name: config
-            mountPath: /srv/kubed
-          - name: scratch
-            mountPath: /tmp
-      volumes:
         - name: config
-          secret:
-            secretName: kubed-config
+          mountPath: /srv/kubed
         - name: scratch
-          emptyDir: {}
+          mountPath: /tmp
+      volumes:
+      - name: config
+        secret:
+          secretName: kubed-config
+      - name: scratch
+        emptyDir: {}
       tolerations:
-      - key: "CriticalAddonsOnly"
-        operator: "Exists"
+      - key: CriticalAddonsOnly
+        operator: Exists
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: kubed-operator
-  namespace: kube-system
+  namespace: $KUBED_NAMESPACE
   labels:
     app: kubed
 spec:

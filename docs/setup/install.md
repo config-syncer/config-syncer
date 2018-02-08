@@ -20,7 +20,7 @@ section_menu_id: setup
 Before you can install Kubed, you need a cluster config for Kubed. Cluster config is defined in YAML format. You find an example config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/config.yaml).
 
 ```yaml
-$ cat ./hack/deploy/config.yaml
+$ cat https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/config.yaml
 
 apiServer:
   address: :8080
@@ -73,6 +73,17 @@ snapshotter:
 
 To understand the various configuration options, check Kubed [tutorials](/docs/guides/README.md). Once you are satisfied with the configuration, create a Secret with the Kubed cluster config under `config.yaml` key.
 
+```console
+$ kubectl create secret generic kubed-config -n kube-system \
+    --from-file=./hack/deploy/config.yaml
+secret "kubed-config" created
+
+# apply app=kubed label to easily cleanup later
+$ kubectl label secret kubed-config app=kubed -n kube-system
+secret "kubed-config" labeled
+
+```
+
 You may have to create another [Secret for notifiers](/docs/guides/cluster-events/notifiers.md), usually called `notifier-config`. If you are [storing cluster snapshots](/docs/guides/disaster-recovery/cluster-snapshot.md) in cloud storage, you have to create another Secret to provide cloud credentials.
 
 ### Generate Config using script
@@ -90,17 +101,60 @@ $ kubed check --clusterconfig=./hack/deploy/config.yaml
 Cluster config was parsed successfully.
 ```
 
+
 ## Using YAML
-Kubed can be installed using YAML files includes in the [/hack/deploy](https://github.com/appscode/kubed/tree/0.5.0/hack/deploy) folder.
+Kubed can be installed via installer script included in the [/hack/deploy](https://github.com/appscode/kubed/tree/0.5.0/hack/deploy) folder.
 
 ```console
-# Install without RBAC roles
-$ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/without-rbac.yaml
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh | bash -s -- -h
+kubed.sh - install Kubernetes cluster daemon
 
+kubed.sh [options]
+
+options:
+-h, --help                         show brief help
+-n, --namespace=NAMESPACE          specify namespace (default: kube-system)
+    --rbac                         create RBAC roles and bindings
+    --docker-registry              docker registry used to pull kubed images (default: appscode)
+    --image-pull-secret            name of secret used to pull kubed operator images
+    --run-on-master                run kubed operator on master
+
+# install without RBAC roles
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh \
+    | bash
 
 # Install with RBAC roles
-$ kubectl apply -f https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/with-rbac.yaml
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh \
+    | bash -s -- --rbac
 ```
+
+If you would like to run Kubed operator pod in `master` instances, pass the `--run-on-master` flag:
+
+```console
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh \
+    | bash -s -- --run-on-master [--rbac]
+```
+
+Kubed operator will be installed in a `kube-system` namespace by default. If you would like to run Kubed operator pod in `kubed` namespace, pass the `--namespace=kubed` flag:
+
+```console
+$ kubectl create namespace kubed
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh \
+    | bash -s -- --namespace=kubed [--run-on-master] [--rbac]
+```
+
+If you are using a private Docker registry, you need to pull the following docker image:
+
+ - [appscode/kubed](https://hub.docker.com/r/appscode/kubed)
+
+To pass the address of your private registry and optionally a image pull secret use flags `--docker-registry` and `--image-pull-secret` respectively.
+
+```console
+$ kubectl create namespace kubed
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh \
+    | bash -s -- --docker-registry=MY_REGISTRY [--image-pull-secret=SECRET_NAME] [--rbac]
+```
+
 
 ## Using Helm
 Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/0.5.0/chart/stable/kubed) included in this repository. To install the chart with the release name `my-release`:
