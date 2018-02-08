@@ -11,6 +11,7 @@ export KUBED_ENABLE_RBAC=false
 export KUBED_RUN_ON_MASTER=0
 export KUBED_DOCKER_REGISTRY=appscode
 export KUBED_IMAGE_PULL_SECRET=
+export KUBED_UNINSTALL=0
 
 show_help() {
     echo "kubed.sh - install Kubernetes cluster daemon"
@@ -24,6 +25,7 @@ show_help() {
     echo "    --docker-registry              docker registry used to pull kubed images (default: appscode)"
     echo "    --image-pull-secret            name of secret used to pull kubed operator images"
     echo "    --run-on-master                run kubed operator on master"
+    echo "    --uninstall                    uninstall kubed"
 }
 
 while test $# -gt 0; do
@@ -64,12 +66,29 @@ while test $# -gt 0; do
             export KUBED_RUN_ON_MASTER=1
             shift
             ;;
+        --uninstall)
+            export KUBED_UNINSTALL=1
+            shift
+            ;;
         *)
             show_help
             exit 1
             ;;
     esac
 done
+
+if [ "$KUBED_UNINSTALL" -eq 1 ]; then
+    kubectl delete deployment -l app=kubed --namespace $KUBED_NAMESPACE
+    kubectl delete service -l app=kubed --namespace $KUBED_NAMESPACE
+    kubectl delete secret -l app=kubed --namespace $KUBED_NAMESPACE
+    kubectl delete apiservice -l app=kubed --namespace $KUBED_NAMESPACE
+    # Delete RBAC objects, if --rbac flag was used.
+    kubectl delete serviceaccount -l app=kubed --namespace $KUBED_NAMESPACE
+    kubectl delete clusterrolebindings -l app=kubed --namespace $KUBED_NAMESPACE
+    kubectl delete clusterrole -l app=kubed --namespace $KUBED_NAMESPACE
+
+    exit 0
+fi
 
 env | sort | grep KUBED*
 echo ""

@@ -124,6 +124,7 @@ options:
     --docker-registry              docker registry used to pull kubed images (default: appscode)
     --image-pull-secret            name of secret used to pull kubed operator images
     --run-on-master                run kubed operator on master
+    --uninstall                    uninstall kubed
 
 # install without RBAC roles
 $ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/kubed.sh \
