@@ -46,7 +46,7 @@ eventForwarder:
 janitors:
 - elasticsearch:
     endpoint: http://elasticsearch-logging.kube-system:9200
-    logIndexPrefix: logkubed-
+    logIndexPrefix: logstash-
   kind: Elasticsearch
   ttl: 2160h0m0s
 - influxdb:

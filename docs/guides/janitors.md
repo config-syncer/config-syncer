@@ -38,7 +38,7 @@ janitors:
   ttl: 2160h
   elasticsearch:
     endpoint: http://elasticsearch-logging.kube-system:9200
-    logIndexPrefix: logkubed-
+    logIndexPrefix: logstash-
 - kind: InfluxDB
   ttl: 2160h
   influxdb:
