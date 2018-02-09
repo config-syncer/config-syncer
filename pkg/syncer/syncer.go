@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/appscode/go/types"
-	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kutil/meta"
 	clientcmd_util "github.com/appscode/kutil/tools/clientcmd"
 	core "k8s.io/api/core/v1"

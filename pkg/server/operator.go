@@ -12,7 +12,7 @@ import (
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go/log"
 	prom_util "github.com/appscode/kube-mon/prometheus/v1"
-	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
 	"github.com/appscode/kubed/pkg/influxdb"

@@ -3,7 +3,7 @@ package resource
 import (
 	"errors"
 
-	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/blevesearch/bleve"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"

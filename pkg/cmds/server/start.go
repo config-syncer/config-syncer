@@ -5,7 +5,7 @@ import (
 	"io"
 	"net"
 
-	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/server"
 	"github.com/spf13/pflag"
 	genericapiserver "k8s.io/apiserver/pkg/server"

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"

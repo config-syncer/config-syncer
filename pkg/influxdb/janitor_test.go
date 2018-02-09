@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
 
