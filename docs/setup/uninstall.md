@@ -20,7 +20,7 @@ Please follow the steps below to uninstall Kubed:
 - Delete the various objects created for Kubed operator.
 
 ```console
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/api/hack/deploy/kubed.sh \
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/kubed.sh \
     | bash -s -- --uninstall [--namespace=NAMESPACE]
 
 + kubectl delete deployment -l app=kubed -n kube-system
