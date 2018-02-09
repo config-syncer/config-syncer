@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/appscode/go/flags"
-	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
+	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	"github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
 )
@@ -21,7 +21,7 @@ func NewCmdCheck() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			flags.EnsureRequiredFlags(cmd, "clusterconfig")
 
-			cfg, err := apis.LoadConfig(configPath)
+			cfg, err := api.LoadConfig(configPath)
 			if err != nil {
 				return err
 			}

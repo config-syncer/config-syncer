@@ -1,6 +1,3 @@
-apiServer:
-  address: :8080
-  enableSearchIndex: true
 clusterName: unicorn
 enableConfigSyncer: true
 eventForwarder:
@@ -49,30 +46,8 @@ eventForwarder:
     - group: certificates.k8s.io
       resources:
       - certificatesigningrequests
-janitors:
-- elasticsearch:
-    endpoint: https://elasticsearch-logging.kube-system:9200
-    logIndexPrefix: logstash-
-    secretName: elasticsearch-logging-cert
-  kind: Elasticsearch
-  ttl: 2160h0m0s
-- influxdb:
-    endpoint: https://monitoring-influxdb.kube-system:8086
-  kind: InfluxDB
-  ttl: 2160h0m0s
 notifierSecretName: notifier-config
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
-  receivers:
-  - notifier: Mailgun
-    to:
-    - ops@example.com
   ttl: 168h0m0s
-snapshotter:
-  gcs:
-    bucket: restic
-    prefix: minikube
-  sanitize: true
-  schedule: '@every 6h'
-  storageSecretName: snap-secret

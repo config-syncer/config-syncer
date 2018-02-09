@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/appscode/go/types"
-	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
+	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	"github.com/appscode/kutil/meta"
 	clientcmd_util "github.com/appscode/kutil/tools/clientcmd"
 	core "k8s.io/api/core/v1"
@@ -99,14 +99,14 @@ type options struct {
 
 func getSyncOptions(annotations map[string]string) options {
 	opts := options{}
-	if v, err := meta.GetString(annotations, apis.ConfigSyncKey); err == nil {
+	if v, err := meta.GetStringValue(annotations, api.ConfigSyncKey); err == nil {
 		if v == "true" {
 			opts.nsSelector = types.StringP(labels.Everything().String())
 		} else {
 			opts.nsSelector = &v
 		}
 	}
-	if contexts, _ := meta.GetString(annotations, apis.ConfigSyncContexts); contexts != "" {
+	if contexts, _ := meta.GetStringValue(annotations, api.ConfigSyncContexts); contexts != "" {
 		opts.contexts = sets.NewString(strings.Split(contexts, ",")...)
 	}
 	return opts
@@ -142,9 +142,9 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 
 func (s *ConfigSyncer) syncerLabels(name, namespace, cluster string) labels.Set {
 	return labels.Set{
-		apis.OriginNameLabelKey:      name,
-		apis.OriginNamespaceLabelKey: namespace,
-		apis.OriginClusterLabelKey:   cluster,
+		api.OriginNameLabelKey:      name,
+		api.OriginNamespaceLabelKey: namespace,
+		api.OriginClusterLabelKey:   cluster,
 	}
 }
 
@@ -156,22 +156,22 @@ func (s *ConfigSyncer) syncerAnnotations(oldAnnotations, srcAnnotations map[stri
 	newAnnotations := map[string]string{}
 
 	// preserve sync annotations
-	if v, ok := oldAnnotations[apis.ConfigSyncKey]; ok {
-		newAnnotations[apis.ConfigSyncKey] = v
+	if v, ok := oldAnnotations[api.ConfigSyncKey]; ok {
+		newAnnotations[api.ConfigSyncKey] = v
 	}
-	if v, ok := oldAnnotations[apis.ConfigSyncContexts]; ok {
-		newAnnotations[apis.ConfigSyncContexts] = v
+	if v, ok := oldAnnotations[api.ConfigSyncContexts]; ok {
+		newAnnotations[api.ConfigSyncContexts] = v
 	}
 
 	for k, v := range srcAnnotations {
-		if k != apis.ConfigSyncKey && k != apis.ConfigSyncContexts {
+		if k != api.ConfigSyncKey && k != api.ConfigSyncContexts {
 			newAnnotations[k] = v
 		}
 	}
 
 	// set origin reference
 	ref, _ := json.Marshal(srcRef)
-	newAnnotations[apis.ConfigOriginKey] = string(ref)
+	newAnnotations[api.ConfigOriginKey] = string(ref)
 
 	return newAnnotations
 }

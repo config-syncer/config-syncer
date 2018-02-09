@@ -10,13 +10,13 @@ import (
 	"time"
 
 	"github.com/appscode/go/log"
-	apis "github.com/appscode/kubed/pkg/apis/v1alpha1"
+	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	"gopkg.in/olivere/elastic.v5"
 )
 
 type Janitor struct {
-	Spec     apis.ElasticsearchSpec
-	AuthInfo *apis.JanitorAuthInfo
+	Spec     api.ElasticsearchSpec
+	AuthInfo *api.JanitorAuthInfo
 	TTL      time.Duration
 }
 
