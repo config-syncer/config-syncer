@@ -1,6 +1,40 @@
 #!/bin/bash
 set -eou pipefail
 
+echo "checking kubeconfig context"
+kubectl config current-context || { echo "Set a context (kubectl use-context <context>) out of the following:"; echo; kubectl config get-contexts; exit 1; }
+echo ""
+
+# ref: https://stackoverflow.com/a/27776822/244009
+case "$(uname -s)" in
+    Darwin)
+        curl -fsSL -o onessl https://github.com/appscode/onessl/releases/download/0.1.0/onessl-darwin-amd64
+        chmod +x onessl
+        export ONESSL=./onessl
+        ;;
+
+    Linux)
+        curl -fsSL -o onessl https://github.com/appscode/onessl/releases/download/0.1.0/onessl-linux-amd64
+        chmod +x onessl
+        export ONESSL=./onessl
+        ;;
+
+    CYGWIN*|MINGW32*|MSYS*)
+        curl -fsSL -o onessl.exe https://github.com/appscode/onessl/releases/download/0.1.0/onessl-windows-amd64.exe
+        chmod +x onessl.exe
+        export ONESSL=./onessl.exe
+        ;;
+    *)
+        echo 'other OS'
+        ;;
+esac
+
+# http://redsymbol.net/articles/bash-exit-traps/
+function cleanup {
+    rm -rf $ONESSL ca.crt ca.key server.crt server.key
+}
+trap cleanup EXIT
+
 # ref: https://stackoverflow.com/a/7069755/244009
 # ref: https://jonalmeida.com/posts/2013/05/26/different-ways-to-implement-flags-in-bash/
 # ref: http://tldp.org/LDP/abs/html/comparison-ops.html
@@ -93,34 +127,6 @@ fi
 env | sort | grep KUBED*
 echo ""
 
-echo "checking kubeconfig context"
-kubectl config current-context || { echo "Set a context (kubectl use-context <context>) out of the following:"; echo; kubectl config get-contexts; exit 1; }
-echo ""
-
-# ref: https://stackoverflow.com/a/27776822/244009
-case "$(uname -s)" in
-    Darwin)
-        curl -fsSL -o onessl https://github.com/appscode/onessl/releases/download/0.1.0/onessl-darwin-amd64
-        chmod +x onessl
-        export ONESSL=./onessl
-        ;;
-
-    Linux)
-        curl -fsSL -o onessl https://github.com/appscode/onessl/releases/download/0.1.0/onessl-linux-amd64
-        chmod +x onessl
-        export ONESSL=./onessl
-        ;;
-
-    CYGWIN*|MINGW32*|MSYS*)
-        curl -fsSL -o onessl.exe https://github.com/appscode/onessl/releases/download/0.1.0/onessl-windows-amd64.exe
-        chmod +x onessl.exe
-        export ONESSL=./onessl.exe
-        ;;
-    *)
-        echo 'other OS'
-        ;;
-esac
-
 # create necessary TLS certificates:
 # - a local CA key and cert
 # - a webhook server key and cert signed by the local CA
@@ -130,7 +136,6 @@ export SERVICE_SERVING_CERT_CA=$(cat ca.crt | $ONESSL base64)
 export TLS_SERVING_CERT=$(cat server.crt | $ONESSL base64)
 export TLS_SERVING_KEY=$(cat server.key | $ONESSL base64)
 export KUBE_CA=$($ONESSL get kube-ca | $ONESSL base64)
-rm -rf $ONESSL ca.crt ca.key server.crt server.key
 
 curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/operator.yaml | envsubst | kubectl apply -f -
 
