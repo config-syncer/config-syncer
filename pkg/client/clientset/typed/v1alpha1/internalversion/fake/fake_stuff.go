@@ -16,7 +16,7 @@ limitations under the License.
 package fake
 
 import (
-	kubed "github.com/appscode/kubed/pkg/apis/kubed"
+	v1alpha1 "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	testing "k8s.io/client-go/testing"
@@ -32,13 +32,13 @@ var stuffsResource = schema.GroupVersionResource{Group: "kubed.appscode.com", Ve
 
 var stuffsKind = schema.GroupVersionKind{Group: "kubed.appscode.com", Version: "", Kind: "Stuff"}
 
-// Get takes name of the searchResult, and returns the corresponding searchResult object, and an error if there is any.
-func (c *FakeStuffs) Get(name string, options v1.GetOptions) (result *kubed.Stuff, err error) {
+// Get takes name of the stuff, and returns the corresponding stuff object, and an error if there is any.
+func (c *FakeStuffs) Get(name string, options v1.GetOptions) (result *v1alpha1.Stuff, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(stuffsResource, c.ns, name), &kubed.Stuff{})
+		Invokes(testing.NewGetAction(stuffsResource, c.ns, name), &v1alpha1.Stuff{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*kubed.Stuff), err
+	return obj.(*v1alpha1.Stuff), err
 }

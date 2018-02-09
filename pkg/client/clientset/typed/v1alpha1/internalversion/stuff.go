@@ -34,22 +34,22 @@ type StuffInterface interface {
 	StuffExpansion
 }
 
-// searchResults implements StuffInterface
-type searchResults struct {
+// stuffs implements StuffInterface
+type stuffs struct {
 	client rest.Interface
 	ns     string
 }
 
 // newStuffs returns a Stuffs
-func newStuffs(c *KubedClient, namespace string) *searchResults {
-	return &searchResults{
+func newStuffs(c *KubedClient, namespace string) *stuffs {
+	return &stuffs{
 		client: c.RESTClient(),
 		ns:     namespace,
 	}
 }
 
-// Get takes name of the searchResult, and returns the corresponding searchResult object, and an error if there is any.
-func (c *searchResults) Get(name string, options v1.GetOptions) (result *v1alpha1.Stuff, err error) {
+// Get takes name of the stuff, and returns the corresponding stuff object, and an error if there is any.
+func (c *stuffs) Get(name string, options v1.GetOptions) (result *v1alpha1.Stuff, err error) {
 	result = &v1alpha1.Stuff{}
 	err = c.client.Get().
 		Namespace(c.ns).

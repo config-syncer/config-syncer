@@ -18,10 +18,10 @@ limitations under the License.
 
 package kubed
 
-// SearchResultListerExpansion allows custom methods to be added to
-// SearchResultLister.
-type SearchResultListerExpansion interface{}
+// StuffListerExpansion allows custom methods to be added to
+// StuffLister.
+type StuffListerExpansion interface{}
 
-// SearchResultNamespaceListerExpansion allows custom methods to be added to
-// SearchResultNamespaceLister.
-type SearchResultNamespaceListerExpansion interface{}
+// StuffNamespaceListerExpansion allows custom methods to be added to
+// StuffNamespaceLister.
+type StuffNamespaceListerExpansion interface{}
