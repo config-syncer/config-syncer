@@ -21,11 +21,11 @@ func (ri *ResourceIndexer) NewREST() rest.Storage {
 }
 
 func (ri *ResourceIndexer) New() runtime.Object {
-	return &api.SearchResult{}
+	return &api.Stuff{}
 }
 
 func (ri *ResourceIndexer) GroupVersionKind(containingGV schema.GroupVersion) schema.GroupVersionKind {
-	return api.SchemeGroupVersion.WithKind("SearchResult")
+	return api.SchemeGroupVersion.WithKind("Stuff")
 }
 
 func (ri *ResourceIndexer) Get(ctx apirequest.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
@@ -48,10 +48,10 @@ func (ri *ResourceIndexer) Get(ctx apirequest.Context, name string, options *met
 		return nil, err
 	}
 
-	resp := &api.SearchResult{
+	resp := &api.Stuff{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "kubed.appscode.com/v1alpha1",
-			Kind:       "SearchResult",
+			Kind:       "Stuff",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,

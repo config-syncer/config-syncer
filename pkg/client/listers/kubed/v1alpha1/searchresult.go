@@ -25,70 +25,70 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-// SearchResultLister helps list SearchResults.
-type SearchResultLister interface {
-	// List lists all SearchResults in the indexer.
-	List(selector labels.Selector) (ret []*v1alpha1.SearchResult, err error)
-	// SearchResults returns an object that can list and get SearchResults.
-	SearchResults(namespace string) SearchResultNamespaceLister
-	SearchResultListerExpansion
+// StuffLister helps list Stuffs.
+type StuffLister interface {
+	// List lists all Stuffs in the indexer.
+	List(selector labels.Selector) (ret []*v1alpha1.Stuff, err error)
+	// Stuffs returns an object that can list and get Stuffs.
+	Stuffs(namespace string) StuffNamespaceLister
+	StuffListerExpansion
 }
 
-// searchResultLister implements the SearchResultLister interface.
+// searchResultLister implements the StuffLister interface.
 type searchResultLister struct {
 	indexer cache.Indexer
 }
 
-// NewSearchResultLister returns a new SearchResultLister.
-func NewSearchResultLister(indexer cache.Indexer) SearchResultLister {
+// NewStuffLister returns a new StuffLister.
+func NewStuffLister(indexer cache.Indexer) StuffLister {
 	return &searchResultLister{indexer: indexer}
 }
 
-// List lists all SearchResults in the indexer.
-func (s *searchResultLister) List(selector labels.Selector) (ret []*v1alpha1.SearchResult, err error) {
+// List lists all Stuffs in the indexer.
+func (s *searchResultLister) List(selector labels.Selector) (ret []*v1alpha1.Stuff, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.SearchResult))
+		ret = append(ret, m.(*v1alpha1.Stuff))
 	})
 	return ret, err
 }
 
-// SearchResults returns an object that can list and get SearchResults.
-func (s *searchResultLister) SearchResults(namespace string) SearchResultNamespaceLister {
+// Stuffs returns an object that can list and get Stuffs.
+func (s *searchResultLister) Stuffs(namespace string) StuffNamespaceLister {
 	return searchResultNamespaceLister{indexer: s.indexer, namespace: namespace}
 }
 
-// SearchResultNamespaceLister helps list and get SearchResults.
-type SearchResultNamespaceLister interface {
-	// List lists all SearchResults in the indexer for a given namespace.
-	List(selector labels.Selector) (ret []*v1alpha1.SearchResult, err error)
-	// Get retrieves the SearchResult from the indexer for a given namespace and name.
-	Get(name string) (*v1alpha1.SearchResult, error)
-	SearchResultNamespaceListerExpansion
+// StuffNamespaceLister helps list and get Stuffs.
+type StuffNamespaceLister interface {
+	// List lists all Stuffs in the indexer for a given namespace.
+	List(selector labels.Selector) (ret []*v1alpha1.Stuff, err error)
+	// Get retrieves the Stuff from the indexer for a given namespace and name.
+	Get(name string) (*v1alpha1.Stuff, error)
+	StuffNamespaceListerExpansion
 }
 
-// searchResultNamespaceLister implements the SearchResultNamespaceLister
+// searchResultNamespaceLister implements the StuffNamespaceLister
 // interface.
 type searchResultNamespaceLister struct {
 	indexer   cache.Indexer
 	namespace string
 }
 
-// List lists all SearchResults in the indexer for a given namespace.
-func (s searchResultNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.SearchResult, err error) {
+// List lists all Stuffs in the indexer for a given namespace.
+func (s searchResultNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.Stuff, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.SearchResult))
+		ret = append(ret, m.(*v1alpha1.Stuff))
 	})
 	return ret, err
 }
 
-// Get retrieves the SearchResult from the indexer for a given namespace and name.
-func (s searchResultNamespaceLister) Get(name string) (*v1alpha1.SearchResult, error) {
+// Get retrieves the Stuff from the indexer for a given namespace and name.
+func (s searchResultNamespaceLister) Get(name string) (*v1alpha1.Stuff, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("searchresult"), name)
+		return nil, errors.NewNotFound(v1alpha1.Resource("stuff"), name)
 	}
-	return obj.(*v1alpha1.SearchResult), nil
+	return obj.(*v1alpha1.Stuff), nil
 }

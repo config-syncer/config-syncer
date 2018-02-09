@@ -16,8 +16,8 @@ limitations under the License.
 package internalversion
 
 import (
-	v1alpha1 "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
-	scheme "github.com/appscode/kubed/pkg/client/clientset/scheme"
+	kubed "github.com/appscode/kubed/pkg/apis/kubed"
+	scheme "github.com/appscode/kubed/pkg/client/clientset/internalversion/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	rest "k8s.io/client-go/rest"
 )
@@ -30,27 +30,27 @@ type StuffsGetter interface {
 
 // StuffInterface has methods to work with Stuff resources.
 type StuffInterface interface {
-	Get(name string, options v1.GetOptions) (*v1alpha1.Stuff, error)
+	Get(name string, options v1.GetOptions) (*kubed.Stuff, error)
 	StuffExpansion
 }
 
-// searchResults implements StuffInterface
-type searchResults struct {
+// stuffs implements StuffInterface
+type stuffs struct {
 	client rest.Interface
 	ns     string
 }
 
 // newStuffs returns a Stuffs
-func newStuffs(c *KubedClient, namespace string) *searchResults {
-	return &searchResults{
+func newStuffs(c *KubedClient, namespace string) *stuffs {
+	return &stuffs{
 		client: c.RESTClient(),
 		ns:     namespace,
 	}
 }
 
-// Get takes name of the searchResult, and returns the corresponding searchResult object, and an error if there is any.
-func (c *searchResults) Get(name string, options v1.GetOptions) (result *v1alpha1.Stuff, err error) {
-	result = &v1alpha1.Stuff{}
+// Get takes name of the stuff, and returns the corresponding stuff object, and an error if there is any.
+func (c *stuffs) Get(name string, options v1.GetOptions) (result *kubed.Stuff, err error) {
+	result = &kubed.Stuff{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("stuffs").

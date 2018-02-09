@@ -22,23 +22,23 @@ import (
 	testing "k8s.io/client-go/testing"
 )
 
-// FakeSearchResults implements SearchResultInterface
-type FakeSearchResults struct {
+// FakeStuffs implements StuffInterface
+type FakeStuffs struct {
 	Fake *FakeKubed
 	ns   string
 }
 
-var searchresultsResource = schema.GroupVersionResource{Group: "kubed.appscode.com", Version: "", Resource: "searchresults"}
+var stuffsResource = schema.GroupVersionResource{Group: "kubed.appscode.com", Version: "", Resource: "stuffs"}
 
-var searchresultsKind = schema.GroupVersionKind{Group: "kubed.appscode.com", Version: "", Kind: "SearchResult"}
+var stuffsKind = schema.GroupVersionKind{Group: "kubed.appscode.com", Version: "", Kind: "Stuff"}
 
 // Get takes name of the searchResult, and returns the corresponding searchResult object, and an error if there is any.
-func (c *FakeSearchResults) Get(name string, options v1.GetOptions) (result *v1alpha1.SearchResult, err error) {
+func (c *FakeStuffs) Get(name string, options v1.GetOptions) (result *v1alpha1.Stuff, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(searchresultsResource, c.ns, name), &v1alpha1.SearchResult{})
+		Invokes(testing.NewGetAction(stuffsResource, c.ns, name), &v1alpha1.Stuff{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.SearchResult), err
+	return obj.(*v1alpha1.Stuff), err
 }
