@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/blevesearch/bleve"
+	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 )
 
@@ -55,6 +56,17 @@ func (ri *ResourceIndexer) insert(obj interface{}) error {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
 		return err
+	}
+
+	if annotations := accessor.GetAnnotations(); annotations != nil {
+		delete(annotations, "kubectl.kubernetes.io/last-applied-configuration")
+		accessor.SetAnnotations(annotations)
+	}
+
+	if s, ok := obj.(*core.Secret); ok {
+		for key := range s.Data {
+			s.Data[key] = []byte("")
+		}
 	}
 
 	index, err := ri.indexFor(accessor.GetNamespace())
