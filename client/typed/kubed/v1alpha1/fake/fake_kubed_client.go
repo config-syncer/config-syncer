@@ -25,8 +25,8 @@ type FakeKubedV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeKubedV1alpha1) Stuffs(namespace string) v1alpha1.StuffInterface {
-	return &FakeStuffs{c, namespace}
+func (c *FakeKubedV1alpha1) SearchResults(namespace string) v1alpha1.SearchResultInterface {
+	return &FakeSearchResults{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

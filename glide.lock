@@ -1,5 +1,5 @@
 hash: 63e3728fb73924ca81bd062958274a78e08390cbc95b65e2243deb53bfd1d0db
-updated: 2018-02-08T21:51:32.139153661-08:00
+updated: 2018-02-09T04:55:43.639340038-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -48,7 +48,7 @@ imports:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: 527e3e39d7713e6078c6bdd25359275127ff2ddc
+  version: 579ddb8cc946c9e5f09d59863a3c5fe27cdc56f5
   subpackages:
   - apiextensions/v1beta1
   - core/v1
@@ -96,7 +96,7 @@ imports:
   - informers/externalversions/stash/v1alpha1
   - listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 88ee56751d0589717d7f07da39ce2fdfd4f90622
+  version: 0cd5a89588aee3e80d4577b53c6b4bc55a9d6b44
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1

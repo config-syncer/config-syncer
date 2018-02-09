@@ -9,7 +9,7 @@ import (
 // +genclient:onlyVerbs=get
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type Stuff struct {
+type SearchResult struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
@@ -19,7 +19,7 @@ type Stuff struct {
 	Took     metav1.Duration `json:"took"`
 }
 
-var _ runtime.Object = &Stuff{}
+var _ runtime.Object = &SearchResult{}
 
 type ResultEntry struct {
 	Score  float64              `json:"score"`
