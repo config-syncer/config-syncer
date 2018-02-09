@@ -1,5 +1,5 @@
 hash: 63e3728fb73924ca81bd062958274a78e08390cbc95b65e2243deb53bfd1d0db
-updated: 2018-02-08T00:09:57.440266972-08:00
+updated: 2018-02-08T21:51:32.139153661-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -48,7 +48,7 @@ imports:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: 4ab7a342c2a4ee464d28146b8c9330c266336fba
+  version: 527e3e39d7713e6078c6bdd25359275127ff2ddc
   subpackages:
   - apiextensions/v1beta1
   - core/v1
@@ -96,7 +96,7 @@ imports:
   - informers/externalversions/stash/v1alpha1
   - listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 9118c63814c3150ed66cb08d976c7599f9443497
+  version: 88ee56751d0589717d7f07da39ce2fdfd4f90622
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -479,7 +479,7 @@ imports:
 - name: github.com/olekukonko/tablewriter
   version: cca8bbc0798408af109aaaa239cbd2634846b340
 - name: github.com/onsi/ginkgo
-  version: 9eda700730cba42af70d53180f9dcce9266bc2bc
+  version: 11459a886d9cd66b319dac7ef1e917ee221372c9
   subpackages:
   - config
   - internal/codelocation
@@ -499,7 +499,7 @@ imports:
   - reporters/stenographer/support/go-isatty
   - types
 - name: github.com/onsi/gomega
-  version: c893efa28eb45626cdaa76c9f653b62488858837
+  version: dcabb60a477c2b6f456df65037cb6708210fbb02
   subpackages:
   - format
   - internal/assertion
@@ -563,7 +563,7 @@ imports:
 - name: github.com/Smerity/govarint
   version: 7265e41f48f15fd61751e16da866af3c704bb3ab
 - name: github.com/spf13/cobra
-  version: 93959269ad99e80983c9ba742a7e01203a4c0e4f
+  version: fd32f09af19efc9b1279c54e0d8ed23f66232a15
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -756,11 +756,15 @@ imports:
   - pkg/api/errors
   - pkg/api/meta
   - pkg/api/resource
+  - pkg/api/testing
+  - pkg/api/testing/fuzzer
+  - pkg/api/testing/roundtrip
   - pkg/api/validation
   - pkg/api/validation/path
   - pkg/apimachinery
   - pkg/apimachinery/announced
   - pkg/apimachinery/registered
+  - pkg/apis/meta/fuzzer
   - pkg/apis/meta/internalversion
   - pkg/apis/meta/v1
   - pkg/apis/meta/v1/unstructured

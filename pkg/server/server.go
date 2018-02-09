@@ -1,7 +1,8 @@
 package server
 
 import (
-	"github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	"github.com/appscode/kubed/pkg/apis/kubed/install"
+	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	"k8s.io/apimachinery/pkg/apimachinery/announced"
 	"k8s.io/apimachinery/pkg/apimachinery/registered"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -11,7 +12,6 @@ import (
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
-	"github.com/appscode/kubed/pkg/apis/kubed/install"
 )
 
 var (
@@ -56,8 +56,8 @@ func (op *KubedServer) Run(stopCh <-chan struct{}) error {
 }
 
 type completedConfig struct {
-	GenericConfig genericapiserver.CompletedConfig
-	ExtraConfig   *OperatorConfig
+	GenericConfig  genericapiserver.CompletedConfig
+	OperatorConfig *OperatorConfig
 }
 
 type CompletedConfig struct {
@@ -86,7 +86,7 @@ func (c completedConfig) New() (*KubedServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	operator, err := c.ExtraConfig.New()
+	operator, err := c.OperatorConfig.New()
 	if err != nil {
 		return nil, err
 	}
@@ -96,8 +96,8 @@ func (c completedConfig) New() (*KubedServer, error) {
 		Operator:         operator,
 	}
 
-	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(v1alpha1.GroupName, registry, Scheme, metav1.ParameterCodec, Codecs)
-	apiGroupInfo.GroupMeta.GroupVersion = v1alpha1.SchemeGroupVersion
+	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(api.GroupName, registry, Scheme, metav1.ParameterCodec, Codecs)
+	apiGroupInfo.GroupMeta.GroupVersion = api.SchemeGroupVersion
 	v1alpha1storage := map[string]rest.Storage{}
 	v1alpha1storage["searchresults"] = operator.searchIndexer.NewREST()
 	apiGroupInfo.VersionedResourcesStorageMap["v1alpha1"] = v1alpha1storage

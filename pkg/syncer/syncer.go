@@ -99,14 +99,14 @@ type options struct {
 
 func getSyncOptions(annotations map[string]string) options {
 	opts := options{}
-	if v, err := meta.GetString(annotations, api.ConfigSyncKey); err == nil {
+	if v, err := meta.GetStringValue(annotations, api.ConfigSyncKey); err == nil {
 		if v == "true" {
 			opts.nsSelector = types.StringP(labels.Everything().String())
 		} else {
 			opts.nsSelector = &v
 		}
 	}
-	if contexts, _ := meta.GetString(annotations, api.ConfigSyncContexts); contexts != "" {
+	if contexts, _ := meta.GetStringValue(annotations, api.ConfigSyncContexts); contexts != "" {
 		opts.contexts = sets.NewString(strings.Split(contexts, ",")...)
 	}
 	return opts

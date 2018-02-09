@@ -5,7 +5,6 @@ import (
 
 	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	"github.com/blevesearch/bleve"
-	admission "k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -26,7 +25,7 @@ func (ri *ResourceIndexer) New() runtime.Object {
 }
 
 func (ri *ResourceIndexer) GroupVersionKind(containingGV schema.GroupVersion) schema.GroupVersionKind {
-	return admission.SchemeGroupVersion.WithKind("SearchResult")
+	return api.SchemeGroupVersion.WithKind("SearchResult")
 }
 
 func (ri *ResourceIndexer) Get(ctx apirequest.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {

@@ -13,10 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package versioned
+package clientset
 
 import (
-	kubedv1alpha1 "github.com/appscode/kubed/pkg/client/clientset/versioned/typed/kubed/v1alpha1"
+	kubedinternalversion "github.com/appscode/kubed/pkg/client/clientset/typed/v1alpha1/internalversion"
 	glog "github.com/golang/glog"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
@@ -25,27 +25,19 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
-	KubedV1alpha1() kubedv1alpha1.KubedV1alpha1Interface
-	// Deprecated: please explicitly pick a version if possible.
-	Kubed() kubedv1alpha1.KubedV1alpha1Interface
+	Kubed() kubedinternalversion.KubedInterface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	kubedV1alpha1 *kubedv1alpha1.KubedV1alpha1Client
+	kubed *kubedinternalversion.KubedClient
 }
 
-// KubedV1alpha1 retrieves the KubedV1alpha1Client
-func (c *Clientset) KubedV1alpha1() kubedv1alpha1.KubedV1alpha1Interface {
-	return c.kubedV1alpha1
-}
-
-// Deprecated: Kubed retrieves the default version of KubedClient.
-// Please explicitly pick a version.
-func (c *Clientset) Kubed() kubedv1alpha1.KubedV1alpha1Interface {
-	return c.kubedV1alpha1
+// Kubed retrieves the KubedClient
+func (c *Clientset) Kubed() kubedinternalversion.KubedInterface {
+	return c.kubed
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -64,7 +56,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	}
 	var cs Clientset
 	var err error
-	cs.kubedV1alpha1, err = kubedv1alpha1.NewForConfig(&configShallowCopy)
+	cs.kubed, err = kubedinternalversion.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +73,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 // panics if there is an error in the config.
 func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
-	cs.kubedV1alpha1 = kubedv1alpha1.NewForConfigOrDie(c)
+	cs.kubed = kubedinternalversion.NewForConfigOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
@@ -90,7 +82,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
-	cs.kubedV1alpha1 = kubedv1alpha1.New(c)
+	cs.kubed = kubedinternalversion.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

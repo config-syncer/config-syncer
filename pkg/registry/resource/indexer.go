@@ -29,6 +29,8 @@ func (ri *ResourceIndexer) indexFor(ns string) (bleve.Index, error) {
 	if idx, ok := ri.indices[ns]; ok {
 		ri.idxLock.RUnlock()
 		return idx, nil
+	} else {
+		ri.idxLock.RUnlock()
 	}
 
 	ri.idxLock.Lock()

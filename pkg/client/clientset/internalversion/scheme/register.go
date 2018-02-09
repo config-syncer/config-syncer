@@ -16,8 +16,6 @@ limitations under the License.
 package scheme
 
 import (
-	os "os"
-
 	kubed "github.com/appscode/kubed/pkg/apis/kubed/install"
 	announced "k8s.io/apimachinery/pkg/apimachinery/announced"
 	registered "k8s.io/apimachinery/pkg/apimachinery/registered"
@@ -25,6 +23,7 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	serializer "k8s.io/apimachinery/pkg/runtime/serializer"
+	os "os"
 )
 
 var Scheme = runtime.NewScheme()

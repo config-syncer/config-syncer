@@ -35,11 +35,7 @@ spec:
         - --v=5
         ports:
         - containerPort: 8443
-          name: api
-          protocol: TCP
         - containerPort: 56790
-          name: web
-          protocol: TCP
         volumeMounts:
         - name: config
           mountPath: /srv/kubed
@@ -90,11 +86,11 @@ metadata:
 spec:
   ports:
   - name: api
-    port: 8080
-    targetPort: api
-  - name: web
+    port: 443
+    targetPort: 8443
+  - name: ops
     port: 56790
-    targetPort: web
+    targetPort: 56790
   selector:
     app: kubed
 ---

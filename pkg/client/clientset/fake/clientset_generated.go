@@ -16,9 +16,9 @@ limitations under the License.
 package fake
 
 import (
-	clientset "github.com/appscode/kubed/pkg/client/clientset/versioned"
-	kubedv1alpha1 "github.com/appscode/kubed/pkg/client/clientset/versioned/typed/kubed/v1alpha1"
-	fakekubedv1alpha1 "github.com/appscode/kubed/pkg/client/clientset/versioned/typed/kubed/v1alpha1/fake"
+	clientset "github.com/appscode/kubed/pkg/client/clientset"
+	kubedinternalversion "github.com/appscode/kubed/pkg/client/clientset/typed/v1alpha1/internalversion"
+	fakekubedinternalversion "github.com/appscode/kubed/pkg/client/clientset/typed/v1alpha1/internalversion/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
@@ -59,12 +59,7 @@ func (c *Clientset) Discovery() discovery.DiscoveryInterface {
 
 var _ clientset.Interface = &Clientset{}
 
-// KubedV1alpha1 retrieves the KubedV1alpha1Client
-func (c *Clientset) KubedV1alpha1() kubedv1alpha1.KubedV1alpha1Interface {
-	return &fakekubedv1alpha1.FakeKubedV1alpha1{Fake: &c.Fake}
-}
-
-// Kubed retrieves the KubedV1alpha1Client
-func (c *Clientset) Kubed() kubedv1alpha1.KubedV1alpha1Interface {
-	return &fakekubedv1alpha1.FakeKubedV1alpha1{Fake: &c.Fake}
+// Kubed retrieves the KubedClient
+func (c *Clientset) Kubed() kubedinternalversion.KubedInterface {
+	return &fakekubedinternalversion.FakeKubed{Fake: &c.Fake}
 }

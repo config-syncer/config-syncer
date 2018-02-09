@@ -5,9 +5,9 @@ import (
 	"io"
 	"net"
 
+	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/server"
 	"github.com/spf13/pflag"
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
 )
@@ -25,7 +25,7 @@ type KubedOptions struct {
 func NewKubedOptions(out, errOut io.Writer) *KubedOptions {
 	o := &KubedOptions{
 		// TODO we will nil out the etcd storage options.  This requires a later level of k8s.io/apiserver
-		RecommendedOptions: genericoptions.NewRecommendedOptions(defaultEtcdPathPrefix, server.Codecs.LegacyCodec(admissionv1beta1.SchemeGroupVersion)),
+		RecommendedOptions: genericoptions.NewRecommendedOptions(defaultEtcdPathPrefix, server.Codecs.LegacyCodec(api.SchemeGroupVersion)),
 		OperatorOptions:    NewOperatorOptions(),
 		StdOut:             out,
 		StdErr:             errOut,
@@ -81,5 +81,11 @@ func (o KubedOptions) Run(stopCh <-chan struct{}) error {
 	if err != nil {
 		return err
 	}
+
+	s.GenericAPIServer.AddPostStartHook("start-kubed-server-informers", func(context genericapiserver.PostStartHookContext) error {
+		config.GenericConfig.SharedInformerFactory.Start(context.StopCh)
+		return nil
+	})
+
 	return s.Run(stopCh)
 }

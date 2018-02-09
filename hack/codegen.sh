@@ -72,9 +72,9 @@ docker run --rm -ti -u $(id -u):$(id -g) \
     appscode/gengo:release-1.9 client-gen \
    --go-header-file "hack/gengo/boilerplate.go.txt" \
    --input-base "$PACKAGE_NAME/pkg/apis/" \
-   --input "kubed/v1alpha1" \
-   --clientset-path "$PACKAGE_NAME/pkg/client/clientset" \
-   --clientset-name "versioned"
+   --input "kubed/v1alpha1/" \
+   --clientset-path "$PACKAGE_NAME/pkg/client/" \
+   --clientset-name "clientset"
 
 # generate lister
 docker run --rm -ti -u $(id -u):$(id -g) \
