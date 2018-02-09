@@ -9,6 +9,8 @@ DOCKER_REPO_ROOT="/go/src/$PACKAGE_NAME"
 
 pushd $REPO_ROOT
 
+rm -rf "$PACKAGE_NAME/pkg/client"
+
 # Generate defaults
 docker run --rm -ti -u $(id -u):$(id -g) \
     -v "$REPO_ROOT":"$DOCKER_REPO_ROOT" \

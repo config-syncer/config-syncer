@@ -6,6 +6,7 @@ import (
 )
 
 // +genclient
+// +genclient:onlyVerbs=get
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type SearchResult struct {
@@ -23,14 +24,4 @@ var _ runtime.Object = &SearchResult{}
 type ResultEntry struct {
 	Score  float64              `json:"score"`
 	Object runtime.RawExtension `json:"object,omitempty"`
-}
-
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-
-// SearchResultList is a list of SearchResult objects.
-type SearchResultList struct {
-	metav1.TypeMeta
-	metav1.ListMeta
-
-	Items []SearchResult
 }

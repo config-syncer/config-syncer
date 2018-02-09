@@ -16,8 +16,8 @@ limitations under the License.
 package internalversion
 
 import (
-	kubed "github.com/appscode/kubed/pkg/apis/kubed"
-	scheme "github.com/appscode/kubed/pkg/client/clientset/internalversion/scheme"
+	v1alpha1 "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	scheme "github.com/appscode/kubed/pkg/client/clientset/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	rest "k8s.io/client-go/rest"
 )
@@ -30,7 +30,7 @@ type SearchResultsGetter interface {
 
 // SearchResultInterface has methods to work with SearchResult resources.
 type SearchResultInterface interface {
-	Get(name string, options v1.GetOptions) (*kubed.SearchResult, error)
+	Get(name string, options v1.GetOptions) (*v1alpha1.SearchResult, error)
 	SearchResultExpansion
 }
 
@@ -49,8 +49,8 @@ func newSearchResults(c *KubedClient, namespace string) *searchResults {
 }
 
 // Get takes name of the searchResult, and returns the corresponding searchResult object, and an error if there is any.
-func (c *searchResults) Get(name string, options v1.GetOptions) (result *kubed.SearchResult, err error) {
-	result = &kubed.SearchResult{}
+func (c *searchResults) Get(name string, options v1.GetOptions) (result *v1alpha1.SearchResult, err error) {
+	result = &v1alpha1.SearchResult{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("searchresults").

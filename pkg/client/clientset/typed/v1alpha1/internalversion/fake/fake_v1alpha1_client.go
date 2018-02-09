@@ -14,3 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 package fake
+
+import (
+	internalversion "github.com/appscode/kubed/pkg/client/clientset/typed/v1alpha1/internalversion"
+	rest "k8s.io/client-go/rest"
+	testing "k8s.io/client-go/testing"
+)
+
+type FakeKubed struct {
+	*testing.Fake
+}
+
+func (c *FakeKubed) SearchResults(namespace string) internalversion.SearchResultInterface {
+	return &FakeSearchResults{c, namespace}
+}
+
+// RESTClient returns a RESTClient that is used to communicate
+// with API server by this client implementation.
+func (c *FakeKubed) RESTClient() rest.Interface {
+	var ret *rest.RESTClient
+	return ret
+}
