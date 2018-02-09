@@ -15,7 +15,7 @@ type ResourceIndexer struct {
 	indices map[string]bleve.Index
 	dir     string
 
-	idxLock sync.RWMutex
+	idxLock sync.Mutex
 }
 
 func NewIndexer(dir string) *ResourceIndexer {
@@ -26,16 +26,12 @@ func NewIndexer(dir string) *ResourceIndexer {
 }
 
 func (ri *ResourceIndexer) indexFor(ns string) (bleve.Index, error) {
-	ri.idxLock.RLock()
-	if idx, ok := ri.indices[ns]; ok {
-		ri.idxLock.RUnlock()
-		return idx, nil
-	} else {
-		ri.idxLock.RUnlock()
-	}
-
 	ri.idxLock.Lock()
 	defer ri.idxLock.Unlock()
+
+	if idx, ok := ri.indices[ns]; ok {
+		return idx, nil
+	}
 
 	indexDir := filepath.Join(ri.dir, ns)
 	idx, err := bleve.Open(indexDir)
