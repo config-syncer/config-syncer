@@ -15,4 +15,4 @@ limitations under the License.
 */
 package v1alpha1
 
-type StuffExpansion interface{}
+type SearchResultExpansion interface{}

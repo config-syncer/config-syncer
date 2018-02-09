@@ -99,7 +99,7 @@ func (c completedConfig) New() (*KubedServer, error) {
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(api.GroupName, registry, Scheme, metav1.ParameterCodec, Codecs)
 	apiGroupInfo.GroupMeta.GroupVersion = api.SchemeGroupVersion
 	v1alpha1storage := map[string]rest.Storage{}
-	v1alpha1storage["stuffs"] = operator.searchIndexer.NewREST()
+	v1alpha1storage["searchresults"] = operator.searchIndexer.NewREST()
 	apiGroupInfo.VersionedResourcesStorageMap["v1alpha1"] = v1alpha1storage
 
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {

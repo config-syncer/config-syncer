@@ -24,7 +24,7 @@ import (
 
 type KubedV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	StuffsGetter
+	SearchResultsGetter
 }
 
 // KubedV1alpha1Client is used to interact with features provided by the kubed.appscode.com group.
@@ -32,8 +32,8 @@ type KubedV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *KubedV1alpha1Client) Stuffs(namespace string) StuffInterface {
-	return newStuffs(c, namespace)
+func (c *KubedV1alpha1Client) SearchResults(namespace string) SearchResultInterface {
+	return newSearchResults(c, namespace)
 }
 
 // NewForConfig creates a new KubedV1alpha1Client for the given config.

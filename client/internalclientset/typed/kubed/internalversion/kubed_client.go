@@ -22,7 +22,7 @@ import (
 
 type KubedInterface interface {
 	RESTClient() rest.Interface
-	StuffsGetter
+	SearchResultsGetter
 }
 
 // KubedClient is used to interact with features provided by the kubed.appscode.com group.
@@ -30,8 +30,8 @@ type KubedClient struct {
 	restClient rest.Interface
 }
 
-func (c *KubedClient) Stuffs(namespace string) StuffInterface {
-	return newStuffs(c, namespace)
+func (c *KubedClient) SearchResults(namespace string) SearchResultInterface {
+	return newSearchResults(c, namespace)
 }
 
 // NewForConfig creates a new KubedClient for the given config.

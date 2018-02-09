@@ -16,29 +16,29 @@ limitations under the License.
 package fake
 
 import (
-	v1alpha1 "github.com/appscode/kubed/apis/kubed/v1alpha1"
+	kubed "github.com/appscode/kubed/apis/kubed"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	testing "k8s.io/client-go/testing"
 )
 
-// FakeStuffs implements StuffInterface
-type FakeStuffs struct {
-	Fake *FakeKubedV1alpha1
+// FakeSearchResults implements SearchResultInterface
+type FakeSearchResults struct {
+	Fake *FakeKubed
 	ns   string
 }
 
-var stuffsResource = schema.GroupVersionResource{Group: "kubed.appscode.com", Version: "v1alpha1", Resource: "stuffs"}
+var searchresultsResource = schema.GroupVersionResource{Group: "kubed.appscode.com", Version: "", Resource: "searchresults"}
 
-var stuffsKind = schema.GroupVersionKind{Group: "kubed.appscode.com", Version: "v1alpha1", Kind: "Stuff"}
+var searchresultsKind = schema.GroupVersionKind{Group: "kubed.appscode.com", Version: "", Kind: "SearchResult"}
 
-// Get takes name of the stuff, and returns the corresponding stuff object, and an error if there is any.
-func (c *FakeStuffs) Get(name string, options v1.GetOptions) (result *v1alpha1.Stuff, err error) {
+// Get takes name of the searchResult, and returns the corresponding searchResult object, and an error if there is any.
+func (c *FakeSearchResults) Get(name string, options v1.GetOptions) (result *kubed.SearchResult, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(stuffsResource, c.ns, name), &v1alpha1.Stuff{})
+		Invokes(testing.NewGetAction(searchresultsResource, c.ns, name), &kubed.SearchResult{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.Stuff), err
+	return obj.(*kubed.SearchResult), err
 }

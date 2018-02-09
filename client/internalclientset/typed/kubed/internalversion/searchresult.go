@@ -22,38 +22,38 @@ import (
 	rest "k8s.io/client-go/rest"
 )
 
-// StuffsGetter has a method to return a StuffInterface.
+// SearchResultsGetter has a method to return a SearchResultInterface.
 // A group's client should implement this interface.
-type StuffsGetter interface {
-	Stuffs(namespace string) StuffInterface
+type SearchResultsGetter interface {
+	SearchResults(namespace string) SearchResultInterface
 }
 
-// StuffInterface has methods to work with Stuff resources.
-type StuffInterface interface {
-	Get(name string, options v1.GetOptions) (*kubed.Stuff, error)
-	StuffExpansion
+// SearchResultInterface has methods to work with SearchResult resources.
+type SearchResultInterface interface {
+	Get(name string, options v1.GetOptions) (*kubed.SearchResult, error)
+	SearchResultExpansion
 }
 
-// stuffs implements StuffInterface
-type stuffs struct {
+// searchResults implements SearchResultInterface
+type searchResults struct {
 	client rest.Interface
 	ns     string
 }
 
-// newStuffs returns a Stuffs
-func newStuffs(c *KubedClient, namespace string) *stuffs {
-	return &stuffs{
+// newSearchResults returns a SearchResults
+func newSearchResults(c *KubedClient, namespace string) *searchResults {
+	return &searchResults{
 		client: c.RESTClient(),
 		ns:     namespace,
 	}
 }
 
-// Get takes name of the stuff, and returns the corresponding stuff object, and an error if there is any.
-func (c *stuffs) Get(name string, options v1.GetOptions) (result *kubed.Stuff, err error) {
-	result = &kubed.Stuff{}
+// Get takes name of the searchResult, and returns the corresponding searchResult object, and an error if there is any.
+func (c *searchResults) Get(name string, options v1.GetOptions) (result *kubed.SearchResult, err error) {
+	result = &kubed.SearchResult{}
 	err = c.client.Get().
 		Namespace(c.ns).
-		Resource("stuffs").
+		Resource("searchresults").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
 		Do().
