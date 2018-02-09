@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/appscode/go/log"
-	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/eventer"
 	core_util "github.com/appscode/kutil/core/v1"
 	core "k8s.io/api/core/v1"

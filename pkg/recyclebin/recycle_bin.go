@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/ghodss/yaml"
 	"github.com/prometheus/common/log"
 	"k8s.io/apimachinery/pkg/api/meta"

@@ -7,7 +7,7 @@ import (
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go-notify"
 	"github.com/appscode/go-notify/unified"
-	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	discovery_util "github.com/appscode/kutil/discovery"
 	"k8s.io/client-go/discovery"
 )

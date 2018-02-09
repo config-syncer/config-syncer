@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/appscode/go/log"
-	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"gopkg.in/olivere/elastic.v5"
 )
 

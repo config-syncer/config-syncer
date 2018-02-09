@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/appscode/go/flags"
-	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
 )

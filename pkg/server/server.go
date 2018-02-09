@@ -1,8 +1,8 @@
 package server
 
 import (
-	api "github.com/appscode/kubed/pkg/apis/kubed/v1alpha1"
-	"github.com/appscode/kubed/pkg/apis/kubed/v1alpha1/install"
+	"github.com/appscode/kubed/apis/kubed/install"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"k8s.io/apimachinery/pkg/apimachinery/announced"
 	"k8s.io/apimachinery/pkg/apimachinery/registered"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
