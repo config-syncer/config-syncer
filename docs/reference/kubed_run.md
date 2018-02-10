@@ -63,6 +63,7 @@ kubed run [flags]
       --requestheader-extra-headers-prefix stringSlice          List of request header prefixes to inspect. X-Remote-Extra- is suggested. (default [x-remote-extra-])
       --requestheader-group-headers stringSlice                 List of request headers to inspect for groups. X-Remote-Group is suggested. (default [x-remote-group])
       --requestheader-username-headers stringSlice              List of request headers to inspect for usernames. X-Remote-User is common. (default [x-remote-user])
+      --resync-period duration                                  If non-zero, will re-list this often. Otherwise, re-list will be delayed aslong as possible (until the upstream source closes the watch or times out. (default 10m0s)
       --scratch-dir emptyDir                                    Directory used to store temporary files. Use an emptyDir in Kubernetes. (default "/tmp")
       --secure-port int                                         The port on which to serve HTTPS with authentication and authorization. If 0, don't serve HTTPS at all. (default 443)
       --tls-ca-file string                                      If set, this certificate authority will used for secure access from Admission Controllers. This must be a valid PEM-encoded CA bundle. Altneratively, the certificate authority can be appended to the certificate provided by --tls-cert-file.

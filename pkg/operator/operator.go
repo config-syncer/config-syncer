@@ -313,7 +313,7 @@ func (op *Operator) setupPrometheusInformers() {
 				ListFunc:  op.PromClient.Prometheuses(core.NamespaceAll).List,
 				WatchFunc: op.PromClient.Prometheuses(core.NamespaceAll).Watch,
 			},
-			&prom.Prometheus{}, 10*time.Minute, cache.Indexers{},
+			&prom.Prometheus{}, op.ResyncPeriod, cache.Indexers{},
 		)
 		op.addEventHandlers(op.promInf, prom_util.SchemeGroupVersion.WithKind(prom.PrometheusesKind))
 
@@ -322,7 +322,7 @@ func (op *Operator) setupPrometheusInformers() {
 				ListFunc:  op.PromClient.ServiceMonitors(core.NamespaceAll).List,
 				WatchFunc: op.PromClient.ServiceMonitors(core.NamespaceAll).Watch,
 			},
-			&prom.ServiceMonitor{}, 10*time.Minute, cache.Indexers{},
+			&prom.ServiceMonitor{}, op.ResyncPeriod, cache.Indexers{},
 		)
 		op.addEventHandlers(op.smonInf, prom_util.SchemeGroupVersion.WithKind(prom.ServiceMonitorsKind))
 
@@ -331,7 +331,7 @@ func (op *Operator) setupPrometheusInformers() {
 				ListFunc:  op.PromClient.Alertmanagers(core.NamespaceAll).List,
 				WatchFunc: op.PromClient.Alertmanagers(core.NamespaceAll).Watch,
 			},
-			&prom.Alertmanager{}, 10*time.Minute, cache.Indexers{},
+			&prom.Alertmanager{}, op.ResyncPeriod, cache.Indexers{},
 		)
 		op.addEventHandlers(op.amgrInf, prom_util.SchemeGroupVersion.WithKind(prom.AlertmanagersKind))
 	}

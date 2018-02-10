@@ -29,6 +29,7 @@ type Config struct {
 	ConfigPath        string
 	OperatorNamespace string
 	OpsAddress        string
+	ResyncPeriod      time.Duration
 }
 
 type OperatorConfig struct {
@@ -79,11 +80,11 @@ func (c *OperatorConfig) New() (*Operator, error) {
 	}
 
 	// ---------------------------
-	op.kubeInformerFactory = informers.NewSharedInformerFactory(op.KubeClient, 10*time.Minute)
-	op.voyagerInformerFactory = voyagerinformers.NewSharedInformerFactory(op.VoyagerClient, 10*time.Minute)
-	op.stashInformerFactory = stashinformers.NewSharedInformerFactory(op.StashClient, 10*time.Minute)
-	op.searchlightInformerFactory = searchlightinformers.NewSharedInformerFactory(op.SearchlightClient, 10*time.Minute)
-	op.kubedbInformerFactory = kubedbinformers.NewSharedInformerFactory(op.KubeDBClient, 10*time.Minute)
+	op.kubeInformerFactory = informers.NewSharedInformerFactory(op.KubeClient, c.ResyncPeriod)
+	op.voyagerInformerFactory = voyagerinformers.NewSharedInformerFactory(op.VoyagerClient, c.ResyncPeriod)
+	op.stashInformerFactory = stashinformers.NewSharedInformerFactory(op.StashClient, c.ResyncPeriod)
+	op.searchlightInformerFactory = searchlightinformers.NewSharedInformerFactory(op.SearchlightClient, c.ResyncPeriod)
+	op.kubedbInformerFactory = kubedbinformers.NewSharedInformerFactory(op.KubeDBClient, c.ResyncPeriod)
 	// ---------------------------
 	op.setupWorkloadInformers()
 	op.setupNetworkInformers()
