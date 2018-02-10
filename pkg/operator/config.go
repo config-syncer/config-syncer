@@ -1,4 +1,4 @@
-package server
+package operator
 
 import (
 	"path/filepath"
@@ -8,7 +8,6 @@ import (
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	resource_indexer "github.com/appscode/kubed/pkg/registry/resource"
 	"github.com/appscode/kubed/pkg/syncer"
-	"github.com/appscode/kutil/meta"
 	"github.com/appscode/kutil/tools/fsnotify"
 	srch_cs "github.com/appscode/searchlight/client"
 	searchlightinformers "github.com/appscode/searchlight/informers/externalversions"
@@ -25,13 +24,17 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+type Config struct {
+	ScratchDir        string
+	ConfigPath        string
+	OperatorNamespace string
+	OpsAddress        string
+}
+
 type OperatorConfig struct {
-	ClientConfig *rest.Config
+	Config
 
-	OpsAddress string
-	ScratchDir string
-	ConfigPath string
-
+	ClientConfig      *rest.Config
 	KubeClient        kubernetes.Interface
 	VoyagerClient     vcs.Interface
 	SearchlightClient srch_cs.Interface
@@ -48,18 +51,14 @@ func NewOperatorConfig(clientConfig *rest.Config) *OperatorConfig {
 
 func (c *OperatorConfig) New() (*Operator, error) {
 	op := &Operator{
+		Config:            c.Config,
+		ClientConfig:      c.ClientConfig,
 		KubeClient:        c.KubeClient,
 		VoyagerClient:     c.VoyagerClient,
 		SearchlightClient: c.SearchlightClient,
 		StashClient:       c.StashClient,
 		KubeDBClient:      c.KubeDBClient,
 		PromClient:        c.PromClient,
-
-		ClientConfig:      c.ClientConfig,
-		ScratchDir:        c.ScratchDir,
-		ConfigPath:        c.ConfigPath,
-		OperatorNamespace: meta.Namespace(),
-		OpsAddress:        c.OpsAddress,
 	}
 
 	op.recorder = eventer.NewEventRecorder(op.KubeClient, "kubed")
@@ -72,7 +71,7 @@ func (c *OperatorConfig) New() (*Operator, error) {
 
 	// Enable full text indexing to have search feature
 	indexDir := filepath.Join(c.ScratchDir, "indices")
-	op.searchIndexer = resource_indexer.NewIndexer(indexDir)
+	op.Indexer = resource_indexer.NewIndexer(indexDir)
 
 	op.watcher = &fsnotify.Watcher{
 		WatchDir: filepath.Dir(c.ConfigPath),

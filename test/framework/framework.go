@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/appscode/go/crypto/rand"
-	"github.com/appscode/kubed/pkg/server"
+	"github.com/appscode/kubed/pkg/operator"
 	sls "github.com/appscode/searchlight/client"
 	scs "github.com/appscode/stash/client"
 	vcs "github.com/appscode/voyager/client"
@@ -32,7 +32,7 @@ type Framework struct {
 	KubeConfig    *rest.Config
 	KubeClient    clientset.Interface
 	crdClient     ecs.ApiextensionsV1beta1Interface
-	KubedOperator *server.Operator
+	KubedOperator *operator.Operator
 	Config        E2EConfig
 	namespace     string
 	Mutex         sync.Mutex
@@ -59,7 +59,7 @@ func New() *Framework {
 		crdClient:  crdClient,
 		namespace:  testConfigs.TestNamespace,
 		Config:     testConfigs,
-		KubedOperator: &server.Operator{
+		KubedOperator: &operator.Operator{
 			KubeClient:        clientset.NewForConfigOrDie(config),
 			StashClient:       scs.NewForConfigOrDie(config),
 			VoyagerClient:     vcs.NewForConfigOrDie(config),

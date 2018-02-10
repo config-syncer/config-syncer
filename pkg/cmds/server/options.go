@@ -3,7 +3,8 @@ package server
 import (
 	"flag"
 
-	"github.com/appscode/kubed/pkg/server"
+	"github.com/appscode/kubed/pkg/operator"
+	"github.com/appscode/kutil/meta"
 	srch_cs "github.com/appscode/searchlight/client"
 	scs "github.com/appscode/stash/client"
 	vcs "github.com/appscode/voyager/client"
@@ -54,34 +55,35 @@ func (s *OperatorOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.IntVar(&s.Burst, "burst", s.Burst, "The maximum burst for throttle")
 }
 
-func (s *OperatorOptions) ApplyTo(config *server.OperatorConfig) error {
+func (s *OperatorOptions) ApplyTo(cfg *operator.OperatorConfig) error {
 	var err error
 
-	config.ClientConfig.QPS = s.QPS
-	config.ClientConfig.Burst = s.Burst
+	cfg.OperatorNamespace = meta.Namespace()
+	cfg.ClientConfig.QPS = s.QPS
+	cfg.ClientConfig.Burst = s.Burst
 
-	if config.KubeClient, err = kubernetes.NewForConfig(config.ClientConfig); err != nil {
+	if cfg.KubeClient, err = kubernetes.NewForConfig(cfg.ClientConfig); err != nil {
 		return err
 	}
-	if config.VoyagerClient, err = vcs.NewForConfig(config.ClientConfig); err != nil {
+	if cfg.VoyagerClient, err = vcs.NewForConfig(cfg.ClientConfig); err != nil {
 		return err
 	}
-	if config.SearchlightClient, err = srch_cs.NewForConfig(config.ClientConfig); err != nil {
+	if cfg.SearchlightClient, err = srch_cs.NewForConfig(cfg.ClientConfig); err != nil {
 		return err
 	}
-	if config.StashClient, err = scs.NewForConfig(config.ClientConfig); err != nil {
+	if cfg.StashClient, err = scs.NewForConfig(cfg.ClientConfig); err != nil {
 		return err
 	}
-	if config.KubeDBClient, err = kcs.NewForConfig(config.ClientConfig); err != nil {
+	if cfg.KubeDBClient, err = kcs.NewForConfig(cfg.ClientConfig); err != nil {
 		return err
 	}
-	if config.PromClient, err = prom.NewForConfig(&s.PrometheusCrdKinds, s.PrometheusCrdGroup, config.ClientConfig); err != nil {
+	if cfg.PromClient, err = prom.NewForConfig(&s.PrometheusCrdKinds, s.PrometheusCrdGroup, cfg.ClientConfig); err != nil {
 		return err
 	}
 
-	config.OpsAddress = s.OpsAddress
-	config.ScratchDir = s.ScratchDir
-	config.ConfigPath = s.ConfigPath
+	cfg.OpsAddress = s.OpsAddress
+	cfg.ScratchDir = s.ScratchDir
+	cfg.ConfigPath = s.ConfigPath
 
 	return nil
 }

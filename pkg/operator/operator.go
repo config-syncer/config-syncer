@@ -1,4 +1,4 @@
-package server
+package operator
 
 import (
 	"fmt"
@@ -64,11 +64,9 @@ import (
 )
 
 type Operator struct {
-	ClientConfig      *rest.Config
-	ScratchDir        string
-	ConfigPath        string
-	OperatorNamespace string
-	OpsAddress        string
+	Config
+
+	ClientConfig *rest.Config
 
 	notifierCred   envconfig.LoaderFunc
 	recorder       record.EventRecorder
@@ -94,7 +92,7 @@ type Operator struct {
 	smonInf                    cache.SharedIndexInformer
 	amgrInf                    cache.SharedIndexInformer
 
-	searchIndexer *indexers.ResourceIndexer
+	Indexer *indexers.ResourceIndexer
 
 	watcher *fsnotify.Watcher
 
@@ -342,7 +340,7 @@ func (op *Operator) setupPrometheusInformers() {
 func (op *Operator) addEventHandlers(informer cache.SharedIndexInformer, gvk schema.GroupVersionKind) {
 	informer.AddEventHandler(queue.NewVersionedHandler(op.trashCan, gvk))
 	informer.AddEventHandler(queue.NewVersionedHandler(op.eventProcessor, gvk))
-	informer.AddEventHandler(queue.NewVersionedHandler(op.searchIndexer, gvk))
+	informer.AddEventHandler(queue.NewVersionedHandler(op.Indexer, gvk))
 }
 
 func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {

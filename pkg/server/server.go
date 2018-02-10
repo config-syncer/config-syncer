@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/appscode/kubed/apis/kubed/install"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
+	"github.com/appscode/kubed/pkg/operator"
 	"k8s.io/apimachinery/pkg/apimachinery/announced"
 	"k8s.io/apimachinery/pkg/apimachinery/registered"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,13 +42,13 @@ func init() {
 
 type KubedConfig struct {
 	GenericConfig  *genericapiserver.RecommendedConfig
-	OperatorConfig *OperatorConfig
+	OperatorConfig *operator.OperatorConfig
 }
 
 // KubedServer contains state for a Kubernetes cluster daemon.
 type KubedServer struct {
 	GenericAPIServer *genericapiserver.GenericAPIServer
-	Operator         *Operator
+	Operator         *operator.Operator
 }
 
 func (op *KubedServer) Run(stopCh <-chan struct{}) error {
@@ -57,7 +58,7 @@ func (op *KubedServer) Run(stopCh <-chan struct{}) error {
 
 type completedConfig struct {
 	GenericConfig  genericapiserver.CompletedConfig
-	OperatorConfig *OperatorConfig
+	OperatorConfig *operator.OperatorConfig
 }
 
 type CompletedConfig struct {
@@ -99,7 +100,7 @@ func (c completedConfig) New() (*KubedServer, error) {
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(api.GroupName, registry, Scheme, metav1.ParameterCodec, Codecs)
 	apiGroupInfo.GroupMeta.GroupVersion = api.SchemeGroupVersion
 	v1alpha1storage := map[string]rest.Storage{}
-	v1alpha1storage["searchresults"] = operator.searchIndexer.NewREST()
+	v1alpha1storage["searchresults"] = operator.Indexer.NewREST()
 	apiGroupInfo.VersionedResourcesStorageMap["v1alpha1"] = v1alpha1storage
 
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {

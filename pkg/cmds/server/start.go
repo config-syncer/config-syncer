@@ -6,6 +6,7 @@ import (
 	"net"
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
+	"github.com/appscode/kubed/pkg/operator"
 	"github.com/appscode/kubed/pkg/server"
 	"github.com/spf13/pflag"
 	genericapiserver "k8s.io/apiserver/pkg/server"
@@ -59,7 +60,7 @@ func (o KubedOptions) Config() (*server.KubedConfig, error) {
 		return nil, err
 	}
 
-	operatorConfig := server.NewOperatorConfig(serverConfig.ClientConfig)
+	operatorConfig := operator.NewOperatorConfig(serverConfig.ClientConfig)
 	if err := o.OperatorOptions.ApplyTo(operatorConfig); err != nil {
 		return nil, err
 	}
