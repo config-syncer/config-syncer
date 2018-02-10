@@ -82,10 +82,5 @@ func (o KubedOptions) Run(stopCh <-chan struct{}) error {
 		return err
 	}
 
-	s.GenericAPIServer.AddPostStartHook("start-kubed-server-informers", func(context genericapiserver.PostStartHookContext) error {
-		config.GenericConfig.SharedInformerFactory.Start(context.StopCh)
-		return nil
-	})
-
 	return s.Run(stopCh)
 }
