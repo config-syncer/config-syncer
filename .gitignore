@@ -33,3 +33,4 @@ dist/
 .vscode/
 hack/docker/osm
 test/e2e/report.xml
+apiserver.local.config/

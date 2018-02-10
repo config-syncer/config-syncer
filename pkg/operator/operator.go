@@ -530,22 +530,17 @@ func (op *Operator) RunSnapshotter() error {
 	})
 }
 
-func (op *Operator) Run(stopCh <-chan struct{}) {
-	var err error
-
-	err = op.RunElasticsearchCleaner()
-	if err != nil {
-		log.Fatalln(err)
+func (op *Operator) Run(stopCh <-chan struct{}) error {
+	if err := op.RunElasticsearchCleaner(); err != nil {
+		return err
 	}
 
-	err = op.RunTrashCanCleaner()
-	if err != nil {
-		log.Fatalln(err)
+	if err := op.RunTrashCanCleaner(); err != nil {
+		return err
 	}
 
-	err = op.RunSnapshotter()
-	if err != nil {
-		log.Fatalln(err)
+	if err := op.RunSnapshotter(); err != nil {
+		return err
 	}
 
 	op.RunWatchers(stopCh)
@@ -556,5 +551,5 @@ func (op *Operator) Run(stopCh <-chan struct{}) {
 	m.Get("/metrics", promhttp.Handler())
 	http.Handle("/", m)
 	log.Infoln("Listening on", op.OpsAddress)
-	log.Fatal(http.ListenAndServe(op.OpsAddress, nil))
+	return http.ListenAndServe(op.OpsAddress, nil)
 }
