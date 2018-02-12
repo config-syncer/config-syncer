@@ -2,7 +2,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: kubed-operator
-  namespace: $KUBED_NAMESPACE
+  namespace: ${KUBED_NAMESPACE}
   labels:
     app: kubed
   initializers:
@@ -19,11 +19,11 @@ spec:
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
-      serviceAccountName: $KUBED_SERVICE_ACCOUNT
-      imagePullSecrets: [$KUBED_IMAGE_PULL_SECRET]
+      serviceAccountName: ${KUBED_SERVICE_ACCOUNT}
+      imagePullSecrets: [${KUBED_IMAGE_PULL_SECRET}]
       containers:
       - name: operator
-        image: $KUBED_DOCKER_REGISTRY/kubed:api
+        image: ${KUBED_DOCKER_REGISTRY}/kubed:api
         imagePullPolicy: Always
         args:
         - run
@@ -67,20 +67,20 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: kubed-apiserver-cert
-  namespace: $KUBED_NAMESPACE
+  namespace: ${KUBED_NAMESPACE}
   labels:
     app: kubed
 type: kubernetes.io/tls
 data:
-  tls.crt: $TLS_SERVING_CERT
-  tls.key: $TLS_SERVING_KEY
+  tls.crt: ${TLS_SERVING_CERT}
+  tls.key: ${TLS_SERVING_KEY}
 ---
 # to be able to expose TSB inside the cluster
 apiVersion: v1
 kind: Service
 metadata:
   name: kubed-operator
-  namespace: $KUBED_NAMESPACE
+  namespace: ${KUBED_NAMESPACE}
   labels:
     app: kubed
 spec:
@@ -102,11 +102,11 @@ metadata:
   labels:
     app: kubed
 spec:
-  caBundle: $SERVICE_SERVING_CERT_CA
+  caBundle: ${SERVICE_SERVING_CERT_CA}
   group: kubed.appscode.com
   groupPriorityMinimum: 1000
   versionPriority: 15
   service:
     name: kubed-operator
-    namespace: $KUBED_NAMESPACE
+    namespace: ${KUBED_NAMESPACE}
   version: v1alpha1
