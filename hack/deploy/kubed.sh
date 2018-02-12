@@ -116,10 +116,14 @@ if [ "$KUBED_UNINSTALL" -eq 1 ]; then
     kubectl delete service -l app=kubed --namespace $KUBED_NAMESPACE
     kubectl delete secret -l app=kubed --namespace $KUBED_NAMESPACE
     kubectl delete apiservice -l app=kubed --namespace $KUBED_NAMESPACE
+    kubectl delete validatingwebhookconfiguration -l app=kubed --namespace $KUBED_NAMESPACE
+    kubectl delete mutatingwebhookconfiguration -l app=kubed --namespace $KUBED_NAMESPACE
     # Delete RBAC objects, if --rbac flag was used.
     kubectl delete serviceaccount -l app=kubed --namespace $KUBED_NAMESPACE
     kubectl delete clusterrolebindings -l app=kubed --namespace $KUBED_NAMESPACE
     kubectl delete clusterrole -l app=kubed --namespace $KUBED_NAMESPACE
+    kubectl delete rolebindings -l app=kubed --namespace $KUBED_NAMESPACE
+    kubectl delete role -l app=kubed --namespace $KUBED_NAMESPACE
 
     exit 0
 fi

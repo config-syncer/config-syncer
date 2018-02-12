@@ -87,6 +87,8 @@ kind: RoleBinding
 metadata:
   name: kubed-apiserver-extension-server-authentication-reader
   namespace: kube-system
+  labels:
+    app: kubed
 roleRef:
   kind: Role
   apiGroup: rbac.authorization.k8s.io
