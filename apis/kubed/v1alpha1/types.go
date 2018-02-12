@@ -30,6 +30,7 @@ type ClusterConfig struct {
 	RecycleBin         *RecycleBinSpec     `json:"recycleBin,omitempty"`
 	EventForwarder     *EventForwarderSpec `json:"eventForwarder,omitempty"`
 	EnableConfigSyncer bool                `json:"enableConfigSyncer"`
+	ExtractDockerLabel bool                `json:"extractDockerLabel"`
 	NotifierSecretName string              `json:"notifierSecretName,omitempty"`
 	Janitors           []JanitorSpec       `json:"janitors,omitempty"`
 	KubeConfigFile     string              `json:"kubeConfigFile,omitempty"`

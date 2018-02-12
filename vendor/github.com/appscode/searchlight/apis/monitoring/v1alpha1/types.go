@@ -5,6 +5,7 @@ import (
 )
 
 // +genclient
+// +genclient:skipVerbs=updateStatus
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -55,6 +56,7 @@ type ClusterAlertSpec struct {
 }
 
 // +genclient
+// +genclient:skipVerbs=updateStatus
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -109,6 +111,7 @@ type NodeAlertSpec struct {
 }
 
 // +genclient
+// +genclient:skipVerbs=updateStatus
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 

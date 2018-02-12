@@ -15,6 +15,7 @@ import (
 	"github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
 	"github.com/appscode/kubed/pkg/influxdb"
+	label_extractor "github.com/appscode/kubed/pkg/label_extractor"
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	indexers "github.com/appscode/kubed/pkg/registry/resource"
 	"github.com/appscode/kubed/pkg/storage"
@@ -68,11 +69,12 @@ type Operator struct {
 
 	ClientConfig *rest.Config
 
-	notifierCred   envconfig.LoaderFunc
-	recorder       record.EventRecorder
-	trashCan       *rbin.RecycleBin
-	eventProcessor *eventer.EventForwarder
-	configSyncer   *syncer.ConfigSyncer
+	notifierCred       envconfig.LoaderFunc
+	recorder           record.EventRecorder
+	trashCan           *rbin.RecycleBin
+	eventProcessor     *eventer.EventForwarder
+	configSyncer       *syncer.ConfigSyncer
+	extractDockerLabel *label_extractor.ExtractDockerLabel
 
 	cron *cron.Cron
 
@@ -142,6 +144,8 @@ func (op *Operator) Configure() error {
 		return err
 	}
 
+	op.extractDockerLabel.Configure(op.config.ExtractDockerLabel)
+
 	for _, j := range op.config.Janitors {
 		if j.Kind == api.JanitorInfluxDB {
 			janitor := influx.Janitor{Spec: *j.InfluxDB, TTL: j.TTL.Duration}
@@ -158,18 +162,27 @@ func (op *Operator) Configure() error {
 func (op *Operator) setupWorkloadInformers() {
 	deploymentInformer := op.kubeInformerFactory.Apps().V1beta1().Deployments().Informer()
 	op.addEventHandlers(deploymentInformer, apps.SchemeGroupVersion.WithKind("Deployment"))
+	deploymentInformer.AddEventHandler(op.extractDockerLabel.ExtractFromDeploymentHandler())
 
 	rcInformer := op.kubeInformerFactory.Core().V1().ReplicationControllers().Informer()
 	op.addEventHandlers(rcInformer, core.SchemeGroupVersion.WithKind("ReplicationController"))
+	rcInformer.AddEventHandler(op.extractDockerLabel.ExtractFromReplicationControllerHandler())
 
 	rsInformer := op.kubeInformerFactory.Extensions().V1beta1().ReplicaSets().Informer()
 	op.addEventHandlers(rsInformer, extensions.SchemeGroupVersion.WithKind("ReplicaSet"))
+	rsInformer.AddEventHandler(op.extractDockerLabel.ExtractFromReplicaSetHandler())
 
 	daemonSetInformer := op.kubeInformerFactory.Extensions().V1beta1().DaemonSets().Informer()
 	op.addEventHandlers(daemonSetInformer, extensions.SchemeGroupVersion.WithKind("DaemonSet"))
+	daemonSetInformer.AddEventHandler(op.extractDockerLabel.ExtractFromDaemonSetHandler())
 
 	jobInformer := op.kubeInformerFactory.Batch().V1().Jobs().Informer()
 	op.addEventHandlers(jobInformer, batch.SchemeGroupVersion.WithKind("Job"))
+	jobInformer.AddEventHandler(op.extractDockerLabel.ExtractFromJobHandler())
+
+	stsInformer := op.kubeInformerFactory.Apps().V1beta1().StatefulSets().Informer()
+	op.addEventHandlers(stsInformer, apps.SchemeGroupVersion.WithKind("StatefulSet"))
+	stsInformer.AddEventHandler(op.extractDockerLabel.ExtractFromStatefulSetHandler())
 
 	op.kubeInformerFactory.Core().V1().Pods().Informer()
 }

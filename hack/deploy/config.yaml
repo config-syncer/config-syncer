@@ -46,7 +46,7 @@ eventForwarder:
     - group: certificates.k8s.io
       resources:
       - certificatesigningrequests
-notifierSecretName: notifier-config
+extractDockerLabel: true
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash

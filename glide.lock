@@ -1,5 +1,5 @@
 hash: 63e3728fb73924ca81bd062958274a78e08390cbc95b65e2243deb53bfd1d0db
-updated: 2018-02-17T12:54:28.282609045-08:00
+updated: 2018-02-27T05:58:55.255090251-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -11,7 +11,7 @@ imports:
 - name: github.com/appscode/envconfig
   version: 183bbe643a2875eaa69c85627ac6b25813983203
 - name: github.com/appscode/go
-  version: 8367769380cf93a12b381d957941ddf2a19d0356
+  version: 83e7fc1967ed737eedfc87da60c42e9fc4dc684c
   subpackages:
   - analytics
   - context
@@ -47,9 +47,10 @@ imports:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: 579ddb8cc946c9e5f09d59863a3c5fe27cdc56f5
+  version: 6a5c108367b50c78b783e51490f015d03ce62259
   subpackages:
   - apiextensions/v1beta1
+  - apps/v1beta1
   - core/v1
   - discovery
   - meta
@@ -67,7 +68,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: f481491440d9f3bbcd66ad590e2f24dd89785350
+  version: f30cdb8c19d121eccc053d2606e5deab9151dc01
   subpackages:
   - apis/monitoring
   - apis/monitoring/v1alpha1
@@ -82,7 +83,7 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: fb47ea99ec392240c982f464e47df676ad95fd16
+  version: d70fc0b286bad15cc99f3f4ffdb4d88d7d1b7c09
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
@@ -95,7 +96,7 @@ imports:
   - client/informers/externalversions/stash/v1alpha1
   - client/listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 7d5c11bc35761fc1662ef4eb6f1b10c75aca9832
+  version: dd608813107ea3b2217a58039e611213f4915dbf
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -295,6 +296,38 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
+- name: github.com/docker/distribution
+  version: edc3ab29cdff8694dd6feb85cfeb4b5f1b38ed9c
+  subpackages:
+  - context
+  - digestset
+  - manifest
+  - manifest/schema1
+  - manifest/schema2
+  - reference
+  - uuid
+- name: github.com/docker/docker
+  version: 4f3616fb1c112e206b88cb7a9922bf49067a7756
+  subpackages:
+  - api/types
+  - api/types/blkiodev
+  - api/types/container
+  - api/types/filters
+  - api/types/mount
+  - api/types/network
+  - api/types/registry
+  - api/types/strslice
+  - api/types/swarm
+  - api/types/swarm/runtime
+  - api/types/versions
+- name: github.com/docker/go-connections
+  version: 3ede32e2033de7505e6500d6c868c2b9ed9f169d
+  subpackages:
+  - nat
+- name: github.com/docker/go-units
+  version: 9e638d38cf6977a37a8ea0078f3ee75a7cdb2dd1
+- name: github.com/docker/libtrust
+  version: aabc10ec26b754e797f9028f4589c5b7bd90dc20
 - name: github.com/edsrzf/mmap-go
   version: 935e0e8a636ca4ba70b713f3e38a19e1b77739e8
 - name: github.com/elazarl/go-bindata-assetfs
@@ -329,7 +362,7 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
+  version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/groupcache
   version: 02826c3e79038b59d737d3b1c0a1d937f71a4433
   subpackages:
@@ -378,8 +411,12 @@ imports:
   - openstack/identity/v3/tokens
   - openstack/utils
   - pagination
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/mux
+  version: 0a192a193177452756c362c20087ddafcf6829c4
 - name: github.com/gorilla/websocket
-  version: 2d1e4548da234d9cb742cc3628556fef86aafbac
+  version: 6eb6ad425a89d9da7a5549bc6da8f79ba5c17844
 - name: github.com/graymeta/stow
   version: 6f2b8867a3fb15cca5507da1d552b55cfe5d07a7
   repo: https://github.com/appscode/stow.git
@@ -410,6 +447,10 @@ imports:
   version: a0d98a5f288019575c6d1f4bb1573fef2d1fcdc4
   subpackages:
   - simplelru
+- name: github.com/heroku/docker-registry-client
+  version: fd2fe803496897db70c236ee244f41487ea92ec2
+  subpackages:
+  - registry
 - name: github.com/howeyc/gopass
   version: bf9dde6d0d2c004a008c27aaee91170c786f6db8
 - name: github.com/imdario/mergo
@@ -423,7 +464,7 @@ imports:
   - models
   - pkg/escape
 - name: github.com/jaytaylor/html2text
-  version: e76a2f8aa970543f8f3dcadaa2223682ef582086
+  version: 190166da35878a77103b951ae035a473531c1fc2
 - name: github.com/jmespath/go-jmespath
   version: 0b12d6b521d83fc7f755e7cfc1b1fbdd35a01a74
 - name: github.com/jpillora/go-ogle-analytics
@@ -433,7 +474,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/kubedb/apimachinery
-  version: 89214d2501bcf65be0ccfa067086d9dc5f0c511d
+  version: 37caef566d41ed47313b44975186c335dde08123
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -470,7 +511,7 @@ imports:
 - name: github.com/ncw/swift
   version: ae9f0ea1605b9aa6434ed5c731ca35d83ba67c55
 - name: github.com/nlopes/slack
-  version: 8ab4d0b364ef1e9af5d102531da20d5ec902b6c4
+  version: 1217b9d3e4304348a9be15c2afd80ad4691f31e5
 - name: github.com/NYTimes/gziphandler
   version: 56545f4a5d46df9a6648819d1664c3a03a13ffdb
 - name: github.com/olekukonko/tablewriter
@@ -509,6 +550,13 @@ imports:
   - matchers/support/goraph/node
   - matchers/support/goraph/util
   - types
+- name: github.com/opencontainers/go-digest
+  version: 279bed98673dd5bef374d3b6e4b09e2af76183bf
+- name: github.com/opencontainers/image-spec
+  version: 372ad780f63454fbbbbcc7cf80e5b90245c13e13
+  subpackages:
+  - specs-go
+  - specs-go/v1
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/peterbourgon/diskv
@@ -542,7 +590,7 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/RoaringBitmap/roaring
-  version: 7580aaa84ed76dd9089df87935dc8aac03713c8c
+  version: a530db3013d436368a87a84daed053b911ccbe15
 - name: github.com/robfig/cron
   version: 2315d5715e36303a941d907f038da7f7c44c773b
 - name: github.com/russross/blackfriday
@@ -560,7 +608,7 @@ imports:
 - name: github.com/Smerity/govarint
   version: 7265e41f48f15fd61751e16da866af3c704bb3ab
 - name: github.com/spf13/cobra
-  version: be77323fc05148ef091e83b3866c0d47c8e74a8b
+  version: a1e4933ab784095895e33dbe9f001ba10cfe2060
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -650,7 +698,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: c7a403bb5fe12fe4644bb956edd5cd677626120a
+  version: ab90adb3efa287b869ecb698db42f923cc734972
   subpackages:
   - gensupport
   - googleapi
@@ -733,7 +781,7 @@ imports:
   - policy/v1beta1
   - rbac/v1
   - rbac/v1alpha1
-  - rbac/v1
+  - rbac/v1beta1
   - scheduling/v1alpha1
   - settings/v1alpha1
   - storage/v1
@@ -932,7 +980,7 @@ imports:
   - informers/rbac
   - informers/rbac/v1
   - informers/rbac/v1alpha1
-  - informers/rbac/v1
+  - informers/rbac/v1beta1
   - informers/scheduling
   - informers/scheduling/v1alpha1
   - informers/settings
@@ -988,8 +1036,8 @@ imports:
   - kubernetes/typed/rbac/v1/fake
   - kubernetes/typed/rbac/v1alpha1
   - kubernetes/typed/rbac/v1alpha1/fake
-  - kubernetes/typed/rbac/v1
-  - kubernetes/typed/rbac/v1/fake
+  - kubernetes/typed/rbac/v1beta1
+  - kubernetes/typed/rbac/v1beta1/fake
   - kubernetes/typed/scheduling/v1alpha1
   - kubernetes/typed/scheduling/v1alpha1/fake
   - kubernetes/typed/settings/v1alpha1
@@ -1018,7 +1066,7 @@ imports:
   - listers/policy/v1beta1
   - listers/rbac/v1
   - listers/rbac/v1alpha1
-  - listers/rbac/v1
+  - listers/rbac/v1beta1
   - listers/scheduling/v1alpha1
   - listers/settings/v1alpha1
   - listers/storage/v1
@@ -1062,6 +1110,8 @@ imports:
   - pkg/util/proto
 - name: k8s.io/kubernetes
   version: 925c127ec6b946659ad0fd596fa959be43f0cc05
+  subpackages:
+  - pkg/util/parsers
 testImports:
 - name: github.com/pmezard/go-difflib
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
