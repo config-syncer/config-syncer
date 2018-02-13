@@ -13,7 +13,7 @@ This chart bootstraps a [Kubed controller](https://github.com/appscode/kubed) de
 
 ## Prerequisites
 
-- Kubernetes 1.7+
+- Kubernetes 1.8+
 
 ## Installing the Chart
 To install the chart with the release name `my-release`:
@@ -39,18 +39,22 @@ The command removes all the Kubernetes components associated with the chart and 
 The following tables lists the configurable parameters of the Kubed chart and their default values.
 
 
-| Parameter                 | Description                                                       | Default            |
-| --------------------------| ------------------------------------------------------------------|--------------------|
-| `replicaCount`            | Number of kubed operator replicas to create (only 1 is supported) | `1`                |
-| `image`                   | container image                                                   | `appscode/kubed`   |
-| `tag`                     | container image tag                                               | `0.5.0`            |
-| `imagePullSecrets`        | Specify image pull secrets                                        | `nil` (does not add image pull secrets to deployed pods) |
-| `imagePullPolicy`         | Image pull policy                                                 | `IfNotPresent`     |
-| `criticalAddon`           | If true, installs kubed operator as critical addon                | `false`            |
-| `logLevel`                | Log level for kubed                                               | `3`                |
-| `nodeSelector`            | Node labels for pod assignment                                    | `{}`               |
-| `rbac.create`             | install required rbac service account, roles and rolebindings     | `false`            |
-| `rbac.serviceAccountName` | ServiceAccount Kubed will use (ignored if rbac.create=true)       | `default`          |
+| Parameter                          | Description                                                       | Default            |
+| -----------------------------------| ------------------------------------------------------------------|--------------------|
+| `replicaCount`                     | Number of kubed operator replicas to create (only 1 is supported) | `1`                |
+| `dockerRegistry`                   | Docker registry used to pull Kubed related images                 | `appscode`         |
+| `imageTags.kubed`                  | Tag of Kubed operator image                                       | `0.5.0`            |
+| `imagePullSecrets`                 | Specify image pull secrets                                        | `nil` (does not add image pull secrets to deployed pods) |
+| `imagePullPolicy`                  | Image pull policy                                                 | `IfNotPresent`     |
+| `criticalAddon`                    | If true, installs kubed operator as critical addon                | `false`            |
+| `logLevel`                         | Log level for kubed                                               | `3`                |
+| `nodeSelector`                     | Node labels for pod assignment                                    | `{}`               |
+| `rbac.create`                      | install required rbac service account, roles and rolebindings     | `false`            |
+| `rbac.serviceAccountName`          | ServiceAccount Kubed will use (ignored if rbac.create=true)       | `default`          |
+| `apiserver.groupPriorityMinimum`   | The minimum priority the group should have.                       | 10000              |
+| `apiserver.versionPriority`        | The ordering of this API inside of the group.                     | 15                 |
+| `apiserver.enableAdmissionWebhook` | Configure apiserver as adission webhooks for Kubed CRDs           | false              |
+| `apiserver.ca`                     | CA certificate used by main Kubernetes api server                 | ``                 |
 
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:

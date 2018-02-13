@@ -23,16 +23,16 @@ spec:
       imagePullSecrets: [${KUBED_IMAGE_PULL_SECRET}]
       containers:
       - name: operator
-        image: ${KUBED_DOCKER_REGISTRY}/kubed:api
+        image: ${KUBED_DOCKER_REGISTRY}/kubed:0.5.0
         imagePullPolicy: Always
         args:
         - run
+        - --v=3
         - --secure-port=8443
         - --audit-log-path=-
         - --tls-cert-file=/var/serving-cert/tls.crt
         - --tls-private-key-file=/var/serving-cert/tls.key
         - --ops-address=:56790
-        - --v=5
         ports:
         - containerPort: 8443
         - containerPort: 56790
