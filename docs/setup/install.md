@@ -165,15 +165,39 @@ $ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/
 
 ## Using Helm
 Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/0.5.0/chart/stable/kubed) included in this repository. To install the chart with the release name `my-release`:
-```bash
+
+```console
+# Mac OSX amd64:
+curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-darwin-amd64 \
+  && chmod +x onessl \
+  && sudo mv onessl /usr/local/bin/
+
+# Linux amd64:
+curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-linux-amd64 \
+  && chmod +x onessl \
+  && sudo mv onessl /usr/local/bin/
+
+# Linux arm64:
+curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-linux-arm64 \
+  && chmod +x onessl \
+  && sudo mv onessl /usr/local/bin/
+
+# Kubernetes 1.8.x
 $ helm repo update
 $ helm install stable/kubed --name my-release
+
+# Kubernetes 1.9.0 or later
+$ helm repo update
+$ helm install stable/kubed --name my-release \
+  --set apiserver.ca="$(onessl get kube-ca)"
 ```
+
 To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/0.5.0/chart/stable/kubed).
 
 
 ## Verify installation
 To check if Kubed operator pods have started, run the following command:
+
 ```console
 $ kubectl get pods --all-namespaces -l app=kubed --watch
 ```
