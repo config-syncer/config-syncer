@@ -57,13 +57,18 @@ func (d *decoderV1) getLen() int {
 	return int(dlen)
 }
 
-func (d *decoderV1) stateAt(addr int) (fstState, error) {
-	var state fstStateV1
+func (d *decoderV1) stateAt(addr int, prealloc fstState) (fstState, error) {
+	state, ok := prealloc.(*fstStateV1)
+	if ok && state != nil {
+		*state = fstStateV1{} // clear the struct
+	} else {
+		state = &fstStateV1{}
+	}
 	err := state.at(d.data, addr)
 	if err != nil {
 		return nil, err
 	}
-	return &state, nil
+	return state, nil
 }
 
 type fstStateV1 struct {

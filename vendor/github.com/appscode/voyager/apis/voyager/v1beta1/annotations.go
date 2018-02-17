@@ -11,7 +11,6 @@ import (
 )
 
 const (
-	IngressKey = "ingress.kubernetes.io"
 	EngressKey = "ingress.appscode.com"
 
 	APISchema        = EngressKey + "/" + "api-schema" // APISchema = {APIGroup}/{APIVersion}
@@ -32,11 +31,6 @@ const (
 	LBTypeLoadBalancer = "LoadBalancer" // default
 	LBTypeInternal     = "Internal"
 	LBType             = EngressKey + "/" + "type"
-
-	// Runs HAProxy on a specific set of a hosts.
-	NodeSelector = EngressKey + "/" + "node-selector"
-	// Deprecated
-	DaemonNodeSelector = EngressKey + "/" + "daemon.nodeSelector"
 
 	// Replicas specify # of HAProxy pods run (default 1)
 	Replicas = EngressKey + "/" + "replicas"
@@ -151,21 +145,16 @@ const (
 	// This value should not be set if the backend do not support https resolution.
 	BackendTLSOptions = EngressKey + "/backend-tls"
 
-	// StickyIngress configures HAProxy to use sticky connection
-	// to the backend servers.
-	// Annotations could  be applied to either Ingress or backend Service (since 3.2+).
-	// ie: ingress.appscode.com/sticky-session: "true"
+	// Specify a method to stick clients to origins across requests.
+	// Only supported value is "cookie".
+	// Annotations could  be applied to either Ingress or backend Service
 	// If applied to Ingress, all the backend connections would be sticky
 	// If applied to Service and Ingress do not have this annotation only
 	// connection to that backend service will be sticky.
-	// Deprecated
-	StickySession = EngressKey + "/" + "sticky-session"
-	// Specify a method to stick clients to origins across requests.
-	// Only supported value is cookie.
 	IngressAffinity = EngressKey + "/affinity"
-	// When affinity is set to cookie, the name of the cookie to use.
+	// When affinity is set to "cookie", the name of the cookie to use.
 	IngressAffinitySessionCookieName = EngressKey + "/session-cookie-name"
-	// When affinity is set to cookie, the hash algorithm used: md5, sha, index.
+	// When affinity is set to "cookie", the hash algorithm used: md5, sha, index.
 	IngressAffinitySessionCookieHash = EngressKey + "/session-cookie-hash"
 
 	// Basic Auth: Follows ingress controller standard
@@ -227,7 +216,7 @@ const (
 	MaxConnections       = EngressKey + "/max-connections"
 
 	// https://github.com/appscode/voyager/issues/552
-	ForceServicePort = EngressKey + "/force-service-port"
+	UseNodePort      = EngressKey + "/use-node-port"
 	SSLRedirect      = EngressKey + "/ssl-redirect"
 	ForceSSLRedirect = EngressKey + "/force-ssl-redirect"
 
@@ -275,7 +264,6 @@ func init() {
 	registerParser(StatsSecret, meta.GetString)
 	registerParser(StatsServiceName, meta.GetString)
 	registerParser(LBType, meta.GetString)
-	registerParser(DaemonNodeSelector, meta.GetString)
 	registerParser(LoadBalancerIP, meta.GetString)
 	registerParser(AuthType, meta.GetString)
 	registerParser(AuthSecret, meta.GetString)
@@ -285,9 +273,8 @@ func init() {
 	registerParser(AuthTLSVerifyClient, meta.GetString)
 	registerParser(AuthTLSErrorPage, meta.GetString)
 	registerParser(ErrorFiles, meta.GetString)
-	registerParser(StickySession, meta.GetBool)
 	registerParser(CORSEnabled, meta.GetBool)
-	registerParser(ForceServicePort, meta.GetBool)
+	registerParser(UseNodePort, meta.GetBool)
 	registerParser(EnableHSTS, meta.GetBool)
 	registerParser(HSTSPreload, meta.GetBool)
 	registerParser(HSTSIncludeSubDomains, meta.GetBool)
@@ -303,7 +290,6 @@ func init() {
 	registerParser(LimitRPS, meta.GetInt)
 	registerParser(LimitRPM, meta.GetInt)
 	registerParser(LimitConnection, meta.GetInt)
-	registerParser(NodeSelector, meta.GetMap)
 	registerParser(ServiceAnnotations, meta.GetMap)
 	registerParser(PodAnnotations, meta.GetMap)
 	registerParser(DefaultsTimeOut, meta.GetMap)
@@ -370,11 +356,8 @@ func (r Ingress) APISchema() string {
 func (r Ingress) Sticky() bool {
 	// Specify a method to stick clients to origins across requests.
 	// Like nginx HAProxy only supports the value cookie.
-	if v, _ := get[IngressAffinity](r.Annotations); v != "" {
-		return true
-	}
-	v, _ := get[StickySession](r.Annotations)
-	return v.(bool)
+	v, _ := get[IngressAffinity](r.Annotations)
+	return v == "cookie"
 }
 
 func (r Ingress) StickySessionCookieName() string {
@@ -429,12 +412,12 @@ func (r Ingress) AllowCORSCred() bool {
 	return true // default value
 }
 
-func (r Ingress) ForceServicePort() bool {
+func (r Ingress) UseNodePort() bool {
 	if r.LBType() == LBTypeNodePort {
-		v, _ := get[ForceServicePort](r.Annotations)
+		v, _ := get[UseNodePort](r.Annotations)
 		return v.(bool)
 	}
-	return true
+	return false
 }
 
 func (r Ingress) EnableHSTS() bool {
@@ -533,14 +516,6 @@ func (r Ingress) Replicas() int32 {
 		return int32(v.(int))
 	}
 	return 1
-}
-
-func (r Ingress) NodeSelector() map[string]string {
-	if v, _ := get[NodeSelector](r.Annotations); len(v.(map[string]string)) > 0 {
-		return v.(map[string]string)
-	}
-	v, _ := get[DaemonNodeSelector](r.Annotations)
-	return ParseDaemonNodeSelector(v.(string))
 }
 
 func (r Ingress) LoadBalancerIP() net.IP {
@@ -710,23 +685,4 @@ func (r Ingress) LimitRPM() int {
 func (r Ingress) LimitConnections() int {
 	value, _ := get[LimitConnection](r.Annotations)
 	return value.(int)
-}
-
-// ref: https://github.com/kubernetes/kubernetes/blob/078238a461a0872a8eacb887fbb3d0085714604c/staging/src/k8s.io/apiserver/pkg/apis/example/v1/types.go#L134
-// Deprecated, for newer ones use '{"k1":"v1", "k2", "v2"}' form
-// This expects the form k1=v1,k2=v2
-func ParseDaemonNodeSelector(labels string) map[string]string {
-	selectorMap := make(map[string]string)
-	for _, label := range strings.Split(labels, ",") {
-		label = strings.TrimSpace(label)
-		if len(label) > 0 && strings.Contains(label, "=") {
-			data := strings.SplitN(label, "=", 2)
-			if len(data) >= 2 {
-				if len(data[0]) > 0 && len(data[1]) > 0 {
-					selectorMap[data[0]] = data[1]
-				}
-			}
-		}
-	}
-	return selectorMap
 }

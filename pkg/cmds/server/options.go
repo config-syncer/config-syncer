@@ -6,11 +6,11 @@ import (
 
 	"github.com/appscode/kubed/pkg/operator"
 	"github.com/appscode/kutil/meta"
-	srch_cs "github.com/appscode/searchlight/client"
-	scs "github.com/appscode/stash/client"
-	vcs "github.com/appscode/voyager/client"
+	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
+	scs "github.com/appscode/stash/client/clientset/versioned"
+	vcs "github.com/appscode/voyager/client/clientset/versioned"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	kcs "github.com/kubedb/apimachinery/client"
+	kcs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	"github.com/spf13/pflag"
 	"k8s.io/client-go/kubernetes"
 )

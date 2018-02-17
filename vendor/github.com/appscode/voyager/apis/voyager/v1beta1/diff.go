@@ -2,13 +2,13 @@ package v1beta1
 
 import (
 	"crypto/x509"
-	"errors"
 	"net"
 	"reflect"
 	"strings"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -47,13 +47,13 @@ func (r Ingress) HasChanged(o Ingress) (bool, error) {
 
 	ra := map[string]string{}
 	for k, v := range r.Annotations {
-		if strings.HasPrefix(k, EngressKey+"/") || strings.HasPrefix(k, IngressKey+"/") || k == ingressClassAnnotationKey {
+		if strings.HasPrefix(k, EngressKey+"/") || k == ingressClassAnnotationKey {
 			ra[k] = v
 		}
 	}
 	oa := map[string]string{}
 	for k, v := range o.Annotations {
-		if strings.HasPrefix(k, EngressKey+"/") || strings.HasPrefix(k, IngressKey+"/") || k == ingressClassAnnotationKey {
+		if strings.HasPrefix(k, EngressKey+"/") || k == ingressClassAnnotationKey {
 			oa[k] = v
 		}
 	}

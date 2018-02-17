@@ -1,10 +1,9 @@
 package resource
 
 import (
-	"errors"
-
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/blevesearch/bleve"
+	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"

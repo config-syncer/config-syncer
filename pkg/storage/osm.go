@@ -2,7 +2,6 @@ package storage
 
 import (
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"net/url"
 	"os"
@@ -26,6 +25,7 @@ import (
 	"github.com/graymeta/stow/local"
 	"github.com/graymeta/stow/s3"
 	"github.com/graymeta/stow/swift"
+	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )

@@ -67,7 +67,7 @@ func (f *FST) Get(input []byte) (uint64, bool, error) {
 
 	var total uint64
 	curr := f.decoder.getRoot()
-	state, err := f.decoder.stateAt(curr)
+	state, err := f.decoder.stateAt(curr, nil)
 	if err != nil {
 		return 0, false, err
 	}
@@ -77,7 +77,7 @@ func (f *FST) Get(input []byte) (uint64, bool, error) {
 			return 0, false, nil
 		}
 
-		state, err = f.decoder.stateAt(curr)
+		state, err = f.decoder.stateAt(curr, state)
 		if err != nil {
 			return 0, false, err
 		}
@@ -157,7 +157,7 @@ func (f *FST) Accept(addr int, b byte) int {
 // IsMatchWithVal returns if this state is a matching state in this Automaton
 // and also returns the final output value for this state
 func (f *FST) IsMatchWithVal(addr int) (bool, uint64) {
-	s, err := f.decoder.stateAt(addr)
+	s, err := f.decoder.stateAt(addr, nil)
 	if err != nil {
 		return false, 0
 	}
@@ -167,7 +167,7 @@ func (f *FST) IsMatchWithVal(addr int) (bool, uint64) {
 // AcceptWithVal returns the next state for this Automaton on input of byte b
 // and also returns the output value for the transition
 func (f *FST) AcceptWithVal(addr int, b byte) (int, uint64) {
-	s, err := f.decoder.stateAt(addr)
+	s, err := f.decoder.stateAt(addr, nil)
 	if err != nil {
 		return noneAddr, 0
 	}
@@ -204,7 +204,7 @@ func (f *FST) Debug(callback func(int, interface{}) error) error {
 			continue
 		}
 		set.Set(uint(addr))
-		state, err := f.decoder.stateAt(addr)
+		state, err := f.decoder.stateAt(addr, nil)
 		if err != nil {
 			return err
 		}
