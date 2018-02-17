@@ -1,7 +1,6 @@
 package operator
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -27,19 +26,20 @@ import (
 	"github.com/appscode/kutil/tools/queue"
 	"github.com/appscode/pat"
 	searchlight_api "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
-	srch_cs "github.com/appscode/searchlight/client"
-	searchlightinformers "github.com/appscode/searchlight/informers/externalversions"
+	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
+	searchlightinformers "github.com/appscode/searchlight/client/informers/externalversions"
 	stash_api "github.com/appscode/stash/apis/stash/v1alpha1"
-	scs "github.com/appscode/stash/client"
-	stashinformers "github.com/appscode/stash/informers/externalversions"
+	scs "github.com/appscode/stash/client/clientset/versioned"
+	stashinformers "github.com/appscode/stash/client/informers/externalversions"
 	voyager_api "github.com/appscode/voyager/apis/voyager/v1beta1"
-	vcs "github.com/appscode/voyager/client"
-	voyagerinformers "github.com/appscode/voyager/informers/externalversions"
+	vcs "github.com/appscode/voyager/client/clientset/versioned"
+	voyagerinformers "github.com/appscode/voyager/client/informers/externalversions"
 	shell "github.com/codeskyblue/go-sh"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	kubedb_api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
-	kcs "github.com/kubedb/apimachinery/client"
-	kubedbinformers "github.com/kubedb/apimachinery/informers/externalversions"
+	kcs "github.com/kubedb/apimachinery/client/clientset/versioned"
+	kubedbinformers "github.com/kubedb/apimachinery/client/informers/externalversions"
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
 	apps "k8s.io/api/apps/v1"
@@ -283,7 +283,7 @@ func (op *Operator) setupKubeDBInformers() {
 		pgInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Postgreses().Informer()
 		op.addEventHandlers(pgInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindPostgres))
 
-		esInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Elasticsearchs().Informer()
+		esInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Elasticsearches().Informer()
 		op.addEventHandlers(esInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindElasticsearch))
 
 		myInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().MySQLs().Informer()
@@ -380,7 +380,7 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 	res = op.kubeInformerFactory.WaitForCacheSync(stopCh)
 	for _, v := range res {
 		if !v {
-			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			runtime.HandleError(errors.Errorf("timed out waiting for caches to sync"))
 			return
 		}
 	}
@@ -388,7 +388,7 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 	res = op.voyagerInformerFactory.WaitForCacheSync(stopCh)
 	for _, v := range res {
 		if !v {
-			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			runtime.HandleError(errors.Errorf("timed out waiting for caches to sync"))
 			return
 		}
 	}
@@ -396,7 +396,7 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 	res = op.stashInformerFactory.WaitForCacheSync(stopCh)
 	for _, v := range res {
 		if !v {
-			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			runtime.HandleError(errors.Errorf("timed out waiting for caches to sync"))
 			return
 		}
 	}
@@ -404,7 +404,7 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 	res = op.searchlightInformerFactory.WaitForCacheSync(stopCh)
 	for _, v := range res {
 		if !v {
-			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			runtime.HandleError(errors.Errorf("timed out waiting for caches to sync"))
 			return
 		}
 	}
@@ -412,22 +412,22 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 	res = op.kubedbInformerFactory.WaitForCacheSync(stopCh)
 	for _, v := range res {
 		if !v {
-			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			runtime.HandleError(errors.Errorf("timed out waiting for caches to sync"))
 			return
 		}
 	}
 
 	if op.promInf != nil {
 		if !cache.WaitForCacheSync(stopCh, op.promInf.HasSynced) {
-			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			runtime.HandleError(errors.Errorf("timed out waiting for caches to sync"))
 			return
 		}
 		if !cache.WaitForCacheSync(stopCh, op.smonInf.HasSynced) {
-			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			runtime.HandleError(errors.Errorf("timed out waiting for caches to sync"))
 			return
 		}
 		if !cache.WaitForCacheSync(stopCh, op.amgrInf.HasSynced) {
-			runtime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
+			runtime.HandleError(errors.Errorf("timed out waiting for caches to sync"))
 			return
 		}
 	}

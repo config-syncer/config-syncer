@@ -2,7 +2,6 @@ package syncer
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 	"strings"
 	"sync"
@@ -11,6 +10,7 @@ import (
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kutil/meta"
 	clientcmd_util "github.com/appscode/kutil/tools/clientcmd"
+	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -49,7 +49,7 @@ func (s *ConfigSyncer) Configure(clusterName string, kubeconfigFile string, enab
 	if kubeconfigFile != "" {
 		kConfig, err := clientcmd.LoadFromFile(kubeconfigFile)
 		if err != nil {
-			return fmt.Errorf("failed to parse context list. Reason: %v", err)
+			return errors.Errorf("failed to parse context list. Reason: %v", err)
 		}
 
 		for contextName := range kConfig.Contexts {

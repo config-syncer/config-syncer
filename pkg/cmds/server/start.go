@@ -1,13 +1,13 @@
 package server
 
 import (
-	"fmt"
 	"io"
 	"net"
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/operator"
 	"github.com/appscode/kubed/pkg/server"
+	"github.com/pkg/errors"
 	"github.com/spf13/pflag"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
@@ -52,7 +52,7 @@ func (o *KubedOptions) Complete() error {
 func (o KubedOptions) Config() (*server.KubedConfig, error) {
 	// TODO have a "real" external address
 	if err := o.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", nil, []net.IP{net.ParseIP("127.0.0.1")}); err != nil {
-		return nil, fmt.Errorf("error creating self-signed certificates: %v", err)
+		return nil, errors.Errorf("error creating self-signed certificates: %v", err)
 	}
 
 	serverConfig := genericapiserver.NewRecommendedConfig(server.Codecs)

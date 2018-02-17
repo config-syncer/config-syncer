@@ -1,12 +1,11 @@
 package syncer
 
 import (
-	"fmt"
-
 	"github.com/appscode/go/log"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/eventer"
 	core_util "github.com/appscode/kutil/core/v1"
+	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -48,10 +47,10 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 	for _, ctx := range contexts.List() {
 		context, found := s.contexts[ctx]
 		if !found {
-			return fmt.Errorf("context %s not found in kubeconfig file", ctx)
+			return errors.Errorf("context %s not found in kubeconfig file", ctx)
 		}
 		if _, found = taken[context.Address]; found {
-			return fmt.Errorf("multiple contexts poniting same cluster")
+			return errors.Errorf("multiple contexts poniting same cluster")
 		}
 		taken[context.Address] = struct{}{}
 	}

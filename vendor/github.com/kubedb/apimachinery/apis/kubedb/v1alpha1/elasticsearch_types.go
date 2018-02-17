@@ -11,7 +11,7 @@ const (
 	ResourceCodeElasticsearch = "es"
 	ResourceKindElasticsearch = "Elasticsearch"
 	ResourceNameElasticsearch = "elasticsearch"
-	ResourceTypeElasticsearch = "elasticsearchs"
+	ResourceTypeElasticsearch = "elasticsearches"
 )
 
 // +genclient

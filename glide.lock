@@ -1,5 +1,5 @@
 hash: 63e3728fb73924ca81bd062958274a78e08390cbc95b65e2243deb53bfd1d0db
-updated: 2018-02-09T04:55:43.639340038-08:00
+updated: 2018-02-17T12:54:28.282609045-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -11,14 +11,13 @@ imports:
 - name: github.com/appscode/envconfig
   version: 183bbe643a2875eaa69c85627ac6b25813983203
 - name: github.com/appscode/go
-  version: fe2dd84a755c383d0516595f4537c2298be9fce5
+  version: 8367769380cf93a12b381d957941ddf2a19d0356
   subpackages:
   - analytics
   - context
   - crypto/rand
   - encoding/json/types
   - encoding/yaml
-  - errors
   - flags
   - homedir
   - log
@@ -68,46 +67,46 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 00d3c28978fc17d8134e009d9ebeb12b95fe3d65
+  version: f481491440d9f3bbcd66ad590e2f24dd89785350
   subpackages:
   - apis/monitoring
   - apis/monitoring/v1alpha1
-  - client
-  - client/scheme
-  - client/typed/monitoring/v1alpha1
+  - client/clientset/versioned
+  - client/clientset/versioned/scheme
+  - client/clientset/versioned/typed/monitoring/v1alpha1
+  - client/informers/externalversions
+  - client/informers/externalversions/internalinterfaces
+  - client/informers/externalversions/monitoring
+  - client/informers/externalversions/monitoring/v1alpha1
+  - client/listers/monitoring/v1alpha1
   - data
   - data/files
-  - informers/externalversions
-  - informers/externalversions/internalinterfaces
-  - informers/externalversions/monitoring
-  - informers/externalversions/monitoring/v1alpha1
-  - listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: 29c489e5d30b41abf7de48c2236fbc7ab3b244a5
+  version: fb47ea99ec392240c982f464e47df676ad95fd16
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
-  - client
-  - client/scheme
-  - client/typed/stash/v1alpha1
-  - informers/externalversions
-  - informers/externalversions/internalinterfaces
-  - informers/externalversions/stash
-  - informers/externalversions/stash/v1alpha1
-  - listers/stash/v1alpha1
+  - client/clientset/versioned
+  - client/clientset/versioned/scheme
+  - client/clientset/versioned/typed/stash/v1alpha1
+  - client/informers/externalversions
+  - client/informers/externalversions/internalinterfaces
+  - client/informers/externalversions/stash
+  - client/informers/externalversions/stash/v1alpha1
+  - client/listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 0cd5a89588aee3e80d4577b53c6b4bc55a9d6b44
+  version: 7d5c11bc35761fc1662ef4eb6f1b10c75aca9832
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
-  - client
-  - client/scheme
-  - client/typed/voyager/v1beta1
-  - informers/externalversions
-  - informers/externalversions/internalinterfaces
-  - informers/externalversions/voyager
-  - informers/externalversions/voyager/v1beta1
-  - listers/voyager/v1beta1
+  - client/clientset/versioned
+  - client/clientset/versioned/scheme
+  - client/clientset/versioned/typed/voyager/v1beta1
+  - client/informers/externalversions
+  - client/informers/externalversions/internalinterfaces
+  - client/informers/externalversions/voyager
+  - client/informers/externalversions/voyager/v1beta1
+  - client/listers/voyager/v1beta1
 - name: github.com/aws/aws-sdk-go
   version: 819b71cf8430e434c1eee7e7e8b0f2b8870be899
   subpackages:
@@ -282,7 +281,7 @@ imports:
   subpackages:
   - pkg/client/monitoring/v1
 - name: github.com/couchbase/vellum
-  version: ed84a675e24ed0a0bf6859b1ddec7e7c858354bd
+  version: 335037ec44ab61b8f54c35079a641a868f3d3362
   subpackages:
   - regexp
   - utf8
@@ -308,8 +307,6 @@ imports:
   version: dcef7f55730566d41eae5db10e7d6981829720f6
 - name: github.com/evanphx/json-patch
   version: 944e07253867aacae43c04b2e6a239005443f33a
-- name: github.com/facebookgo/stack
-  version: 751773369052141c013c6e827a71e8f35c07879c
 - name: github.com/fsnotify/fsnotify
   version: c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9
 - name: github.com/ghodss/yaml
@@ -332,7 +329,7 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 44145f04b68cf362d9c4df2182967c2275eaefed
+  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
 - name: github.com/golang/groupcache
   version: 02826c3e79038b59d737d3b1c0a1d937f71a4433
   subpackages:
@@ -382,7 +379,7 @@ imports:
   - openstack/utils
   - pagination
 - name: github.com/gorilla/websocket
-  version: 6eb6ad425a89d9da7a5549bc6da8f79ba5c17844
+  version: 2d1e4548da234d9cb742cc3628556fef86aafbac
 - name: github.com/graymeta/stow
   version: 6f2b8867a3fb15cca5507da1d552b55cfe5d07a7
   repo: https://github.com/appscode/stow.git
@@ -436,18 +433,18 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/kubedb/apimachinery
-  version: 1f787b4302ed6655f5295638cfaab5acfc1b6189
+  version: 89214d2501bcf65be0ccfa067086d9dc5f0c511d
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
-  - client
-  - client/scheme
-  - client/typed/kubedb/v1alpha1
-  - informers/externalversions
-  - informers/externalversions/internalinterfaces
-  - informers/externalversions/kubedb
-  - informers/externalversions/kubedb/v1alpha1
-  - listers/kubedb/v1alpha1
+  - client/clientset/versioned
+  - client/clientset/versioned/scheme
+  - client/clientset/versioned/typed/kubedb/v1alpha1
+  - client/informers/externalversions
+  - client/informers/externalversions/internalinterfaces
+  - client/informers/externalversions/kubedb
+  - client/informers/externalversions/kubedb/v1alpha1
+  - client/listers/kubedb/v1alpha1
 - name: github.com/mailgun/mailgun-go
   version: 369a1fa57ce6fb314e627087b9fff0db5c266c0f
 - name: github.com/mailru/easyjson
@@ -473,7 +470,7 @@ imports:
 - name: github.com/ncw/swift
   version: ae9f0ea1605b9aa6434ed5c731ca35d83ba67c55
 - name: github.com/nlopes/slack
-  version: db1988bcee7431c807305524daebdfaa323dbb6a
+  version: 8ab4d0b364ef1e9af5d102531da20d5ec902b6c4
 - name: github.com/NYTimes/gziphandler
   version: 56545f4a5d46df9a6648819d1664c3a03a13ffdb
 - name: github.com/olekukonko/tablewriter
@@ -545,7 +542,7 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/RoaringBitmap/roaring
-  version: 579959187317130bda443ec40f81c914e24b1396
+  version: 7580aaa84ed76dd9089df87935dc8aac03713c8c
 - name: github.com/robfig/cron
   version: 2315d5715e36303a941d907f038da7f7c44c773b
 - name: github.com/russross/blackfriday
@@ -563,7 +560,7 @@ imports:
 - name: github.com/Smerity/govarint
   version: 7265e41f48f15fd61751e16da866af3c704bb3ab
 - name: github.com/spf13/cobra
-  version: fd32f09af19efc9b1279c54e0d8ed23f66232a15
+  version: be77323fc05148ef091e83b3866c0d47c8e74a8b
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -578,7 +575,7 @@ imports:
   subpackages:
   - hipchat
 - name: github.com/tinylib/msgp
-  version: 03a79185462ad029a6e7e05b2f3f3e0498d0a6c0
+  version: 3b5c87ab5fb00c660bf85b888445d9a01db64db4
   subpackages:
   - msgp
 - name: github.com/ugorji/go
@@ -653,7 +650,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: e771abbff930c1ae3c6e2c35117fc88856f11b2f
+  version: c7a403bb5fe12fe4644bb956edd5cd677626120a
   subpackages:
   - gensupport
   - googleapi

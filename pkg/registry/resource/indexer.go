@@ -2,11 +2,11 @@ package resource
 
 import (
 	"encoding/json"
-	"fmt"
 	"path/filepath"
 	"sync"
 
 	"github.com/blevesearch/bleve"
+	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 )
@@ -40,7 +40,7 @@ func (ri *ResourceIndexer) indexFor(ns string) (bleve.Index, error) {
 		mapping.AddDocumentMapping("search", bleve.NewDocumentMapping())
 		idx, err := bleve.New(indexDir, mapping)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create index for namespace %s at dir: %s", ns, indexDir)
+			return nil, errors.Errorf("failed to create index for namespace %s at dir: %s", ns, indexDir)
 		}
 		ri.indices[ns] = idx
 		return idx, nil
@@ -73,17 +73,17 @@ func (ri *ResourceIndexer) insert(obj interface{}) error {
 
 	err = index.Index(string(id), obj)
 	if err != nil {
-		return fmt.Errorf("failed to index id %s. Reason: %s", id, err)
+		return errors.Errorf("failed to index id %s. Reason: %s", id, err)
 	}
 
 	data, err := json.Marshal(obj)
 	if err != nil {
-		return fmt.Errorf("failed to serialize to json document for id %s. Reason: %s", id, err)
+		return errors.Errorf("failed to serialize to json document for id %s. Reason: %s", id, err)
 	}
 
 	err = index.SetInternal([]byte(id), data)
 	if err != nil {
-		return fmt.Errorf("failed to store document for id %s. Reason: %s", id, err)
+		return errors.Errorf("failed to store document for id %s. Reason: %s", id, err)
 	}
 	return nil
 }
@@ -101,10 +101,10 @@ func (ri *ResourceIndexer) delete(obj interface{}) error {
 	id := accessor.GetUID()
 
 	if err := index.Delete(string(id)); err != nil {
-		return fmt.Errorf("failed to delete id %s. Reason: %s", id, err)
+		return errors.Errorf("failed to delete id %s. Reason: %s", id, err)
 	}
 	if err := index.DeleteInternal([]byte(id)); err != nil {
-		return fmt.Errorf("failed to delete document for id %s. Reason: %s", id, err)
+		return errors.Errorf("failed to delete document for id %s. Reason: %s", id, err)
 	}
 	return nil
 }

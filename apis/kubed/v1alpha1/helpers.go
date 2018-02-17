@@ -2,20 +2,19 @@ package v1alpha1
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 
 	yc "github.com/appscode/go/encoding/yaml"
-	"github.com/appscode/go/errors"
 	"github.com/ghodss/yaml"
+	"github.com/pkg/errors"
 )
 
 func LoadConfig(configPath string) (*ClusterConfig, error) {
 	if _, err := os.Stat(configPath); err != nil {
-		return nil, fmt.Errorf("failed to find file %s. Reason: %s", configPath, err)
+		return nil, errors.Errorf("failed to find file %s. Reason: %s", configPath, err)
 	}
 	os.Chmod(configPath, 0600)
 
@@ -47,19 +46,19 @@ func (cfg ClusterConfig) Save(configPath string) error {
 func (cfg ClusterConfig) Validate() error {
 	if cfg.EventForwarder != nil {
 		if cfg.EventForwarder.NodeAdded != nil {
-			return fmt.Errorf("convert `nodeAdded` spec to eventForwarder.rules format")
+			return errors.Errorf("convert `nodeAdded` spec to eventForwarder.rules format")
 		}
 		if cfg.EventForwarder.StorageAdded != nil {
-			return fmt.Errorf("convert `storageAdded` spec to eventForwarder.rules format")
+			return errors.Errorf("convert `storageAdded` spec to eventForwarder.rules format")
 		}
 		if cfg.EventForwarder.IngressAdded != nil {
-			return fmt.Errorf("convert `ingressAdded` spec to eventForwarder.rules format")
+			return errors.Errorf("convert `ingressAdded` spec to eventForwarder.rules format")
 		}
 		if cfg.EventForwarder.WarningEvents != nil {
-			return fmt.Errorf("convert `warningEvents` spec to eventForwarder.rules format")
+			return errors.Errorf("convert `warningEvents` spec to eventForwarder.rules format")
 		}
 		if cfg.EventForwarder.CSREvents != nil {
-			return fmt.Errorf("convert `csrEvents` spec to eventForwarder.rules format")
+			return errors.Errorf("convert `csrEvents` spec to eventForwarder.rules format")
 		}
 	}
 
@@ -67,14 +66,14 @@ func (cfg ClusterConfig) Validate() error {
 		switch j.Kind {
 		case JanitorElasticsearch:
 			if j.Elasticsearch == nil {
-				return fmt.Errorf("missing spec for janitor kind %s", j.Kind)
+				return errors.Errorf("missing spec for janitor kind %s", j.Kind)
 			}
 		case JanitorInfluxDB:
 			if j.InfluxDB == nil {
-				return fmt.Errorf("missing spec for janitor kind %s", j.Kind)
+				return errors.Errorf("missing spec for janitor kind %s", j.Kind)
 			}
 		default:
-			return fmt.Errorf("unknown janitor kind %s", j.Kind)
+			return errors.Errorf("unknown janitor kind %s", j.Kind)
 		}
 	}
 	return nil
