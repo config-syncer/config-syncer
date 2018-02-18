@@ -191,7 +191,7 @@ Following Kubernetes objects are supported by recycle bin:
   - ClusterRoleBinding
   - Role
   - RoleBinding
-- __rbac/v1beta1:__
+- __rbac/v1:__
   - ClusterRole
   - ClusterRoleBinding
   - Role
