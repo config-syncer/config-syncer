@@ -147,6 +147,7 @@ if [ "$KUBED_ENABLE_RBAC" = true ]; then
     kubectl create serviceaccount $KUBED_SERVICE_ACCOUNT --namespace $KUBED_NAMESPACE
     kubectl label serviceaccount $KUBED_SERVICE_ACCOUNT app=kubed --namespace $KUBED_NAMESPACE
     curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/rbac-list.yaml | $ONESSL envsubst | kubectl auth reconcile -f -
+    curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/user-roles.yaml | $ONESSL envsubst | kubectl auth reconcile -f -
 fi
 
 if [ "$KUBED_RUN_ON_MASTER" -eq 1 ]; then
