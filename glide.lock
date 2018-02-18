@@ -733,7 +733,7 @@ imports:
   - policy/v1beta1
   - rbac/v1
   - rbac/v1alpha1
-  - rbac/v1beta1
+  - rbac/v1
   - scheduling/v1alpha1
   - settings/v1alpha1
   - storage/v1
@@ -932,7 +932,7 @@ imports:
   - informers/rbac
   - informers/rbac/v1
   - informers/rbac/v1alpha1
-  - informers/rbac/v1beta1
+  - informers/rbac/v1
   - informers/scheduling
   - informers/scheduling/v1alpha1
   - informers/settings
@@ -988,8 +988,8 @@ imports:
   - kubernetes/typed/rbac/v1/fake
   - kubernetes/typed/rbac/v1alpha1
   - kubernetes/typed/rbac/v1alpha1/fake
-  - kubernetes/typed/rbac/v1beta1
-  - kubernetes/typed/rbac/v1beta1/fake
+  - kubernetes/typed/rbac/v1
+  - kubernetes/typed/rbac/v1/fake
   - kubernetes/typed/scheduling/v1alpha1
   - kubernetes/typed/scheduling/v1alpha1/fake
   - kubernetes/typed/settings/v1alpha1
@@ -1018,7 +1018,7 @@ imports:
   - listers/policy/v1beta1
   - listers/rbac/v1
   - listers/rbac/v1alpha1
-  - listers/rbac/v1beta1
+  - listers/rbac/v1
   - listers/scheduling/v1alpha1
   - listers/settings/v1alpha1
   - listers/storage/v1

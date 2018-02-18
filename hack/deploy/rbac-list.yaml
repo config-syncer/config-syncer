@@ -1,4 +1,4 @@
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: kubed-operator
@@ -66,7 +66,7 @@ rules:
   resources: ["*"]
   verbs: ["list", "watch"]
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: kubed-operator
@@ -82,7 +82,7 @@ subjects:
   namespace: ${KUBED_NAMESPACE}
 ---
 # to read the config for terminating authentication
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: kubed-apiserver-extension-server-authentication-reader
@@ -99,7 +99,7 @@ subjects:
   namespace: ${KUBED_NAMESPACE}
 ---
 # to delegate authentication and authorization
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: kubed-apiserver-auth-delegator
@@ -115,7 +115,7 @@ subjects:
   namespace: ${KUBED_NAMESPACE}
 ---
 # to let aggregated apiservers create admission reviews
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: appscode:kubed:apiserver-requester

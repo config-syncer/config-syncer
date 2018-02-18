@@ -186,7 +186,7 @@ Following Kubernetes objects are supported by search index:
   - ClusterRoleBinding
   - Role
   - RoleBinding
-- __rbac/v1beta1:__
+- __rbac/v1:__
   - ClusterRole
   - ClusterRoleBinding
   - Role
