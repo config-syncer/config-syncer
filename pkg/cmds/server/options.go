@@ -16,10 +16,9 @@ import (
 )
 
 type OperatorOptions struct {
-	ConfigPath          string
-	OpsAddress          string
-	ScratchDir          string
-	ControllerNamespace string
+	ConfigPath string
+	OpsAddress string
+	ScratchDir string
 
 	QPS          float32
 	Burst        int

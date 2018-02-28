@@ -21,10 +21,11 @@ limitations under the License.
 package v1alpha1
 
 import (
+	unsafe "unsafe"
+
 	kubed "github.com/appscode/kubed/apis/kubed"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
-	unsafe "unsafe"
 )
 
 func init() {
