@@ -48,6 +48,7 @@ func CreateClusterConfig() apis.ClusterConfig {
 	return apis.ClusterConfig{
 		ClusterName:        "unicorn",
 		EnableConfigSyncer: true,
+		ExtractDockerLabel: true,
 		EventForwarder: &apis.EventForwarderSpec{
 			Rules: []apis.PolicyRule{
 				{
@@ -127,7 +128,7 @@ func CreateClusterConfig() apis.ClusterConfig {
 				},
 			},
 		},
-		NotifierSecretName: "notifier-config",
+		// NotifierSecretName: "notifier-config",
 		RecycleBin: &apis.RecycleBinSpec{
 			Path:          "/tmp/kubed/trash",
 			TTL:           metav1.Duration{Duration: 7 * 24 * time.Hour},

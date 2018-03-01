@@ -15,6 +15,8 @@ const (
 )
 
 // +genclient
+// +genclient:skipVerbs=updateStatus
+// +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Redis defines a Redis database.
@@ -29,7 +31,7 @@ type RedisSpec struct {
 	// Version of Redis to be deployed.
 	Version types.StrYo `json:"version,omitempty"`
 	// Number of instances to deploy for a Redis database.
-	Replicas int32 `json:"replicas,omitempty"`
+	Replicas *int32 `json:"replicas,omitempty"`
 	// Storage spec to specify how storage shall be used.
 	Storage *core.PersistentVolumeClaimSpec `json:"storage,omitempty"`
 	// NodeSelector is a selector which must be true for the pod to fit on a node

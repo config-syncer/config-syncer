@@ -15,6 +15,8 @@ const (
 )
 
 // +genclient
+// +genclient:skipVerbs=updateStatus
+// +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // MongoDB defines a MongoDB database.
@@ -29,7 +31,7 @@ type MongoDBSpec struct {
 	// Version of MongoDB to be deployed.
 	Version types.StrYo `json:"version,omitempty"`
 	// Number of instances to deploy for a MongoDB database.
-	Replicas int32 `json:"replicas,omitempty"`
+	Replicas *int32 `json:"replicas,omitempty"`
 	// Storage spec to specify how storage shall be used.
 	Storage *core.PersistentVolumeClaimSpec `json:"storage,omitempty"`
 	// Database authentication secret

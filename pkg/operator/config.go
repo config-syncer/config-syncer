@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/appscode/kubed/pkg/eventer"
+	"github.com/appscode/kubed/pkg/label_extractor"
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	resource_indexer "github.com/appscode/kubed/pkg/registry/resource"
 	"github.com/appscode/kubed/pkg/syncer"
@@ -66,6 +67,7 @@ func (c *OperatorConfig) New() (*Operator, error) {
 	op.trashCan = &rbin.RecycleBin{}
 	op.eventProcessor = &eventer.EventForwarder{Client: op.KubeClient.Discovery()}
 	op.configSyncer = syncer.New(op.KubeClient, op.recorder)
+	op.extractDockerLabel = label_extractor.New(op.KubeClient)
 
 	op.cron = cron.New()
 	op.cron.Start()

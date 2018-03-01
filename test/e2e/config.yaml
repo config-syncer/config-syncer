@@ -1,3 +1,4 @@
 clusterName: minikube
 enableConfigSyncer: true
-kubeConfig: /home/dipta/all/kubed-test/kubeconfig
+enableExtractDockerLabel: true
+kubeConfig: /home/ac/kubed-test/kubeconfig
