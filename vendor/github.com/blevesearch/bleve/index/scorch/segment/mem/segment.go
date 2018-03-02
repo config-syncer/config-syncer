@@ -40,35 +40,38 @@ const idFieldID uint16 = 0
 // Segment is an in memory implementation of scorch.Segment
 type Segment struct {
 
-	// FieldsMap name -> id+1
+	// FieldsMap adds 1 to field id to avoid zero value issues
+	//  name -> field id + 1
 	FieldsMap map[string]uint16
-	// fields id -> name
+
+	// FieldsInv is the inverse of FieldsMap
+	//  field id -> name
 	FieldsInv []string
 
-	// term dictionary
-	//  field id -> term -> posting id + 1
+	// Term dictionaries for each field
+	//  field id -> term -> postings list id + 1
 	Dicts []map[string]uint64
 
-	// term dictionary keys
-	//  field id -> []dictionary keys
+	// Terms for each field, where terms are sorted ascending
+	//  field id -> []term
 	DictKeys [][]string
 
 	// Postings list
-	//  Postings list id -> Postings bitmap
+	//  postings list id -> bitmap by docNum
 	Postings []*roaring.Bitmap
 
-	// Postings List has locations
+	// Postings list has locations
 	PostingsLocs []*roaring.Bitmap
 
-	// term frequencies
+	// Term frequencies
 	//  postings list id -> Freqs (one for each hit in bitmap)
 	Freqs [][]uint64
 
-	// field Norms
+	// Field norms
 	//  postings list id -> Norms (one for each hit in bitmap)
 	Norms [][]float32
 
-	// field/start/end/pos/locarraypos
+	// Field/start/end/pos/locarraypos
 	//  postings list id -> start/end/pos/locarraypos (one for each freq)
 	Locfields   [][]uint16
 	Locstarts   [][]uint64
@@ -80,18 +83,18 @@ type Segment struct {
 	//  docNum -> field id -> slice of values (each value []byte)
 	Stored []map[uint16][][]byte
 
-	// stored field types
+	// Stored field types
 	//  docNum -> field id -> slice of types (each type byte)
 	StoredTypes []map[uint16][]byte
 
-	// stored field array positions
+	// Stored field array positions
 	//  docNum -> field id -> slice of array positions (each is []uint64)
 	StoredPos []map[uint16][][]uint64
 
-	// for storing the docValue persisted fields
+	// For storing the docValue persisted fields
 	DocValueFields map[uint16]bool
 
-	// footprint of the segment, updated when analyzed document mutations
+	// Footprint of the segment, updated when analyzed document mutations
 	// are added into the segment
 	sizeInBytes uint64
 }
@@ -107,27 +110,41 @@ func New() *Segment {
 func (s *Segment) updateSizeInBytes() {
 	var sizeInBytes uint64
 
+	// FieldsMap, FieldsInv
 	for k, _ := range s.FieldsMap {
-		sizeInBytes += uint64(len(k)*2 /* FieldsMap + FieldsInv */ +
+		sizeInBytes += uint64((len(k)+int(segment.SizeOfString))*2 +
 			2 /* size of uint16 */)
 	}
+	// overhead from the data structures
+	sizeInBytes += (segment.SizeOfMap + segment.SizeOfSlice)
 
+	// Dicts, DictKeys
 	for _, entry := range s.Dicts {
 		for k, _ := range entry {
-			sizeInBytes += uint64(len(k)*2 /* Dicts + DictKeys */ +
+			sizeInBytes += uint64((len(k)+int(segment.SizeOfString))*2 +
 				8 /* size of uint64 */)
 		}
+		// overhead from the data structures
+		sizeInBytes += (segment.SizeOfMap + segment.SizeOfSlice)
 	}
+	sizeInBytes += (segment.SizeOfSlice * 2)
 
+	// Postings, PostingsLocs
 	for i := 0; i < len(s.Postings); i++ {
-		sizeInBytes += s.Postings[i].GetSizeInBytes() + s.PostingsLocs[i].GetSizeInBytes()
+		sizeInBytes += (s.Postings[i].GetSizeInBytes() + segment.SizeOfPointer) +
+			(s.PostingsLocs[i].GetSizeInBytes() + segment.SizeOfPointer)
 	}
+	sizeInBytes += (segment.SizeOfSlice * 2)
 
+	// Freqs, Norms
 	for i := 0; i < len(s.Freqs); i++ {
 		sizeInBytes += uint64(len(s.Freqs[i])*8 /* size of uint64 */ +
-			len(s.Norms[i])*4 /* size of float32 */)
+			len(s.Norms[i])*4 /* size of float32 */) +
+			(segment.SizeOfSlice * 2)
 	}
+	sizeInBytes += (segment.SizeOfSlice * 2)
 
+	// Location data
 	for i := 0; i < len(s.Locfields); i++ {
 		sizeInBytes += uint64(len(s.Locfields[i])*2 /* size of uint16 */ +
 			len(s.Locstarts[i])*8 /* size of uint64 */ +
@@ -135,31 +152,49 @@ func (s *Segment) updateSizeInBytes() {
 			len(s.Locpos[i])*8 /* size of uint64 */)
 
 		for j := 0; j < len(s.Locarraypos[i]); j++ {
-			sizeInBytes += uint64(len(s.Locarraypos[i][j]) * 8 /* size of uint64 */)
+			sizeInBytes += uint64(len(s.Locarraypos[i][j])*8 /* size of uint64 */) +
+				segment.SizeOfSlice
 		}
-	}
 
+		sizeInBytes += (segment.SizeOfSlice * 5)
+	}
+	sizeInBytes += (segment.SizeOfSlice * 5)
+
+	// Stored data
 	for i := 0; i < len(s.Stored); i++ {
 		for _, v := range s.Stored[i] {
 			sizeInBytes += uint64(2 /* size of uint16 */)
 			for _, arr := range v {
-				sizeInBytes += uint64(len(arr))
+				sizeInBytes += uint64(len(arr)) + segment.SizeOfSlice
 			}
+			sizeInBytes += segment.SizeOfSlice
 		}
 
 		for _, v := range s.StoredTypes[i] {
-			sizeInBytes += uint64(2 /* size of uint16 */ + len(v))
+			sizeInBytes += uint64(2 /* size of uint16 */ +len(v)) + segment.SizeOfSlice
 		}
 
 		for _, v := range s.StoredPos[i] {
 			sizeInBytes += uint64(2 /* size of uint16 */)
 			for _, arr := range v {
-				sizeInBytes += uint64(len(arr) * 8 /* size of uint64 */)
+				sizeInBytes += uint64(len(arr)*8 /* size of uint64 */) +
+					segment.SizeOfSlice
 			}
+			sizeInBytes += segment.SizeOfSlice
 		}
-	}
 
-	sizeInBytes += uint64(8 /* size of sizeInBytes -> uint64*/)
+		// overhead from map(s) within Stored, StoredTypes, StoredPos
+		sizeInBytes += (segment.SizeOfMap * 3)
+	}
+	// overhead from data structures: Stored, StoredTypes, StoredPos
+	sizeInBytes += (segment.SizeOfSlice * 3)
+
+	// DocValueFields
+	sizeInBytes += uint64(len(s.DocValueFields)*3 /* size of uint16 + bool */) +
+		segment.SizeOfMap
+
+	// SizeInBytes
+	sizeInBytes += uint64(8)
 
 	s.sizeInBytes = sizeInBytes
 }
@@ -188,9 +223,11 @@ func (s *Segment) VisitDocument(num uint64, visitor segment.DocumentFieldValueVi
 		return nil
 	}
 	docFields := s.Stored[int(num)]
+	st := s.StoredTypes[int(num)]
+	sp := s.StoredPos[int(num)]
 	for field, values := range docFields {
 		for i, value := range values {
-			keepGoing := visitor(s.FieldsInv[field], s.StoredTypes[int(num)][field][i], value, s.StoredPos[int(num)][field][i])
+			keepGoing := visitor(s.FieldsInv[field], st[field][i], value, sp[field][i])
 			if !keepGoing {
 				return nil
 			}

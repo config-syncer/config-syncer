@@ -28,6 +28,7 @@ import (
 	"github.com/blevesearch/bleve/index"
 	"github.com/blevesearch/bleve/index/scorch/segment"
 	"github.com/blevesearch/bleve/index/scorch/segment/mem"
+	"github.com/blevesearch/bleve/index/scorch/segment/zap"
 	"github.com/blevesearch/bleve/index/store"
 	"github.com/blevesearch/bleve/registry"
 	"github.com/boltdb/bolt"
@@ -36,14 +37,6 @@ import (
 const Name = "scorch"
 
 const Version uint8 = 1
-
-// UnInvertIndex is implemented by various scorch index implementations
-// to provide the un inverting of the postings or other indexed values.
-type UnInvertIndex interface {
-	// apparently need better namings here..
-	VisitDocumentFieldTerms(localDocNum uint64, fields []string,
-		visitor index.DocumentFieldTermVisitor) error
-}
 
 type Scorch struct {
 	readOnly      bool
@@ -68,7 +61,7 @@ type Scorch struct {
 	merges             chan *segmentMerge
 	introducerNotifier chan *epochWatcher
 	revertToSnapshots  chan *snapshotReversion
-	persisterNotifier  chan notificationChan
+	persisterNotifier  chan *epochWatcher
 	rootBolt           *bolt.DB
 	asyncTasks         sync.WaitGroup
 
@@ -83,11 +76,11 @@ func NewScorch(storeName string,
 		version:              Version,
 		config:               config,
 		analysisQueue:        analysisQueue,
-		stats:                &Stats{},
 		nextSnapshotEpoch:    1,
 		closeCh:              make(chan struct{}),
 		ineligibleForRemoval: map[string]bool{},
 	}
+	rv.stats = &Stats{i: rv}
 	rv.root = &IndexSnapshot{parent: rv, refs: 1}
 	ro, ok := config["read_only"].(bool)
 	if ok {
@@ -121,6 +114,25 @@ func (s *Scorch) fireAsyncError(err error) {
 }
 
 func (s *Scorch) Open() error {
+	err := s.openBolt()
+	if err != nil {
+		return err
+	}
+
+	s.asyncTasks.Add(1)
+	go s.mainLoop()
+
+	if !s.readOnly && s.path != "" {
+		s.asyncTasks.Add(1)
+		go s.persisterLoop()
+		s.asyncTasks.Add(1)
+		go s.mergerLoop()
+	}
+
+	return nil
+}
+
+func (s *Scorch) openBolt() error {
 	var ok bool
 	s.path, ok = s.config["path"].(string)
 	if !ok {
@@ -143,6 +155,7 @@ func (s *Scorch) Open() error {
 			}
 		}
 	}
+
 	rootBoltPath := s.path + string(os.PathSeparator) + "root.bolt"
 	var err error
 	if s.path != "" {
@@ -163,7 +176,7 @@ func (s *Scorch) Open() error {
 	s.merges = make(chan *segmentMerge)
 	s.introducerNotifier = make(chan *epochWatcher, 1)
 	s.revertToSnapshots = make(chan *snapshotReversion)
-	s.persisterNotifier = make(chan notificationChan)
+	s.persisterNotifier = make(chan *epochWatcher, 1)
 
 	if !s.readOnly && s.path != "" {
 		err := s.removeOldZapFiles() // Before persister or merger create any new files.
@@ -171,16 +184,6 @@ func (s *Scorch) Open() error {
 			_ = s.Close()
 			return err
 		}
-	}
-
-	s.asyncTasks.Add(1)
-	go s.mainLoop()
-
-	if !s.readOnly && s.path != "" {
-		s.asyncTasks.Add(1)
-		go s.persisterLoop()
-		s.asyncTasks.Add(1)
-		go s.mergerLoop()
 	}
 
 	return nil
@@ -225,7 +228,7 @@ func (s *Scorch) Delete(id string) error {
 }
 
 // Batch applices a batch of changes to the index atomically
-func (s *Scorch) Batch(batch *index.Batch) error {
+func (s *Scorch) Batch(batch *index.Batch) (err error) {
 	start := time.Now()
 
 	defer func() {
@@ -279,10 +282,13 @@ func (s *Scorch) Batch(batch *index.Batch) error {
 
 	var newSegment segment.Segment
 	if len(analysisResults) > 0 {
-		newSegment = mem.NewFromAnalyzedDocs(analysisResults)
+		newSegment, err = zap.NewSegmentBase(mem.NewFromAnalyzedDocs(analysisResults), DefaultChunkFactor)
+		if err != nil {
+			return err
+		}
 	}
 
-	err := s.prepareSegment(newSegment, ids, batch.InternalOps)
+	err = s.prepareSegment(newSegment, ids, batch.InternalOps)
 	if err != nil {
 		if newSegment != nil {
 			_ = newSegment.Close()
@@ -314,17 +320,21 @@ func (s *Scorch) prepareSegment(newSegment segment.Segment, ids []string,
 		introduction.persisted = make(chan error, 1)
 	}
 
-	// get read lock, to optimistically prepare obsoleted info
+	// optimistically prepare obsoletes outside of rootLock
 	s.rootLock.RLock()
-	for _, seg := range s.root.segment {
+	root := s.root
+	root.AddRef()
+	s.rootLock.RUnlock()
+
+	for _, seg := range root.segment {
 		delta, err := seg.segment.DocNumbers(ids)
 		if err != nil {
-			s.rootLock.RUnlock()
 			return err
 		}
 		introduction.obsoletes[seg.id] = delta
 	}
-	s.rootLock.RUnlock()
+
+	_ = root.DecRef()
 
 	s.introductions <- introduction
 
@@ -367,7 +377,8 @@ func (s *Scorch) Stats() json.Marshaler {
 	return s.stats
 }
 func (s *Scorch) StatsMap() map[string]interface{} {
-	return s.stats.statsMap()
+	m, _ := s.stats.statsMap()
+	return m
 }
 
 func (s *Scorch) Analyze(d *document.Document) *index.AnalysisResult {
@@ -410,13 +421,15 @@ func (s *Scorch) AddEligibleForRemoval(epoch uint64) {
 func (s *Scorch) MemoryUsed() uint64 {
 	var memUsed uint64
 	s.rootLock.RLock()
-	for _, segmentSnapshot := range s.root.segment {
-		memUsed += 8 /* size of id -> uint64 */ +
-			segmentSnapshot.segment.SizeInBytes()
-		if segmentSnapshot.deleted != nil {
-			memUsed += segmentSnapshot.deleted.GetSizeInBytes()
+	if s.root != nil {
+		for _, segmentSnapshot := range s.root.segment {
+			memUsed += 8 /* size of id -> uint64 */ +
+				segmentSnapshot.segment.SizeInBytes()
+			if segmentSnapshot.deleted != nil {
+				memUsed += segmentSnapshot.deleted.GetSizeInBytes()
+			}
+			memUsed += segmentSnapshot.cachedDocs.sizeInBytes()
 		}
-		memUsed += segmentSnapshot.cachedDocs.sizeInBytes()
 	}
 	s.rootLock.RUnlock()
 	return memUsed
