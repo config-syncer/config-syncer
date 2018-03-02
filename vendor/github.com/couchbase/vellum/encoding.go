@@ -32,6 +32,7 @@ type encoder interface {
 	start() error
 	encodeState(s *builderNode, addr int) (int, error)
 	finish(count, rootAddr int) error
+	reset(w io.Writer)
 }
 
 func loadEncoder(ver int, w io.Writer) (encoder, error) {

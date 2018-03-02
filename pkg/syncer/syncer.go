@@ -1,7 +1,6 @@
 package syncer
 
 import (
-	"encoding/json"
 	"net/url"
 	"strings"
 	"sync"
@@ -10,6 +9,7 @@ import (
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kutil/meta"
 	clientcmd_util "github.com/appscode/kutil/tools/clientcmd"
+	"github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -19,6 +19,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/record"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type ConfigSyncer struct {
 	kubeClient kubernetes.Interface

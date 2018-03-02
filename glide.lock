@@ -1,5 +1,5 @@
 hash: 63e3728fb73924ca81bd062958274a78e08390cbc95b65e2243deb53bfd1d0db
-updated: 2018-02-17T12:54:28.282609045-08:00
+updated: 2018-03-02T13:07:09.49876651-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -11,7 +11,7 @@ imports:
 - name: github.com/appscode/envconfig
   version: 183bbe643a2875eaa69c85627ac6b25813983203
 - name: github.com/appscode/go
-  version: 8367769380cf93a12b381d957941ddf2a19d0356
+  version: c312c0a1fe0d4988480073287b8633fc5a244647
   subpackages:
   - analytics
   - context
@@ -41,14 +41,17 @@ imports:
   - twilio
   - unified
   - webhook
+- name: github.com/appscode/jsonpatch
+  version: d554673fce2c0bef30d385e7946996a27f6be827
 - name: github.com/appscode/kube-mon
   version: 69036cc40b44a7ba97be91d530f421e3adaba407
   subpackages:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: 579ddb8cc946c9e5f09d59863a3c5fe27cdc56f5
+  version: 00a04e324e089e575b007bfa9927c2c3724d6286
   subpackages:
+  - admission/api
   - apiextensions/v1beta1
   - core/v1
   - discovery
@@ -67,7 +70,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: f481491440d9f3bbcd66ad590e2f24dd89785350
+  version: d3bbee04f3c58e0693bee1060e64cd0f7a131a53
   subpackages:
   - apis/monitoring
   - apis/monitoring/v1alpha1
@@ -82,7 +85,7 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: fb47ea99ec392240c982f464e47df676ad95fd16
+  version: b90a456481890b13ae523cd2fdbb16da0ca64f0a
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
@@ -95,7 +98,7 @@ imports:
   - client/informers/externalversions/stash/v1alpha1
   - client/listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 7d5c11bc35761fc1662ef4eb6f1b10c75aca9832
+  version: d74d5a226d6ff379f886f690bb02d5884ccf40dc
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -281,7 +284,7 @@ imports:
   subpackages:
   - pkg/client/monitoring/v1
 - name: github.com/couchbase/vellum
-  version: 335037ec44ab61b8f54c35079a641a868f3d3362
+  version: 9e4f15ba220601e0546afe6718d189ebbf60e143
   subpackages:
   - regexp
   - utf8
@@ -329,7 +332,7 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
+  version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/groupcache
   version: 02826c3e79038b59d737d3b1c0a1d937f71a4433
   subpackages:
@@ -349,7 +352,7 @@ imports:
 - name: github.com/google/btree
   version: 7d79101e329e5a3adf994758c578dab82b90c017
 - name: github.com/google/go-cmp
-  version: 3af367b6b30c263d47e8895973edcca9a49cf029
+  version: 0c93777250bd58222171888d1651979319d8b381
   subpackages:
   - cmp
   - cmp/internal/diff
@@ -423,7 +426,7 @@ imports:
   - models
   - pkg/escape
 - name: github.com/jaytaylor/html2text
-  version: e76a2f8aa970543f8f3dcadaa2223682ef582086
+  version: 190166da35878a77103b951ae035a473531c1fc2
 - name: github.com/jmespath/go-jmespath
   version: 0b12d6b521d83fc7f755e7cfc1b1fbdd35a01a74
 - name: github.com/jpillora/go-ogle-analytics
@@ -433,7 +436,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/kubedb/apimachinery
-  version: 89214d2501bcf65be0ccfa067086d9dc5f0c511d
+  version: 37caef566d41ed47313b44975186c335dde08123
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -470,7 +473,7 @@ imports:
 - name: github.com/ncw/swift
   version: ae9f0ea1605b9aa6434ed5c731ca35d83ba67c55
 - name: github.com/nlopes/slack
-  version: 8ab4d0b364ef1e9af5d102531da20d5ec902b6c4
+  version: 1217b9d3e4304348a9be15c2afd80ad4691f31e5
 - name: github.com/NYTimes/gziphandler
   version: 56545f4a5d46df9a6648819d1664c3a03a13ffdb
 - name: github.com/olekukonko/tablewriter
@@ -516,7 +519,7 @@ imports:
 - name: github.com/philhofer/fwd
   version: bb6d471dc95d4fe11e432687f8b70ff496cf3136
 - name: github.com/pkg/errors
-  version: 645ef00459ed84a119197bfb8d8205042c6df63d
+  version: 30136e27e2ac8d167177e8a583aa4c3fea5be833
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -542,7 +545,7 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/RoaringBitmap/roaring
-  version: 7580aaa84ed76dd9089df87935dc8aac03713c8c
+  version: a530db3013d436368a87a84daed053b911ccbe15
 - name: github.com/robfig/cron
   version: 2315d5715e36303a941d907f038da7f7c44c773b
 - name: github.com/russross/blackfriday
@@ -560,7 +563,7 @@ imports:
 - name: github.com/Smerity/govarint
   version: 7265e41f48f15fd61751e16da866af3c704bb3ab
 - name: github.com/spf13/cobra
-  version: be77323fc05148ef091e83b3866c0d47c8e74a8b
+  version: c6c44e6fdcc30161c7f4480754da7230d01c06e3
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -650,7 +653,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: c7a403bb5fe12fe4644bb956edd5cd677626120a
+  version: ab90adb3efa287b869ecb698db42f923cc734972
   subpackages:
   - gensupport
   - googleapi
@@ -733,7 +736,7 @@ imports:
   - policy/v1beta1
   - rbac/v1
   - rbac/v1alpha1
-  - rbac/v1
+  - rbac/v1beta1
   - scheduling/v1alpha1
   - settings/v1alpha1
   - storage/v1
@@ -789,7 +792,6 @@ imports:
   - pkg/util/httpstream
   - pkg/util/intstr
   - pkg/util/json
-  - pkg/util/jsonmergepatch
   - pkg/util/mergepatch
   - pkg/util/net
   - pkg/util/proxy
@@ -932,7 +934,7 @@ imports:
   - informers/rbac
   - informers/rbac/v1
   - informers/rbac/v1alpha1
-  - informers/rbac/v1
+  - informers/rbac/v1beta1
   - informers/scheduling
   - informers/scheduling/v1alpha1
   - informers/settings
@@ -988,8 +990,8 @@ imports:
   - kubernetes/typed/rbac/v1/fake
   - kubernetes/typed/rbac/v1alpha1
   - kubernetes/typed/rbac/v1alpha1/fake
-  - kubernetes/typed/rbac/v1
-  - kubernetes/typed/rbac/v1/fake
+  - kubernetes/typed/rbac/v1beta1
+  - kubernetes/typed/rbac/v1beta1/fake
   - kubernetes/typed/scheduling/v1alpha1
   - kubernetes/typed/scheduling/v1alpha1/fake
   - kubernetes/typed/settings/v1alpha1
@@ -1018,7 +1020,7 @@ imports:
   - listers/policy/v1beta1
   - listers/rbac/v1
   - listers/rbac/v1alpha1
-  - listers/rbac/v1
+  - listers/rbac/v1beta1
   - listers/scheduling/v1alpha1
   - listers/settings/v1alpha1
   - listers/storage/v1

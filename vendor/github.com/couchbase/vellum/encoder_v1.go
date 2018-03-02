@@ -42,6 +42,10 @@ func newEncoderV1(w io.Writer) *encoderV1 {
 	}
 }
 
+func (e *encoderV1) reset(w io.Writer) {
+	e.bw.Reset(w)
+}
+
 func (e *encoderV1) start() error {
 	header := make([]byte, headerSize)
 	binary.LittleEndian.PutUint64(header, versionV1)
