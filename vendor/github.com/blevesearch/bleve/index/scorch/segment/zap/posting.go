@@ -27,32 +27,38 @@ import (
 
 // PostingsList is an in-memory represenation of a postings list
 type PostingsList struct {
-	dictionary     *Dictionary
-	term           string
+	sb             *SegmentBase
 	postingsOffset uint64
 	freqOffset     uint64
 	locOffset      uint64
 	locBitmap      *roaring.Bitmap
 	postings       *roaring.Bitmap
 	except         *roaring.Bitmap
-	postingKey     []byte
 }
 
 // Iterator returns an iterator for this postings list
 func (p *PostingsList) Iterator() segment.PostingsIterator {
-	rv := &PostingsIterator{
-		postings: p,
+	return p.iterator(nil)
+}
+
+func (p *PostingsList) iterator(rv *PostingsIterator) *PostingsIterator {
+	if rv == nil {
+		rv = &PostingsIterator{}
+	} else {
+		*rv = PostingsIterator{} // clear the struct
 	}
+	rv.postings = p
+
 	if p.postings != nil {
 		// prepare the freq chunk details
 		var n uint64
 		var read int
 		var numFreqChunks uint64
-		numFreqChunks, read = binary.Uvarint(p.dictionary.segment.mm[p.freqOffset+n : p.freqOffset+n+binary.MaxVarintLen64])
+		numFreqChunks, read = binary.Uvarint(p.sb.mem[p.freqOffset+n : p.freqOffset+n+binary.MaxVarintLen64])
 		n += uint64(read)
 		rv.freqChunkLens = make([]uint64, int(numFreqChunks))
 		for i := 0; i < int(numFreqChunks); i++ {
-			rv.freqChunkLens[i], read = binary.Uvarint(p.dictionary.segment.mm[p.freqOffset+n : p.freqOffset+n+binary.MaxVarintLen64])
+			rv.freqChunkLens[i], read = binary.Uvarint(p.sb.mem[p.freqOffset+n : p.freqOffset+n+binary.MaxVarintLen64])
 			n += uint64(read)
 		}
 		rv.freqChunkStart = p.freqOffset + n
@@ -60,11 +66,11 @@ func (p *PostingsList) Iterator() segment.PostingsIterator {
 		// prepare the loc chunk details
 		n = 0
 		var numLocChunks uint64
-		numLocChunks, read = binary.Uvarint(p.dictionary.segment.mm[p.locOffset+n : p.locOffset+n+binary.MaxVarintLen64])
+		numLocChunks, read = binary.Uvarint(p.sb.mem[p.locOffset+n : p.locOffset+n+binary.MaxVarintLen64])
 		n += uint64(read)
 		rv.locChunkLens = make([]uint64, int(numLocChunks))
 		for i := 0; i < int(numLocChunks); i++ {
-			rv.locChunkLens[i], read = binary.Uvarint(p.dictionary.segment.mm[p.locOffset+n : p.locOffset+n+binary.MaxVarintLen64])
+			rv.locChunkLens[i], read = binary.Uvarint(p.sb.mem[p.locOffset+n : p.locOffset+n+binary.MaxVarintLen64])
 			n += uint64(read)
 		}
 		rv.locChunkStart = p.locOffset + n
@@ -96,6 +102,49 @@ func (p *PostingsList) Count() uint64 {
 		return n
 	}
 	return 0
+}
+
+func (rv *PostingsList) read(postingsOffset uint64, d *Dictionary) error {
+	rv.postingsOffset = postingsOffset
+
+	// read the location of the freq/norm details
+	var n uint64
+	var read int
+
+	rv.freqOffset, read = binary.Uvarint(d.sb.mem[postingsOffset+n : postingsOffset+binary.MaxVarintLen64])
+	n += uint64(read)
+
+	rv.locOffset, read = binary.Uvarint(d.sb.mem[postingsOffset+n : postingsOffset+n+binary.MaxVarintLen64])
+	n += uint64(read)
+
+	var locBitmapOffset uint64
+	locBitmapOffset, read = binary.Uvarint(d.sb.mem[postingsOffset+n : postingsOffset+n+binary.MaxVarintLen64])
+	n += uint64(read)
+
+	var locBitmapLen uint64
+	locBitmapLen, read = binary.Uvarint(d.sb.mem[locBitmapOffset : locBitmapOffset+binary.MaxVarintLen64])
+
+	locRoaringBytes := d.sb.mem[locBitmapOffset+uint64(read) : locBitmapOffset+uint64(read)+locBitmapLen]
+
+	rv.locBitmap = roaring.NewBitmap()
+	_, err := rv.locBitmap.FromBuffer(locRoaringBytes)
+	if err != nil {
+		return fmt.Errorf("error loading roaring bitmap of locations with hits: %v", err)
+	}
+
+	var postingsLen uint64
+	postingsLen, read = binary.Uvarint(d.sb.mem[postingsOffset+n : postingsOffset+n+binary.MaxVarintLen64])
+	n += uint64(read)
+
+	roaringBytes := d.sb.mem[postingsOffset+n : postingsOffset+n+postingsLen]
+
+	rv.postings = roaring.NewBitmap()
+	_, err = rv.postings.FromBuffer(roaringBytes)
+	if err != nil {
+		return fmt.Errorf("error loading roaring bitmap: %v", err)
+	}
+
+	return nil
 }
 
 // PostingsIterator provides a way to iterate through the postings list
@@ -133,7 +182,7 @@ func (i *PostingsIterator) loadChunk(chunk int) error {
 		start += i.freqChunkLens[j]
 	}
 	end := start + i.freqChunkLens[chunk]
-	i.currChunkFreqNorm = i.postings.dictionary.segment.mm[start:end]
+	i.currChunkFreqNorm = i.postings.sb.mem[start:end]
 	i.freqNormDecoder = govarint.NewU64Base128Decoder(bytes.NewReader(i.currChunkFreqNorm))
 
 	start = i.locChunkStart
@@ -141,7 +190,7 @@ func (i *PostingsIterator) loadChunk(chunk int) error {
 		start += i.locChunkLens[j]
 	}
 	end = start + i.locChunkLens[chunk]
-	i.currChunkLoc = i.postings.dictionary.segment.mm[start:end]
+	i.currChunkLoc = i.postings.sb.mem[start:end]
 	i.locDecoder = govarint.NewU64Base128Decoder(bytes.NewReader(i.currChunkLoc))
 	i.currChunk = uint32(chunk)
 	return nil
@@ -192,7 +241,7 @@ func (i *PostingsIterator) readLocation(l *Location) error {
 
 	// group these together for less branching
 	if l != nil {
-		l.field = i.postings.dictionary.segment.fieldsInv[fieldID]
+		l.field = i.postings.sb.fieldsInv[fieldID]
 		l.pos = pos
 		l.start = start
 		l.end = end
@@ -221,9 +270,9 @@ func (i *PostingsIterator) Next() (segment.Posting, error) {
 		return nil, nil
 	}
 	n := i.actual.Next()
-	nChunk := n / i.postings.dictionary.segment.chunkFactor
+	nChunk := n / i.postings.sb.chunkFactor
 	allN := i.all.Next()
-	allNChunk := allN / i.postings.dictionary.segment.chunkFactor
+	allNChunk := allN / i.postings.sb.chunkFactor
 
 	// n is the next actual hit (excluding some postings)
 	// allN is the next hit in the full postings

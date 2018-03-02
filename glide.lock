@@ -1,5 +1,5 @@
-hash: 63e3728fb73924ca81bd062958274a78e08390cbc95b65e2243deb53bfd1d0db
-updated: 2018-03-02T13:07:09.49876651-08:00
+hash: b7d1168b71f5bdb5cbdce4bffc99c7b3d5bfac30705f2bb40ae8cd153b52cab9
+updated: 2018-03-02T13:57:09.369953542-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -85,7 +85,7 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: b90a456481890b13ae523cd2fdbb16da0ca64f0a
+  version: 41df1df48177b56d57c67ad88edfde577bc31a3a
   subpackages:
   - apis/stash
   - apis/stash/v1alpha1
@@ -156,7 +156,7 @@ imports:
   subpackages:
   - quantile
 - name: github.com/blevesearch/bleve
-  version: 0456569b6240ce13fc7bfed00e10b3f99e68a3e2
+  version: 1a319cdf5bf77dc8cee35a6b99f908792c2547ef
   subpackages:
   - analysis
   - analysis/analyzer/standard

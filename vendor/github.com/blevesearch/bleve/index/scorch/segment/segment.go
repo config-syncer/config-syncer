@@ -19,6 +19,12 @@ import (
 	"github.com/blevesearch/bleve/index"
 )
 
+// Overhead from go data structures when deployed on a 64-bit system.
+const SizeOfMap uint64 = 8
+const SizeOfPointer uint64 = 8
+const SizeOfSlice uint64 = 24
+const SizeOfString uint64 = 16
+
 // DocumentFieldValueVisitor defines a callback to be visited for each
 // stored field value.  The return value determines if the visitor
 // should keep going.  Returning true continues visiting, false stops.
@@ -91,9 +97,14 @@ type Location interface {
 }
 
 // DocumentFieldTermVisitable is implemented by various scorch segment
-// implementations to provide the un inverting of the postings
-// or other indexed values.
+// implementations with persistence for the un inverting of the
+// postings or other indexed values.
 type DocumentFieldTermVisitable interface {
 	VisitDocumentFieldTerms(localDocNum uint64, fields []string,
 		visitor index.DocumentFieldTermVisitor) error
+
+	// VisitableDocValueFields implementation should return
+	// the list of fields which are document value persisted and
+	// therefore visitable by the above VisitDocumentFieldTerms method.
+	VisitableDocValueFields() ([]string, error)
 }
