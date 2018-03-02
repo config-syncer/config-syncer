@@ -1,15 +1,17 @@
 package resource
 
 import (
-	"encoding/json"
 	"path/filepath"
 	"sync"
 
 	"github.com/blevesearch/bleve"
+	"github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type ResourceIndexer struct {
 	indices map[string]bleve.Index

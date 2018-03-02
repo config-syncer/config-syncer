@@ -67,6 +67,21 @@ func newBuilder(w io.Writer, opts *BuilderOpts) (*Builder, error) {
 	return rv, nil
 }
 
+func (b *Builder) Reset(w io.Writer) error {
+	b.unfinished.Reset()
+	b.registry.Reset()
+	b.lastAddr = noneAddr
+	b.encoder.reset(w)
+	b.last = nil
+	b.len = 0
+
+	err := b.encoder.start()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Insert the provided value to the set being built.
 // NOTE: values must be inserted in lexicographical order.
 func (b *Builder) Insert(key []byte, val uint64) error {
@@ -163,6 +178,14 @@ type unfinishedNodes struct {
 	// this means calls get() and pushXYZ() must be paired,
 	// as well as calls put() and popXYZ()
 	cache []builderNodeUnfinished
+}
+
+func (u *unfinishedNodes) Reset() {
+	u.stack = u.stack[:0]
+	for i := 0; i < len(u.cache); i++ {
+		u.cache[i] = builderNodeUnfinished{}
+	}
+	u.pushEmpty(false)
 }
 
 func newUnfinishedNodes() *unfinishedNodes {

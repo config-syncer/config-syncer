@@ -32,6 +32,11 @@ func newWriter(w io.Writer) *writer {
 	}
 }
 
+func (w *writer) Reset(newWriter io.Writer) {
+	w.w.Reset(newWriter)
+	w.counter = 0
+}
+
 func (w *writer) WriteByte(c byte) error {
 	err := w.w.WriteByte(c)
 	if err != nil {

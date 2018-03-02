@@ -42,6 +42,13 @@ func newRegistry(tableSize, mruSize int) *registry {
 	return rv
 }
 
+func (r *registry) Reset() {
+	for i := 0; i < len(r.table); i++ {
+		r.table[i] = registryCell{}
+	}
+	r.hasher.Reset()
+}
+
 func (r *registry) entry(node *builderNode) (bool, int, *registryCell) {
 	if len(r.table) == 0 {
 		return false, 0, nil

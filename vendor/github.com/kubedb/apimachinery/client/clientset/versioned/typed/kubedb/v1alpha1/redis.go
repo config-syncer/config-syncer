@@ -35,7 +35,6 @@ type RedisesGetter interface {
 type RedisInterface interface {
 	Create(*v1alpha1.Redis) (*v1alpha1.Redis, error)
 	Update(*v1alpha1.Redis) (*v1alpha1.Redis, error)
-	UpdateStatus(*v1alpha1.Redis) (*v1alpha1.Redis, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
 	Get(name string, options v1.GetOptions) (*v1alpha1.Redis, error)
@@ -113,22 +112,6 @@ func (c *redises) Update(redis *v1alpha1.Redis) (result *v1alpha1.Redis, err err
 		Namespace(c.ns).
 		Resource("redises").
 		Name(redis.Name).
-		Body(redis).
-		Do().
-		Into(result)
-	return
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-
-func (c *redises) UpdateStatus(redis *v1alpha1.Redis) (result *v1alpha1.Redis, err error) {
-	result = &v1alpha1.Redis{}
-	err = c.client.Put().
-		Namespace(c.ns).
-		Resource("redises").
-		Name(redis.Name).
-		SubResource("status").
 		Body(redis).
 		Do().
 		Into(result)

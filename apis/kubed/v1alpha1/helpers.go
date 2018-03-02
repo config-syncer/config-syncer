@@ -1,7 +1,6 @@
 package v1alpha1
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -9,8 +8,11 @@ import (
 
 	yc "github.com/appscode/go/encoding/yaml"
 	"github.com/ghodss/yaml"
+	"github.com/json-iterator/go"
 	"github.com/pkg/errors"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func LoadConfig(configPath string) (*ClusterConfig, error) {
 	if _, err := os.Stat(configPath); err != nil {

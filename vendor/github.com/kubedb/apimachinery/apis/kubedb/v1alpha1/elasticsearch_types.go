@@ -15,6 +15,7 @@ const (
 )
 
 // +genclient
+// +genclient:skipVerbs=updateStatus
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -30,7 +31,7 @@ type ElasticsearchSpec struct {
 	// Version of Elasticsearch to be deployed.
 	Version types.StrYo `json:"version,omitempty"`
 	// Number of instances to deploy for a Elasticsearch database.
-	Replicas int32 `json:"replicas,omitempty"`
+	Replicas *int32 `json:"replicas,omitempty"`
 	// Elasticsearch topology for node specification
 	Topology *ElasticsearchClusterTopology `json:"topology,omitempty"`
 	// To enable ssl in transport & http layer
@@ -82,7 +83,7 @@ type ElasticsearchClusterTopology struct {
 }
 
 type ElasticsearchNode struct {
-	Replicas int32  `json:"replicas,omitempty"`
+	Replicas *int32 `json:"replicas,omitempty"`
 	Prefix   string `json:"prefix,omitempty"`
 }
 
