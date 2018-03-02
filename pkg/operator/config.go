@@ -90,7 +90,7 @@ func (c *OperatorConfig) New() (*Operator, error) {
 	op.setupNetworkInformers()
 	op.setupConfigInformers()
 	op.setupRBACInformers()
-	op.setupNodeInformers()
+	op.setupCoreInformers()
 	op.setupEventInformers()
 	op.setupCertificateInformers()
 	// ---------------------------

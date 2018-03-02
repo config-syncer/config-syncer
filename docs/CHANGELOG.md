@@ -17,6 +17,55 @@ aliases:
 
 # Change Log
 
+## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
+
+[Full Changelog](https://github.com/appscode/kubed/compare/0.5.0...HEAD)
+
+**Closed issues:**
+
+- Cleanup indexed data [\#212](https://github.com/appscode/kubed/issues/212)
+- Delete search index when namespace is deleted [\#210](https://github.com/appscode/kubed/issues/210)
+- Allow configuring resource types for Add/Update notification [\#192](https://github.com/appscode/kubed/issues/192)
+- Used shared informer and queue [\#152](https://github.com/appscode/kubed/issues/152)
+- Use separate bleve index for Events and other kube api objects [\#106](https://github.com/appscode/kubed/issues/106)
+- Support soft loading of ClusterConfig [\#51](https://github.com/appscode/kubed/issues/51)
+
+**Merged pull requests:**
+
+- Upgrade github.com/blevesearch/bleve to 0.7.0 [\#229](https://github.com/appscode/kubed/pull/229)
+- Use github.com/json-iterator/go [\#228](https://github.com/appscode/kubed/pull/228)
+- Remove unused options field [\#227](https://github.com/appscode/kubed/pull/227)
+- Sync chart to stable charts repo [\#226](https://github.com/appscode/kubed/pull/226)
+- Generate internal types [\#225](https://github.com/appscode/kubed/pull/225)
+- Use rbac/v1 apis [\#224](https://github.com/appscode/kubed/pull/224)
+- Create user facing aggregate roles [\#223](https://github.com/appscode/kubed/pull/223)
+- Use official code generator scripts [\#222](https://github.com/appscode/kubed/pull/222)
+- Update charts to support api registration [\#221](https://github.com/appscode/kubed/pull/221)
+- Use ${} form for onessl envsubst [\#220](https://github.com/appscode/kubed/pull/220)
+- Update .gitignore file [\#219](https://github.com/appscode/kubed/pull/219)
+- Rename Stuff back to SearchResult [\#218](https://github.com/appscode/kubed/pull/218)
+- Fix locks in resource indexer [\#217](https://github.com/appscode/kubed/pull/217)
+- Move apis out of pkg package [\#216](https://github.com/appscode/kubed/pull/216)
+- Rename searchresult to stuff [\#214](https://github.com/appscode/kubed/pull/214)
+- Add installer script [\#211](https://github.com/appscode/kubed/pull/211)
+- Add tests for RestMapper [\#209](https://github.com/appscode/kubed/pull/209)
+- Set GroupVersionKind for event handlers [\#208](https://github.com/appscode/kubed/pull/208)
+- Rename api package by version [\#207](https://github.com/appscode/kubed/pull/207)
+- Properly handle update events for trashcan [\#206](https://github.com/appscode/kubed/pull/206)
+- Use fsnotify from kutil [\#205](https://github.com/appscode/kubed/pull/205)
+- Fix NPE [\#204](https://github.com/appscode/kubed/pull/204)
+- Generate DeepCopy methods for ClusterConfig [\#203](https://github.com/appscode/kubed/pull/203)
+- Fix config validator for event forwarder [\#202](https://github.com/appscode/kubed/pull/202)
+- Transform event forwarder rules to rules format [\#201](https://github.com/appscode/kubed/pull/201)
+- Split Setup\(\) into New\(\) and Configure\(\) [\#199](https://github.com/appscode/kubed/pull/199)
+- Remove reverse index [\#198](https://github.com/appscode/kubed/pull/198)
+- Update bleve to v0.6.0 [\#197](https://github.com/appscode/kubed/pull/197)
+- Turn kubed api server into an EAS [\#196](https://github.com/appscode/kubed/pull/196)
+- Allow configuring resource types for Add/Update notification [\#195](https://github.com/appscode/kubed/pull/195)
+- Use SharedInformerFactory [\#193](https://github.com/appscode/kubed/pull/193)
+- Support soft loading of ClusterConfig [\#125](https://github.com/appscode/kubed/pull/125)
+
+
 ## [0.5.0](https://github.com/appscode/kubed/releases/tag/0.5.0) (2018-01-16)
 Kubed 0.5.0 can send notifications to Telegram and fixes various issues related to janitors and cluster backup.
 

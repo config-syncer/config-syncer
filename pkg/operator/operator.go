@@ -168,6 +168,9 @@ func (op *Operator) setupWorkloadInformers() {
 	daemonSetInformer := op.kubeInformerFactory.Extensions().V1beta1().DaemonSets().Informer()
 	op.addEventHandlers(daemonSetInformer, extensions.SchemeGroupVersion.WithKind("DaemonSet"))
 
+	statefulSetInformer := op.kubeInformerFactory.Apps().V1beta1().StatefulSets().Informer()
+	op.addEventHandlers(statefulSetInformer, apps.SchemeGroupVersion.WithKind("StatefulSet"))
+
 	jobInformer := op.kubeInformerFactory.Batch().V1().Jobs().Informer()
 	op.addEventHandlers(jobInformer, batch.SchemeGroupVersion.WithKind("Job"))
 
@@ -180,6 +183,9 @@ func (op *Operator) setupNetworkInformers() {
 
 	ingressInformer := op.kubeInformerFactory.Extensions().V1beta1().Ingresses().Informer()
 	op.addEventHandlers(ingressInformer, extensions.SchemeGroupVersion.WithKind("Ingress"))
+
+	netPolicyInformer := op.kubeInformerFactory.Networking().V1().NetworkPolicies().Informer()
+	op.addEventHandlers(netPolicyInformer, core.SchemeGroupVersion.WithKind("NetworkPolicy"))
 }
 
 func (op *Operator) setupConfigInformers() {
@@ -192,6 +198,7 @@ func (op *Operator) setupConfigInformers() {
 	secretInformer.AddEventHandler(op.configSyncer.SecretHandler())
 
 	nsInformer := op.kubeInformerFactory.Core().V1().Namespaces().Informer()
+	op.addEventHandlers(nsInformer, core.SchemeGroupVersion.WithKind("Namespace"))
 	nsInformer.AddEventHandler(op.configSyncer.NamespaceHandler())
 }
 
@@ -209,9 +216,15 @@ func (op *Operator) setupRBACInformers() {
 	op.addEventHandlers(roleBindingInformer, rbac.SchemeGroupVersion.WithKind("RoleBinding"))
 }
 
-func (op *Operator) setupNodeInformers() {
+func (op *Operator) setupCoreInformers() {
 	nodeInformer := op.kubeInformerFactory.Core().V1().Nodes().Informer()
 	op.addEventHandlers(nodeInformer, core.SchemeGroupVersion.WithKind("Node"))
+
+	limitRangeInformer := op.kubeInformerFactory.Core().V1().LimitRanges().Informer()
+	op.addEventHandlers(limitRangeInformer, core.SchemeGroupVersion.WithKind("LimitRange"))
+
+	saInformer := op.kubeInformerFactory.Core().V1().ServiceAccounts().Informer()
+	op.addEventHandlers(saInformer, core.SchemeGroupVersion.WithKind("ServiceAccount"))
 }
 
 func (op *Operator) setupEventInformers() {

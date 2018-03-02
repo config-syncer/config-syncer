@@ -1,10 +1,6 @@
 clusterName: unicorn
 enableConfigSyncer: true
 eventForwarder:
-  receivers:
-  - notifier: Mailgun
-    to:
-    - ops@example.com
   rules:
   - namespaces:
     - kube-system
@@ -22,31 +18,21 @@ eventForwarder:
       - nodes
       - persistentvolumes
       - persistentvolumeclaims
-  - operations:
-    - CREATE
-    resources:
     - group: storage.k8s.io
       resources:
       - storageclasses
-  - operations:
-    - CREATE
-    resources:
     - group: extensions
       resources:
       - ingresses
-  - operations:
-    - CREATE
-    resources:
     - group: voyager.appscode.com
       resources:
       - ingresses
-  - operations:
-    - CREATE
-    resources:
     - group: certificates.k8s.io
       resources:
       - certificatesigningrequests
-notifierSecretName: notifier-config
+    - group: networking.k8s.io
+      resources:
+      - networkpolicies
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash

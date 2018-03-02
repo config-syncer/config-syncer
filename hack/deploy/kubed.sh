@@ -141,6 +141,12 @@ export TLS_SERVING_CERT=$(cat server.crt | $ONESSL base64)
 export TLS_SERVING_KEY=$(cat server.key | $ONESSL base64)
 export KUBE_CA=$($ONESSL get kube-ca | $ONESSL base64)
 
+if [ $(kubectl get secret kubed-config -n kube-system > /dev/null 2>&1) -eq 1 ]; then
+    kubectl create secret generic kubed-config -n $KUBED_NAMESPACE \
+        --from-literal=config.yaml=$(curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/config.yaml)
+    kubectl label secret kubed-config app=kubed -n $KUBED_NAMESPACE
+fi
+
 curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.5.0/hack/deploy/operator.yaml | $ONESSL envsubst | kubectl apply -f -
 
 if [ "$KUBED_ENABLE_RBAC" = true ]; then

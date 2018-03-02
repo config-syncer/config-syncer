@@ -62,6 +62,14 @@ func (cfg ClusterConfig) Validate() error {
 		if cfg.EventForwarder.CSREvents != nil {
 			return errors.Errorf("convert `csrEvents` spec to eventForwarder.rules format")
 		}
+
+		for i, rule := range cfg.EventForwarder.Rules {
+			for j, op := range rule.Operations {
+				if op != Create && op != Delete {
+					return errors.Errorf("unknown operation %s found at eventForwarder.rules[%d].operations[%d]", op, i, j)
+				}
+			}
+		}
 	}
 
 	for _, j := range cfg.Janitors {

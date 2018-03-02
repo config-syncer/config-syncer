@@ -53,7 +53,6 @@ The following tables lists the configurable parameters of the Kubed chart and th
 | `rbac.serviceAccountName`          | ServiceAccount Kubed will use (ignored if rbac.create=true)       | `default`          |
 | `apiserver.groupPriorityMinimum`   | The minimum priority the group should have.                       | 10000              |
 | `apiserver.versionPriority`        | The ordering of this API inside of the group.                     | 15                 |
-| `apiserver.enableAdmissionWebhook` | Configure apiserver as adission webhooks for Kubed CRDs           | false              |
 | `apiserver.ca`                     | CA certificate used by main Kubernetes api server                 | ``                 |
 
 

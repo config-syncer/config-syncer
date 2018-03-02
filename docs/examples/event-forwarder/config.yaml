@@ -1,19 +1,39 @@
 clusterName: unicorn
 eventForwarder:
-  nodeAdded:
-    handle: true
-  csrEvents:
-    handle: true
-  storageAdded:
-    handle: true
-  ingressAdded:
-    handle: true
-  warningEvents:
-    handle: true
-    namespaces:
-    - kube-system
   receivers:
   - notifier: Mailgun
     to:
     - ops@example.com
+  rules:
+  - namespaces:
+    - kube-system
+    operations:
+    - CREATE
+    resources:
+    - group: ""
+      resources:
+      - events
+  - operations:
+    - CREATE
+    resources:
+    - group: ""
+      resources:
+      - nodes
+      - persistentvolumes
+      - persistentvolumeclaims
+    - group: storage.k8s.io
+      resources:
+      - storageclasses
+    - group: extensions
+      resources:
+      - ingresses
+    - group: voyager.appscode.com
+      resources:
+      - ingresses
+    - group: certificates.k8s.io
+      resources:
+      - certificatesigningrequests
+    - group: networking.k8s.io
+      resources:
+      - networkpolicies
 notifierSecretName: notifier-config

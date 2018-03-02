@@ -15,7 +15,7 @@ section_menu_id: guides
 > New to Kubed? Please start [here](/docs/concepts/README.md).
 
 # Forward Cluster Events
-Kubed can send notifications via Email, SMS or Chat for various cluster events. This tutorial will show you how to use Kubed to setup an event forwarder.
+Kubed can send notifications via Email, SMS or Chat for various cluster events. This document will show you how to use Kubed to setup an event forwarder.
 
 
 ## Before You Begin
@@ -30,37 +30,46 @@ $ cat ./docs/examples/event-forwarder/config.yaml
 
 clusterName: unicorn
 eventForwarder:
-  nodeAdded:
-    handle: true
-  csrEvents:
-    handle: true
-  storageAdded:
-    handle: true
-  ingressAdded:
-    handle: true
-  warningEvents:
-    handle: true
-    namespaces:
-    - kube-system
   receivers:
   - notifier: Mailgun
     to:
     - ops@example.com
+  rules:
+  # notify for warning events in kube-system namespace
+  - namespaces:
+    - kube-system
+    operations:
+    - CREATE
+    resources:
+    - group: "" # core API group
+      resources:
+      - events
+  # notify for both CREATE and DELETE operations in any namespace
+  - resources:
+    - group: ""  # core API group
+      resources:
+      - nodes
+      - persistentvolumes
+      - persistentvolumeclaims
+    - group: storage.k8s.io
+      resources:
+      - storageclasses
+    - group: extensions
+      resources:
+      - ingresses
+    - group: voyager.appscode.com
+      resources:
+      - ingresses
+    - group: certificates.k8s.io
+      resources:
+      - certificatesigningrequests
 notifierSecretName: notifier-config
 ```
 
-| Key                                       | Description                                                                                           |
-|-------------------------------------------|-------------------------------------------------------------------------------------------------------|
-| `eventForwarder.nodeAdded.handle`         | `Optional`. If set to true, notifications are sent when a Node is added.                              |
-| `eventForwarder.csrEvents.handle`         | `Optional`. If set to true, notifications are sent when a [CertificateSigningRequest](https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/) is added, approved or denied. |
-| `eventForwarder.ingressAdded.handle`      | `Optional`. If set to true, notifications are sent when an Ingress is added.                          |
-| `eventForwarder.ingressAdded.namespaces`  | `Optional`. If set, notifications are sent only when Ingress are added in these namespaces. Otherwise, notifications are sent when Ingress are added in any namespace |
-| `eventForwarder.storageAdded.handle`      | `Optional`. If set to true, notifications are sent when a StorageClass/PV/PVC is added.               |
-| `eventForwarder.storageAdded.namespaces`  | `Optional`. If set, notifications are sent only when PVC are added in these namespaces. Otherwise, notifications are sent when PVC added in any namespace. Since StorageClass and PV are non-namespaced resource, this field has not effect on these. |
-| `eventForwarder.warningEvents.handle`     | `Optional`. If set to true, notifications are sent when a `Warning` Event is added.                   |
-| `eventForwarder.warningEvents.namespaces` | `Optional`. If set, notifications are sent only when warning events are added in these namespaces. Otherwise, notifications are sent when warning events are added in any namespace |
-| `eventForwarder.receiver`                 | `Required`. To learn how to use various notifiers, please visit [here](/docs/guides/cluster-events/notifiers.md). |
-| `clusterName`                             | `Optional`. A meaningful identifer for cluster. This cluster name will be prefixed to any notification sent via Email/SMS/Chat so that you can identify the source easily. |
+The configuration format is inpired by [audit policy file format](https://kubernetes.io/docs/tasks/debug-application-cluster/audit/). The policy is defined [here](https://github.com/appscode/kubed/blob/4d4f7b9d03a84910e04c52a6801a9b0f71fae8e7/apis/kubed/v1alpha1/types.go#L75).
+The matcher logic is implemented [here](https://github.com/appscode/kubed/blob/4d4f7b9d03a84910e04c52a6801a9b0f71fae8e7/pkg/eventer/resourcehandler.go#L52).
+
+**NB:** The event forwarder configuration format has been redesigned in 0.6.0 and should be updates accordingly if you are upgrading from a previous version.
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
@@ -108,7 +117,7 @@ kube-system   Active    6h
 demo          Active    4m
 ```
 
-### Forward Storage Added Event  
+### Forward Storage Added Event
 In this section, a PVC will be used to show how event forwarder feature can be used. Create a PVC called `myclaim` in the `demo` namespace.
 
 ```console
@@ -189,33 +198,69 @@ Here, the busybox pod fails to start because it uses a missing command called `b
 ![Pod FailedSync](/docs/images/event-forwarder/pod-fail-2.png)
 
 
-## Filter by Namespaces
-You can configure Kubed to forward events for a subset of namespaces. You can also disable sending events for a particular type. Here is an example `config.yaml`:
-```yaml
-clusterName: unicorn
-eventForwarder:
-  nodeAdded: {}
-  ingressAdded:
-    handle: false
-  warningEvents:
-    handle: true
-    namespaces:
-    - kube-system
-  receivers:
-  - notifier: Mailgun
-    to:
-    - ops@example.com
-notifierSecretName: notifier-config
-```
+## Supported Kubernetes Objects
+Following Kubernetes objects are supported by event forwarder:
 
-In the above example:
- - `eventForwarder.nodeAdded` is set to an empty object `{}`. This means `eventForwarder.nodeAdded.handle` is false. So, notifications are _not_ sent when Nodes are added.
- - `eventForwarder.ingressAdded.handle` is set to `false`. Notifications are _not_ sent when Ingress objects are added.
- - `eventForwarder.storageAdded` is missing. So, _no_ notifications are sent when StorageClass/PV/PVC etc are added.
- - `eventForwarder.warningEvents.handle` is set to `true`. Notifications are sent when Events are added in `kube-system` namespace.
+- __v1:__
+  - ConfigMap
+  - Event
+  - LimitRange
+  - Namespace
+  - Node
+  - PersistentVolume
+  - PersistentVolumeClaim
+  - ReplicationController
+  - Secret
+  - Service
+  - ServiceAccount
+- __apps/v1beta1:__
+  - Deployment
+  - StatefulSet
+- __batch/v1:__
+  - Job
+- __batch/v1beta1:__
+  - CronJob
+- __extensions/v1beta1:__
+  - Deployment
+  - Ingress
+  - ReplicaSet
+- __networking.k8s.io/v1:__
+  - NetworkPolicy
+- __kubedb/v1alpha1:__
+  - DormantDatabase
+  - Elasticsearch
+  - Memcached
+  - MongoDB
+  - MySQL
+  - Postgres
+  - Redis
+  - Snapshot
+- __monitoring.coreos.com/v1:__
+  - Prometheus
+  - ServiceMonitor
+  - Alertmanager
+- __rbac/v1:__
+  - ClusterRole
+  - ClusterRoleBinding
+  - Role
+  - RoleBinding
+- __monitoring.appscode.com/v1alpha1:__
+  - ClusterAlert
+  - NodeAlert
+  - PodAlert
+- __stash.appscode.com/v1alpha1:__
+  - Restic
+  - Recovery
+- __storage/v1:__
+  - StorageClass
+- __voyager.appscode.com/v1beta1:__
+  - Certificate
+  - Ingress
+
+To add support for additional object types, please [file an issue](https://github.com/appscode/kubed/issues/new?title=Support+Object+Kind+[xyz]+in+SearchEngine).
 
 
-## Disable Recycle Bin
+## Disable Event Forwarder
 If you would like to disable this feature, remove the `eventForwarder` portion of your Kubed cluster config. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
 
 
