@@ -2,9 +2,9 @@
 title: Reference
 description: Kubed CLI Reference
 menu:
-  product_kubed_0.5.0:
+  product_kubed_0.6.0-rc.0:
     identifier: reference
     name: Reference
     weight: 1000
-menu_name: product_kubed_0.5.0
+menu_name: product_kubed_0.6.0-rc.0
 ---

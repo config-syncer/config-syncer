@@ -1,9 +1,9 @@
 ---
 title: Setup | Kubed
 menu:
-  product_kubed_0.5.0:
+  product_kubed_0.6.0-rc.0:
     identifier: setup
     name: Setup
     weight: 30
-menu_name: product_kubed_0.5.0
+menu_name: product_kubed_0.6.0-rc.0
 ---

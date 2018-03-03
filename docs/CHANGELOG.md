@@ -2,24 +2,24 @@
 title: Changelog | Kubed
 description: Changelog
 menu:
-  product_kubed_0.5.0:
+  product_kubed_0.6.0-rc.0:
     identifier: changelog-kubed
     name: Changelog
     parent: welcome
     weight: 10
 product_name: kubed
-menu_name: product_kubed_0.5.0
+menu_name: product_kubed_0.6.0-rc.0
 section_menu_id: welcome
-url: /products/kubed/0.5.0/welcome/changelog/
+url: /products/kubed/0.6.0-rc.0/welcome/changelog/
 aliases:
-  - /products/kubed/0.5.0/CHANGELOG/
+  - /products/kubed/0.6.0-rc.0/CHANGELOG/
 ---
 
 # Change Log
 
 ## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
 
-[Full Changelog](https://github.com/appscode/kubed/compare/0.5.0...HEAD)
+[Full Changelog](https://github.com/appscode/kubed/compare/0.6.0-rc.0...HEAD)
 
 **Closed issues:**
 
@@ -59,15 +59,15 @@ aliases:
 - Transform event forwarder rules to rules format [\#201](https://github.com/appscode/kubed/pull/201)
 - Split Setup\(\) into New\(\) and Configure\(\) [\#199](https://github.com/appscode/kubed/pull/199)
 - Remove reverse index [\#198](https://github.com/appscode/kubed/pull/198)
-- Update bleve to v0.6.0 [\#197](https://github.com/appscode/kubed/pull/197)
+- Update bleve to v0.6.0-rc.0 [\#197](https://github.com/appscode/kubed/pull/197)
 - Turn kubed api server into an EAS [\#196](https://github.com/appscode/kubed/pull/196)
 - Allow configuring resource types for Add/Update notification [\#195](https://github.com/appscode/kubed/pull/195)
 - Use SharedInformerFactory [\#193](https://github.com/appscode/kubed/pull/193)
 - Support soft loading of ClusterConfig [\#125](https://github.com/appscode/kubed/pull/125)
 
 
-## [0.5.0](https://github.com/appscode/kubed/releases/tag/0.5.0) (2018-01-16)
-Kubed 0.5.0 can send notifications to Telegram and fixes various issues related to janitors and cluster backup.
+## [0.6.0-rc.0](https://github.com/appscode/kubed/releases/tag/0.6.0-rc.0) (2018-01-16)
+Kubed 0.6.0-rc.0 can send notifications to Telegram and fixes various issues related to janitors and cluster backup.
 
 __Changelog__
 

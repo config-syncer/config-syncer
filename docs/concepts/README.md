@@ -1,17 +1,17 @@
 ---
 title: Concepts | Kubed
 menu:
-  product_kubed_0.5.0:
+  product_kubed_0.6.0-rc.0:
     identifier: concepts-readme
     name: Readme
     parent: concepts
     weight: -1
 product_name: kubed
-menu_name: product_kubed_0.5.0
+menu_name: product_kubed_0.6.0-rc.0
 section_menu_id: concepts
-url: /products/kubed/0.5.0/concepts/
+url: /products/kubed/0.6.0-rc.0/concepts/
 aliases:
-  - /products/kubed/0.5.0/concepts/README/
+  - /products/kubed/0.6.0-rc.0/concepts/README/
 ---
 
 # Concepts

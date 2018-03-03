@@ -2,13 +2,13 @@
 title: Overview | Developer Guide
 description: Developer Guide Overview
 menu:
-  product_kubed_0.5.0:
+  product_kubed_0.6.0-rc.0:
     identifier: developer-guide-readme
     name: Overview
     parent: developer-guide
     weight: 15
 product_name: kubed
-menu_name: product_kubed_0.5.0
+menu_name: product_kubed_0.6.0-rc.0
 section_menu_id: setup
 ---
 
