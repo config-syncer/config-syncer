@@ -5,29 +5,35 @@ echo "checking kubeconfig context"
 kubectl config current-context || { echo "Set a context (kubectl use-context <context>) out of the following:"; echo; kubectl config get-contexts; exit 1; }
 echo ""
 
-# ref: https://stackoverflow.com/a/27776822/244009
-case "$(uname -s)" in
-    Darwin)
-        curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-darwin-amd64
-        chmod +x onessl
-        export ONESSL=./onessl
-        ;;
+# https://stackoverflow.com/a/677212/244009
+if ! [ -x "$(command -v onessl >/dev/null 2>&1)" ]; then
+    echo "using onessl found in the machine"
+    export ONESSL=onessl
+else
+    # ref: https://stackoverflow.com/a/27776822/244009
+    case "$(uname -s)" in
+        Darwin)
+            curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-darwin-amd64
+            chmod +x onessl
+            export ONESSL=./onessl
+            ;;
 
-    Linux)
-        curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-linux-amd64
-        chmod +x onessl
-        export ONESSL=./onessl
-        ;;
+        Linux)
+            curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-linux-amd64
+            chmod +x onessl
+            export ONESSL=./onessl
+            ;;
 
-    CYGWIN*|MINGW32*|MSYS*)
-        curl -fsSL -o onessl.exe https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-windows-amd64.exe
-        chmod +x onessl.exe
-        export ONESSL=./onessl.exe
-        ;;
-    *)
-        echo 'other OS'
-        ;;
-esac
+        CYGWIN*|MINGW32*|MSYS*)
+            curl -fsSL -o onessl.exe https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-windows-amd64.exe
+            chmod +x onessl.exe
+            export ONESSL=./onessl.exe
+            ;;
+        *)
+            echo 'other OS'
+            ;;
+    esac
+fi
 
 # http://redsymbol.net/articles/bash-exit-traps/
 function cleanup {
@@ -128,6 +134,10 @@ if [ "$KUBED_UNINSTALL" -eq 1 ]; then
     exit 0
 fi
 
+echo "checking whether extended apiserver feature is enabled"
+$ONESSL has-keys configmap --namespace=kube-system --keys=requestheader-client-ca-file extension-apiserver-authentication || { echo "Set --requestheader-client-ca-file flag on Kubernetes apiserver"; exit 1; }
+echo ""
+
 env | sort | grep KUBED*
 echo ""
 
@@ -161,3 +171,9 @@ if [ "$KUBED_RUN_ON_MASTER" -eq 1 ]; then
     kubectl patch deploy kubed-operator -n $KUBED_NAMESPACE \
       --patch="$(curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/deploy/run-on-master.yaml)"
 fi
+
+echo "waiting until kubed deployment is ready"
+$ONESSL wait-until-ready deployment kubed-operator --namespace $KUBED_NAMESPACE || { echo "Kubed deployment failed to be ready"; exit 1; }
+
+echo "waiting until kubed apiservice is available"
+$ONESSL wait-until-ready apiservice v1alpha1.kubed.appscode.com || { echo "Kubed apiservice failed to be ready"; exit 1; }
