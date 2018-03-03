@@ -17,9 +17,8 @@ aliases:
 
 # Change Log
 
-## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
-
-[Full Changelog](https://github.com/appscode/kubed/compare/0.6.0-rc.0...HEAD)
+## [0.6.0-rc.0](https://github.com/appscode/kubed/tree/0.6.0-rc.0) (2018-03-03)
+[Full Changelog](https://github.com/appscode/kubed/compare/0.5.0...0.6.0-rc.0)
 
 **Closed issues:**
 
@@ -29,9 +28,12 @@ aliases:
 - Used shared informer and queue [\#152](https://github.com/appscode/kubed/issues/152)
 - Use separate bleve index for Events and other kube api objects [\#106](https://github.com/appscode/kubed/issues/106)
 - Support soft loading of ClusterConfig [\#51](https://github.com/appscode/kubed/issues/51)
+- Expose Kubed api server as a UAS [\#19](https://github.com/appscode/kubed/issues/19)
 
 **Merged pull requests:**
 
+- Fix docs [\#231](https://github.com/appscode/kubed/pull/231)
+- Update docs for 0.6.0-rc.0 release [\#230](https://github.com/appscode/kubed/pull/230)
 - Upgrade github.com/blevesearch/bleve to 0.7.0 [\#229](https://github.com/appscode/kubed/pull/229)
 - Use github.com/json-iterator/go [\#228](https://github.com/appscode/kubed/pull/228)
 - Remove unused options field [\#227](https://github.com/appscode/kubed/pull/227)
@@ -46,6 +48,7 @@ aliases:
 - Rename Stuff back to SearchResult [\#218](https://github.com/appscode/kubed/pull/218)
 - Fix locks in resource indexer [\#217](https://github.com/appscode/kubed/pull/217)
 - Move apis out of pkg package [\#216](https://github.com/appscode/kubed/pull/216)
+- Document recent changes [\#215](https://github.com/appscode/kubed/pull/215)
 - Rename searchresult to stuff [\#214](https://github.com/appscode/kubed/pull/214)
 - Add installer script [\#211](https://github.com/appscode/kubed/pull/211)
 - Add tests for RestMapper [\#209](https://github.com/appscode/kubed/pull/209)
@@ -59,7 +62,7 @@ aliases:
 - Transform event forwarder rules to rules format [\#201](https://github.com/appscode/kubed/pull/201)
 - Split Setup\(\) into New\(\) and Configure\(\) [\#199](https://github.com/appscode/kubed/pull/199)
 - Remove reverse index [\#198](https://github.com/appscode/kubed/pull/198)
-- Update bleve to v0.6.0-rc.0 [\#197](https://github.com/appscode/kubed/pull/197)
+- Update bleve to v0.6.0 [\#197](https://github.com/appscode/kubed/pull/197)
 - Turn kubed api server into an EAS [\#196](https://github.com/appscode/kubed/pull/196)
 - Allow configuring resource types for Add/Update notification [\#195](https://github.com/appscode/kubed/pull/195)
 - Use SharedInformerFactory [\#193](https://github.com/appscode/kubed/pull/193)
