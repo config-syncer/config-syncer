@@ -43,7 +43,7 @@ The following tables lists the configurable parameters of the Kubed chart and th
 | -----------------------------------| ------------------------------------------------------------------|--------------------|
 | `replicaCount`                     | Number of kubed operator replicas to create (only 1 is supported) | `1`                |
 | `dockerRegistry`                   | Docker registry used to pull Kubed related images                 | `appscode`         |
-| `imageTags.kubed`                  | Tag of Kubed operator image                                       | `0.5.0`            |
+| `imageTags.kubed`                  | Tag of Kubed operator image                                       | `0.6.0-rc.0`            |
 | `imagePullSecrets`                 | Specify image pull secrets                                        | `nil` (does not add image pull secrets to deployed pods) |
 | `imagePullPolicy`                  | Image pull policy                                                 | `IfNotPresent`     |
 | `criticalAddon`                    | If true, installs kubed operator as critical addon                | `false`            |

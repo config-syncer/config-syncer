@@ -513,7 +513,7 @@
                     },
                     {
                         "names": [
-                            "appscode/kubed:0.5.0"
+                            "appscode/kubed:0.6.0-rc.0"
                         ],
                         "sizeBytes": 82301225
                     },
