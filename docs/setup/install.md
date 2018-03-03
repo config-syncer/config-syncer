@@ -46,30 +46,21 @@ eventForwarder:
       - nodes
       - persistentvolumes
       - persistentvolumeclaims
-  - operations:
-    - CREATE
-    resources:
     - group: storage.k8s.io
       resources:
       - storageclasses
-  - operations:
-    - CREATE
-    resources:
     - group: extensions
       resources:
       - ingresses
-  - operations:
-    - CREATE
-    resources:
     - group: voyager.appscode.com
       resources:
       - ingresses
-  - operations:
-    - CREATE
-    resources:
     - group: certificates.k8s.io
       resources:
       - certificatesigningrequests
+    - group: networking.k8s.io
+      resources:
+      - networkpolicies
 notifierSecretName: notifier-config
 recycleBin:
   handleUpdates: false
