@@ -48,6 +48,11 @@ func CreateClusterConfig() apis.ClusterConfig {
 	return apis.ClusterConfig{
 		ClusterName:        "unicorn",
 		EnableConfigSyncer: true,
+		RecycleBin: &apis.RecycleBinSpec{
+			Path:          "/tmp/kubed/trash",
+			TTL:           metav1.Duration{Duration: 7 * 24 * time.Hour},
+			HandleUpdates: false,
+		},
 		EventForwarder: &apis.EventForwarderSpec{
 			Rules: []apis.PolicyRule{
 				{
@@ -73,66 +78,47 @@ func CreateClusterConfig() apis.ClusterConfig {
 								"persistentvolumeclaims",
 							},
 						},
-					},
-				},
-				{
-					Operations: []apis.Operation{apis.Create},
-					Resources: []apis.GroupResources{
 						{
 							Group: "storage.k8s.io",
 							Resources: []string{
 								"storageclasses",
 							},
 						},
-					},
-				},
-				{
-					Operations: []apis.Operation{apis.Create},
-					Resources: []apis.GroupResources{
 						{
 							Group: "extensions",
 							Resources: []string{
 								"ingresses",
 							},
 						},
-					},
-				},
-				{
-					Operations: []apis.Operation{apis.Create},
-					Resources: []apis.GroupResources{
 						{
 							Group: "voyager.appscode.com",
 							Resources: []string{
 								"ingresses",
 							},
 						},
-					},
-				},
-				{
-					Operations: []apis.Operation{apis.Create},
-					Resources: []apis.GroupResources{
 						{
 							Group: "certificates.k8s.io",
 							Resources: []string{
 								"certificatesigningrequests",
 							},
 						},
+						{
+							Group: "networking.k8s.io",
+							Resources: []string{
+								"networkpolicies",
+							},
+						},
 					},
 				},
 			},
-			Receivers: []apis.Receiver{
-				{
-					To:       []string{"ops@example.com"},
-					Notifier: "Mailgun",
-				},
-			},
+			//Receivers: []apis.Receiver{
+			//	{
+			//		To:       []string{"ops@example.com"},
+			//		Notifier: "Mailgun",
+			//	},
+			//},
 		},
-		NotifierSecretName: "notifier-config",
-		RecycleBin: &apis.RecycleBinSpec{
-			Path:          "/tmp/kubed/trash",
-			TTL:           metav1.Duration{Duration: 7 * 24 * time.Hour},
-			HandleUpdates: false,
-		},
+		// NotifierSecretName: "notifier-config",
 		//Snapshotter: &api.SnapshotSpec{
 		//	Schedule: "@every 6h",
 		//	Sanitize: true,

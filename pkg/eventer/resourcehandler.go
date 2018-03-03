@@ -67,9 +67,7 @@ func ruleMatchesResource(r api.PolicyRule, attrs attributes) bool {
 
 	apiGroup := attrs.gvr.Group
 	resource := attrs.gvr.Resource
-
 	name := attrs.accessor.GetName()
-
 	for _, gr := range r.Resources {
 		if gr.Group == apiGroup {
 			if len(gr.Resources) == 0 {
