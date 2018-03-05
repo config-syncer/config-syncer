@@ -14,6 +14,6 @@ roleRef:
   name: {{ template "kubed.fullname" . }}
 subjects:
 - kind: ServiceAccount
-  name: {{ template "kubed.fullname" . }}
+  name: {{ template "kubed.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 {{ end }}
