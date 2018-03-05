@@ -6,8 +6,7 @@ kubectl config current-context || { echo "Set a context (kubectl use-context <co
 echo ""
 
 # https://stackoverflow.com/a/677212/244009
-if ! [ -x "$(command -v onessl >/dev/null 2>&1)" ]; then
-    echo "using onessl found in the machine"
+if [ -x "$(command -v onessl >/dev/null 2>&1)" ]; then
     export ONESSL=onessl
 else
     # ref: https://stackoverflow.com/a/27776822/244009
@@ -46,8 +45,8 @@ trap cleanup EXIT
 # ref: http://tldp.org/LDP/abs/html/comparison-ops.html
 
 export KUBED_NAMESPACE=kube-system
-export KUBED_SERVICE_ACCOUNT=default
-export KUBED_ENABLE_RBAC=false
+export KUBED_SERVICE_ACCOUNT=kubed-operator
+export KUBED_ENABLE_RBAC=true
 export KUBED_RUN_ON_MASTER=0
 export KUBED_DOCKER_REGISTRY=appscode
 export KUBED_IMAGE_PULL_SECRET=
@@ -61,7 +60,7 @@ show_help() {
     echo "options:"
     echo "-h, --help                         show brief help"
     echo "-n, --namespace=NAMESPACE          specify namespace (default: kube-system)"
-    echo "    --rbac                         create RBAC roles and bindings"
+    echo "    --rbac                         create RBAC roles and bindings (default: true)"
     echo "    --docker-registry              docker registry used to pull kubed images (default: appscode)"
     echo "    --image-pull-secret            name of secret used to pull kubed operator images"
     echo "    --run-on-master                run kubed operator on master"
@@ -97,9 +96,12 @@ while test $# -gt 0; do
             export KUBED_IMAGE_PULL_SECRET="name: '$secret'"
             shift
             ;;
-        --rbac)
-            export KUBED_SERVICE_ACCOUNT=kubed-operator
-            export KUBED_ENABLE_RBAC=true
+        --rbac*)
+            val=`echo $1 | sed -e 's/^[^=]*=//g'`
+            if [ "$val" = "false" ]; then
+                export KUBED_SERVICE_ACCOUNT=default
+                export KUBED_ENABLE_RBAC=false
+            fi
             shift
             ;;
         --run-on-master)
@@ -151,12 +153,13 @@ export TLS_SERVING_CERT=$(cat server.crt | $ONESSL base64)
 export TLS_SERVING_KEY=$(cat server.key | $ONESSL base64)
 export KUBE_CA=$($ONESSL get kube-ca | $ONESSL base64)
 
-kubectl get secret kubed-config -n kube-system > /dev/null 2>&1
-if [ "$?" -eq 1 ]; then
+CONFIG_FOUND=1
+kubectl get secret kubed-config -n $KUBED_NAMESPACE > /dev/null 2>&1 || CONFIG_FOUND=0
+if [ $CONFIG_FOUND -eq 0 ]; then
     kubectl create secret generic kubed-config -n $KUBED_NAMESPACE \
         --from-literal=config.yaml=$(curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/deploy/config.yaml)
-    kubectl label secret kubed-config app=kubed -n $KUBED_NAMESPACE
 fi
+kubectl label secret kubed-config app=kubed -n $KUBED_NAMESPACE --overwrite
 
 curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/deploy/operator.yaml | $ONESSL envsubst | kubectl apply -f -
 
@@ -177,3 +180,6 @@ $ONESSL wait-until-ready deployment kubed-operator --namespace $KUBED_NAMESPACE 
 
 echo "waiting until kubed apiservice is available"
 $ONESSL wait-until-ready apiservice v1alpha1.kubed.appscode.com || { echo "Kubed apiservice failed to be ready"; exit 1; }
+
+echo
+echo "Successfully installed Kubed cluster daemon!"
