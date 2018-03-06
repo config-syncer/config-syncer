@@ -103,6 +103,15 @@ Cluster config was parsed successfully.
 Kubed can be installed via installer script included in the [/hack/deploy](https://github.com/appscode/kubed/tree/0.6.0-rc.0/hack/deploy) folder.
 
 ```console
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/deploy/kubed.sh \
+    | bash
+```
+
+#### Customizing Installer
+
+You can see the full list of flags available to installer using `-h` flag.
+
+```console
 $ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/deploy/kubed.sh | bash -s -- -h
 kubed.sh - install Kubernetes cluster daemon
 
@@ -116,12 +125,7 @@ options:
     --image-pull-secret            name of secret used to pull kubed operator images
     --run-on-master                run kubed operator on master
     --uninstall                    uninstall kubed
-
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/deploy/kubed.sh \
-    | bash
 ```
-
-### Customizing Installer
 
 If you would like to run Kubed operator pod in `master` instances, pass the `--run-on-master` flag:
 
