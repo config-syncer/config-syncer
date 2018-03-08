@@ -9,14 +9,14 @@ metadata:
     heritage: "{{ .Release.Service }}"
 spec:
   ports:
+  # Port used to expose admission webhook apiserver
   - name: api
-    port: 8080
-    protocol: TCP
-    targetPort: api
-  - name: web
+    port: 443
+    targetPort: 8443
+  # Port used to expose Prometheus metrics for the operator
+  - name: ops
     port: 56790
-    protocol: TCP
-    targetPort: web
+    targetPort: 56790
   selector:
     app: "{{ template "kubed.name" . }}"
     release: "{{ .Release.Name }}"
