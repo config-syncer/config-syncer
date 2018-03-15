@@ -1,4 +1,9 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/appscode/kubed)](https://goreportcard.com/report/github.com/appscode/kubed)
+[![Build Status](https://travis-ci.org/appscode/kubed.svg?branch=master)](https://travis-ci.org/appscode/kubed)
+[![codecov](https://codecov.io/gh/appscode/kubed/branch/master/graph/badge.svg)](https://codecov.io/gh/appscode/kubed)
+[![Docker Pulls](https://img.shields.io/docker/pulls/appscode/kubed.svg)](https://hub.docker.com/r/appscode/kubed/)
+[![Slack](https://slack.appscode.com/badge.svg)](https://slack.appscode.com)
+[![Twitter](https://img.shields.io/twitter/follow/appscodehq.svg?style=social&logo=twitter&label=Follow)](https://twitter.com/intent/follow?screen_name=AppsCodeHQ)
 
 # Kubed
 Kubed (pronounced Cube-Dee) by AppsCode is a Kubernetes Cluster Operator Daemon. Kubed can do the following things for you:
