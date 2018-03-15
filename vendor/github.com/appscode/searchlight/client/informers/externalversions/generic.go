@@ -55,6 +55,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	// Group=monitoring.appscode.com, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithResource("clusteralerts"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1alpha1().ClusterAlerts().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("incidents"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1alpha1().Incidents().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("nodealerts"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1alpha1().NodeAlerts().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("podalerts"):

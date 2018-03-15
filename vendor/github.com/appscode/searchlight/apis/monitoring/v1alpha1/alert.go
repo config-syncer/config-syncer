@@ -4,6 +4,7 @@ import (
 	"time"
 
 	core "k8s.io/api/core/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 type Alert interface {
@@ -12,7 +13,7 @@ type Alert interface {
 	Command() string
 	GetCheckInterval() time.Duration
 	GetAlertInterval() time.Duration
-	IsValid() (bool, error)
+	IsValid(kc kubernetes.Interface) error
 	GetNotifierSecretName() string
 	GetReceivers() []Receiver
 	ObjectReference() *core.ObjectReference

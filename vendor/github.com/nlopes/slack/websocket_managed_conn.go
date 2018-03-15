@@ -145,11 +145,7 @@ func (rtm *RTM) startRTMAndDial(useRTMStart bool) (*Info, *websocket.Conn, error
 	// Only use HTTPS for connections to prevent MITM attacks on the connection.
 	upgradeHeader := http.Header{}
 	upgradeHeader.Add("Origin", "https://api.slack.com")
-	dialer := websocket.DefaultDialer
-	if rtm.dialer != nil {
-		dialer = rtm.dialer
-	}
-	conn, _, err := dialer.Dial(url, upgradeHeader)
+	conn, _, err := websocket.DefaultDialer.Dial(url, upgradeHeader)
 	if err != nil {
 		rtm.Debugf("Failed to dial to the websocket: %s", err)
 		return nil, nil, err
@@ -290,27 +286,26 @@ func (rtm *RTM) ping() error {
 func (rtm *RTM) receiveIncomingEvent() {
 	event := json.RawMessage{}
 	err := rtm.conn.ReadJSON(&event)
-	switch {
-	case err == io.EOF:
+	if err == io.EOF {
 		// EOF's don't seem to signify a failed connection so instead we ignore
 		// them here and detect a failed connection upon attempting to send a
 		// 'PING' message
 
-		// trigger a 'PING' to detect potential websocket disconnect
+		// trigger a 'PING' to detect pontential websocket disconnect
 		rtm.forcePing <- true
-	case websocket.IsCloseError(err, websocket.CloseAbnormalClosure):
-		rtm.killChannel <- false
-	case err != nil:
+		return
+	} else if err != nil {
 		rtm.IncomingEvents <- RTMEvent{"incoming_error", &IncomingEventError{
 			ErrorObj: err,
 		}}
 		// force a ping here too?
-	case len(event) == 0:
+		return
+	} else if len(event) == 0 {
 		rtm.Debugln("Received empty event")
-	default:
-		rtm.Debugln("Incoming Event:", string(event[:]))
-		rtm.rawEvents <- event
+		return
 	}
+	rtm.Debugln("Incoming Event:", string(event[:]))
+	rtm.rawEvents <- event
 }
 
 // handleRawEvent takes a raw JSON message received from the slack websocket

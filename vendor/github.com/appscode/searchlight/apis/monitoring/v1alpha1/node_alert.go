@@ -2,16 +2,78 @@ package v1alpha1
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	core "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 const (
-	ResourceKindNodeAlert = "NodeAlert"
-	ResourceNameNodeAlert = "node-alert"
-	ResourceTypeNodeAlert = "nodealerts"
+	ResourceKindNodeAlert     = "NodeAlert"
+	ResourcePluralNodeAlert   = "nodealerts"
+	ResourceSingularNodeAlert = "nodealert"
 )
+
+// +genclient
+// +genclient:skipVerbs=updateStatus
+// +k8s:openapi-gen=true
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+type NodeAlert struct {
+	metav1.TypeMeta `json:",inline"`
+	// Standard object's metadata.
+	// More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	// Spec is the desired state of the NodeAlert.
+	// More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status
+	Spec NodeAlertSpec `json:"spec,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// NodeAlertList is a collection of NodeAlert.
+type NodeAlertList struct {
+	metav1.TypeMeta `json:",inline"`
+	// Standard object's metadata.
+	// More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata
+	metav1.ListMeta `json:"metadata,omitempty"`
+
+	// Items is the list of NodeAlert.
+	Items []NodeAlert `json:"items"`
+}
+
+// NodeAlertSpec describes the NodeAlert the user wishes to create.
+type NodeAlertSpec struct {
+	Selector map[string]string `json:"selector,omitempty"`
+
+	NodeName *string `json:"nodeName,omitempty"`
+
+	// Icinga CheckCommand name
+	Check CheckNode `json:"check,omitempty"`
+
+	// How frequently Icinga Service will be checked
+	CheckInterval metav1.Duration `json:"checkInterval,omitempty"`
+
+	// How frequently notifications will be send
+	AlertInterval metav1.Duration `json:"alertInterval,omitempty"`
+
+	// Secret containing notifier credentials
+	NotifierSecretName string `json:"notifierSecretName,omitempty"`
+
+	// NotifierParams contains information to send notifications for Incident
+	// State, UserUid, Method
+	Receivers []Receiver `json:"receivers,omitempty"`
+
+	// Vars contains Icinga Service variables to be used in CheckCommand
+	Vars map[string]string `json:"vars,omitempty"`
+
+	// Indicates that Check is paused
+	// Icinga Services are removed
+	Paused bool `json:"paused,omitempty"`
+}
 
 var _ Alert = &NodeAlert{}
 
@@ -35,29 +97,34 @@ func (a NodeAlert) GetAlertInterval() time.Duration {
 	return a.Spec.AlertInterval.Duration
 }
 
-func (a NodeAlert) IsValid() (bool, error) {
+func (a NodeAlert) IsValid(kc kubernetes.Interface) error {
+	if a.Spec.NodeName != nil && len(a.Spec.Selector) > 0 {
+		return fmt.Errorf("can't specify both node name and selector")
+	}
+
 	cmd, ok := NodeCommands[a.Spec.Check]
 	if !ok {
-		return false, fmt.Errorf("%s is not a valid node check command", a.Spec.Check)
+		return fmt.Errorf("%s is not a valid node check command", a.Spec.Check)
 	}
 	for k := range a.Spec.Vars {
 		if _, ok := cmd.Vars[k]; !ok {
-			return false, fmt.Errorf("var %s is unsupported for check command %s", k, a.Spec.Check)
+			return fmt.Errorf("var %s is unsupported for check command %s", k, a.Spec.Check)
 		}
 	}
 	for _, rcv := range a.Spec.Receivers {
 		found := false
 		for _, state := range cmd.States {
-			if state == rcv.State {
+			if strings.EqualFold(state, rcv.State) {
 				found = true
 				break
 			}
 		}
 		if !found {
-			return false, fmt.Errorf("state %s is unsupported for check command %s", rcv.State, a.Spec.Check)
+			return fmt.Errorf("state %s is unsupported for check command %s", rcv.State, a.Spec.Check)
 		}
 	}
-	return true, nil
+
+	return checkNotifiers(kc, a)
 }
 
 func (a NodeAlert) GetNotifierSecretName() string {

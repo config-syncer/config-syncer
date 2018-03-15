@@ -26,6 +26,8 @@ import (
 type Interface interface {
 	// ClusterAlerts returns a ClusterAlertInformer.
 	ClusterAlerts() ClusterAlertInformer
+	// Incidents returns a IncidentInformer.
+	Incidents() IncidentInformer
 	// NodeAlerts returns a NodeAlertInformer.
 	NodeAlerts() NodeAlertInformer
 	// PodAlerts returns a PodAlertInformer.
@@ -46,6 +48,11 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // ClusterAlerts returns a ClusterAlertInformer.
 func (v *version) ClusterAlerts() ClusterAlertInformer {
 	return &clusterAlertInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// Incidents returns a IncidentInformer.
+func (v *version) Incidents() IncidentInformer {
+	return &incidentInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // NodeAlerts returns a NodeAlertInformer.
