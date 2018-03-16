@@ -18,6 +18,8 @@ package v1alpha1
 
 type ClusterAlertExpansion interface{}
 
+type IncidentExpansion interface{}
+
 type NodeAlertExpansion interface{}
 
 type PodAlertExpansion interface{}

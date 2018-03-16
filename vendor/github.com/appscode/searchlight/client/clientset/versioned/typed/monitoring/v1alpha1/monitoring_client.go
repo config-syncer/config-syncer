@@ -26,6 +26,7 @@ import (
 type MonitoringV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	ClusterAlertsGetter
+	IncidentsGetter
 	NodeAlertsGetter
 	PodAlertsGetter
 }
@@ -37,6 +38,10 @@ type MonitoringV1alpha1Client struct {
 
 func (c *MonitoringV1alpha1Client) ClusterAlerts(namespace string) ClusterAlertInterface {
 	return newClusterAlerts(c, namespace)
+}
+
+func (c *MonitoringV1alpha1Client) Incidents(namespace string) IncidentInterface {
+	return newIncidents(c, namespace)
 }
 
 func (c *MonitoringV1alpha1Client) NodeAlerts(namespace string) NodeAlertInterface {

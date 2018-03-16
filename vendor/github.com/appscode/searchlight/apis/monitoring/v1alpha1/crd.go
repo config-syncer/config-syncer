@@ -8,7 +8,7 @@ import (
 func (a ClusterAlert) CustomResourceDefinition() *apiextensions.CustomResourceDefinition {
 	return &apiextensions.CustomResourceDefinition{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: ResourceTypeClusterAlert + "." + SchemeGroupVersion.Group,
+			Name: ResourcePluralClusterAlert + "." + SchemeGroupVersion.Group,
 			Labels: map[string]string{
 				"app": "searchlight",
 			},
@@ -18,7 +18,8 @@ func (a ClusterAlert) CustomResourceDefinition() *apiextensions.CustomResourceDe
 			Version: SchemeGroupVersion.Version,
 			Scope:   apiextensions.NamespaceScoped,
 			Names: apiextensions.CustomResourceDefinitionNames{
-				Plural:     ResourceTypeClusterAlert,
+				Plural:     ResourcePluralClusterAlert,
+				Singular:   ResourceSingularClusterAlert,
 				Kind:       ResourceKindClusterAlert,
 				ShortNames: []string{"ca"},
 			},
@@ -29,7 +30,7 @@ func (a ClusterAlert) CustomResourceDefinition() *apiextensions.CustomResourceDe
 func (a NodeAlert) CustomResourceDefinition() *apiextensions.CustomResourceDefinition {
 	return &apiextensions.CustomResourceDefinition{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: ResourceTypeNodeAlert + "." + SchemeGroupVersion.Group,
+			Name: ResourcePluralNodeAlert + "." + SchemeGroupVersion.Group,
 			Labels: map[string]string{
 				"app": "searchlight",
 			},
@@ -39,7 +40,8 @@ func (a NodeAlert) CustomResourceDefinition() *apiextensions.CustomResourceDefin
 			Version: SchemeGroupVersion.Version,
 			Scope:   apiextensions.NamespaceScoped,
 			Names: apiextensions.CustomResourceDefinitionNames{
-				Plural:     ResourceTypeNodeAlert,
+				Plural:     ResourcePluralNodeAlert,
+				Singular:   ResourceSingularNodeAlert,
 				Kind:       ResourceKindNodeAlert,
 				ShortNames: []string{"noa"},
 			},
@@ -50,7 +52,7 @@ func (a NodeAlert) CustomResourceDefinition() *apiextensions.CustomResourceDefin
 func (a PodAlert) CustomResourceDefinition() *apiextensions.CustomResourceDefinition {
 	return &apiextensions.CustomResourceDefinition{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: ResourceTypePodAlert + "." + SchemeGroupVersion.Group,
+			Name: ResourcePluralPodAlert + "." + SchemeGroupVersion.Group,
 			Labels: map[string]string{
 				"app": "searchlight",
 			},
@@ -60,9 +62,31 @@ func (a PodAlert) CustomResourceDefinition() *apiextensions.CustomResourceDefini
 			Version: SchemeGroupVersion.Version,
 			Scope:   apiextensions.NamespaceScoped,
 			Names: apiextensions.CustomResourceDefinitionNames{
-				Plural:     ResourceTypePodAlert,
+				Plural:     ResourcePluralPodAlert,
+				Singular:   ResourceSingularPodAlert,
 				Kind:       ResourceKindPodAlert,
 				ShortNames: []string{"poa"},
+			},
+		},
+	}
+}
+
+func (a Incident) CustomResourceDefinition() *apiextensions.CustomResourceDefinition {
+	return &apiextensions.CustomResourceDefinition{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: ResourcePluralIncident + "." + SchemeGroupVersion.Group,
+			Labels: map[string]string{
+				"app": "searchlight",
+			},
+		},
+		Spec: apiextensions.CustomResourceDefinitionSpec{
+			Group:   SchemeGroupVersion.Group,
+			Version: SchemeGroupVersion.Version,
+			Scope:   apiextensions.NamespaceScoped,
+			Names: apiextensions.CustomResourceDefinitionNames{
+				Plural:   ResourcePluralIncident,
+				Singular: ResourceSingularIncident,
+				Kind:     ResourceKindIncident,
 			},
 		},
 	}

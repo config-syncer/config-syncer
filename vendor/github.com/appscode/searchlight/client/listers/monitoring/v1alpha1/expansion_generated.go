@@ -26,6 +26,14 @@ type ClusterAlertListerExpansion interface{}
 // ClusterAlertNamespaceLister.
 type ClusterAlertNamespaceListerExpansion interface{}
 
+// IncidentListerExpansion allows custom methods to be added to
+// IncidentLister.
+type IncidentListerExpansion interface{}
+
+// IncidentNamespaceListerExpansion allows custom methods to be added to
+// IncidentNamespaceLister.
+type IncidentNamespaceListerExpansion interface{}
+
 // NodeAlertListerExpansion allows custom methods to be added to
 // NodeAlertLister.
 type NodeAlertListerExpansion interface{}
