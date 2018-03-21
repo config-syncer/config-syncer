@@ -50,6 +50,7 @@ export KUBED_ENABLE_RBAC=true
 export KUBED_RUN_ON_MASTER=0
 export KUBED_DOCKER_REGISTRY=appscode
 export KUBED_IMAGE_PULL_SECRET=
+export KUBED_ENABLE_ANALYTICS=true
 export KUBED_UNINSTALL=0
 
 show_help() {
@@ -64,6 +65,7 @@ show_help() {
     echo "    --docker-registry              docker registry used to pull kubed images (default: appscode)"
     echo "    --image-pull-secret            name of secret used to pull kubed operator images"
     echo "    --run-on-master                run kubed operator on master"
+    echo "    --enable-analytics             send usage events to Google Analytics (default: true)"
     echo "    --uninstall                    uninstall kubed"
 }
 
@@ -94,6 +96,13 @@ while test $# -gt 0; do
         --image-pull-secret*)
             secret=`echo $1 | sed -e 's/^[^=]*=//g'`
             export KUBED_IMAGE_PULL_SECRET="name: '$secret'"
+            shift
+            ;;
+        --enable-analytics*)
+            val=`echo $1 | sed -e 's/^[^=]*=//g'`
+            if [ "$val" = "false" ]; then
+                export SEARCHLIGHT_ENABLE_ANALYTICS=false
+            fi
             shift
             ;;
         --rbac*)

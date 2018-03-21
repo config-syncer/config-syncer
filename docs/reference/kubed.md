@@ -26,7 +26,7 @@ Kubed is a Kubernetes daemon to perform cluster management tasks. For more infor
 
 ```
       --alsologtostderr                  log to standard error as well as files
-      --analytics                        Send analytical events to Google Analytics (default true)
+      --enable-analytics                 send usage events to Google Analytics (default true)
   -h, --help                             help for kubed
       --log.format logFormatFlag         Set the log target and format. Example: "logger:syslog?appname=bob&local=7" or "logger:stdout?json=true" (default "logger:stderr")
       --log.level levelFlag              Only log messages with the given severity or above. Valid levels: [debug, info, warn, error, fatal] (default "info")

@@ -36,7 +36,7 @@ Want to help improve Kubed? Please start [here](https://appscode.com/products/ku
 
 ---
 
-**Kubed binaries collects anonymous usage statistics to help us learn how the software is being used and how we can improve it. To disable stats collection, run the operator with the flag** `--analytics=false`.
+**Kubed binaries collects anonymous usage statistics to help us learn how the software is being used and how we can improve it. To disable stats collection, run the operator with the flag** `--enable-analytics=false`.
 
 ---
 
