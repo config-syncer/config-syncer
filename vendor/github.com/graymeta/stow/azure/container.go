@@ -10,6 +10,9 @@ import (
 	"github.com/pkg/errors"
 )
 
+// The maximum size of an object that can be Put in a single request
+const maxPutSize = 256 * 1024 * 1024
+
 // timeFormat is the time format for azure.
 var timeFormat = "Mon, 2 Jan 2006 15:04:05 MST"
 
@@ -101,9 +104,18 @@ func (c *container) Put(name string, r io.Reader, size int64, metadata map[strin
 	}
 
 	name = strings.Replace(name, " ", "+", -1)
-	err = c.client.GetContainerReference(c.id).GetBlobReference(name).CreateBlockBlobFromReader(r, nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to create or update Item")
+
+	if size > maxPutSize {
+		// Do a multipart upload
+		err := c.multipartUpload(name, r, size)
+		if err != nil {
+			return nil, errors.Wrap(err, "multipart upload")
+		}
+	} else {
+		err = c.client.GetContainerReference(c.id).GetBlobReference(name).CreateBlockBlobFromReader(r, nil)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to create or update Item")
+		}
 	}
 
 	err = c.SetItemMetadata(name, mdParsed)

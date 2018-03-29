@@ -26,6 +26,7 @@ import (
 type StashV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	RecoveriesGetter
+	RepositoriesGetter
 	ResticsGetter
 }
 
@@ -36,6 +37,10 @@ type StashV1alpha1Client struct {
 
 func (c *StashV1alpha1Client) Recoveries(namespace string) RecoveryInterface {
 	return newRecoveries(c, namespace)
+}
+
+func (c *StashV1alpha1Client) Repositories(namespace string) RepositoryInterface {
+	return newRepositories(c, namespace)
 }
 
 func (c *StashV1alpha1Client) Restics(namespace string) ResticInterface {

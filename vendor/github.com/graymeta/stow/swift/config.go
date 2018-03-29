@@ -28,6 +28,25 @@ const (
 const Kind = "swift"
 
 func init() {
+	validatefn := func(config stow.Config) error {
+		_, ok := config.Config(ConfigUsername)
+		if !ok {
+			return errors.New("missing account username")
+		}
+		_, ok = config.Config(ConfigKey)
+		if !ok {
+			return errors.New("missing api key")
+		}
+		_, ok = config.Config(ConfigTenantName)
+		if !ok {
+			return errors.New("missing tenant name")
+		}
+		_, ok = config.Config(ConfigTenantAuthURL)
+		if !ok {
+			return errors.New("missing tenant auth url")
+		}
+		return nil
+	}
 	makefn := func(config stow.Config) (stow.Location, error) {
 		_, ok := config.Config(ConfigUsername)
 		if !ok {
@@ -58,7 +77,7 @@ func init() {
 	kindfn := func(u *url.URL) bool {
 		return u.Scheme == Kind
 	}
-	stow.Register(Kind, makefn, kindfn)
+	stow.Register(Kind, makefn, kindfn, validatefn)
 }
 
 func newSwiftClient(cfg stow.Config) (*swift.Connection, error) {

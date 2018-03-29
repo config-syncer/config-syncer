@@ -18,4 +18,6 @@ package v1alpha1
 
 type RecoveryExpansion interface{}
 
+type RepositoryExpansion interface{}
+
 type ResticExpansion interface{}

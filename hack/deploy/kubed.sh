@@ -129,16 +129,18 @@ while test $# -gt 0; do
 done
 
 if [ "$KUBED_UNINSTALL" -eq 1 ]; then
+    # delete webhooks and apiservices
+    kubectl delete validatingwebhookconfiguration -l app=kubed || true
+    kubectl delete mutatingwebhookconfiguration -l app=kubed || true
+    kubectl delete apiservice -l app=kubed
+    # delete kubed operator
     kubectl delete deployment -l app=kubed --namespace $KUBED_NAMESPACE
     kubectl delete service -l app=kubed --namespace $KUBED_NAMESPACE
     kubectl delete secret -l app=kubed --namespace $KUBED_NAMESPACE
-    kubectl delete apiservice -l app=kubed --namespace $KUBED_NAMESPACE
-    kubectl delete validatingwebhookconfiguration -l app=kubed --namespace $KUBED_NAMESPACE
-    kubectl delete mutatingwebhookconfiguration -l app=kubed --namespace $KUBED_NAMESPACE
-    # Delete RBAC objects, if --rbac flag was used.
+    # delete RBAC objects, if --rbac flag was used.
     kubectl delete serviceaccount -l app=kubed --namespace $KUBED_NAMESPACE
-    kubectl delete clusterrolebindings -l app=kubed --namespace $KUBED_NAMESPACE
-    kubectl delete clusterrole -l app=kubed --namespace $KUBED_NAMESPACE
+    kubectl delete clusterrolebindings -l app=kubed
+    kubectl delete clusterrole -l app=kubed
     kubectl delete rolebindings -l app=kubed --namespace $KUBED_NAMESPACE
     kubectl delete role -l app=kubed --namespace $KUBED_NAMESPACE
 
