@@ -16,6 +16,9 @@ var (
 	// supplying a function that creates a new instance of
 	// that Location.
 	locations = map[string]func(Config) (Location, error){}
+	// configurations is a map of installed location providers,
+	// supplying a function that validates the configuration
+	configurations = map[string]func(Config) error{}
 	// kindmatches is a slice of functions that take turns
 	// trying to match the kind of Location for a given
 	// URL. Functions return an empty string if it does not
@@ -156,6 +159,8 @@ type Config interface {
 	// Config gets a string configuration value and a
 	// bool indicating whether the value was present or not.
 	Config(name string) (string, bool)
+	// Set sets the configuration name to specified value
+	Set(name, value string)
 }
 
 // Register adds a Location implementation, with two helper functions.
@@ -164,7 +169,7 @@ type Config interface {
 // of this kind or not. Code can call KindByURL to get a kind string
 // for any given URL and all registered implementations will be consulted.
 // Register is usually called in an implementation package's init method.
-func Register(kind string, makefn func(Config) (Location, error), kindmatchfn func(*url.URL) bool) {
+func Register(kind string, makefn func(Config) (Location, error), kindmatchfn func(*url.URL) bool, validatefn func(Config) error) {
 	lock.Lock()
 	defer lock.Unlock()
 	// if already registered, leave
@@ -172,6 +177,7 @@ func Register(kind string, makefn func(Config) (Location, error), kindmatchfn fu
 		return
 	}
 	locations[kind] = makefn
+	configurations[kind] = validatefn
 	kinds = append(kinds, kind)
 	kindmatches = append(kindmatches, func(u *url.URL) string {
 		if kindmatchfn(u) {
@@ -187,6 +193,15 @@ func Dial(kind string, config Config) (Location, error) {
 	fn, ok := locations[kind]
 	if !ok {
 		return nil, errUnknownKind(kind)
+	}
+	return fn(config)
+}
+
+// Validate validates the config for a location
+func Validate(kind string, config Config) error {
+	fn, ok := configurations[kind]
+	if !ok {
+		return errUnknownKind(kind)
 	}
 	return fn(config)
 }
@@ -223,6 +238,11 @@ type ConfigMap map[string]string
 func (c ConfigMap) Config(name string) (string, bool) {
 	val, ok := c[name]
 	return val, ok
+}
+
+// Config sets name configuration to value
+func (c ConfigMap) Set(name, value string) {
+	c[name] = value
 }
 
 // errUnknownKind indicates that a kind is unknown.

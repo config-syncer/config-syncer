@@ -19,6 +19,17 @@ const (
 const Kind = "azure"
 
 func init() {
+	validatefn := func(config stow.Config) error {
+		_, ok := config.Config(ConfigAccount)
+		if !ok {
+			return errors.New("missing account id")
+		}
+		_, ok = config.Config(ConfigKey)
+		if !ok {
+			return errors.New("missing auth key")
+		}
+		return nil
+	}
 	makefn := func(config stow.Config) (stow.Location, error) {
 		_, ok := config.Config(ConfigAccount)
 		if !ok {
@@ -44,9 +55,9 @@ func init() {
 		return l, nil
 	}
 	kindfn := func(u *url.URL) bool {
-		return u.Scheme == "azure"
+		return u.Scheme == Kind
 	}
-	stow.Register(Kind, makefn, kindfn)
+	stow.Register(Kind, makefn, kindfn, validatefn)
 }
 
 func newBlobStorageClient(cfg stow.Config) (*az.BlobStorageClient, error) {

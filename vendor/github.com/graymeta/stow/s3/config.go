@@ -16,6 +16,11 @@ import (
 // Kind represents the name of the location/storage type.
 const Kind = "s3"
 
+var (
+	authTypeAccessKey = "accesskey"
+	authTypeIAM       = "iam"
+)
+
 const (
 	// ConfigAuthType is an optional argument that defines whether to use an IAM role or access key based auth
 	ConfigAuthType = "auth_type"
@@ -43,19 +48,41 @@ const (
 )
 
 func init() {
+	validatefn := func(config stow.Config) error {
+		authType, ok := config.Config(ConfigAuthType)
+		if !ok || authType == "" {
+			authType = authTypeAccessKey
+		}
 
+		if !(authType == authTypeAccessKey || authType == authTypeIAM) {
+			return errors.New("invalid auth_type")
+		}
+
+		if authType == authTypeAccessKey {
+			_, ok := config.Config(ConfigAccessKeyID)
+			if !ok {
+				return errors.New("missing Access Key ID")
+			}
+
+			_, ok = config.Config(ConfigSecretKey)
+			if !ok {
+				return errors.New("missing Secret Key")
+			}
+		}
+		return nil
+	}
 	makefn := func(config stow.Config) (stow.Location, error) {
 
 		authType, ok := config.Config(ConfigAuthType)
 		if !ok || authType == "" {
-			authType = "accesskey"
+			authType = authTypeAccessKey
 		}
 
-		if !(authType == "accesskey" || authType == "iam") {
+		if !(authType == authTypeAccessKey || authType == authTypeIAM) {
 			return nil, errors.New("invalid auth_type")
 		}
 
-		if authType == "accesskey" {
+		if authType == authTypeAccessKey {
 			_, ok := config.Config(ConfigAccessKeyID)
 			if !ok {
 				return nil, errors.New("missing Access Key ID")
@@ -87,7 +114,7 @@ func init() {
 		return u.Scheme == Kind
 	}
 
-	stow.Register(Kind, makefn, kindfn)
+	stow.Register(Kind, makefn, kindfn, validatefn)
 }
 
 // Attempts to create a session based on the information given.
@@ -98,7 +125,7 @@ func newS3Client(config stow.Config) (client *s3.S3, endpoint string, err error)
 	//	token, _ := config.Config(ConfigToken)
 
 	if authType == "" {
-		authType = "accesskey"
+		authType = authTypeAccessKey
 	}
 
 	awsConfig := aws.NewConfig().
@@ -115,7 +142,7 @@ func newS3Client(config stow.Config) (client *s3.S3, endpoint string, err error)
 		awsConfig.WithRegion("us-east-1")
 	}
 
-	if authType == "accesskey" {
+	if authType == authTypeAccessKey {
 		awsConfig.WithCredentials(credentials.NewStaticCredentials(accessKeyID, secretKey, ""))
 	}
 

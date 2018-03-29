@@ -1,5 +1,5 @@
 hash: b7d1168b71f5bdb5cbdce4bffc99c7b3d5bfac30705f2bb40ae8cd153b52cab9
-updated: 2018-03-15T13:54:50.226309228-07:00
+updated: 2018-03-29T10:24:03.762509876-07:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -42,16 +42,15 @@ imports:
   - unified
   - webhook
 - name: github.com/appscode/jsonpatch
-  version: ee757872f6aca6d412d0d80543725bd4cf48f793
+  version: d1ada3d25b084ae42746377df856bbc74a901503
 - name: github.com/appscode/kube-mon
-  version: a670a5ff28df12938aa324b9f13683caeb216f8f
+  version: eeb8de0ba83795dc2fd86c3667d6566a62276160
   subpackages:
   - api
   - prometheus/v1
 - name: github.com/appscode/kutil
-  version: 3e1d387015c275db5fd3d605fcf1f61af6ab6866
+  version: 9618833b480d6b78f02121dc4d231a933e30a8cc
   subpackages:
-  - admission/api
   - apiextensions/v1beta1
   - core/v1
   - discovery
@@ -70,7 +69,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 3f969c5a7c51a78474ed039b2e14962daa27a577
+  version: 9c98a8359d0c79da65907b36d65f289df395c4b4
   subpackages:
   - apis/incidents
   - apis/incidents/v1alpha1
@@ -88,12 +87,15 @@ imports:
   - data
   - data/files
 - name: github.com/appscode/stash
-  version: 224a17136fe65de20e6bff266c61631b6ac2b4f6
+  version: 3ef2eed48c185e128461c4eba46ff2c0b0a4203b
   subpackages:
+  - apis/repositories
+  - apis/repositories/v1alpha1
   - apis/stash
   - apis/stash/v1alpha1
   - client/clientset/versioned
   - client/clientset/versioned/scheme
+  - client/clientset/versioned/typed/repositories/v1alpha1
   - client/clientset/versioned/typed/stash/v1alpha1
   - client/informers/externalversions
   - client/informers/externalversions/internalinterfaces
@@ -101,7 +103,7 @@ imports:
   - client/informers/externalversions/stash/v1alpha1
   - client/listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 0f96873087d5e04b4b4db07ce4221944c9996ca8
+  version: 3fd6207f7767f1fba930d108abbad011b1a6ce12
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -301,11 +303,6 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
-- name: github.com/docker/distribution
-  version: edc3ab29cdff8694dd6feb85cfeb4b5f1b38ed9c
-  subpackages:
-  - digestset
-  - reference
 - name: github.com/edsrzf/mmap-go
   version: 935e0e8a636ca4ba70b713f3e38a19e1b77739e8
 - name: github.com/elazarl/go-bindata-assetfs
@@ -323,9 +320,9 @@ imports:
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/glycerine/go-unsnap-stream
-  version: 62a9a9eb44fd8932157b1a8ace2149eff5971af6
+  version: 9f0cb55181dd3a0a4c168d3dbc72d4aca4853126
 - name: github.com/go-ini/ini
-  version: d3de07a94d22b4a0972deb4b96d790c2c0ce8333
+  version: 300e940a926eb277d3901b20bdfcc54928ad3642
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -360,7 +357,7 @@ imports:
 - name: github.com/google/btree
   version: 7d79101e329e5a3adf994758c578dab82b90c017
 - name: github.com/google/go-cmp
-  version: 0c93777250bd58222171888d1651979319d8b381
+  version: 5411ab924f9ffa6566244a9e504bc347edacffd3
   subpackages:
   - cmp
   - cmp/internal/diff
@@ -392,7 +389,7 @@ imports:
 - name: github.com/gorilla/websocket
   version: 6eb6ad425a89d9da7a5549bc6da8f79ba5c17844
 - name: github.com/graymeta/stow
-  version: 6f2b8867a3fb15cca5507da1d552b55cfe5d07a7
+  version: 1df3851b8fc06f775b3daed2f19442b3c5b26a37
   repo: https://github.com/appscode/stow.git
   vcs: git
   subpackages:
@@ -434,7 +431,7 @@ imports:
   - models
   - pkg/escape
 - name: github.com/jaytaylor/html2text
-  version: 190166da35878a77103b951ae035a473531c1fc2
+  version: 64a82a6d140778896f13303121a49d8cb8007034
 - name: github.com/jmespath/go-jmespath
   version: 0b12d6b521d83fc7f755e7cfc1b1fbdd35a01a74
 - name: github.com/jpillora/go-ogle-analytics
@@ -444,7 +441,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/kubedb/apimachinery
-  version: 33dbe18447c355068889f50ef687ae81cbc85b5b
+  version: 7ade3129f0fccc4c128a5736aaa46499f7b18db8
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -479,7 +476,7 @@ imports:
   subpackages:
   - flowrate
 - name: github.com/ncw/swift
-  version: ae9f0ea1605b9aa6434ed5c731ca35d83ba67c55
+  version: b2a7479cf26fa841ff90dd932d0221cb5c50782d
 - name: github.com/nlopes/slack
   version: 8ab4d0b364ef1e9af5d102531da20d5ec902b6c4
 - name: github.com/NYTimes/gziphandler
@@ -520,8 +517,6 @@ imports:
   - matchers/support/goraph/node
   - matchers/support/goraph/util
   - types
-- name: github.com/opencontainers/go-digest
-  version: a6d0ee40d4207ea02364bd3b9e8e77b9159ba1eb
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/peterbourgon/diskv
@@ -555,7 +550,7 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/RoaringBitmap/roaring
-  version: b4582ce6cdbf937f5d147946c09f2712b5fb1158
+  version: c1bce359df68d125b7d20c989b11efa49f845ee7
 - name: github.com/robfig/cron
   version: 2315d5715e36303a941d907f038da7f7c44c773b
 - name: github.com/russross/blackfriday
@@ -573,7 +568,7 @@ imports:
 - name: github.com/Smerity/govarint
   version: 7265e41f48f15fd61751e16da866af3c704bb3ab
 - name: github.com/spf13/cobra
-  version: c6c44e6fdcc30161c7f4480754da7230d01c06e3
+  version: a1f051bc3eba734da4772d60e2d677f47cf93ef4
   subpackages:
   - doc
 - name: github.com/spf13/pflag
@@ -663,7 +658,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: c24aa0e5ed34558ea50c016e4fb92c5e9aa69f2c
+  version: a213db537ac9b393526194a5c85ad6e546f7923f
   subpackages:
   - gensupport
   - googleapi
@@ -759,7 +754,6 @@ imports:
   - pkg/apis/apiextensions/v1beta1
   - pkg/client/clientset/clientset/scheme
   - pkg/client/clientset/clientset/typed/apiextensions/v1beta1
-  - pkg/features
 - name: k8s.io/apimachinery
   version: 180eddb345a5be3a157cea1c624700ad5bd27b8f
   subpackages:
@@ -1076,28 +1070,7 @@ imports:
 - name: k8s.io/kubernetes
   version: 925c127ec6b946659ad0fd596fa959be43f0cc05
   subpackages:
-  - pkg/api/legacyscheme
-  - pkg/apis/apps
-  - pkg/apis/apps/install
-  - pkg/apis/apps/v1
-  - pkg/apis/apps/v1beta1
-  - pkg/apis/apps/v1beta2
-  - pkg/apis/autoscaling
-  - pkg/apis/batch
-  - pkg/apis/batch/install
-  - pkg/apis/batch/v1
-  - pkg/apis/batch/v1beta1
-  - pkg/apis/batch/v2alpha1
-  - pkg/apis/core
-  - pkg/apis/core/install
-  - pkg/apis/core/v1
-  - pkg/apis/extensions
-  - pkg/apis/extensions/install
-  - pkg/apis/extensions/v1beta1
-  - pkg/apis/networking
-  - pkg/features
-  - pkg/util/parsers
-  - pkg/util/pointer
+  - pkg/util/hash
 testImports:
 - name: github.com/pmezard/go-difflib
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d

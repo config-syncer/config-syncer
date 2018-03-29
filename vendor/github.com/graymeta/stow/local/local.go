@@ -22,6 +22,13 @@ const (
 )
 
 func init() {
+	validatefn := func(config stow.Config) error {
+		_, ok := config.Config(ConfigKeyPath)
+		if !ok {
+			return errors.New("missing path config")
+		}
+		return nil
+	}
 	makefn := func(config stow.Config) (stow.Location, error) {
 		path, ok := config.Config(ConfigKeyPath)
 		if !ok {
@@ -41,5 +48,5 @@ func init() {
 	kindfn := func(u *url.URL) bool {
 		return u.Scheme == "file"
 	}
-	stow.Register(Kind, makefn, kindfn)
+	stow.Register(Kind, makefn, kindfn, validatefn)
 }
