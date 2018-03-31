@@ -5,9 +5,10 @@ import (
 	"strings"
 
 	"github.com/appscode/kube-mon/api"
+	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	core "k8s.io/api/core/v1"
+	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (p Postgres) OffshootName() string {
@@ -43,7 +44,7 @@ func (p Postgres) StatefulSetAnnotations() map[string]string {
 
 var _ ResourceInfo = &Postgres{}
 
-func (p Postgres) ResourceCode() string {
+func (p Postgres) ResourceShortCode() string {
 	return ResourceCodePostgres
 }
 
@@ -51,12 +52,12 @@ func (p Postgres) ResourceKind() string {
 	return ResourceKindPostgres
 }
 
-func (p Postgres) ResourceName() string {
-	return ResourceNamePostgres
+func (p Postgres) ResourceSingular() string {
+	return ResourceSingularPostgres
 }
 
-func (p Postgres) ResourceType() string {
-	return ResourceTypePostgres
+func (p Postgres) ResourcePlural() string {
+	return ResourcePluralPostgres
 }
 
 func (p Postgres) ObjectReference() *core.ObjectReference {
@@ -79,7 +80,7 @@ func (p Postgres) ServiceMonitorName() string {
 }
 
 func (p Postgres) Path() string {
-	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", p.Namespace, p.ResourceType(), p.Name)
+	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", p.Namespace, p.ResourcePlural(), p.Name)
 }
 
 func (p Postgres) Scheme() string {
@@ -102,24 +103,20 @@ func (p Postgres) ReplicasServiceName() string {
 }
 
 func (p Postgres) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
-	resourceName := ResourceTypePostgres + "." + SchemeGroupVersion.Group
-
-	return &crd_api.CustomResourceDefinition{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: resourceName,
-			Labels: map[string]string{
-				"app": "kubedb",
-			},
+	return crdutils.NewCustomResourceDefinition(crdutils.Config{
+		Group:         SchemeGroupVersion.Group,
+		Version:       SchemeGroupVersion.Version,
+		Plural:        ResourcePluralPostgres,
+		Singular:      ResourceSingularPostgres,
+		Kind:          ResourceKindPostgres,
+		ListKind:      ResourceKindPostgres + "List",
+		ShortNames:    []string{ResourceCodePostgres},
+		ResourceScope: string(apiextensions.NamespaceScoped),
+		Labels: crdutils.Labels{
+			LabelsMap: map[string]string{"app": "kubedb"},
 		},
-		Spec: crd_api.CustomResourceDefinitionSpec{
-			Group:   SchemeGroupVersion.Group,
-			Version: SchemeGroupVersion.Version,
-			Scope:   crd_api.NamespaceScoped,
-			Names: crd_api.CustomResourceDefinitionNames{
-				Plural:     ResourceTypePostgres,
-				Kind:       ResourceKindPostgres,
-				ShortNames: []string{ResourceCodePostgres},
-			},
-		},
-	}
+		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Postgres",
+		EnableValidation:      true,
+		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+	})
 }

@@ -8,13 +8,13 @@ const (
 	LabelDatabaseKind = GenericKey + "/kind"
 	LabelDatabaseName = GenericKey + "/name"
 
-	PostgresKey         = ResourceTypePostgres + "." + GenericKey
-	ElasticsearchKey    = ResourceTypeElasticsearch + "." + GenericKey
-	MySQLKey            = ResourceTypeMySQL + "." + GenericKey
-	MongoDBKey          = ResourceTypeMongoDB + "." + GenericKey
-	RedisKey            = ResourceTypeRedis + "." + GenericKey
-	MemcachedKey        = ResourceTypeMemcached + "." + GenericKey
-	SnapshotKey         = ResourceTypeSnapshot + "." + GenericKey
+	PostgresKey         = ResourcePluralPostgres + "." + GenericKey
+	ElasticsearchKey    = ResourcePluralElasticsearch + "." + GenericKey
+	MySQLKey            = ResourcePluralMySQL + "." + GenericKey
+	MongoDBKey          = ResourcePluralMongoDB + "." + GenericKey
+	RedisKey            = ResourcePluralRedis + "." + GenericKey
+	MemcachedKey        = ResourcePluralMemcached + "." + GenericKey
+	SnapshotKey         = ResourcePluralSnapshot + "." + GenericKey
 	LabelSnapshotStatus = SnapshotKey + "/status"
 
 	AnnotationInitialized = GenericKey + "/initialized"

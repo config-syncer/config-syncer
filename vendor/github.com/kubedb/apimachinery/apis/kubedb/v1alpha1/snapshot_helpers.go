@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"path/filepath"
 
+	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
+	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (s Snapshot) OffshootName() string {
@@ -30,7 +31,7 @@ func (s Snapshot) Location() (string, error) {
 	return "", errors.New("no storage provider is configured")
 }
 
-func (s Snapshot) ResourceCode() string {
+func (s Snapshot) ResourceShortCode() string {
 	return ResourceCodeSnapshot
 }
 
@@ -38,12 +39,12 @@ func (s Snapshot) ResourceKind() string {
 	return ResourceKindSnapshot
 }
 
-func (s Snapshot) ResourceName() string {
-	return ResourceNameSnapshot
+func (s Snapshot) ResourceSingular() string {
+	return ResourceSingularSnapshot
 }
 
-func (s Snapshot) ResourceType() string {
-	return ResourceTypeSnapshot
+func (s Snapshot) ResourcePlural() string {
+	return ResourcePluralSnapshot
 }
 
 func (s SnapshotStorageSpec) Container() (string, error) {
@@ -92,23 +93,20 @@ func (s Snapshot) OSMSecretName() string {
 }
 
 func (s Snapshot) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
-	resourceName := ResourceTypeSnapshot + "." + SchemeGroupVersion.Group
-	return &crd_api.CustomResourceDefinition{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: resourceName,
-			Labels: map[string]string{
-				"app": "kubedb",
-			},
+	return crdutils.NewCustomResourceDefinition(crdutils.Config{
+		Group:         SchemeGroupVersion.Group,
+		Version:       SchemeGroupVersion.Version,
+		Plural:        ResourcePluralSnapshot,
+		Singular:      ResourceSingularSnapshot,
+		Kind:          ResourceKindSnapshot,
+		ListKind:      ResourceKindSnapshot + "List",
+		ShortNames:    []string{ResourceCodeSnapshot},
+		ResourceScope: string(apiextensions.NamespaceScoped),
+		Labels: crdutils.Labels{
+			LabelsMap: map[string]string{"app": "kubedb"},
 		},
-		Spec: crd_api.CustomResourceDefinitionSpec{
-			Group:   SchemeGroupVersion.Group,
-			Version: SchemeGroupVersion.Version,
-			Scope:   crd_api.NamespaceScoped,
-			Names: crd_api.CustomResourceDefinitionNames{
-				Plural:     ResourceTypeSnapshot,
-				Kind:       ResourceKindSnapshot,
-				ShortNames: []string{ResourceCodeSnapshot},
-			},
-		},
-	}
+		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Snapshot",
+		EnableValidation:      true,
+		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+	})
 }

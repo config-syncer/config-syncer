@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	ResourceCodeMySQL = "my"
-	ResourceKindMySQL = "MySQL"
-	ResourceNameMySQL = "mysql"
-	ResourceTypeMySQL = "mysqls"
+	ResourceCodeMySQL     = "my"
+	ResourceKindMySQL     = "MySQL"
+	ResourceSingularMySQL = "mysql"
+	ResourcePluralMySQL   = "mysqls"
 )
 
 // +genclient

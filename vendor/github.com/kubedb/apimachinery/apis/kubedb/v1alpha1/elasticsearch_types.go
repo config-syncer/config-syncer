@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	ResourceCodeElasticsearch = "es"
-	ResourceKindElasticsearch = "Elasticsearch"
-	ResourceNameElasticsearch = "elasticsearch"
-	ResourceTypeElasticsearch = "elasticsearches"
+	ResourceCodeElasticsearch     = "es"
+	ResourceKindElasticsearch     = "Elasticsearch"
+	ResourceSingularElasticsearch = "elasticsearch"
+	ResourcePluralElasticsearch   = "elasticsearches"
 )
 
 // +genclient

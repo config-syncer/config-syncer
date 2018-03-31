@@ -5,10 +5,10 @@ import (
 )
 
 const (
-	ResourceCodeDormantDatabase = "drmn"
-	ResourceKindDormantDatabase = "DormantDatabase"
-	ResourceNameDormantDatabase = "dormant-database"
-	ResourceTypeDormantDatabase = "dormantdatabases"
+	ResourceCodeDormantDatabase     = "drmn"
+	ResourceKindDormantDatabase     = "DormantDatabase"
+	ResourceSingularDormantDatabase = "dormantdatabase"
+	ResourcePluralDormantDatabase   = "dormantdatabases"
 )
 
 // +genclient

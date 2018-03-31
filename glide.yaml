@@ -43,8 +43,9 @@ import:
 - package: github.com/robfig/cron
   version: master
 - package: github.com/spf13/cobra
+  version: master
 - package: github.com/spf13/pflag
-  version: v1.0.0
+  version: master
 - package: github.com/yudai/gojsondiff
   version: 1.0.0
 - package: gopkg.in/olivere/elastic.v5

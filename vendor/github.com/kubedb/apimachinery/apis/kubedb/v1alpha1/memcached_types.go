@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	ResourceCodeMemcached = "mc"
-	ResourceKindMemcached = "Memcached"
-	ResourceNameMemcached = "memcached"
-	ResourceTypeMemcached = "memcacheds"
+	ResourceCodeMemcached     = "mc"
+	ResourceKindMemcached     = "Memcached"
+	ResourceSingularMemcached = "memcached"
+	ResourcePluralMemcached   = "memcacheds"
 )
 
 // +genclient

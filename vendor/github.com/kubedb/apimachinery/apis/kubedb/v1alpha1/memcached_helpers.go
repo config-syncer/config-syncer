@@ -5,9 +5,10 @@ import (
 	"strings"
 
 	"github.com/appscode/kube-mon/api"
+	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	core "k8s.io/api/core/v1"
+	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (r Memcached) OffshootName() string {
@@ -41,7 +42,7 @@ func (r Memcached) DeploymentAnnotations() map[string]string {
 	return annotations
 }
 
-func (r Memcached) ResourceCode() string {
+func (r Memcached) ResourceShortCode() string {
 	return ResourceCodeMemcached
 }
 
@@ -49,12 +50,12 @@ func (r Memcached) ResourceKind() string {
 	return ResourceKindMemcached
 }
 
-func (r Memcached) ResourceName() string {
-	return ResourceNameMemcached
+func (r Memcached) ResourceSingular() string {
+	return ResourceSingularMemcached
 }
 
-func (r Memcached) ResourceType() string {
-	return ResourceTypeMemcached
+func (r Memcached) ResourcePlural() string {
+	return ResourcePluralMemcached
 }
 
 func (s Memcached) ObjectReference() *core.ObjectReference {
@@ -77,7 +78,7 @@ func (m Memcached) ServiceMonitorName() string {
 }
 
 func (m Memcached) Path() string {
-	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", m.Namespace, m.ResourceType(), m.Name)
+	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", m.Namespace, m.ResourcePlural(), m.Name)
 }
 
 func (m Memcached) Scheme() string {
@@ -96,24 +97,20 @@ func (m *Memcached) GetMonitoringVendor() string {
 }
 
 func (m Memcached) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
-	resourceName := ResourceTypeMemcached + "." + SchemeGroupVersion.Group
-
-	return &crd_api.CustomResourceDefinition{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: resourceName,
-			Labels: map[string]string{
-				"app": "kubedb",
-			},
+	return crdutils.NewCustomResourceDefinition(crdutils.Config{
+		Group:         SchemeGroupVersion.Group,
+		Version:       SchemeGroupVersion.Version,
+		Plural:        ResourcePluralMemcached,
+		Singular:      ResourceSingularMemcached,
+		Kind:          ResourceKindMemcached,
+		ListKind:      ResourceKindMemcached + "List",
+		ShortNames:    []string{ResourceCodeMemcached},
+		ResourceScope: string(apiextensions.NamespaceScoped),
+		Labels: crdutils.Labels{
+			LabelsMap: map[string]string{"app": "kubedb"},
 		},
-		Spec: crd_api.CustomResourceDefinitionSpec{
-			Group:   SchemeGroupVersion.Group,
-			Version: SchemeGroupVersion.Version,
-			Scope:   crd_api.NamespaceScoped,
-			Names: crd_api.CustomResourceDefinitionNames{
-				Plural:     ResourceTypeMemcached,
-				Kind:       ResourceKindMemcached,
-				ShortNames: []string{ResourceCodeMemcached},
-			},
-		},
-	}
+		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Memcached",
+		EnableValidation:      true,
+		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+	})
 }

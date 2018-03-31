@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	ResourceCodeRedis = "rd"
-	ResourceKindRedis = "Redis"
-	ResourceNameRedis = "redis"
-	ResourceTypeRedis = "redises"
+	ResourceCodeRedis     = "rd"
+	ResourceKindRedis     = "Redis"
+	ResourceSingularRedis = "redis"
+	ResourcePluralRedis   = "redises"
 )
 
 // +genclient

@@ -53,7 +53,7 @@ type IncidentNotification struct {
 	CheckOutput string `json:"checkOutput"`
 	// name of user making comment
 	// +optional
-	Author *string `json:"comment,omitempty"`
+	Author *string `json:"author,omitempty"`
 	// comment made by user
 	// +optional
 	Comment *string `json:"comment,omitempty"`

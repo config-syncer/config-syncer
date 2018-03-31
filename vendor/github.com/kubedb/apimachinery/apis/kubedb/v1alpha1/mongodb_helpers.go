@@ -5,9 +5,10 @@ import (
 	"strings"
 
 	"github.com/appscode/kube-mon/api"
+	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	core "k8s.io/api/core/v1"
+	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (p MongoDB) OffshootName() string {
@@ -41,7 +42,7 @@ func (p MongoDB) StatefulSetAnnotations() map[string]string {
 	return annotations
 }
 
-func (p MongoDB) ResourceCode() string {
+func (p MongoDB) ResourceShortCode() string {
 	return ResourceCodeMongoDB
 }
 
@@ -49,12 +50,12 @@ func (p MongoDB) ResourceKind() string {
 	return ResourceKindMongoDB
 }
 
-func (p MongoDB) ResourceName() string {
-	return ResourceNameMongoDB
+func (p MongoDB) ResourceSingular() string {
+	return ResourceSingularMongoDB
 }
 
-func (p MongoDB) ResourceType() string {
-	return ResourceTypeMongoDB
+func (p MongoDB) ResourcePlural() string {
+	return ResourcePluralMongoDB
 }
 
 func (p MongoDB) ObjectReference() *core.ObjectReference {
@@ -77,7 +78,7 @@ func (p MongoDB) ServiceMonitorName() string {
 }
 
 func (p MongoDB) Path() string {
-	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", p.Namespace, p.ResourceType(), p.Name)
+	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", p.Namespace, p.ResourcePlural(), p.Name)
 }
 
 func (p MongoDB) Scheme() string {
@@ -96,23 +97,20 @@ func (m *MongoDB) GetMonitoringVendor() string {
 }
 
 func (p MongoDB) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
-	resourceName := ResourceTypeMongoDB + "." + SchemeGroupVersion.Group
-	return &crd_api.CustomResourceDefinition{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: resourceName,
-			Labels: map[string]string{
-				"app": "kubedb",
-			},
+	return crdutils.NewCustomResourceDefinition(crdutils.Config{
+		Group:         SchemeGroupVersion.Group,
+		Version:       SchemeGroupVersion.Version,
+		Plural:        ResourcePluralMongoDB,
+		Singular:      ResourceSingularMongoDB,
+		Kind:          ResourceKindMongoDB,
+		ListKind:      ResourceKindMongoDB + "List",
+		ShortNames:    []string{ResourceCodeMongoDB},
+		ResourceScope: string(apiextensions.NamespaceScoped),
+		Labels: crdutils.Labels{
+			LabelsMap: map[string]string{"app": "kubedb"},
 		},
-		Spec: crd_api.CustomResourceDefinitionSpec{
-			Group:   SchemeGroupVersion.Group,
-			Version: SchemeGroupVersion.Version,
-			Scope:   crd_api.NamespaceScoped,
-			Names: crd_api.CustomResourceDefinitionNames{
-				Plural:     ResourceTypeMongoDB,
-				Kind:       ResourceKindMongoDB,
-				ShortNames: []string{ResourceCodeMongoDB},
-			},
-		},
-	}
+		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.MongoDB",
+		EnableValidation:      true,
+		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+	})
 }

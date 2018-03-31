@@ -28,6 +28,7 @@ const (
 
 // +genclient
 // +genclient:skipVerbs=get,list,update,patch,deleteCollection,watch
+// +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type Acknowledgement struct {

@@ -5,9 +5,10 @@ import (
 	"strings"
 
 	"github.com/appscode/kube-mon/api"
+	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	core "k8s.io/api/core/v1"
+	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (r Redis) OffshootName() string {
@@ -41,7 +42,7 @@ func (r Redis) StatefulSetAnnotations() map[string]string {
 	return annotations
 }
 
-func (r Redis) ResourceCode() string {
+func (r Redis) ResourceShortCode() string {
 	return ResourceCodeRedis
 }
 
@@ -49,12 +50,12 @@ func (r Redis) ResourceKind() string {
 	return ResourceKindRedis
 }
 
-func (r Redis) ResourceName() string {
-	return ResourceNameRedis
+func (r Redis) ResourceSingular() string {
+	return ResourceSingularRedis
 }
 
-func (r Redis) ResourceType() string {
-	return ResourceTypeRedis
+func (r Redis) ResourcePlural() string {
+	return ResourcePluralRedis
 }
 
 func (r Redis) ObjectReference() *core.ObjectReference {
@@ -77,7 +78,7 @@ func (r Redis) ServiceMonitorName() string {
 }
 
 func (r Redis) Path() string {
-	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", r.Namespace, r.ResourceType(), r.Name)
+	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", r.Namespace, r.ResourcePlural(), r.Name)
 }
 
 func (r Redis) Scheme() string {
@@ -96,24 +97,20 @@ func (r *Redis) GetMonitoringVendor() string {
 }
 
 func (r Redis) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
-	resourceName := ResourceTypeRedis + "." + SchemeGroupVersion.Group
-
-	return &crd_api.CustomResourceDefinition{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: resourceName,
-			Labels: map[string]string{
-				"app": "kubedb",
-			},
+	return crdutils.NewCustomResourceDefinition(crdutils.Config{
+		Group:         SchemeGroupVersion.Group,
+		Version:       SchemeGroupVersion.Version,
+		Plural:        ResourcePluralRedis,
+		Singular:      ResourceSingularRedis,
+		Kind:          ResourceKindRedis,
+		ListKind:      ResourceKindRedis + "List",
+		ShortNames:    []string{ResourceCodeRedis},
+		ResourceScope: string(apiextensions.NamespaceScoped),
+		Labels: crdutils.Labels{
+			LabelsMap: map[string]string{"app": "kubedb"},
 		},
-		Spec: crd_api.CustomResourceDefinitionSpec{
-			Group:   SchemeGroupVersion.Group,
-			Version: SchemeGroupVersion.Version,
-			Scope:   crd_api.NamespaceScoped,
-			Names: crd_api.CustomResourceDefinitionNames{
-				Plural:     ResourceTypeRedis,
-				Kind:       ResourceKindRedis,
-				ShortNames: []string{ResourceCodeRedis},
-			},
-		},
-	}
+		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Redis",
+		EnableValidation:      true,
+		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+	})
 }

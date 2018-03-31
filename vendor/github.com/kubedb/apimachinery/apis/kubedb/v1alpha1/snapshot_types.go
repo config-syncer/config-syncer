@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	ResourceCodeSnapshot = "snap"
-	ResourceKindSnapshot = "Snapshot"
-	ResourceNameSnapshot = "snapshot"
-	ResourceTypeSnapshot = "snapshots"
+	ResourceCodeSnapshot     = "snap"
+	ResourceKindSnapshot     = "Snapshot"
+	ResourceSingularSnapshot = "snapshot"
+	ResourcePluralSnapshot   = "snapshots"
 )
 
 // +genclient

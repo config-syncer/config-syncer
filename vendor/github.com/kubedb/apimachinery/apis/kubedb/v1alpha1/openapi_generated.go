@@ -1678,14 +1678,14 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 								Format:      "int32",
 							},
 						},
-						"standby": {
+						"standbyMode": {
 							SchemaProps: spec.SchemaProps{
 								Description: "Standby mode",
 								Type:        []string{"string"},
 								Format:      "",
 							},
 						},
-						"streaming": {
+						"streamingMode": {
 							SchemaProps: spec.SchemaProps{
 								Description: "Streaming mode",
 								Type:        []string{"string"},

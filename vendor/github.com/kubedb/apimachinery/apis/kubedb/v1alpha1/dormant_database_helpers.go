@@ -1,16 +1,17 @@
 package v1alpha1
 
 import (
+	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	core "k8s.io/api/core/v1"
+	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (d DormantDatabase) OffshootName() string {
 	return d.Name
 }
 
-func (d DormantDatabase) ResourceCode() string {
+func (d DormantDatabase) ResourceShortCode() string {
 	return ResourceCodeDormantDatabase
 }
 
@@ -18,12 +19,12 @@ func (d DormantDatabase) ResourceKind() string {
 	return ResourceKindDormantDatabase
 }
 
-func (d DormantDatabase) ResourceName() string {
-	return ResourceNameDormantDatabase
+func (d DormantDatabase) ResourceSingular() string {
+	return ResourceSingularDormantDatabase
 }
 
-func (d DormantDatabase) ResourceType() string {
-	return ResourceTypeDormantDatabase
+func (d DormantDatabase) ResourcePlural() string {
+	return ResourcePluralDormantDatabase
 }
 
 func (d DormantDatabase) ObjectReference() *core.ObjectReference {
@@ -38,23 +39,20 @@ func (d DormantDatabase) ObjectReference() *core.ObjectReference {
 }
 
 func (d DormantDatabase) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
-	resourceName := ResourceTypeDormantDatabase + "." + SchemeGroupVersion.Group
-	return &crd_api.CustomResourceDefinition{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: resourceName,
-			Labels: map[string]string{
-				"app": "kubedb",
-			},
+	return crdutils.NewCustomResourceDefinition(crdutils.Config{
+		Group:         SchemeGroupVersion.Group,
+		Version:       SchemeGroupVersion.Version,
+		Plural:        ResourcePluralDormantDatabase,
+		Singular:      ResourceSingularDormantDatabase,
+		Kind:          ResourceKindDormantDatabase,
+		ListKind:      ResourceKindDormantDatabase + "List",
+		ShortNames:    []string{ResourceCodeDormantDatabase},
+		ResourceScope: string(apiextensions.NamespaceScoped),
+		Labels: crdutils.Labels{
+			LabelsMap: map[string]string{"app": "kubedb"},
 		},
-		Spec: crd_api.CustomResourceDefinitionSpec{
-			Group:   SchemeGroupVersion.Group,
-			Version: SchemeGroupVersion.Version,
-			Scope:   crd_api.NamespaceScoped,
-			Names: crd_api.CustomResourceDefinitionNames{
-				Plural:     ResourceTypeDormantDatabase,
-				Kind:       ResourceKindDormantDatabase,
-				ShortNames: []string{ResourceCodeDormantDatabase},
-			},
-		},
-	}
+		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.DormantDatabase",
+		EnableValidation:      true,
+		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+	})
 }

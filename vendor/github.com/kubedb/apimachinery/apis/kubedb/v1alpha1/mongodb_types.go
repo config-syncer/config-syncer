@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	ResourceCodeMongoDB = "mg"
-	ResourceKindMongoDB = "MongoDB"
-	ResourceNameMongoDB = "mongodb"
-	ResourceTypeMongoDB = "mongodbs"
+	ResourceCodeMongoDB     = "mg"
+	ResourceKindMongoDB     = "MongoDB"
+	ResourceSingularMongoDB = "mongodb"
+	ResourcePluralMongoDB   = "mongodbs"
 )
 
 // +genclient

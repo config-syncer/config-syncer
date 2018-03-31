@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	ResourceCodePostgres = "pg"
-	ResourceKindPostgres = "Postgres"
-	ResourceNamePostgres = "postgres"
-	ResourceTypePostgres = "postgreses"
+	ResourceCodePostgres     = "pg"
+	ResourceKindPostgres     = "Postgres"
+	ResourceSingularPostgres = "postgres"
+	ResourcePluralPostgres   = "postgreses"
 )
 
 // +genclient

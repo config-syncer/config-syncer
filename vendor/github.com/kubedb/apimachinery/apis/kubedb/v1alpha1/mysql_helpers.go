@@ -5,9 +5,10 @@ import (
 	"strings"
 
 	"github.com/appscode/kube-mon/api"
+	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	core "k8s.io/api/core/v1"
+	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (m MySQL) OffshootName() string {
@@ -43,7 +44,7 @@ func (m MySQL) StatefulSetAnnotations() map[string]string {
 
 var _ ResourceInfo = &MySQL{}
 
-func (m MySQL) ResourceCode() string {
+func (m MySQL) ResourceShortCode() string {
 	return ResourceCodeMySQL
 }
 
@@ -51,12 +52,12 @@ func (m MySQL) ResourceKind() string {
 	return ResourceKindMySQL
 }
 
-func (m MySQL) ResourceName() string {
-	return ResourceNameMySQL
+func (m MySQL) ResourceSingular() string {
+	return ResourceSingularMySQL
 }
 
-func (m MySQL) ResourceType() string {
-	return ResourceTypeMySQL
+func (m MySQL) ResourcePlural() string {
+	return ResourcePluralMySQL
 }
 
 func (m MySQL) ObjectReference() *core.ObjectReference {
@@ -79,7 +80,7 @@ func (m MySQL) ServiceMonitorName() string {
 }
 
 func (m MySQL) Path() string {
-	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", m.Namespace, m.ResourceType(), m.Name)
+	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", m.Namespace, m.ResourcePlural(), m.Name)
 }
 
 func (m MySQL) Scheme() string {
@@ -98,24 +99,20 @@ func (m *MySQL) GetMonitoringVendor() string {
 }
 
 func (m MySQL) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
-	resourceName := ResourceTypeMySQL + "." + SchemeGroupVersion.Group
-
-	return &crd_api.CustomResourceDefinition{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: resourceName,
-			Labels: map[string]string{
-				"app": "kubedb",
-			},
+	return crdutils.NewCustomResourceDefinition(crdutils.Config{
+		Group:         SchemeGroupVersion.Group,
+		Version:       SchemeGroupVersion.Version,
+		Plural:        ResourcePluralMySQL,
+		Singular:      ResourceSingularMySQL,
+		Kind:          ResourceKindMySQL,
+		ListKind:      ResourceKindMySQL + "List",
+		ShortNames:    []string{ResourceCodeMySQL},
+		ResourceScope: string(apiextensions.NamespaceScoped),
+		Labels: crdutils.Labels{
+			LabelsMap: map[string]string{"app": "kubedb"},
 		},
-		Spec: crd_api.CustomResourceDefinitionSpec{
-			Group:   SchemeGroupVersion.Group,
-			Version: SchemeGroupVersion.Version,
-			Scope:   crd_api.NamespaceScoped,
-			Names: crd_api.CustomResourceDefinitionNames{
-				Plural:     ResourceTypeMySQL,
-				Kind:       ResourceKindMySQL,
-				ShortNames: []string{ResourceCodeMySQL},
-			},
-		},
-	}
+		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.MySQL",
+		EnableValidation:      true,
+		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+	})
 }

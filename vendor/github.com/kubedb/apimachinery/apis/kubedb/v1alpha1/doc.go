@@ -4,5 +4,6 @@
 // +k8s:conversion-gen=github.com/kubedb/apimachinery/apis/kubedb
 // +k8s:openapi-gen=true
 // +k8s:defaulter-gen=TypeMeta
+
 // +groupName=kubedb.com
 package v1alpha1

@@ -6,10 +6,10 @@ import (
 )
 
 type ResourceInfo interface {
-	ResourceCode() string
+	ResourceShortCode() string
 	ResourceKind() string
-	ResourceName() string
-	ResourceType() string
+	ResourceSingular() string
+	ResourcePlural() string
 }
 
 func ObjectReferenceFor(obj runtime.Object) *core.ObjectReference {
