@@ -43,4 +43,4 @@ Want to help improve Kubed? Please start [here](https://appscode.com/products/ku
 ## Support
 We use Slack for public discussions. To chit chat with us or the rest of the community, join us in the [AppsCode Slack team](https://appscode.slack.com/messages/C6HSHCKBL/details/) channel `#kubed`. To sign up, use our [Slack inviter](https://slack.appscode.com/).
 
-If you have found a bug with Searchlight or want to request for new features, please [file an issue](https://github.com/appscode/kubed/issues/new).
+If you have found a bug with Kubed or want to request for new features, please [file an issue](https://github.com/appscode/kubed/issues/new).
