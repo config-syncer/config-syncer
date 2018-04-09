@@ -29,7 +29,7 @@ type MySQL struct {
 
 type MySQLSpec struct {
 	// Version of MySQL to be deployed.
-	Version types.StrYo `json:"version,omitempty"`
+	Version types.StrYo `json:"version"`
 	// Number of instances to deploy for a MySQL database.
 	Replicas *int32 `json:"replicas,omitempty"`
 	// Storage spec to specify how storage shall be used.

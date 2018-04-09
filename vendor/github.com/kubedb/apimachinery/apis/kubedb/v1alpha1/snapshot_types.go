@@ -26,7 +26,7 @@ type Snapshot struct {
 
 type SnapshotSpec struct {
 	// Database name
-	DatabaseName string `json:"databaseName,omitempty"`
+	DatabaseName string `json:"databaseName"`
 	// Snapshot Spec
 	SnapshotStorageSpec `json:",inline"`
 	// Compute Resources required by the sidecar container.

@@ -6,7 +6,6 @@ import (
 
 	"github.com/appscode/kube-mon/api"
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
-	core "k8s.io/api/core/v1"
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 )
@@ -58,17 +57,6 @@ func (r Redis) ResourcePlural() string {
 	return ResourcePluralRedis
 }
 
-func (r Redis) ObjectReference() *core.ObjectReference {
-	return &core.ObjectReference{
-		APIVersion:      SchemeGroupVersion.String(),
-		Kind:            ResourceKindRedis,
-		Namespace:       r.Namespace,
-		Name:            r.Name,
-		UID:             r.UID,
-		ResourceVersion: r.ResourceVersion,
-	}
-}
-
 func (r Redis) ServiceName() string {
 	return r.OffshootName()
 }
@@ -103,7 +91,6 @@ func (r Redis) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
 		Plural:        ResourcePluralRedis,
 		Singular:      ResourceSingularRedis,
 		Kind:          ResourceKindRedis,
-		ListKind:      ResourceKindRedis + "List",
 		ShortNames:    []string{ResourceCodeRedis},
 		ResourceScope: string(apiextensions.NamespaceScoped),
 		Labels: crdutils.Labels{

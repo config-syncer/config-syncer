@@ -6,7 +6,6 @@ import (
 
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	"github.com/pkg/errors"
-	core "k8s.io/api/core/v1"
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 )
@@ -77,17 +76,6 @@ func (s SnapshotStorageSpec) Location() (string, error) {
 	return "", errors.New("no storage provider is configured")
 }
 
-func (s Snapshot) ObjectReference() *core.ObjectReference {
-	return &core.ObjectReference{
-		APIVersion:      SchemeGroupVersion.String(),
-		Kind:            ResourceKindSnapshot,
-		Namespace:       s.Namespace,
-		Name:            s.Name,
-		UID:             s.UID,
-		ResourceVersion: s.ResourceVersion,
-	}
-}
-
 func (s Snapshot) OSMSecretName() string {
 	return fmt.Sprintf("osm-%v", s.Name)
 }
@@ -99,7 +87,6 @@ func (s Snapshot) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
 		Plural:        ResourcePluralSnapshot,
 		Singular:      ResourceSingularSnapshot,
 		Kind:          ResourceKindSnapshot,
-		ListKind:      ResourceKindSnapshot + "List",
 		ShortNames:    []string{ResourceCodeSnapshot},
 		ResourceScope: string(apiextensions.NamespaceScoped),
 		Labels: crdutils.Labels{

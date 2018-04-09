@@ -29,7 +29,7 @@ type Postgres struct {
 
 type PostgresSpec struct {
 	// Version of Postgres to be deployed.
-	Version types.StrYo `json:"version,omitempty"`
+	Version types.StrYo `json:"version"`
 	// Number of instances to deploy for a Postgres database.
 	Replicas *int32 `json:"replicas,omitempty"`
 	// Standby mode
