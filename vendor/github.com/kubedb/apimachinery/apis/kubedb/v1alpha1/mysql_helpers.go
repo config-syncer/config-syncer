@@ -6,7 +6,6 @@ import (
 
 	"github.com/appscode/kube-mon/api"
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
-	core "k8s.io/api/core/v1"
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 )
@@ -60,17 +59,6 @@ func (m MySQL) ResourcePlural() string {
 	return ResourcePluralMySQL
 }
 
-func (m MySQL) ObjectReference() *core.ObjectReference {
-	return &core.ObjectReference{
-		APIVersion:      SchemeGroupVersion.String(),
-		Kind:            m.ResourceKind(),
-		Namespace:       m.Namespace,
-		Name:            m.Name,
-		UID:             m.UID,
-		ResourceVersion: m.ResourceVersion,
-	}
-}
-
 func (m MySQL) ServiceName() string {
 	return m.OffshootName()
 }
@@ -105,7 +93,6 @@ func (m MySQL) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
 		Plural:        ResourcePluralMySQL,
 		Singular:      ResourceSingularMySQL,
 		Kind:          ResourceKindMySQL,
-		ListKind:      ResourceKindMySQL + "List",
 		ShortNames:    []string{ResourceCodeMySQL},
 		ResourceScope: string(apiextensions.NamespaceScoped),
 		Labels: crdutils.Labels{

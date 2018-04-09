@@ -12,13 +12,10 @@ func (a ClusterAlert) CustomResourceDefinition() *apiextensions.CustomResourceDe
 		Plural:        ResourcePluralClusterAlert,
 		Singular:      ResourceSingularClusterAlert,
 		Kind:          ResourceKindClusterAlert,
-		ListKind:      ResourceKindClusterAlert + "List",
 		ShortNames:    []string{"ca"},
 		ResourceScope: string(apiextensions.NamespaceScoped),
 		Labels: crdutils.Labels{
-			LabelsMap: map[string]string{
-				"app": "searchlight",
-			},
+			LabelsMap: map[string]string{"app": "searchlight"},
 		},
 		SpecDefinitionName:    "github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlert",
 		EnableValidation:      true,
@@ -33,13 +30,10 @@ func (a NodeAlert) CustomResourceDefinition() *apiextensions.CustomResourceDefin
 		Plural:        ResourcePluralNodeAlert,
 		Singular:      ResourceSingularNodeAlert,
 		Kind:          ResourceKindNodeAlert,
-		ListKind:      ResourceKindNodeAlert + "List",
 		ShortNames:    []string{"noa"},
 		ResourceScope: string(apiextensions.NamespaceScoped),
 		Labels: crdutils.Labels{
-			LabelsMap: map[string]string{
-				"app": "searchlight",
-			},
+			LabelsMap: map[string]string{"app": "searchlight"},
 		},
 		SpecDefinitionName:    "github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlert",
 		EnableValidation:      true,
@@ -54,13 +48,10 @@ func (a PodAlert) CustomResourceDefinition() *apiextensions.CustomResourceDefini
 		Plural:        ResourcePluralPodAlert,
 		Singular:      ResourceSingularPodAlert,
 		Kind:          ResourceKindPodAlert,
-		ListKind:      ResourceKindPodAlert + "List",
 		ShortNames:    []string{"poa"},
 		ResourceScope: string(apiextensions.NamespaceScoped),
 		Labels: crdutils.Labels{
-			LabelsMap: map[string]string{
-				"app": "searchlight",
-			},
+			LabelsMap: map[string]string{"app": "searchlight"},
 		},
 		SpecDefinitionName:    "github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlert",
 		EnableValidation:      true,
@@ -75,12 +66,9 @@ func (a Incident) CustomResourceDefinition() *apiextensions.CustomResourceDefini
 		Plural:        ResourcePluralIncident,
 		Singular:      ResourceSingularIncident,
 		Kind:          ResourceKindIncident,
-		ListKind:      ResourceKindIncident + "List",
 		ResourceScope: string(apiextensions.NamespaceScoped),
 		Labels: crdutils.Labels{
-			LabelsMap: map[string]string{
-				"app": "searchlight",
-			},
+			LabelsMap: map[string]string{"app": "searchlight"},
 		},
 		SpecDefinitionName:    "github.com/appscode/searchlight/apis/monitoring/v1alpha1.Incident",
 		EnableValidation:      true,

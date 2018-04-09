@@ -6,7 +6,6 @@ import (
 
 	"github.com/appscode/kube-mon/api"
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
-	core "k8s.io/api/core/v1"
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 )
@@ -58,17 +57,6 @@ func (p MongoDB) ResourcePlural() string {
 	return ResourcePluralMongoDB
 }
 
-func (p MongoDB) ObjectReference() *core.ObjectReference {
-	return &core.ObjectReference{
-		APIVersion:      SchemeGroupVersion.String(),
-		Kind:            p.ResourceKind(),
-		Namespace:       p.Namespace,
-		Name:            p.Name,
-		UID:             p.UID,
-		ResourceVersion: p.ResourceVersion,
-	}
-}
-
 func (p MongoDB) ServiceName() string {
 	return p.OffshootName()
 }
@@ -103,7 +91,6 @@ func (p MongoDB) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
 		Plural:        ResourcePluralMongoDB,
 		Singular:      ResourceSingularMongoDB,
 		Kind:          ResourceKindMongoDB,
-		ListKind:      ResourceKindMongoDB + "List",
 		ShortNames:    []string{ResourceCodeMongoDB},
 		ResourceScope: string(apiextensions.NamespaceScoped),
 		Labels: crdutils.Labels{

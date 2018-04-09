@@ -6,7 +6,6 @@ import (
 
 	"github.com/appscode/kube-mon/api"
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
-	core "k8s.io/api/core/v1"
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 )
@@ -60,17 +59,6 @@ func (e Elasticsearch) ResourcePlural() string {
 	return ResourcePluralElasticsearch
 }
 
-func (e Elasticsearch) ObjectReference() *core.ObjectReference {
-	return &core.ObjectReference{
-		APIVersion:      SchemeGroupVersion.String(),
-		Kind:            e.ResourceKind(),
-		Namespace:       e.Namespace,
-		Name:            e.Name,
-		UID:             e.UID,
-		ResourceVersion: e.ResourceVersion,
-	}
-}
-
 func (r Elasticsearch) ServiceName() string {
 	return r.OffshootName()
 }
@@ -109,7 +97,6 @@ func (r Elasticsearch) CustomResourceDefinition() *crd_api.CustomResourceDefinit
 		Plural:        ResourcePluralElasticsearch,
 		Singular:      ResourceSingularElasticsearch,
 		Kind:          ResourceKindElasticsearch,
-		ListKind:      ResourceKindElasticsearch + "List",
 		ShortNames:    []string{ResourceCodeElasticsearch},
 		ResourceScope: string(apiextensions.NamespaceScoped),
 		Labels: crdutils.Labels{
