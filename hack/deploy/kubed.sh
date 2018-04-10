@@ -53,6 +53,12 @@ export KUBED_IMAGE_PULL_SECRET=
 export KUBED_ENABLE_ANALYTICS=true
 export KUBED_UNINSTALL=0
 
+export APPSCODE_ENV=${APPSCODE_ENV:-prod}
+export SCRIPT_LOCATION="curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/"
+if [ "$APPSCODE_ENV" = "dev" ]; then
+    export SCRIPT_LOCATION="cat "
+fi
+
 show_help() {
     echo "kubed.sh - install Kubernetes cluster daemon"
     echo " "
@@ -168,22 +174,22 @@ CONFIG_FOUND=1
 kubectl get secret kubed-config -n $KUBED_NAMESPACE > /dev/null 2>&1 || CONFIG_FOUND=0
 if [ $CONFIG_FOUND -eq 0 ]; then
     kubectl create secret generic kubed-config -n $KUBED_NAMESPACE \
-        --from-literal=config.yaml=$(curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/deploy/config.yaml)
+        --from-literal=config.yaml=$(${SCRIPT_LOCATION}hack/deploy/config.yaml)
 fi
 kubectl label secret kubed-config app=kubed -n $KUBED_NAMESPACE --overwrite
 
-curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/deploy/operator.yaml | $ONESSL envsubst | kubectl apply -f -
+${SCRIPT_LOCATION}hack/deploy/operator.yaml | $ONESSL envsubst | kubectl apply -f -
 
 if [ "$KUBED_ENABLE_RBAC" = true ]; then
     kubectl create serviceaccount $KUBED_SERVICE_ACCOUNT --namespace $KUBED_NAMESPACE
     kubectl label serviceaccount $KUBED_SERVICE_ACCOUNT app=kubed --namespace $KUBED_NAMESPACE
-    curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/deploy/rbac-list.yaml | $ONESSL envsubst | kubectl auth reconcile -f -
-    curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/deploy/user-roles.yaml | $ONESSL envsubst | kubectl auth reconcile -f -
+    ${SCRIPT_LOCATION}hack/deploy/rbac-list.yaml | $ONESSL envsubst | kubectl auth reconcile -f -
+    ${SCRIPT_LOCATION}hack/deploy/user-roles.yaml | $ONESSL envsubst | kubectl auth reconcile -f -
 fi
 
 if [ "$KUBED_RUN_ON_MASTER" -eq 1 ]; then
     kubectl patch deploy kubed-operator -n $KUBED_NAMESPACE \
-      --patch="$(curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/deploy/run-on-master.yaml)"
+      --patch="$(${SCRIPT_LOCATION}hack/deploy/run-on-master.yaml)"
 fi
 
 echo "waiting until kubed deployment is ready"
