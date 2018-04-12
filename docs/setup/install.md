@@ -99,7 +99,7 @@ Cluster config was parsed successfully.
 ```
 
 
-## Using YAML
+## Using Script
 Kubed can be installed via installer script included in the [/hack/deploy](https://github.com/appscode/kubed/tree/0.6.0-rc.0/hack/deploy) folder.
 
 ```console
@@ -156,7 +156,7 @@ $ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/de
 
 
 ## Using Helm
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/0.6.0-rc.0/chart/stable/kubed) included in this repository. To install the chart with the release name `my-release`:
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/0.6.0-rc.0/chart/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
 
 ```console
 # Mac OSX amd64:
@@ -175,16 +175,18 @@ curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/
   && sudo mv onessl /usr/local/bin/
 
 # Kubernetes 1.8.x
+$ helm repo add appscode https://charts.appscode.com/stable/
 $ helm repo update
-$ helm install stable/kubed --name my-release
+$ helm install appscode/kubed --name my-release
 
 # Kubernetes 1.9.0 or later
+$ helm repo add appscode https://charts.appscode.com/stable/
 $ helm repo update
-$ helm install stable/kubed --name my-release \
+$ helm install appscode/kubed --name my-release \
   --set apiserver.ca="$(onessl get kube-ca)"
 ```
 
-To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/0.6.0-rc.0/chart/stable/kubed).
+To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/0.6.0-rc.0/chart/kubed).
 
 
 ## Verify installation
