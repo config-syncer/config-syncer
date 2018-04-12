@@ -188,6 +188,18 @@ $ helm install appscode/kubed --name my-release \
 
 To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/0.6.0-rc.0/chart/kubed).
 
+### Installing in GKE Cluster
+
+If you are installing Kubed on a GKE cluster, you will need cluster admin permissions to install Kubed operator. Run the following command to grant admin permision to the cluster.
+
+```console
+# get current google identity
+$ gcloud info | grep Account
+Account: [user@example.org]
+
+$ kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=user@example.org
+```
+
 
 ## Verify installation
 To check if Kubed operator pods have started, run the following command:
