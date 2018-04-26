@@ -56,6 +56,9 @@ type OriginSpec struct {
 	// Memcached Spec
 	// +optional
 	Memcached *MemcachedSpec `json:"memcached,omitempty"`
+	// Etcd Spec
+	// +optional
+	Etcd *EtcdSpec `json:"etcd,omitempty"`
 }
 
 type DormantDatabasePhase string

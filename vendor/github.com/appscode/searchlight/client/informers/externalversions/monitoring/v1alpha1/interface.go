@@ -32,6 +32,8 @@ type Interface interface {
 	NodeAlerts() NodeAlertInformer
 	// PodAlerts returns a PodAlertInformer.
 	PodAlerts() PodAlertInformer
+	// SearchlightPlugins returns a SearchlightPluginInformer.
+	SearchlightPlugins() SearchlightPluginInformer
 }
 
 type version struct {
@@ -63,4 +65,9 @@ func (v *version) NodeAlerts() NodeAlertInformer {
 // PodAlerts returns a PodAlertInformer.
 func (v *version) PodAlerts() PodAlertInformer {
 	return &podAlertInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// SearchlightPlugins returns a SearchlightPluginInformer.
+func (v *version) SearchlightPlugins() SearchlightPluginInformer {
+	return &searchlightPluginInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
