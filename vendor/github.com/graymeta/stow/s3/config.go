@@ -1,9 +1,15 @@
 package s3
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
+
+	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -41,6 +47,10 @@ const (
 	// ConfigEndpoint is optional config value for changing s3 endpoint
 	// used for e.g. minio.io
 	ConfigEndpoint = "endpoint"
+
+	// ConfigCACertDir is optional config value for providing cacerts for custom endpoint like minio
+	// provide root CAs certificate directory to establish TLS secure connection
+	ConfigCACertDir = "cacert_dir"
 
 	// ConfigDisableSSL is optional config value for disabling SSL support on custom endpoints
 	// Its default value is "false", to disable SSL set it to "true".
@@ -157,6 +167,14 @@ func newS3Client(config stow.Config) (client *s3.S3, endpoint string, err error)
 		awsConfig.WithDisableSSL(true)
 	}
 
+	cacertDir, ok := config.Config(ConfigCACertDir)
+	if ok {
+		awsConfig.HTTPClient.Transport, err = newTLSTransport(cacertDir)
+		if err != nil {
+			return nil, "", err
+		}
+	}
+
 	sess := session.New(awsConfig)
 	if sess == nil {
 		return nil, "", errors.New("creating the S3 session")
@@ -165,4 +183,38 @@ func newS3Client(config stow.Config) (client *s3.S3, endpoint string, err error)
 	s3Client := s3.New(sess)
 
 	return s3Client, endpoint, nil
+}
+
+func newTLSTransport(cacertDir string) (http.RoundTripper, error) {
+	if cacertDir == "" {
+		return nil, fmt.Errorf("invalid root certificate directory")
+	}
+
+	tr := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		MaxIdleConns:          100,
+		MaxIdleConnsPerHost:   100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+		TLSClientConfig:       &tls.Config{},
+	}
+
+	pool := x509.NewCertPool()
+
+	certData, err := ioutil.ReadFile(cacertDir)
+	if err != nil {
+		return nil, errors.Errorf("unable to read root certificate: %v", err)
+	}
+	if ok := pool.AppendCertsFromPEM(certData); !ok {
+		return nil, errors.Errorf("cannot parse root certificate from %q", cacertDir)
+	}
+	tr.TLSClientConfig.RootCAs = pool
+
+	return tr, nil
 }

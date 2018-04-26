@@ -34,6 +34,14 @@ type ElasticsearchListerExpansion interface{}
 // ElasticsearchNamespaceLister.
 type ElasticsearchNamespaceListerExpansion interface{}
 
+// EtcdListerExpansion allows custom methods to be added to
+// EtcdLister.
+type EtcdListerExpansion interface{}
+
+// EtcdNamespaceListerExpansion allows custom methods to be added to
+// EtcdNamespaceLister.
+type EtcdNamespaceListerExpansion interface{}
+
 // MemcachedListerExpansion allows custom methods to be added to
 // MemcachedLister.
 type MemcachedListerExpansion interface{}

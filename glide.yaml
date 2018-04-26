@@ -29,7 +29,7 @@ import:
   version: v1.0.0
 - package: github.com/graymeta/stow
   repo: https://github.com/appscode/stow.git
-  version: master
+  version: minio-cacerts
   vcs: git
 - package: github.com/influxdata/influxdb
   version: v1.3.3

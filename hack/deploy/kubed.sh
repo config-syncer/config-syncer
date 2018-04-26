@@ -59,6 +59,9 @@ if [ "$APPSCODE_ENV" = "dev" ]; then
     export SCRIPT_LOCATION="cat "
 fi
 
+echo "Script location"
+echo $SCRIPT_LOCATION
+
 show_help() {
     echo "kubed.sh - install Kubernetes cluster daemon"
     echo " "

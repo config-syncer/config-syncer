@@ -119,7 +119,7 @@ func (op *Operator) Configure() error {
 	op.config = *cfg
 
 	if op.config.RecycleBin != nil && op.config.RecycleBin.Path == "" {
-		op.config.RecycleBin.Path = filepath.Join(op.ScratchDir, "transhcan")
+		op.config.RecycleBin.Path = filepath.Join(op.ScratchDir, "trashcan")
 	}
 
 	op.notifierCred, err = op.getLoader()

@@ -145,7 +145,11 @@ func (rtm *RTM) startRTMAndDial(useRTMStart bool) (*Info, *websocket.Conn, error
 	// Only use HTTPS for connections to prevent MITM attacks on the connection.
 	upgradeHeader := http.Header{}
 	upgradeHeader.Add("Origin", "https://api.slack.com")
-	conn, _, err := websocket.DefaultDialer.Dial(url, upgradeHeader)
+	dialer := websocket.DefaultDialer
+	if rtm.dialer != nil {
+		dialer = rtm.dialer
+	}
+	conn, _, err := dialer.Dial(url, upgradeHeader)
 	if err != nil {
 		rtm.Debugf("Failed to dial to the websocket: %s", err)
 		return nil, nil, err
@@ -286,26 +290,27 @@ func (rtm *RTM) ping() error {
 func (rtm *RTM) receiveIncomingEvent() {
 	event := json.RawMessage{}
 	err := rtm.conn.ReadJSON(&event)
-	if err == io.EOF {
+	switch {
+	case err == io.ErrUnexpectedEOF:
 		// EOF's don't seem to signify a failed connection so instead we ignore
 		// them here and detect a failed connection upon attempting to send a
 		// 'PING' message
 
-		// trigger a 'PING' to detect pontential websocket disconnect
+		// trigger a 'PING' to detect potential websocket disconnect
 		rtm.forcePing <- true
-		return
-	} else if err != nil {
+	case err != nil:
+		// All other errors from ReadJSON come from NextReader, and should
+		// kill the read loop and force a reconnect.
 		rtm.IncomingEvents <- RTMEvent{"incoming_error", &IncomingEventError{
 			ErrorObj: err,
 		}}
-		// force a ping here too?
-		return
-	} else if len(event) == 0 {
+		rtm.killChannel <- false
+	case len(event) == 0:
 		rtm.Debugln("Received empty event")
-		return
+	default:
+		rtm.Debugln("Incoming Event:", string(event[:]))
+		rtm.rawEvents <- event
 	}
-	rtm.Debugln("Incoming Event:", string(event[:]))
-	rtm.rawEvents <- event
 }
 
 // handleRawEvent takes a raw JSON message received from the slack websocket
@@ -481,4 +486,7 @@ var eventMapping = map[string]interface{}{
 	"accounts_changed": AccountsChangedEvent{},
 
 	"reconnect_url": ReconnectUrlEvent{},
+
+	"member_joined_channel": MemberJoinedChannelEvent{},
+	"member_left_channel": MemberLeftChannelEvent{},
 }

@@ -193,14 +193,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 						},
 						"Vars": {
 							SchemaProps: spec.SchemaProps{
-								Type: []string{"object"},
-								AdditionalProperties: &spec.SchemaOrBool{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/data.CommandVar"),
-										},
-									},
-								},
+								Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"),
 							},
 						},
 						"States": {
@@ -221,7 +214,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 				},
 			},
 			Dependencies: []string{
-				"github.com/appscode/searchlight/data.CommandVar"},
+				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"},
 		},
 		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Incident": {
 			Schema: spec.Schema{
@@ -564,6 +557,92 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 			Dependencies: []string{
 				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver", "k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
 		},
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginArguments": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"vars": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"),
+							},
+						},
+						"host": {
+							SchemaProps: spec.SchemaProps{
+								Type: []string{"object"},
+								AdditionalProperties: &spec.SchemaOrBool{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Type:   []string{"string"},
+											Format: "",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Dependencies: []string{
+				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"},
+		},
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarItem": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"description": {
+							SchemaProps: spec.SchemaProps{
+								Type:   []string{"string"},
+								Format: "",
+							},
+						},
+						"type": {
+							SchemaProps: spec.SchemaProps{
+								Type:   []string{"string"},
+								Format: "",
+							},
+						},
+					},
+					Required: []string{"type"},
+				},
+			},
+			Dependencies: []string{},
+		},
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"Item": {
+							SchemaProps: spec.SchemaProps{
+								Type: []string{"object"},
+								AdditionalProperties: &spec.SchemaOrBool{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarItem"),
+										},
+									},
+								},
+							},
+						},
+						"required": {
+							SchemaProps: spec.SchemaProps{
+								Type: []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Type:   []string{"string"},
+											Format: "",
+										},
+									},
+								},
+							},
+						},
+					},
+					Required: []string{"Item"},
+				},
+			},
+			Dependencies: []string{
+				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarItem"},
+		},
 		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlert": {
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
@@ -760,6 +839,197 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 							},
 						},
 					},
+				},
+			},
+			Dependencies: []string{},
+		},
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Registry": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"reg": {
+							SchemaProps: spec.SchemaProps{
+								Type: []string{"object"},
+								AdditionalProperties: &spec.SchemaOrBool{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.IcingaCommand"),
+										},
+									},
+								},
+							},
+						},
+						"mu": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("sync.RWMutex"),
+							},
+						},
+					},
+					Required: []string{"reg", "mu"},
+				},
+			},
+			Dependencies: []string{
+				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IcingaCommand", "sync.RWMutex"},
+		},
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPlugin": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"kind": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"apiVersion": {
+							SchemaProps: spec.SchemaProps{
+								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"metadata": {
+							SchemaProps: spec.SchemaProps{
+								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							},
+						},
+						"spec": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Spec is the desired state of the SearchlightPlugin. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status",
+								Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPluginSpec"),
+							},
+						},
+					},
+				},
+			},
+			Dependencies: []string{
+				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPluginSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+		},
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPluginList": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Description: "SearchlightPluginList is a collection of SearchlightPlugin.",
+					Properties: map[string]spec.Schema{
+						"kind": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"apiVersion": {
+							SchemaProps: spec.SchemaProps{
+								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"metadata": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
+								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							},
+						},
+						"items": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Items is the list of SearchlightPlugin.",
+								Type:        []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPlugin"),
+										},
+									},
+								},
+							},
+						},
+					},
+					Required: []string{"items"},
+				},
+			},
+			Dependencies: []string{
+				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPlugin", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+		},
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPluginSpec": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Description: "SearchlightPluginSpec describes the SearchlightPlugin the user wishes to create.",
+					Properties: map[string]spec.Schema{
+						"command": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Check Command",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"webhook": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Webhook provides a reference to the service for this SearchlightPlugin. It must communicate on port 80",
+								Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.WebhookServiceSpec"),
+							},
+						},
+						"alertKinds": {
+							SchemaProps: spec.SchemaProps{
+								Description: "AlertKinds refers to supports Alert kinds for this plugin",
+								Type:        []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Type:   []string{"string"},
+											Format: "",
+										},
+									},
+								},
+							},
+						},
+						"arguments": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Supported arguments for SearchlightPlugin",
+								Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginArguments"),
+							},
+						},
+						"state": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Supported Icinga Service State",
+								Type:        []string{"array"},
+								Items: &spec.SchemaOrArray{
+									Schema: &spec.Schema{
+										SchemaProps: spec.SchemaProps{
+											Type:   []string{"string"},
+											Format: "",
+										},
+									},
+								},
+							},
+						},
+					},
+					Required: []string{"alertKinds", "state"},
+				},
+			},
+			Dependencies: []string{
+				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginArguments", "github.com/appscode/searchlight/apis/monitoring/v1alpha1.WebhookServiceSpec"},
+		},
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.WebhookServiceSpec": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Properties: map[string]spec.Schema{
+						"namespace": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Namespace is the namespace of the service",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+						"name": {
+							SchemaProps: spec.SchemaProps{
+								Description: "Name is the name of the service",
+								Type:        []string{"string"},
+								Format:      "",
+							},
+						},
+					},
+					Required: []string{"name"},
 				},
 			},
 			Dependencies: []string{},
