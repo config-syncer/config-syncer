@@ -1,24 +1,24 @@
 ---
-title: Kubed Snapshot
+title: Kubed Backup
 menu:
   product_kubed_0.6.0-rc.0:
-    identifier: kubed-snapshot
-    name: Kubed Snapshot
+    identifier: kubed-backup
+    name: Kubed Backup
     parent: reference
 product_name: kubed
 menu_name: product_kubed_0.6.0-rc.0
 section_menu_id: reference
 ---
-## kubed snapshot
+## kubed backup
 
-Takes a snapshot of Kubernetes api objects
+Takes a backup of Kubernetes api objects
 
 ### Synopsis
 
-Takes a snapshot of Kubernetes api objects
+Takes a backup of Kubernetes api objects
 
 ```
-kubed snapshot [flags]
+kubed backup [flags]
 ```
 
 ### Options
@@ -26,7 +26,8 @@ kubed snapshot [flags]
 ```
       --backup-dir string   Directory where YAML files will be stored
       --context string      Name of the kubeconfig context to use
-  -h, --help                help for snapshot
+  -h, --help                help for backup
+      --kubeconfig string   kubeconfig file pointing at the 'core' kubernetes server
       --sanitize             Sanitize fields in YAML
 ```
 
