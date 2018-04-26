@@ -176,8 +176,9 @@ export KUBE_CA=$($ONESSL get kube-ca | $ONESSL base64)
 CONFIG_FOUND=1
 kubectl get secret kubed-config -n $KUBED_NAMESPACE > /dev/null 2>&1 || CONFIG_FOUND=0
 if [ $CONFIG_FOUND -eq 0 ]; then
+    config=`${SCRIPT_LOCATION}hack/deploy/config.yaml`
     kubectl create secret generic kubed-config -n $KUBED_NAMESPACE \
-        --from-literal=config.yaml=$(${SCRIPT_LOCATION}hack/deploy/config.yaml)
+        --from-literal=config.yaml="${config}"
 fi
 kubectl label secret kubed-config app=kubed -n $KUBED_NAMESPACE --overwrite
 

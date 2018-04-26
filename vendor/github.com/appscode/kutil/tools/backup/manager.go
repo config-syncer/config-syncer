@@ -10,18 +10,16 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-	"fmt"
 
 	"github.com/ghodss/yaml"
 	"github.com/golang/glog"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
-	oneliners "github.com/the-redback/go-oneliners"
-	kerr "k8s.io/apimachinery/pkg/api/errors"
 )
 
 const (
@@ -114,7 +112,6 @@ func (mgr BackupManager) Backup(process processorFunc) error {
 	// ref: https://github.com/kubernetes/ingress-nginx/blob/0dab51d9eb1e5a9ba3661f351114825ac8bfc1af/pkg/ingress/controller/launch.go#L252
 	mgr.config.QPS = 1e6
 	mgr.config.Burst = 1e6
-	fmt.Println("=====================================================================")
 	if err := rest.SetKubernetesDefaults(mgr.config); err != nil {
 		return err
 	}
@@ -143,15 +140,18 @@ func (mgr BackupManager) Backup(process processorFunc) error {
 			return err
 		}
 		for _, r := range list.APIResources {
-			if strings.ContainsRune(r.Name, '/') ||r.Kind=="APIService"{
+			if strings.ContainsRune(r.Name, '/') {
+				continue // skip subresource
+			}
+			if !sets.NewString(r.Verbs...).HasAll("list", "get") {
 				continue
 			}
-			oneliners.PrettyJson(r,"Resource")
-			glog.V(3).Infof("Taking backup of %s apiVersion:%s kind:%s", list.GroupVersion, r.Name, r.Kind)
+
+			glog.V(3).Infof("Taking backup of %s apiVersion:%s kind:%s", list.GroupVersion, r.Name)
 			mgr.config.GroupVersion = &gv
 			mgr.config.APIPath = "/apis"
 			if gv.Group == core.GroupName {
-				mgr.config.APIPath = "/v1beta1"
+				mgr.config.APIPath = "/api"
 			}
 			client, err := rest.RESTClientFor(mgr.config)
 			if err != nil {
@@ -159,8 +159,7 @@ func (mgr BackupManager) Backup(process processorFunc) error {
 			}
 			request := client.Get().Resource(r.Name).Param("pretty", "true")
 			resp, err := request.DoRaw()
-			if err != nil && !kerr.IsNotFound(err){
-				fmt.Println(err)
+			if err != nil {
 				return err
 			}
 			items := &ItemList{}
@@ -214,7 +213,6 @@ func (mgr BackupManager) Backup(process processorFunc) error {
 			}
 		}
 	}
-	fmt.Println("=====================================================================")
 	return nil
 }
 
