@@ -49,3 +49,7 @@ type PodAlertListerExpansion interface{}
 // PodAlertNamespaceListerExpansion allows custom methods to be added to
 // PodAlertNamespaceLister.
 type PodAlertNamespaceListerExpansion interface{}
+
+// SearchlightPluginListerExpansion allows custom methods to be added to
+// SearchlightPluginLister.
+type SearchlightPluginListerExpansion interface{}

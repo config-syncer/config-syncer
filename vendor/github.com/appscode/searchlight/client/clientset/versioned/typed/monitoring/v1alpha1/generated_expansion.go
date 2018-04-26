@@ -23,3 +23,5 @@ type IncidentExpansion interface{}
 type NodeAlertExpansion interface{}
 
 type PodAlertExpansion interface{}
+
+type SearchlightPluginExpansion interface{}

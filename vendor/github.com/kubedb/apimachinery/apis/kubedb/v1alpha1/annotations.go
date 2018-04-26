@@ -14,6 +14,7 @@ const (
 	MongoDBKey          = ResourcePluralMongoDB + "." + GenericKey
 	RedisKey            = ResourcePluralRedis + "." + GenericKey
 	MemcachedKey        = ResourcePluralMemcached + "." + GenericKey
+	EtcdKey             = ResourcePluralEtcd + "." + GenericKey
 	SnapshotKey         = ResourcePluralSnapshot + "." + GenericKey
 	LabelSnapshotStatus = SnapshotKey + "/status"
 

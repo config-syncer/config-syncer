@@ -29,6 +29,7 @@ type MonitoringV1alpha1Interface interface {
 	IncidentsGetter
 	NodeAlertsGetter
 	PodAlertsGetter
+	SearchlightPluginsGetter
 }
 
 // MonitoringV1alpha1Client is used to interact with features provided by the monitoring.appscode.com group.
@@ -50,6 +51,10 @@ func (c *MonitoringV1alpha1Client) NodeAlerts(namespace string) NodeAlertInterfa
 
 func (c *MonitoringV1alpha1Client) PodAlerts(namespace string) PodAlertInterface {
 	return newPodAlerts(c, namespace)
+}
+
+func (c *MonitoringV1alpha1Client) SearchlightPlugins() SearchlightPluginInterface {
+	return newSearchlightPlugins(c)
 }
 
 // NewForConfig creates a new MonitoringV1alpha1Client for the given config.

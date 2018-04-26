@@ -52,7 +52,7 @@ type PodAlertSpec struct {
 	PodName *string `json:"podName,omitempty"`
 
 	// Icinga CheckCommand name
-	Check CheckPod `json:"check,omitempty"`
+	Check string `json:"check,omitempty"`
 
 	// How frequently Icinga Service will be checked
 	CheckInterval metav1.Duration `json:"checkInterval,omitempty"`
@@ -98,6 +98,10 @@ func (a PodAlert) GetAlertInterval() time.Duration {
 }
 
 func (a PodAlert) IsValid(kc kubernetes.Interface) error {
+	if a.Spec.Paused {
+		return nil
+	}
+
 	if a.Spec.PodName != nil && a.Spec.Selector != nil {
 		return fmt.Errorf("can't specify both pod name and selector")
 	}
@@ -111,15 +115,15 @@ func (a PodAlert) IsValid(kc kubernetes.Interface) error {
 		}
 	}
 
-	cmd, ok := PodCommands[a.Spec.Check]
+	cmd, ok := PodCommands.Get(a.Spec.Check)
 	if !ok {
 		return fmt.Errorf("%s is not a valid pod check command", a.Spec.Check)
 	}
-	for k := range a.Spec.Vars {
-		if _, ok := cmd.Vars[k]; !ok {
-			return fmt.Errorf("var %s is unsupported for check command %s", k, a.Spec.Check)
-		}
+
+	if err := validateVariables(cmd.Vars, a.Spec.Vars); err != nil {
+		return err
 	}
+
 	for _, rcv := range a.Spec.Receivers {
 		found := false
 		for _, state := range cmd.States {

@@ -28,6 +28,8 @@ type Interface interface {
 	DormantDatabases() DormantDatabaseInformer
 	// Elasticsearches returns a ElasticsearchInformer.
 	Elasticsearches() ElasticsearchInformer
+	// Etcds returns a EtcdInformer.
+	Etcds() EtcdInformer
 	// Memcacheds returns a MemcachedInformer.
 	Memcacheds() MemcachedInformer
 	// MongoDBs returns a MongoDBInformer.
@@ -61,6 +63,11 @@ func (v *version) DormantDatabases() DormantDatabaseInformer {
 // Elasticsearches returns a ElasticsearchInformer.
 func (v *version) Elasticsearches() ElasticsearchInformer {
 	return &elasticsearchInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// Etcds returns a EtcdInformer.
+func (v *version) Etcds() EtcdInformer {
+	return &etcdInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Memcacheds returns a MemcachedInformer.

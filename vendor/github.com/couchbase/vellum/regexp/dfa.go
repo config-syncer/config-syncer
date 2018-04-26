@@ -14,7 +14,10 @@
 
 package regexp
 
-import "fmt"
+import (
+	"encoding/binary"
+	"fmt"
+)
 
 // StateLimit is the maximum number of states allowed
 const StateLimit = 10000
@@ -25,8 +28,9 @@ var ErrTooManyStates = fmt.Errorf("dfa contains more than %d states",
 	StateLimit)
 
 type dfaBuilder struct {
-	dfa   *dfa
-	cache map[string]int
+	dfa    *dfa
+	cache  map[string]int
+	keyBuf []byte
 }
 
 func newDfaBuilder(insts prog) *dfaBuilder {
@@ -83,6 +87,18 @@ func (d *dfaBuilder) runState(cur, next *sparseSet, state int, b byte) int {
 	return nextState
 }
 
+func instsKey(insts []uint, buf []byte) []byte {
+	if cap(buf) < 8*len(insts) {
+		buf = make([]byte, 8*len(insts))
+	} else {
+		buf = buf[0 : 8*len(insts)]
+	}
+	for i, inst := range insts {
+		binary.LittleEndian.PutUint64(buf[i*8:], uint64(inst))
+	}
+	return buf
+}
+
 func (d *dfaBuilder) cachedState(set *sparseSet) int {
 	var insts []uint
 	var isMatch bool
@@ -99,8 +115,8 @@ func (d *dfaBuilder) cachedState(set *sparseSet) int {
 	if len(insts) == 0 {
 		return 0
 	}
-	k := fmt.Sprintf("%v", insts)
-	v, ok := d.cache[k]
+	d.keyBuf = instsKey(insts, d.keyBuf)
+	v, ok := d.cache[string(d.keyBuf)]
 	if ok {
 		return v
 	}
@@ -110,7 +126,7 @@ func (d *dfaBuilder) cachedState(set *sparseSet) int {
 		match: isMatch,
 	})
 	newV := len(d.dfa.states) - 1
-	d.cache[k] = newV
+	d.cache[string(d.keyBuf)] = newV
 	return newV
 }
 

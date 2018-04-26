@@ -189,18 +189,19 @@ func (f *fstStateV1) atMulti(data []byte, addr int) error {
 	}
 	f.bottom-- // extra byte with pack sizes
 	f.transSize, f.outSize = decodePackSize(data[f.bottom])
+
+	f.transTop = f.bottom
 	f.bottom -= f.numTrans // one byte for each transition
 	f.transBottom = f.bottom
-	f.transTop = f.bottom + f.numTrans
 
+	f.destTop = f.bottom
 	f.bottom -= f.numTrans * f.transSize
 	f.destBottom = f.bottom
-	f.destTop = f.bottom + (f.numTrans * f.transSize)
 
 	if f.outSize > 0 {
+		f.outTop = f.bottom
 		f.bottom -= f.numTrans * f.outSize
 		f.outBottom = f.bottom
-		f.outTop = f.bottom + (f.numTrans * f.outSize)
 		if f.final {
 			f.bottom -= f.outSize
 			f.outFinal = f.bottom
