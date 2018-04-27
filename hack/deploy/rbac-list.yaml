@@ -10,6 +10,10 @@ rules:
   - apps
   - authentication.k8s.io
   - authorization.k8s.io
+  - apiregistration.k8s.io
+  - admissionregistration.k8s.io
+  - apiextensions.k8s.io
+  - events.k8s.io
   - autoscaling
   - batch
   - certificates.k8s.io
@@ -22,6 +26,7 @@ rules:
   - rbac.authorization.k8s.io
   - stash.appscode.com
   - voyager.appscode.com
+  - policy
   resources: ["*"]
   verbs: ["list", "watch"]
 - apiGroups: [""]

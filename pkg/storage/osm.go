@@ -152,7 +152,14 @@ func NewOSMContext(client kubernetes.Interface, spec api.Backend, namespace stri
 			cacertData, ok := config[api.CA_CERT_DATA]
 			if ok && u.Scheme == "https" {
 				certFileName := filepath.Join(SecretMountPath, "ca.crt")
-				ioutil.WriteFile(certFileName, cacertData, 0644)
+				err = os.MkdirAll(filepath.Dir(certFileName), 0755)
+				if err != nil {
+					return nil, err
+				}
+				err = ioutil.WriteFile(certFileName, cacertData, 0755)
+				if err != nil {
+					return nil, err
+				}
 				nc.Config[s3.ConfigCACertDir] = certFileName
 			}
 		}

@@ -23,7 +23,7 @@ spec:
       imagePullSecrets: [${KUBED_IMAGE_PULL_SECRET}]
       containers:
       - name: operator
-        image: ${KUBED_DOCKER_REGISTRY}/kubed:minio-cacerts
+        image: ${KUBED_DOCKER_REGISTRY}/kubed:0.6.0-rc.0
         args:
         - run
         - --v=3
