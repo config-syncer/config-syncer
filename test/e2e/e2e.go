@@ -1,6 +1,8 @@
 package e2e
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -15,7 +17,6 @@ const TestTimeout = 3 * time.Minute
 var (
 	root *framework.Framework
 )
-
 func RunE2ETestSuit(t *testing.T) {
 	RegisterFailHandler(Fail)
 	SetDefaultEventuallyTimeout(TestTimeout)
@@ -30,24 +31,24 @@ var _ = BeforeSuite(func() {
 	By("Ensuring Test Namespace " + root.Config.TestNamespace)
 	err := root.EnsureNamespace()
 	Expect(err).NotTo(HaveOccurred())
+
+	By("Creating CRDs")
 	err = root.EnsureCreatedCRDs()
 	Expect(err).NotTo(HaveOccurred())
 
-	//// configure and run operator
-	//opt := server.Options{
-	//	KubeConfig:        filepath.Join(homedir.HomeDir(), ".kube/config"),
-	//	ConfigPath:        "config.yaml",
-	//	APIAddress:        ":8080",
-	//	WebAddress:        ":56790",
-	//	ScratchDir:        "/tmp/kubed",
-	//	OperatorNamespace: root.Namespace(),
-	//	ResyncPeriod:      5 * time.Minute,
-	//}
-	//
-	//By("Running kubed operator")
-	//go cmds.Run(opt)
+	By("Creating kubed configuration file dir")
+	err = os.MkdirAll(filepath.Dir(framework.KubedTestConfigFileDir),0755)
+	Expect(err).NotTo(HaveOccurred())
+
+	By("Registering API service")
+	err = root.Invoke().RegisterAPIService()
+	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = AfterSuite(func() {
+	By("Cleaning API service stuff")
+	root.Invoke().DeleteAPIService()
+
 	root.DeleteNamespace()
+	//os.RemoveAll(framework.KubedTestConfigFileDir)
 })
