@@ -3,12 +3,10 @@
 ##
 # Declare variables to be passed into your templates.
 replicaCount: 1
-# Docker registry containing Kubed images
-dockerRegistry: appscode
-## Tags for Docker images
-imageTags:
-  ## Docker image tag containing Kubed
-  kubed: 0.6.0-rc.0
+kubed:
+  registry: appscode
+  repository: kubed
+  tag: 0.6.0-rc.0
 ## Optionally specify an array of imagePullSecrets.
 ## Secrets must be manually created in the namespace.
 ## ref: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
