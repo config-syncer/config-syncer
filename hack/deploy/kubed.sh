@@ -11,6 +11,46 @@ function cleanup {
 }
 trap cleanup EXIT
 
+# ref: https://github.com/appscodelabs/libbuild/blob/master/common/lib.sh#L55
+inside_git_repo() {
+    git rev-parse --is-inside-work-tree > /dev/null 2>&1
+    inside_git=$?
+    if [ "$inside_git" -ne 0 ]; then
+        echo "Not inside a git repository"
+        exit 1
+    fi
+}
+
+detect_tag() {
+    inside_git_repo
+
+    # http://stackoverflow.com/a/1404862/3476121
+    git_tag=$(git describe --exact-match --abbrev=0 2>/dev/null || echo '')
+
+    commit_hash=$(git rev-parse --verify HEAD)
+    git_branch=$(git rev-parse --abbrev-ref HEAD)
+    commit_timestamp=$(git show -s --format=%ct)
+
+    if [ "$git_tag" != '' ]; then
+        TAG=$git_tag
+        TAG_STRATEGY='git_tag'
+    elif [ "$git_branch" != 'master' ] && [ "$git_branch" != 'HEAD' ] && [[ "$git_branch" != release-* ]]; then
+        TAG=$git_branch
+        TAG_STRATEGY='git_branch'
+    else
+        hash_ver=$(git describe --tags --always --dirty)
+        TAG="${hash_ver}"
+        TAG_STRATEGY='commit_hash'
+    fi
+
+    export TAG
+    export TAG_STRATEGY
+    export git_tag
+    export git_branch
+    export commit_hash
+    export commit_timestamp
+}
+
 # https://stackoverflow.com/a/677212/244009
 if [ -x "$(command -v onessl)" ]; then
     export ONESSL=onessl
@@ -18,19 +58,19 @@ else
     # ref: https://stackoverflow.com/a/27776822/244009
     case "$(uname -s)" in
         Darwin)
-            curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-darwin-amd64
+            curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-darwin-amd64
             chmod +x onessl
             export ONESSL=./onessl
             ;;
 
         Linux)
-            curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-linux-amd64
+            curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-linux-amd64
             chmod +x onessl
             export ONESSL=./onessl
             ;;
 
         CYGWIN*|MINGW32*|MSYS*)
-            curl -fsSL -o onessl.exe https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-windows-amd64.exe
+            curl -fsSL -o onessl.exe https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-windows-amd64.exe
             chmod +x onessl.exe
             export ONESSL=./onessl.exe
             ;;
@@ -49,14 +89,19 @@ export KUBED_SERVICE_ACCOUNT=kubed-operator
 export KUBED_ENABLE_RBAC=true
 export KUBED_RUN_ON_MASTER=0
 export KUBED_DOCKER_REGISTRY=appscode
+export KUBED_IMAGE_TAG=0.6.0-rc.0
 export KUBED_IMAGE_PULL_SECRET=
+export KUBED_IMAGE_PULL_POLICY=IfNotPresent
 export KUBED_ENABLE_ANALYTICS=true
 export KUBED_UNINSTALL=0
 
 export APPSCODE_ENV=${APPSCODE_ENV:-prod}
 export SCRIPT_LOCATION="curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/"
 if [ "$APPSCODE_ENV" = "dev" ]; then
+    detect_tag
     export SCRIPT_LOCATION="cat "
+    export KUBED_IMAGE_TAG=$TAG
+    export KUBED_IMAGE_PULL_POLICY=Always
 fi
 
 show_help() {
@@ -168,7 +213,6 @@ $ONESSL create server-cert server --domains=kubed-operator.$KUBED_NAMESPACE.svc
 export SERVICE_SERVING_CERT_CA=$(cat ca.crt | $ONESSL base64)
 export TLS_SERVING_CERT=$(cat server.crt | $ONESSL base64)
 export TLS_SERVING_KEY=$(cat server.key | $ONESSL base64)
-export KUBE_CA=$($ONESSL get kube-ca | $ONESSL base64)
 
 CONFIG_FOUND=1
 kubectl get secret kubed-config -n $KUBED_NAMESPACE > /dev/null 2>&1 || CONFIG_FOUND=0
@@ -200,4 +244,4 @@ echo "waiting until kubed apiservice is available"
 $ONESSL wait-until-ready apiservice v1alpha1.kubed.appscode.com || { echo "Kubed apiservice failed to be ready"; exit 1; }
 
 echo
-echo "Successfully installed Kubed cluster daemon!"
+echo "Successfully installed Kubed cluster daemon in $KUBED_NAMESPACE namespace!"
