@@ -23,7 +23,8 @@ spec:
       imagePullSecrets: [${KUBED_IMAGE_PULL_SECRET}]
       containers:
       - name: operator
-        image: ${KUBED_DOCKER_REGISTRY}/kubed:0.6.0-rc.0
+        image: ${KUBED_DOCKER_REGISTRY}/kubed:${KUBED_IMAGE_TAG}
+        imagePullPolicy: ${KUBED_IMAGE_PULL_POLICY}
         args:
         - run
         - --v=3
