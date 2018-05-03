@@ -35,7 +35,7 @@ import subprocess
 import sys
 from os.path import expandvars, join, dirname
 
-libbuild.REPO_ROOT = expandvars('$GOPATH') + '/src/github.com/appscode/kubed'
+libbuild.REPO_ROOT = libbuild.GOPATH + '/src/github.com/appscode/kubed'
 BUILD_METADATA = libbuild.metadata(libbuild.REPO_ROOT)
 libbuild.BIN_MATRIX = {
     'kubed': {

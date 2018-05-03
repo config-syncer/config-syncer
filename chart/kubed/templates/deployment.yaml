@@ -2,6 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: {{ template "kubed.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     app: "{{ template "kubed.name" . }}"
@@ -30,7 +31,7 @@ spec:
       {{- end }}
       containers:
       - name: kubed
-        image: {{ .Values.dockerRegistry }}/kubed:{{ .Values.imageTags.kubed }}
+        image: {{ .Values.kubed.registry }}/{{ .Values.kubed.repository }}:{{ .Values.kubed.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         args:
         - run
