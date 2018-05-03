@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/reporters"
 	. "github.com/onsi/gomega"
+	genericapiserver "k8s.io/apiserver/pkg/server"
 )
 
 const TestTimeout = 3 * time.Minute
@@ -17,6 +18,7 @@ const TestTimeout = 3 * time.Minute
 var (
 	root *framework.Framework
 )
+
 func RunE2ETestSuit(t *testing.T) {
 	RegisterFailHandler(Fail)
 	SetDefaultEventuallyTimeout(TestTimeout)
@@ -37,12 +39,22 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 
 	By("Creating kubed configuration file dir")
-	err = os.MkdirAll(filepath.Dir(framework.KubedTestConfigFileDir),0755)
+	err = os.MkdirAll(filepath.Dir(framework.KubedTestConfigFileDir), 0755)
 	Expect(err).NotTo(HaveOccurred())
 
 	By("Registering API service")
 	err = root.Invoke().RegisterAPIService()
 	Expect(err).NotTo(HaveOccurred())
+
+	root.KubedServer, err = root.NewTestKubedServer()
+	Expect(err).NotTo(HaveOccurred())
+
+	By("Starting API server")
+	stopCh := genericapiserver.SetupSignalHandler()
+	go root.KubedServer.GenericAPIServer.PrepareRun().Run(stopCh)
+
+	By("Waiting for API server to be ready")
+	root.EventuallyAPIServerReady().Should(Succeed())
 })
 
 var _ = AfterSuite(func() {

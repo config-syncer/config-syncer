@@ -1,5 +1,5 @@
-hash: c3f8b8206181bb57684796d77ec7670b9c82c6129db5e173a372dad9e51980f0
-updated: 2018-04-28T18:23:06.369688477+06:00
+hash: d9806102dfc59d97237476a934cef0315e818d996992f6f6b9e3f18a2dc09b89
+updated: 2018-05-03T11:18:17.010200794+06:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -30,8 +30,9 @@ imports:
   - types
   - version
 - name: github.com/appscode/go-notify
-  version: 0cc74b5af540568be7b72f6ce9f7a0232c4acda1
+  version: 223b426de3481d50ab14384a0e899bfa26768c30
   subpackages:
+  - discord
   - hipchat
   - log
   - mailgun
@@ -50,6 +51,10 @@ imports:
   subpackages:
   - api
   - prometheus/v1
+- name: github.com/appscode/kubernetes-webhook-util
+  version: d5f5497d85773ad6e4c0d0364702ad7fb155c03c
+  subpackages:
+  - apis/workload/v1
 - name: github.com/appscode/kutil
   version: 2211bbe2c455d75d3b4e92d8389f3ba36eff6083
   subpackages:
@@ -67,13 +72,13 @@ imports:
 - name: github.com/appscode/mergo
   version: e3000cb3d28c72b837601cac94debd91032d19fe
 - name: github.com/appscode/osm
-  version: 2a2ce2bb676e83a8f8340b628de870d41cba1e3a
+  version: 582393dba2719a1963717b4a99ee9081377487f5
   subpackages:
   - context
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 129db6c615cd395bec3e80a0adedc99982c5ea8e
+  version: 55d0a46ab66eb93cf640fdfd9c491a6c7c83f04b
   subpackages:
   - apis/incidents
   - apis/incidents/v1alpha1
@@ -89,7 +94,7 @@ imports:
   - client/informers/externalversions/monitoring/v1alpha1
   - client/listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: bd9b4b50112a88e428781d6e177896e0337937cb
+  version: 476a9a8893e3156ebaee0bcb77d8cfb0280bc298
   subpackages:
   - apis/repositories
   - apis/repositories/v1alpha1
@@ -105,7 +110,7 @@ imports:
   - client/informers/externalversions/stash/v1alpha1
   - client/listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 83e98400dc6fa344de268840e2c4712e0250d4fe
+  version: 3e506a0eff55e52fd0eb9d40725fdb493171390e
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -208,6 +213,8 @@ imports:
   repo: https://github.com/blevesearch/segment
 - name: github.com/boltdb/bolt
   version: 583e8937c61f1af6513608ccc75c97b6abdf4ff9
+- name: github.com/bwmarrin/discordgo
+  version: 4a33b9bc7c56cfdb9bb244e33e83cb3941fe2bdc
 - name: github.com/cenkalti/backoff
   version: 61153c768f31ee5f130071d08fc82b85208528de
 - name: github.com/codegangsta/inject
@@ -391,7 +398,7 @@ imports:
 - name: github.com/gorilla/websocket
   version: 6eb6ad425a89d9da7a5549bc6da8f79ba5c17844
 - name: github.com/graymeta/stow
-  version: 86bf006386f2a6dbab4617aefc442966dd999149
+  version: a2bb5ac932dfea981d79ab395a0ab4ea09365d52
   repo: https://github.com/appscode/stow.git
   vcs: git
   subpackages:
@@ -480,7 +487,7 @@ imports:
 - name: github.com/ncw/swift
   version: b2a7479cf26fa841ff90dd932d0221cb5c50782d
 - name: github.com/nlopes/slack
-  version: 625f4f9ebe5ca9709571eaea4f517a32f6e88041
+  version: 885df8f78dfbb91166a746e4ea93367b04095dff
 - name: github.com/NYTimes/gziphandler
   version: 56545f4a5d46df9a6648819d1664c3a03a13ffdb
 - name: github.com/olekukonko/tablewriter
@@ -606,6 +613,9 @@ imports:
 - name: golang.org/x/crypto
   version: 81e90905daefcd6fd217b62423c0908922eadb30
   subpackages:
+  - nacl/secretbox
+  - poly1305
+  - salsa20/salsa
   - ssh/terminal
 - name: golang.org/x/net
   version: 1c05540f6879653db88113bc4a2b70aec4bd491f
@@ -662,7 +672,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: a12439171c62991c8a4fd19686b7f4d6c8ecf850
+  version: ce90db2c36a2cb8c9c06779ed8bb96f92ea6e3b8
   subpackages:
   - gensupport
   - googleapi
@@ -1064,7 +1074,7 @@ imports:
   - util/jsonpath
   - util/workqueue
 - name: k8s.io/kube-aggregator
-  version: 0486d91221eb5f130122e17d7cfcd9eb7a6d737e
+  version: da7f9c1e7b5617ddf67b6491f2cf26581c21c3e3
   subpackages:
   - pkg/apis/apiregistration
   - pkg/apis/apiregistration/v1

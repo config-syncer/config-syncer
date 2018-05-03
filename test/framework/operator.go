@@ -8,7 +8,7 @@ import (
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/cmds/server"
-	. "github.com/onsi/ginkgo"
+	srvr "github.com/appscode/kubed/pkg/server"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -57,22 +57,19 @@ func NewTestKubedOperatorOptions() *server.OperatorOptions {
 	return opt
 }
 
-func (f *Invocation) RunKubedOperator() {
+func (f *Framework) NewTestKubedServer() (*srvr.KubedServer, error) {
 	kubedOptions := f.NewTestKubedOptions()
 
-	By("Starting API server and Operator")
-	err := kubedOptions.Run(f.StopOperator)
-	fmt.Println("KubeConfigPath: ", f.Config.KubeConfig)
-	fmt.Println("Error:", err.Error())
-	Expect(err).NotTo(HaveOccurred())
+	config, err := kubedOptions.Config()
+	if err != nil {
+		return nil, err
+	}
 
-	By("Waiting for API server to be ready")
-	f.EventuallyAPIServerReady().Should(Succeed())
-}
-
-func (f *Invocation) StopKubedOperator() {
-	By("Stopping API server and Operator")
-	close(f.StopOperator)
+	s, err := config.Complete().New()
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
 }
 
 func (f *Invocation) RegisterAPIService() (err error) {

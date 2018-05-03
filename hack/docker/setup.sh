@@ -39,8 +39,7 @@ build_binary() {
     rm -rf $DIST/osm
     mkdir $DIST/osm
     cd $DIST/osm
-#    wget https://cdn.appscode.com/binaries/osm/${OSM_VER}/osm-alpine-amd64
-    cp $HOME/Downloads/osm-alpine-amd64 $DIST/osm/osm-alpine-amd64
+    wget https://cdn.appscode.com/binaries/osm/${OSM_VER}/osm-alpine-amd64
     chmod +x osm-alpine-amd64
     popd
 }

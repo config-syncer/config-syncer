@@ -7,6 +7,7 @@ import (
 
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/kubed/pkg/operator"
+	"github.com/appscode/kubed/pkg/server"
 	"github.com/appscode/kutil/tools/certstore"
 	sls "github.com/appscode/searchlight/client/clientset/versioned"
 	scs "github.com/appscode/stash/client/clientset/versioned"
@@ -35,14 +36,14 @@ const (
 type Framework struct {
 	KubeConfig    *rest.Config
 	KubeClient    clientset.Interface
-	KAClient	  ka.Interface
+	KAClient      ka.Interface
 	crdClient     ecs.ApiextensionsV1beta1Interface
 	KubedOperator *operator.Operator
 	Config        E2EConfig
 	namespace     string
 	Mutex         sync.Mutex
 	CertStore     *certstore.CertStore
-	StopOperator  chan struct{}
+	KubedServer   *server.KubedServer
 }
 
 type Invocation struct {
@@ -69,12 +70,11 @@ func New() *Framework {
 	return &Framework{
 		KubeConfig: config,
 		KubeClient: clientset.NewForConfigOrDie(config),
-		KAClient: ka.NewForConfigOrDie(config),
+		KAClient:   ka.NewForConfigOrDie(config),
 		crdClient:  crdClient,
 		namespace:  testConfigs.TestNamespace,
 		Config:     testConfigs,
 		CertStore:  store,
-		StopOperator: make(chan struct{}),
 		KubedOperator: &operator.Operator{
 			KubeClient:        clientset.NewForConfigOrDie(config),
 			StashClient:       scs.NewForConfigOrDie(config),

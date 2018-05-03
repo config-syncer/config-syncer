@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -542,18 +543,26 @@ func (op *Operator) RunSnapshotter() error {
 		}
 	})
 }
+func (op *Operator) RunOperator(stopCh <-chan struct{}) {
+	go op.Run(stopCh)
+	<-stopCh
+}
 
-func (op *Operator) Run(stopCh <-chan struct{}) error {
+func (op *Operator) Run(stopCh <-chan struct{}) {
+
+	defer func() {
+		fmt.Println("Operator stopped....")
+	}()
 	if err := op.RunElasticsearchCleaner(); err != nil {
-		return err
+		log.Fatalln(err.Error())
 	}
 
 	if err := op.RunTrashCanCleaner(); err != nil {
-		return err
+		log.Fatalln(err.Error())
 	}
 
 	if err := op.RunSnapshotter(); err != nil {
-		return err
+		log.Fatalln(err.Error())
 	}
 
 	op.RunWatchers(stopCh)
@@ -564,5 +573,8 @@ func (op *Operator) Run(stopCh <-chan struct{}) error {
 	m.Get("/metrics", promhttp.Handler())
 	http.Handle("/", m)
 	log.Infoln("Listening on", op.OpsAddress)
-	return http.ListenAndServe(op.OpsAddress, nil)
+	err := http.ListenAndServe(op.OpsAddress, nil)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 }

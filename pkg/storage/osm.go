@@ -160,7 +160,7 @@ func NewOSMContext(client kubernetes.Interface, spec api.Backend, namespace stri
 				if err != nil {
 					return nil, err
 				}
-				nc.Config[s3.ConfigCACertDir] = certFileName
+				nc.Config[s3.ConfigCACertFile] = certFileName
 			}
 		}
 		return nc, nil

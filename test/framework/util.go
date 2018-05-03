@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	KubedTestConfigFileDir = filepath.Join(homedir.HomeDir(),"srv","kubed","config.yaml")
+	KubedTestConfigFileDir = filepath.Join(homedir.HomeDir(), "srv", "kubed", "config.yaml")
 )
 
 func deleteInBackground() *metav1.DeleteOptions {

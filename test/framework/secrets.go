@@ -2,8 +2,8 @@ package framework
 
 import (
 	"github.com/appscode/kutil/tools/clientcmd"
-	core "k8s.io/api/core/v1"
 	. "github.com/onsi/gomega"
+	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -55,7 +55,6 @@ func (f *Invocation) DeleteAllSecrets() {
 		Expect(err).NotTo(HaveOccurred())
 	}
 }
-
 
 func (f *Framework) CreateSecret(obj core.Secret) error {
 	_, err := f.KubeClient.CoreV1().Secrets(obj.Namespace).Create(&obj)
