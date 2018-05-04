@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/appscode/envconfig"
+	"github.com/appscode/go-notify/discord"
 	"github.com/appscode/go-notify/hipchat"
 	"github.com/appscode/go-notify/log"
 	"github.com/appscode/go-notify/mailgun"
@@ -53,6 +54,8 @@ func DefaultVia(via string) (interface{}, error) {
 		return pushover.Default()
 	case telegram.UID:
 		return telegram.Default()
+	case discord.UID:
+		return discord.Default()
 	}
 	return nil, fmt.Errorf("Unknown notifier %s", via)
 }
@@ -87,6 +90,8 @@ func LoadVia(via string, loader envconfig.LoaderFunc) (interface{}, error) {
 		return pushover.Load(loader)
 	case telegram.UID:
 		return telegram.Load(loader)
+	case discord.UID:
+		return discord.Load(loader)
 	}
 	return nil, fmt.Errorf("Unknown notifier %s", via)
 }
