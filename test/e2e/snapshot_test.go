@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"fmt"
+	"net"
 	"strconv"
 	"time"
 
@@ -43,17 +44,21 @@ var _ = Describe("Snapshots", func() {
 			})
 
 			BeforeEach(func() {
-				By("Creating Minio server without cacert")
-				_, err := f.CreateMinioServer(true)
+				minikubeIP := net.IP{192, 168, 99, 100}
+
+				By("Creating Minio server with cacert")
+				_, err := f.CreateMinioServer(true, []net.IP{minikubeIP})
 				Expect(err).NotTo(HaveOccurred())
 
-				minikubeIP := "192.168.99.100"
 				msvc, err := f.KubeClient.CoreV1().Services(f.Namespace()).Get("minio-service", metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())
 				minioServiceNodePort := strconv.Itoa(int(msvc.Spec.Ports[0].NodePort))
-				fmt.Println("Minio server address: https://" + minikubeIP + ":" + minioServiceNodePort)
+				fmt.Println("Minio server address: https://" + minikubeIP.String() + ":" + minioServiceNodePort)
 
 				//clusterConfig.Snapshotter.S3.Bucket="test"
+			})
+			It(`should success to perform Snapshot's operations`, func() {
+				//TODO: write test
 			})
 			It(`should success to perform Snapshot's operations`, func() {
 				//TODO: write test

@@ -44,9 +44,11 @@ func NewTestKubedServerOptions(kubeConfigPath string) *options.RecommendedOption
 		CoreAPI: &options.CoreAPIOptions{
 			CoreAPIKubeconfigPath: kubeConfigPath,
 		},
-		SecureServing: &options.SecureServingOptions{
-			BindPort:    8443,
-			BindAddress: net.ParseIP("127.0.0.1"),
+		SecureServing: &options.SecureServingOptionsWithLoopback{
+			SecureServingOptions: &options.SecureServingOptions{
+				BindPort:    8443,
+				BindAddress: net.ParseIP("127.0.0.1"),
+			},
 		},
 	}
 }

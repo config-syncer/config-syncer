@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -549,6 +550,7 @@ func (op *Operator) Run(stopCh <-chan struct{}) {
 	for {
 		select {
 		case <-stopCh:
+			fmt.Println("================== Closing operator ========================")
 			return
 		case <-startCh:
 			if err := op.RunElasticsearchCleaner(); err != nil {
