@@ -32,7 +32,7 @@ var _ = Describe("Snapshots", func() {
 		//	Skip("Missing repository credential")
 		//}
 		stopCh = make(chan struct{})
-		go f.KubedServer.Operator.RunOperator(stopCh)
+		go f.KubedServer.Operator.Run(stopCh)
 		time.Sleep(time.Second * 30)
 	})
 

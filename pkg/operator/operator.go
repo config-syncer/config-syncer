@@ -1,7 +1,6 @@
 package operator
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -543,38 +542,41 @@ func (op *Operator) RunSnapshotter() error {
 		}
 	})
 }
-func (op *Operator) RunOperator(stopCh <-chan struct{}) {
-	go op.Run(stopCh)
-	<-stopCh
-}
 
 func (op *Operator) Run(stopCh <-chan struct{}) {
+	startCh := make(chan bool)
+	startCh <- true
+	for {
+		select {
+		case <-stopCh:
+			return
+		case <-startCh:
+			if err := op.RunElasticsearchCleaner(); err != nil {
+				log.Fatalln(err.Error())
+			}
 
-	defer func() {
-		fmt.Println("Operator stopped....")
-	}()
-	if err := op.RunElasticsearchCleaner(); err != nil {
-		log.Fatalln(err.Error())
-	}
+			if err := op.RunTrashCanCleaner(); err != nil {
+				log.Fatalln(err.Error())
+			}
 
-	if err := op.RunTrashCanCleaner(); err != nil {
-		log.Fatalln(err.Error())
-	}
+			if err := op.RunSnapshotter(); err != nil {
+				log.Fatalln(err.Error())
+			}
 
-	if err := op.RunSnapshotter(); err != nil {
-		log.Fatalln(err.Error())
-	}
+			op.RunWatchers(stopCh)
 
-	op.RunWatchers(stopCh)
+			go op.watcher.Run(stopCh)
 
-	go op.watcher.Run(stopCh)
-
-	m := pat.New()
-	m.Get("/metrics", promhttp.Handler())
-	http.Handle("/", m)
-	log.Infoln("Listening on", op.OpsAddress)
-	err := http.ListenAndServe(op.OpsAddress, nil)
-	if err != nil {
-		log.Fatalln(err.Error())
+			go func() {
+				m := pat.New()
+				m.Get("/metrics", promhttp.Handler())
+				http.Handle("/", m)
+				log.Infoln("Listening on", op.OpsAddress)
+				err := http.ListenAndServe(op.OpsAddress, nil)
+				if err != nil {
+					log.Fatalln(err.Error())
+				}
+			}()
+		}
 	}
 }
