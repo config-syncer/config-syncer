@@ -16,8 +16,8 @@ type ScriptSourceSpec struct {
 }
 
 type SnapshotSourceSpec struct {
-	Namespace string `json:"namespace,omitempty"`
-	Name      string `json:"name,omitempty"`
+	Namespace string `json:"namespace"`
+	Name      string `json:"name"`
 }
 
 type BackupScheduleSpec struct {

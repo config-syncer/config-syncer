@@ -37,6 +37,7 @@ type ElasticsearchesGetter interface {
 type ElasticsearchInterface interface {
 	Create(*v1alpha1.Elasticsearch) (*v1alpha1.Elasticsearch, error)
 	Update(*v1alpha1.Elasticsearch) (*v1alpha1.Elasticsearch, error)
+	UpdateStatus(*v1alpha1.Elasticsearch) (*v1alpha1.Elasticsearch, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
 	Get(name string, options v1.GetOptions) (*v1alpha1.Elasticsearch, error)
@@ -114,6 +115,22 @@ func (c *elasticsearches) Update(elasticsearch *v1alpha1.Elasticsearch) (result 
 		Namespace(c.ns).
 		Resource("elasticsearches").
 		Name(elasticsearch.Name).
+		Body(elasticsearch).
+		Do().
+		Into(result)
+	return
+}
+
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+
+func (c *elasticsearches) UpdateStatus(elasticsearch *v1alpha1.Elasticsearch) (result *v1alpha1.Elasticsearch, err error) {
+	result = &v1alpha1.Elasticsearch{}
+	err = c.client.Put().
+		Namespace(c.ns).
+		Resource("elasticsearches").
+		Name(elasticsearch.Name).
+		SubResource("status").
 		Body(elasticsearch).
 		Do().
 		Into(result)
