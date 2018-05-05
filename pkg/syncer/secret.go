@@ -137,6 +137,7 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 
 		obj.Data = src.Data
 		obj.Labels = labels.Merge(src.Labels, s.syncerLabels(src.Name, src.Namespace, s.clusterName))
+		obj.Kind = src.Kind
 
 		ref := core.ObjectReference{
 			APIVersion:      src.APIVersion,
