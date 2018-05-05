@@ -32,6 +32,7 @@ func NewKubedOptions(out, errOut io.Writer) *KubedOptions {
 		StdErr:             errOut,
 	}
 	o.RecommendedOptions.Etcd = nil
+	o.RecommendedOptions.Admission = nil
 
 	return o
 }
