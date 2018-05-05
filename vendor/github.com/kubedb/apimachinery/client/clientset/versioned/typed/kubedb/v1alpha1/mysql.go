@@ -37,6 +37,7 @@ type MySQLsGetter interface {
 type MySQLInterface interface {
 	Create(*v1alpha1.MySQL) (*v1alpha1.MySQL, error)
 	Update(*v1alpha1.MySQL) (*v1alpha1.MySQL, error)
+	UpdateStatus(*v1alpha1.MySQL) (*v1alpha1.MySQL, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
 	Get(name string, options v1.GetOptions) (*v1alpha1.MySQL, error)
@@ -114,6 +115,22 @@ func (c *mySQLs) Update(mySQL *v1alpha1.MySQL) (result *v1alpha1.MySQL, err erro
 		Namespace(c.ns).
 		Resource("mysqls").
 		Name(mySQL.Name).
+		Body(mySQL).
+		Do().
+		Into(result)
+	return
+}
+
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+
+func (c *mySQLs) UpdateStatus(mySQL *v1alpha1.MySQL) (result *v1alpha1.MySQL, err error) {
+	result = &v1alpha1.MySQL{}
+	err = c.client.Put().
+		Namespace(c.ns).
+		Resource("mysqls").
+		Name(mySQL.Name).
+		SubResource("status").
 		Body(mySQL).
 		Do().
 		Into(result)
