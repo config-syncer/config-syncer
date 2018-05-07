@@ -1,6 +1,8 @@
 package framework
 
 import (
+	"github.com/appscode/go/crypto/rand"
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kutil/tools/clientcmd"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
@@ -63,4 +65,23 @@ func (f *Framework) CreateSecret(obj core.Secret) error {
 
 func (f *Framework) DeleteSecret(meta metav1.ObjectMeta) error {
 	return f.KubeClient.CoreV1().Secrets(meta.Namespace).Delete(meta.Name, deleteInForeground())
+}
+
+func (fi *Invocation) SecretForMinioBackend(includeCert bool) core.Secret {
+	secret := core.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rand.WithUniqSuffix(fi.app + "-minio"),
+			Namespace: fi.namespace,
+		},
+		Data: map[string][]byte{
+			api.AWS_ACCESS_KEY_ID:     []byte(MINIO_ACCESS_KEY_ID),
+			api.AWS_SECRET_ACCESS_KEY: []byte(MINIO_SECRET_ACCESS_KEY),
+		},
+	}
+
+	if includeCert {
+		secret.Data[api.CA_CERT_DATA] = fi.CertStore.CACert()
+	}
+
+	return secret
 }

@@ -1,7 +1,6 @@
 package operator
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -97,8 +96,8 @@ type Operator struct {
 
 	watcher *fsnotify.Watcher
 
-	config api.ClusterConfig
-	lock   sync.RWMutex
+	ClusterConfig api.ClusterConfig
+	lock          sync.RWMutex
 }
 
 func (op *Operator) Configure() error {
@@ -117,10 +116,10 @@ func (op *Operator) Configure() error {
 	if err != nil {
 		return err
 	}
-	op.config = *cfg
+	op.ClusterConfig = *cfg
 
-	if op.config.RecycleBin != nil && op.config.RecycleBin.Path == "" {
-		op.config.RecycleBin.Path = filepath.Join(op.ScratchDir, "trashcan")
+	if op.ClusterConfig.RecycleBin != nil && op.ClusterConfig.RecycleBin.Path == "" {
+		op.ClusterConfig.RecycleBin.Path = filepath.Join(op.ScratchDir, "trashcan")
 	}
 
 	op.notifierCred, err = op.getLoader()
@@ -128,22 +127,22 @@ func (op *Operator) Configure() error {
 		return err
 	}
 
-	err = op.trashCan.Configure(op.config.ClusterName, op.config.RecycleBin)
+	err = op.trashCan.Configure(op.ClusterConfig.ClusterName, op.ClusterConfig.RecycleBin)
 	if err != nil {
 		return err
 	}
 
-	err = op.eventProcessor.Configure(op.config.ClusterName, op.config.EventForwarder, op.notifierCred)
+	err = op.eventProcessor.Configure(op.ClusterConfig.ClusterName, op.ClusterConfig.EventForwarder, op.notifierCred)
 	if err != nil {
 		return err
 	}
 
-	err = op.configSyncer.Configure(op.config.ClusterName, op.config.KubeConfigFile, op.config.EnableConfigSyncer)
+	err = op.configSyncer.Configure(op.ClusterConfig.ClusterName, op.ClusterConfig.KubeConfigFile, op.ClusterConfig.EnableConfigSyncer)
 	if err != nil {
 		return err
 	}
 
-	for _, j := range op.config.Janitors {
+	for _, j := range op.ClusterConfig.Janitors {
 		if j.Kind == api.JanitorInfluxDB {
 			janitor := influx.Janitor{Spec: *j.InfluxDB, TTL: j.TTL.Duration}
 			err = janitor.Cleanup()
@@ -358,14 +357,14 @@ func (op *Operator) addEventHandlers(informer cache.SharedIndexInformer, gvk sch
 }
 
 func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {
-	if op.config.NotifierSecretName == "" {
+	if op.ClusterConfig.NotifierSecretName == "" {
 		return func(key string) (string, bool) {
 			return "", false
 		}, nil
 	}
 	cfg, err := op.KubeClient.CoreV1().
 		Secrets(op.OperatorNamespace).
-		Get(op.config.NotifierSecretName, metav1.GetOptions{})
+		Get(op.ClusterConfig.NotifierSecretName, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -448,7 +447,7 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 }
 
 func (op *Operator) RunElasticsearchCleaner() error {
-	for _, j := range op.config.Janitors {
+	for _, j := range op.ClusterConfig.Janitors {
 		if j.Kind == api.JanitorElasticsearch {
 			var authInfo *api.JanitorAuthInfo
 
@@ -492,18 +491,18 @@ func (op *Operator) RunTrashCanCleaner() error {
 	})
 }
 
-func (op *Operator) RunSnapshotter() error {
-	if op.config.Snapshotter == nil {
+func (op *Operator) RunSnapshotter(testing bool) error {
+	if op.ClusterConfig.Snapshotter == nil {
 		return nil
 	}
 
 	osmconfigPath := filepath.Join(op.ScratchDir, "osm", "config.yaml")
-	err := storage.WriteOSMConfig(op.KubeClient, op.config.Snapshotter.Backend, op.OperatorNamespace, osmconfigPath)
+	err := storage.WriteOSMConfig(op.KubeClient, op.ClusterConfig.Snapshotter.Backend, op.OperatorNamespace, osmconfigPath)
 	if err != nil {
 		return err
 	}
 
-	container, err := op.config.Snapshotter.Backend.Container()
+	container, err := op.ClusterConfig.Snapshotter.Backend.Container()
 	if err != nil {
 		return err
 	}
@@ -513,7 +512,7 @@ func (op *Operator) RunSnapshotter() error {
 	sh.SetDir(op.ScratchDir)
 	sh.ShowCMD = true
 	snapshotter := func() error {
-		mgr := backup.NewBackupManager(op.config.ClusterName, op.ClientConfig, op.config.Snapshotter.Sanitize)
+		mgr := backup.NewBackupManager(op.ClusterConfig.ClusterName, op.ClientConfig, op.ClusterConfig.Snapshotter.Sanitize)
 		snapshotFile, err := mgr.BackupToTar(filepath.Join(op.ScratchDir, "snapshot"))
 		if err != nil {
 			return err
@@ -523,7 +522,7 @@ func (op *Operator) RunSnapshotter() error {
 				log.Errorln(err)
 			}
 		}()
-		dest, err := op.config.Snapshotter.Location(filepath.Base(snapshotFile))
+		dest, err := op.ClusterConfig.Snapshotter.Location(filepath.Base(snapshotFile))
 		if err != nil {
 			return err
 		}
@@ -536,49 +535,56 @@ func (op *Operator) RunSnapshotter() error {
 			log.Errorln(err)
 		}
 	}()
-	return op.cron.AddFunc(op.config.Snapshotter.Schedule, func() {
-		err := snapshotter()
-		if err != nil {
-			log.Errorln(err)
-		}
-	})
+
+	if !testing {
+		return op.cron.AddFunc(op.ClusterConfig.Snapshotter.Schedule, func() {
+			err := snapshotter()
+			if err != nil {
+				log.Errorln(err)
+			}
+		})
+	}
+	return nil
 }
 
-func (op *Operator) Run(stopCh <-chan struct{}) {
-	startCh := make(chan bool)
-	startCh <- true
+func (op *Operator) Run(stopCh <-chan struct{}, testing bool) {
+	startOperator := true
 	for {
 		select {
 		case <-stopCh:
-			fmt.Println("================== Closing operator ========================")
 			return
-		case <-startCh:
-			if err := op.RunElasticsearchCleaner(); err != nil {
-				log.Fatalln(err.Error())
-			}
-
-			if err := op.RunTrashCanCleaner(); err != nil {
-				log.Fatalln(err.Error())
-			}
-
-			if err := op.RunSnapshotter(); err != nil {
-				log.Fatalln(err.Error())
-			}
-
-			op.RunWatchers(stopCh)
-
-			go op.watcher.Run(stopCh)
-
-			go func() {
-				m := pat.New()
-				m.Get("/metrics", promhttp.Handler())
-				http.Handle("/", m)
-				log.Infoln("Listening on", op.OpsAddress)
-				err := http.ListenAndServe(op.OpsAddress, nil)
-				if err != nil {
+		default:
+			if startOperator {
+				startOperator = false
+				if err := op.RunElasticsearchCleaner(); err != nil {
 					log.Fatalln(err.Error())
 				}
-			}()
+
+				if err := op.RunTrashCanCleaner(); err != nil {
+					log.Fatalln(err.Error())
+				}
+
+				if err := op.RunSnapshotter(testing); err != nil {
+					log.Fatalln(err.Error())
+				}
+
+				op.RunWatchers(stopCh)
+
+				go op.watcher.Run(stopCh)
+
+				if !testing {
+					go func() {
+						m := pat.New()
+						m.Get("/metrics", promhttp.Handler())
+						http.Handle("/", m)
+						log.Infoln("Listening on", op.OpsAddress)
+						err := http.ListenAndServe(op.OpsAddress, nil)
+						if err != nil {
+							log.Fatalln(err.Error())
+						}
+					}()
+				}
+			}
 		}
 	}
 }

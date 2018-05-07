@@ -4,41 +4,60 @@ import (
 	"fmt"
 	"net"
 	"strconv"
-	"time"
 
+	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/test/framework"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	//api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 )
 
 var _ = Describe("Snapshots", func() {
 	var (
-		f *framework.Invocation
-		//cred core.Secret
-		stopCh chan struct{}
-		//clusterConfig api.ClusterConfig
+		f             *framework.Invocation
+		cred          core.Secret
+		stopCh        chan struct{}
+		clusterConfig api.ClusterConfig
+		backend       *api.Backend
 	)
 
 	BeforeEach(func() {
 		f = root.Invoke()
 	})
+
 	AfterEach(func() {
 		close(stopCh)
-		time.Sleep(30 * time.Second)
-	})
-	JustBeforeEach(func() {
-		//if missing, _ := BeZero().Match(cred); missing {
-		//	Skip("Missing repository credential")
-		//}
-		stopCh = make(chan struct{})
-		go f.KubedServer.Operator.Run(stopCh)
-		time.Sleep(time.Second * 30)
 	})
 
+	JustBeforeEach(func() {
+		if missing, _ := BeZero().Match(cred); missing {
+			Skip("Missing backend credential")
+		}
+
+		err := f.CreateSecret(cred)
+		Expect(err).NotTo(HaveOccurred())
+
+		operatorConfig := f.NewTestOperatorConfig()
+		f.KubedServer.Operator, err = operatorConfig.New()
+		Expect(err).NotTo(HaveOccurred())
+
+		f.KubedServer.Operator.ClusterConfig = clusterConfig
+		f.KubedServer.Operator.OperatorNamespace = f.Namespace()
+
+		err = f.CreateBucketIfNotExist(clusterConfig.Snapshotter.Backend)
+		Expect(err).NotTo(HaveOccurred())
+
+		stopCh = make(chan struct{})
+		go f.KubedServer.Operator.Run(stopCh, true)
+	})
+
+	shouldTakeClusterSnapshot := func() {
+		f.EventuallyBackupSnapshot(*backend).ShouldNot(BeEmpty())
+	}
+
 	Describe("Snapshots operations", func() {
-		FContext(`"Minio" backend`, func() {
+		Context(`"Minio" backend`, func() {
 			AfterEach(func() {
 				f.DeleteMinioServer()
 			})
@@ -53,16 +72,16 @@ var _ = Describe("Snapshots", func() {
 				msvc, err := f.KubeClient.CoreV1().Services(f.Namespace()).Get("minio-service", metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())
 				minioServiceNodePort := strconv.Itoa(int(msvc.Spec.Ports[0].NodePort))
-				fmt.Println("Minio server address: https://" + minikubeIP.String() + ":" + minioServiceNodePort)
+				minioEndpoint := fmt.Sprintf("https://" + minikubeIP.String() + ":" + minioServiceNodePort)
 
-				//clusterConfig.Snapshotter.S3.Bucket="test"
+				cred = f.SecretForMinioBackend(true)
+
+				backend = framework.NewMinioBackend("kubed-test", "demo", minioEndpoint, cred.Name)
+				clusterConfig = framework.SnapshotClusterConfig(backend)
 			})
-			It(`should success to perform Snapshot's operations`, func() {
-				//TODO: write test
-			})
-			It(`should success to perform Snapshot's operations`, func() {
-				//TODO: write test
-			})
+			It(`should backup cluster Snapshot`, shouldTakeClusterSnapshot)
+
+			It(`should backup cluster Snapshot`, shouldTakeClusterSnapshot)
 
 		})
 	})

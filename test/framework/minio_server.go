@@ -1,4 +1,5 @@
 package framework
+
 import (
 	"fmt"
 	"net"
@@ -14,6 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/util/cert"
 )
 
@@ -26,6 +28,9 @@ const (
 
 	MINIO_CERTS_MOUNTPATH = "/root/.minio/certs"
 	StandardStorageClass  = "standard"
+
+	interval = time.Second * 2
+	timeout  = time.Minute * 3
 )
 
 var (
@@ -66,6 +71,8 @@ func (fi *Invocation) CreateMinioServer(tls bool, ips []net.IP) (string, error) 
 	if err != nil {
 		return "", err
 	}
+
+	fi.WaitUntilDeploymentReady(mdeploy.ObjectMeta)
 
 	return fi.MinioServiceAddres(), nil
 }
@@ -144,7 +151,7 @@ func (fi *Invocation) DeploymentForMinioServer() apps.Deployment {
 							},
 						},
 						{
-							Name: "minio-public-crt",
+							Name: "minio-certs",
 							VolumeSource: core.VolumeSource{
 								Secret: &core.SecretVolumeSource{
 									SecretName: "minio-server-secret",
@@ -153,33 +160,13 @@ func (fi *Invocation) DeploymentForMinioServer() apps.Deployment {
 											Key:  MINIO_PUBLIC_CRT_NAME,
 											Path: MINIO_PUBLIC_CRT_NAME,
 										},
-									},
-								},
-							},
-						},
-						{
-							Name: "minio-private-key",
-							VolumeSource: core.VolumeSource{
-								Secret: &core.SecretVolumeSource{
-									SecretName: "minio-server-secret",
-									Items: []core.KeyToPath{
 										{
 											Key:  MINIO_PRIVATE_KEY_NAME,
 											Path: MINIO_PRIVATE_KEY_NAME,
 										},
-									},
-								},
-							},
-						},
-						{
-							Name: "minio-ca-crt",
-							VolumeSource: core.VolumeSource{
-								Secret: &core.SecretVolumeSource{
-									SecretName: "minio-server-secret",
-									Items: []core.KeyToPath{
 										{
 											Key:  MINIO_PUBLIC_CRT_NAME,
-											Path: MINIO_PUBLIC_CRT_NAME,
+											Path: filepath.Join("CAs", MINIO_PUBLIC_CRT_NAME),
 										},
 									},
 								},
@@ -219,19 +206,8 @@ func (fi *Invocation) DeploymentForMinioServer() apps.Deployment {
 									MountPath: "/storage",
 								},
 								{
-									Name:      "minio-public-crt",
-									MountPath: filepath.Join(MINIO_CERTS_MOUNTPATH, MINIO_PUBLIC_CRT_NAME),
-									SubPath:   MINIO_PUBLIC_CRT_NAME,
-								},
-								{
-									Name:      "minio-private-key",
-									MountPath: filepath.Join(MINIO_CERTS_MOUNTPATH, MINIO_PRIVATE_KEY_NAME),
-									SubPath:   MINIO_PRIVATE_KEY_NAME,
-								},
-								{
-									Name:      "minio-ca-crt",
-									MountPath: filepath.Join(MINIO_CERTS_MOUNTPATH, "CAs", MINIO_PUBLIC_CRT_NAME),
-									SubPath:   MINIO_PUBLIC_CRT_NAME,
+									Name:      "minio-certs",
+									MountPath: MINIO_CERTS_MOUNTPATH,
 								},
 							},
 						},
@@ -255,10 +231,6 @@ func (fi *Invocation) RemoveSecretVolumeMount(containers []core.Container) []cor
 
 func (fi *Invocation) CreateDeploymentForMinioServer(obj apps.Deployment) error {
 	_, err := fi.KubeClient.AppsV1beta1().Deployments(obj.Namespace).Create(&obj)
-	if err == nil {
-		//Waiting 30 second to minio server to be ready
-		time.Sleep(time.Second * 30)
-	}
 	return err
 }
 
@@ -294,6 +266,7 @@ func (fi *Invocation) DeleteMinioServer() {
 	fi.DeleteDeploymentForMinioServer(mdeploy.ObjectMeta)
 	fi.DeleteServiceForMinioServer(msrvc.ObjectMeta)
 }
+
 func (f *Framework) DeleteSecretForMinioServer(meta metav1.ObjectMeta) error {
 	return f.KubeClient.CoreV1().Secrets(meta.Namespace).Delete(meta.Name, deleteInForeground())
 }
@@ -302,8 +275,10 @@ func (f *Framework) DeletePVCForMinioServer(meta metav1.ObjectMeta) error {
 	return f.KubeClient.CoreV1().PersistentVolumeClaims(meta.Namespace).Delete(meta.Name, deleteInForeground())
 }
 
-func (f *Framework) DeleteDeploymentForMinioServer(meta metav1.ObjectMeta) error {
-	return f.KubeClient.AppsV1beta1().Deployments(meta.Namespace).Delete(meta.Name, deleteInBackground())
+func (fi *Invocation) DeleteDeploymentForMinioServer(meta metav1.ObjectMeta) error {
+	err := fi.KubeClient.AppsV1beta1().Deployments(meta.Namespace).Delete(meta.Name, deleteInBackground())
+	fi.WaitUntilDeploymentTerminated(meta)
+	return err
 }
 
 func (f *Framework) DeleteServiceForMinioServer(meta metav1.ObjectMeta) error {
@@ -323,4 +298,22 @@ func (fi *Invocation) MinioServerSANs(ips []net.IP) cert.AltNames {
 func (fi *Invocation) MinioServiceAddres() string {
 	return fmt.Sprintf("minio-service.%s.svc", fi.namespace)
 
+}
+
+func (fi *Invocation) WaitUntilDeploymentReady(meta metav1.ObjectMeta) error {
+	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
+		if obj, err := fi.KubeClient.AppsV1beta1().Deployments(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err == nil {
+			return types.Int32(obj.Spec.Replicas) == obj.Status.ReadyReplicas, nil
+		}
+		return false, nil
+	})
+}
+
+func (fi *Invocation) WaitUntilDeploymentTerminated(meta metav1.ObjectMeta) error {
+	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
+		if pods, err := fi.KubeClient.CoreV1().Pods(meta.Namespace).List(metav1.ListOptions{}); err == nil {
+			return len(pods.Items) == 0, nil
+		}
+		return false, nil
+	})
 }

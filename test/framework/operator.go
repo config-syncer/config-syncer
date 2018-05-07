@@ -8,11 +8,14 @@ import (
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/cmds/server"
+	"github.com/appscode/kubed/pkg/operator"
 	srvr "github.com/appscode/kubed/pkg/server"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/apiserver/pkg/admission"
+	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/options"
 	apireg "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1beta1"
 )
@@ -25,14 +28,14 @@ var (
 
 func (f *Framework) NewTestKubedOptions() *server.KubedOptions {
 	return &server.KubedOptions{
-		RecommendedOptions: NewTestKubedServerOptions(f.Config.KubeConfig),
-		OperatorOptions:    NewTestKubedOperatorOptions(),
+		RecommendedOptions: f.NewTestKubedServerOptions(f.Config.KubeConfig),
+		OperatorOptions:    f.NewTestKubedOperatorOptions(),
 		StdOut:             os.Stdout,
 		StdErr:             os.Stderr,
 	}
 }
 
-func NewTestKubedServerOptions(kubeConfigPath string) *options.RecommendedOptions {
+func (f *Framework) NewTestKubedServerOptions(kubeConfigPath string) *options.RecommendedOptions {
 	return &options.RecommendedOptions{
 		Authentication: &options.DelegatingAuthenticationOptions{
 			RemoteKubeConfigFile: kubeConfigPath,
@@ -50,15 +53,30 @@ func NewTestKubedServerOptions(kubeConfigPath string) *options.RecommendedOption
 				BindAddress: net.ParseIP("127.0.0.1"),
 			},
 		},
+		ExtraAdmissionInitializers: func(c *genericapiserver.RecommendedConfig) ([]admission.PluginInitializer, error) { return nil, nil },
+		Etcd:      nil,
+		Admission: nil,
 	}
 }
 
-func NewTestKubedOperatorOptions() *server.OperatorOptions {
+func (f *Framework) NewTestKubedOperatorOptions() *server.OperatorOptions {
 	opt := server.NewOperatorOptions()
 	opt.ConfigPath = KubedTestConfigFileDir
 	return opt
 }
 
+func (f *Framework) NewTestOperatorConfig() *operator.OperatorConfig {
+	return &operator.OperatorConfig{
+		Config:            f.KubedServer.Operator.Config,
+		ClientConfig:      f.KubedServer.Operator.ClientConfig,
+		KubeClient:        f.KubedServer.Operator.KubeClient,
+		VoyagerClient:     f.KubedServer.Operator.VoyagerClient,
+		StashClient:       f.KubedServer.Operator.StashClient,
+		SearchlightClient: f.KubedServer.Operator.SearchlightClient,
+		KubeDBClient:      f.KubedServer.Operator.KubeDBClient,
+		PromClient:        f.KubedServer.Operator.PromClient,
+	}
+}
 func (f *Framework) NewTestKubedServer() (*srvr.KubedServer, error) {
 	kubedOptions := f.NewTestKubedOptions()
 

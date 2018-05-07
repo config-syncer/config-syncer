@@ -52,7 +52,7 @@ type KubedServer struct {
 }
 
 func (op *KubedServer) Run(stopCh <-chan struct{}) error {
-	go op.Operator.Run(stopCh)
+	go op.Operator.Run(stopCh, false)
 	return op.GenericAPIServer.PrepareRun().Run(stopCh)
 }
 
