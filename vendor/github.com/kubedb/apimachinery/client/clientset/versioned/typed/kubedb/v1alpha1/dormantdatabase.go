@@ -37,6 +37,7 @@ type DormantDatabasesGetter interface {
 type DormantDatabaseInterface interface {
 	Create(*v1alpha1.DormantDatabase) (*v1alpha1.DormantDatabase, error)
 	Update(*v1alpha1.DormantDatabase) (*v1alpha1.DormantDatabase, error)
+	UpdateStatus(*v1alpha1.DormantDatabase) (*v1alpha1.DormantDatabase, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
 	Get(name string, options v1.GetOptions) (*v1alpha1.DormantDatabase, error)
@@ -114,6 +115,22 @@ func (c *dormantDatabases) Update(dormantDatabase *v1alpha1.DormantDatabase) (re
 		Namespace(c.ns).
 		Resource("dormantdatabases").
 		Name(dormantDatabase.Name).
+		Body(dormantDatabase).
+		Do().
+		Into(result)
+	return
+}
+
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+
+func (c *dormantDatabases) UpdateStatus(dormantDatabase *v1alpha1.DormantDatabase) (result *v1alpha1.DormantDatabase, err error) {
+	result = &v1alpha1.DormantDatabase{}
+	err = c.client.Put().
+		Namespace(c.ns).
+		Resource("dormantdatabases").
+		Name(dormantDatabase.Name).
+		SubResource("status").
 		Body(dormantDatabase).
 		Do().
 		Into(result)

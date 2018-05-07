@@ -2847,6 +2847,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 							},
 						},
 					},
+					Required: []string{"namespace", "name"},
 				},
 			},
 			Dependencies: []string{},

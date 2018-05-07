@@ -37,6 +37,7 @@ type MemcachedsGetter interface {
 type MemcachedInterface interface {
 	Create(*v1alpha1.Memcached) (*v1alpha1.Memcached, error)
 	Update(*v1alpha1.Memcached) (*v1alpha1.Memcached, error)
+	UpdateStatus(*v1alpha1.Memcached) (*v1alpha1.Memcached, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
 	Get(name string, options v1.GetOptions) (*v1alpha1.Memcached, error)
@@ -114,6 +115,22 @@ func (c *memcacheds) Update(memcached *v1alpha1.Memcached) (result *v1alpha1.Mem
 		Namespace(c.ns).
 		Resource("memcacheds").
 		Name(memcached.Name).
+		Body(memcached).
+		Do().
+		Into(result)
+	return
+}
+
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+
+func (c *memcacheds) UpdateStatus(memcached *v1alpha1.Memcached) (result *v1alpha1.Memcached, err error) {
+	result = &v1alpha1.Memcached{}
+	err = c.client.Put().
+		Namespace(c.ns).
+		Resource("memcacheds").
+		Name(memcached.Name).
+		SubResource("status").
 		Body(memcached).
 		Do().
 		Into(result)
