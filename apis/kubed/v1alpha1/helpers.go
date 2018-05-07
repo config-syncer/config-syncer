@@ -132,6 +132,8 @@ func (b Backend) GetBucketAndPrefix() (string, string, error) {
 		return b.Azure.Container, b.Azure.Prefix, nil
 	} else if b.Swift != nil {
 		return b.Swift.Container, b.Swift.Prefix, nil
+	} else if b.Local !=nil{
+		return b.Local.Path,"",nil
 	}
 	return "", "", errors.New("unknown backend type.")
 }

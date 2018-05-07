@@ -18,6 +18,14 @@ func NewMinioBackend(bucket, prefix, endpoint, secretName string) *api.Backend {
 	}
 }
 
+func NewLocalBackend(dir string) *api.Backend {
+	return &api.Backend{
+		Local: &api.LocalSpec{
+			Path: dir,
+		},
+	}
+}
+
 func (f *Invocation) EventuallyBackupSnapshot(backend api.Backend) GomegaAsyncAssertion {
 	return Eventually(func() []stow.Item {
 		loc, err := f.GetLocation(backend)
@@ -25,7 +33,9 @@ func (f *Invocation) EventuallyBackupSnapshot(backend api.Backend) GomegaAsyncAs
 
 		bucket, prefix, err := backend.GetBucketAndPrefix()
 		Expect(err).NotTo(HaveOccurred())
-		prefix = prefix + "/"
+		if backend.Local == nil{
+			prefix = prefix + "/"
+		}
 
 		container, err := loc.Container(bucket)
 		Expect(err).NotTo(HaveOccurred())

@@ -55,6 +55,7 @@ var _ = BeforeSuite(func() {
 
 	By("Waiting for API server to be ready")
 	root.EventuallyAPIServerReady().Should(Succeed())
+	time.Sleep(time.Second*5)
 })
 
 var _ = AfterSuite(func() {
