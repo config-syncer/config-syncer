@@ -16,7 +16,7 @@ const (
 func (fi *Invocation) Deployment() *apps.Deployment {
 	return &apps.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      rand.WithUniqSuffix("stash"),
+			Name:      rand.WithUniqSuffix("busybox"),
 			Namespace: fi.namespace,
 			Labels: map[string]string{
 				"app": fi.app,

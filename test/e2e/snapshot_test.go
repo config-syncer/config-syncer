@@ -2,22 +2,19 @@ package e2e
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net"
 	"os"
+	"path/filepath"
 	"strconv"
-	"time"
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/test/framework"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	apps "k8s.io/api/apps/v1beta1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apps "k8s.io/api/apps/v1beta1"
-)
-
-const (
-	TEST_LOCAL_BACKUP_DIR = "/tmp/kubed/snapshot"
 )
 
 var _ = Describe("Snapshotter", func() {
@@ -27,7 +24,7 @@ var _ = Describe("Snapshotter", func() {
 		stopCh        chan struct{}
 		clusterConfig api.ClusterConfig
 		backend       *api.Backend
-		deployment	*apps.Deployment
+		deployment    *apps.Deployment
 	)
 
 	BeforeEach(func() {
@@ -96,14 +93,14 @@ var _ = Describe("Snapshotter", func() {
 
 		Context(`"Local" backend`, func() {
 			AfterEach(func() {
-				os.RemoveAll(TEST_LOCAL_BACKUP_DIR)
+				os.RemoveAll(framework.TEST_LOCAL_BACKUP_DIR)
 			})
 
 			BeforeEach(func() {
-				err:=os.MkdirAll(TEST_LOCAL_BACKUP_DIR,0777)
+				err := os.MkdirAll(framework.TEST_LOCAL_BACKUP_DIR, 0777)
 				Expect(err).NotTo(HaveOccurred())
 
-				backend = framework.NewLocalBackend(TEST_LOCAL_BACKUP_DIR)
+				backend = framework.NewLocalBackend(framework.TEST_LOCAL_BACKUP_DIR)
 				clusterConfig = framework.SnapshotClusterConfig(backend)
 			})
 
@@ -114,25 +111,46 @@ var _ = Describe("Snapshotter", func() {
 	Describe("Sanitize backed up object", func() {
 		Context(`"Local" backend`, func() {
 			AfterEach(func() {
-				os.RemoveAll(TEST_LOCAL_BACKUP_DIR)
+				os.RemoveAll(framework.TEST_LOCAL_BACKUP_DIR)
 				f.DeleteDeployment(deployment.ObjectMeta)
 			})
 
 			BeforeEach(func() {
-				err:=os.MkdirAll(TEST_LOCAL_BACKUP_DIR,0777)
+				err := os.MkdirAll(framework.TEST_LOCAL_BACKUP_DIR, 0777)
 				Expect(err).NotTo(HaveOccurred())
 
-				backend = framework.NewLocalBackend(TEST_LOCAL_BACKUP_DIR)
+				backend = framework.NewLocalBackend(framework.TEST_LOCAL_BACKUP_DIR)
 				clusterConfig = framework.SnapshotClusterConfig(backend)
 
 				deployment = f.Deployment()
-				f.CreateDeployment(*deployment)
+				_, err = f.CreateDeployment(*deployment)
+				Expect(err).NotTo(HaveOccurred())
 				f.WaitUntilDeploymentReady(deployment.ObjectMeta)
 			})
 
-			FIt(`should sanitize backed up deployment`, func() {
+			It(`should sanitize backed up deployment`, func() {
 				shouldTakeClusterSnapshot()
-				time.Sleep(time.Minute*1)
+
+				By("Listing backed up snapshots")
+				files, err := ioutil.ReadDir(framework.TEST_LOCAL_BACKUP_DIR)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(files).NotTo(BeEmpty())
+
+				By("Exrtacting snapshot tarball")
+				file, err := os.Open(filepath.Join(framework.TEST_LOCAL_BACKUP_DIR, files[0].Name()))
+				Expect(err).NotTo(HaveOccurred())
+				defer file.Close()
+				err = framework.Untar(framework.TEST_LOCAL_BACKUP_DIR, file)
+				Expect(err).NotTo(HaveOccurred())
+
+				By("Reading deployment's yaml from backed up snapshot")
+				dpl, err := framework.ReadYaml(deployment.Name + ".yaml")
+				Expect(err).NotTo(HaveOccurred())
+
+				By("Checking deployment snapshot is sanitized")
+				err = framework.DeploymentSnapshotSanitized(dpl)
+				Expect(err).NotTo(HaveOccurred())
+
 			})
 		})
 	})
