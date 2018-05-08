@@ -46,18 +46,13 @@ var _ = Describe("Snapshotter", func() {
 			Expect(err).NotTo(HaveOccurred())
 		}
 
-		operatorConfig := f.NewTestOperatorConfig()
-		f.KubedServer.Operator, err = operatorConfig.New()
-		Expect(err).NotTo(HaveOccurred())
-
-		f.KubedServer.Operator.ClusterConfig = clusterConfig
-		f.KubedServer.Operator.OperatorNamespace = f.Namespace()
-
 		err = f.CreateBucketIfNotExist(clusterConfig.Snapshotter.Backend)
 		Expect(err).NotTo(HaveOccurred())
 
+		By("Starting Operator")
 		stopCh = make(chan struct{})
-		go f.KubedServer.Operator.Run(stopCh, true)
+		err = f.RunOperator(stopCh, clusterConfig)
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	shouldTakeClusterSnapshot := func() {
@@ -85,7 +80,7 @@ var _ = Describe("Snapshotter", func() {
 				cred = f.SecretForMinioBackend(true)
 
 				backend = framework.NewMinioBackend("kubed-test", "demo", minioEndpoint, cred.Name)
-				clusterConfig = framework.SnapshotClusterConfig(backend)
+				clusterConfig = framework.SnapshotterClusterConfig(backend)
 			})
 
 			It(`should backup cluster Snapshot`, shouldTakeClusterSnapshot)
@@ -101,7 +96,7 @@ var _ = Describe("Snapshotter", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				backend = framework.NewLocalBackend(framework.TEST_LOCAL_BACKUP_DIR)
-				clusterConfig = framework.SnapshotClusterConfig(backend)
+				clusterConfig = framework.SnapshotterClusterConfig(backend)
 			})
 
 			It(`should backup cluster Snapshot`, shouldTakeClusterSnapshot)
@@ -120,7 +115,7 @@ var _ = Describe("Snapshotter", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				backend = framework.NewLocalBackend(framework.TEST_LOCAL_BACKUP_DIR)
-				clusterConfig = framework.SnapshotClusterConfig(backend)
+				clusterConfig = framework.SnapshotterClusterConfig(backend)
 
 				deployment = f.Deployment()
 				_, err = f.CreateDeployment(*deployment)

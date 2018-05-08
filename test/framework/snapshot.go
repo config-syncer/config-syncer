@@ -2,12 +2,11 @@ package framework
 
 import (
 	"archive/tar"
+	"compress/gzip"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	"compress/gzip"
 
 	"github.com/appscode/go/encoding/yaml"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"

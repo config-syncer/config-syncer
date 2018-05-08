@@ -77,6 +77,23 @@ func (f *Framework) NewTestOperatorConfig() *operator.OperatorConfig {
 		PromClient:        f.KubedServer.Operator.PromClient,
 	}
 }
+
+func (f *Framework) RunOperator(stopCh chan struct{}, clusterConfig api.ClusterConfig) error {
+	var err error
+	operatorConfig := f.NewTestOperatorConfig()
+	f.KubedServer.Operator, err = operatorConfig.New()
+	if err != nil {
+		return err
+	}
+
+	f.KubedServer.Operator.ClusterConfig = clusterConfig
+	f.KubedServer.Operator.OperatorNamespace = f.Namespace()
+
+	go f.KubedServer.Operator.Run(stopCh, true)
+
+	return nil
+}
+
 func (f *Framework) NewTestKubedServer() (*srvr.KubedServer, error) {
 	kubedOptions := f.NewTestKubedOptions()
 

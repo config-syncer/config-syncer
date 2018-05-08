@@ -1,7 +1,8 @@
 package e2e
 
 import (
-	"github.com/appscode/go/crypto/rand"
+	"os"
+
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/test/framework"
 	core_util "github.com/appscode/kutil/core/v1"
@@ -15,44 +16,29 @@ import (
 
 var _ = Describe("Config-syncer", func() {
 	var (
-		f               *framework.Invocation
-		cfgMap          *core.ConfigMap
-		nsWithLabel     *core.Namespace
-		numOfNamespaces = func() int {
-			ns, err := f.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
-			Expect(err).NotTo(HaveOccurred())
-			return len(ns.Items)
-		}
+		f             *framework.Invocation
+		cfgMap        *core.ConfigMap
+		nsWithLabel   *core.Namespace
+		stopCh        chan struct{}
+		clusterConfig api.ClusterConfig
 	)
 
 	BeforeEach(func() {
 		f = root.Invoke()
+		cfgMap = f.NewConfigMap()
+		nsWithLabel = f.NewNamespaceWithLabel()
+	})
 
-		cfgMap = &core.ConfigMap{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      f.App(),
-				Namespace: f.Namespace(),
-				Labels: map[string]string{
-					"app": f.App(),
-				},
-			},
-			Data: map[string]string{
-				"you":   "only",
-				"leave": "once",
-			},
-		}
-
-		nsWithLabel = &core.Namespace{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: rand.WithUniqSuffix("kubed-e2e-labeled"),
-				Labels: map[string]string{
-					"app": f.App(),
-				},
-			},
-		}
+	JustBeforeEach(func() {
+		clusterConfig = framework.ConfigMapSyncClusterConfig()
+		By("Starting Operator")
+		stopCh = make(chan struct{})
+		err := f.RunOperator(stopCh, clusterConfig)
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
+		close(stopCh)
 		f.DeleteAllConfigmaps()
 
 		err := f.KubeClient.CoreV1().Namespaces().Delete(nsWithLabel.Name, &metav1.DeleteOptions{})
@@ -64,10 +50,14 @@ var _ = Describe("Config-syncer", func() {
 	})
 
 	Describe("ConfigMap Syncer Test", func() {
+
 		It("Should add configmap to all namespaces", func() {
+
 			By("Creating configmap")
-			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
+			c, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
 			Expect(err).NotTo(HaveOccurred())
+
+			By("Checking configmap has not sync. yet")
 			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
@@ -77,29 +67,42 @@ var _ = Describe("Config-syncer", func() {
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Checking configmap has synced to all namespaces")
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 
 			By("Creating new namespace")
-			_, err = root.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
+			_, err = f.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Checking new namespace has the configmap")
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
+			c, err = f.KubeClient.CoreV1().ConfigMaps(nsWithLabel.Name).Get(cfgMap.Name, metav1.GetOptions{})
+			Expect(err).NotTo(HaveOccurred())
 
 			By("Removing sync annotation")
+			c, err = f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(cfgMap.Name, metav1.GetOptions{})
 			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
 				obj.Annotations = meta.RemoveKey(obj.Annotations, api.ConfigSyncKey)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
+
+			By("Checking synced configmaps are deleted")
 			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 		})
 	})
 
 	Describe("ConfigMap Syncer Backward Compatibility Test", func() {
+
 		It("Should add configmap to all namespaces", func() {
+
 			By("Creating configmap")
-			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
+			c, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
 			Expect(err).NotTo(HaveOccurred())
+
+			By("Checking configmap has not synced yet")
 			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
@@ -109,15 +112,21 @@ var _ = Describe("Config-syncer", func() {
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Checking configmap has synced to all namespaces")
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 		})
 	})
 
 	Describe("ConfigMap Syncer With Namespace Selector", func() {
+
 		It("Should add configmap to selected namespaces", func() {
+
 			By("Creating configmap")
-			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
+			c, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
 			Expect(err).NotTo(HaveOccurred())
+
+			By("Checking configmap has not synced yet")
 			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
@@ -127,7 +136,9 @@ var _ = Describe("Config-syncer", func() {
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Checking configmap has synced to all namespaces")
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 
 			By("Adding selector annotation")
 			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
@@ -135,12 +146,16 @@ var _ = Describe("Config-syncer", func() {
 				return obj
 			})
 			Expect(err).NotTo(HaveOccurred())
+
+			By("Checking configmap has not synced to other namespaces")
 			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Creating new namespace with label")
-			_, err = root.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
+			_, err = f.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
 			Expect(err).ShouldNot(HaveOccurred())
+
+			By("Checking configmap is added to only new namespace")
 			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfConfigmaps(nsWithLabel.Name).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 2))
@@ -151,6 +166,8 @@ var _ = Describe("Config-syncer", func() {
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
+
+			By("Checking config map not synced to other namespaces")
 			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
@@ -160,16 +177,22 @@ var _ = Describe("Config-syncer", func() {
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
+
+			By("Checking configmap synced to all namespaces")
 			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
-			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 		})
 	})
 
 	Describe("ConfigMap Syncer Source Deleted", func() {
+
 		It("Should delete synced configmaps from namespaces", func() {
+
 			By("Creating configmap")
-			c, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
+			c, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
 			Expect(err).NotTo(HaveOccurred())
+
+			By("Checking configmap has not synced yet")
 			f.EventuallyNumOfConfigmaps(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
@@ -179,16 +202,22 @@ var _ = Describe("Config-syncer", func() {
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Checking configmap synced to all namespaces")
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 
 			By("Creating new namespace")
-			_, err = root.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
+			_, err = f.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Checking configmap added to new namespaces")
+			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 
 			By("Deleting source configmap")
 			err = f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Delete(cfgMap.Name, &metav1.DeleteOptions{})
 			Expect(err).ShouldNot(HaveOccurred())
+
+			By("Checking synced configmaps has deleted")
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 0))
 		})
 	})
@@ -200,6 +229,9 @@ var _ = Describe("Config-syncer", func() {
 		)
 
 		BeforeEach(func() {
+			if _, err := os.Stat(kubeConfigPath); err != nil {
+				Skip(`"config" file not found on` + kubeConfigPath)
+			}
 			By("Creating namespace for context")
 			f.EnsureNamespaceForContext(kubeConfigPath, context)
 		})
@@ -214,7 +246,7 @@ var _ = Describe("Config-syncer", func() {
 			f.EnsureNamespaceForContext(kubeConfigPath, context)
 
 			By("Creating configmap")
-			cfgMap, err := root.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
+			cfgMap, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Adding sync annotation")
