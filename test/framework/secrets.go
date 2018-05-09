@@ -12,6 +12,22 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+func (f *Invocation) NewSecret() *core.Secret {
+	return &core.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      f.App(),
+			Namespace: f.Namespace(),
+			Labels: map[string]string{
+				"app": f.App(),
+			},
+		},
+		StringData: map[string]string{
+			"you":   "only",
+			"leave": "once",
+		},
+	}
+}
+
 func (f *Invocation) EventuallyNumOfSecrets(namespace string) GomegaAsyncAssertion {
 	return f.EventuallyNumOfSecretsForClient(f.KubeClient, namespace)
 }

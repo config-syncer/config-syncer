@@ -30,7 +30,6 @@ var _ = Describe("Config-syncer", func() {
 	})
 
 	JustBeforeEach(func() {
-		clusterConfig = framework.ConfigMapSyncClusterConfig()
 		By("Starting Operator")
 		stopCh = make(chan struct{})
 		err := f.RunOperator(stopCh, clusterConfig)
@@ -50,6 +49,9 @@ var _ = Describe("Config-syncer", func() {
 	})
 
 	Describe("ConfigMap Syncer Test", func() {
+		BeforeEach(func() {
+			clusterConfig = framework.ConfigMapSyncClusterConfig()
+		})
 
 		It("Should add configmap to all namespaces", func() {
 
@@ -77,11 +79,12 @@ var _ = Describe("Config-syncer", func() {
 
 			By("Checking new namespace has the configmap")
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
-			c, err = f.KubeClient.CoreV1().ConfigMaps(nsWithLabel.Name).Get(cfgMap.Name, metav1.GetOptions{})
+			_, err = f.KubeClient.CoreV1().ConfigMaps(nsWithLabel.Name).Get(cfgMap.Name, metav1.GetOptions{})
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Removing sync annotation")
 			c, err = f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(cfgMap.Name, metav1.GetOptions{})
+			Expect(err).NotTo(HaveOccurred())
 			c, _, err = core_util.PatchConfigMap(f.KubeClient, c, func(obj *core.ConfigMap) *core.ConfigMap {
 				obj.Annotations = meta.RemoveKey(obj.Annotations, api.ConfigSyncKey)
 				return obj
@@ -95,6 +98,10 @@ var _ = Describe("Config-syncer", func() {
 	})
 
 	Describe("ConfigMap Syncer Backward Compatibility Test", func() {
+
+		BeforeEach(func() {
+			clusterConfig = framework.ConfigMapSyncClusterConfig()
+		})
 
 		It("Should add configmap to all namespaces", func() {
 
@@ -119,6 +126,10 @@ var _ = Describe("Config-syncer", func() {
 	})
 
 	Describe("ConfigMap Syncer With Namespace Selector", func() {
+
+		BeforeEach(func() {
+			clusterConfig = framework.ConfigMapSyncClusterConfig()
+		})
 
 		It("Should add configmap to selected namespaces", func() {
 
@@ -186,6 +197,10 @@ var _ = Describe("Config-syncer", func() {
 
 	Describe("ConfigMap Syncer Source Deleted", func() {
 
+		BeforeEach(func() {
+			clusterConfig = framework.ConfigMapSyncClusterConfig()
+		})
+
 		It("Should delete synced configmaps from namespaces", func() {
 
 			By("Creating configmap")
@@ -229,9 +244,14 @@ var _ = Describe("Config-syncer", func() {
 		)
 
 		BeforeEach(func() {
+			clusterConfig = framework.ConfigMapSyncClusterConfig()
+			clusterConfig.ClusterName = "minikube"
+			clusterConfig.KubeConfigFile = kubeConfigPath
+
 			if _, err := os.Stat(kubeConfigPath); err != nil {
 				Skip(`"config" file not found on` + kubeConfigPath)
 			}
+
 			By("Creating namespace for context")
 			f.EnsureNamespaceForContext(kubeConfigPath, context)
 		})

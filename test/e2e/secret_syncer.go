@@ -1,7 +1,8 @@
 package e2e
 
 import (
-	"github.com/appscode/go/crypto/rand"
+	"os"
+
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/test/framework"
 	core_util "github.com/appscode/kutil/core/v1"
@@ -15,44 +16,28 @@ import (
 
 var _ = Describe("Secret-syncer", func() {
 	var (
-		f               *framework.Invocation
-		secret          *core.Secret
-		nsWithLabel     *core.Namespace
-		numOfNamespaces = func() int {
-			ns, err := f.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
-			Expect(err).NotTo(HaveOccurred())
-			return len(ns.Items)
-		}
+		f             *framework.Invocation
+		secret        *core.Secret
+		nsWithLabel   *core.Namespace
+		stopCh        chan struct{}
+		clusterConfig api.ClusterConfig
 	)
 
 	BeforeEach(func() {
 		f = root.Invoke()
+		secret = f.NewSecret()
+		nsWithLabel = f.NewNamespaceWithLabel()
+	})
 
-		secret = &core.Secret{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      f.App(),
-				Namespace: f.Namespace(),
-				Labels: map[string]string{
-					"app": f.App(),
-				},
-			},
-			StringData: map[string]string{
-				"you":   "only",
-				"leave": "once",
-			},
-		}
-
-		nsWithLabel = &core.Namespace{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: rand.WithUniqSuffix("kubed-e2e-labeled"),
-				Labels: map[string]string{
-					"app": f.App(),
-				},
-			},
-		}
+	JustBeforeEach(func() {
+		By("Starting Operator")
+		stopCh = make(chan struct{})
+		err := f.RunOperator(stopCh, clusterConfig)
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
+		close(stopCh)
 		f.DeleteAllSecrets()
 
 		err := f.KubeClient.CoreV1().Namespaces().Delete(nsWithLabel.Name, &metav1.DeleteOptions{})
@@ -64,131 +49,191 @@ var _ = Describe("Secret-syncer", func() {
 	})
 
 	Describe("Secret Syncer Test", func() {
+
+		BeforeEach(func() {
+			clusterConfig = framework.ConfigMapSyncClusterConfig()
+		})
+
 		It("Should add secret to all namespaces", func() {
+
 			By("Creating secret")
-			c, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
+			s, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
 			Expect(err).NotTo(HaveOccurred())
+
+			By("Checking secret has not synced yet")
 			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Adding sync annotation")
-			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			s, _, err = core_util.PatchSecret(f.KubeClient, s, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "true")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Checking secret has synced to all namespaces")
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 
 			By("Creating new namespace")
 			_, err = root.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Checking secret has been added to new namespace")
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
+			_, err = f.KubeClient.CoreV1().Secrets(secret.Namespace).Get(secret.Name, metav1.GetOptions{})
+			Expect(err).NotTo(HaveOccurred())
 
 			By("Removing sync annotation")
-			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			s, err = f.KubeClient.CoreV1().Secrets(secret.Namespace).Get(secret.Name, metav1.GetOptions{})
+			Expect(err).NotTo(HaveOccurred())
+			s, _, err = core_util.PatchSecret(f.KubeClient, s, func(obj *core.Secret) *core.Secret {
 				obj.Annotations = meta.RemoveKey(obj.Annotations, api.ConfigSyncKey)
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
+
+			By("Checking secret has removed from other namespaces")
 			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 		})
 	})
 
-	Describe("Secret Syncer Test Backward Compatibility Tes", func() {
+	Describe("Secret Syncer Backward Compatibility Test", func() {
+
+		BeforeEach(func() {
+			clusterConfig = framework.ConfigMapSyncClusterConfig()
+		})
+
 		It("Should add secret to all namespaces", func() {
+
 			By("Creating secret")
-			c, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
+			s, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
 			Expect(err).NotTo(HaveOccurred())
+
+			By("Checking secret has not synced yet")
 			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Adding sync annotation")
-			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			s, _, err = core_util.PatchSecret(f.KubeClient, s, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "true")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Checking secret has synced to all namespaces")
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 		})
 	})
 
 	Describe("Secret Syncer With Namespace Selector", func() {
+
+		BeforeEach(func() {
+			clusterConfig = framework.ConfigMapSyncClusterConfig()
+		})
+
 		It("Should add secret to selected namespaces", func() {
+
 			By("Creating secret")
-			c, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
+			s, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
 			Expect(err).NotTo(HaveOccurred())
+
+			By("Checking secret has not synced yet")
 			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Adding sync annotation")
-			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			s, _, err = core_util.PatchSecret(f.KubeClient, s, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "true")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Checking secret has synced to all namespaces")
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 
 			By("Adding selector annotation")
-			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			s, _, err = core_util.PatchSecret(f.KubeClient, s, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "app="+f.App())
 				return obj
 			})
 			Expect(err).NotTo(HaveOccurred())
+
+			By("Checking secret has removed from no-matching namespaces")
 			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
-			By("Creating new namespace with label")
+			By("Creating new namespace with matching label")
 			_, err = root.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
 			Expect(err).ShouldNot(HaveOccurred())
+
+			By("Checking secret has added to new namespace")
 			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfSecrets(nsWithLabel.Name).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 2))
 
 			By("Changing selector annotation")
-			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			s, _, err = core_util.PatchSecret(f.KubeClient, s, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "app=do-not-match")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
+
+			By("Checking secret has removed from no-matching namespaces")
 			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Removing selector annotation")
-			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			s, _, err = core_util.PatchSecret(f.KubeClient, s, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
+
+			By("Checking secret has synced to all namespaces")
 			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
-			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 		})
 	})
 
 	Describe("Secret Syncer Source Deleted", func() {
+
+		BeforeEach(func() {
+			clusterConfig = framework.ConfigMapSyncClusterConfig()
+		})
+
 		It("Should delete synced secrets from namespaces", func() {
+
 			By("Creating secret")
-			c, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
+			s, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
 			Expect(err).NotTo(HaveOccurred())
+
+			By("Checkin secret has not synced yet")
 			f.EventuallyNumOfSecrets(f.Namespace()).Should(BeNumerically("==", 1))
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Adding sync annotation")
-			c, _, err = core_util.PatchSecret(f.KubeClient, c, func(obj *core.Secret) *core.Secret {
+			s, _, err = core_util.PatchSecret(f.KubeClient, s, func(obj *core.Secret) *core.Secret {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Checking secret has synced to all namespaces")
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 
 			By("Creating new namespace")
 			_, err = root.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
 			Expect(err).ShouldNot(HaveOccurred())
-			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", numOfNamespaces()))
+
+			By("Checking secret has synced to new namespace")
+			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 
 			By("Deleting source secret")
 			err = f.KubeClient.CoreV1().Secrets(secret.Namespace).Delete(secret.Name, &metav1.DeleteOptions{})
 			Expect(err).ShouldNot(HaveOccurred())
+
+			By("Checking secret has removed from all namespaces")
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 0))
 		})
 	})
@@ -200,6 +245,14 @@ var _ = Describe("Secret-syncer", func() {
 		)
 
 		BeforeEach(func() {
+			clusterConfig = framework.ConfigMapSyncClusterConfig()
+			clusterConfig.ClusterName = "minikube"
+			clusterConfig.KubeConfigFile = kubeConfigPath
+
+			if _, err := os.Stat(kubeConfigPath); err != nil {
+				Skip(`"config" file not found on` + kubeConfigPath)
+			}
+
 			By("Creating namespace for context")
 			f.EnsureNamespaceForContext(kubeConfigPath, context)
 		})
@@ -210,6 +263,7 @@ var _ = Describe("Secret-syncer", func() {
 		})
 
 		It("Should add secret to contexts", func() {
+
 			By("Creating source ns in remote cluster")
 			f.EnsureNamespaceForContext(kubeConfigPath, context)
 
