@@ -1,2 +1,2 @@
 clusterName: minikube
-enableConfigSyncer: true
+enableConfigSyncer: false

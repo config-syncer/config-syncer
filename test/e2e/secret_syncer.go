@@ -46,6 +46,9 @@ var _ = Describe("Secret-syncer", func() {
 		}
 		Expect(err).NotTo(HaveOccurred())
 		f.EventuallyNamespaceDeleted(nsWithLabel.Name).Should(BeTrue())
+
+		err = framework.ResetTestConfigFile()
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	Describe("Secret Syncer Test", func() {

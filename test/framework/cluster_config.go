@@ -19,3 +19,52 @@ func ConfigMapSyncClusterConfig() api.ClusterConfig {
 		EnableConfigSyncer: true,
 	}
 }
+
+func (f *Invocation) EventForwarderClusterConfig() api.ClusterConfig {
+	return api.ClusterConfig{
+		EventForwarder: &api.EventForwarderSpec{
+			Rules: []api.PolicyRule{
+				{
+					Operations: []api.Operation{api.Create},
+					Namespaces: []string{f.namespace},
+					Resources: []api.GroupResources{
+						{
+							Group: "",
+							Resources: []string{
+								"events",
+							},
+						},
+					},
+				},
+				{
+					Operations: []api.Operation{api.Create},
+					Namespaces: []string{f.namespace},
+					Resources: []api.GroupResources{
+						{
+							Group: "",
+							Resources: []string{
+								"persistentvolumeclaims",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func WebhookReceiver() []api.Receiver {
+	return []api.Receiver{
+		{
+			To:       []string{"ops-alerts"},
+			Notifier: "Webhook",
+		},
+	}
+}
+
+func ResetTestConfigFile() error {
+	defaultClusterConfig := api.ClusterConfig{
+		ClusterName: "minikube",
+	}
+	return defaultClusterConfig.Save(KubedTestConfigFileDir)
+}

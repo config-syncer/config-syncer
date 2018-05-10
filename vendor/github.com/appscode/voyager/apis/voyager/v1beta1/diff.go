@@ -4,6 +4,7 @@ import (
 	"crypto/x509"
 	"net"
 	"reflect"
+	"sort"
 	"strings"
 	"time"
 
@@ -226,7 +227,7 @@ func (c Certificate) ShouldRenew(crt *x509.Certificate) bool {
 func (c Certificate) IsRateLimited() bool {
 	for _, cond := range c.Status.Conditions {
 		if cond.Type == CertificateRateLimited {
-			return time.Now().Add(-24 * time.Hour).Before(cond.LastUpdateTime.Time)
+			return time.Now().Add(-65 * time.Minute).Before(cond.LastUpdateTime.Time)
 		}
 	}
 	return false
@@ -265,4 +266,13 @@ func (r IngressRule) GetHost() string {
 		return ``
 	}
 	return host
+}
+
+func (r TCPIngressRuleValue) ParseALPNOptions() string {
+	opt := append([]string{}, r.ALPN...) // copy slice, don't modify the input
+	if len(opt) <= 0 {
+		return ""
+	}
+	sort.Strings(opt)
+	return "alpn " + strings.Join(opt, ",")
 }

@@ -33,6 +33,12 @@ var _ = Describe("Snapshotter", func() {
 
 	AfterEach(func() {
 		close(stopCh)
+
+		err := framework.ResetTestConfigFile()
+		Expect(err).NotTo(HaveOccurred())
+
+		err = f.WaitUntilSecretDeleted(cred.ObjectMeta)
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	JustBeforeEach(func() {

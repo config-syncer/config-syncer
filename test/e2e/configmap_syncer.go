@@ -46,6 +46,9 @@ var _ = Describe("Config-syncer", func() {
 		}
 		Expect(err).NotTo(HaveOccurred())
 		f.EventuallyNamespaceDeleted(nsWithLabel.Name).Should(BeTrue())
+
+		err = framework.ResetTestConfigFile()
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	Describe("ConfigMap Syncer Test", func() {

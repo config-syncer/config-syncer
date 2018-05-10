@@ -101,3 +101,19 @@ func (fi *Invocation) SecretForMinioBackend(includeCert bool) core.Secret {
 
 	return secret
 }
+
+func (fi *Invocation) SecretForWebhookNotifier() *core.Secret {
+	return &core.Secret{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Secret",
+			APIVersion: metav1.SchemeGroupVersion.String(),
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "notifier-config",
+			Namespace: fi.namespace,
+		},
+		Data: map[string][]byte{
+			"WEBHOOK_URL": []byte("http://localhost:8181"),
+		},
+	}
+}

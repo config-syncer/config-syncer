@@ -491,7 +491,7 @@ func (op *Operator) RunTrashCanCleaner() error {
 	})
 }
 
-func (op *Operator) RunSnapshotter(testing bool) error {
+func (op *Operator) RunSnapshotter() error {
 	if op.ClusterConfig.Snapshotter == nil {
 		return nil
 	}
@@ -536,7 +536,7 @@ func (op *Operator) RunSnapshotter(testing bool) error {
 		}
 	}()
 
-	if !testing {
+	if !op.Test { // don't run cronjob for test. it cause problem for consecutive tests.
 		return op.cron.AddFunc(op.ClusterConfig.Snapshotter.Schedule, func() {
 			err := snapshotter()
 			if err != nil {
@@ -547,7 +547,7 @@ func (op *Operator) RunSnapshotter(testing bool) error {
 	return nil
 }
 
-func (op *Operator) Run(stopCh <-chan struct{}, testing bool) {
+func (op *Operator) Run(stopCh <-chan struct{}) {
 	startOperator := true
 	for {
 		select {
@@ -564,7 +564,7 @@ func (op *Operator) Run(stopCh <-chan struct{}, testing bool) {
 					log.Fatalln(err.Error())
 				}
 
-				if err := op.RunSnapshotter(testing); err != nil {
+				if err := op.RunSnapshotter(); err != nil {
 					log.Fatalln(err.Error())
 				}
 
@@ -572,7 +572,7 @@ func (op *Operator) Run(stopCh <-chan struct{}, testing bool) {
 
 				go op.watcher.Run(stopCh)
 
-				if !testing {
+				if !op.Test { // don't run prometheus server for test. it can't be restarted for consecutive tests.
 					go func() {
 						m := pat.New()
 						m.Get("/metrics", promhttp.Handler())

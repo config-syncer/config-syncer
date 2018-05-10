@@ -66,7 +66,7 @@ func (f *Framework) NewTestKubedOperatorOptions() *server.OperatorOptions {
 }
 
 func (f *Framework) NewTestOperatorConfig() *operator.OperatorConfig {
-	return &operator.OperatorConfig{
+	ocfg := &operator.OperatorConfig{
 		Config:            f.KubedServer.Operator.Config,
 		ClientConfig:      f.KubedServer.Operator.ClientConfig,
 		KubeClient:        f.KubedServer.Operator.KubeClient,
@@ -76,20 +76,26 @@ func (f *Framework) NewTestOperatorConfig() *operator.OperatorConfig {
 		KubeDBClient:      f.KubedServer.Operator.KubeDBClient,
 		PromClient:        f.KubedServer.Operator.PromClient,
 	}
+	ocfg.Test = true
+	ocfg.ConfigPath = KubedTestConfigFileDir
+	return ocfg
 }
 
 func (f *Framework) RunOperator(stopCh chan struct{}, clusterConfig api.ClusterConfig) error {
 	var err error
 	operatorConfig := f.NewTestOperatorConfig()
+	err = clusterConfig.Save(operatorConfig.ConfigPath)
+	if err != nil {
+		return err
+	}
+
+	operatorConfig.OperatorNamespace = f.Namespace()
 	f.KubedServer.Operator, err = operatorConfig.New()
 	if err != nil {
 		return err
 	}
 
-	f.KubedServer.Operator.ClusterConfig = clusterConfig
-	f.KubedServer.Operator.OperatorNamespace = f.Namespace()
-
-	go f.KubedServer.Operator.Run(stopCh, true)
+	go f.KubedServer.Operator.Run(stopCh)
 
 	return nil
 }
