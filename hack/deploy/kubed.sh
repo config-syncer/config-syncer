@@ -101,7 +101,7 @@ if [ "$APPSCODE_ENV" = "dev" ]; then
     detect_tag
     export SCRIPT_LOCATION="cat "
     export KUBED_IMAGE_TAG=$TAG
-    export KUBED_IMAGE_PULL_POLICY=Always
+    export KUBED_IMAGE_PULL_POLICY=IfNotPresent
 fi
 
 show_help() {

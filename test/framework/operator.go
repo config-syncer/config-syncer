@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 	"time"
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
@@ -78,6 +79,7 @@ func (f *Framework) NewTestOperatorConfig() *operator.OperatorConfig {
 	}
 	ocfg.Test = true
 	ocfg.ConfigPath = KubedTestConfigFileDir
+	ocfg.ScratchDir = filepath.Dir(KubedTestConfigFileDir)
 	return ocfg
 }
 
@@ -225,4 +227,12 @@ func (f *Framework) EventuallyAPIServerReady() GomegaAsyncAssertion {
 		time.Minute*5,
 		time.Microsecond*10,
 	)
+}
+
+func (f *Framework) DeleteClusterRole(meta metav1.ObjectMeta) error {
+	return f.KubeClient.RbacV1().ClusterRoles().Delete(meta.Name, deleteInBackground())
+}
+
+func (f *Framework) DeleteClusterRoleBinding(meta metav1.ObjectMeta) error {
+	return f.KubeClient.RbacV1().ClusterRoleBindings().Delete(meta.Name, deleteInBackground())
 }
