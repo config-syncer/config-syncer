@@ -53,12 +53,6 @@ func (f *Invocation) EventForwarderClusterConfig() api.ClusterConfig {
 	}
 }
 
-func APIServerClusterConfig() api.ClusterConfig {
-	return api.ClusterConfig{
-		ClusterName: "minikube",
-	}
-}
-
 func WebhookReceiver() []api.Receiver {
 	return []api.Receiver{
 		{
