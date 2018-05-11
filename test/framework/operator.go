@@ -39,7 +39,7 @@ func (f *Framework) NewTestKubedServerOptions(kubeConfigPath string) *options.Re
 	return &options.RecommendedOptions{
 		Authentication: &options.DelegatingAuthenticationOptions{
 			RemoteKubeConfigFile: kubeConfigPath,
-			SkipInClusterLookup:  true,
+			//SkipInClusterLookup:  true,
 		},
 		Authorization: &options.DelegatingAuthorizationOptions{
 			RemoteKubeConfigFile: kubeConfigPath,
@@ -225,4 +225,12 @@ func (f *Framework) EventuallyAPIServerReady() GomegaAsyncAssertion {
 		time.Minute*5,
 		time.Microsecond*10,
 	)
+}
+
+func (f *Framework) DeleteClusterRole(meta metav1.ObjectMeta) error {
+	return f.KubeClient.RbacV1().ClusterRoles().Delete(meta.Name, deleteInBackground())
+}
+
+func (f *Framework) DeleteClusterRoleBinding(meta metav1.ObjectMeta) error {
+	return f.KubeClient.RbacV1().ClusterRoleBindings().Delete(meta.Name, deleteInBackground())
 }

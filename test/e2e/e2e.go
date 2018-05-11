@@ -2,7 +2,6 @@ package e2e
 
 import (
 	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -10,13 +9,16 @@ import (
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/reporters"
 	. "github.com/onsi/gomega"
+	rbac "k8s.io/api/rbac/v1"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 )
 
 const TestTimeout = 3 * time.Minute
 
 var (
-	root *framework.Framework
+	root            *framework.Framework
+	userRule        *rbac.ClusterRole
+	userRoleBinding *rbac.ClusterRoleBinding
 )
 
 func RunE2ETestSuit(t *testing.T) {
@@ -38,8 +40,8 @@ var _ = BeforeSuite(func() {
 	err = root.EnsureCreatedCRDs()
 	Expect(err).NotTo(HaveOccurred())
 
-	By("Creating kubed configuration file dir")
-	err = os.MkdirAll(filepath.Dir(framework.KubedTestConfigFileDir), 0755)
+	By("Creating initial kubed configuration file")
+	err = framework.APIServerClusterConfig().Save(framework.KubedTestConfigFileDir)
 	Expect(err).NotTo(HaveOccurred())
 
 	By("Registering API service")
@@ -48,6 +50,16 @@ var _ = BeforeSuite(func() {
 
 	root.KubedServer, err = root.NewTestKubedServer()
 	Expect(err).NotTo(HaveOccurred())
+
+	//By("Creating UserRole")
+	//userRule = root.CreateUserRole()
+	//_, err = root.KubeClient.RbacV1().ClusterRoles().Create(userRule)
+	//Expect(err).NotTo(HaveOccurred())
+
+	//By("Binding user role to " + framework.USER_ANONYMOUS)
+	//userRoleBinding = root.UserRoleBinding()
+	//_, err = root.KubeClient.RbacV1().ClusterRoleBindings().Create(userRoleBinding)
+	//Expect(err).NotTo(HaveOccurred())
 
 	By("Starting API server")
 	stopCh := genericapiserver.SetupSignalHandler()
@@ -61,7 +73,8 @@ var _ = BeforeSuite(func() {
 var _ = AfterSuite(func() {
 	By("Cleaning API service stuff")
 	root.Invoke().DeleteAPIService()
-
+	//root.DeleteClusterRole(userRule.ObjectMeta)
+	//root.DeleteClusterRoleBinding(userRoleBinding.ObjectMeta)
 	root.DeleteNamespace()
-	//os.RemoveAll(framework.KubedTestConfigFileDir)
+	os.Remove(framework.KubedTestConfigFileDir)
 })

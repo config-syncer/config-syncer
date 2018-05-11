@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/appscode/go/crypto/rand"
+	kcs "github.com/appscode/kubed/client/clientset/versioned"
 	"github.com/appscode/kubed/pkg/operator"
 	"github.com/appscode/kubed/pkg/server"
 	"github.com/appscode/kutil/tools/certstore"
@@ -13,7 +14,7 @@ import (
 	scs "github.com/appscode/stash/client/clientset/versioned"
 	vcs "github.com/appscode/voyager/client/clientset/versioned"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	kcs "github.com/kubedb/apimachinery/client/clientset/versioned"
+	kdbcs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
 	extensionsobj "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
@@ -36,6 +37,7 @@ const (
 type Framework struct {
 	KubeConfig    *rest.Config
 	KubeClient    clientset.Interface
+	KubedClient   kcs.Interface
 	KAClient      ka.Interface
 	crdClient     ecs.ApiextensionsV1beta1Interface
 	KubedOperator *operator.Operator
@@ -68,19 +70,20 @@ func New() *Framework {
 	Expect(err).NotTo(HaveOccurred())
 
 	return &Framework{
-		KubeConfig: config,
-		KubeClient: clientset.NewForConfigOrDie(config),
-		KAClient:   ka.NewForConfigOrDie(config),
-		crdClient:  crdClient,
-		namespace:  testConfigs.TestNamespace,
-		Config:     testConfigs,
-		CertStore:  store,
+		KubeConfig:  config,
+		KubeClient:  clientset.NewForConfigOrDie(config),
+		KubedClient: kcs.NewForConfigOrDie(config),
+		KAClient:    ka.NewForConfigOrDie(config),
+		crdClient:   crdClient,
+		namespace:   testConfigs.TestNamespace,
+		Config:      testConfigs,
+		CertStore:   store,
 		KubedOperator: &operator.Operator{
 			KubeClient:        clientset.NewForConfigOrDie(config),
 			StashClient:       scs.NewForConfigOrDie(config),
 			VoyagerClient:     vcs.NewForConfigOrDie(config),
 			SearchlightClient: sls.NewForConfigOrDie(config),
-			KubeDBClient:      kcs.NewForConfigOrDie(config),
+			KubeDBClient:      kdbcs.NewForConfigOrDie(config),
 			PromClient:        promClient,
 		},
 	}
