@@ -1,15 +1,14 @@
-package e2e
+package e2e_test
 
 import (
-	"os"
-	"path/filepath"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-	"github.com/appscode/kubed/test/framework"
+	"github.com/appscode/kubed/test/e2e/framework"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/the-redback/go-oneliners"
 	apps "k8s.io/api/apps/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"time"
 )
 
 var _ = Describe("API server", func() {
@@ -25,7 +24,6 @@ var _ = Describe("API server", func() {
 	})
 
 	JustBeforeEach(func() {
-		os.RemoveAll(filepath.Join(f.KubedOperator.ScratchDir,"indices"))
 		By("Starting Operator")
 		stopCh = make(chan struct{})
 		err := f.RunOperator(stopCh, clusterConfig)
@@ -39,7 +37,7 @@ var _ = Describe("API server", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	Describe("Search object", func() {
+	FDescribe("Search object", func() {
 
 		BeforeEach(func() {
 			By("Creating clusterConfiguration")
@@ -63,7 +61,7 @@ var _ = Describe("API server", func() {
 
 			It("SearchResult should have deployment", func() {
 
-				//time.Sleep(time.Minute*2)
+				time.Sleep(time.Minute*3)
 				By("Searching deployment by name")
 				result, err := f.KubedClient.KubedV1alpha1().SearchResults(deployment.Namespace).Get(deployment.Name, metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())

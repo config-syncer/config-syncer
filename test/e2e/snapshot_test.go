@@ -1,4 +1,4 @@
-package e2e
+package e2e_test
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-	"github.com/appscode/kubed/test/framework"
+	"github.com/appscode/kubed/test/e2e/framework"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	apps "k8s.io/api/apps/v1beta1"
@@ -37,8 +37,10 @@ var _ = Describe("Snapshotter", func() {
 		err := framework.ResetTestConfigFile()
 		Expect(err).NotTo(HaveOccurred())
 
-		err = f.WaitUntilSecretDeleted(cred.ObjectMeta)
-		Expect(err).NotTo(HaveOccurred())
+		if missing,_:=BeZero().Match(cred); !missing{
+			err = f.WaitUntilSecretDeleted(cred.ObjectMeta)
+			Expect(err).NotTo(HaveOccurred())
+		}
 	})
 
 	JustBeforeEach(func() {

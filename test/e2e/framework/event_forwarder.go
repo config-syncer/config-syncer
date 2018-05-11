@@ -18,6 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"github.com/appscode/go/log"
 )
 
 var (
@@ -44,7 +45,7 @@ func (f *Invocation) RunWebhookServer(stopCh <-chan os.Signal, requests *[]*http
 	go func() {
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			// Error starting or closing listener:
-			fmt.Println("ListenAndServe error. Reason: %v", err)
+			log.Errorln("ListenAndServe error. Reason: %v", err)
 		}
 	}()
 
@@ -138,6 +139,7 @@ func (f *Invocation) WaitUntilPodTerminated(meta metav1.ObjectMeta) error {
 }
 
 func (f *Invocation) WaitUntilSecretDeleted(meta metav1.ObjectMeta) error {
+	fmt.Println("deleting......",meta)
 	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
 		if _, err := f.KubeClient.CoreV1().Secrets(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err != nil {
 			if kerr.IsNotFound(err) {

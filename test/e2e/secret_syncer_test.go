@@ -1,10 +1,10 @@
-package e2e
+package e2e_test
 
 import (
 	"os"
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-	"github.com/appscode/kubed/test/framework"
+	"github.com/appscode/kubed/test/e2e/framework"
 	core_util "github.com/appscode/kutil/core/v1"
 	"github.com/appscode/kutil/meta"
 	. "github.com/onsi/ginkgo"
@@ -60,7 +60,7 @@ var _ = Describe("Secret-syncer", func() {
 		It("Should add secret to all namespaces", func() {
 
 			By("Creating secret")
-			s, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
+			s, err := f.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Checking secret has not synced yet")
@@ -78,7 +78,7 @@ var _ = Describe("Secret-syncer", func() {
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 
 			By("Creating new namespace")
-			_, err = root.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
+			_, err = f.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
 			Expect(err).ShouldNot(HaveOccurred())
 
 			By("Checking secret has been added to new namespace")
@@ -110,7 +110,7 @@ var _ = Describe("Secret-syncer", func() {
 		It("Should add secret to all namespaces", func() {
 
 			By("Creating secret")
-			s, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
+			s, err := f.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Checking secret has not synced yet")
@@ -138,7 +138,7 @@ var _ = Describe("Secret-syncer", func() {
 		It("Should add secret to selected namespaces", func() {
 
 			By("Creating secret")
-			s, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
+			s, err := f.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Checking secret has not synced yet")
@@ -167,7 +167,7 @@ var _ = Describe("Secret-syncer", func() {
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", 1))
 
 			By("Creating new namespace with matching label")
-			_, err = root.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
+			_, err = f.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
 			Expect(err).ShouldNot(HaveOccurred())
 
 			By("Checking secret has added to new namespace")
@@ -208,7 +208,7 @@ var _ = Describe("Secret-syncer", func() {
 		It("Should delete synced secrets from namespaces", func() {
 
 			By("Creating secret")
-			s, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
+			s, err := f.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Checkin secret has not synced yet")
@@ -226,7 +226,7 @@ var _ = Describe("Secret-syncer", func() {
 			f.EventuallyNumOfSecrets(metav1.NamespaceAll).Should(BeNumerically("==", f.NumberOfNameSpace()))
 
 			By("Creating new namespace")
-			_, err = root.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
+			_, err = f.KubeClient.CoreV1().Namespaces().Create(nsWithLabel)
 			Expect(err).ShouldNot(HaveOccurred())
 
 			By("Checking secret has synced to new namespace")
@@ -271,7 +271,7 @@ var _ = Describe("Secret-syncer", func() {
 			f.EnsureNamespaceForContext(kubeConfigPath, context)
 
 			By("Creating secret")
-			secret, err := root.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
+			secret, err := f.KubeClient.CoreV1().Secrets(secret.Namespace).Create(secret)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Adding sync annotation")

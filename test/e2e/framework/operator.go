@@ -26,9 +26,9 @@ var (
 	endpoints  *core.Endpoints
 )
 
-func (f *Framework) NewTestKubedOptions() *server.KubedOptions {
+func (f *Framework) NewTestKubedOptions(kubeConfigPath string) *server.KubedOptions {
 	return &server.KubedOptions{
-		RecommendedOptions: f.NewTestKubedServerOptions(f.Config.KubeConfig),
+		RecommendedOptions: f.NewTestKubedServerOptions(kubeConfigPath),
 		OperatorOptions:    f.NewTestKubedOperatorOptions(),
 		StdOut:             os.Stdout,
 		StdErr:             os.Stderr,
@@ -100,8 +100,8 @@ func (f *Framework) RunOperator(stopCh chan struct{}, clusterConfig api.ClusterC
 	return nil
 }
 
-func (f *Framework) NewTestKubedServer() (*srvr.KubedServer, error) {
-	kubedOptions := f.NewTestKubedOptions()
+func (f *Framework) NewTestKubedServer(kubeConfigPath string) (*srvr.KubedServer, error) {
+	kubedOptions := f.NewTestKubedOptions(kubeConfigPath)
 
 	config, err := kubedOptions.Config()
 	if err != nil {

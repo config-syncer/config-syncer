@@ -7,10 +7,10 @@ import (
 
 	"github.com/appscode/go/crypto/rand"
 	kcs "github.com/appscode/kubed/client/clientset/versioned"
-	"github.com/appscode/kubed/pkg/operator"
 	"github.com/appscode/kubed/pkg/server"
 	"github.com/appscode/kutil/tools/certstore"
 	sls "github.com/appscode/searchlight/client/clientset/versioned"
+	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
 	scs "github.com/appscode/stash/client/clientset/versioned"
 	vcs "github.com/appscode/voyager/client/clientset/versioned"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
@@ -22,7 +22,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	ka "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 )
 
@@ -35,32 +34,23 @@ const (
 )
 
 type Framework struct {
-	KubeConfig    *rest.Config
-	KubeClient    clientset.Interface
-	KubedClient   kcs.Interface
-	KAClient      ka.Interface
-	crdClient     ecs.ApiextensionsV1beta1Interface
-	KubedOperator *operator.Operator
-	Config        E2EConfig
-	namespace     string
-	Mutex         sync.Mutex
-	CertStore     *certstore.CertStore
-	KubedServer   *server.KubedServer
+	KubeClient        clientset.Interface
+	KubedClient       kcs.Interface
+	KAClient          ka.Interface
+	VoyagerClient     vcs.Interface
+	SearchlightClient srch_cs.Interface
+	StashClient       scs.Interface
+	KubeDBClient      kdbcs.Interface
+	PromClient        prom.MonitoringV1Interface
+	crdClient         ecs.ApiextensionsV1beta1Interface
+	namespace         string
+	Mutex             sync.Mutex
+	CertStore         *certstore.CertStore
+	KubedServer       *server.KubedServer
 }
 
-type Invocation struct {
-	*Framework
-	app string
-}
-
-func New() *Framework {
-	testConfigs.validate()
-
-	config, err := clientcmd.BuildConfigFromFlags(testConfigs.Master, testConfigs.KubeConfig)
-	Expect(err).NotTo(HaveOccurred())
+func New(config *rest.Config) *Framework {
 	promClient, err := prom.NewForConfig(&prom.DefaultCrdKinds, prom.Group, config)
-	Expect(err).NotTo(HaveOccurred())
-	crdClient, err := ecs.NewForConfig(config)
 	Expect(err).NotTo(HaveOccurred())
 
 	store, err := certstore.NewCertStore(afero.NewMemMapFs(), filepath.Join("", "pki"))
@@ -70,22 +60,18 @@ func New() *Framework {
 	Expect(err).NotTo(HaveOccurred())
 
 	return &Framework{
-		KubeConfig:  config,
-		KubeClient:  clientset.NewForConfigOrDie(config),
-		KubedClient: kcs.NewForConfigOrDie(config),
-		KAClient:    ka.NewForConfigOrDie(config),
-		crdClient:   crdClient,
-		namespace:   testConfigs.TestNamespace,
-		Config:      testConfigs,
-		CertStore:   store,
-		KubedOperator: &operator.Operator{
-			KubeClient:        clientset.NewForConfigOrDie(config),
-			StashClient:       scs.NewForConfigOrDie(config),
-			VoyagerClient:     vcs.NewForConfigOrDie(config),
-			SearchlightClient: sls.NewForConfigOrDie(config),
-			KubeDBClient:      kdbcs.NewForConfigOrDie(config),
-			PromClient:        promClient,
-		},
+		namespace: rand.WithUniqSuffix("test-kubed"),
+
+		KubeClient:        clientset.NewForConfigOrDie(config),
+		KAClient:          ka.NewForConfigOrDie(config),
+		KubedClient:       kcs.NewForConfigOrDie(config),
+		crdClient:         ecs.NewForConfigOrDie(config),
+		CertStore:         store,
+		StashClient:       scs.NewForConfigOrDie(config),
+		VoyagerClient:     vcs.NewForConfigOrDie(config),
+		SearchlightClient: sls.NewForConfigOrDie(config),
+		KubeDBClient:      kdbcs.NewForConfigOrDie(config),
+		PromClient:        promClient,
 	}
 }
 
@@ -100,9 +86,14 @@ func (f *Invocation) App() string {
 	return f.app
 }
 
+type Invocation struct {
+	*Framework
+	app string
+}
+
 func (f *Framework) EnsureCreatedCRDs() error {
-	_, pErr := f.KubedOperator.PromClient.Prometheuses(f.Config.TestNamespace).List(metav1.ListOptions{})
-	_, sErr := f.KubedOperator.PromClient.ServiceMonitors(f.Config.TestNamespace).List(metav1.ListOptions{})
+	_, pErr := f.PromClient.Prometheuses(f.namespace).List(metav1.ListOptions{})
+	_, sErr := f.PromClient.ServiceMonitors(f.namespace).List(metav1.ListOptions{})
 	if pErr == nil && sErr == nil {
 		return nil
 	}

@@ -1,10 +1,10 @@
-package e2e
+package e2e_test
 
 import (
 	"os"
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-	"github.com/appscode/kubed/test/framework"
+	"github.com/appscode/kubed/test/e2e/framework"
 	core_util "github.com/appscode/kutil/core/v1"
 	"github.com/appscode/kutil/meta"
 	. "github.com/onsi/ginkgo"
