@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/test/e2e/framework"
@@ -37,7 +38,7 @@ var _ = Describe("Snapshotter", func() {
 		err := framework.ResetTestConfigFile()
 		Expect(err).NotTo(HaveOccurred())
 
-		if missing,_:=BeZero().Match(cred); !missing{
+		if missing, _ := BeZero().Match(cred); !missing {
 			err = f.WaitUntilSecretDeleted(cred.ObjectMeta)
 			Expect(err).NotTo(HaveOccurred())
 		}
@@ -52,15 +53,21 @@ var _ = Describe("Snapshotter", func() {
 		if backend.Local == nil {
 			err := f.CreateSecret(cred)
 			Expect(err).NotTo(HaveOccurred())
+			err = f.WaitUntilSecretCreated(cred.ObjectMeta)
+			Expect(err).NotTo(HaveOccurred())
 		}
 
 		err = f.CreateBucketIfNotExist(clusterConfig.Snapshotter.Backend)
 		Expect(err).NotTo(HaveOccurred())
 
-		By("Starting Operator")
+		By("Starting Kubed")
 		stopCh = make(chan struct{})
-		err = f.RunOperator(stopCh, clusterConfig)
+		err = f.RunKubed(stopCh, clusterConfig)
 		Expect(err).NotTo(HaveOccurred())
+
+		By("Waiting for API server to be ready")
+		root.EventuallyAPIServerReady().Should(Succeed())
+		time.Sleep(time.Second * 5)
 	})
 
 	shouldTakeClusterSnapshot := func() {
@@ -71,6 +78,7 @@ var _ = Describe("Snapshotter", func() {
 		Context(`"Minio" backend`, func() {
 			AfterEach(func() {
 				f.DeleteMinioServer()
+				f.DeleteSecret(cred.ObjectMeta)
 			})
 
 			BeforeEach(func() {
@@ -105,6 +113,7 @@ var _ = Describe("Snapshotter", func() {
 
 				backend = framework.NewLocalBackend(framework.TEST_LOCAL_BACKUP_DIR)
 				clusterConfig = framework.SnapshotterClusterConfig(backend)
+				cred = core.Secret{}
 			})
 
 			It(`should backup cluster Snapshot`, shouldTakeClusterSnapshot)
@@ -124,6 +133,7 @@ var _ = Describe("Snapshotter", func() {
 
 				backend = framework.NewLocalBackend(framework.TEST_LOCAL_BACKUP_DIR)
 				clusterConfig = framework.SnapshotterClusterConfig(backend)
+				cred = core.Secret{}
 
 				deployment = f.Deployment()
 				_, err = f.CreateDeployment(*deployment)

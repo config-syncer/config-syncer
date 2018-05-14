@@ -1,14 +1,17 @@
 package e2e_test
 
 import (
+	"os"
+	"path/filepath"
+	"time"
+
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/test/e2e/framework"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/the-redback/go-oneliners"
+	. "github.com/appscode/kubed/test/e2e/matcher"
 	apps "k8s.io/api/apps/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"time"
 )
 
 var _ = Describe("API server", func() {
@@ -21,13 +24,18 @@ var _ = Describe("API server", func() {
 
 	BeforeEach(func() {
 		f = root.Invoke()
+		os.RemoveAll(filepath.Join("/tmp", "indices"))
 	})
 
 	JustBeforeEach(func() {
-		By("Starting Operator")
+		By("Starting Kubed")
 		stopCh = make(chan struct{})
-		err := f.RunOperator(stopCh, clusterConfig)
+		err := f.RunKubed(stopCh, clusterConfig)
 		Expect(err).NotTo(HaveOccurred())
+
+		By("Waiting for API server to be ready")
+		root.EventuallyAPIServerReady().Should(Succeed())
+		time.Sleep(time.Second * 5)
 	})
 
 	AfterEach(func() {
@@ -35,9 +43,11 @@ var _ = Describe("API server", func() {
 
 		err := framework.ResetTestConfigFile()
 		Expect(err).NotTo(HaveOccurred())
+
+		os.RemoveAll(filepath.Join("/tmp", "indices"))
 	})
 
-	FDescribe("Search object", func() {
+	Describe("Search object", func() {
 
 		BeforeEach(func() {
 			By("Creating clusterConfiguration")
@@ -48,9 +58,6 @@ var _ = Describe("API server", func() {
 
 			BeforeEach(func() {
 				deployment = f.Deployment()
-				By("Creating deployment: " + deployment.Name)
-				_, err := f.CreateDeployment(*deployment)
-				Expect(err).NotTo(HaveOccurred())
 			})
 
 			AfterEach(func() {
@@ -61,13 +68,23 @@ var _ = Describe("API server", func() {
 
 			It("SearchResult should have deployment", func() {
 
-				time.Sleep(time.Minute*3)
+				By("Creating deployment: " + deployment.Name)
+				_, err := f.CreateDeployment(*deployment)
+				Expect(err).NotTo(HaveOccurred())
+
+				// give some time for indexing
+				time.Sleep(time.Second * 30)
+
 				By("Searching deployment by name")
 				result, err := f.KubedClient.KubedV1alpha1().SearchResults(deployment.Namespace).Get(deployment.Name, metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())
-				oneliners.PrettyJson(result, "SearchResult")
+				Expect(result.Total).Should(BeNumerically(">", 0))
 
-				//TODO: do rest of the test
+				dp, err := f.KubeClient.AppsV1beta1().Deployments(deployment.Namespace).Get(deployment.Name, metav1.GetOptions{})
+				Expect(err).NotTo(HaveOccurred())
+
+				By("Checking search result returns the deployment")
+				Expect(result).Should(HaveObject(dp))
 			})
 		})
 	})

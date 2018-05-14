@@ -7,7 +7,6 @@ import (
 
 	"github.com/appscode/go/crypto/rand"
 	kcs "github.com/appscode/kubed/client/clientset/versioned"
-	"github.com/appscode/kubed/pkg/server"
 	"github.com/appscode/kutil/tools/certstore"
 	sls "github.com/appscode/searchlight/client/clientset/versioned"
 	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
@@ -46,7 +45,7 @@ type Framework struct {
 	namespace         string
 	Mutex             sync.Mutex
 	CertStore         *certstore.CertStore
-	KubedServer       *server.KubedServer
+	KubeConfigPath    string
 }
 
 func New(config *rest.Config) *Framework {

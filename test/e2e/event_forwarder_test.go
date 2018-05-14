@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"syscall"
+	"time"
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/test/e2e/framework"
@@ -33,10 +34,14 @@ var _ = Describe("Event-forwarder", func() {
 			Skip("Missing notifier secret")
 		}
 
-		By("Starting Operator")
+		By("Starting Kubed")
 		stopCh = make(chan struct{})
-		err := f.RunOperator(stopCh, clusterConfig)
+		err := f.RunKubed(stopCh, clusterConfig)
 		Expect(err).NotTo(HaveOccurred())
+
+		By("Waiting for API server to be ready")
+		root.EventuallyAPIServerReady().Should(Succeed())
+		time.Sleep(time.Second * 5)
 	})
 
 	AfterEach(func() {

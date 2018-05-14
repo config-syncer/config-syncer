@@ -17,11 +17,13 @@ import (
 const UID = "hipchat"
 
 type Options struct {
-	AuthToken          string   `envconfig:"AUTH_TOKEN" required:"true"`
-	To                 []string `envconfig:"TO"`
-	BaseURL            string   `envconfig:"BASE_URL"`
-	CACertData         string   `envconfig:"CA_CERT_DATA"`
-	InsecureSkipVerify bool     `envconfig:"INSECURE_SKIP_VERIFY"`
+	AuthToken          string        `envconfig:"AUTH_TOKEN" required:"true"`
+	To                 []string      `envconfig:"TO"`
+	BaseURL            string        `envconfig:"BASE_URL"`
+	CACertData         string        `envconfig:"CA_CERT_DATA"`
+	InsecureSkipVerify bool          `envconfig:"INSECURE_SKIP_VERIFY"`
+	Color              hipchat.Color `envconfig:"COLOR"`
+	Notify             bool          `envconfig:"NOTIFY"`
 }
 
 type client struct {
@@ -105,7 +107,11 @@ func (c *client) Send() error {
 	}
 
 	for _, room := range c.opt.To {
-		_, err := h.Room.Notification(room, &hipchat.NotificationRequest{Message: c.body})
+		_, err := h.Room.Notification(room, &hipchat.NotificationRequest{
+			Message: c.body,
+			Color:   c.opt.Color,
+			Notify:  c.opt.Notify,
+		})
 		if err != nil {
 			return err
 		}

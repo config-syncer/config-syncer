@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/appscode/go/crypto/rand"
+	"github.com/appscode/go/log"
 	"github.com/appscode/go/types"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
@@ -18,7 +19,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"github.com/appscode/go/log"
 )
 
 var (
@@ -128,20 +128,6 @@ func (f *Invocation) DeletePersistentVolumeClaim(meta metav1.ObjectMeta) error {
 func (f *Invocation) WaitUntilPodTerminated(meta metav1.ObjectMeta) error {
 	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
 		if _, err := f.KubeClient.CoreV1().Pods(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err != nil {
-			if kerr.IsNotFound(err) {
-				return true, nil
-			} else {
-				return true, err
-			}
-		}
-		return false, nil
-	})
-}
-
-func (f *Invocation) WaitUntilSecretDeleted(meta metav1.ObjectMeta) error {
-	fmt.Println("deleting......",meta)
-	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
-		if _, err := f.KubeClient.CoreV1().Secrets(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err != nil {
 			if kerr.IsNotFound(err) {
 				return true, nil
 			} else {

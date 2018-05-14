@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	logs "github.com/appscode/go/log/golog"
 	prom_util "github.com/appscode/kube-mon/prometheus/v1"
 	"github.com/appscode/kubed/test/e2e/framework"
 	"github.com/appscode/kutil/tools/clientcmd"
@@ -16,8 +17,6 @@ import (
 	"github.com/onsi/ginkgo/reporters"
 	. "github.com/onsi/gomega"
 	rbac "k8s.io/api/rbac/v1"
-	genericapiserver "k8s.io/apiserver/pkg/server"
-	logs "github.com/appscode/go/log/golog"
 	clientsetscheme "k8s.io/client-go/kubernetes/scheme"
 )
 
@@ -48,6 +47,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 
 	root = framework.New(clientConfig)
+	root.KubeConfigPath = options.KubeConfig
 
 	By("Using Namespace " + root.Namespace())
 	err = root.EnsureNamespace()
@@ -64,34 +64,11 @@ var _ = BeforeSuite(func() {
 	By("Registering API service")
 	err = root.Invoke().RegisterAPIService()
 	Expect(err).NotTo(HaveOccurred())
-
-	root.KubedServer, err = root.NewTestKubedServer(options.KubeConfig)
-	Expect(err).NotTo(HaveOccurred())
-
-	//By("Creating UserRole")
-	//userRule = root.CreateUserRole()
-	//_, err = root.KubeClient.RbacV1().ClusterRoles().Create(userRule)
-	//Expect(err).NotTo(HaveOccurred())
-
-	//By("Binding user role to " + framework.USER_ANONYMOUS)
-	//userRoleBinding = root.UserRoleBinding()
-	//_, err = root.KubeClient.RbacV1().ClusterRoleBindings().Create(userRoleBinding)
-	//Expect(err).NotTo(HaveOccurred())
-
-	By("Starting API server")
-	stopCh := genericapiserver.SetupSignalHandler()
-	go root.KubedServer.GenericAPIServer.PrepareRun().Run(stopCh)
-
-	By("Waiting for API server to be ready")
-	root.EventuallyAPIServerReady().Should(Succeed())
-	time.Sleep(time.Second * 5)
 })
 
 var _ = AfterSuite(func() {
 	By("Cleaning API service stuff")
 	root.Invoke().DeleteAPIService()
-	//root.DeleteClusterRole(userRule.ObjectMeta)
-	//root.DeleteClusterRoleBinding(userRoleBinding.ObjectMeta)
 	root.DeleteNamespace()
 	os.Remove(framework.KubedTestConfigFileDir)
 })

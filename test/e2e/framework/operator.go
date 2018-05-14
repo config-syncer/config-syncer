@@ -8,7 +8,6 @@ import (
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/cmds/server"
-	"github.com/appscode/kubed/pkg/operator"
 	srvr "github.com/appscode/kubed/pkg/server"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
@@ -26,26 +25,58 @@ var (
 	endpoints  *core.Endpoints
 )
 
-func (f *Framework) NewTestKubedOptions(kubeConfigPath string) *server.KubedOptions {
+func (f *Framework) RunKubed(stopCh chan struct{}, clusterConfig api.ClusterConfig) error {
+	clusterConfig.Save(KubedTestConfigFileDir)
+
+	kubedServer, err := f.NewKubedServer()
+	if err != nil {
+		return err
+	}
+
+	go kubedServer.GenericAPIServer.PrepareRun().Run(stopCh)
+	go kubedServer.Operator.Run(stopCh)
+
+	return nil
+}
+
+func (f *Framework) NewKubedServer() (*srvr.KubedServer, error) {
+	kubedOptions := f.NewKubedOptions()
+	config, err := kubedOptions.Config()
+	if err != nil {
+		return nil, err
+	}
+
+	config.OperatorConfig.OperatorNamespace = f.namespace
+	config.OperatorConfig.ConfigPath = KubedTestConfigFileDir
+	config.OperatorConfig.Test = true
+
+	s, err := config.Complete().New()
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+func (f *Framework) NewKubedOptions() *server.KubedOptions {
 	return &server.KubedOptions{
-		RecommendedOptions: f.NewTestKubedServerOptions(kubeConfigPath),
-		OperatorOptions:    f.NewTestKubedOperatorOptions(),
+		RecommendedOptions: f.NewKubedServerOptions(),
+		OperatorOptions:    server.NewOperatorOptions(),
 		StdOut:             os.Stdout,
 		StdErr:             os.Stderr,
 	}
 }
 
-func (f *Framework) NewTestKubedServerOptions(kubeConfigPath string) *options.RecommendedOptions {
+func (f *Framework) NewKubedServerOptions() *options.RecommendedOptions {
 	return &options.RecommendedOptions{
 		Authentication: &options.DelegatingAuthenticationOptions{
-			RemoteKubeConfigFile: kubeConfigPath,
+			RemoteKubeConfigFile: f.KubeConfigPath,
 			//SkipInClusterLookup:  true,
 		},
 		Authorization: &options.DelegatingAuthorizationOptions{
-			RemoteKubeConfigFile: kubeConfigPath,
+			RemoteKubeConfigFile: f.KubeConfigPath,
 		},
 		CoreAPI: &options.CoreAPIOptions{
-			CoreAPIKubeconfigPath: kubeConfigPath,
+			CoreAPIKubeconfigPath: f.KubeConfigPath,
 		},
 		SecureServing: &options.SecureServingOptionsWithLoopback{
 			SecureServingOptions: &options.SecureServingOptions{
@@ -57,62 +88,6 @@ func (f *Framework) NewTestKubedServerOptions(kubeConfigPath string) *options.Re
 		Etcd:      nil,
 		Admission: nil,
 	}
-}
-
-func (f *Framework) NewTestKubedOperatorOptions() *server.OperatorOptions {
-	opt := server.NewOperatorOptions()
-	opt.ConfigPath = KubedTestConfigFileDir
-	return opt
-}
-
-func (f *Framework) NewTestOperatorConfig() *operator.OperatorConfig {
-	ocfg := &operator.OperatorConfig{
-		Config:            f.KubedServer.Operator.Config,
-		ClientConfig:      f.KubedServer.Operator.ClientConfig,
-		KubeClient:        f.KubedServer.Operator.KubeClient,
-		VoyagerClient:     f.KubedServer.Operator.VoyagerClient,
-		StashClient:       f.KubedServer.Operator.StashClient,
-		SearchlightClient: f.KubedServer.Operator.SearchlightClient,
-		KubeDBClient:      f.KubedServer.Operator.KubeDBClient,
-		PromClient:        f.KubedServer.Operator.PromClient,
-	}
-	ocfg.Test = true
-	ocfg.ConfigPath = KubedTestConfigFileDir
-	return ocfg
-}
-
-func (f *Framework) RunOperator(stopCh chan struct{}, clusterConfig api.ClusterConfig) error {
-	var err error
-	operatorConfig := f.NewTestOperatorConfig()
-	err = clusterConfig.Save(operatorConfig.ConfigPath)
-	if err != nil {
-		return err
-	}
-
-	operatorConfig.OperatorNamespace = f.Namespace()
-	f.KubedServer.Operator, err = operatorConfig.New()
-	if err != nil {
-		return err
-	}
-
-	go f.KubedServer.Operator.Run(stopCh)
-
-	return nil
-}
-
-func (f *Framework) NewTestKubedServer(kubeConfigPath string) (*srvr.KubedServer, error) {
-	kubedOptions := f.NewTestKubedOptions(kubeConfigPath)
-
-	config, err := kubedOptions.Config()
-	if err != nil {
-		return nil, err
-	}
-
-	s, err := config.Complete().New()
-	if err != nil {
-		return nil, err
-	}
-	return s, nil
 }
 
 func (f *Invocation) RegisterAPIService() (err error) {

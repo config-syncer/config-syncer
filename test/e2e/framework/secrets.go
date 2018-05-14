@@ -9,6 +9,7 @@ import (
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -83,11 +84,11 @@ func (f *Framework) DeleteSecret(meta metav1.ObjectMeta) error {
 	return f.KubeClient.CoreV1().Secrets(meta.Namespace).Delete(meta.Name, deleteInForeground())
 }
 
-func (fi *Invocation) SecretForMinioBackend(includeCert bool) core.Secret {
+func (f *Invocation) SecretForMinioBackend(includeCert bool) core.Secret {
 	secret := core.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      rand.WithUniqSuffix(fi.app + "-minio"),
-			Namespace: fi.namespace,
+			Name:      rand.WithUniqSuffix(f.app + "-minio"),
+			Namespace: f.namespace,
 		},
 		Data: map[string][]byte{
 			api.AWS_ACCESS_KEY_ID:     []byte(MINIO_ACCESS_KEY_ID),
@@ -96,7 +97,7 @@ func (fi *Invocation) SecretForMinioBackend(includeCert bool) core.Secret {
 	}
 
 	if includeCert {
-		secret.Data[api.CA_CERT_DATA] = fi.CertStore.CACert()
+		secret.Data[api.CA_CERT_DATA] = f.CertStore.CACert()
 	}
 
 	return secret
@@ -116,4 +117,30 @@ func (fi *Invocation) SecretForWebhookNotifier() *core.Secret {
 			"WEBHOOK_URL": []byte("http://localhost:8181"),
 		},
 	}
+}
+
+func (f *Invocation) WaitUntilSecretCreated(meta metav1.ObjectMeta) error {
+	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
+		if _, err := f.KubeClient.CoreV1().Secrets(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err != nil {
+			if kerr.IsNotFound(err) {
+				return false, nil
+			} else {
+				return true, err
+			}
+		}
+		return true, nil
+	})
+}
+
+func (f *Invocation) WaitUntilSecretDeleted(meta metav1.ObjectMeta) error {
+	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
+		if _, err := f.KubeClient.CoreV1().Secrets(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err != nil {
+			if kerr.IsNotFound(err) {
+				return true, nil
+			} else {
+				return true, err
+			}
+		}
+		return false, nil
+	})
 }

@@ -1,5 +1,5 @@
 hash: cf1257127c911156e6bbeb81552dd14834bb80dbabe8553a7733053700a2a903
-updated: 2018-05-10T10:22:25.630556133+06:00
+updated: 2018-05-14T21:13:14.425967971+06:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -30,7 +30,7 @@ imports:
   - types
   - version
 - name: github.com/appscode/go-notify
-  version: 223b426de3481d50ab14384a0e899bfa26768c30
+  version: fa7a471a406a5d19120bd693b08a0d0cffcd2ee3
   subpackages:
   - discord
   - hipchat
@@ -55,6 +55,7 @@ imports:
   version: 5a1b68c81878cdb4e07a7b5dbdbb6c88e7f5fa04
   subpackages:
   - apis/workload/v1
+  - client/workload/v1
 - name: github.com/appscode/kutil
   version: c397449684de5caf2de0309e6453eab905901cf8
   subpackages:
@@ -110,7 +111,7 @@ imports:
   - client/informers/externalversions/stash/v1alpha1
   - client/listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 941c9a44d0108bd9273aed3602a6e95b9cf537a6
+  version: 9f2f5d5effc76dd98544f69bd9ed3d691bd8d358
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -491,26 +492,6 @@ imports:
   version: 56545f4a5d46df9a6648819d1664c3a03a13ffdb
 - name: github.com/olekukonko/tablewriter
   version: cca8bbc0798408af109aaaa239cbd2634846b340
-- name: github.com/onsi/ginkgo
-  version: 11459a886d9cd66b319dac7ef1e917ee221372c9
-  subpackages:
-  - config
-  - internal/codelocation
-  - internal/containernode
-  - internal/failer
-  - internal/leafnodes
-  - internal/remote
-  - internal/spec
-  - internal/spec_iterator
-  - internal/specrunner
-  - internal/suite
-  - internal/testingtproxy
-  - internal/writer
-  - reporters
-  - reporters/stenographer
-  - reporters/stenographer/support/go-colorable
-  - reporters/stenographer/support/go-isatty
-  - types
 - name: github.com/onsi/gomega
   version: dcabb60a477c2b6f456df65037cb6708210fbb02
   subpackages:
@@ -525,6 +506,16 @@ imports:
   - matchers/support/goraph/node
   - matchers/support/goraph/util
   - types
+- name: github.com/openshift/api
+  version: 09a4e3d50f1aae6613b1b86941ffb8bded21e674
+  subpackages:
+  - apps/v1
+- name: github.com/openshift/client-go
+  version: b3f4c8b4682c151defdd33ce75acfbf5fb30bccc
+  subpackages:
+  - apps/clientset/versioned
+  - apps/clientset/versioned/scheme
+  - apps/clientset/versioned/typed/apps/v1
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/philhofer/fwd
@@ -592,8 +583,6 @@ imports:
   version: 749fb9e14beb9995f677c101a754393cecb64b0f
   subpackages:
   - hipchat
-- name: github.com/the-redback/go-oneliners
-  version: 82a97ec58df4809a2bc57ebbbcc1e6a2feb78111
 - name: github.com/tinylib/msgp
   version: 3b5c87ab5fb00c660bf85b888445d9a01db64db4
   subpackages:
@@ -677,7 +666,7 @@ imports:
   subpackages:
   - rate
 - name: google.golang.org/api
-  version: 4bd7f4beb291148443ed4553071c4e0697ff4afb
+  version: 15aea8711db98e640b277da9771a9d74270c2edc
   subpackages:
   - gensupport
   - googleapi
@@ -1115,8 +1104,29 @@ imports:
 - name: k8s.io/kubernetes
   version: fc32d2f3698e36b93322a3465f63a14e9f0eaead
   subpackages:
+  - pkg/api/legacyscheme
   - pkg/util/hash
 testImports:
+- name: github.com/onsi/ginkgo
+  version: 11459a886d9cd66b319dac7ef1e917ee221372c9
+  subpackages:
+  - config
+  - internal/codelocation
+  - internal/containernode
+  - internal/failer
+  - internal/leafnodes
+  - internal/remote
+  - internal/spec
+  - internal/spec_iterator
+  - internal/specrunner
+  - internal/suite
+  - internal/testingtproxy
+  - internal/writer
+  - reporters
+  - reporters/stenographer
+  - reporters/stenographer/support/go-colorable
+  - reporters/stenographer/support/go-isatty
+  - types
 - name: github.com/pmezard/go-difflib
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
@@ -1125,3 +1135,5 @@ testImports:
   version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
   subpackages:
   - assert
+- name: github.com/the-redback/go-oneliners
+  version: 82a97ec58df4809a2bc57ebbbcc1e6a2feb78111
