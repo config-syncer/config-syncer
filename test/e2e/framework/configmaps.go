@@ -1,7 +1,13 @@
 package framework
 
 import (
+	"fmt"
+	"io/ioutil"
+	"path/filepath"
+	"strings"
+
 	"github.com/appscode/go/crypto/rand"
+	"github.com/appscode/go/encoding/yaml"
 	"github.com/appscode/kutil/tools/clientcmd"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
@@ -72,6 +78,32 @@ func (f *Invocation) EventuallyNumOfConfigmapsForClient(client kubernetes.Interf
 	})
 }
 
+func (f *Invocation) ReadConfigMapFromRecycleBin(recycleBinLocation string, cm *core.ConfigMap) (*core.ConfigMap, error) {
+	deletedConfigMap := &core.ConfigMap{}
+	dir := filepath.Join(recycleBinLocation, filepath.Dir(cm.SelfLink))
+
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, file := range files {
+		if strings.HasPrefix(file.Name(), cm.Name) && strings.HasSuffix(file.Name(), ".yaml") {
+			data, err := ioutil.ReadFile(filepath.Join(dir, file.Name()))
+			if err != nil {
+				return nil, err
+			}
+
+			err = yaml.Unmarshal(data, &deletedConfigMap)
+			if err != nil {
+				return nil, err
+			}
+			return deletedConfigMap, nil
+		}
+	}
+	return deletedConfigMap, fmt.Errorf("configmap not found")
+}
+
 func (f *Invocation) DeleteAllConfigmaps() {
 	cfgMaps, err := f.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
 		LabelSelector: labels.Set{
@@ -81,10 +113,16 @@ func (f *Invocation) DeleteAllConfigmaps() {
 	Expect(err).NotTo(HaveOccurred())
 
 	for _, value := range cfgMaps.Items {
-		err := f.KubeClient.CoreV1().ConfigMaps(value.Namespace).Delete(value.Name, &metav1.DeleteOptions{})
+		err := f.DeleteConfigMap(value.ObjectMeta)
 		if kerr.IsNotFound(err) {
-			err = nil
+			Expect(err).NotTo(HaveOccurred())
 		}
-		Expect(err).NotTo(HaveOccurred())
 	}
+}
+
+func (f *Invocation) CreateConfigMap(configMap *core.ConfigMap) (*core.ConfigMap, error) {
+	return f.KubeClient.CoreV1().ConfigMaps(configMap.Namespace).Create(configMap)
+}
+func (f *Invocation) DeleteConfigMap(meta metav1.ObjectMeta) error {
+	return f.KubeClient.CoreV1().ConfigMaps(meta.Namespace).Delete(meta.Name, &metav1.DeleteOptions{})
 }
