@@ -6,27 +6,7 @@ metadata:
     app: kubed
 rules:
 - apiGroups:
-  - ""
-  - apps
-  - authentication.k8s.io
-  - authorization.k8s.io
-  - apiregistration.k8s.io
-  - admissionregistration.k8s.io
-  - apiextensions.k8s.io
-  - events.k8s.io
-  - autoscaling
-  - batch
-  - certificates.k8s.io
-  - extensions
-  - networking.k8s.io
-  - storage.k8s.io
-  - monitoring.coreos.com
-  - kubedb.com
-  - monitoring.appscode.com
-  - rbac.authorization.k8s.io
-  - stash.appscode.com
-  - voyager.appscode.com
-  - policy
+  - "*"
   resources: ["*"]
   verbs: ["list", "watch"]
 - apiGroups: [""]
