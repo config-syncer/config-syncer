@@ -67,10 +67,3 @@ func WebhookReceiver() []api.Receiver {
 		},
 	}
 }
-
-func ResetTestConfigFile() error {
-	defaultClusterConfig := api.ClusterConfig{
-		ClusterName: "minikube",
-	}
-	return defaultClusterConfig.Save(KubedTestConfigFileDir)
-}

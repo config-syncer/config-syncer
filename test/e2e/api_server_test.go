@@ -7,9 +7,9 @@ import (
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/test/e2e/framework"
+	. "github.com/appscode/kubed/test/e2e/matcher"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/appscode/kubed/test/e2e/matcher"
 	apps "k8s.io/api/apps/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -40,10 +40,6 @@ var _ = Describe("API server", func() {
 
 	AfterEach(func() {
 		close(stopCh)
-
-		err := framework.ResetTestConfigFile()
-		Expect(err).NotTo(HaveOccurred())
-
 		os.RemoveAll(filepath.Join("/tmp", "indices"))
 	})
 

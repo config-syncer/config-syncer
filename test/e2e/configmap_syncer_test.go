@@ -51,9 +51,6 @@ var _ = Describe("Config-syncer", func() {
 		}
 		Expect(err).NotTo(HaveOccurred())
 		f.EventuallyNamespaceDeleted(nsWithLabel.Name).Should(BeTrue())
-
-		err = framework.ResetTestConfigFile()
-		Expect(err).NotTo(HaveOccurred())
 	})
 
 	Describe("ConfigMap Syncer Test", func() {
@@ -240,7 +237,7 @@ var _ = Describe("Config-syncer", func() {
 			err = f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Delete(cfgMap.Name, &metav1.DeleteOptions{})
 			Expect(err).ShouldNot(HaveOccurred())
 
-			By("Checking synced configmaps has deleted")
+			By("Checking synced configmaps has been deleted")
 			f.EventuallyNumOfConfigmaps(metav1.NamespaceAll).Should(BeNumerically("==", 0))
 		})
 	})

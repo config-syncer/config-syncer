@@ -35,11 +35,8 @@ var _ = Describe("Snapshotter", func() {
 	AfterEach(func() {
 		close(stopCh)
 
-		err := framework.ResetTestConfigFile()
-		Expect(err).NotTo(HaveOccurred())
-
 		if missing, _ := BeZero().Match(cred); !missing {
-			err = f.WaitUntilSecretDeleted(cred.ObjectMeta)
+			err := f.WaitUntilSecretDeleted(cred.ObjectMeta)
 			Expect(err).NotTo(HaveOccurred())
 		}
 	})
@@ -87,6 +84,9 @@ var _ = Describe("Snapshotter", func() {
 				By("Creating Minio server with cacert")
 				_, err := f.CreateMinioServer(true, []net.IP{minikubeIP})
 				Expect(err).NotTo(HaveOccurred())
+
+				// give some time for minio-server to be ready
+				time.Sleep(time.Second * 15)
 
 				msvc, err := f.KubeClient.CoreV1().Services(f.Namespace()).Get("minio-service", metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())

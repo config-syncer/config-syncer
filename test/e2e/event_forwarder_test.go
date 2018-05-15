@@ -31,7 +31,7 @@ var _ = Describe("Event-forwarder", func() {
 
 	JustBeforeEach(func() {
 		if missing, _ := BeZero().Match(notifierSecret); missing {
-			Skip("Missing notifier secret")
+			Skip("Missing notifier-secret")
 		}
 
 		By("Starting Kubed")
@@ -47,9 +47,6 @@ var _ = Describe("Event-forwarder", func() {
 	AfterEach(func() {
 		close(stopCh)
 		err := f.DeleteSecret(notifierSecret.ObjectMeta)
-		Expect(err).NotTo(HaveOccurred())
-
-		err = framework.ResetTestConfigFile()
 		Expect(err).NotTo(HaveOccurred())
 
 		err = f.WaitUntilSecretDeleted(notifierSecret.ObjectMeta)

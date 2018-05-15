@@ -96,7 +96,7 @@ type Operator struct {
 
 	watcher *fsnotify.Watcher
 
-	ClusterConfig api.ClusterConfig
+	clusterConfig api.ClusterConfig
 	lock          sync.RWMutex
 }
 
@@ -116,10 +116,10 @@ func (op *Operator) Configure() error {
 	if err != nil {
 		return err
 	}
-	op.ClusterConfig = *cfg
+	op.clusterConfig = *cfg
 
-	if op.ClusterConfig.RecycleBin != nil && op.ClusterConfig.RecycleBin.Path == "" {
-		op.ClusterConfig.RecycleBin.Path = filepath.Join(op.ScratchDir, "trashcan")
+	if op.clusterConfig.RecycleBin != nil && op.clusterConfig.RecycleBin.Path == "" {
+		op.clusterConfig.RecycleBin.Path = filepath.Join(op.ScratchDir, "trashcan")
 	}
 
 	op.notifierCred, err = op.getLoader()
@@ -127,22 +127,22 @@ func (op *Operator) Configure() error {
 		return err
 	}
 
-	err = op.trashCan.Configure(op.ClusterConfig.ClusterName, op.ClusterConfig.RecycleBin)
+	err = op.trashCan.Configure(op.clusterConfig.ClusterName, op.clusterConfig.RecycleBin)
 	if err != nil {
 		return err
 	}
 
-	err = op.eventProcessor.Configure(op.ClusterConfig.ClusterName, op.ClusterConfig.EventForwarder, op.notifierCred)
+	err = op.eventProcessor.Configure(op.clusterConfig.ClusterName, op.clusterConfig.EventForwarder, op.notifierCred)
 	if err != nil {
 		return err
 	}
 
-	err = op.configSyncer.Configure(op.ClusterConfig.ClusterName, op.ClusterConfig.KubeConfigFile, op.ClusterConfig.EnableConfigSyncer)
+	err = op.configSyncer.Configure(op.clusterConfig.ClusterName, op.clusterConfig.KubeConfigFile, op.clusterConfig.EnableConfigSyncer)
 	if err != nil {
 		return err
 	}
 
-	for _, j := range op.ClusterConfig.Janitors {
+	for _, j := range op.clusterConfig.Janitors {
 		if j.Kind == api.JanitorInfluxDB {
 			janitor := influx.Janitor{Spec: *j.InfluxDB, TTL: j.TTL.Duration}
 			err = janitor.Cleanup()
@@ -357,14 +357,14 @@ func (op *Operator) addEventHandlers(informer cache.SharedIndexInformer, gvk sch
 }
 
 func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {
-	if op.ClusterConfig.NotifierSecretName == "" {
+	if op.clusterConfig.NotifierSecretName == "" {
 		return func(key string) (string, bool) {
 			return "", false
 		}, nil
 	}
 	cfg, err := op.KubeClient.CoreV1().
 		Secrets(op.OperatorNamespace).
-		Get(op.ClusterConfig.NotifierSecretName, metav1.GetOptions{})
+		Get(op.clusterConfig.NotifierSecretName, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -447,7 +447,7 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 }
 
 func (op *Operator) RunElasticsearchCleaner() error {
-	for _, j := range op.ClusterConfig.Janitors {
+	for _, j := range op.clusterConfig.Janitors {
 		if j.Kind == api.JanitorElasticsearch {
 			var authInfo *api.JanitorAuthInfo
 
@@ -492,17 +492,17 @@ func (op *Operator) RunTrashCanCleaner() error {
 }
 
 func (op *Operator) RunSnapshotter() error {
-	if op.ClusterConfig.Snapshotter == nil {
+	if op.clusterConfig.Snapshotter == nil {
 		return nil
 	}
 
 	osmconfigPath := filepath.Join(op.ScratchDir, "osm", "config.yaml")
-	err := storage.WriteOSMConfig(op.KubeClient, op.ClusterConfig.Snapshotter.Backend, op.OperatorNamespace, osmconfigPath)
+	err := storage.WriteOSMConfig(op.KubeClient, op.clusterConfig.Snapshotter.Backend, op.OperatorNamespace, osmconfigPath)
 	if err != nil {
 		return err
 	}
 
-	container, err := op.ClusterConfig.Snapshotter.Backend.Container()
+	container, err := op.clusterConfig.Snapshotter.Backend.Container()
 	if err != nil {
 		return err
 	}
@@ -512,7 +512,7 @@ func (op *Operator) RunSnapshotter() error {
 	sh.SetDir(op.ScratchDir)
 	sh.ShowCMD = true
 	snapshotter := func() error {
-		mgr := backup.NewBackupManager(op.ClusterConfig.ClusterName, op.ClientConfig, op.ClusterConfig.Snapshotter.Sanitize)
+		mgr := backup.NewBackupManager(op.clusterConfig.ClusterName, op.ClientConfig, op.clusterConfig.Snapshotter.Sanitize)
 		snapshotFile, err := mgr.BackupToTar(filepath.Join(op.ScratchDir, "snapshot"))
 		if err != nil {
 			return err
@@ -522,7 +522,7 @@ func (op *Operator) RunSnapshotter() error {
 				log.Errorln(err)
 			}
 		}()
-		dest, err := op.ClusterConfig.Snapshotter.Location(filepath.Base(snapshotFile))
+		dest, err := op.clusterConfig.Snapshotter.Location(filepath.Base(snapshotFile))
 		if err != nil {
 			return err
 		}
@@ -537,7 +537,7 @@ func (op *Operator) RunSnapshotter() error {
 	}()
 
 	if !op.Test { // don't run cronjob for test. it cause problem for consecutive tests.
-		return op.cron.AddFunc(op.ClusterConfig.Snapshotter.Schedule, func() {
+		return op.cron.AddFunc(op.clusterConfig.Snapshotter.Schedule, func() {
 			err := snapshotter()
 			if err != nil {
 				log.Errorln(err)
