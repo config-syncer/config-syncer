@@ -56,14 +56,11 @@ Now, to receive notifications via Hipchat, configure receiver as below:
 
 ```yaml
 clusterName: unicorn
-recycleBin:
-  handleUpdates: false
-  path: /tmp/kubed/trash
+eventForwarder:
   receivers:
   - notifier: Hipchat
     to:
     - ops-alerts
-  ttl: 168h
 notifierSecretName: notifier-config
 ```
 
@@ -114,14 +111,11 @@ Now, to receive notifications via Mailgun, configure receiver as below:
 
 ```yaml
 clusterName: unicorn
-recycleBin:
-  handleUpdates: false
-  path: /tmp/kubed/trash
+eventForwarder:
   receivers:
   - notifier: Mailgun
     to:
     - ops-alerts@example.com
-  ttl: 168h
 notifierSecretName: notifier-config
 ```
 
@@ -172,14 +166,11 @@ Now, to receive notifications via SMTP, configure receiver as below:
 
 ```yaml
 clusterName: unicorn
-recycleBin:
-  handleUpdates: false
-  path: /tmp/kubed/trash
+eventForwarder:
   receivers:
   - notifier: SMTP
     to:
     - ops-alerts@example.com
-  ttl: 168h
 notifierSecretName: notifier-config
 ```
 
@@ -227,14 +218,11 @@ Now, to receive notifications via Twilio, configure receiver as below:
 
 ```yaml
 clusterName: unicorn
-recycleBin:
-  handleUpdates: false
-  path: /tmp/kubed/trash
+eventForwarder:
   receivers:
   - notifier: Twilio
     to:
     - +1-999-888-1234
-  ttl: 168h
 notifierSecretName: notifier-config
 ```
 
@@ -274,14 +262,11 @@ Now, to receive notifications via Slack, configure receiver as below:
 
 ```yaml
 clusterName: unicorn
-recycleBin:
-  handleUpdates: false
-  path: /tmp/kubed/trash
+eventForwarder:
   receivers:
   - notifier: Slack
     to:
     - '#ops-alerts'
-  ttl: 168h
 notifierSecretName: notifier-config
 ```
 
@@ -329,14 +314,11 @@ Now, to receive notifications via Plivo, configure receiver as below:
 
 ```yaml
 clusterName: unicorn
-recycleBin:
-  handleUpdates: false
-  path: /tmp/kubed/trash
+eventForwarder:
   receivers:
   - notifier: Plivo
     to:
     - +1-999-888-1234
-  ttl: 168h
 notifierSecretName: notifier-config
 ```
 
@@ -401,14 +383,11 @@ Now, to receive notifications via Pushover.net, configure receiver as below:
 
 ```yaml
 clusterName: unicorn
-recycleBin:
-  handleUpdates: false
-  path: /tmp/kubed/trash
+eventForwarder:
   receivers:
   - notifier: Pushover
     to:
     - my-phone
-  ttl: 168h
 notifierSecretName: notifier-config
 ```
 
@@ -457,14 +436,11 @@ Now, to receiver notifications in your **public** Telegram channels, configure r
 
 ```yaml
 clusterName: unicorn
-recycleBin:
-  handleUpdates: false
-  path: /tmp/kubed/trash
+eventForwarder:
   receivers:
   - notifier: Telegram
     to:
     - '@my-channel'
-  ttl: 168h
 notifierSecretName: notifier-config
 ```
 
@@ -486,14 +462,11 @@ Now, to receiver notifications in your private Telegram channels, configure chan
 
 ```yaml
 clusterName: unicorn
-recycleBin:
-  handleUpdates: false
-  path: /tmp/kubed/trash
+eventForwarder:
   receivers:
   - notifier: Telegram
     to:
     - '-1001210429328'
-  ttl: 168h
 notifierSecretName: notifier-config
 ```
 
@@ -547,14 +520,11 @@ Now, to receiver notifications via Webhook, configure receiver as below:
 
 ```yaml
 clusterName: unicorn
-recycleBin:
-  handleUpdates: false
-  path: /tmp/kubed/trash
+eventForwarder:
   receivers:
   - notifier: Webhook
     to:
     - ops-alerts
-  ttl: 168h
 notifierSecretName: notifier-config
 ```
 
@@ -592,18 +562,7 @@ eventForwarder:
     - ops@example.com
   - notifier: Slack
     to:
-    - #ops-alerts
-recycleBin:
-  handleUpdates: false
-  path: /tmp/kubed/trash
-  receivers:
-  - notifier: mailgun
-    to:
-    - ops@example.com
-  - notifier: slack
-    to:
     - '#ops-alerts'
-  ttl: 168h
 notifierSecretName: notifier-config
 ```
 
