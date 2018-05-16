@@ -9,13 +9,12 @@ metadata:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
 rules:
-- apiGroups:
-  - "*"
+- apiGroups: ["*"]
   resources: ["*"]
   verbs: ["list", "watch"]
 - apiGroups: [""]
   resources:
   - configmaps
   - secrets
-  verbs: ["get", "create", "update"]
+  verbs: ["get", "create", "patch"]
 {{ end }}
