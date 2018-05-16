@@ -483,7 +483,12 @@ func (op *Operator) RunTrashCanCleaner() error {
 		return nil
 	}
 
-	return op.cron.AddFunc("@every 1h", func() {
+	schedule := "@every 1h"
+	if op.Test {
+		schedule = "@every 1m"
+	}
+
+	return op.cron.AddFunc(schedule, func() {
 		err := op.trashCan.Cleanup()
 		if err != nil {
 			log.Errorln(err)

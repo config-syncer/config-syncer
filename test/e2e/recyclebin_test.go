@@ -39,6 +39,7 @@ var _ = Describe("RecycleBin", func() {
 
 	AfterEach(func() {
 		close(stopCh)
+		time.Sleep(time.Second * 10)
 	})
 
 	Describe("ConfigMap", func() {
@@ -84,7 +85,7 @@ var _ = Describe("RecycleBin", func() {
 
 			BeforeEach(func() {
 				configMap = f.NewConfigMap()
-				clusterConfig.RecycleBin.TTL = metav1.Duration{Duration: time.Minute}
+				clusterConfig.RecycleBin.HandleUpdates = true
 			})
 
 			AfterEach(func() {
@@ -99,9 +100,8 @@ var _ = Describe("RecycleBin", func() {
 
 				By("Patching configMap: " + cm.Name)
 				patchedConfigMap, _, err := core_util.PatchConfigMap(f.KubeClient, cm, func(in *core.ConfigMap) *core.ConfigMap {
-					out := in.DeepCopy()
-					out.Data["from"] = "here"
-					return out
+					in.Data["from"] = "here"
+					return in
 				})
 				Expect(err).NotTo(HaveOccurred())
 
@@ -118,17 +118,18 @@ var _ = Describe("RecycleBin", func() {
 			})
 		})
 
-		Context("TTL", func() {
+		Context("TTL timeout", func() {
 
 			BeforeEach(func() {
 				configMap = f.NewConfigMap()
+				clusterConfig.RecycleBin.TTL = metav1.Duration{Duration: time.Minute}
 			})
 
 			AfterEach(func() {
 				os.RemoveAll(clusterConfig.RecycleBin.Path)
 			})
 
-			It("should delete stored configMap from RecycleBin after time limit", func() {
+			It("should delete stored configMap from RecycleBin after configured TTL", func() {
 
 				By("Creating configMap: " + configMap.Name)
 				cm, err := f.CreateConfigMap(configMap)
@@ -147,6 +148,13 @@ var _ = Describe("RecycleBin", func() {
 
 				By("Checking recycled configMap is the deleted configMap")
 				Expect(deletedConfigMap).Should(BeEquivalentToConfigMap(cm))
+
+				By("Waiting for TTL timeout")
+				time.Sleep(time.Minute * 2)
+
+				By("Checking configMap deleted from RecycleBin")
+				_, err = f.ReadConfigMapFromRecycleBin(clusterConfig.RecycleBin.Path, cm)
+				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
