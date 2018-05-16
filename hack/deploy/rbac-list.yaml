@@ -12,7 +12,12 @@ rules:
   resources:
   - configmaps
   - secrets
-  verbs: ["get", "create", "patch"]
+  verbs: ["get", "create", "patch", "delete"]
+- apiGroups:
+    - ""
+  resources:
+    - namespaces
+  verbs: ["get"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

@@ -16,5 +16,10 @@ rules:
   resources:
   - configmaps
   - secrets
-  verbs: ["get", "create", "patch"]
+  verbs: ["get", "create", "patch", "delete"]
+- apiGroups:
+    - ""
+  resources:
+    - namespaces
+  verbs: ["get"]
 {{ end }}
