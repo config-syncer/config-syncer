@@ -33,9 +33,9 @@ In this section, we will show how you can use the kubed api server.
 ### Configuring RBAC
 Kubed creates a custom resource: `SearchResult`. Kubed installer will create a user facing cluster role:
 
-| ClusterRole           | Aggregates To     | Desription                            |
-|-----------------------|-------------------|---------------------------------------|
-| appscode:voyager:view | admin, edit, view | Allows read-only access to Kubed resources, intended to be granted within a namespace using a RoleBinding. |
+| ClusterRole             | Aggregates To       | Desription                                                                                                 |
+| ----------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------- |
+| appscode:kubed:view     | admin, edit, view   | Allows read-only access to Kubed resources, intended to be granted within a namespace using a RoleBinding. |
 
 These user facing roles supports [ClusterRole Aggregation](https://kubernetes.io/docs/admin/authorization/rbac/#aggregated-clusterroles) feature in Kubernetes 1.9 or later clusters.
 

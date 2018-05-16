@@ -11,7 +11,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func TestEsJanitor(t *testing.T) {
+func _TestEsJanitor(t *testing.T) {
 	c, err := clientcmd.BuildConfigFromFlags("", "")
 	assert.Nil(t, err)
 

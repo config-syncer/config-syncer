@@ -15,6 +15,7 @@ import (
 	"github.com/appscode/go-notify/pushover"
 	"github.com/appscode/go-notify/slack"
 	"github.com/appscode/go-notify/smtp"
+	"github.com/appscode/go-notify/stride"
 	"github.com/appscode/go-notify/telegram"
 	"github.com/appscode/go-notify/twilio"
 	"github.com/appscode/go-notify/webhook"
@@ -56,8 +57,10 @@ func DefaultVia(via string) (interface{}, error) {
 		return telegram.Default()
 	case discord.UID:
 		return discord.Default()
+	case stride.UID:
+		return stride.Default()
 	}
-	return nil, fmt.Errorf("Unknown notifier %s", via)
+	return nil, fmt.Errorf("unknown notifier %s", via)
 }
 
 func Load(loader envconfig.LoaderFunc) (interface{}, error) {
@@ -92,6 +95,8 @@ func LoadVia(via string, loader envconfig.LoaderFunc) (interface{}, error) {
 		return telegram.Load(loader)
 	case discord.UID:
 		return discord.Load(loader)
+	case stride.UID:
+		return stride.Load(loader)
 	}
-	return nil, fmt.Errorf("Unknown notifier %s", via)
+	return nil, fmt.Errorf("unknown notifier %s", via)
 }

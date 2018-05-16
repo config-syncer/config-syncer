@@ -123,6 +123,21 @@ func (b Backend) Container() (string, error) {
 	return "", errors.New("No storage provider is configured.")
 }
 
+func (b Backend) GetBucketAndPrefix() (string, string, error) {
+	if b.S3 != nil {
+		return b.S3.Bucket, b.S3.Prefix, nil
+	} else if b.GCS != nil {
+		return b.GCS.Bucket, b.GCS.Prefix, nil
+	} else if b.Azure != nil {
+		return b.Azure.Container, b.Azure.Prefix, nil
+	} else if b.Swift != nil {
+		return b.Swift.Container, b.Swift.Prefix, nil
+	} else if b.Local != nil {
+		return b.Local.Path, "", nil
+	}
+	return "", "", errors.New("unknown backend type.")
+}
+
 func LoadJanitorAuthInfo(data map[string][]byte) *JanitorAuthInfo {
 	if data == nil {
 		return &JanitorAuthInfo{}

@@ -30,6 +30,7 @@ type Config struct {
 	OperatorNamespace string
 	OpsAddress        string
 	ResyncPeriod      time.Duration
+	Test              bool
 }
 
 type OperatorConfig struct {
@@ -93,6 +94,7 @@ func (c *OperatorConfig) New() (*Operator, error) {
 	op.setupCoreInformers()
 	op.setupEventInformers()
 	op.setupCertificateInformers()
+	op.setupStorageInformers()
 	// ---------------------------
 	op.setupVoyagerInformers()
 	op.setupStashInformers()

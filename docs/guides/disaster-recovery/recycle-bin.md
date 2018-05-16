@@ -30,15 +30,10 @@ To enable config syncer, you need a cluster config like below.
 $ cat ./docs/examples/recycle-bin/config.yaml
 
 clusterName: unicorn
-notifierSecretName: notifier-config
 recycleBin:
+  handleUpdates: false
   path: /tmp/kubed/trash
   ttl: 168h
-  handleUpdates: false
-  receivers:
-  - notifier: Mailgun
-    to:
-    - ops@example.com
 ```
 
 | Key                        | Description                                                                               |
@@ -46,7 +41,6 @@ recycleBin:
 | `recycleBin.path`          | `Required`. Path to folder where deleted and/or updated objects are stored. |
 | `recycleBin.ttl`           | `Required`. Duration for which deleted and/or updated objects are stored before purging. |
 | `recycleBin.handleUpdates` | `Optional`. If set to `true`, past version of supported objects are stored when updated. We recommend that you keep this set to `false` on an active cluster. |
-| `recycleBin.receiver`      | `Optional`. If set, a notification will be sent when any supported object is deleted and/or updated. To learn how to use various notifiers, please visit [here](/docs/guides/cluster-events/notifiers.md). |
 | `clusterName`              | `Optional`. A meaningful identifer for cluster. This cluster name will be prefixed to any notification sent via Email/SMS/Chat so that you can identify the source easily. |
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.

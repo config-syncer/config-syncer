@@ -9,28 +9,12 @@ metadata:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
 rules:
-- apiGroups:
-  - ""
-  - apps
-  - authentication.k8s.io
-  - authorization.k8s.io
-  - autoscaling
-  - batch
-  - certificates.k8s.io
-  - extensions
-  - networking.k8s.io
-  - storage.k8s.io
-  - monitoring.coreos.com
-  - kubedb.com
-  - monitoring.appscode.com
-  - rbac.authorization.k8s.io
-  - stash.appscode.com
-  - voyager.appscode.com
+- apiGroups: ["*"]
   resources: ["*"]
   verbs: ["list", "watch"]
 - apiGroups: [""]
   resources:
   - configmaps
   - secrets
-  verbs: ["get", "create", "update"]
+  verbs: ["get", "create", "patch"]
 {{ end }}
