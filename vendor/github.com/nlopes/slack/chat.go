@@ -3,6 +3,7 @@ package slack
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/url"
 	"strings"
 )
@@ -111,10 +112,11 @@ func (api *Client) PostMessageContext(ctx context.Context, channel, text string,
 // PostEphemeral sends an ephemeral message to a user in a channel.
 // Message is escaped by default according to https://api.slack.com/docs/formatting
 // Use http://davestevens.github.io/slack-message-builder/ to help crafting your message.
-func (api *Client) PostEphemeral(channelID, userID string, options ...MsgOption) (string, error) {
+func (api *Client) PostEphemeral(channel, userID string, options ...MsgOption) (string, error) {
+	options = append(options, MsgOptionPostEphemeral())
 	return api.PostEphemeralContext(
 		context.Background(),
-		channelID,
+		channel,
 		userID,
 		options...,
 	)
@@ -122,19 +124,30 @@ func (api *Client) PostEphemeral(channelID, userID string, options ...MsgOption)
 
 // PostEphemeralContext sends an ephemeal message to a user in a channel with a custom context
 // For more details, see PostEphemeral documentation
-func (api *Client) PostEphemeralContext(ctx context.Context, channelID, userID string, options ...MsgOption) (timestamp string, err error) {
-	_, timestamp, _, err = api.SendMessageContext(ctx, channelID, append(options, MsgOptionPostEphemeral2(userID))...)
-	return timestamp, err
+func (api *Client) PostEphemeralContext(ctx context.Context, channel, userID string, options ...MsgOption) (string, error) {
+	path, values, err := ApplyMsgOptions(api.token, channel, options...)
+	if err != nil {
+		return "", err
+	}
+
+	values.Add("user", userID)
+
+	response, err := chatRequest(ctx, api.httpclient, path, values, api.debug)
+	if err != nil {
+		return "", err
+	}
+
+	return response.Timestamp, nil
 }
 
 // UpdateMessage updates a message in a channel
-func (api *Client) UpdateMessage(channelID, timestamp, text string) (string, string, string, error) {
-	return api.UpdateMessageContext(context.Background(), channelID, timestamp, text)
+func (api *Client) UpdateMessage(channel, timestamp, text string) (string, string, string, error) {
+	return api.UpdateMessageContext(context.Background(), channel, timestamp, text)
 }
 
 // UpdateMessageContext updates a message in a channel
-func (api *Client) UpdateMessageContext(ctx context.Context, channelID, timestamp, text string) (string, string, string, error) {
-	return api.SendMessageContext(ctx, channelID, MsgOptionUpdate(timestamp), MsgOptionText(text, true))
+func (api *Client) UpdateMessageContext(ctx context.Context, channel, timestamp, text string) (string, string, string, error) {
+	return api.SendMessageContext(ctx, channel, MsgOptionUpdate(timestamp), MsgOptionText(text, true))
 }
 
 // SendMessage more flexible method for configuring messages.
@@ -143,30 +156,22 @@ func (api *Client) SendMessage(channel string, options ...MsgOption) (string, st
 }
 
 // SendMessageContext more flexible method for configuring messages with a custom context.
-func (api *Client) SendMessageContext(ctx context.Context, channelID string, options ...MsgOption) (channel string, timestamp string, text string, err error) {
-	var (
-		config   sendConfig
-		response chatResponseFull
-	)
-
-	if config, err = applyMsgOptions(api.token, channelID, options...); err != nil {
+func (api *Client) SendMessageContext(ctx context.Context, channel string, options ...MsgOption) (string, string, string, error) {
+	channel, values, err := ApplyMsgOptions(api.token, channel, options...)
+	if err != nil {
 		return "", "", "", err
 	}
 
-	if err = post(ctx, api.httpclient, string(config.mode), config.values, &response, api.debug); err != nil {
+	response, err := chatRequest(ctx, api.httpclient, channel, values, api.debug)
+	if err != nil {
 		return "", "", "", err
 	}
 
-	return response.Channel, response.Timestamp, response.Text, response.Err()
+	return response.Channel, response.Timestamp, response.Text, nil
 }
 
 // ApplyMsgOptions utility function for debugging/testing chat requests.
 func ApplyMsgOptions(token, channel string, options ...MsgOption) (string, url.Values, error) {
-	config, err := applyMsgOptions(token, channel, options...)
-	return string(config.mode), config.values, err
-}
-
-func applyMsgOptions(token, channel string, options ...MsgOption) (sendConfig, error) {
 	config := sendConfig{
 		mode: chatPostMessage,
 		values: url.Values{
@@ -177,16 +182,28 @@ func applyMsgOptions(token, channel string, options ...MsgOption) (sendConfig, e
 
 	for _, opt := range options {
 		if err := opt(&config); err != nil {
-			return config, err
+			return string(config.mode), config.values, err
 		}
 	}
 
-	return config, nil
+	return string(config.mode), config.values, nil
 }
 
 func escapeMessage(message string) string {
 	replacer := strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;")
 	return replacer.Replace(message)
+}
+
+func chatRequest(ctx context.Context, client HTTPRequester, path string, values url.Values, debug bool) (*chatResponseFull, error) {
+	response := &chatResponseFull{}
+	err := post(ctx, client, path, values, response, debug)
+	if err != nil {
+		return nil, err
+	}
+	if !response.Ok {
+		return nil, errors.New(response.Error)
+	}
+	return response, nil
 }
 
 type sendMode string
@@ -215,23 +232,11 @@ func MsgOptionPost() MsgOption {
 	}
 }
 
-// MsgOptionPostEphemeral - DEPRECATED: use MsgOptionPostEphemeral2
-// posts an ephemeral message.
+// MsgOptionPostEphemeral posts an ephemeral message
 func MsgOptionPostEphemeral() MsgOption {
 	return func(config *sendConfig) error {
 		config.mode = chatPostEphemeral
 		config.values.Del("ts")
-		return nil
-	}
-}
-
-// MsgOptionPostEphemeral2 - posts an ephemeral message to the provided user.
-func MsgOptionPostEphemeral2(userID string) MsgOption {
-	return func(config *sendConfig) error {
-		config.mode = chatPostEphemeral
-		MsgOptionUser(userID)(config)
-		config.values.Del("ts")
-
 		return nil
 	}
 }
@@ -260,14 +265,6 @@ func MsgOptionAsUser(b bool) MsgOption {
 		if b != DEFAULT_MESSAGE_ASUSER {
 			config.values.Set("as_user", "true")
 		}
-		return nil
-	}
-}
-
-// MsgOptionUser set the user for the message.
-func MsgOptionUser(userID string) MsgOption {
-	return func(config *sendConfig) error {
-		config.values.Set("user", userID)
 		return nil
 	}
 }
@@ -335,7 +332,7 @@ func MsgOptionDisableMarkdown() MsgOption {
 func MsgOptionPostMessageParameters(params PostMessageParameters) MsgOption {
 	return func(config *sendConfig) error {
 		if params.Username != DEFAULT_MESSAGE_USERNAME {
-			config.values.Set("username", params.Username)
+			config.values.Set("username", string(params.Username))
 		}
 
 		// chat.postEphemeral support
@@ -347,7 +344,7 @@ func MsgOptionPostMessageParameters(params PostMessageParameters) MsgOption {
 		MsgOptionAsUser(params.AsUser)(config)
 
 		if params.Parse != DEFAULT_MESSAGE_PARSE {
-			config.values.Set("parse", params.Parse)
+			config.values.Set("parse", string(params.Parse))
 		}
 		if params.LinkNames != DEFAULT_MESSAGE_LINK_NAMES {
 			config.values.Set("link_names", "1")

@@ -62,7 +62,6 @@ func (api *Client) InviteGuestContext(ctx context.Context, teamName, channel, fi
 		"last_name":        {lastName},
 		"ultra_restricted": {"1"},
 		"token":            {api.token},
-		"resend":           {"true"},
 		"set_active":       {"true"},
 		"_attempts":        {"1"},
 	}
@@ -89,7 +88,6 @@ func (api *Client) InviteRestrictedContext(ctx context.Context, teamName, channe
 		"last_name":  {lastName},
 		"restricted": {"1"},
 		"token":      {api.token},
-		"resend":     {"true"},
 		"set_active": {"true"},
 		"_attempts":  {"1"},
 	}

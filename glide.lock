@@ -1,6 +1,10 @@
 hash: cf1257127c911156e6bbeb81552dd14834bb80dbabe8553a7733053700a2a903
-updated: 2018-05-14T21:13:14.425967971+06:00
+updated: 2018-05-16T02:18:42.175817644-07:00
 imports:
+- name: bitbucket.org/atlassian/go-stride
+  version: 8846b835cb45ec8707e6694533a2b6180861cdbe
+  subpackages:
+  - pkg/stride
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
 - name: cloud.google.com/go
@@ -30,7 +34,7 @@ imports:
   - types
   - version
 - name: github.com/appscode/go-notify
-  version: fa7a471a406a5d19120bd693b08a0d0cffcd2ee3
+  version: 17078f08a5bafdaaa93a7bdef2d689326bd57b3a
   subpackages:
   - discord
   - hipchat
@@ -40,12 +44,13 @@ imports:
   - pushover
   - slack
   - smtp
+  - stride
   - telegram
   - twilio
   - unified
   - webhook
 - name: github.com/appscode/jsonpatch
-  version: 1359b374de83fa14fd58ab10aa8ea4935f84d249
+  version: 58a38a46ddb591a543c6b1003213353e29331c5a
 - name: github.com/appscode/kube-mon
   version: dc81c09a885b0862f1bbbae3e440a68fbf2b36a6
   subpackages:
@@ -95,7 +100,7 @@ imports:
   - client/informers/externalversions/monitoring/v1alpha1
   - client/listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: 4bddc2e10982130ee424737372e1c7c44435b16f
+  version: c8c18fb5c96030f4a81529f9520f618c6cc1d1f4
   subpackages:
   - apis/repositories
   - apis/repositories/v1alpha1
@@ -356,7 +361,7 @@ imports:
 - name: github.com/go-openapi/jsonreference
   version: 13c6e3589ad90f49bd3e3bbe2c2cb3d7a4142272
 - name: github.com/go-openapi/spec
-  version: 7abd5745472fff5eb3685386d5fb8bf38683154d
+  version: 1de3e0542de65ad8d75452a595886fdd0befb363
 - name: github.com/go-openapi/swag
   version: f3f9494671f93fcff853e3c6e9e948b3eb71e590
 - name: github.com/gogo/protobuf
@@ -365,7 +370,7 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
+  version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/groupcache
   version: 02826c3e79038b59d737d3b1c0a1d937f71a4433
   subpackages:
@@ -452,7 +457,7 @@ imports:
 - name: github.com/json-iterator/go
   version: 13f86432b882000a51c6e610c620974462691a97
 - name: github.com/kubedb/apimachinery
-  version: ef349e6021d9b4905eb64e0335be83613a2afb7f
+  version: 39400609cc45604ee5ad5b97b113d9f8c55f3b77
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -487,7 +492,7 @@ imports:
 - name: github.com/ncw/swift
   version: b2a7479cf26fa841ff90dd932d0221cb5c50782d
 - name: github.com/nlopes/slack
-  version: d8ac454a777b2593d818e3e634bb99245962c42b
+  version: 8ab4d0b364ef1e9af5d102531da20d5ec902b6c4
 - name: github.com/NYTimes/gziphandler
   version: 56545f4a5d46df9a6648819d1664c3a03a13ffdb
 - name: github.com/olekukonko/tablewriter
@@ -550,6 +555,12 @@ imports:
   version: 1a28a7fa985680f9f4e1644c0a857ec359a444b0
 - name: github.com/robfig/cron
   version: b41be1df696709bb6395fe435af20370037c0b4c
+- name: github.com/rs/zerolog
+  version: b5207c012d2c2d73bec68f517ef281fdad38114b
+  subpackages:
+  - internal/cbor
+  - internal/json
+  - log
 - name: github.com/russross/blackfriday
   version: 300106c228d52c8941d4b3de6054a6062a86dda3
 - name: github.com/satori/uuid
@@ -666,7 +677,7 @@ imports:
   subpackages:
   - rate
 - name: google.golang.org/api
-  version: 15aea8711db98e640b277da9771a9d74270c2edc
+  version: d7aa31fbd7da4467a8056610e654315a4c1f068e
   subpackages:
   - gensupport
   - googleapi
@@ -1084,7 +1095,7 @@ imports:
   - util/retry
   - util/workqueue
 - name: k8s.io/kube-aggregator
-  version: 29c7989121fc30258c674f31aff9bbd393dfab5e
+  version: adfe041e31889bef412f2105d246e549f824ca92
   subpackages:
   - pkg/apis/apiregistration
   - pkg/apis/apiregistration/v1
@@ -1135,5 +1146,3 @@ testImports:
   version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
   subpackages:
   - assert
-- name: github.com/the-redback/go-oneliners
-  version: 82a97ec58df4809a2bc57ebbbcc1e6a2feb78111

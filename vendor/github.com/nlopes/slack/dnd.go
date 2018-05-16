@@ -64,8 +64,10 @@ func (api *Client) EndDNDContext(ctx context.Context) error {
 	if err := post(ctx, api.httpclient, "dnd.endDnd", values, response, api.debug); err != nil {
 		return err
 	}
-
-	return response.Err()
+	if !response.Ok {
+		return errors.New(response.Error)
+	}
+	return nil
 }
 
 // EndSnooze ends the current user's snooze mode

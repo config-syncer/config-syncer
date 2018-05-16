@@ -48,21 +48,23 @@ func (api *Client) AddStarContext(ctx context.Context, channel string, item Item
 		"token":   {api.token},
 	}
 	if item.Timestamp != "" {
-		values.Set("timestamp", item.Timestamp)
+		values.Set("timestamp", string(item.Timestamp))
 	}
 	if item.File != "" {
-		values.Set("file", item.File)
+		values.Set("file", string(item.File))
 	}
 	if item.Comment != "" {
-		values.Set("file_comment", item.Comment)
+		values.Set("file_comment", string(item.Comment))
 	}
 
 	response := &SlackResponse{}
 	if err := post(ctx, api.httpclient, "stars.add", values, response, api.debug); err != nil {
 		return err
 	}
-
-	return response.Err()
+	if !response.Ok {
+		return errors.New(response.Error)
+	}
+	return nil
 }
 
 // RemoveStar removes a starred item from a channel
@@ -77,21 +79,23 @@ func (api *Client) RemoveStarContext(ctx context.Context, channel string, item I
 		"token":   {api.token},
 	}
 	if item.Timestamp != "" {
-		values.Set("timestamp", item.Timestamp)
+		values.Set("timestamp", string(item.Timestamp))
 	}
 	if item.File != "" {
-		values.Set("file", item.File)
+		values.Set("file", string(item.File))
 	}
 	if item.Comment != "" {
-		values.Set("file_comment", item.Comment)
+		values.Set("file_comment", string(item.Comment))
 	}
 
 	response := &SlackResponse{}
 	if err := post(ctx, api.httpclient, "stars.remove", values, response, api.debug); err != nil {
 		return err
 	}
-
-	return response.Err()
+	if !response.Ok {
+		return errors.New(response.Error)
+	}
+	return nil
 }
 
 // ListStars returns information about the stars a user added
