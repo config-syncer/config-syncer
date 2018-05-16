@@ -1,13 +1,13 @@
 package main
 
 import (
-	"io/ioutil"
 	gort "github.com/appscode/go/runtime"
-	"github.com/appscode/kutil/openapi"
 	"github.com/appscode/kubed/apis/kubed/install"
 	"github.com/appscode/kubed/apis/kubed/v1alpha1"
+	"github.com/appscode/kutil/openapi"
 	"github.com/go-openapi/spec"
 	"github.com/golang/glog"
+	"io/ioutil"
 	"k8s.io/apimachinery/pkg/apimachinery/announced"
 	"k8s.io/apimachinery/pkg/apimachinery/registered"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -18,10 +18,10 @@ import (
 
 func generateSwaggerJson() {
 	var (
-		groupFactoryRegistry= make(announced.APIGroupFactoryRegistry)
-		registry= registered.NewOrDie("")
-		Scheme= runtime.NewScheme()
-		Codecs= serializer.NewCodecFactory(Scheme)
+		groupFactoryRegistry = make(announced.APIGroupFactoryRegistry)
+		registry             = registered.NewOrDie("")
+		Scheme               = runtime.NewScheme()
+		Codecs               = serializer.NewCodecFactory(Scheme)
 	)
 
 	install.Install(groupFactoryRegistry, registry, Scheme)

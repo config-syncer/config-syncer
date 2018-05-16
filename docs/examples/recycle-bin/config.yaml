@@ -1,10 +1,5 @@
 clusterName: unicorn
-notifierSecretName: notifier-config
 recycleBin:
   handleUpdates: false
   path: /tmp/kubed/trash
-  receivers:
-  - notifier: Mailgun
-    to:
-    - ops@example.com
   ttl: 168h

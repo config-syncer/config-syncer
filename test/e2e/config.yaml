@@ -1,3 +1,0 @@
-clusterName: minikube
-enableConfigSyncer: true
-kubeConfig: /home/dipta/all/kubed-test/kubeconfig

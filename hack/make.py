@@ -171,8 +171,8 @@ def test(type, *args):
         die(call(libbuild.GOC + ' test -v ./pkg/...'))
     elif type == 'e2e':
         st = ' '.join(args)
-        die(call(libbuild.GOC + ' test -v ./test/e2e/... -args -ginkgo.v -ginkgo.progress -ginkgo.trace ' + st))
-        # die(call('ginkgo ./test/e2e -r --v --progress --trace -- ' + st))
+        # die(call(libbuild.GOC + ' test -v ./test/e2e/... -args -ginkgo.v -ginkgo.progress -ginkgo.trace ' + st))
+        die(call('ginkgo -r -v -progress -trace test/e2e -- ' + " ".join(args)))
     else:
         print '{test unit|e2e}'
 

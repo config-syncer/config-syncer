@@ -1,5 +1,5 @@
 hash: cf1257127c911156e6bbeb81552dd14834bb80dbabe8553a7733053700a2a903
-updated: 2018-05-05T12:42:52.079697286-07:00
+updated: 2018-05-14T21:13:14.425967971+06:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -22,6 +22,7 @@ imports:
   - homedir
   - log
   - log/golog
+  - net
   - net/httpclient
   - runtime
   - sets
@@ -29,7 +30,7 @@ imports:
   - types
   - version
 - name: github.com/appscode/go-notify
-  version: 223b426de3481d50ab14384a0e899bfa26768c30
+  version: fa7a471a406a5d19120bd693b08a0d0cffcd2ee3
   subpackages:
   - discord
   - hipchat
@@ -44,7 +45,7 @@ imports:
   - unified
   - webhook
 - name: github.com/appscode/jsonpatch
-  version: 58a38a46ddb591a543c6b1003213353e29331c5a
+  version: 1359b374de83fa14fd58ab10aa8ea4935f84d249
 - name: github.com/appscode/kube-mon
   version: dc81c09a885b0862f1bbbae3e440a68fbf2b36a6
   subpackages:
@@ -54,8 +55,9 @@ imports:
   version: 5a1b68c81878cdb4e07a7b5dbdbb6c88e7f5fa04
   subpackages:
   - apis/workload/v1
+  - client/workload/v1
 - name: github.com/appscode/kutil
-  version: ed8d181d523ddd37e5cb7a23fa457b4c370a5140
+  version: c397449684de5caf2de0309e6453eab905901cf8
   subpackages:
   - apiextensions/v1beta1
   - core/v1
@@ -64,6 +66,7 @@ imports:
   - openapi
   - tools/analytics
   - tools/backup
+  - tools/certstore
   - tools/clientcmd
   - tools/fsnotify
   - tools/queue
@@ -92,7 +95,7 @@ imports:
   - client/informers/externalversions/monitoring/v1alpha1
   - client/listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: 3ca33f76ba3245cced170a77a1d1bcf711117fad
+  version: 4bddc2e10982130ee424737372e1c7c44435b16f
   subpackages:
   - apis/repositories
   - apis/repositories/v1alpha1
@@ -108,7 +111,7 @@ imports:
   - client/informers/externalversions/stash/v1alpha1
   - client/listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: c15850d90e36e0e16e05a4edfa4a91a450979e7a
+  version: 9f2f5d5effc76dd98544f69bd9ed3d691bd8d358
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -324,6 +327,10 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
+- name: github.com/docker/spdystream
+  version: 449fdfce4d962303d702fec724ef0ad181c92528
+  subpackages:
+  - spdy
 - name: github.com/edsrzf/mmap-go
   version: 935e0e8a636ca4ba70b713f3e38a19e1b77739e8
 - name: github.com/elazarl/go-bindata-assetfs
@@ -349,7 +356,7 @@ imports:
 - name: github.com/go-openapi/jsonreference
   version: 13c6e3589ad90f49bd3e3bbe2c2cb3d7a4142272
 - name: github.com/go-openapi/spec
-  version: 1de3e0542de65ad8d75452a595886fdd0befb363
+  version: 7abd5745472fff5eb3685386d5fb8bf38683154d
 - name: github.com/go-openapi/swag
   version: f3f9494671f93fcff853e3c6e9e948b3eb71e590
 - name: github.com/gogo/protobuf
@@ -358,7 +365,7 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 44145f04b68cf362d9c4df2182967c2275eaefed
+  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
 - name: github.com/golang/groupcache
   version: 02826c3e79038b59d737d3b1c0a1d937f71a4433
   subpackages:
@@ -445,7 +452,7 @@ imports:
 - name: github.com/json-iterator/go
   version: 13f86432b882000a51c6e610c620974462691a97
 - name: github.com/kubedb/apimachinery
-  version: 06f741a3961f6f6c83b7a24fdfa5dff753c15444
+  version: ef349e6021d9b4905eb64e0335be83613a2afb7f
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -480,31 +487,11 @@ imports:
 - name: github.com/ncw/swift
   version: b2a7479cf26fa841ff90dd932d0221cb5c50782d
 - name: github.com/nlopes/slack
-  version: 8ab4d0b364ef1e9af5d102531da20d5ec902b6c4
+  version: d8ac454a777b2593d818e3e634bb99245962c42b
 - name: github.com/NYTimes/gziphandler
   version: 56545f4a5d46df9a6648819d1664c3a03a13ffdb
 - name: github.com/olekukonko/tablewriter
   version: cca8bbc0798408af109aaaa239cbd2634846b340
-- name: github.com/onsi/ginkgo
-  version: 11459a886d9cd66b319dac7ef1e917ee221372c9
-  subpackages:
-  - config
-  - internal/codelocation
-  - internal/containernode
-  - internal/failer
-  - internal/leafnodes
-  - internal/remote
-  - internal/spec
-  - internal/spec_iterator
-  - internal/specrunner
-  - internal/suite
-  - internal/testingtproxy
-  - internal/writer
-  - reporters
-  - reporters/stenographer
-  - reporters/stenographer/support/go-colorable
-  - reporters/stenographer/support/go-isatty
-  - types
 - name: github.com/onsi/gomega
   version: dcabb60a477c2b6f456df65037cb6708210fbb02
   subpackages:
@@ -519,12 +506,22 @@ imports:
   - matchers/support/goraph/node
   - matchers/support/goraph/util
   - types
+- name: github.com/openshift/api
+  version: 09a4e3d50f1aae6613b1b86941ffb8bded21e674
+  subpackages:
+  - apps/v1
+- name: github.com/openshift/client-go
+  version: b3f4c8b4682c151defdd33ce75acfbf5fb30bccc
+  subpackages:
+  - apps/clientset/versioned
+  - apps/clientset/versioned/scheme
+  - apps/clientset/versioned/typed/apps/v1
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/philhofer/fwd
   version: bb6d471dc95d4fe11e432687f8b70ff496cf3136
 - name: github.com/pkg/errors
-  version: 816c9085562cd7ee03e7f8188a1cfd942858cded
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -550,9 +547,9 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/RoaringBitmap/roaring
-  version: e4aafc3cbc16a7f61c5dbdc635088c8fe26da4a5
+  version: 1a28a7fa985680f9f4e1644c0a857ec359a444b0
 - name: github.com/robfig/cron
-  version: da757ee1bf6762b4f03db86a7f043c43ca23866e
+  version: b41be1df696709bb6395fe435af20370037c0b4c
 - name: github.com/russross/blackfriday
   version: 300106c228d52c8941d4b3de6054a6062a86dda3
 - name: github.com/satori/uuid
@@ -567,6 +564,10 @@ imports:
   version: f006c2ac4710855cf0f916dd6b77acf6b048dc6e
 - name: github.com/Smerity/govarint
   version: 7265e41f48f15fd61751e16da866af3c704bb3ab
+- name: github.com/spf13/afero
+  version: bb8f1927f2a9d3ab41c9340aa034f6b803f4359c
+  subpackages:
+  - mem
 - name: github.com/spf13/cobra
   version: ef82de70bb3f60c65fb8eebacbb2d122ef517385
   subpackages:
@@ -665,7 +666,7 @@ imports:
   subpackages:
   - rate
 - name: google.golang.org/api
-  version: bb395b674c9930450ea7243b3e3c8f43150f4c11
+  version: 15aea8711db98e640b277da9771a9d74270c2edc
   subpackages:
   - gensupport
   - googleapi
@@ -806,11 +807,14 @@ imports:
   - pkg/util/diff
   - pkg/util/errors
   - pkg/util/framer
+  - pkg/util/httpstream
+  - pkg/util/httpstream/spdy
   - pkg/util/intstr
   - pkg/util/json
   - pkg/util/mergepatch
   - pkg/util/net
   - pkg/util/rand
+  - pkg/util/remotecommand
   - pkg/util/runtime
   - pkg/util/sets
   - pkg/util/strategicpatch
@@ -823,6 +827,7 @@ imports:
   - pkg/version
   - pkg/watch
   - third_party/forked/golang/json
+  - third_party/forked/golang/netutil
   - third_party/forked/golang/reflect
 - name: k8s.io/apiserver
   version: 6fdedd7050e542dd8c23fdababac0237aedd7f9e
@@ -1066,15 +1071,28 @@ imports:
   - tools/pager
   - tools/record
   - tools/reference
+  - tools/remotecommand
   - transport
+  - transport/spdy
   - util/buffer
   - util/cert
+  - util/exec
   - util/flowcontrol
   - util/homedir
   - util/integer
   - util/jsonpath
   - util/retry
   - util/workqueue
+- name: k8s.io/kube-aggregator
+  version: 29c7989121fc30258c674f31aff9bbd393dfab5e
+  subpackages:
+  - pkg/apis/apiregistration
+  - pkg/apis/apiregistration/v1
+  - pkg/apis/apiregistration/v1beta1
+  - pkg/client/clientset_generated/clientset
+  - pkg/client/clientset_generated/clientset/scheme
+  - pkg/client/clientset_generated/clientset/typed/apiregistration/v1
+  - pkg/client/clientset_generated/clientset/typed/apiregistration/v1beta1
 - name: k8s.io/kube-openapi
   version: 50ae88d24ede7b8bad68e23c805b5d3da5c8abaf
   subpackages:
@@ -1086,8 +1104,29 @@ imports:
 - name: k8s.io/kubernetes
   version: fc32d2f3698e36b93322a3465f63a14e9f0eaead
   subpackages:
+  - pkg/api/legacyscheme
   - pkg/util/hash
 testImports:
+- name: github.com/onsi/ginkgo
+  version: 11459a886d9cd66b319dac7ef1e917ee221372c9
+  subpackages:
+  - config
+  - internal/codelocation
+  - internal/containernode
+  - internal/failer
+  - internal/leafnodes
+  - internal/remote
+  - internal/spec
+  - internal/spec_iterator
+  - internal/specrunner
+  - internal/suite
+  - internal/testingtproxy
+  - internal/writer
+  - reporters
+  - reporters/stenographer
+  - reporters/stenographer/support/go-colorable
+  - reporters/stenographer/support/go-isatty
+  - types
 - name: github.com/pmezard/go-difflib
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
@@ -1096,3 +1135,5 @@ testImports:
   version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
   subpackages:
   - assert
+- name: github.com/the-redback/go-oneliners
+  version: 82a97ec58df4809a2bc57ebbbcc1e6a2feb78111

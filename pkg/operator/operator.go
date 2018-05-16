@@ -96,8 +96,8 @@ type Operator struct {
 
 	watcher *fsnotify.Watcher
 
-	config api.ClusterConfig
-	lock   sync.RWMutex
+	clusterConfig api.ClusterConfig
+	lock          sync.RWMutex
 }
 
 func (op *Operator) Configure() error {
@@ -116,10 +116,10 @@ func (op *Operator) Configure() error {
 	if err != nil {
 		return err
 	}
-	op.config = *cfg
+	op.clusterConfig = *cfg
 
-	if op.config.RecycleBin != nil && op.config.RecycleBin.Path == "" {
-		op.config.RecycleBin.Path = filepath.Join(op.ScratchDir, "transhcan")
+	if op.clusterConfig.RecycleBin != nil && op.clusterConfig.RecycleBin.Path == "" {
+		op.clusterConfig.RecycleBin.Path = filepath.Join(op.ScratchDir, "trashcan")
 	}
 
 	op.notifierCred, err = op.getLoader()
@@ -127,22 +127,22 @@ func (op *Operator) Configure() error {
 		return err
 	}
 
-	err = op.trashCan.Configure(op.config.ClusterName, op.config.RecycleBin)
+	err = op.trashCan.Configure(op.clusterConfig.ClusterName, op.clusterConfig.RecycleBin)
 	if err != nil {
 		return err
 	}
 
-	err = op.eventProcessor.Configure(op.config.ClusterName, op.config.EventForwarder, op.notifierCred)
+	err = op.eventProcessor.Configure(op.clusterConfig.ClusterName, op.clusterConfig.EventForwarder, op.notifierCred)
 	if err != nil {
 		return err
 	}
 
-	err = op.configSyncer.Configure(op.config.ClusterName, op.config.KubeConfigFile, op.config.EnableConfigSyncer)
+	err = op.configSyncer.Configure(op.clusterConfig.ClusterName, op.clusterConfig.KubeConfigFile, op.clusterConfig.EnableConfigSyncer)
 	if err != nil {
 		return err
 	}
 
-	for _, j := range op.config.Janitors {
+	for _, j := range op.clusterConfig.Janitors {
 		if j.Kind == api.JanitorInfluxDB {
 			janitor := influx.Janitor{Spec: *j.InfluxDB, TTL: j.TTL.Duration}
 			err = janitor.Cleanup()
@@ -357,14 +357,14 @@ func (op *Operator) addEventHandlers(informer cache.SharedIndexInformer, gvk sch
 }
 
 func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {
-	if op.config.NotifierSecretName == "" {
+	if op.clusterConfig.NotifierSecretName == "" {
 		return func(key string) (string, bool) {
 			return "", false
 		}, nil
 	}
 	cfg, err := op.KubeClient.CoreV1().
 		Secrets(op.OperatorNamespace).
-		Get(op.config.NotifierSecretName, metav1.GetOptions{})
+		Get(op.clusterConfig.NotifierSecretName, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -447,7 +447,7 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 }
 
 func (op *Operator) RunElasticsearchCleaner() error {
-	for _, j := range op.config.Janitors {
+	for _, j := range op.clusterConfig.Janitors {
 		if j.Kind == api.JanitorElasticsearch {
 			var authInfo *api.JanitorAuthInfo
 
@@ -483,7 +483,12 @@ func (op *Operator) RunTrashCanCleaner() error {
 		return nil
 	}
 
-	return op.cron.AddFunc("@every 1h", func() {
+	schedule := "@every 1h"
+	if op.Test {
+		schedule = "@every 1m"
+	}
+
+	return op.cron.AddFunc(schedule, func() {
 		err := op.trashCan.Cleanup()
 		if err != nil {
 			log.Errorln(err)
@@ -492,17 +497,17 @@ func (op *Operator) RunTrashCanCleaner() error {
 }
 
 func (op *Operator) RunSnapshotter() error {
-	if op.config.Snapshotter == nil {
+	if op.clusterConfig.Snapshotter == nil {
 		return nil
 	}
 
 	osmconfigPath := filepath.Join(op.ScratchDir, "osm", "config.yaml")
-	err := storage.WriteOSMConfig(op.KubeClient, op.config.Snapshotter.Backend, op.OperatorNamespace, osmconfigPath)
+	err := storage.WriteOSMConfig(op.KubeClient, op.clusterConfig.Snapshotter.Backend, op.OperatorNamespace, osmconfigPath)
 	if err != nil {
 		return err
 	}
 
-	container, err := op.config.Snapshotter.Backend.Container()
+	container, err := op.clusterConfig.Snapshotter.Backend.Container()
 	if err != nil {
 		return err
 	}
@@ -512,7 +517,7 @@ func (op *Operator) RunSnapshotter() error {
 	sh.SetDir(op.ScratchDir)
 	sh.ShowCMD = true
 	snapshotter := func() error {
-		mgr := backup.NewBackupManager(op.config.ClusterName, op.ClientConfig, op.config.Snapshotter.Sanitize)
+		mgr := backup.NewBackupManager(op.clusterConfig.ClusterName, op.ClientConfig, op.clusterConfig.Snapshotter.Sanitize)
 		snapshotFile, err := mgr.BackupToTar(filepath.Join(op.ScratchDir, "snapshot"))
 		if err != nil {
 			return err
@@ -522,7 +527,7 @@ func (op *Operator) RunSnapshotter() error {
 				log.Errorln(err)
 			}
 		}()
-		dest, err := op.config.Snapshotter.Location(filepath.Base(snapshotFile))
+		dest, err := op.clusterConfig.Snapshotter.Location(filepath.Base(snapshotFile))
 		if err != nil {
 			return err
 		}
@@ -535,34 +540,56 @@ func (op *Operator) RunSnapshotter() error {
 			log.Errorln(err)
 		}
 	}()
-	return op.cron.AddFunc(op.config.Snapshotter.Schedule, func() {
-		err := snapshotter()
-		if err != nil {
-			log.Errorln(err)
-		}
-	})
+
+	if !op.Test { // don't run cronjob for test. it cause problem for consecutive tests.
+		return op.cron.AddFunc(op.clusterConfig.Snapshotter.Schedule, func() {
+			err := snapshotter()
+			if err != nil {
+				log.Errorln(err)
+			}
+		})
+	}
+	return nil
 }
 
-func (op *Operator) Run(stopCh <-chan struct{}) error {
-	if err := op.RunElasticsearchCleaner(); err != nil {
-		return err
+func (op *Operator) Run(stopCh <-chan struct{}) {
+	startOperator := true
+	for {
+		select {
+		case <-stopCh:
+			return
+		default:
+			if startOperator {
+				startOperator = false
+				if err := op.RunElasticsearchCleaner(); err != nil {
+					log.Fatalln(err.Error())
+				}
+
+				if err := op.RunTrashCanCleaner(); err != nil {
+					log.Fatalln(err.Error())
+				}
+
+				if err := op.RunSnapshotter(); err != nil {
+					log.Fatalln(err.Error())
+				}
+
+				op.RunWatchers(stopCh)
+
+				go op.watcher.Run(stopCh)
+
+				if !op.Test { // don't run prometheus server for test. it can't be restarted for consecutive tests.
+					go func() {
+						m := pat.New()
+						m.Get("/metrics", promhttp.Handler())
+						http.Handle("/", m)
+						log.Infoln("Listening on", op.OpsAddress)
+						err := http.ListenAndServe(op.OpsAddress, nil)
+						if err != nil {
+							log.Fatalln(err.Error())
+						}
+					}()
+				}
+			}
+		}
 	}
-
-	if err := op.RunTrashCanCleaner(); err != nil {
-		return err
-	}
-
-	if err := op.RunSnapshotter(); err != nil {
-		return err
-	}
-
-	op.RunWatchers(stopCh)
-
-	go op.watcher.Run(stopCh)
-
-	m := pat.New()
-	m.Get("/metrics", promhttp.Handler())
-	http.Handle("/", m)
-	log.Infoln("Listening on", op.OpsAddress)
-	return http.ListenAndServe(op.OpsAddress, nil)
 }

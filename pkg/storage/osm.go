@@ -143,8 +143,24 @@ func NewOSMContext(client kubernetes.Interface, spec api.Backend, namespace stri
 			nc.Config[s3.ConfigRegion] = stringz.Val(types.String(out.LocationConstraint), "us-east-1")
 		} else {
 			nc.Config[s3.ConfigEndpoint] = spec.S3.Endpoint
-			if u, err := url.Parse(spec.S3.Endpoint); err == nil {
-				nc.Config[s3.ConfigDisableSSL] = strconv.FormatBool(u.Scheme == "http")
+			u, err := url.Parse(spec.S3.Endpoint)
+			if err != nil {
+				return nil, err
+			}
+			nc.Config[s3.ConfigDisableSSL] = strconv.FormatBool(u.Scheme == "http")
+
+			cacertData, ok := config[api.CA_CERT_DATA]
+			if ok && u.Scheme == "https" {
+				certFileName := filepath.Join(SecretMountPath, "ca.crt")
+				err = os.MkdirAll(filepath.Dir(certFileName), 0755)
+				if err != nil {
+					return nil, err
+				}
+				err = ioutil.WriteFile(certFileName, cacertData, 0755)
+				if err != nil {
+					return nil, err
+				}
+				nc.Config[s3.ConfigCACertFile] = certFileName
 			}
 		}
 		return nc, nil

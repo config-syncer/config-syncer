@@ -4,6 +4,7 @@ import (
 	"crypto/x509"
 	"net"
 	"reflect"
+	"sort"
 	"strings"
 	"time"
 
@@ -64,6 +65,14 @@ func (r Ingress) HasChanged(o Ingress) (bool, error) {
 		}
 	}
 	return !reflect.DeepEqual(ra, oa), nil
+}
+
+func (r Ingress) UseTLSForRule(rule IngressRule) bool {
+	if (rule.HTTP != nil && rule.HTTP.NoTLS) || (rule.TCP != nil && rule.TCP.NoTLS) {
+		return false
+	}
+	_, ok := r.FindTLSSecret(rule.Host)
+	return ok
 }
 
 func (r Ingress) FindTLSSecret(h string) (*LocalTypedReference, bool) {
@@ -226,7 +235,7 @@ func (c Certificate) ShouldRenew(crt *x509.Certificate) bool {
 func (c Certificate) IsRateLimited() bool {
 	for _, cond := range c.Status.Conditions {
 		if cond.Type == CertificateRateLimited {
-			return time.Now().Add(-24 * time.Hour).Before(cond.LastUpdateTime.Time)
+			return time.Now().Add(-65 * time.Minute).Before(cond.LastUpdateTime.Time)
 		}
 	}
 	return false
@@ -265,4 +274,22 @@ func (r IngressRule) GetHost() string {
 		return ``
 	}
 	return host
+}
+
+func (r IngressRule) ParseALPNOptions() string {
+	var opts []string
+	if r.HTTP != nil {
+		if len(r.HTTP.ALPN) > 0 {
+			opts = append(opts, r.HTTP.ALPN...) // copy slice, don't modify the input
+		} else {
+			opts = []string{"http/1.1"} //maintain backward compatibility
+		}
+	} else if r.TCP != nil {
+		opts = append(opts, r.TCP.ALPN...) // copy slice, don't modify the input
+	}
+	if len(opts) <= 0 {
+		return ""
+	}
+	sort.Strings(opts)
+	return "alpn " + strings.Join(opts, ",")
 }

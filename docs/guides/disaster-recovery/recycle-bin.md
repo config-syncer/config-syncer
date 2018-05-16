@@ -30,15 +30,10 @@ To enable config syncer, you need a cluster config like below.
 $ cat ./docs/examples/recycle-bin/config.yaml
 
 clusterName: unicorn
-notifierSecretName: notifier-config
 recycleBin:
+  handleUpdates: false
   path: /tmp/kubed/trash
   ttl: 168h
-  handleUpdates: false
-  receivers:
-  - notifier: Mailgun
-    to:
-    - ops@example.com
 ```
 
 | Key                        | Description                                                                               |

@@ -66,6 +66,7 @@ func (s *OperatorOptions) ApplyTo(cfg *operator.OperatorConfig) error {
 	cfg.ClientConfig.QPS = s.QPS
 	cfg.ClientConfig.Burst = s.Burst
 	cfg.ResyncPeriod = s.ResyncPeriod
+	cfg.Test = false
 
 	if cfg.KubeClient, err = kubernetes.NewForConfig(cfg.ClientConfig); err != nil {
 		return err
