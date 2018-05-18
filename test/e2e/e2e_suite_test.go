@@ -69,6 +69,6 @@ var _ = BeforeSuite(func() {
 var _ = AfterSuite(func() {
 	By("Cleaning API service stuff")
 	root.Invoke().DeleteAPIService()
-	root.DeleteNamespace()
+	root.DeleteNamespace(root.Namespace())
 	os.Remove(framework.KubedTestConfigFileDir)
 })

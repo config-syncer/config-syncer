@@ -48,7 +48,7 @@ var _ = Describe("Snapshotter", func() {
 		}
 
 		if backend.Local == nil {
-			err := f.CreateSecret(cred)
+			_, err := f.CreateSecret(&cred)
 			Expect(err).NotTo(HaveOccurred())
 			err = f.WaitUntilSecretCreated(cred.ObjectMeta)
 			Expect(err).NotTo(HaveOccurred())

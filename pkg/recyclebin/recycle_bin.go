@@ -63,7 +63,7 @@ func (c *RecycleBin) OnDelete(obj interface{}) {
 }
 
 func (c *RecycleBin) update(oldObj, newObj interface{}) error {
-	om, err := meta.Accessor(newObj)
+	om, err := meta.Accessor(oldObj)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (c *RecycleBin) update(oldObj, newObj interface{}) error {
 	fn := fmt.Sprintf("%s.%s.yaml", name, om.GetCreationTimestamp().UTC().Format(api.TimestampFormat))
 
 	fullPath := filepath.Join(dir, fn)
-	data, err := yaml.Marshal(newObj)
+	data, err := yaml.Marshal(oldObj)
 	if err != nil {
 		return err
 	}

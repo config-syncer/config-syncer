@@ -65,7 +65,7 @@ var _ = Describe("Event-forwarder", func() {
 			notifierSecret = f.SecretForWebhookNotifier()
 
 			By("Creating notifier secret: " + notifierSecret.Name)
-			err := f.CreateSecret(*notifierSecret)
+			_, err := f.CreateSecret(notifierSecret)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Creating clusterConfiguration")

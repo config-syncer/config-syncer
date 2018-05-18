@@ -11,6 +11,8 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
+	"github.com/appscode/kubed/pkg/syncer"
+	"reflect"
 )
 
 func (f *Invocation) NewSecret() *core.Secret {
@@ -58,6 +60,121 @@ func (f *Invocation) EventuallyNumOfSecretsForClient(client kubernetes.Interface
 	})
 }
 
+func (f *Invocation) EventuallySecretSynced(source *core.Secret) GomegaAsyncAssertion {
+	opt := syncer.GetSyncOptions(source.Annotations)
+
+	return Eventually(func() bool {
+
+		if opt.NamespaceSelector != nil {
+			namespaces, err := syncer.NamespacesForSelector(f.KubeClient, *opt.NamespaceSelector)
+			Expect(err).NotTo(HaveOccurred())
+
+			for _, ns := range namespaces.List() {
+				if ns == source.Name {
+					continue
+				}
+				_, err := f.KubeClient.CoreV1().Secrets(ns).Get(source.Name, metav1.GetOptions{})
+				if err != nil {
+					return false
+				}
+			}
+			return true
+
+		} else if opt.Contexts != nil {
+			//TODO: Check across context
+		}
+		return false
+	})
+}
+
+func (f *Invocation) EventuallySecretNotSynced(source *core.Secret) GomegaAsyncAssertion {
+
+	return Eventually(func() bool {
+		namespaces, err := f.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
+		Expect(err).NotTo(HaveOccurred())
+
+		for _, ns := range namespaces.Items {
+			if ns.Name == source.Name {
+				continue
+			}
+			_, err := f.KubeClient.CoreV1().Secrets(ns.Namespace).Get(source.Name, metav1.GetOptions{})
+			if err == nil {
+				return false
+			}
+		}
+		return true
+	})
+}
+
+func (f *Invocation) EventuallySecretSyncedToNamespace(source *core.Secret, namespace string) GomegaAsyncAssertion {
+	return Eventually(func() bool {
+		_, err := f.KubeClient.CoreV1().Secrets(namespace).Get(source.Name, metav1.GetOptions{})
+		if err != nil {
+			return false
+		}
+
+		return true
+	})
+}
+
+func (f *Invocation) EventuallySyncedSecretsUpdated(source *core.Secret) GomegaAsyncAssertion {
+	opt := syncer.GetSyncOptions(source.Annotations)
+
+	return Eventually(func() bool {
+
+		if opt.NamespaceSelector != nil {
+			namespaces, err := syncer.NamespacesForSelector(f.KubeClient, *opt.NamespaceSelector)
+			Expect(err).NotTo(HaveOccurred())
+
+			for _, ns := range namespaces.List() {
+				if ns == source.Namespace {
+					continue
+				}
+				secretReplica, err := f.KubeClient.CoreV1().Secrets(ns).Get(source.Name, metav1.GetOptions{})
+				if err != nil {
+					return false
+				}
+				if !reflect.DeepEqual(source.Data, secretReplica.Data) {
+					return false
+				}
+			}
+			return true
+
+		} else if opt.Contexts != nil {
+			//TODO: Check across context
+		}
+		return false
+	})
+}
+
+func (f *Invocation) EventuallySyncedSecretsDeleted(source *core.Secret) GomegaAsyncAssertion {
+	opt := syncer.GetSyncOptions(source.Annotations)
+
+	return Eventually(func() bool {
+
+		if opt.NamespaceSelector != nil {
+			namespaces, err := syncer.NamespacesForSelector(f.KubeClient, *opt.NamespaceSelector)
+			Expect(err).NotTo(HaveOccurred())
+
+			for _, ns := range namespaces.List() {
+				if ns == source.Namespace {
+					continue
+				}
+				_, err := f.KubeClient.CoreV1().Secrets(ns).Get(source.Name, metav1.GetOptions{})
+				if err == nil {
+					return false
+				}
+			}
+			return true
+
+		} else if opt.Contexts != nil {
+			//TODO: Check across context
+		}
+		return false
+	})
+}
+
+
 func (f *Invocation) DeleteAllSecrets() {
 	secrets, err := f.KubeClient.CoreV1().Secrets(metav1.NamespaceAll).List(metav1.ListOptions{
 		LabelSelector: labels.Set{
@@ -75,9 +192,8 @@ func (f *Invocation) DeleteAllSecrets() {
 	}
 }
 
-func (f *Framework) CreateSecret(obj core.Secret) error {
-	_, err := f.KubeClient.CoreV1().Secrets(obj.Namespace).Create(&obj)
-	return err
+func (f *Framework) CreateSecret(obj *core.Secret) (*core.Secret,error) {
+	return f.KubeClient.CoreV1().Secrets(obj.Namespace).Create(obj)
 }
 
 func (f *Framework) DeleteSecret(meta metav1.ObjectMeta) error {

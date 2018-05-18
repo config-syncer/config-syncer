@@ -43,7 +43,7 @@ var (
 func (fi *Invocation) CreateMinioServer(tls bool, ips []net.IP) (string, error) {
 	//creating secret for minio server
 	mcred = fi.SecretForMinioServer(ips)
-	err := fi.CreateSecret(mcred)
+	_, err := fi.CreateSecret(&mcred)
 	if err != nil {
 		return "", err
 	}
