@@ -43,7 +43,7 @@ type SearchlightPluginSpec struct {
 	// Supported arguments for SearchlightPlugin
 	Arguments PluginArguments `json:"arguments,omitempty"`
 	// Supported Icinga Service State
-	State []string `json:"state"`
+	States []string `json:"states"`
 }
 
 type WebhookServiceSpec struct {
@@ -69,7 +69,7 @@ type PluginVarItem struct {
 }
 
 type PluginVars struct {
-	Items    map[string]PluginVarItem `json:"Item"`
+	Items    map[string]PluginVarItem `json:"items"`
 	Required []string                 `json:"required,omitempty"`
 }
 

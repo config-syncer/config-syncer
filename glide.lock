@@ -1,5 +1,5 @@
 hash: cf1257127c911156e6bbeb81552dd14834bb80dbabe8553a7733053700a2a903
-updated: 2018-05-16T02:18:42.175817644-07:00
+updated: 2018-05-17T22:24:08.460113891-07:00
 imports:
 - name: bitbucket.org/atlassian/go-stride
   version: 8846b835cb45ec8707e6694533a2b6180861cdbe
@@ -62,7 +62,7 @@ imports:
   - apis/workload/v1
   - client/workload/v1
 - name: github.com/appscode/kutil
-  version: c397449684de5caf2de0309e6453eab905901cf8
+  version: 58e34c2195a0b9eee67eea40701f7f7759f3f79f
   subpackages:
   - apiextensions/v1beta1
   - core/v1
@@ -84,7 +84,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 2a7eda3639f46eaed615f14cd21259492de88fe4
+  version: 93aecf99952362f1e49b71db4c7c389cdf46ed0d
   subpackages:
   - apis/incidents
   - apis/incidents/v1alpha1
@@ -100,7 +100,7 @@ imports:
   - client/informers/externalversions/monitoring/v1alpha1
   - client/listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: c8c18fb5c96030f4a81529f9520f618c6cc1d1f4
+  version: b694835b78dc7f996829eb37bb506045c10b33da
   subpackages:
   - apis/repositories
   - apis/repositories/v1alpha1
@@ -116,7 +116,7 @@ imports:
   - client/informers/externalversions/stash/v1alpha1
   - client/listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 9f2f5d5effc76dd98544f69bd9ed3d691bd8d358
+  version: 3c688e53248aa8c3daa33b3b7d7cbc247a04882c
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -222,7 +222,7 @@ imports:
 - name: github.com/bwmarrin/discordgo
   version: 4a33b9bc7c56cfdb9bb244e33e83cb3941fe2bdc
 - name: github.com/cenkalti/backoff
-  version: 61153c768f31ee5f130071d08fc82b85208528de
+  version: 2ea60e5f094469f9e65adb9cd103795b73ae743e
 - name: github.com/codegangsta/inject
   version: 33e0aa1cb7c019ccc3fbe049a8262a6403d30504
 - name: github.com/codeskyblue/go-sh
@@ -332,10 +332,6 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
-- name: github.com/docker/spdystream
-  version: 449fdfce4d962303d702fec724ef0ad181c92528
-  subpackages:
-  - spdy
 - name: github.com/edsrzf/mmap-go
   version: 935e0e8a636ca4ba70b713f3e38a19e1b77739e8
 - name: github.com/elazarl/go-bindata-assetfs
@@ -457,7 +453,7 @@ imports:
 - name: github.com/json-iterator/go
   version: 13f86432b882000a51c6e610c620974462691a97
 - name: github.com/kubedb/apimachinery
-  version: 39400609cc45604ee5ad5b97b113d9f8c55f3b77
+  version: a8071385b2fc35db545bc8a3b516e711217d3cce
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -526,7 +522,7 @@ imports:
 - name: github.com/philhofer/fwd
   version: bb6d471dc95d4fe11e432687f8b70ff496cf3136
 - name: github.com/pkg/errors
-  version: 645ef00459ed84a119197bfb8d8205042c6df63d
+  version: 816c9085562cd7ee03e7f8188a1cfd942858cded
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -556,7 +552,7 @@ imports:
 - name: github.com/robfig/cron
   version: b41be1df696709bb6395fe435af20370037c0b4c
 - name: github.com/rs/zerolog
-  version: b5207c012d2c2d73bec68f517ef281fdad38114b
+  version: ea197802eb218ea675a8286a77c13e132aa9a21c
   subpackages:
   - internal/cbor
   - internal/json
@@ -595,7 +591,7 @@ imports:
   subpackages:
   - hipchat
 - name: github.com/tinylib/msgp
-  version: 3b5c87ab5fb00c660bf85b888445d9a01db64db4
+  version: c8cf64dff2009d53fa8f8a16df54d1cdfc64c4a7
   subpackages:
   - msgp
 - name: github.com/ugorji/go
@@ -677,7 +673,7 @@ imports:
   subpackages:
   - rate
 - name: google.golang.org/api
-  version: d7aa31fbd7da4467a8056610e654315a4c1f068e
+  version: aedc137bffcaca05f836e35c6d182fcb7a68b1c0
   subpackages:
   - gensupport
   - googleapi
@@ -818,14 +814,11 @@ imports:
   - pkg/util/diff
   - pkg/util/errors
   - pkg/util/framer
-  - pkg/util/httpstream
-  - pkg/util/httpstream/spdy
   - pkg/util/intstr
   - pkg/util/json
   - pkg/util/mergepatch
   - pkg/util/net
   - pkg/util/rand
-  - pkg/util/remotecommand
   - pkg/util/runtime
   - pkg/util/sets
   - pkg/util/strategicpatch
@@ -838,7 +831,6 @@ imports:
   - pkg/version
   - pkg/watch
   - third_party/forked/golang/json
-  - third_party/forked/golang/netutil
   - third_party/forked/golang/reflect
 - name: k8s.io/apiserver
   version: 6fdedd7050e542dd8c23fdababac0237aedd7f9e
@@ -1082,12 +1074,9 @@ imports:
   - tools/pager
   - tools/record
   - tools/reference
-  - tools/remotecommand
   - transport
-  - transport/spdy
   - util/buffer
   - util/cert
-  - util/exec
   - util/flowcontrol
   - util/homedir
   - util/integer

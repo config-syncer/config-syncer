@@ -629,8 +629,8 @@ func (in *SearchlightPluginSpec) DeepCopyInto(out *SearchlightPluginSpec) {
 		copy(*out, *in)
 	}
 	in.Arguments.DeepCopyInto(&out.Arguments)
-	if in.State != nil {
-		in, out := &in.State, &out.State
+	if in.States != nil {
+		in, out := &in.States, &out.States
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}

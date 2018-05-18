@@ -32,7 +32,7 @@ type MongoDBSpec struct {
 	// Number of instances to deploy for a MongoDB database.
 	Replicas *int32 `json:"replicas,omitempty"`
 	// Storage spec to specify how storage shall be used.
-	Storage *core.PersistentVolumeClaimSpec `json:"storage,omitempty"`
+	Storage core.PersistentVolumeClaimSpec `json:"storage"`
 	// Database authentication secret
 	DatabaseSecret *core.SecretVolumeSource `json:"databaseSecret,omitempty"`
 	// NodeSelector is a selector which must be true for the pod to fit on a node
