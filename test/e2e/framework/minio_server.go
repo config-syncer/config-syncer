@@ -15,7 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/util/cert"
 )
 
@@ -298,22 +297,4 @@ func (fi *Invocation) MinioServerSANs(ips []net.IP) cert.AltNames {
 func (fi *Invocation) MinioServiceAddres() string {
 	return fmt.Sprintf("minio-service.%s.svc", fi.namespace)
 
-}
-
-func (fi *Invocation) WaitUntilDeploymentReady(meta metav1.ObjectMeta) error {
-	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
-		if obj, err := fi.KubeClient.AppsV1beta1().Deployments(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err == nil {
-			return types.Int32(obj.Spec.Replicas) == obj.Status.ReadyReplicas, nil
-		}
-		return false, nil
-	})
-}
-
-func (fi *Invocation) WaitUntilDeploymentTerminated(meta metav1.ObjectMeta) error {
-	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
-		if pods, err := fi.KubeClient.CoreV1().Pods(meta.Namespace).List(metav1.ListOptions{}); err == nil {
-			return len(pods.Items) == 0, nil
-		}
-		return false, nil
-	})
 }

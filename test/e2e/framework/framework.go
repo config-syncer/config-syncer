@@ -46,6 +46,7 @@ type Framework struct {
 	Mutex             sync.Mutex
 	CertStore         *certstore.CertStore
 	KubeConfigPath    string
+	SelfHostedOperator bool
 }
 
 func New(config *rest.Config) *Framework {

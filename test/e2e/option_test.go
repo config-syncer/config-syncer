@@ -12,6 +12,7 @@ import (
 type E2EOptions struct {
 	KubeContext string
 	KubeConfig  string
+	SelfHostedOperator bool
 }
 
 var (
@@ -23,6 +24,7 @@ var (
 func init() {
 	flag.StringVar(&options.KubeConfig, "kubeconfig", options.KubeConfig, "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
 	flag.StringVar(&options.KubeContext, "kube-context", "", "Name of kube context")
+	flag.BoolVar(&options.SelfHostedOperator, "selfhosted-operator", false, "Run tests in selfhosted-operator mode")
 	enableLogging()
 	flag.Parse()
 }

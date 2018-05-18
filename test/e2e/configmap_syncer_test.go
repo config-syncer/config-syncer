@@ -31,18 +31,25 @@ var _ = Describe("Config-Syncer", func() {
 	})
 
 	JustBeforeEach(func() {
-		By("Starting Kubed")
-		stopCh = make(chan struct{})
-		err := f.RunKubed(stopCh, clusterConfig)
-		Expect(err).NotTo(HaveOccurred())
+		if f.SelfHostedOperator {
+			err := f.RestartKubedOperator(&clusterConfig)
+			Expect(err).NotTo(HaveOccurred())
+		} else {
+			By("Starting Kubed")
+			stopCh = make(chan struct{})
+			err := f.RunKubed(stopCh, clusterConfig)
+			Expect(err).NotTo(HaveOccurred())
 
-		By("Waiting for API server to be ready")
-		root.EventuallyAPIServerReady().Should(Succeed())
-		time.Sleep(time.Second * 5)
+			By("Waiting for API server to be ready")
+			root.EventuallyAPIServerReady().Should(Succeed())
+			time.Sleep(time.Second * 5)
+		}
 	})
 
 	AfterEach(func() {
-		close(stopCh)
+		if !f.SelfHostedOperator{
+			close(stopCh)
+		}
 		f.DeleteAllConfigmaps()
 
 		err := f.KubeClient.CoreV1().Namespaces().Delete(nsWithLabel.Name, &metav1.DeleteOptions{})

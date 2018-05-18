@@ -1,8 +1,12 @@
 package framework
 
 import (
+	"encoding/json"
+	"reflect"
+
 	"github.com/appscode/go/crypto/rand"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
+	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kutil/tools/clientcmd"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
@@ -11,8 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
-	"github.com/appscode/kubed/pkg/syncer"
-	"reflect"
 )
 
 func (f *Invocation) NewSecret() *core.Secret {
@@ -174,7 +176,6 @@ func (f *Invocation) EventuallySyncedSecretsDeleted(source *core.Secret) GomegaA
 	})
 }
 
-
 func (f *Invocation) DeleteAllSecrets() {
 	secrets, err := f.KubeClient.CoreV1().Secrets(metav1.NamespaceAll).List(metav1.ListOptions{
 		LabelSelector: labels.Set{
@@ -192,7 +193,7 @@ func (f *Invocation) DeleteAllSecrets() {
 	}
 }
 
-func (f *Framework) CreateSecret(obj *core.Secret) (*core.Secret,error) {
+func (f *Framework) CreateSecret(obj *core.Secret) (*core.Secret, error) {
 	return f.KubeClient.CoreV1().Secrets(obj.Namespace).Create(obj)
 }
 
@@ -259,4 +260,21 @@ func (f *Invocation) WaitUntilSecretDeleted(meta metav1.ObjectMeta) error {
 		}
 		return false, nil
 	})
+}
+
+func (f *Framework) KubeConfigSecret(config *api.ClusterConfig) (*core.Secret, error) {
+	data, err := json.Marshal(config)
+	if err != nil {
+		return nil, err
+	}
+
+	return &core.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "kube-config",
+			Namespace: "kube-system",
+		},
+		Data: map[string][]byte{
+			"config.yaml": data,
+		},
+	}, nil
 }
