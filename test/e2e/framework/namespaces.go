@@ -1,6 +1,7 @@
 package framework
 
 import (
+	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/kutil/tools/clientcmd"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
@@ -25,8 +26,36 @@ func (f *Framework) EnsureNamespace() error {
 	return err
 }
 
-func (f *Framework) DeleteNamespace() error {
-	return f.KubeClient.CoreV1().Namespaces().Delete(f.namespace, &metav1.DeleteOptions{})
+func (f *Framework) NewNamespace(name string) *core.Namespace {
+	return &core.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: rand.WithUniqSuffix(name),
+		},
+	}
+}
+func (f *Invocation) NewNamespaceWithLabel() *core.Namespace {
+	return &core.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: rand.WithUniqSuffix("kubed-e2e-labeled"),
+			Labels: map[string]string{
+				"app": f.App(),
+			},
+		},
+	}
+}
+
+func (f *Invocation) NumberOfNameSpace() int {
+	ns, err := f.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
+	Expect(err).NotTo(HaveOccurred())
+	return len(ns.Items)
+}
+
+func (f *Framework) CreateNamespace(ns *core.Namespace) error {
+	_, err := f.KubeClient.CoreV1().Namespaces().Create(ns)
+	return err
+}
+func (f *Framework) DeleteNamespace(name string) error {
+	return f.KubeClient.CoreV1().Namespaces().Delete(name, &metav1.DeleteOptions{})
 }
 
 func (f *Framework) EventuallyNamespaceDeleted(ns string) GomegaAsyncAssertion {

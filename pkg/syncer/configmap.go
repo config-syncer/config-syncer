@@ -14,10 +14,10 @@ import (
 )
 
 func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
-	opts := getSyncOptions(src.Annotations)
+	opts := GetSyncOptions(src.Annotations)
 
-	if opts.nsSelector != nil { // delete that were in old-ns but not in new-ns and upsert to new-ns
-		newNs, err := s.namespacesForSelector(*opts.nsSelector)
+	if opts.NamespaceSelector != nil { // delete that were in old-ns but not in new-ns and upsert to new-ns
+		newNs, err := NamespacesForSelector(s.kubeClient, *opts.NamespaceSelector)
 		if err != nil {
 			return err
 		}
@@ -30,7 +30,7 @@ func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
 		}
 	}
 
-	return s.syncConfigMapIntoContexts(src, opts.contexts)
+	return s.syncConfigMapIntoContexts(src, opts.Contexts)
 }
 
 // source deleted, delete that were previously added
@@ -107,11 +107,11 @@ func (s *ConfigSyncer) syncConfigMapIntoNamespaces(k8sClient kubernetes.Interfac
 }
 
 func (s *ConfigSyncer) syncConfigMapIntoNewNamespace(src *core.ConfigMap, namespace *core.Namespace) error {
-	opts := getSyncOptions(src.Annotations)
-	if opts.nsSelector == nil {
+	opts := GetSyncOptions(src.Annotations)
+	if opts.NamespaceSelector == nil {
 		return nil
 	}
-	if selector, err := labels.Parse(*opts.nsSelector); err != nil {
+	if selector, err := labels.Parse(*opts.NamespaceSelector); err != nil {
 		return err
 	} else if selector.Matches(labels.Set(namespace.Labels)) {
 		return s.upsertConfigMap(s.kubeClient, src, namespace.Name, "")

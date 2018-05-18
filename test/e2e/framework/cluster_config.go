@@ -1,7 +1,10 @@
 package framework
 
 import (
+	"time"
+
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func SnapshotterClusterConfig(backend *api.Backend) api.ClusterConfig {
@@ -14,7 +17,7 @@ func SnapshotterClusterConfig(backend *api.Backend) api.ClusterConfig {
 	}
 }
 
-func ConfigMapSyncClusterConfig() api.ClusterConfig {
+func ConfigSyncClusterConfig() api.ClusterConfig {
 	return api.ClusterConfig{
 		EnableConfigSyncer: true,
 	}
@@ -56,6 +59,18 @@ func (f *Invocation) EventForwarderClusterConfig() api.ClusterConfig {
 func APIServerClusterConfig() api.ClusterConfig {
 	return api.ClusterConfig{
 		ClusterName: "minikube",
+	}
+}
+
+func RecycleBinClusterConfig() api.ClusterConfig {
+	return api.ClusterConfig{
+		RecycleBin: &api.RecycleBinSpec{
+			Path: "/tmp/kubed/trash",
+			TTL: metav1.Duration{
+				Duration: time.Hour,
+			},
+			HandleUpdates: false,
+		},
 	}
 }
 
