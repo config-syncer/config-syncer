@@ -76,9 +76,9 @@ type ElasticsearchSpec struct {
 }
 
 type ElasticsearchClusterTopology struct {
-	Master ElasticsearchNode `json:"master,omitempty"`
-	Data   ElasticsearchNode `json:"data,omitempty"`
-	Client ElasticsearchNode `json:"client,omitempty"`
+	Master ElasticsearchNode `json:"master"`
+	Data   ElasticsearchNode `json:"data"`
+	Client ElasticsearchNode `json:"client"`
 }
 
 type ElasticsearchNode struct {
@@ -86,9 +86,9 @@ type ElasticsearchNode struct {
 	Replicas *int32 `json:"replicas,omitempty"`
 	Prefix   string `json:"prefix,omitempty"`
 	// Storage to specify how storage shall be used.
-	Storage *core.PersistentVolumeClaimSpec `json:"storage,omitempty"`
+	Storage core.PersistentVolumeClaimSpec `json:"storage"`
 	// Compute Resources required by the sidecar container.
-	Resources *core.ResourceRequirements `json:"resources,omitempty"`
+	Resources core.ResourceRequirements `json:"resources,omitempty"`
 }
 
 type ElasticsearchStatus struct {

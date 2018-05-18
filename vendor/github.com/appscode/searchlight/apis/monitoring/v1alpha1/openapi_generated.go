@@ -613,7 +613,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
 					Properties: map[string]spec.Schema{
-						"Item": {
+						"items": {
 							SchemaProps: spec.SchemaProps{
 								Type: []string{"object"},
 								AdditionalProperties: &spec.SchemaOrBool{
@@ -639,7 +639,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 							},
 						},
 					},
-					Required: []string{"Item"},
+					Required: []string{"items"},
 				},
 			},
 			Dependencies: []string{
@@ -991,7 +991,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 								Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginArguments"),
 							},
 						},
-						"state": {
+						"states": {
 							SchemaProps: spec.SchemaProps{
 								Description: "Supported Icinga Service State",
 								Type:        []string{"array"},
@@ -1006,7 +1006,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 							},
 						},
 					},
-					Required: []string{"alertKinds", "state"},
+					Required: []string{"alertKinds", "states"},
 				},
 			},
 			Dependencies: []string{

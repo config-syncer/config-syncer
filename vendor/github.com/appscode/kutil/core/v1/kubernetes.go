@@ -125,6 +125,25 @@ func EnsureVolumeMountDeleted(mounts []core.VolumeMount, name string) []core.Vol
 	return mounts
 }
 
+func UpsertVolumeMountByPath(mounts []core.VolumeMount, nv core.VolumeMount) []core.VolumeMount {
+	for i, vol := range mounts {
+		if vol.MountPath == nv.MountPath {
+			mounts[i] = nv
+			return mounts
+		}
+	}
+	return append(mounts, nv)
+}
+
+func EnsureVolumeMountDeletedByPath(mounts []core.VolumeMount, mountPath string) []core.VolumeMount {
+	for i, v := range mounts {
+		if v.MountPath == mountPath {
+			return append(mounts[:i], mounts[i+1:]...)
+		}
+	}
+	return mounts
+}
+
 func UpsertEnvVars(vars []core.EnvVar, nv ...core.EnvVar) []core.EnvVar {
 	upsert := func(env core.EnvVar) {
 		for i, v := range vars {
