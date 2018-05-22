@@ -11,6 +11,7 @@ import (
 	"github.com/appscode/go/encoding/yaml"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/storage"
+	exec_util "github.com/appscode/kutil/tools/exec"
 	"github.com/graymeta/stow"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
@@ -43,24 +44,41 @@ func NewLocalBackend(dir string) *api.Backend {
 }
 
 func (f *Invocation) EventuallyBackupSnapshot(backend api.Backend) GomegaAsyncAssertion {
-	return Eventually(func() []stow.Item {
-		loc, err := f.GetLocation(backend)
-		Expect(err).NotTo(HaveOccurred())
-
-		bucket, prefix, err := backend.GetBucketAndPrefix()
-		Expect(err).NotTo(HaveOccurred())
-		if backend.Local == nil {
-			prefix = prefix + "/"
+	return Eventually(func() interface{} {
+		if !f.SelfHostedOperator && backend.Local == nil {
+			return f.GetItems(backend)
+		} else {
+			return f.ListSnapshotInsideOperatorPod()
 		}
-
-		container, err := loc.Container(bucket)
-		Expect(err).NotTo(HaveOccurred())
-
-		items, _, err := container.Items(prefix, stow.CursorStart, 50)
-		Expect(err).NotTo(HaveOccurred())
-
-		return items
 	})
+}
+
+func (f *Invocation) GetItems(backend api.Backend) []stow.Item {
+	loc, err := f.GetLocation(backend)
+	Expect(err).NotTo(HaveOccurred())
+
+	bucket, prefix, err := backend.GetBucketAndPrefix()
+	Expect(err).NotTo(HaveOccurred())
+	if backend.Local == nil {
+		prefix = prefix + "/"
+	}
+
+	container, err := loc.Container(bucket)
+	Expect(err).NotTo(HaveOccurred())
+
+	items, _, err := container.Items(prefix, stow.CursorStart, 50)
+	Expect(err).NotTo(HaveOccurred())
+
+	return items
+}
+
+func (f *Invocation) ListSnapshotInsideOperatorPod() string {
+	pod, err := f.OperatorPod()
+	Expect(err).NotTo(HaveOccurred())
+
+	output, err := exec_util.ExecIntoPod(f.ClientConfig, pod, "ls", TEST_LOCAL_BACKUP_DIR)
+	Expect(err).NotTo(HaveOccurred())
+	return output
 }
 
 func (f *Invocation) CreateBucketIfNotExist(backend api.Backend) error {

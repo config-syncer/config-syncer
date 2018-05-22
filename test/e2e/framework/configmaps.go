@@ -10,6 +10,7 @@ import (
 	"github.com/appscode/go/encoding/yaml"
 	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kutil/tools/clientcmd"
+	exec_util "github.com/appscode/kutil/tools/exec"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
@@ -180,26 +181,45 @@ func (f *Invocation) ReadConfigMapFromRecycleBin(recycleBinLocation string, cm *
 	deletedConfigMap := &core.ConfigMap{}
 	dir := filepath.Join(recycleBinLocation, filepath.Dir(cm.SelfLink))
 
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, file := range files {
-		if strings.HasPrefix(file.Name(), cm.Name) && strings.HasSuffix(file.Name(), ".yaml") {
-			data, err := ioutil.ReadFile(filepath.Join(dir, file.Name()))
-			if err != nil {
-				return nil, err
-			}
-
-			err = yaml.Unmarshal(data, &deletedConfigMap)
-			if err != nil {
-				return nil, err
-			}
-			return deletedConfigMap, nil
+	if f.SelfHostedOperator {
+		pod, err := f.OperatorPod()
+		if err != nil {
+			return nil, err
 		}
+
+		output, err := exec_util.ExecIntoPod(f.ClientConfig, pod, "cat", filepath.Join(dir, cm.Name)+".yaml")
+		if err != nil {
+			return nil, err
+		}
+
+		err = yaml.Unmarshal([]byte(output), &deletedConfigMap)
+		if err != nil {
+			return nil, err
+		}
+		return deletedConfigMap, nil
+
+	} else {
+		files, err := ioutil.ReadDir(dir)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, file := range files {
+			if strings.HasPrefix(file.Name(), cm.Name) && strings.HasSuffix(file.Name(), ".yaml") {
+				data, err := ioutil.ReadFile(filepath.Join(dir, file.Name()))
+				if err != nil {
+					return nil, err
+				}
+
+				err = yaml.Unmarshal(data, &deletedConfigMap)
+				if err != nil {
+					return nil, err
+				}
+				return deletedConfigMap, nil
+			}
+		}
+		return deletedConfigMap, fmt.Errorf("configmap not found")
 	}
-	return deletedConfigMap, fmt.Errorf("configmap not found")
 }
 
 func (f *Invocation) DeleteAllConfigmaps() {

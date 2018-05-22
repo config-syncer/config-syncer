@@ -10,8 +10,8 @@ import (
 )
 
 type E2EOptions struct {
-	KubeContext string
-	KubeConfig  string
+	KubeContext        string
+	KubeConfig         string
 	SelfHostedOperator bool
 }
 

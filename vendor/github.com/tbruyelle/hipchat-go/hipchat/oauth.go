@@ -72,9 +72,9 @@ func (c *Client) GenerateToken(credentials ClientCredentials, scopes []string) (
 	content, err := ioutil.ReadAll(resp.Body)
 
 	var token OAuthAccessToken
-	json.Unmarshal(content, &token)
+	err = json.Unmarshal(content, &token)
 
-	return &token, resp, nil
+	return &token, resp, err
 }
 
 const (

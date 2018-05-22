@@ -110,12 +110,18 @@ var _ = Describe("Snapshotter", func() {
 
 		Context(`"Local" backend`, func() {
 			AfterEach(func() {
-				os.RemoveAll(framework.TEST_LOCAL_BACKUP_DIR)
+				if f.SelfHostedOperator {
+					f.RemoveFromOperatorPod(framework.TEST_LOCAL_BACKUP_DIR)
+				} else {
+					os.RemoveAll(framework.TEST_LOCAL_BACKUP_DIR)
+				}
 			})
 
 			BeforeEach(func() {
-				err := os.MkdirAll(framework.TEST_LOCAL_BACKUP_DIR, 0777)
-				Expect(err).NotTo(HaveOccurred())
+				if !f.SelfHostedOperator {
+					err := os.MkdirAll(framework.TEST_LOCAL_BACKUP_DIR, 0777)
+					Expect(err).NotTo(HaveOccurred())
+				}
 
 				backend = framework.NewLocalBackend(framework.TEST_LOCAL_BACKUP_DIR)
 				clusterConfig = framework.SnapshotterClusterConfig(backend)
@@ -134,6 +140,9 @@ var _ = Describe("Snapshotter", func() {
 			})
 
 			BeforeEach(func() {
+				if f.SelfHostedOperator {
+					Skip("No Sanitize  test for local backend in SelfHostedOperator mode")
+				}
 				err := os.MkdirAll(framework.TEST_LOCAL_BACKUP_DIR, 0777)
 				Expect(err).NotTo(HaveOccurred())
 

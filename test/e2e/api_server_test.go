@@ -14,7 +14,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var _ = Describe("API server", func() {
+var _ = FDescribe("API server", func() {
 	var (
 		f             *framework.Invocation
 		deployment    *apps.Deployment

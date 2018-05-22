@@ -3,17 +3,17 @@ package mailgun
 // Campaigns have been deprecated since development work on this SDK commenced.
 // Please refer to http://documentation.mailgun.com/api_reference .
 type Campaign struct {
-	Id                string `json:"id"`
-	Name              string `json:"name"`
-	CreatedAt         string `json:"created_at"`
-	DeliveredCount    int    `json:"delivered_count"`
-	ClickedCount      int    `json:"clicked_count"`
-	OpenedCount       int    `json:"opened_count"`
-	SubmittedCount    int    `json:"submitted_count"`
-	UnsubscribedCount int    `json:"unsubscribed_count"`
-	BouncedCount      int    `json:"bounced_count"`
-	ComplainedCount   int    `json:"complained_count"`
-	DroppedCount      int    `json:"dropped_count"`
+	Id                string `json:"id,omitempty"`
+	Name              string `json:"name,omitempty"`
+	CreatedAt         string `json:"created_at,omitempty"`
+	DeliveredCount    int    `json:"delivered_count,omitempty"`
+	ClickedCount      int    `json:"clicked_count,omitempty"`
+	OpenedCount       int    `json:"opened_count,omitempty"`
+	SubmittedCount    int    `json:"submitted_count,omitempty"`
+	UnsubscribedCount int    `json:"unsubscribed_count,omitempty"`
+	BouncedCount      int    `json:"bounced_count,omitempty"`
+	ComplainedCount   int    `json:"complained_count,omitempty"`
+	DroppedCount      int    `json:"dropped_count,omitempty"`
 }
 
 type campaignsEnvelope struct {

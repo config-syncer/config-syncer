@@ -47,7 +47,7 @@ var _ = Describe("Config-Syncer", func() {
 	})
 
 	AfterEach(func() {
-		if !f.SelfHostedOperator{
+		if !f.SelfHostedOperator {
 			close(stopCh)
 		}
 		f.DeleteAllConfigmaps()

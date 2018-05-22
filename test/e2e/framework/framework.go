@@ -33,20 +33,21 @@ const (
 )
 
 type Framework struct {
-	KubeClient        clientset.Interface
-	KubedClient       kcs.Interface
-	KAClient          ka.Interface
-	VoyagerClient     vcs.Interface
-	SearchlightClient srch_cs.Interface
-	StashClient       scs.Interface
-	KubeDBClient      kdbcs.Interface
-	PromClient        prom.MonitoringV1Interface
-	crdClient         ecs.ApiextensionsV1beta1Interface
-	namespace         string
-	Mutex             sync.Mutex
-	CertStore         *certstore.CertStore
-	KubeConfigPath    string
+	KubeClient         clientset.Interface
+	KubedClient        kcs.Interface
+	KAClient           ka.Interface
+	VoyagerClient      vcs.Interface
+	SearchlightClient  srch_cs.Interface
+	StashClient        scs.Interface
+	KubeDBClient       kdbcs.Interface
+	PromClient         prom.MonitoringV1Interface
+	crdClient          ecs.ApiextensionsV1beta1Interface
+	namespace          string
+	Mutex              sync.Mutex
+	CertStore          *certstore.CertStore
+	KubeConfigPath     string
 	SelfHostedOperator bool
+	ClientConfig       *rest.Config
 }
 
 func New(config *rest.Config) *Framework {
@@ -62,6 +63,7 @@ func New(config *rest.Config) *Framework {
 	return &Framework{
 		namespace: rand.WithUniqSuffix("test-kubed"),
 
+		ClientConfig:      config,
 		KubeClient:        clientset.NewForConfigOrDie(config),
 		KAClient:          ka.NewForConfigOrDie(config),
 		KubedClient:       kcs.NewForConfigOrDie(config),

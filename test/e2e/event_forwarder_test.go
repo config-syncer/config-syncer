@@ -61,6 +61,8 @@ var _ = Describe("Event-forwarder", func() {
 	})
 
 	Describe("Event-forwarder for Webhook Server", func() {
+		svc := &core.Service{}
+		ep := &core.Endpoints{}
 
 		BeforeEach(func() {
 			requests = make([]*http.Request, 0)
@@ -70,6 +72,19 @@ var _ = Describe("Event-forwarder", func() {
 			f.RunWebhookServer(stopServer, &requests)
 
 			notifierSecret = f.SecretForWebhookNotifier()
+
+			if f.SelfHostedOperator {
+				svc = f.ServiceForWebhook()
+				ep = f.LocalEndPointForWebhook(svc)
+
+				_, err := f.KubeClient.CoreV1().Services(svc.Namespace).Create(svc)
+				Expect(err).NotTo(HaveOccurred())
+
+				_, err = f.KubeClient.CoreV1().Endpoints(ep.Namespace).Create(ep)
+				Expect(err).NotTo(HaveOccurred())
+
+				notifierSecret.Data["WEBHOOK_URL"] = []byte(svc.Name + "." + svc.Namespace + ".svc")
+			}
 
 			By("Creating notifier secret: " + notifierSecret.Name)
 			_, err := f.CreateSecret(notifierSecret)
@@ -85,6 +100,14 @@ var _ = Describe("Event-forwarder", func() {
 			By("Closing Webhook Server")
 			stopServer <- os.Signal(syscall.SIGINT)
 			defer close(stopServer)
+
+			if f.SelfHostedOperator {
+				err := f.DeleteService(svc.ObjectMeta)
+				Expect(err).NotTo(HaveOccurred())
+
+				err = f.DeleteEndpoints(ep.ObjectMeta)
+				Expect(err).NotTo(HaveOccurred())
+			}
 		})
 
 		Context("PVC add eventer", func() {
