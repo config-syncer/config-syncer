@@ -98,7 +98,6 @@ $ kubed check --clusterconfig=./hack/deploy/config.yaml
 Cluster config was parsed successfully.
 ```
 
-
 ## Using Script
 Kubed can be installed via installer script included in the [/hack/deploy](https://github.com/appscode/kubed/tree/0.6.0-rc.0/hack/deploy) folder.
 
@@ -159,31 +158,37 @@ $ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.6.0-rc.0/hack/de
 Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/0.6.0-rc.0/chart/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
 
 ```console
+$ helm repo add appscode https://charts.appscode.com/stable/
+$ helm repo update
+$ helm search appscode/kubed
+NAME            CHART VERSION APP VERSION   DESCRIPTION
+appscode/kubed  0.7.0-rc.0    0.7.0-rc.0    Kubed by AppsCode - Kubernetes daemon
+
+# Kubernetes 1.8.x
+$ helm install appscode/kubed --name kubed --version 0.7.0-rc.0
+
+# Kubernetes 1.9.0 or later
+$ helm install appscode/kubed --name kubed --version 0.7.0-rc.0 \
+  --set apiserver.ca="$(onessl get kube-ca)"
+```
+
+To install `onessl`, run the following commands:
+
+```console
 # Mac OSX amd64:
-curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-darwin-amd64 \
+curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-darwin-amd64 \
   && chmod +x onessl \
   && sudo mv onessl /usr/local/bin/
 
 # Linux amd64:
-curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-linux-amd64 \
+curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-linux-amd64 \
   && chmod +x onessl \
   && sudo mv onessl /usr/local/bin/
 
 # Linux arm64:
-curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.1.0/onessl-linux-arm64 \
+curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-linux-arm64 \
   && chmod +x onessl \
   && sudo mv onessl /usr/local/bin/
-
-# Kubernetes 1.8.x
-$ helm repo add appscode https://charts.appscode.com/stable/
-$ helm repo update
-$ helm install appscode/kubed --name my-release
-
-# Kubernetes 1.9.0 or later
-$ helm repo add appscode https://charts.appscode.com/stable/
-$ helm repo update
-$ helm install appscode/kubed --name my-release \
-  --set apiserver.ca="$(onessl get kube-ca)"
 ```
 
 To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/0.6.0-rc.0/chart/kubed).

@@ -194,6 +194,8 @@ if [ "$KUBED_UNINSTALL" -eq 1 ]; then
     kubectl delete clusterrole -l app=kubed
     kubectl delete rolebindings -l app=kubed --namespace $KUBED_NAMESPACE
     kubectl delete role -l app=kubed --namespace $KUBED_NAMESPACE
+    # delete user roles
+    kubectl get clusterrole appscode:kubed:view
 
     exit 0
 fi
