@@ -24,16 +24,11 @@ type EmailVerificationParts struct {
 // Mailgun thinks you might have a typo.
 // DidYouMean may be empty (""), in which case Mailgun has no recommendation to give.
 // The existence of DidYouMean does NOT imply the email provided has anything wrong with it.
-// IsDisposableAddress indicates whether Mailgun thinks the address is from a known
-// disposable mailbox provider.
-// IsRoleAddress indicates whether Mailgun thinks the address is an email distribution list.
 type EmailVerification struct {
-	IsValid             bool                   `json:"is_valid"`
-	Parts               EmailVerificationParts `json:"parts"`
-	Address             string                 `json:"address"`
-	DidYouMean          string                 `json:"did_you_mean"`
-	IsDisposableAddress bool                   `json:"is_disposable_address"`
-	IsRoleAddress       bool                   `json:"is_role_address"`
+	IsValid    bool                   `json:"is_valid"`
+	Parts      EmailVerificationParts `json:"parts"`
+	Address    string                 `json:"address"`
+	DidYouMean string                 `json:"did_you_mean"`
 }
 
 type addressParseResult struct {
@@ -45,7 +40,7 @@ type addressParseResult struct {
 // It may also be used to break an email address into its sub-components.  (See example.)
 // NOTE: Use of this function requires a proper public API key.  The private API key will not work.
 func (m *MailgunImpl) ValidateEmail(email string) (EmailVerification, error) {
-	r := newHTTPRequest(generatePublicApiUrl(m, addressValidateEndpoint))
+	r := newHTTPRequest(generatePublicApiUrl(addressValidateEndpoint))
 	r.setClient(m.Client())
 	r.addParameter("address", email)
 	r.setBasicAuth(basicAuthUser, m.PublicApiKey())
@@ -62,7 +57,7 @@ func (m *MailgunImpl) ValidateEmail(email string) (EmailVerification, error) {
 // ParseAddresses takes a list of addresses and sorts them into valid and invalid address categories.
 // NOTE: Use of this function requires a proper public API key.  The private API key will not work.
 func (m *MailgunImpl) ParseAddresses(addresses ...string) ([]string, []string, error) {
-	r := newHTTPRequest(generatePublicApiUrl(m, addressParseEndpoint))
+	r := newHTTPRequest(generatePublicApiUrl(addressParseEndpoint))
 	r.setClient(m.Client())
 	r.addParameter("addresses", strings.Join(addresses, ","))
 	r.setBasicAuth(basicAuthUser, m.PublicApiKey())

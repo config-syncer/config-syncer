@@ -25,26 +25,18 @@ import (
 //
 // The defined error events are located in websocket_internals.go.
 func (rtm *RTM) ManageConnection() {
-	var (
-		err             error
-		connectionCount int
-		info            *Info
-		conn            *websocket.Conn
-	)
-
+	var connectionCount int
 	for {
-		// BEGIN SENSITIVE CODE, make sure lock is unlocked in this section.
-		rtm.mu.Lock()
 		connectionCount++
 		// start trying to connect
 		// the returned err is already passed onto the IncomingEvents channel
-		if info, conn, err = rtm.connect(connectionCount, rtm.useRTMStart); err != nil {
-			// when the connection is unsuccessful its fatal, and we need to bail out.
+		info, conn, err := rtm.connect(connectionCount, rtm.useRTMStart)
+		// if err != nil then the connection is sucessful - otherwise it is
+		// fatal
+		if err != nil {
 			rtm.Debugf("Failed to connect with RTM on try %d: %s", connectionCount, err)
-			rtm.mu.Unlock()
 			return
 		}
-
 		rtm.info = info
 		rtm.IncomingEvents <- RTMEvent{"connected", &ConnectedEvent{
 			ConnectionCount: connectionCount,
@@ -53,8 +45,6 @@ func (rtm *RTM) ManageConnection() {
 
 		rtm.conn = conn
 		rtm.isConnected = true
-		rtm.mu.Unlock()
-		// END SENSITIVE CODE
 
 		rtm.Debugf("RTM connection succeeded on try %d", connectionCount)
 
@@ -81,12 +71,6 @@ func (rtm *RTM) ManageConnection() {
 // If useRTMStart is false then it uses rtm.connect to create the connection,
 // otherwise it uses rtm.start.
 func (rtm *RTM) connect(connectionCount int, useRTMStart bool) (*Info, *websocket.Conn, error) {
-	const (
-		errInvalidAuth      = "invalid_auth"
-		errInactiveAccount  = "account_inactive"
-		errMissingAuthToken = "not_authed"
-	)
-
 	// used to provide exponential backoff wait time with jitter before trying
 	// to connect to slack again
 	boff := &backoff{
@@ -107,14 +91,11 @@ func (rtm *RTM) connect(connectionCount int, useRTMStart bool) (*Info, *websocke
 		if err == nil {
 			return info, conn, nil
 		}
-
-		// check for fatal errors
-		switch err.Error() {
-		case errInvalidAuth, errInactiveAccount, errMissingAuthToken:
+		// check for fatal errors - currently only invalid_auth
+		if sErr, ok := err.(*WebError); ok && (sErr.Error() == "invalid_auth" || sErr.Error() == "account_inactive") {
 			rtm.Debugf("Invalid auth when connecting with RTM: %s", err)
 			rtm.IncomingEvents <- RTMEvent{"invalid_auth", &InvalidAuthEvent{}}
-			return nil, nil, err
-		default:
+			return nil, nil, sErr
 		}
 
 		// any other errors are treated as recoverable and we try again after
@@ -126,7 +107,7 @@ func (rtm *RTM) connect(connectionCount int, useRTMStart bool) (*Info, *websocke
 
 		// check if Disconnect() has been invoked.
 		select {
-		case <-rtm.disconnected:
+		case _ = <-rtm.disconnected:
 			rtm.IncomingEvents <- RTMEvent{"disconnected", &DisconnectedEvent{Intentional: true}}
 			return nil, nil, fmt.Errorf("disconnect received while trying to connect")
 		default:
@@ -143,10 +124,10 @@ func (rtm *RTM) connect(connectionCount int, useRTMStart bool) (*Info, *websocke
 // startRTMAndDial attempts to connect to the slack websocket. If useRTMStart is true,
 // then it returns the  full information returned by the "rtm.start" method on the
 // slack API. Else it uses the "rtm.connect" method to connect
-func (rtm *RTM) startRTMAndDial(useRTMStart bool) (info *Info, _ *websocket.Conn, err error) {
-	var (
-		url string
-	)
+func (rtm *RTM) startRTMAndDial(useRTMStart bool) (*Info, *websocket.Conn, error) {
+	var info *Info
+	var url string
+	var err error
 
 	if useRTMStart {
 		rtm.Debugf("Starting RTM")
@@ -164,11 +145,7 @@ func (rtm *RTM) startRTMAndDial(useRTMStart bool) (info *Info, _ *websocket.Conn
 	// Only use HTTPS for connections to prevent MITM attacks on the connection.
 	upgradeHeader := http.Header{}
 	upgradeHeader.Add("Origin", "https://api.slack.com")
-	dialer := websocket.DefaultDialer
-	if rtm.dialer != nil {
-		dialer = rtm.dialer
-	}
-	conn, _, err := dialer.Dial(url, upgradeHeader)
+	conn, _, err := websocket.DefaultDialer.Dial(url, upgradeHeader)
 	if err != nil {
 		rtm.Debugf("Failed to dial to the websocket: %s", err)
 		return nil, nil, err
@@ -309,27 +286,26 @@ func (rtm *RTM) ping() error {
 func (rtm *RTM) receiveIncomingEvent() {
 	event := json.RawMessage{}
 	err := rtm.conn.ReadJSON(&event)
-	switch {
-	case err == io.ErrUnexpectedEOF:
+	if err == io.EOF {
 		// EOF's don't seem to signify a failed connection so instead we ignore
 		// them here and detect a failed connection upon attempting to send a
 		// 'PING' message
 
-		// trigger a 'PING' to detect potential websocket disconnect
+		// trigger a 'PING' to detect pontential websocket disconnect
 		rtm.forcePing <- true
-	case err != nil:
-		// All other errors from ReadJSON come from NextReader, and should
-		// kill the read loop and force a reconnect.
+		return
+	} else if err != nil {
 		rtm.IncomingEvents <- RTMEvent{"incoming_error", &IncomingEventError{
 			ErrorObj: err,
 		}}
-		rtm.killChannel <- false
-	case len(event) == 0:
+		// force a ping here too?
+		return
+	} else if len(event) == 0 {
 		rtm.Debugln("Received empty event")
-	default:
-		rtm.Debugln("Incoming Event:", string(event[:]))
-		rtm.rawEvents <- event
+		return
 	}
+	rtm.Debugln("Incoming Event:", string(event[:]))
+	rtm.rawEvents <- event
 }
 
 // handleRawEvent takes a raw JSON message received from the slack websocket
@@ -405,7 +381,7 @@ func (rtm *RTM) handlePong(event json.RawMessage) {
 // correct struct then this sends an UnmarshallingErrorEvent to the
 // IncomingEvents channel.
 func (rtm *RTM) handleEvent(typeStr string, event json.RawMessage) {
-	v, exists := EventMapping[typeStr]
+	v, exists := eventMapping[typeStr]
 	if !exists {
 		rtm.Debugf("RTM Error, received unmapped event %q: %s\n", typeStr, string(event))
 		err := fmt.Errorf("RTM Error: Received unmapped event %q: %s\n", typeStr, string(event))
@@ -424,10 +400,10 @@ func (rtm *RTM) handleEvent(typeStr string, event json.RawMessage) {
 	rtm.IncomingEvents <- RTMEvent{typeStr, recvEvent}
 }
 
-// EventMapping holds a mapping of event names to their corresponding struct
+// eventMapping holds a mapping of event names to their corresponding struct
 // implementations. The structs should be instances of the unmarshalling
 // target for the matching event type.
-var EventMapping = map[string]interface{}{
+var eventMapping = map[string]interface{}{
 	"message":         MessageEvent{},
 	"presence_change": PresenceChangeEvent{},
 	"user_typing":     UserTypingEvent{},
@@ -505,7 +481,4 @@ var EventMapping = map[string]interface{}{
 	"accounts_changed": AccountsChangedEvent{},
 
 	"reconnect_url": ReconnectUrlEvent{},
-
-	"member_joined_channel": MemberJoinedChannelEvent{},
-	"member_left_channel":   MemberLeftChannelEvent{},
 }

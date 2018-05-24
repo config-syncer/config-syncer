@@ -93,27 +93,22 @@
 package mailgun
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"time"
 )
 
-var Debug = false
-
 const (
-	ApiBase                 = "https://api.mailgun.net/v3"
+	apiBase                 = "https://api.mailgun.net/v3"
 	messagesEndpoint        = "messages"
 	mimeMessagesEndpoint    = "messages.mime"
 	addressValidateEndpoint = "address/validate"
 	addressParseEndpoint    = "address/parse"
 	bouncesEndpoint         = "bounces"
 	statsEndpoint           = "stats"
-	statsTotalEndpoint      = "stats/total"
 	domainsEndpoint         = "domains"
-	tagsEndpoint            = "tags"
+	deleteTagEndpoint       = "tags"
 	campaignsEndpoint       = "campaigns"
 	eventsEndpoint          = "events"
 	credentialsEndpoint     = "credentials"
@@ -133,7 +128,6 @@ const (
 // Always double-check with the Mailgun API Documentation to
 // determine the currently supported feature set.
 type Mailgun interface {
-	ApiBase() string
 	Domain() string
 	ApiKey() string
 	PublicApiKey() string
@@ -147,10 +141,7 @@ type Mailgun interface {
 	AddBounce(address, code, error string) error
 	DeleteBounce(address string) error
 	GetStats(limit int, skip int, startDate *time.Time, event ...string) (int, []Stat, error)
-	GetStatsTotal(start *time.Time, end *time.Time, resolution string, duration string, event ...string) (*StatsTotalResponse, error)
-	GetTag(tag string) (TagItem, error)
 	DeleteTag(tag string) error
-	ListTags(*TagOptions) *TagIterator
 	GetDomains(limit, skip int) (int, []Domain, error)
 	GetSingleDomain(domain string) (Domain, []DNSRecord, []DNSRecord, error)
 	CreateDomain(name string, smtpPassword string, spamAction string, wildcard bool) error
@@ -163,8 +154,6 @@ type Mailgun interface {
 	GetSingleComplaint(address string) (Complaint, error)
 	GetStoredMessage(id string) (StoredMessage, error)
 	GetStoredMessageRaw(id string) (StoredMessageRaw, error)
-	GetStoredMessageForURL(url string) (StoredMessage, error)
-	GetStoredMessageRawForURL(url string) (StoredMessageRaw, error)
 	DeleteStoredMessage(id string) error
 	GetCredentials(limit, skip int) (int, []Credential, error)
 	CreateCredential(login, password string) error
@@ -187,7 +176,6 @@ type Mailgun interface {
 	DeleteWebhook(kind string) error
 	GetWebhookByType(kind string) (string, error)
 	UpdateWebhook(kind, url string) error
-	VerifyWebhookRequest(req *http.Request) (verified bool, err error)
 	GetLists(limit, skip int, filter string) (int, []List, error)
 	CreateList(List) (List, error)
 	DeleteList(string) error
@@ -202,68 +190,26 @@ type Mailgun interface {
 	NewMessage(from, subject, text string, to ...string) *Message
 	NewMIMEMessage(body io.ReadCloser, to ...string) *Message
 	NewEventIterator() *EventIterator
-	ListEvents(*EventsOptions) *EventIterator
-	PollEvents(*EventsOptions) *EventPoller
-	SetAPIBase(url string)
 }
 
 // MailgunImpl bundles data needed by a large number of methods in order to interact with the Mailgun API.
 // Colloquially, we refer to instances of this structure as "clients."
 type MailgunImpl struct {
-	apiBase      string
 	domain       string
 	apiKey       string
 	publicApiKey string
 	client       *http.Client
-	baseURL      string
 }
 
 // NewMailGun creates a new client instance.
 func NewMailgun(domain, apiKey, publicApiKey string) Mailgun {
 	m := MailgunImpl{
-		apiBase:      ApiBase,
 		domain:       domain,
 		apiKey:       apiKey,
 		publicApiKey: publicApiKey,
 		client:       http.DefaultClient,
 	}
 	return &m
-}
-
-// NewMailgunImpl creates a new client instance.
-func NewMailgunImpl(domain, apiKey, publicApiKey string) *MailgunImpl {
-	return NewMailgun(domain, apiKey, publicApiKey).(*MailgunImpl)
-}
-
-// Return a new Mailgun client using the environment variables
-// MG_API_KEY, MG_DOMAIN, MG_PUBLIC_API_KEY and MG_URL
-func NewMailgunFromEnv() (Mailgun, error) {
-	apiKey := os.Getenv("MG_API_KEY")
-	if apiKey == "" {
-		return nil, errors.New("required environment variable MG_API_KEY not defined")
-	}
-	domain := os.Getenv("MG_DOMAIN")
-	if domain == "" {
-		return nil, errors.New("required environment variable MG_DOMAIN not defined")
-	}
-
-	mg := MailgunImpl{
-		apiBase:      ApiBase,
-		domain:       domain,
-		apiKey:       apiKey,
-		publicApiKey: os.Getenv("MG_PUBLIC_API_KEY"),
-		client:       http.DefaultClient,
-	}
-	url := os.Getenv("MG_URL")
-	if url != "" {
-		mg.SetAPIBase(url)
-	}
-	return &mg, nil
-}
-
-// ApiBase returns the API Base URL configured for this client.
-func (m *MailgunImpl) ApiBase() string {
-	return m.apiBase
 }
 
 // Domain returns the domain configured for this client.
@@ -291,25 +237,15 @@ func (m *MailgunImpl) SetClient(c *http.Client) {
 	m.client = c
 }
 
-// SetAPIBase updates the API Base URL for this client.
-func (m *MailgunImpl) SetAPIBase(address string) {
-	m.apiBase = address
-}
-
 // generateApiUrl renders a URL for an API endpoint using the domain and endpoint name.
 func generateApiUrl(m Mailgun, endpoint string) string {
-	return fmt.Sprintf("%s/%s/%s", m.ApiBase(), m.Domain(), endpoint)
-}
-
-// generateApiUrlWithDomain renders a URL for an API endpoint using a separate domain and endpoint name.
-func generateApiUrlWithDomain(m Mailgun, endpoint, domain string) string {
-	return fmt.Sprintf("%s/%s/%s", m.ApiBase(), domain, endpoint)
+	return fmt.Sprintf("%s/%s/%s", apiBase, m.Domain(), endpoint)
 }
 
 // generateMemberApiUrl renders a URL relevant for specifying mailing list members.
 // The address parameter refers to the mailing list in question.
-func generateMemberApiUrl(m Mailgun, endpoint, address string) string {
-	return fmt.Sprintf("%s/%s/%s/members", m.ApiBase(), endpoint, address)
+func generateMemberApiUrl(endpoint, address string) string {
+	return fmt.Sprintf("%s/%s/%s/members", apiBase, endpoint, address)
 }
 
 // generateApiUrlWithTarget works as generateApiUrl,
@@ -327,7 +263,7 @@ func generateApiUrlWithTarget(m Mailgun, endpoint, target string) string {
 // Most URLs consume a domain in the 2nd position, but some endpoints
 // require the word "domains" to be there instead.
 func generateDomainApiUrl(m Mailgun, endpoint string) string {
-	return fmt.Sprintf("%s/domains/%s/%s", m.ApiBase(), m.Domain(), endpoint)
+	return fmt.Sprintf("%s/domains/%s/%s", apiBase, m.Domain(), endpoint)
 }
 
 // generateCredentialsUrl renders a URL as generateDomainApiUrl,
@@ -348,8 +284,8 @@ func generateStoredMessageUrl(m Mailgun, endpoint, id string) string {
 }
 
 // generatePublicApiUrl works as generateApiUrl, except that generatePublicApiUrl has no need for the domain.
-func generatePublicApiUrl(m Mailgun, endpoint string) string {
-	return fmt.Sprintf("%s/%s", m.ApiBase(), endpoint)
+func generatePublicApiUrl(endpoint string) string {
+	return fmt.Sprintf("%s/%s", apiBase, endpoint)
 }
 
 // generateParameterizedUrl works as generateApiUrl, but supports query parameters.

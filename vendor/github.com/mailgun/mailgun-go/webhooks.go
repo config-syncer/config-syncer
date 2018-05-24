@@ -79,11 +79,11 @@ func (mg *MailgunImpl) UpdateWebhook(t, u string) error {
 
 func (mg *MailgunImpl) VerifyWebhookRequest(req *http.Request) (verified bool, err error) {
 	h := hmac.New(sha256.New, []byte(mg.ApiKey()))
-	io.WriteString(h, req.FormValue("timestamp"))
-	io.WriteString(h, req.FormValue("token"))
+	io.WriteString(h, req.Form.Get("timestamp"))
+	io.WriteString(h, req.Form.Get("token"))
 
 	calculatedSignature := h.Sum(nil)
-	signature, err := hex.DecodeString(req.FormValue("signature"))
+	signature, err := hex.DecodeString(req.Form.Get("signature"))
 	if err != nil {
 		return false, err
 	}
