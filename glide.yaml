@@ -65,6 +65,8 @@ import:
   version: release-7.0
 - package: k8s.io/apiextensions-apiserver
   version: kubernetes-1.10.0
+- package: k8s.io/kube-aggregator
+  version: kubernetes-1.10.0
 - package: k8s.io/kubernetes
   version: v1.10.0
 - package: google.golang.org/api/storage/v1
