@@ -214,11 +214,13 @@ func (f *Framework) DeleteClusterRoleBinding(meta metav1.ObjectMeta) error {
 const (
 	OperatorName      = "kubed-operator"
 	OperatorNamespace = "kube-system"
+	ContainerOperator = "operator"
+	OperatorConfig    = "kubed-config"
 )
 
 func (f *Invocation) RestartKubedOperator(config *api.ClusterConfig) error {
 	meta := metav1.ObjectMeta{
-		Name:      "kube-config",
+		Name:      OperatorConfig,
 		Namespace: OperatorNamespace,
 	}
 
@@ -229,26 +231,37 @@ func (f *Invocation) RestartKubedOperator(config *api.ClusterConfig) error {
 
 	kubeConfig, err := f.KubeConfigSecret(config)
 	if err != nil {
+		fmt.Println("Err2:",err.Error())
 		return err
 	}
 
 	_, err = f.CreateSecret(kubeConfig)
 	if err != nil {
+		fmt.Println("Err3:",err.Error())
 		return err
 	}
-
 	pods, err := f.KubeClient.CoreV1().Pods(OperatorNamespace).List(metav1.ListOptions{LabelSelector: "app=kubed"})
+	fmt.Println("pods:", len(pods.Items))
 	for _, pod := range pods.Items {
 		for _, c := range pod.Spec.Containers {
-			if c.Name == "operator" {
-				f.KubeClient.CoreV1().Pods(OperatorNamespace).Delete(pod.Name, deleteInBackground())
+			if c.Name == ContainerOperator {
+				err = f.KubeClient.CoreV1().Pods(OperatorNamespace).Delete(pod.Name, deleteInBackground())
+				if err!=nil{
+					fmt.Println("Err4:",err.Error())
+					return err
+				}
+				err = f.WaitUntilPodTerminated(pod.ObjectMeta)
+				if err!=nil{
+					fmt.Println("Err5:",err.Error())
+					return err
+				}
 				break
 			}
 		}
 	}
 
 	deployment, err := f.KubeClient.AppsV1beta1().Deployments(OperatorNamespace).Get(OperatorName, metav1.GetOptions{})
-	if err != nil {
+	if err != nil {fmt.Println("Err6:",err.Error())
 		return err
 	}
 

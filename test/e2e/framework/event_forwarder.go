@@ -67,9 +67,9 @@ func (f *Invocation) ServiceForWebhook() *core.Service {
 			Ports: []core.ServicePort{
 				{
 					Name:       "webhook",
-					Port:       8181,
+					Port:       80,
 					Protocol:   core.ProtocolTCP,
-					TargetPort: intstr.FromInt(8181),
+					TargetPort: intstr.FromInt(80),
 				},
 			},
 			Type: core.ServiceTypeClusterIP,

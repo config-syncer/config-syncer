@@ -28,7 +28,9 @@ var _ = Describe("RecycleBin", func() {
 
 	JustBeforeEach(func() {
 		if f.SelfHostedOperator {
-			f.RestartKubedOperator(&clusterConfig)
+			By("Restarting kubed operator")
+			err:=f.RestartKubedOperator(&clusterConfig)
+			Expect(err).NotTo(HaveOccurred())
 		} else {
 			By("Starting Kubed")
 			stopCh = make(chan struct{})

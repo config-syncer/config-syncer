@@ -1,13 +1,13 @@
 package framework
 
 import (
-	"encoding/json"
 	"reflect"
 
 	"github.com/appscode/go/crypto/rand"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kutil/tools/clientcmd"
+	"github.com/ghodss/yaml"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
@@ -228,7 +228,7 @@ func (fi *Invocation) SecretForWebhookNotifier() *core.Secret {
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "notifier-config",
-			Namespace: fi.namespace,
+			Namespace: OperatorNamespace,
 		},
 		Data: map[string][]byte{
 			"WEBHOOK_URL": []byte("http://localhost:8181"),
@@ -263,15 +263,15 @@ func (f *Invocation) WaitUntilSecretDeleted(meta metav1.ObjectMeta) error {
 }
 
 func (f *Framework) KubeConfigSecret(config *api.ClusterConfig) (*core.Secret, error) {
-	data, err := json.Marshal(config)
+	data, err := yaml.Marshal(config)
 	if err != nil {
 		return nil, err
 	}
 
 	return &core.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "kube-config",
-			Namespace: "kube-system",
+			Name:      OperatorConfig,
+			Namespace: OperatorNamespace,
 		},
 		Data: map[string][]byte{
 			"config.yaml": data,

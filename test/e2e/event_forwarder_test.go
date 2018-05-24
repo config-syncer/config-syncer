@@ -35,7 +35,9 @@ var _ = Describe("Event-forwarder", func() {
 		}
 
 		if f.SelfHostedOperator {
-			f.RestartKubedOperator(&clusterConfig)
+			By("Restarting kubed operator")
+			err:=f.RestartKubedOperator(&clusterConfig)
+			Expect(err).NotTo(HaveOccurred())
 		} else {
 			By("Starting Kubed")
 			stopCh = make(chan struct{})
@@ -110,7 +112,7 @@ var _ = Describe("Event-forwarder", func() {
 			}
 		})
 
-		Context("PVC add eventer", func() {
+		FContext("PVC add eventer", func() {
 
 			BeforeEach(func() {
 				pvc = f.NewPersistentVolumeClaim()

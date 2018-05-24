@@ -14,7 +14,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var _ = FDescribe("API server", func() {
+var _ = Describe("API server", func() {
 	var (
 		f             *framework.Invocation
 		deployment    *apps.Deployment
@@ -24,12 +24,16 @@ var _ = FDescribe("API server", func() {
 
 	BeforeEach(func() {
 		f = root.Invoke()
-		os.RemoveAll(filepath.Join("/tmp", "indices"))
+		if !f.SelfHostedOperator {
+			os.RemoveAll(filepath.Join("/tmp", "indices"))
+		}
 	})
 
 	JustBeforeEach(func() {
 		if f.SelfHostedOperator {
-			f.RestartKubedOperator(&clusterConfig)
+			By("Restarting kubed operator")
+			err:=f.RestartKubedOperator(&clusterConfig)
+			Expect(err).NotTo(HaveOccurred())
 		} else {
 			By("Starting Kubed")
 			stopCh = make(chan struct{})
@@ -73,6 +77,7 @@ var _ = FDescribe("API server", func() {
 				By("Creating deployment: " + deployment.Name)
 				_, err := f.CreateDeployment(*deployment)
 				Expect(err).NotTo(HaveOccurred())
+				f.WaitUntilDeploymentReady(deployment.ObjectMeta)
 
 				// give some time for indexing
 				time.Sleep(time.Second * 30)
