@@ -65,8 +65,8 @@ func (fi *Invocation) OperatorPod() (*core.Pod, error) {
 	}
 
 	for _, pod := range pods.Items {
-		for _,c:= range pod.Spec.Containers{
-			if c.Name  == ContainerOperator{
+		for _, c := range pod.Spec.Containers {
+			if c.Name == ContainerOperator {
 				return &pod, nil
 			}
 		}

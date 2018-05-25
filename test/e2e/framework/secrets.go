@@ -221,6 +221,10 @@ func (f *Invocation) SecretForMinioBackend(includeCert bool) core.Secret {
 }
 
 func (fi *Invocation) SecretForWebhookNotifier() *core.Secret {
+	namespace := fi.namespace
+	if fi.SelfHostedOperator {
+		namespace = OperatorNamespace
+	}
 	return &core.Secret{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Secret",
@@ -228,7 +232,7 @@ func (fi *Invocation) SecretForWebhookNotifier() *core.Secret {
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "notifier-config",
-			Namespace: OperatorNamespace,
+			Namespace: namespace,
 		},
 		Data: map[string][]byte{
 			"WEBHOOK_URL": []byte("http://localhost:8181"),

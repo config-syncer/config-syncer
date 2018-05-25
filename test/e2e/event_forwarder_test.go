@@ -36,7 +36,7 @@ var _ = Describe("Event-forwarder", func() {
 
 		if f.SelfHostedOperator {
 			By("Restarting kubed operator")
-			err:=f.RestartKubedOperator(&clusterConfig)
+			err := f.RestartKubedOperator(&clusterConfig)
 			Expect(err).NotTo(HaveOccurred())
 		} else {
 			By("Starting Kubed")
@@ -85,7 +85,7 @@ var _ = Describe("Event-forwarder", func() {
 				_, err = f.KubeClient.CoreV1().Endpoints(ep.Namespace).Create(ep)
 				Expect(err).NotTo(HaveOccurred())
 
-				notifierSecret.Data["WEBHOOK_URL"] = []byte(svc.Name + "." + svc.Namespace + ".svc")
+				notifierSecret.Data["WEBHOOK_URL"] = []byte("http://" + svc.Name + "." + svc.Namespace + ".svc")
 			}
 
 			By("Creating notifier secret: " + notifierSecret.Name)
@@ -106,13 +106,10 @@ var _ = Describe("Event-forwarder", func() {
 			if f.SelfHostedOperator {
 				err := f.DeleteService(svc.ObjectMeta)
 				Expect(err).NotTo(HaveOccurred())
-
-				err = f.DeleteEndpoints(ep.ObjectMeta)
-				Expect(err).NotTo(HaveOccurred())
 			}
 		})
 
-		FContext("PVC add eventer", func() {
+		Context("PVC add eventer", func() {
 
 			BeforeEach(func() {
 				pvc = f.NewPersistentVolumeClaim()

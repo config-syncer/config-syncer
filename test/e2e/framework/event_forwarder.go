@@ -61,7 +61,7 @@ func (f *Invocation) ServiceForWebhook() *core.Service {
 	return &core.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      f.app,
-			Namespace: f.Namespace(),
+			Namespace: f.namespace,
 		},
 		Spec: core.ServiceSpec{
 			Ports: []core.ServicePort{
@@ -69,7 +69,7 @@ func (f *Invocation) ServiceForWebhook() *core.Service {
 					Name:       "webhook",
 					Port:       80,
 					Protocol:   core.ProtocolTCP,
-					TargetPort: intstr.FromInt(80),
+					TargetPort: intstr.FromInt(8181),
 				},
 			},
 			Type: core.ServiceTypeClusterIP,

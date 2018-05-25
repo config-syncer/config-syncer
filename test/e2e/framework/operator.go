@@ -225,34 +225,35 @@ func (f *Invocation) RestartKubedOperator(config *api.ClusterConfig) error {
 	}
 
 	err := f.DeleteSecret(meta)
-	if !kerr.IsNotFound(err) {
+	if err != nil && !kerr.IsNotFound(err) {
 		return err
 	}
 
-	kubeConfig, err := f.KubeConfigSecret(config)
+	err = f.WaitUntilSecretDeleted(meta)
 	if err != nil {
-		fmt.Println("Err2:",err.Error())
+		return err
+	}
+
+	kubeConfig, err := f.KubeConfigSecret(config, meta)
+	if err != nil {
 		return err
 	}
 
 	_, err = f.CreateSecret(kubeConfig)
 	if err != nil {
-		fmt.Println("Err3:",err.Error())
 		return err
 	}
+
 	pods, err := f.KubeClient.CoreV1().Pods(OperatorNamespace).List(metav1.ListOptions{LabelSelector: "app=kubed"})
-	fmt.Println("pods:", len(pods.Items))
 	for _, pod := range pods.Items {
 		for _, c := range pod.Spec.Containers {
 			if c.Name == ContainerOperator {
 				err = f.KubeClient.CoreV1().Pods(OperatorNamespace).Delete(pod.Name, deleteInBackground())
-				if err!=nil{
-					fmt.Println("Err4:",err.Error())
+				if err != nil {
 					return err
 				}
 				err = f.WaitUntilPodTerminated(pod.ObjectMeta)
-				if err!=nil{
-					fmt.Println("Err5:",err.Error())
+				if err != nil {
 					return err
 				}
 				break
@@ -261,7 +262,7 @@ func (f *Invocation) RestartKubedOperator(config *api.ClusterConfig) error {
 	}
 
 	deployment, err := f.KubeClient.AppsV1beta1().Deployments(OperatorNamespace).Get(OperatorName, metav1.GetOptions{})
-	if err != nil {fmt.Println("Err6:",err.Error())
+	if err != nil {
 		return err
 	}
 

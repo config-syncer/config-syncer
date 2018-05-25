@@ -29,7 +29,7 @@ var _ = Describe("RecycleBin", func() {
 	JustBeforeEach(func() {
 		if f.SelfHostedOperator {
 			By("Restarting kubed operator")
-			err:=f.RestartKubedOperator(&clusterConfig)
+			err := f.RestartKubedOperator(&clusterConfig)
 			Expect(err).NotTo(HaveOccurred())
 		} else {
 			By("Starting Kubed")
@@ -64,7 +64,7 @@ var _ = Describe("RecycleBin", func() {
 			})
 
 			AfterEach(func() {
-				if !f.SelfHostedOperator{
+				if !f.SelfHostedOperator {
 					os.RemoveAll(clusterConfig.RecycleBin.Path)
 				}
 			})
@@ -99,7 +99,7 @@ var _ = Describe("RecycleBin", func() {
 			})
 
 			AfterEach(func() {
-				if !f.SelfHostedOperator{
+				if !f.SelfHostedOperator {
 					os.RemoveAll(clusterConfig.RecycleBin.Path)
 				}
 			})
@@ -133,7 +133,7 @@ var _ = Describe("RecycleBin", func() {
 		Context("TTL timeout", func() {
 
 			BeforeEach(func() {
-				if f.SelfHostedOperator{
+				if f.SelfHostedOperator {
 					Skip("Skipping test. Reason: In Self Hosted Operator mode Trash cleaner run in 1hour interval")
 				}
 				configMap = f.NewConfigMap()
