@@ -187,7 +187,22 @@ func (f *Invocation) ReadConfigMapFromRecycleBin(recycleBinLocation string, cm *
 			return nil, err
 		}
 
-		output, err := exec_util.ExecIntoPod(f.ClientConfig, pod, "cat", filepath.Join(dir, cm.Name)+".yaml")
+		// list the name of recycled configMaps
+		output, err := exec_util.ExecIntoPod(f.ClientConfig, pod, "ls", dir)
+		if err != nil {
+			return nil, err
+		}
+
+		// read the recycled configMaps
+		var recycledCMName string
+		fileNames := strings.Split(output, "\n")
+		for _, fileName := range fileNames {
+			if strings.HasPrefix(fileName, cm.Name) && strings.HasSuffix(fileName, ".yaml") {
+				recycledCMName = fileName
+				break
+			}
+		}
+		output, err = exec_util.ExecIntoPod(f.ClientConfig, pod, "cat", filepath.Join(dir, recycledCMName))
 		if err != nil {
 			return nil, err
 		}

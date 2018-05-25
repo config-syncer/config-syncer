@@ -65,7 +65,11 @@ func (fi *Invocation) OperatorPod() (*core.Pod, error) {
 	}
 
 	for _, pod := range pods.Items {
-		return &pod, nil
+		for _,c:= range pod.Spec.Containers{
+			if c.Name  == ContainerOperator{
+				return &pod, nil
+			}
+		}
 	}
 
 	return nil, fmt.Errorf("pod not found")

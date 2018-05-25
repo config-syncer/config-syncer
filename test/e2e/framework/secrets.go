@@ -262,17 +262,14 @@ func (f *Invocation) WaitUntilSecretDeleted(meta metav1.ObjectMeta) error {
 	})
 }
 
-func (f *Framework) KubeConfigSecret(config *api.ClusterConfig) (*core.Secret, error) {
+func (f *Framework) KubeConfigSecret(config *api.ClusterConfig, meta metav1.ObjectMeta) (*core.Secret, error) {
 	data, err := yaml.Marshal(config)
 	if err != nil {
 		return nil, err
 	}
 
 	return &core.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      OperatorConfig,
-			Namespace: OperatorNamespace,
-		},
+		ObjectMeta: meta,
 		Data: map[string][]byte{
 			"config.yaml": data,
 		},
