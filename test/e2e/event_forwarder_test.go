@@ -34,18 +34,27 @@ var _ = Describe("Event-forwarder", func() {
 			Skip("Missing notifier-secret")
 		}
 
-		By("Starting Kubed")
-		stopCh = make(chan struct{})
-		err := f.RunKubed(stopCh, clusterConfig)
-		Expect(err).NotTo(HaveOccurred())
+		if f.SelfHostedOperator {
+			By("Restarting kubed operator")
+			err := f.RestartKubedOperator(&clusterConfig)
+			Expect(err).NotTo(HaveOccurred())
+		} else {
+			By("Starting Kubed")
+			stopCh = make(chan struct{})
+			err := f.RunKubed(stopCh, clusterConfig)
+			Expect(err).NotTo(HaveOccurred())
 
-		By("Waiting for API server to be ready")
-		root.EventuallyAPIServerReady().Should(Succeed())
-		time.Sleep(time.Second * 5)
+			By("Waiting for API server to be ready")
+			root.EventuallyAPIServerReady().Should(Succeed())
+			time.Sleep(time.Second * 5)
+		}
 	})
 
 	AfterEach(func() {
-		close(stopCh)
+		if !f.SelfHostedOperator {
+			close(stopCh)
+		}
+
 		err := f.DeleteSecret(notifierSecret.ObjectMeta)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -54,6 +63,8 @@ var _ = Describe("Event-forwarder", func() {
 	})
 
 	Describe("Event-forwarder for Webhook Server", func() {
+		svc := &core.Service{}
+		ep := &core.Endpoints{}
 
 		BeforeEach(func() {
 			requests = make([]*http.Request, 0)
@@ -64,8 +75,21 @@ var _ = Describe("Event-forwarder", func() {
 
 			notifierSecret = f.SecretForWebhookNotifier()
 
+			if f.SelfHostedOperator {
+				svc = f.ServiceForWebhook()
+				ep = f.LocalEndPointForWebhook(svc)
+
+				_, err := f.KubeClient.CoreV1().Services(svc.Namespace).Create(svc)
+				Expect(err).NotTo(HaveOccurred())
+
+				_, err = f.KubeClient.CoreV1().Endpoints(ep.Namespace).Create(ep)
+				Expect(err).NotTo(HaveOccurred())
+
+				notifierSecret.Data["WEBHOOK_URL"] = []byte("http://" + svc.Name + "." + svc.Namespace + ".svc")
+			}
+
 			By("Creating notifier secret: " + notifierSecret.Name)
-			err := f.CreateSecret(*notifierSecret)
+			_, err := f.CreateSecret(notifierSecret)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Creating clusterConfiguration")
@@ -78,6 +102,11 @@ var _ = Describe("Event-forwarder", func() {
 			By("Closing Webhook Server")
 			stopServer <- os.Signal(syscall.SIGINT)
 			defer close(stopServer)
+
+			if f.SelfHostedOperator {
+				err := f.DeleteService(svc.ObjectMeta)
+				Expect(err).NotTo(HaveOccurred())
+			}
 		})
 
 		Context("PVC add eventer", func() {

@@ -63,14 +63,14 @@ const (
 	VarTypeDuration VarType = "duration"
 )
 
-type PluginVarItem struct {
+type PluginVarField struct {
 	Description string  `json:"description,omitempty"`
 	Type        VarType `json:"type"`
 }
 
 type PluginVars struct {
-	Items    map[string]PluginVarItem `json:"items"`
-	Required []string                 `json:"required,omitempty"`
+	Fields   map[string]PluginVarField `json:"fields"`
+	Required []string                  `json:"required,omitempty"`
 }
 
 type PluginArguments struct {
@@ -114,7 +114,7 @@ func validateVariables(pluginVars *PluginVars, vars map[string]string) error {
 	// Check if any invalid variable is provided
 	var err error
 	for k := range vars {
-		p, found := pluginVars.Items[k]
+		p, found := pluginVars.Fields[k]
 		if !found {
 			return fmt.Errorf("var '%s' is unsupported", k)
 		}

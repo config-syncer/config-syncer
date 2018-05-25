@@ -2,19 +2,15 @@ package syncer
 
 import (
 	"net/url"
-	"strings"
 	"sync"
 
-	"github.com/appscode/go/types"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-	"github.com/appscode/kutil/meta"
 	clientcmd_util "github.com/appscode/kutil/tools/clientcmd"
 	"github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/record"
@@ -94,26 +90,6 @@ type clusterContext struct {
 	Address   string
 }
 
-type options struct {
-	nsSelector *string // if nil, delete from cluster
-	contexts   sets.String
-}
-
-func getSyncOptions(annotations map[string]string) options {
-	opts := options{}
-	if v, err := meta.GetStringValue(annotations, api.ConfigSyncKey); err == nil {
-		if v == "true" {
-			opts.nsSelector = types.StringP(labels.Everything().String())
-		} else {
-			opts.nsSelector = &v
-		}
-	}
-	if contexts, _ := meta.GetStringValue(annotations, api.ConfigSyncContexts); contexts != "" {
-		opts.contexts = sets.NewString(strings.Split(contexts, ",")...)
-	}
-	return opts
-}
-
 func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 	ns, err := s.kubeClient.CoreV1().Namespaces().Get(namespace, metav1.GetOptions{})
 	if err != nil {
@@ -176,18 +152,4 @@ func (s *ConfigSyncer) syncerAnnotations(oldAnnotations, srcAnnotations map[stri
 	newAnnotations[api.ConfigOriginKey] = string(ref)
 
 	return newAnnotations
-}
-
-func (s *ConfigSyncer) namespacesForSelector(selector string) (sets.String, error) {
-	namespaces, err := s.kubeClient.CoreV1().Namespaces().List(metav1.ListOptions{
-		LabelSelector: selector,
-	})
-	if err != nil {
-		return nil, err
-	}
-	ns := sets.NewString()
-	for _, obj := range namespaces.Items {
-		ns.Insert(obj.Name)
-	}
-	return ns, nil
 }

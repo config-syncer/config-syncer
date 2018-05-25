@@ -587,7 +587,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 			Dependencies: []string{
 				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"},
 		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarItem": {
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarField": {
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
 					Properties: map[string]spec.Schema{
@@ -613,13 +613,13 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
 					Properties: map[string]spec.Schema{
-						"items": {
+						"fields": {
 							SchemaProps: spec.SchemaProps{
 								Type: []string{"object"},
 								AdditionalProperties: &spec.SchemaOrBool{
 									Schema: &spec.Schema{
 										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarItem"),
+											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarField"),
 										},
 									},
 								},
@@ -639,11 +639,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 							},
 						},
 					},
-					Required: []string{"items"},
+					Required: []string{"fields"},
 				},
 			},
 			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarItem"},
+				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarField"},
 		},
 		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlert": {
 			Schema: spec.Schema{

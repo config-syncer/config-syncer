@@ -33,7 +33,9 @@ var _ = Describe("Snapshotter", func() {
 	})
 
 	AfterEach(func() {
-		close(stopCh)
+		if !f.SelfHostedOperator {
+			close(stopCh)
+		}
 
 		if missing, _ := BeZero().Match(cred); !missing {
 			err := f.WaitUntilSecretDeleted(cred.ObjectMeta)
@@ -48,8 +50,9 @@ var _ = Describe("Snapshotter", func() {
 		}
 
 		if backend.Local == nil {
-			err := f.CreateSecret(cred)
+			_, err := f.CreateSecret(&cred)
 			Expect(err).NotTo(HaveOccurred())
+
 			err = f.WaitUntilSecretCreated(cred.ObjectMeta)
 			Expect(err).NotTo(HaveOccurred())
 		}
@@ -57,14 +60,20 @@ var _ = Describe("Snapshotter", func() {
 		err = f.CreateBucketIfNotExist(clusterConfig.Snapshotter.Backend)
 		Expect(err).NotTo(HaveOccurred())
 
-		By("Starting Kubed")
-		stopCh = make(chan struct{})
-		err = f.RunKubed(stopCh, clusterConfig)
-		Expect(err).NotTo(HaveOccurred())
+		if f.SelfHostedOperator {
+			By("Restarting kubed operator")
+			err = f.RestartKubedOperator(&clusterConfig)
+			Expect(err).NotTo(HaveOccurred())
+		} else {
+			By("Starting Kubed")
+			stopCh = make(chan struct{})
+			err = f.RunKubed(stopCh, clusterConfig)
+			Expect(err).NotTo(HaveOccurred())
 
-		By("Waiting for API server to be ready")
-		root.EventuallyAPIServerReady().Should(Succeed())
-		time.Sleep(time.Second * 5)
+			By("Waiting for API server to be ready")
+			root.EventuallyAPIServerReady().Should(Succeed())
+			time.Sleep(time.Second * 5)
+		}
 	})
 
 	shouldTakeClusterSnapshot := func() {
@@ -94,6 +103,9 @@ var _ = Describe("Snapshotter", func() {
 				minioEndpoint := fmt.Sprintf("https://" + minikubeIP.String() + ":" + minioServiceNodePort)
 
 				cred = f.SecretForMinioBackend(true)
+				if f.SelfHostedOperator {
+					cred.Namespace = framework.OperatorNamespace
+				}
 
 				backend = framework.NewMinioBackend("kubed-test", "demo", minioEndpoint, cred.Name)
 				clusterConfig = framework.SnapshotterClusterConfig(backend)
@@ -104,19 +116,32 @@ var _ = Describe("Snapshotter", func() {
 
 		Context(`"Local" backend`, func() {
 			AfterEach(func() {
-				os.RemoveAll(framework.TEST_LOCAL_BACKUP_DIR)
+				if !f.SelfHostedOperator {
+					os.RemoveAll(framework.TEST_LOCAL_BACKUP_DIR)
+				}
 			})
 
 			BeforeEach(func() {
-				err := os.MkdirAll(framework.TEST_LOCAL_BACKUP_DIR, 0777)
-				Expect(err).NotTo(HaveOccurred())
+				if !f.SelfHostedOperator {
+					err := os.MkdirAll(framework.TEST_LOCAL_BACKUP_DIR, 0777)
+					Expect(err).NotTo(HaveOccurred())
+				}
 
 				backend = framework.NewLocalBackend(framework.TEST_LOCAL_BACKUP_DIR)
 				clusterConfig = framework.SnapshotterClusterConfig(backend)
 				cred = core.Secret{}
 			})
 
-			It(`should backup cluster Snapshot`, shouldTakeClusterSnapshot)
+			It(`should backup cluster Snapshot`, func() {
+				if f.SelfHostedOperator {
+					By("Creating backup dir")
+					err := f.MakeDirInsideOperatorPod(backend.Local.Path)
+					Expect(err).NotTo(HaveOccurred())
+				}
+
+				By("Waiting for backup to complete")
+				shouldTakeClusterSnapshot()
+			})
 		})
 	})
 
@@ -128,6 +153,9 @@ var _ = Describe("Snapshotter", func() {
 			})
 
 			BeforeEach(func() {
+				if f.SelfHostedOperator {
+					Skip("No Sanitize  test for local backend in SelfHostedOperator mode")
+				}
 				err := os.MkdirAll(framework.TEST_LOCAL_BACKUP_DIR, 0777)
 				Expect(err).NotTo(HaveOccurred())
 

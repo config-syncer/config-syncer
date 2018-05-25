@@ -48,6 +48,7 @@ var _ = BeforeSuite(func() {
 
 	root = framework.New(clientConfig)
 	root.KubeConfigPath = options.KubeConfig
+	root.SelfHostedOperator = options.SelfHostedOperator
 
 	By("Using Namespace " + root.Namespace())
 	err = root.EnsureNamespace()
@@ -61,14 +62,18 @@ var _ = BeforeSuite(func() {
 	err = framework.APIServerClusterConfig().Save(framework.KubedTestConfigFileDir)
 	Expect(err).NotTo(HaveOccurred())
 
-	By("Registering API service")
-	err = root.Invoke().RegisterAPIService()
-	Expect(err).NotTo(HaveOccurred())
+	if !root.SelfHostedOperator {
+		By("Registering API service")
+		err = root.Invoke().RegisterAPIService()
+		Expect(err).NotTo(HaveOccurred())
+	}
 })
 
 var _ = AfterSuite(func() {
-	By("Cleaning API service stuff")
-	root.Invoke().DeleteAPIService()
-	root.DeleteNamespace()
+	if !root.SelfHostedOperator {
+		By("Cleaning API service stuff")
+		root.Invoke().DeleteAPIService()
+	}
+	root.DeleteNamespace(root.Namespace())
 	os.Remove(framework.KubedTestConfigFileDir)
 })

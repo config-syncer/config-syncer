@@ -18,6 +18,7 @@ import (
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
@@ -54,6 +55,51 @@ func (f *Invocation) RunWebhookServer(stopCh <-chan os.Signal, requests *[]*http
 		fmt.Println("Clossing webhook server....")
 		srv.Shutdown(context.Background())
 	}()
+}
+
+func (f *Invocation) ServiceForWebhook() *core.Service {
+	return &core.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      f.app,
+			Namespace: f.namespace,
+		},
+		Spec: core.ServiceSpec{
+			Ports: []core.ServicePort{
+				{
+					Name:       "webhook",
+					Port:       80,
+					Protocol:   core.ProtocolTCP,
+					TargetPort: intstr.FromInt(8181),
+				},
+			},
+			Type: core.ServiceTypeClusterIP,
+		},
+	}
+}
+
+func (f *Invocation) LocalEndPointForWebhook(service *core.Service) *core.Endpoints {
+	return &core.Endpoints{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      service.Name,
+			Namespace: service.Namespace,
+		},
+		Subsets: []core.EndpointSubset{
+			{
+				Addresses: []core.EndpointAddress{
+					{
+						IP: "10.0.2.2",
+					},
+				},
+				Ports: []core.EndpointPort{
+					{
+						Name:     "webhook",
+						Port:     8181,
+						Protocol: core.ProtocolTCP,
+					},
+				},
+			},
+		},
+	}
 }
 
 func (f *Invocation) NewPersistentVolumeClaim() *core.PersistentVolumeClaim {

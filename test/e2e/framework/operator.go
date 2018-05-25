@@ -11,6 +11,7 @@ import (
 	srvr "github.com/appscode/kubed/pkg/server"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
+	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apiserver/pkg/admission"
@@ -208,4 +209,62 @@ func (f *Framework) DeleteClusterRole(meta metav1.ObjectMeta) error {
 
 func (f *Framework) DeleteClusterRoleBinding(meta metav1.ObjectMeta) error {
 	return f.KubeClient.RbacV1().ClusterRoleBindings().Delete(meta.Name, deleteInBackground())
+}
+
+const (
+	OperatorName      = "kubed-operator"
+	OperatorNamespace = "kube-system"
+	ContainerOperator = "operator"
+	OperatorConfig    = "kubed-config"
+)
+
+func (f *Invocation) RestartKubedOperator(config *api.ClusterConfig) error {
+	meta := metav1.ObjectMeta{
+		Name:      OperatorConfig,
+		Namespace: OperatorNamespace,
+	}
+
+	err := f.DeleteSecret(meta)
+	if err != nil && !kerr.IsNotFound(err) {
+		return err
+	}
+
+	err = f.WaitUntilSecretDeleted(meta)
+	if err != nil {
+		return err
+	}
+
+	kubeConfig, err := f.KubeConfigSecret(config, meta)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.CreateSecret(kubeConfig)
+	if err != nil {
+		return err
+	}
+
+	pods, err := f.KubeClient.CoreV1().Pods(OperatorNamespace).List(metav1.ListOptions{LabelSelector: "app=kubed"})
+	for _, pod := range pods.Items {
+		for _, c := range pod.Spec.Containers {
+			if c.Name == ContainerOperator {
+				err = f.KubeClient.CoreV1().Pods(OperatorNamespace).Delete(pod.Name, deleteInBackground())
+				if err != nil {
+					return err
+				}
+				err = f.WaitUntilPodTerminated(pod.ObjectMeta)
+				if err != nil {
+					return err
+				}
+				break
+			}
+		}
+	}
+
+	deployment, err := f.KubeClient.AppsV1beta1().Deployments(OperatorNamespace).Get(OperatorName, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	return f.WaitUntilDeploymentReady(deployment.ObjectMeta)
 }

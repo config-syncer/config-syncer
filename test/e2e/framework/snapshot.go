@@ -11,6 +11,7 @@ import (
 	"github.com/appscode/go/encoding/yaml"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/storage"
+	exec_util "github.com/appscode/kutil/tools/exec"
 	"github.com/graymeta/stow"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
@@ -20,7 +21,7 @@ import (
 )
 
 const (
-	TEST_LOCAL_BACKUP_DIR = "/tmp/kubed/snapshot"
+	TEST_LOCAL_BACKUP_DIR = "/tmp/kubed/backup/snapshot"
 )
 
 func NewMinioBackend(bucket, prefix, endpoint, secretName string) *api.Backend {
@@ -43,28 +44,54 @@ func NewLocalBackend(dir string) *api.Backend {
 }
 
 func (f *Invocation) EventuallyBackupSnapshot(backend api.Backend) GomegaAsyncAssertion {
-	return Eventually(func() []stow.Item {
-		loc, err := f.GetLocation(backend)
-		Expect(err).NotTo(HaveOccurred())
-
-		bucket, prefix, err := backend.GetBucketAndPrefix()
-		Expect(err).NotTo(HaveOccurred())
-		if backend.Local == nil {
-			prefix = prefix + "/"
+	return Eventually(func() interface{} {
+		if backend.Local != nil && f.SelfHostedOperator {
+			return f.ListSnapshotInsideOperatorPod()
+		} else {
+			return f.GetItems(backend)
 		}
-
-		container, err := loc.Container(bucket)
-		Expect(err).NotTo(HaveOccurred())
-
-		items, _, err := container.Items(prefix, stow.CursorStart, 50)
-		Expect(err).NotTo(HaveOccurred())
-
-		return items
 	})
 }
 
+func (f *Invocation) GetItems(backend api.Backend) []stow.Item {
+	loc, err := f.GetLocation(backend)
+	Expect(err).NotTo(HaveOccurred())
+
+	bucket, prefix, err := backend.GetBucketAndPrefix()
+	Expect(err).NotTo(HaveOccurred())
+	if backend.Local == nil {
+		prefix = prefix + "/"
+	}
+
+	container, err := loc.Container(bucket)
+	Expect(err).NotTo(HaveOccurred())
+
+	items, _, err := container.Items(prefix, stow.CursorStart, 50)
+	Expect(err).NotTo(HaveOccurred())
+
+	return items
+}
+
+func (f *Invocation) ListSnapshotInsideOperatorPod() string {
+	pod, err := f.OperatorPod()
+	Expect(err).NotTo(HaveOccurred())
+
+	output, err := exec_util.ExecIntoPod(f.ClientConfig, pod, "ls", TEST_LOCAL_BACKUP_DIR)
+	Expect(err).NotTo(HaveOccurred())
+	return output
+}
+
 func (f *Invocation) CreateBucketIfNotExist(backend api.Backend) error {
-	err := storage.CheckBucketAccess(f.KubeClient, backend, f.namespace)
+	namespace := f.namespace
+	if f.SelfHostedOperator {
+		namespace = OperatorNamespace
+	}
+
+	if f.SelfHostedOperator && backend.Local != nil {
+		return nil
+	}
+
+	err := storage.CheckBucketAccess(f.KubeClient, backend, namespace)
 	if err != nil {
 		if err.Error() == stow.ErrNotFound.Error() {
 			loc, err := f.GetLocation(backend)
@@ -87,8 +114,25 @@ func (f *Invocation) CreateBucketIfNotExist(backend api.Backend) error {
 	return nil
 }
 
+func (f *Invocation) MakeDirInsideOperatorPod(dir string) error {
+	pod, err := f.OperatorPod()
+	if err != nil {
+		return err
+	}
+
+	_, err = exec_util.ExecIntoPod(f.ClientConfig, pod, "mkdir", "-p", dir)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (f *Invocation) GetLocation(backend api.Backend) (stow.Location, error) {
-	cfg, err := storage.NewOSMContext(f.KubeClient, backend, f.namespace)
+	namespace := f.namespace
+	if f.SelfHostedOperator {
+		namespace = OperatorNamespace
+	}
+	cfg, err := storage.NewOSMContext(f.KubeClient, backend, namespace)
 	if err != nil {
 		return nil, err
 	}

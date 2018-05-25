@@ -1,5 +1,5 @@
-hash: cf1257127c911156e6bbeb81552dd14834bb80dbabe8553a7733053700a2a903
-updated: 2018-05-17T22:24:08.460113891-07:00
+hash: 3bd0ad5e5ef706b9d5a547c19bd6efba01662205091b2d852234076a55fbbcf4
+updated: 2018-05-24T02:25:13.532164598-07:00
 imports:
 - name: bitbucket.org/atlassian/go-stride
   version: 8846b835cb45ec8707e6694533a2b6180861cdbe
@@ -62,7 +62,7 @@ imports:
   - apis/workload/v1
   - client/workload/v1
 - name: github.com/appscode/kutil
-  version: 58e34c2195a0b9eee67eea40701f7f7759f3f79f
+  version: 1071d579106207585c16e774e11e8b53e876c135
   subpackages:
   - apiextensions/v1beta1
   - core/v1
@@ -73,6 +73,7 @@ imports:
   - tools/backup
   - tools/certstore
   - tools/clientcmd
+  - tools/exec
   - tools/fsnotify
   - tools/queue
 - name: github.com/appscode/mergo
@@ -84,7 +85,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 93aecf99952362f1e49b71db4c7c389cdf46ed0d
+  version: c520036627428ec3921dd969fbb55b43bf64445f
   subpackages:
   - apis/incidents
   - apis/incidents/v1alpha1
@@ -100,7 +101,7 @@ imports:
   - client/informers/externalversions/monitoring/v1alpha1
   - client/listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: b694835b78dc7f996829eb37bb506045c10b33da
+  version: 72c9e20eaf49036bfabf616429a2fc2c83e94428
   subpackages:
   - apis/repositories
   - apis/repositories/v1alpha1
@@ -116,7 +117,7 @@ imports:
   - client/informers/externalversions/stash/v1alpha1
   - client/listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 3c688e53248aa8c3daa33b3b7d7cbc247a04882c
+  version: d979c876d0c814e5c9c5f7bdd3d1be12315193f7
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -332,6 +333,10 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
+- name: github.com/docker/spdystream
+  version: 449fdfce4d962303d702fec724ef0ad181c92528
+  subpackages:
+  - spdy
 - name: github.com/edsrzf/mmap-go
   version: 935e0e8a636ca4ba70b713f3e38a19e1b77739e8
 - name: github.com/elazarl/go-bindata-assetfs
@@ -453,7 +458,7 @@ imports:
 - name: github.com/json-iterator/go
   version: 13f86432b882000a51c6e610c620974462691a97
 - name: github.com/kubedb/apimachinery
-  version: a8071385b2fc35db545bc8a3b516e711217d3cce
+  version: 1f462fe2a8b320d95f5f81b3a063fc83c34d28f1
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -522,7 +527,7 @@ imports:
 - name: github.com/philhofer/fwd
   version: bb6d471dc95d4fe11e432687f8b70ff496cf3136
 - name: github.com/pkg/errors
-  version: 816c9085562cd7ee03e7f8188a1cfd942858cded
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -552,7 +557,7 @@ imports:
 - name: github.com/robfig/cron
   version: b41be1df696709bb6395fe435af20370037c0b4c
 - name: github.com/rs/zerolog
-  version: ea197802eb218ea675a8286a77c13e132aa9a21c
+  version: 64faaa6980a691db8af9a7c50d448c6dc8c6aedb
   subpackages:
   - internal/cbor
   - internal/json
@@ -673,7 +678,7 @@ imports:
   subpackages:
   - rate
 - name: google.golang.org/api
-  version: aedc137bffcaca05f836e35c6d182fcb7a68b1c0
+  version: 348810ff778af56686d572415ce79e6c9fad9613
   subpackages:
   - gensupport
   - googleapi
@@ -814,11 +819,14 @@ imports:
   - pkg/util/diff
   - pkg/util/errors
   - pkg/util/framer
+  - pkg/util/httpstream
+  - pkg/util/httpstream/spdy
   - pkg/util/intstr
   - pkg/util/json
   - pkg/util/mergepatch
   - pkg/util/net
   - pkg/util/rand
+  - pkg/util/remotecommand
   - pkg/util/runtime
   - pkg/util/sets
   - pkg/util/strategicpatch
@@ -831,6 +839,7 @@ imports:
   - pkg/version
   - pkg/watch
   - third_party/forked/golang/json
+  - third_party/forked/golang/netutil
   - third_party/forked/golang/reflect
 - name: k8s.io/apiserver
   version: 6fdedd7050e542dd8c23fdababac0237aedd7f9e
@@ -1074,9 +1083,12 @@ imports:
   - tools/pager
   - tools/record
   - tools/reference
+  - tools/remotecommand
   - transport
+  - transport/spdy
   - util/buffer
   - util/cert
+  - util/exec
   - util/flowcontrol
   - util/homedir
   - util/integer
