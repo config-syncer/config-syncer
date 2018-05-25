@@ -52,6 +52,7 @@ var _ = Describe("Snapshotter", func() {
 		if backend.Local == nil {
 			_, err := f.CreateSecret(&cred)
 			Expect(err).NotTo(HaveOccurred())
+
 			err = f.WaitUntilSecretCreated(cred.ObjectMeta)
 			Expect(err).NotTo(HaveOccurred())
 		}
@@ -61,7 +62,7 @@ var _ = Describe("Snapshotter", func() {
 
 		if f.SelfHostedOperator {
 			By("Restarting kubed operator")
-			err:=f.RestartKubedOperator(&clusterConfig)
+			err = f.RestartKubedOperator(&clusterConfig)
 			Expect(err).NotTo(HaveOccurred())
 		} else {
 			By("Starting Kubed")
@@ -102,6 +103,9 @@ var _ = Describe("Snapshotter", func() {
 				minioEndpoint := fmt.Sprintf("https://" + minikubeIP.String() + ":" + minioServiceNodePort)
 
 				cred = f.SecretForMinioBackend(true)
+				if f.SelfHostedOperator {
+					cred.Namespace = framework.OperatorNamespace
+				}
 
 				backend = framework.NewMinioBackend("kubed-test", "demo", minioEndpoint, cred.Name)
 				clusterConfig = framework.SnapshotterClusterConfig(backend)
@@ -112,9 +116,7 @@ var _ = Describe("Snapshotter", func() {
 
 		Context(`"Local" backend`, func() {
 			AfterEach(func() {
-				if f.SelfHostedOperator {
-					f.RemoveFromOperatorPod(framework.TEST_LOCAL_BACKUP_DIR)
-				} else {
+				if !f.SelfHostedOperator {
 					os.RemoveAll(framework.TEST_LOCAL_BACKUP_DIR)
 				}
 			})
@@ -130,7 +132,16 @@ var _ = Describe("Snapshotter", func() {
 				cred = core.Secret{}
 			})
 
-			It(`should backup cluster Snapshot`, shouldTakeClusterSnapshot)
+			It(`should backup cluster Snapshot`, func() {
+				if f.SelfHostedOperator {
+					By("Creating backup dir")
+					err := f.MakeDirInsideOperatorPod(backend.Local.Path)
+					Expect(err).NotTo(HaveOccurred())
+				}
+
+				By("Waiting for backup to complete")
+				shouldTakeClusterSnapshot()
+			})
 		})
 	})
 
