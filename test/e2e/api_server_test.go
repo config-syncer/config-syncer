@@ -32,7 +32,7 @@ var _ = Describe("API server", func() {
 	JustBeforeEach(func() {
 		if f.SelfHostedOperator {
 			By("Restarting kubed operator")
-			err:=f.RestartKubedOperator(&clusterConfig)
+			err := f.RestartKubedOperator(&clusterConfig)
 			Expect(err).NotTo(HaveOccurred())
 		} else {
 			By("Starting Kubed")
