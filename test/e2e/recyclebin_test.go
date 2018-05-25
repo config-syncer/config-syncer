@@ -64,7 +64,9 @@ var _ = Describe("RecycleBin", func() {
 			})
 
 			AfterEach(func() {
-				os.RemoveAll(clusterConfig.RecycleBin.Path)
+				if !f.SelfHostedOperator{
+					os.RemoveAll(clusterConfig.RecycleBin.Path)
+				}
 			})
 
 			It("should store deleted configMap in RecycleBin", func() {
@@ -97,7 +99,9 @@ var _ = Describe("RecycleBin", func() {
 			})
 
 			AfterEach(func() {
-				os.RemoveAll(clusterConfig.RecycleBin.Path)
+				if !f.SelfHostedOperator{
+					os.RemoveAll(clusterConfig.RecycleBin.Path)
+				}
 			})
 
 			It("should store old configMap in RecycleBin", func() {
@@ -129,6 +133,9 @@ var _ = Describe("RecycleBin", func() {
 		Context("TTL timeout", func() {
 
 			BeforeEach(func() {
+				if f.SelfHostedOperator{
+					Skip("Skipping test. Reason: In Self Hosted Operator mode Trash cleaner run in 1hour interval")
+				}
 				configMap = f.NewConfigMap()
 				clusterConfig.RecycleBin.TTL = metav1.Duration{Duration: time.Minute}
 			})
