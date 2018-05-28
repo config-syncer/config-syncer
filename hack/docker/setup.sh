@@ -61,7 +61,7 @@ COPY osm /usr/bin/osm
 COPY kubed /usr/bin/kubed
 ENTRYPOINT ["kubed"]
 EOL
-    local cmd="docker build -t appscode/$IMG:$TAG ."
+    local cmd="docker build -t $DOCKER_REGISTRY/$IMG:$TAG ."
     echo $cmd; $cmd
 
     rm kubed osm Dockerfile

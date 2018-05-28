@@ -1,0 +1,56 @@
+resource_types:
+- name: pull-request
+  type: docker-image
+  source:
+    repository: tahsin/git-pull-resource
+    tag: latest
+
+resources:
+- name: kubed
+  type: git
+  source:
+    uri: https://github.com/appscode/kubed
+    branch: master
+
+- name: pull-request
+  type: pull-request
+  source:
+    owner: appscode
+    repo: kubed
+    label: ok-to-test
+    access_token: ((access_token))
+
+jobs:
+- name: test-kubed
+  plan:
+  - get: kubed
+    trigger: true
+  - task: test-e2e
+    privileged: true
+    file: kubed/hack/concourse/task.yml
+    params:
+      TOKEN: ((digitaloceanToken))
+      DOCKER_USER: ((docker_user))
+      DOCKER_PASS: ((docker_pass))
+
+- name: test-kubed-pr
+  plan:
+  - get: pull-request
+    trigger: true
+  - put: pull-request
+    params: { path: pull-request, status: pending}
+  - task: test-e2e
+    privileged: true
+    file: pull-request/hack/concourse/task.yml
+    input_mapping:
+      kubed: pull-request
+    params:
+      TOKEN: ((digitaloceanToken))
+      DOCKER_USER: ((docker_user))
+      DOCKER_PASS: ((docker_pass))
+    on_success:
+      put: pull-request
+      params: { path: pull-request, status: success}
+    on_failure:
+      put: pull-request
+      params: {path: pull-request, status: failure}
