@@ -5,6 +5,7 @@ echo "checking kubeconfig context"
 kubectl config current-context || { echo "Set a context (kubectl use-context <context>) out of the following:"; echo; kubectl config get-contexts; exit 1; }
 echo ""
 
+<<<<<<< HEAD
 APPSCODE_TEST=${APPSCODE_TEST:-minikube}
 
 if [ "$APPSCODE_TEST" != "concourse" ]; then
@@ -12,6 +13,15 @@ if [ "$APPSCODE_TEST" != "concourse" ]; then
 	function cleanup {
 		rm -rf $ONESSL ca.crt ca.key server.crt server.key
 	}
+=======
+# http://redsymbol.net/articles/bash-exit-traps/
+function cleanup {
+    rm -rf $ONESSL ca.crt ca.key server.crt server.key
+}
+APPSCODE_TEST=${APPSCODE_TEST:-minikube}
+echo $APPSCODE_TEST
+if [ "$APPSCODE_TEST" != "concourse" ]; then
+>>>>>>> 8ff117c247e2878f4cb04e0c31bee6821a5f07d2
     trap cleanup EXIT
 fi
 
@@ -93,7 +103,11 @@ export KUBED_SERVICE_ACCOUNT=kubed-operator
 export KUBED_ENABLE_RBAC=true
 export KUBED_RUN_ON_MASTER=0
 export KUBED_DOCKER_REGISTRY=${DOCKER_REGISTRY:-appscode}
+<<<<<<< HEAD
+export KUBED_IMAGE_TAG=0.6.0-rc.0
+=======
 export KUBED_IMAGE_TAG=0.7.0-rc.0
+>>>>>>> 8ff117c247e2878f4cb04e0c31bee6821a5f07d2
 export KUBED_IMAGE_PULL_SECRET=
 export KUBED_IMAGE_PULL_POLICY=IfNotPresent
 export KUBED_ENABLE_ANALYTICS=true

@@ -106,7 +106,7 @@ spec:
       serviceAccountName: kubed
       containers:
       - name: kubed
-        image: appscode/kubed:0.6.0-rc.0
+        image: appscode/kubed:0.7.0-rc.0
         imagePullPolicy: IfNotPresent
         args:
         - run
