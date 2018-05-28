@@ -88,19 +88,32 @@ var _ = Describe("Snapshotter", func() {
 			})
 
 			BeforeEach(func() {
-				minikubeIP := net.IP{192, 168, 99, 100}
+				clusterIP := net.IP{192, 168, 99, 100}
 
 				By("Creating Minio server with cacert")
-				_, err := f.CreateMinioServer(true, []net.IP{minikubeIP})
+				_, err := f.CreateMinioServer(true, []net.IP{clusterIP})
 				Expect(err).NotTo(HaveOccurred())
 
 				// give some time for minio-server to be ready
 				time.Sleep(time.Second * 15)
 
+				pod, err := f.OperatorPod()
+				if f.SelfHostedOperator && pod.Spec.NodeName != "minikube" {
+					node, err := f.KubeClient.CoreV1().Nodes().Get(pod.Spec.NodeName, metav1.GetOptions{})
+					Expect(err).NotTo(HaveOccurred())
+
+					for _, addr := range node.Status.Addresses {
+						if addr.Type == core.NodeExternalIP {
+							clusterIP = net.ParseIP(addr.Address)
+							break
+						}
+					}
+				}
+
 				msvc, err := f.KubeClient.CoreV1().Services(f.Namespace()).Get("minio-service", metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())
 				minioServiceNodePort := strconv.Itoa(int(msvc.Spec.Ports[0].NodePort))
-				minioEndpoint := fmt.Sprintf("https://" + minikubeIP.String() + ":" + minioServiceNodePort)
+				minioEndpoint := fmt.Sprintf("https://" + clusterIP.String() + ":" + minioServiceNodePort)
 
 				cred = f.SecretForMinioBackend(true)
 				if f.SelfHostedOperator {
