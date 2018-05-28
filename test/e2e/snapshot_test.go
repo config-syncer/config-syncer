@@ -90,13 +90,6 @@ var _ = Describe("Snapshotter", func() {
 			BeforeEach(func() {
 				clusterIP := net.IP{192, 168, 99, 100}
 
-				By("Creating Minio server with cacert")
-				_, err := f.CreateMinioServer(true, []net.IP{clusterIP})
-				Expect(err).NotTo(HaveOccurred())
-
-				// give some time for minio-server to be ready
-				time.Sleep(time.Second * 15)
-
 				pod, err := f.OperatorPod()
 				if f.SelfHostedOperator && pod.Spec.NodeName != "minikube" {
 					node, err := f.KubeClient.CoreV1().Nodes().Get(pod.Spec.NodeName, metav1.GetOptions{})
@@ -109,6 +102,13 @@ var _ = Describe("Snapshotter", func() {
 						}
 					}
 				}
+
+				By("Creating Minio server with cacert")
+				_, err = f.CreateMinioServer(true, []net.IP{clusterIP})
+				Expect(err).NotTo(HaveOccurred())
+
+				// give some time for minio-server to be ready
+				time.Sleep(time.Second * 15)
 
 				msvc, err := f.KubeClient.CoreV1().Services(f.Namespace()).Get("minio-service", metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())

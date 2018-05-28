@@ -32,18 +32,19 @@ import (
 	policy "k8s.io/api/policy/v1beta1"
 	rbac "k8s.io/api/rbac/v1"
 	// scheduling "k8s.io/api/scheduling/v1alpha1"
+	"os"
+
 	apiext_util "github.com/appscode/kutil/apiextensions/v1beta1"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	crd_cs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
-	"os"
 )
 
 func TestRestMapper(t *testing.T) {
 	masterURL := ""
 	kubeconfigPath := filepath.Join(homedir.HomeDir(), ".kube/config")
 
-	_,err:=os.Stat(kubeconfigPath)
-	if  err!=nil{ //kubeconfig file not found. so skip testing.
+	_, err := os.Stat(kubeconfigPath)
+	if err != nil { //kubeconfig file not found. so skip testing.
 		return
 	}
 
