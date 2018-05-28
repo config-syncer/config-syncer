@@ -5,13 +5,13 @@ echo "checking kubeconfig context"
 kubectl config current-context || { echo "Set a context (kubectl use-context <context>) out of the following:"; echo; kubectl config get-contexts; exit 1; }
 echo ""
 
-# http://redsymbol.net/articles/bash-exit-traps/
-function cleanup {
-    rm -rf $ONESSL ca.crt ca.key server.crt server.key
-}
 APPSCODE_TEST=${APPSCODE_TEST:-minikube}
-echo $APPSCODE_TEST
+
 if [ "$APPSCODE_TEST" != "concourse" ]; then
+	# http://redsymbol.net/articles/bash-exit-traps/
+	function cleanup {
+		rm -rf $ONESSL ca.crt ca.key server.crt server.key
+	}
     trap cleanup EXIT
 fi
 
