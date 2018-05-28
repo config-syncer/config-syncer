@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestInfluxJanitor(t *testing.T) {
+func XTestInfluxJanitor(t *testing.T) {
 	host := ""
 	user := ""
 	pass := ""

@@ -35,8 +35,15 @@ var _ = Describe("Event-forwarder", func() {
 		}
 
 		if f.SelfHostedOperator {
+			pod, err := f.OperatorPod()
+			Expect(err).NotTo(HaveOccurred())
+
+			if pod.Spec.NodeName != "minikube" {
+				Skip("Skipping test. Reason: This test is designed only for minikube.")
+			}
+
 			By("Restarting kubed operator")
-			err := f.RestartKubedOperator(&clusterConfig)
+			err = f.RestartKubedOperator(&clusterConfig)
 			Expect(err).NotTo(HaveOccurred())
 		} else {
 			By("Starting Kubed")

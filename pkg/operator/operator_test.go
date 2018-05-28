@@ -32,8 +32,9 @@ import (
 	policy "k8s.io/api/policy/v1beta1"
 	rbac "k8s.io/api/rbac/v1"
 	// scheduling "k8s.io/api/scheduling/v1alpha1"
+	"os"
+
 	apiext_util "github.com/appscode/kutil/apiextensions/v1beta1"
-	settings "k8s.io/api/settings/v1alpha1"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	crd_cs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 )
@@ -41,6 +42,11 @@ import (
 func TestRestMapper(t *testing.T) {
 	masterURL := ""
 	kubeconfigPath := filepath.Join(homedir.HomeDir(), ".kube/config")
+
+	_, err := os.Stat(kubeconfigPath)
+	if err != nil { //kubeconfig file not found. so skip testing.
+		return
+	}
 
 	config, err := clientcmd.BuildConfigFromFlags(masterURL, kubeconfigPath)
 	if err != nil {
@@ -116,31 +122,31 @@ func TestRestMapper(t *testing.T) {
 		{&rbac.ClusterRole{}, rbac.SchemeGroupVersion.WithResource("clusterroles")},
 		{&rbac.RoleBinding{}, rbac.SchemeGroupVersion.WithResource("rolebindings")},
 		{&rbac.Role{}, rbac.SchemeGroupVersion.WithResource("roles")},
-		{&settings.PodPreset{}, settings.SchemeGroupVersion.WithResource("podpresets")},
+		//{&settings.PodPreset{}, settings.SchemeGroupVersion.WithResource("podpresets")},
 		{&storage_v1.StorageClass{}, storage_v1.SchemeGroupVersion.WithResource("storageclasses")},
 
 		// voyager
-		{&voyager_api.Ingress{}, voyager_api.SchemeGroupVersion.WithResource(voyager_api.ResourceTypeIngress)},
-		{&voyager_api.Certificate{}, voyager_api.SchemeGroupVersion.WithResource(voyager_api.ResourceTypeCertificate)},
-
-		// stash
-		{&stash_api.Restic{}, stash_api.SchemeGroupVersion.WithResource(stash_api.ResourceTypeRestic)},
-		{&stash_api.Recovery{}, stash_api.SchemeGroupVersion.WithResource(stash_api.ResourceTypeRecovery)},
-
-		// searchlight
-		{&searchlight_api.ClusterAlert{}, searchlight_api.SchemeGroupVersion.WithResource(searchlight_api.ResourceTypeClusterAlert)},
-		{&searchlight_api.NodeAlert{}, searchlight_api.SchemeGroupVersion.WithResource(searchlight_api.ResourceTypeNodeAlert)},
-		{&searchlight_api.PodAlert{}, searchlight_api.SchemeGroupVersion.WithResource(searchlight_api.ResourceTypePodAlert)},
-
-		// kubedb
-		{&kubedb_api.Postgres{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypePostgres)},
-		{&kubedb_api.Elasticsearch{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeElasticsearch)},
-		{&kubedb_api.MySQL{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeMySQL)},
-		{&kubedb_api.MongoDB{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeMongoDB)},
-		{&kubedb_api.Redis{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeRedis)},
-		{&kubedb_api.Memcached{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeMemcached)},
-		{&kubedb_api.Snapshot{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeSnapshot)},
-		{&kubedb_api.DormantDatabase{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeDormantDatabase)},
+		//{&voyager_api.Ingress{}, voyager_api.SchemeGroupVersion.WithResource(voyager_api.ResourceTypeIngress)},
+		//{&voyager_api.Certificate{}, voyager_api.SchemeGroupVersion.WithResource(voyager_api.ResourceTypeCertificate)},
+		//
+		//// stash
+		//{&stash_api.Restic{}, stash_api.SchemeGroupVersion.WithResource(stash_api.ResourceTypeRestic)},
+		//{&stash_api.Recovery{}, stash_api.SchemeGroupVersion.WithResource(stash_api.ResourceTypeRecovery)},
+		//
+		//// searchlight
+		//{&searchlight_api.ClusterAlert{}, searchlight_api.SchemeGroupVersion.WithResource(searchlight_api.ResourceTypeClusterAlert)},
+		//{&searchlight_api.NodeAlert{}, searchlight_api.SchemeGroupVersion.WithResource(searchlight_api.ResourceTypeNodeAlert)},
+		//{&searchlight_api.PodAlert{}, searchlight_api.SchemeGroupVersion.WithResource(searchlight_api.ResourceTypePodAlert)},
+		//
+		//// kubedb
+		//{&kubedb_api.Postgres{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypePostgres)},
+		//{&kubedb_api.Elasticsearch{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeElasticsearch)},
+		//{&kubedb_api.MySQL{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeMySQL)},
+		//{&kubedb_api.MongoDB{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeMongoDB)},
+		//{&kubedb_api.Redis{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeRedis)},
+		//{&kubedb_api.Memcached{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeMemcached)},
+		//{&kubedb_api.Snapshot{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeSnapshot)},
+		//{&kubedb_api.DormantDatabase{}, kubedb_api.SchemeGroupVersion.WithResource(kubedb_api.ResourceTypeDormantDatabase)},
 
 		//// coreos-prometheus
 		//{&prom.Prometheus{}, prom_util.SchemeGroupVersion.WithResource(prom.PrometheusesKind)},

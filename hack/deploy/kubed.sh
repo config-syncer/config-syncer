@@ -9,7 +9,11 @@ echo ""
 function cleanup {
     rm -rf $ONESSL ca.crt ca.key server.crt server.key
 }
-trap cleanup EXIT
+APPSCODE_TEST=${APPSCODE_TEST:-minikube}
+echo $APPSCODE_TEST
+if [ "$APPSCODE_TEST" != "concourse" ]; then
+    trap cleanup EXIT
+fi
 
 # ref: https://github.com/appscodelabs/libbuild/blob/master/common/lib.sh#L55
 inside_git_repo() {
@@ -88,7 +92,7 @@ export KUBED_NAMESPACE=kube-system
 export KUBED_SERVICE_ACCOUNT=kubed-operator
 export KUBED_ENABLE_RBAC=true
 export KUBED_RUN_ON_MASTER=0
-export KUBED_DOCKER_REGISTRY=appscode
+export KUBED_DOCKER_REGISTRY=${DOCKER_REGISTRY:-appscode}
 export KUBED_IMAGE_TAG=0.6.0-rc.0
 export KUBED_IMAGE_PULL_SECRET=
 export KUBED_IMAGE_PULL_POLICY=IfNotPresent
