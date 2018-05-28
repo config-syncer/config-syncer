@@ -29,6 +29,9 @@ mv pharmer-linux-amd64 /bin/pharmer
 popd
 
 function cleanup {
+    pwd
+    rm -rf $ONESSL ca.crt ca.key server.crt server.key || true
+
     # delete cluster on exit
     pharmer get cluster || true
     pharmer delete cluster $NAME || true
@@ -55,6 +58,7 @@ NAME=kubed-$(git rev-parse --short HEAD)
 
 ./hack/builddeps.sh
 export APPSCODE_ENV=dev
+export APPSCODE_TEST=concourse
 export DOCKER_REGISTRY=appscodeci
 ./hack/docker/setup.sh
 ./hack/docker/setup.sh push
@@ -97,5 +101,4 @@ pushd $GOPATH/src/github.com/appscode/kubed
 
 # run tests
 source ./hack/deploy/kubed.sh --docker-registry=appscodeci
-./hack/make.py test e2e --v=1 --storageclass=standard --selfhosted-operator=true
 ./hack/make.py test e2e --v=3 --kubeconfig=/root/.kube/config --selfhosted-operator=true
