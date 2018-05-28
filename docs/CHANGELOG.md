@@ -17,9 +17,8 @@ aliases:
 
 # Change Log
 
-## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
-
-[Full Changelog](https://github.com/appscode/kubed/compare/0.6.0-rc.0...HEAD)
+## [0.7.0-rc.0](https://github.com/appscode/kubed/tree/0.7.0-rc.0) (2018-05-28)
+[Full Changelog](https://github.com/appscode/kubed/compare/0.6.0-rc.0...0.7.0-rc.0)
 
 **Fixed bugs:**
 
@@ -43,6 +42,8 @@ aliases:
 
 **Merged pull requests:**
 
+- Use same config for chart and script installer [\#274](https://github.com/appscode/kubed/pull/274) ([tamalsaha](https://github.com/tamalsaha))
+- Prepare docs for 7.0.0-rc.0 [\#273](https://github.com/appscode/kubed/pull/273) ([tamalsaha](https://github.com/tamalsaha))
 - Add concourse test [\#272](https://github.com/appscode/kubed/pull/272) ([tahsinrahman](https://github.com/tahsinrahman))
 - Improve installer [\#271](https://github.com/appscode/kubed/pull/271) ([tamalsaha](https://github.com/tamalsaha))
 - Improve e2e test [\#270](https://github.com/appscode/kubed/pull/270) ([emruz-hossain](https://github.com/emruz-hossain))
