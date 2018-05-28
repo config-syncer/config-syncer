@@ -2,13 +2,13 @@
 title: Kubed Overview
 description: Kubed Overview
 menu:
-  product_kubed_0.6.0-rc.0:
+  product_kubed_0.7.0-rc.0:
     identifier: overview-concepts
     name: Overview
     parent: what-is-kubed
     weight: 10
 product_name: kubed
-menu_name: product_kubed_0.6.0-rc.0
+menu_name: product_kubed_0.7.0-rc.0
 section_menu_id: concepts
 ---
 
