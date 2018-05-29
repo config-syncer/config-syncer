@@ -5,13 +5,12 @@ echo "checking kubeconfig context"
 kubectl config current-context || { echo "Set a context (kubectl use-context <context>) out of the following:"; echo; kubectl config get-contexts; exit 1; }
 echo ""
 
-APPSCODE_TEST=${APPSCODE_TEST:-minikube}
+# http://redsymbol.net/articles/bash-exit-traps/
+function cleanup {
+	rm -rf $ONESSL ca.crt ca.key server.crt server.key
+}
 
-if [ "$APPSCODE_TEST" != "concourse" ]; then
-	# http://redsymbol.net/articles/bash-exit-traps/
-	function cleanup {
-		rm -rf $ONESSL ca.crt ca.key server.crt server.key
-	}
+if [ "$APPSCODE_ENV" != "test-concourse" ]; then
     trap cleanup EXIT
 fi
 
@@ -101,7 +100,7 @@ export KUBED_UNINSTALL=0
 
 export APPSCODE_ENV=${APPSCODE_ENV:-prod}
 export SCRIPT_LOCATION="curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.0/"
-if [ "$APPSCODE_ENV" = "dev" ]; then
+if [[ "$APPSCODE_ENV" = "dev" || "$APPSCODE_ENV" = "test-concourse" ]]; then
     detect_tag
     export SCRIPT_LOCATION="cat "
     export KUBED_IMAGE_TAG=$TAG
