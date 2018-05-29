@@ -28,8 +28,7 @@ chmod +x pharmer-linux-amd64
 mv pharmer-linux-amd64 /bin/pharmer
 popd
 
-function cleanup {
-    pwd
+function cleanup_test_stuff {
     rm -rf $ONESSL ca.crt ca.key server.crt server.key || true
 
     # delete cluster on exit
@@ -45,7 +44,7 @@ function cleanup {
     chmod +x docker.py || true
     ./docker.py del_tag appscodeci kubed $KUBED_IMAGE_TAG || true
 }
-trap cleanup EXIT
+trap cleanup_test_stuff EXIT
 
 # copy kubed to $GOPATH
 mkdir -p $GOPATH/src/github.com/appscode
@@ -57,8 +56,7 @@ pushd $GOPATH/src/github.com/appscode/kubed
 NAME=kubed-$(git rev-parse --short HEAD)
 
 ./hack/builddeps.sh
-export APPSCODE_ENV=dev
-export APPSCODE_TEST=concourse
+export APPSCODE_ENV=test-concourse
 export DOCKER_REGISTRY=appscodeci
 ./hack/docker/setup.sh
 ./hack/docker/setup.sh push
