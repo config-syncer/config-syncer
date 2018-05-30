@@ -124,7 +124,6 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 		Name:      src.Name,
 		Namespace: namespace,
 	}
-
 	_, _, err := core_util.CreateOrPatchSecret(k8sClient, meta, func(obj *core.Secret) *core.Secret {
 		// check origin cluster, if not match overwrite and create an event
 		if v, ok := obj.Labels[api.OriginClusterLabelKey]; ok && v != s.clusterName {
