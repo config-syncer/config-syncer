@@ -93,13 +93,13 @@ export KUBED_SERVICE_ACCOUNT=kubed-operator
 export KUBED_ENABLE_RBAC=true
 export KUBED_RUN_ON_MASTER=0
 export KUBED_DOCKER_REGISTRY=${DOCKER_REGISTRY:-appscode}
-export KUBED_IMAGE_TAG=0.7.0-rc.0
+export KUBED_IMAGE_TAG=0.7.0-rc.1
 export KUBED_IMAGE_PULL_SECRET=
 export KUBED_IMAGE_PULL_POLICY=IfNotPresent
 export KUBED_ENABLE_ANALYTICS=true
 export KUBED_UNINSTALL=0
 
-export SCRIPT_LOCATION="curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.0/"
+export SCRIPT_LOCATION="curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/"
 if [[ "$APPSCODE_ENV" = "dev" || "$APPSCODE_ENV" = "test-concourse" ]]; then
     detect_tag
     export SCRIPT_LOCATION="cat "
