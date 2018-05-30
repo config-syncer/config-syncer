@@ -128,11 +128,11 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 	}
 
 	// if a copy already exist but type do not match, then delete old copy
-	_, err := s.kubeClient.CoreV1().Secrets(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
+	oldSecret, err := s.kubeClient.CoreV1().Secrets(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if err != nil && !kerr.IsNotFound(err) {
 		return err
 	}
-	if err == nil {
+	if err == nil && oldSecret.Type != src.Type {
 		err = s.kubeClient.CoreV1().Secrets(meta.Namespace).Delete(meta.Name, meta2.DeleteInBackground())
 		if err != nil {
 			return err
