@@ -5,10 +5,8 @@ import (
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/eventer"
 	core_util "github.com/appscode/kutil/core/v1"
-	meta2 "github.com/appscode/kutil/meta"
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
-	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -127,18 +125,7 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 		Namespace: namespace,
 	}
 
-	// if a copy already exist but type do not match, then delete old copy
-	oldSecret, err := s.kubeClient.CoreV1().Secrets(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
-	if err != nil && !kerr.IsNotFound(err) {
-		return err
-	}
-	if err == nil && oldSecret.Type != src.Type {
-		err = s.kubeClient.CoreV1().Secrets(meta.Namespace).Delete(meta.Name, meta2.DeleteInBackground())
-		if err != nil {
-			return err
-		}
-	}
-	_, _, err = core_util.CreateOrPatchSecret(k8sClient, meta, func(obj *core.Secret) *core.Secret {
+	_, _, err := core_util.CreateOrPatchSecret(k8sClient, meta, func(obj *core.Secret) *core.Secret {
 		// check origin cluster, if not match overwrite and create an event
 		if v, ok := obj.Labels[api.OriginClusterLabelKey]; ok && v != s.clusterName {
 			s.recorder.Eventf(
@@ -165,7 +152,7 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 		obj.Annotations = s.syncerAnnotations(obj.Annotations, src.Annotations, ref)
 
 		return obj
-	})
+	}, true)
 
 	return err
 }
