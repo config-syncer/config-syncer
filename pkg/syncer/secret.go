@@ -135,6 +135,7 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 			)
 		}
 
+		obj.Type = src.Type
 		obj.Data = src.Data
 		obj.Labels = labels.Merge(src.Labels, s.syncerLabels(src.Name, src.Namespace, s.clusterName))
 		obj.Kind = src.Kind
@@ -150,7 +151,7 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 		obj.Annotations = s.syncerAnnotations(obj.Annotations, src.Annotations, ref)
 
 		return obj
-	})
+	}, true)
 
 	return err
 }
