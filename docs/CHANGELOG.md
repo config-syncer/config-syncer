@@ -2,20 +2,41 @@
 title: Changelog | Kubed
 description: Changelog
 menu:
-  product_kubed_0.7.0-rc.0:
+  product_kubed_0.7.0-rc.1:
     identifier: changelog-kubed
     name: Changelog
     parent: welcome
     weight: 10
 product_name: kubed
-menu_name: product_kubed_0.7.0-rc.0
+menu_name: product_kubed_0.7.0-rc.1
 section_menu_id: welcome
-url: /products/kubed/0.7.0-rc.0/welcome/changelog/
+url: /products/kubed/0.7.0-rc.1/welcome/changelog/
 aliases:
-  - /products/kubed/0.7.0-rc.0/CHANGELOG/
+  - /products/kubed/0.7.0-rc.1/CHANGELOG/
 ---
 
 # Change Log
+
+## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
+
+[Full Changelog](https://github.com/appscode/kubed/compare/0.7.0-rc.0...HEAD)
+
+**Fixed bugs:**
+
+- ConfigSyncer does not sync configmap/secret when new namespace is created [\#266](https://github.com/appscode/kubed/issues/266)
+- secrets syncing is not proper [\#233](https://github.com/appscode/kubed/issues/233)
+
+**Closed issues:**
+
+- Fix backup manage RBAC issue [\#256](https://github.com/appscode/kubed/issues/256)
+- Fix tests [\#240](https://github.com/appscode/kubed/issues/240)
+- invalid header field value error when setting up with S3. [\#161](https://github.com/appscode/kubed/issues/161)
+- Restart kubed in e2e tests when config.yaml changes [\#158](https://github.com/appscode/kubed/issues/158)
+
+**Merged pull requests:**
+
+- Fixed secret type of synced secret [\#277](https://github.com/appscode/kubed/pull/277) ([emruz-hossain](https://github.com/emruz-hossain))
+- concourse - delete cluster on exit [\#275](https://github.com/appscode/kubed/pull/275) ([tahsinrahman](https://github.com/tahsinrahman))
 
 ## [0.7.0-rc.0](https://github.com/appscode/kubed/tree/0.7.0-rc.0) (2018-05-28)
 [Full Changelog](https://github.com/appscode/kubed/compare/0.6.0-rc.0...0.7.0-rc.0)
@@ -42,6 +63,7 @@ aliases:
 
 **Merged pull requests:**
 
+- Update changelog [\#276](https://github.com/appscode/kubed/pull/276) ([tamalsaha](https://github.com/tamalsaha))
 - Use same config for chart and script installer [\#274](https://github.com/appscode/kubed/pull/274) ([tamalsaha](https://github.com/tamalsaha))
 - Prepare docs for 7.0.0-rc.0 [\#273](https://github.com/appscode/kubed/pull/273) ([tamalsaha](https://github.com/tamalsaha))
 - Add concourse test [\#272](https://github.com/appscode/kubed/pull/272) ([tahsinrahman](https://github.com/tahsinrahman))

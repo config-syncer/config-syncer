@@ -2,13 +2,13 @@
 title: Kubed Install
 description: Kubed Install
 menu:
-  product_kubed_0.7.0-rc.0:
+  product_kubed_0.7.0-rc.1:
     identifier: kubed-install
     name: Install
     parent: setup
     weight: 10
 product_name: kubed
-menu_name: product_kubed_0.7.0-rc.0
+menu_name: product_kubed_0.7.0-rc.1
 section_menu_id: setup
 ---
 
@@ -17,10 +17,10 @@ section_menu_id: setup
 # Installation Guide
 
 ## Create Cluster Config
-Before you can install Kubed, you need a cluster config for Kubed. Cluster config is defined in YAML format. You find an example config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.0/hack/deploy/config.yaml).
+Before you can install Kubed, you need a cluster config for Kubed. Cluster config is defined in YAML format. You find an example config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/hack/deploy/config.yaml).
 
 ```yaml
-$ cat https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.0/hack/deploy/config.yaml
+$ cat https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/hack/deploy/config.yaml
 
 clusterName: unicorn
 enableConfigSyncer: true
@@ -72,7 +72,7 @@ To understand the various configuration options, check Kubed [tutorials](/docs/g
 
 ```console
 $ kubectl create secret generic kubed-config -n kube-system \
-    --from-literal=config.yaml=$(curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.0/hack/deploy/config.yaml)
+    --from-literal=config.yaml=$(curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/hack/deploy/config.yaml)
 secret "kubed-config" created
 
 # apply app=kubed label to easily cleanup later
@@ -84,7 +84,7 @@ secret "kubed-config" labeled
 You may have to create another [Secret for notifiers](/docs/guides/cluster-events/notifiers.md), usually called `notifier-config`. If you are [storing cluster snapshots](/docs/guides/disaster-recovery/cluster-snapshot.md) in cloud storage, you have to create another Secret to provide cloud credentials.
 
 ### Generate Config using script
-If you are familiar with GO, you can use the [./hack/config/main.go](https://github.com/appscode/kubed/blob/0.7.0-rc.0/hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.0/hack/deploy/config.yaml).
+If you are familiar with GO, you can use the [./hack/config/main.go](https://github.com/appscode/kubed/blob/0.7.0-rc.1/hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/hack/deploy/config.yaml).
 
 ```console
 go run ./hack/config/main.go
@@ -99,10 +99,10 @@ Cluster config was parsed successfully.
 ```
 
 ## Using Script
-Kubed can be installed via installer script included in the [/hack/deploy](https://github.com/appscode/kubed/tree/0.7.0-rc.0/hack/deploy) folder.
+Kubed can be installed via installer script included in the [/hack/deploy](https://github.com/appscode/kubed/tree/0.7.0-rc.1/hack/deploy) folder.
 
 ```console
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.0/hack/deploy/kubed.sh \
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/hack/deploy/kubed.sh \
     | bash
 ```
 
@@ -111,7 +111,7 @@ $ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.0/hack/de
 You can see the full list of flags available to installer using `-h` flag.
 
 ```console
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.0/hack/deploy/kubed.sh | bash -s -- -h
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/hack/deploy/kubed.sh | bash -s -- -h
 kubed.sh - install Kubernetes cluster daemon
 
 kubed.sh [options]
@@ -129,7 +129,7 @@ options:
 If you would like to run Kubed operator pod in `master` instances, pass the `--run-on-master` flag:
 
 ```console
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.0/hack/deploy/kubed.sh \
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/hack/deploy/kubed.sh \
     | bash -s -- --run-on-master [--rbac]
 ```
 
@@ -137,7 +137,7 @@ Kubed operator will be installed in a `kube-system` namespace by default. If you
 
 ```console
 $ kubectl create namespace kubed
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.0/hack/deploy/kubed.sh \
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/hack/deploy/kubed.sh \
     | bash -s -- --namespace=kubed [--run-on-master] [--rbac]
 ```
 
@@ -149,26 +149,26 @@ To pass the address of your private registry and optionally a image pull secret 
 
 ```console
 $ kubectl create namespace kubed
-$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.0/hack/deploy/kubed.sh \
+$ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/hack/deploy/kubed.sh \
     | bash -s -- --docker-registry=MY_REGISTRY [--image-pull-secret=SECRET_NAME] [--rbac]
 ```
 
 
 ## Using Helm
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/0.7.0-rc.0/chart/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/0.7.0-rc.1/chart/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
 
 ```console
 $ helm repo add appscode https://charts.appscode.com/stable/
 $ helm repo update
 $ helm search appscode/kubed
 NAME            CHART VERSION APP VERSION   DESCRIPTION
-appscode/kubed  0.7.0-rc.0    0.7.0-rc.0    Kubed by AppsCode - Kubernetes daemon
+appscode/kubed  0.7.0-rc.1    0.7.0-rc.1    Kubed by AppsCode - Kubernetes daemon
 
 # Kubernetes 1.8.x
-$ helm install appscode/kubed --name kubed --version 0.7.0-rc.0
+$ helm install appscode/kubed --name kubed --version 0.7.0-rc.1
 
 # Kubernetes 1.9.0 or later
-$ helm install appscode/kubed --name kubed --version 0.7.0-rc.0 \
+$ helm install appscode/kubed --name kubed --version 0.7.0-rc.1 \
   --set apiserver.ca="$(onessl get kube-ca)"
 ```
 
@@ -191,7 +191,7 @@ curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/
   && sudo mv onessl /usr/local/bin/
 ```
 
-To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/0.7.0-rc.0/chart/kubed).
+To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/0.7.0-rc.1/chart/kubed).
 
 ### Installing in GKE Cluster
 
