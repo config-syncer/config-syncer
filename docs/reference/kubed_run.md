@@ -1,12 +1,12 @@
 ---
 title: Kubed Run
 menu:
-  product_kubed_0.7.0-rc.1:
+  product_kubed_0.7.0-rc.2:
     identifier: kubed-run
     name: Kubed Run
     parent: reference
 product_name: kubed
-menu_name: product_kubed_0.7.0-rc.1
+menu_name: product_kubed_0.7.0-rc.2
 section_menu_id: reference
 ---
 ## kubed run

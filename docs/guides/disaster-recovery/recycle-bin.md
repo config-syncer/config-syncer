@@ -2,13 +2,13 @@
 title: Recycle Bin
 description: Recycle Bin
 menu:
-  product_kubed_0.7.0-rc.1:
+  product_kubed_0.7.0-rc.2:
     identifier: recycle-bin-dr
     name: Recycle Bin
     parent: disaster-recovery
     weight: 15
 product_name: kubed
-menu_name: product_kubed_0.7.0-rc.1
+menu_name: product_kubed_0.7.0-rc.2
 section_menu_id: guides
 ---
 
