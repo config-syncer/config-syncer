@@ -99,6 +99,8 @@ export KUBED_IMAGE_PULL_POLICY=IfNotPresent
 export KUBED_ENABLE_ANALYTICS=true
 export KUBED_UNINSTALL=0
 
+export KUBED_CONFIG_CLUSTER_NAME=unicorn
+
 export SCRIPT_LOCATION="curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/"
 if [[ "$APPSCODE_ENV" = "dev" || "$APPSCODE_ENV" = "test-concourse" ]]; then
     detect_tag
@@ -119,6 +121,7 @@ show_help() {
     echo "    --docker-registry              docker registry used to pull kubed images (default: appscode)"
     echo "    --image-pull-secret            name of secret used to pull kubed operator images"
     echo "    --run-on-master                run kubed operator on master"
+    echo "    --cluster-name                 name of cluster (default: unicorn)"
     echo "    --enable-analytics             send usage events to Google Analytics (default: true)"
     echo "    --uninstall                    uninstall kubed"
 }
@@ -169,6 +172,10 @@ while test $# -gt 0; do
             ;;
         --run-on-master)
             export KUBED_RUN_ON_MASTER=1
+            shift
+            ;;
+        --cluster-name*)
+            export KUBED_CONFIG_CLUSTER_NAME=`echo $1 | sed -e 's/^[^=]*=//g'`
             shift
             ;;
         --uninstall)
@@ -222,7 +229,7 @@ export TLS_SERVING_KEY=$(cat server.key | $ONESSL base64)
 CONFIG_FOUND=1
 kubectl get secret kubed-config -n $KUBED_NAMESPACE > /dev/null 2>&1 || CONFIG_FOUND=0
 if [ $CONFIG_FOUND -eq 0 ]; then
-    config=`${SCRIPT_LOCATION}hack/deploy/config.yaml`
+    config=`${SCRIPT_LOCATION}hack/deploy/config.yaml | $ONESSL envsubst`
     kubectl create secret generic kubed-config -n $KUBED_NAMESPACE \
         --from-literal=config.yaml="${config}"
 fi

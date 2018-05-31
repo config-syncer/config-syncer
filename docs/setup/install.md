@@ -102,8 +102,10 @@ Cluster config was parsed successfully.
 Kubed can be installed via installer script included in the [/hack/deploy](https://github.com/appscode/kubed/tree/0.7.0-rc.1/hack/deploy) folder.
 
 ```console
+# set cluster-name to something meaning to you, say, prod, prod-us-east, qa, etc.
+# so that you can distinguish notifications sent by kubed
 $ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/hack/deploy/kubed.sh \
-    | bash
+    | bash -s -- --cluster-name=<your-cluster-name>
 ```
 
 #### Customizing Installer
@@ -123,6 +125,8 @@ options:
     --docker-registry              docker registry used to pull kubed images (default: appscode)
     --image-pull-secret            name of secret used to pull kubed operator images
     --run-on-master                run kubed operator on master
+    --cluster-name                 name of cluster (default: unicorn)
+    --enable-analytics             send usage events to Google Analytics (default: true)
     --uninstall                    uninstall kubed
 ```
 
@@ -164,12 +168,17 @@ $ helm search appscode/kubed
 NAME            CHART VERSION APP VERSION   DESCRIPTION
 appscode/kubed  0.7.0-rc.1    0.7.0-rc.1    Kubed by AppsCode - Kubernetes daemon
 
+# set cluster-name to something meaning to you, say, prod, prod-us-east, qa, etc.
+# so that you can distinguish notifications sent by kubed
+
 # Kubernetes 1.8.x
-$ helm install appscode/kubed --name kubed --version 0.7.0-rc.1
+$ helm install appscode/kubed --name kubed --version 0.7.0-rc.1 \
+  --set config.clusterName=<your-cluster-name>
 
 # Kubernetes 1.9.0 or later
 $ helm install appscode/kubed --name kubed --version 0.7.0-rc.1 \
-  --set apiserver.ca="$(onessl get kube-ca)"
+  --set apiserver.ca="$(onessl get kube-ca)" \
+  --set config.clusterName=<your-cluster-name>
 ```
 
 To install `onessl`, run the following commands:
