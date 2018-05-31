@@ -17,9 +17,23 @@ aliases:
 
 # Change Log
 
-## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
+## [0.7.0-rc.2](https://github.com/appscode/kubed/tree/0.7.0-rc.2) (2018-05-31)
+[Full Changelog](https://github.com/appscode/kubed/compare/0.7.0-rc.1...0.7.0-rc.2)
 
-[Full Changelog](https://github.com/appscode/kubed/compare/0.7.0-rc.0...HEAD)
+**Fixed bugs:**
+
+- Ensure bad backups are not used to overwrite last good backup [\#176](https://github.com/appscode/kubed/issues/176)
+
+**Merged pull requests:**
+
+- Add document for Stride [\#284](https://github.com/appscode/kubed/pull/284) ([tamalsaha](https://github.com/tamalsaha))
+- Prepare docs for 0.7.0-rc.2 release [\#283](https://github.com/appscode/kubed/pull/283) ([tamalsaha](https://github.com/tamalsaha))
+- Disable api server by default in 1.8 cluster. [\#282](https://github.com/appscode/kubed/pull/282) ([tamalsaha](https://github.com/tamalsaha))
+- Fix grammar [\#281](https://github.com/appscode/kubed/pull/281) ([tamalsaha](https://github.com/tamalsaha))
+- Allow setting cluster-name during installation [\#280](https://github.com/appscode/kubed/pull/280) ([tamalsaha](https://github.com/tamalsaha))
+
+## [0.7.0-rc.1](https://github.com/appscode/kubed/tree/0.7.0-rc.1) (2018-05-30)
+[Full Changelog](https://github.com/appscode/kubed/compare/0.7.0-rc.0...0.7.0-rc.1)
 
 **Fixed bugs:**
 
@@ -35,6 +49,7 @@ aliases:
 
 **Merged pull requests:**
 
+- Prepare docs for 0.7.0-rc.1 [\#278](https://github.com/appscode/kubed/pull/278) ([tamalsaha](https://github.com/tamalsaha))
 - Fixed secret type of synced secret [\#277](https://github.com/appscode/kubed/pull/277) ([emruz-hossain](https://github.com/emruz-hossain))
 - concourse - delete cluster on exit [\#275](https://github.com/appscode/kubed/pull/275) ([tahsinrahman](https://github.com/tahsinrahman))
 
