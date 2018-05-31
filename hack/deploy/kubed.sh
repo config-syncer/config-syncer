@@ -100,6 +100,7 @@ export KUBED_ENABLE_ANALYTICS=true
 export KUBED_UNINSTALL=0
 
 export KUBED_CONFIG_CLUSTER_NAME=unicorn
+export KUBED_CONFIG_ENABLE_APISERVER=false
 
 export SCRIPT_LOCATION="curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0-rc.1/"
 if [[ "$APPSCODE_ENV" = "dev" || "$APPSCODE_ENV" = "test-concourse" ]]; then
@@ -108,6 +109,9 @@ if [[ "$APPSCODE_ENV" = "dev" || "$APPSCODE_ENV" = "test-concourse" ]]; then
     export KUBED_IMAGE_TAG=$TAG
     export KUBED_IMAGE_PULL_POLICY=Always
 fi
+
+KUBE_APISERVER_VERSION=$(kubectl version -o=json | $ONESSL jsonpath '{.serverVersion.gitVersion}')
+$ONESSL semver --check='<1.9.0' $KUBE_APISERVER_VERSION || { export KUBED_CONFIG_ENABLE_APISERVER=true; }
 
 show_help() {
     echo "kubed.sh - install Kubernetes cluster daemon"
@@ -122,6 +126,7 @@ show_help() {
     echo "    --image-pull-secret            name of secret used to pull kubed operator images"
     echo "    --run-on-master                run kubed operator on master"
     echo "    --cluster-name                 name of cluster (default: unicorn)"
+    echo "    --enable-apiserver             enable/disable kubed apiserver"
     echo "    --enable-analytics             send usage events to Google Analytics (default: true)"
     echo "    --uninstall                    uninstall kubed"
 }
@@ -178,6 +183,15 @@ while test $# -gt 0; do
             export KUBED_CONFIG_CLUSTER_NAME=`echo $1 | sed -e 's/^[^=]*=//g'`
             shift
             ;;
+        --enable-apiserver*)
+            val=`echo $1 | sed -e 's/^[^=]*=//g'`
+            if [ "$val" = "false" ]; then
+                export KUBED_CONFIG_ENABLE_APISERVER=false
+            else
+                export KUBED_CONFIG_ENABLE_APISERVER=true
+            fi
+            shift
+            ;;
         --uninstall)
             export KUBED_UNINSTALL=1
             shift
@@ -205,7 +219,7 @@ if [ "$KUBED_UNINSTALL" -eq 1 ]; then
     kubectl delete rolebindings -l app=kubed --namespace $KUBED_NAMESPACE
     kubectl delete role -l app=kubed --namespace $KUBED_NAMESPACE
     # delete user roles
-    kubectl get clusterrole appscode:kubed:view
+    kubectl delete clusterrole appscode:kubed:view
 
     exit 0
 fi
@@ -249,11 +263,17 @@ if [ "$KUBED_RUN_ON_MASTER" -eq 1 ]; then
       --patch="$(${SCRIPT_LOCATION}hack/deploy/run-on-master.yaml)"
 fi
 
+if [ "$KUBED_CONFIG_ENABLE_APISERVER" = true ]; then
+    ${SCRIPT_LOCATION}hack/deploy/apiservices.yaml | $ONESSL envsubst | kubectl apply -f -
+fi
+
 echo "waiting until kubed deployment is ready"
 $ONESSL wait-until-ready deployment kubed-operator --namespace $KUBED_NAMESPACE || { echo "Kubed deployment failed to be ready"; exit 1; }
 
-echo "waiting until kubed apiservice is available"
-$ONESSL wait-until-ready apiservice v1alpha1.kubed.appscode.com || { echo "Kubed apiservice failed to be ready"; exit 1; }
+if [ "$KUBED_CONFIG_ENABLE_APISERVER" = true ]; then
+    echo "waiting until kubed apiservice is available"
+    $ONESSL wait-until-ready apiservice v1alpha1.kubed.appscode.com || { echo "Kubed apiservice failed to be ready"; exit 1; }
+fi
 
 echo
 echo "Successfully installed Kubed cluster daemon in $KUBED_NAMESPACE namespace!"
