@@ -2,13 +2,13 @@
 title: Event Forwarder
 description: Event Forwarder
 menu:
-  product_kubed_0.7.0-rc.1:
+  product_kubed_0.7.0-rc.2:
     identifier: event-forwarder
     name: Event Forwarder
     parent: cluster-events
     weight: 10
 product_name: kubed
-menu_name: product_kubed_0.7.0-rc.1
+menu_name: product_kubed_0.7.0-rc.2
 section_menu_id: guides
 ---
 
@@ -69,7 +69,7 @@ notifierSecretName: notifier-config
 The configuration format is inpired by [audit policy file format](https://kubernetes.io/docs/tasks/debug-application-cluster/audit/). The policy is defined [here](https://github.com/appscode/kubed/blob/4d4f7b9d03a84910e04c52a6801a9b0f71fae8e7/apis/kubed/v1alpha1/types.go#L75).
 The matcher logic is implemented [here](https://github.com/appscode/kubed/blob/4d4f7b9d03a84910e04c52a6801a9b0f71fae8e7/pkg/eventer/resourcehandler.go#L52).
 
-**NB:** The event forwarder configuration format has been redesigned in 0.7.0-rc.1 and should be updates accordingly if you are upgrading from a previous version.
+**NB:** The event forwarder configuration format has been redesigned in 0.7.0-rc.2 and should be updates accordingly if you are upgrading from a previous version.
 
 Now, create a Secret with the Kubed cluster config under `config.yaml` key.
 
