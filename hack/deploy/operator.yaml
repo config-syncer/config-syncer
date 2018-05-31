@@ -94,20 +94,3 @@ spec:
     targetPort: 56790
   selector:
     app: kubed
----
-# register as aggregated apiserver
-apiVersion: apiregistration.k8s.io/v1beta1
-kind: APIService
-metadata:
-  name: v1alpha1.kubed.appscode.com
-  labels:
-    app: kubed
-spec:
-  caBundle: ${SERVICE_SERVING_CERT_CA}
-  group: kubed.appscode.com
-  groupPriorityMinimum: 1000
-  versionPriority: 15
-  service:
-    name: kubed-operator
-    namespace: ${KUBED_NAMESPACE}
-  version: v1alpha1

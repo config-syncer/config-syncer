@@ -40,6 +40,7 @@ serviceAccount:
   name:
 
 apiserver:
+  enabled: true
   # groupPriorityMinimum is the minimum priority the group should have. Please see
   # https://github.com/kubernetes/kube-aggregator/blob/release-1.9/pkg/apis/apiregistration/v1beta1/types.go#L58-L64
   # for more information on proper values of this field.

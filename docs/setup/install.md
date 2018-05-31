@@ -126,6 +126,7 @@ options:
     --image-pull-secret            name of secret used to pull kubed operator images
     --run-on-master                run kubed operator on master
     --cluster-name                 name of cluster (default: unicorn)
+    --enable-apiserver             enable/disable kubed apiserver
     --enable-analytics             send usage events to Google Analytics (default: true)
     --uninstall                    uninstall kubed
 ```
