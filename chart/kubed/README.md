@@ -61,7 +61,7 @@ The following table lists the configurable parameters of the Kubed chart and the
 | `apiserver.versionPriority`      | The ordering of this API inside of the group.                     | 15                 |
 | `apiserver.ca`                   | CA certificate used by main Kubernetes api server                 | ``                 |
 | `enableAnalytics`                | Send usage events to Google Analytics                             | `true`             |
-| `config.clusterName`             | Set cluster name to something meaning to you, say, prod, prod-us-east, qa, etc. so that you can distinguish notifications sent by kubed | `unicorn`          |
+| `config.clusterName`             | Set cluster name to something meaningful to you, say, prod, prod-us-east, qa, etc. so that you can distinguish notifications sent by kubed | `unicorn`          |
 | `config.enableConfigSyncer`      | If `true`, enables configmap and secret syncer                    | `true`             |
 
 

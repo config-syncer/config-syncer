@@ -55,7 +55,7 @@ apiserver:
 enableAnalytics: true
 
 config:
-  # set cluster-name to something meaning to you, say, prod, prod-us-east, qa, etc.
+  # set cluster-name to something meaningful to you, say, prod, prod-us-east, qa, etc.
   # so that you can distinguish notifications sent by kubed
   clusterName: unicorn
   enableConfigSyncer: true
