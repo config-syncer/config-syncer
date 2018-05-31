@@ -1,4 +1,4 @@
-clusterName: unicorn
+clusterName: "${KUBED_CONFIG_CLUSTER_NAME}"
 enableConfigSyncer: true
 eventForwarder:
   rules:
