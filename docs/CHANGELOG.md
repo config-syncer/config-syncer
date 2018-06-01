@@ -2,20 +2,28 @@
 title: Changelog | Kubed
 description: Changelog
 menu:
-  product_kubed_0.7.0-rc.2:
+  product_kubed_0.7.0:
     identifier: changelog-kubed
     name: Changelog
     parent: welcome
     weight: 10
 product_name: kubed
-menu_name: product_kubed_0.7.0-rc.2
+menu_name: product_kubed_0.7.0
 section_menu_id: welcome
-url: /products/kubed/0.7.0-rc.2/welcome/changelog/
+url: /products/kubed/0.7.0/welcome/changelog/
 aliases:
-  - /products/kubed/0.7.0-rc.2/CHANGELOG/
+  - /products/kubed/0.7.0/CHANGELOG/
 ---
 
 # Change Log
+
+## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
+
+[Full Changelog](https://github.com/appscode/kubed/compare/0.7.0-rc.2...HEAD)
+
+**Closed issues:**
+
+- Event Forwarder Hipchat notifier sends messages not notifications [\#260](https://github.com/appscode/kubed/issues/260)
 
 ## [0.7.0-rc.2](https://github.com/appscode/kubed/tree/0.7.0-rc.2) (2018-05-31)
 [Full Changelog](https://github.com/appscode/kubed/compare/0.7.0-rc.1...0.7.0-rc.2)
@@ -26,6 +34,7 @@ aliases:
 
 **Merged pull requests:**
 
+- Update changelog [\#285](https://github.com/appscode/kubed/pull/285) ([tamalsaha](https://github.com/tamalsaha))
 - Add document for Stride [\#284](https://github.com/appscode/kubed/pull/284) ([tamalsaha](https://github.com/tamalsaha))
 - Prepare docs for 0.7.0-rc.2 release [\#283](https://github.com/appscode/kubed/pull/283) ([tamalsaha](https://github.com/tamalsaha))
 - Disable api server by default in 1.8 cluster. [\#282](https://github.com/appscode/kubed/pull/282) ([tamalsaha](https://github.com/tamalsaha))

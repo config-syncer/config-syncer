@@ -2,17 +2,17 @@
 title: Roadmap | Kubed
 description: Roadmap of kubed
 menu:
-  product_kubed_0.7.0-rc.2:
+  product_kubed_0.7.0:
     identifier: roadmap-kubed
     name: Roadmap
     parent: welcome
     weight: 20
 product_name: kubed
-menu_name: product_kubed_0.7.0-rc.2
+menu_name: product_kubed_0.7.0
 section_menu_id: welcome
-url: /products/kubed/0.7.0-rc.2/welcome/roadmap/
+url: /products/kubed/0.7.0/welcome/roadmap/
 aliases:
-  - /products/kubed/0.7.0-rc.2/roadmap/
+  - /products/kubed/0.7.0/roadmap/
 ---
 
 # Project Status
