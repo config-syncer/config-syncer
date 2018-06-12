@@ -98,7 +98,21 @@ $ kubed check --clusterconfig=./hack/deploy/config.yaml
 Cluster config was parsed successfully.
 ```
 
+Kubed can be installed via a script or as a Helm chart.
+
+<ul class="nav nav-tabs" id="installerTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="script-tab" data-toggle="tab" href="#script" role="tab" aria-controls="script" aria-selected="true">Script</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="helm-tab" data-toggle="tab" href="#helm" role="tab" aria-controls="helm" aria-selected="false">Helm</a>
+  </li>
+</ul>
+<div class="tab-content" id="installerTabContent">
+  <div class="tab-pane fade show active" id="script" role="tabpanel" aria-labelledby="script-tab">
+
 ## Using Script
+
 Kubed can be installed via installer script included in the [/hack/deploy](https://github.com/appscode/kubed/tree/0.7.0/hack/deploy) folder.
 
 ```console
@@ -158,6 +172,8 @@ $ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.7.0/hack/deploy/
     | bash -s -- --docker-registry=MY_REGISTRY [--image-pull-secret=SECRET_NAME] [--rbac]
 ```
 
+</div>
+<div class="tab-pane fade" id="helm" role="tabpanel" aria-labelledby="helm-tab">
 
 ## Using Helm
 Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/0.7.0/chart/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
@@ -203,6 +219,8 @@ curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/
 ```
 
 To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/0.7.0/chart/kubed).
+
+</div>
 
 ### Installing in GKE Cluster
 
