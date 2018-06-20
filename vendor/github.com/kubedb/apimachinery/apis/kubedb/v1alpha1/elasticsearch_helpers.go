@@ -6,6 +6,7 @@ import (
 
 	"github.com/appscode/kube-mon/api"
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
+	"github.com/appscode/kutil/meta"
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 )
@@ -105,5 +106,14 @@ func (r Elasticsearch) CustomResourceDefinition() *crd_api.CustomResourceDefinit
 		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Elasticsearch",
 		EnableValidation:      true,
 		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
-	})
+	}, setNameSchema)
+}
+
+const (
+	ESSearchGuardDisabled = ElasticsearchKey + "/searchguard-disabled"
+)
+
+func (r Elasticsearch) SearchGuardDisabled() bool {
+	v, _ := meta.GetBoolValue(r.Annotations, ESSearchGuardDisabled)
+	return v
 }

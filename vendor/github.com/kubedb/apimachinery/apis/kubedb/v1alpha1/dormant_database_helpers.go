@@ -41,5 +41,5 @@ func (d DormantDatabase) CustomResourceDefinition() *crd_api.CustomResourceDefin
 		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.DormantDatabase",
 		EnableValidation:      true,
 		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
-	})
+	}, setNameSchema)
 }

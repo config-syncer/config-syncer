@@ -3,6 +3,7 @@ package mailgun
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -10,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 )
 
 type httpRequest struct {
@@ -29,6 +31,7 @@ type httpResponse struct {
 type payload interface {
 	getPayloadBuffer() (*bytes.Buffer, error)
 	getContentType() string
+	getValues() []keyValuePair
 }
 
 type keyValuePair struct {
@@ -93,12 +96,20 @@ func (f *urlEncodedPayload) getContentType() string {
 	return "application/x-www-form-urlencoded"
 }
 
+func (f *urlEncodedPayload) getValues() []keyValuePair {
+	return f.Values
+}
+
 func (r *httpResponse) parseFromJSON(v interface{}) error {
 	return json.Unmarshal(r.Data, v)
 }
 
 func newFormDataPayload() *formDataPayload {
 	return &formDataPayload{}
+}
+
+func (f *formDataPayload) getValues() []keyValuePair {
+	return f.Values
 }
 
 func (f *formDataPayload) addValue(key, value string) {
@@ -215,6 +226,10 @@ func (r *httpRequest) makeRequest(method string, payload payload) (*httpResponse
 		req.Header.Add(header, value)
 	}
 
+	if Debug {
+		fmt.Println(r.curlString(req, payload))
+	}
+
 	response := httpResponse{}
 
 	resp, err := r.Client.Do(req)
@@ -251,4 +266,21 @@ func (r *httpRequest) generateUrlWithParameters() (string, error) {
 	url.RawQuery = q.Encode()
 
 	return url.String(), nil
+}
+
+func (r *httpRequest) curlString(req *http.Request, p payload) string {
+
+	parts := []string{"curl", "-i", "-X", req.Method, req.URL.String()}
+	for key, value := range req.Header {
+		parts = append(parts, fmt.Sprintf("-H \"%s: %s\"", key, value[0]))
+	}
+
+	//parts = append(parts, fmt.Sprintf(" --user '%s:%s'", r.BasicAuthUser, r.BasicAuthPassword))
+
+	if p != nil {
+		for _, param := range p.getValues() {
+			parts = append(parts, fmt.Sprintf(" -F %s='%s'", param.key, param.value))
+		}
+	}
+	return strings.Join(parts, " ")
 }

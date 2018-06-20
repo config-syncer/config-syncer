@@ -99,5 +99,5 @@ func (p MongoDB) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
 		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.MongoDB",
 		EnableValidation:      true,
 		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
-	})
+	}, setNameSchema)
 }

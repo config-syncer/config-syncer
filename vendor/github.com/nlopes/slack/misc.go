@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -18,15 +19,17 @@ import (
 	"time"
 )
 
-type WebResponse struct {
-	Ok    bool      `json:"ok"`
-	Error *WebError `json:"error"`
+type SlackResponse struct {
+	Ok    bool   `json:"ok"`
+	Error string `json:"error"`
 }
 
-type WebError string
+func (t SlackResponse) Err() error {
+	if t.Ok {
+		return nil
+	}
 
-func (s WebError) Error() string {
-	return string(s)
+	return errors.New(t.Error)
 }
 
 type RateLimitedError struct {
@@ -63,7 +66,7 @@ func fileUploadReq(ctx context.Context, path, fieldname, filename string, values
 	return req, nil
 }
 
-func parseResponseBody(body io.ReadCloser, intf *interface{}, debug bool) error {
+func parseResponseBody(body io.ReadCloser, intf interface{}, debug bool) error {
 	response, err := ioutil.ReadAll(body)
 	if err != nil {
 		return err
@@ -74,7 +77,7 @@ func parseResponseBody(body io.ReadCloser, intf *interface{}, debug bool) error 
 		logger.Printf("parseResponseBody: %s\n", string(response))
 	}
 
-	return json.Unmarshal(response, &intf)
+	return json.Unmarshal(response, intf)
 }
 
 func postLocalWithMultipartResponse(ctx context.Context, client HTTPRequester, path, fpath, fieldname string, values url.Values, intf interface{}, debug bool) error {
@@ -116,7 +119,7 @@ func postWithMultipartResponse(ctx context.Context, client HTTPRequester, path, 
 		return fmt.Errorf("Slack server error: %s.", resp.Status)
 	}
 
-	return parseResponseBody(resp.Body, &intf, debug)
+	return parseResponseBody(resp.Body, intf, debug)
 }
 
 func postForm(ctx context.Context, client HTTPRequester, endpoint string, values url.Values, intf interface{}, debug bool) error {
@@ -148,7 +151,7 @@ func postForm(ctx context.Context, client HTTPRequester, endpoint string, values
 		return fmt.Errorf("Slack server error: %s.", resp.Status)
 	}
 
-	return parseResponseBody(resp.Body, &intf, debug)
+	return parseResponseBody(resp.Body, intf, debug)
 }
 
 func post(ctx context.Context, client HTTPRequester, path string, values url.Values, intf interface{}, debug bool) error {
@@ -179,4 +182,10 @@ func okJsonHandler(rw http.ResponseWriter, r *http.Request) {
 		Ok: true,
 	})
 	rw.Write(response)
+}
+
+type errorString string
+
+func (t errorString) Error() string {
+	return string(t)
 }

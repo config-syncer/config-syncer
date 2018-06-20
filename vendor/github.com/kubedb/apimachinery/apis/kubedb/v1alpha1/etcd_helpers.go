@@ -99,5 +99,5 @@ func (p Etcd) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
 		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Etcd",
 		EnableValidation:      true,
 		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
-	})
+	}, setNameSchema)
 }
