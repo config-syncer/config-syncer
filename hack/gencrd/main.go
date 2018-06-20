@@ -14,6 +14,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/kube-openapi/pkg/common"
+	"os"
+	"path/filepath"
 )
 
 func generateSwaggerJson() {
@@ -31,8 +33,8 @@ func generateSwaggerJson() {
 		Scheme:   Scheme,
 		Codecs:   Codecs,
 		Info: spec.InfoProps{
-			Title:   "kubed-server",
-			Version: "v0",
+			Title:   "Kubed",
+			Version: "v0.7.0",
 			Contact: &spec.ContactInfo{
 				Name:  "AppsCode Inc.",
 				URL:   "https://appscode.com",
@@ -54,7 +56,11 @@ func generateSwaggerJson() {
 		glog.Fatal(err)
 	}
 
-	filename := gort.GOPath() + "/src/github.com/appscode/kubed/apis/swagger.json"
+	filename := gort.GOPath() + "/src/github.com/appscode/kubed/api/openapi-spec/swagger.json"
+	err = os.MkdirAll(filepath.Dir(filename), 0755)
+	if err != nil {
+		glog.Fatal(err)
+	}
 	err = ioutil.WriteFile(filename, []byte(apispec), 0644)
 	if err != nil {
 		glog.Fatal(err)
