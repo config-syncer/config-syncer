@@ -105,5 +105,5 @@ func (p Postgres) CustomResourceDefinition() *crd_api.CustomResourceDefinition {
 		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Postgres",
 		EnableValidation:      true,
 		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
-	})
+	}, setNameSchema)
 }

@@ -79,9 +79,6 @@ func (r *Raw) UnmarshalMsg(b []byte) ([]byte, error) {
 		return b, err
 	}
 	rlen := l - len(out)
-	if IsNil(b[:rlen]) {
-		rlen = 0
-	}
 	if cap(*r) < rlen {
 		*r = make(Raw, rlen)
 	} else {
@@ -107,11 +104,7 @@ func (r Raw) EncodeMsg(w *Writer) error {
 // next object on the wire.
 func (r *Raw) DecodeMsg(f *Reader) error {
 	*r = (*r)[:0]
-	err := appendNext(f, (*[]byte)(r))
-	if IsNil(*r) {
-		*r = (*r)[:0]
-	}
-	return err
+	return appendNext(f, (*[]byte)(r))
 }
 
 // Msgsize implements msgp.Sizer
@@ -375,30 +368,12 @@ func ReadInt64Bytes(b []byte) (i int64, o []byte, err error) {
 		o = b[2:]
 		return
 
-	case muint8:
-		if l < 2 {
-			err = ErrShortBytes
-			return
-		}
-		i = int64(getMuint8(b))
-		o = b[2:]
-		return
-
 	case mint16:
 		if l < 3 {
 			err = ErrShortBytes
 			return
 		}
 		i = int64(getMint16(b))
-		o = b[3:]
-		return
-
-	case muint16:
-		if l < 3 {
-			err = ErrShortBytes
-			return
-		}
-		i = int64(getMuint16(b))
 		o = b[3:]
 		return
 
@@ -411,35 +386,12 @@ func ReadInt64Bytes(b []byte) (i int64, o []byte, err error) {
 		o = b[5:]
 		return
 
-	case muint32:
-		if l < 5 {
-			err = ErrShortBytes
-			return
-		}
-		i = int64(getMuint32(b))
-		o = b[5:]
-		return
-
 	case mint64:
 		if l < 9 {
 			err = ErrShortBytes
 			return
 		}
-		i = int64(getMint64(b))
-		o = b[9:]
-		return
-
-	case muint64:
-		if l < 9 {
-			err = ErrShortBytes
-			return
-		}
-		u := getMuint64(b)
-		if u > math.MaxInt64 {
-			err = UintOverflow{Value: u, FailedBitsize: 64}
-			return
-		}
-		i = int64(u)
+		i = getMint64(b)
 		o = b[9:]
 		return
 
@@ -525,20 +477,6 @@ func ReadUint64Bytes(b []byte) (u uint64, o []byte, err error) {
 	}
 
 	switch lead {
-	case mint8:
-		if l < 2 {
-			err = ErrShortBytes
-			return
-		}
-		v := int64(getMint8(b))
-		if v < 0 {
-			err = UintBelowZero{Value: v}
-			return
-		}
-		u = uint64(v)
-		o = b[2:]
-		return
-
 	case muint8:
 		if l < 2 {
 			err = ErrShortBytes
@@ -546,20 +484,6 @@ func ReadUint64Bytes(b []byte) (u uint64, o []byte, err error) {
 		}
 		u = uint64(getMuint8(b))
 		o = b[2:]
-		return
-
-	case mint16:
-		if l < 3 {
-			err = ErrShortBytes
-			return
-		}
-		v := int64(getMint16(b))
-		if v < 0 {
-			err = UintBelowZero{Value: v}
-			return
-		}
-		u = uint64(v)
-		o = b[3:]
 		return
 
 	case muint16:
@@ -571,20 +495,6 @@ func ReadUint64Bytes(b []byte) (u uint64, o []byte, err error) {
 		o = b[3:]
 		return
 
-	case mint32:
-		if l < 5 {
-			err = ErrShortBytes
-			return
-		}
-		v := int64(getMint32(b))
-		if v < 0 {
-			err = UintBelowZero{Value: v}
-			return
-		}
-		u = uint64(v)
-		o = b[5:]
-		return
-
 	case muint32:
 		if l < 5 {
 			err = ErrShortBytes
@@ -592,20 +502,6 @@ func ReadUint64Bytes(b []byte) (u uint64, o []byte, err error) {
 		}
 		u = uint64(getMuint32(b))
 		o = b[5:]
-		return
-
-	case mint64:
-		if l < 9 {
-			err = ErrShortBytes
-			return
-		}
-		v := int64(getMint64(b))
-		if v < 0 {
-			err = UintBelowZero{Value: v}
-			return
-		}
-		u = uint64(v)
-		o = b[9:]
 		return
 
 	case muint64:
@@ -618,11 +514,7 @@ func ReadUint64Bytes(b []byte) (u uint64, o []byte, err error) {
 		return
 
 	default:
-		if isnfixint(lead) {
-			err = UintBelowZero{Value: int64(rnfixint(lead))}
-		} else {
-			err = badPrefix(UintType, lead)
-		}
+		err = badPrefix(UintType, lead)
 		return
 	}
 }

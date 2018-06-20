@@ -689,7 +689,7 @@ func (mw *Writer) WriteIntf(v interface{}) error {
 }
 
 func (mw *Writer) writeMap(v reflect.Value) (err error) {
-	if v.Type().Key().Kind() != reflect.String {
+	if v.Elem().Kind() != reflect.String {
 		return errors.New("msgp: map keys must be strings")
 	}
 	ks := v.MapKeys()

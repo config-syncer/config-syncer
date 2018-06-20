@@ -63,6 +63,7 @@ main:
 
 // In-place Or function that requires repairAfterLazy
 func (x1 *Bitmap) lazyOR(x2 *Bitmap) *Bitmap {
+	answer := NewBitmap() // TODO: we return a new bitmap... could be optimized
 	pos1 := 0
 	pos2 := 0
 	length1 := x1.highlowcontainer.size()
@@ -74,16 +75,15 @@ main:
 
 		for {
 			if s1 < s2 {
+				answer.highlowcontainer.appendWithoutCopy(x1.highlowcontainer, pos1)
 				pos1++
 				if pos1 == length1 {
 					break main
 				}
 				s1 = x1.highlowcontainer.getKeyAtIndex(pos1)
 			} else if s1 > s2 {
-				x1.highlowcontainer.insertNewKeyValueAt(pos1, s2, x2.highlowcontainer.getContainerAtIndex(pos2).clone())
+				answer.highlowcontainer.appendCopy(x2.highlowcontainer, pos2)
 				pos2++
-				pos1++
-				length1++
 				if pos2 == length2 {
 					break main
 				}
@@ -101,8 +101,7 @@ main:
 					c1 = x1.highlowcontainer.getWritableContainerAtIndex(pos1)
 				}
 
-				x1.highlowcontainer.containers[pos1] = c1.lazyIOR(x2.highlowcontainer.getContainerAtIndex(pos2))
-				x1.highlowcontainer.needCopyOnWrite[pos1] = false
+				answer.highlowcontainer.appendContainer(s1, c1.lazyIOR(x2.highlowcontainer.getContainerAtIndex(pos2)), false)
 				pos1++
 				pos2++
 				if (pos1 == length1) || (pos2 == length2) {
@@ -114,9 +113,11 @@ main:
 		}
 	}
 	if pos1 == length1 {
-		x1.highlowcontainer.appendCopyMany(x2.highlowcontainer, pos2, length2)
+		answer.highlowcontainer.appendCopyMany(x2.highlowcontainer, pos2, length2)
+	} else if pos2 == length2 {
+		answer.highlowcontainer.appendWithoutCopyMany(x1.highlowcontainer, pos1, length1)
 	}
-	return x1
+	return answer
 }
 
 // to be called after lazy aggregates

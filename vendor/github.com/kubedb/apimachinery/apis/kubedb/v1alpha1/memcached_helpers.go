@@ -99,5 +99,5 @@ func (m Memcached) CustomResourceDefinition() *crd_api.CustomResourceDefinition 
 		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Memcached",
 		EnableValidation:      true,
 		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
-	})
+	}, setNameSchema)
 }

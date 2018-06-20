@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// DefaultLimit and DefaultSkip instruct the SDK to rely on Mailgun's reasonable defaults for pagination settings.
+// DefaultLimit and DefaultSkip instruct the SDK to rely on Mailgun's reasonable defaults for Paging settings.
 const (
 	DefaultLimit = -1
 	DefaultSkip  = -1
@@ -66,7 +66,7 @@ func (d Domain) GetCreatedAt() (t time.Time, err error) {
 // Note that zero items and a zero-length slice do not necessarily imply an error occurred.
 // Except for the error itself, all results are undefined in the event of an error.
 func (m *MailgunImpl) GetDomains(limit, skip int) (int, []Domain, error) {
-	r := newHTTPRequest(generatePublicApiUrl(domainsEndpoint))
+	r := newHTTPRequest(generatePublicApiUrl(m, domainsEndpoint))
 	r.setClient(m.Client())
 	if limit != DefaultLimit {
 		r.addParameter("limit", strconv.Itoa(limit))
@@ -86,7 +86,7 @@ func (m *MailgunImpl) GetDomains(limit, skip int) (int, []Domain, error) {
 
 // Retrieve detailed information about the named domain.
 func (m *MailgunImpl) GetSingleDomain(domain string) (Domain, []DNSRecord, []DNSRecord, error) {
-	r := newHTTPRequest(generatePublicApiUrl(domainsEndpoint) + "/" + domain)
+	r := newHTTPRequest(generatePublicApiUrl(m, domainsEndpoint) + "/" + domain)
 	r.setClient(m.Client())
 	r.setBasicAuth(basicAuthUser, m.ApiKey())
 	var envelope singleDomainEnvelope
@@ -101,7 +101,7 @@ func (m *MailgunImpl) GetSingleDomain(domain string) (Domain, []DNSRecord, []DNS
 // The wildcard parameter instructs Mailgun to treat all subdomains of this domain uniformly if true,
 // and as different domains if false.
 func (m *MailgunImpl) CreateDomain(name string, smtpPassword string, spamAction string, wildcard bool) error {
-	r := newHTTPRequest(generatePublicApiUrl(domainsEndpoint))
+	r := newHTTPRequest(generatePublicApiUrl(m, domainsEndpoint))
 	r.setClient(m.Client())
 	r.setBasicAuth(basicAuthUser, m.ApiKey())
 
@@ -116,7 +116,7 @@ func (m *MailgunImpl) CreateDomain(name string, smtpPassword string, spamAction 
 
 // DeleteDomain instructs Mailgun to dispose of the named domain name.
 func (m *MailgunImpl) DeleteDomain(name string) error {
-	r := newHTTPRequest(generatePublicApiUrl(domainsEndpoint) + "/" + name)
+	r := newHTTPRequest(generatePublicApiUrl(m, domainsEndpoint) + "/" + name)
 	r.setClient(m.Client())
 	r.setBasicAuth(basicAuthUser, m.ApiKey())
 	_, err := makeDeleteRequest(r)

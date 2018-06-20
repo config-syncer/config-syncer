@@ -5,10 +5,10 @@ import (
 )
 
 type Unsubscription struct {
-	CreatedAt string `json:"created_at"`
-	Tag       string `json:"tag"`
-	ID        string `json:"id"`
-	Address   string `json:"address"`
+	CreatedAt string   `json:"created_at"`
+	Tags      []string `json:"tags"`
+	ID        string   `json:"id"`
+	Address   string   `json:"address"`
 }
 
 // GetUnsubscribes retrieves a list of unsubscriptions issued by recipients of mail from your domain.
