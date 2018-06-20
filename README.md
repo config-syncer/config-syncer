@@ -31,6 +31,12 @@ To install Kubed, please follow the guide [here](https://appscode.com/products/k
 ## Using Kubed
 Want to learn how to use Kubed? Please start [here](https://appscode.com/products/kubed/0.7.0/).
 
+## Kubed API Clients
+You can use Kubed api clients to programmatically access its apis. Here are the supported clients:
+
+- Go: [https://github.com/appscode/kubed](/client/clientset/versioned)
+- Java: https://github.com/kubed-client/java
+
 ## Contribution guidelines
 Want to help improve Kubed? Please start [here](https://appscode.com/products/kubed/0.7.0/welcome/contributing/).
 
