@@ -8,18 +8,18 @@ docker login --username=$DOCKER_USER --password=$DOCKER_PASS
 docker run hello-world
 
 # install python pip
-apt-get update > /dev/null
-apt-get install -y python python-pip > /dev/null
+apt-get update >/dev/null
+apt-get install -y python python-pip >/dev/null
 
 # install kubectl
-curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl &> /dev/null
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl &>/dev/null
 chmod +x ./kubectl
 mv ./kubectl /bin/kubectl
 
 # install onessl
-curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-linux-amd64 \
-  && chmod +x onessl \
-  && mv onessl /usr/local/bin/
+curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-linux-amd64 &&
+  chmod +x onessl &&
+  mv onessl /usr/local/bin/
 
 # install pharmer
 pushd /tmp
@@ -28,21 +28,21 @@ chmod +x pharmer-linux-amd64
 mv pharmer-linux-amd64 /bin/pharmer
 popd
 
-function cleanup_test_stuff {
-    rm -rf $ONESSL ca.crt ca.key server.crt server.key || true
+function cleanup_test_stuff() {
+  rm -rf $ONESSL ca.crt ca.key server.crt server.key || true
 
-    # delete cluster on exit
-    pharmer get cluster || true
-    pharmer delete cluster $NAME || true
-    pharmer get cluster || true
-    sleep 300 || true
-    pharmer apply $NAME || true
-    pharmer get cluster || true
+  # delete cluster on exit
+  pharmer get cluster || true
+  pharmer delete cluster $NAME || true
+  pharmer get cluster || true
+  sleep 300 || true
+  pharmer apply $NAME || true
+  pharmer get cluster || true
 
-    # delete docker image on exit
-    curl -LO https://raw.githubusercontent.com/appscodelabs/libbuild/master/docker.py || true
-    chmod +x docker.py || true
-    ./docker.py del_tag appscodeci kubed $KUBED_IMAGE_TAG || true
+  # delete docker image on exit
+  curl -LO https://raw.githubusercontent.com/appscodelabs/libbuild/master/docker.py || true
+  chmod +x docker.py || true
+  ./docker.py del_tag appscodeci kubed $KUBED_IMAGE_TAG || true
 }
 trap cleanup_test_stuff EXIT
 
@@ -63,7 +63,7 @@ export DOCKER_REGISTRY=appscodeci
 popd
 
 #create credential file for pharmer
-cat > cred.json <<EOF
+cat >cred.json <<EOF
 {
     "token" : "$TOKEN"
 }
@@ -80,7 +80,7 @@ sleep 300
 kubectl get nodes
 
 # create storageclass
-cat > sc.yaml <<EOF
+cat >sc.yaml <<EOF
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
