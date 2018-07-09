@@ -5,6 +5,10 @@ import (
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 )
 
+var (
+	EnableStatusSubresource bool
+)
+
 func (a ClusterAlert) CustomResourceDefinition() *apiextensions.CustomResourceDefinition {
 	return crdutils.NewCustomResourceDefinition(crdutils.Config{
 		Group:         SchemeGroupVersion.Group,
@@ -17,9 +21,10 @@ func (a ClusterAlert) CustomResourceDefinition() *apiextensions.CustomResourceDe
 		Labels: crdutils.Labels{
 			LabelsMap: map[string]string{"app": "searchlight"},
 		},
-		SpecDefinitionName:    "github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlert",
-		EnableValidation:      true,
-		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+		SpecDefinitionName:      "github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlert",
+		EnableValidation:        true,
+		GetOpenAPIDefinitions:   GetOpenAPIDefinitions,
+		EnableStatusSubresource: EnableStatusSubresource,
 	})
 }
 
@@ -35,9 +40,10 @@ func (a NodeAlert) CustomResourceDefinition() *apiextensions.CustomResourceDefin
 		Labels: crdutils.Labels{
 			LabelsMap: map[string]string{"app": "searchlight"},
 		},
-		SpecDefinitionName:    "github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlert",
-		EnableValidation:      true,
-		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+		SpecDefinitionName:      "github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlert",
+		EnableValidation:        true,
+		GetOpenAPIDefinitions:   GetOpenAPIDefinitions,
+		EnableStatusSubresource: EnableStatusSubresource,
 	})
 }
 
@@ -53,9 +59,10 @@ func (a PodAlert) CustomResourceDefinition() *apiextensions.CustomResourceDefini
 		Labels: crdutils.Labels{
 			LabelsMap: map[string]string{"app": "searchlight"},
 		},
-		SpecDefinitionName:    "github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlert",
-		EnableValidation:      true,
-		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+		SpecDefinitionName:      "github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlert",
+		EnableValidation:        true,
+		GetOpenAPIDefinitions:   GetOpenAPIDefinitions,
+		EnableStatusSubresource: EnableStatusSubresource,
 	})
 }
 
@@ -70,9 +77,10 @@ func (a Incident) CustomResourceDefinition() *apiextensions.CustomResourceDefini
 		Labels: crdutils.Labels{
 			LabelsMap: map[string]string{"app": "searchlight"},
 		},
-		SpecDefinitionName:    "github.com/appscode/searchlight/apis/monitoring/v1alpha1.Incident",
-		EnableValidation:      true,
-		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+		SpecDefinitionName:      "github.com/appscode/searchlight/apis/monitoring/v1alpha1.Incident",
+		EnableValidation:        true,
+		GetOpenAPIDefinitions:   GetOpenAPIDefinitions,
+		EnableStatusSubresource: EnableStatusSubresource,
 	})
 }
 
@@ -88,8 +96,9 @@ func (a SearchlightPlugin) CustomResourceDefinition() *apiextensions.CustomResou
 		Labels: crdutils.Labels{
 			LabelsMap: map[string]string{"app": "searchlight"},
 		},
-		SpecDefinitionName:    "github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPlugin",
-		EnableValidation:      true,
-		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+		SpecDefinitionName:      "github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPlugin",
+		EnableValidation:        true,
+		GetOpenAPIDefinitions:   GetOpenAPIDefinitions,
+		EnableStatusSubresource: EnableStatusSubresource,
 	})
 }

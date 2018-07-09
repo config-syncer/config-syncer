@@ -5,6 +5,10 @@ import (
 	"k8s.io/kube-openapi/pkg/common"
 )
 
+var (
+	EnableStatusSubresource bool
+)
+
 type ResourceInfo interface {
 	ResourceShortCode() string
 	ResourceKind() string

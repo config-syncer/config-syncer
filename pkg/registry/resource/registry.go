@@ -1,6 +1,8 @@
 package resource
 
 import (
+	"context"
+
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/blevesearch/bleve"
 	"github.com/pkg/errors"
@@ -8,11 +10,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/endpoints/request"
-	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
 )
 
 var _ rest.Getter = &ResourceIndexer{}
+var _ rest.Scoper = &ResourceIndexer{}
 var _ rest.GroupVersionKindProvider = &ResourceIndexer{}
 
 func (ri *ResourceIndexer) NewREST() rest.Storage {
@@ -27,7 +29,11 @@ func (ri *ResourceIndexer) GroupVersionKind(containingGV schema.GroupVersion) sc
 	return api.SchemeGroupVersion.WithKind("SearchResult")
 }
 
-func (ri *ResourceIndexer) Get(ctx apirequest.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
+func (ri *ResourceIndexer) NamespaceScoped() bool {
+	return true
+}
+
+func (ri *ResourceIndexer) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
 	ns, ok := request.NamespaceFrom(ctx)
 	if !ok {
 		return nil, errors.New("missing namespace")

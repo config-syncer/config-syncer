@@ -38,8 +38,9 @@ func (d DormantDatabase) CustomResourceDefinition() *crd_api.CustomResourceDefin
 		Labels: crdutils.Labels{
 			LabelsMap: map[string]string{"app": "kubedb"},
 		},
-		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.DormantDatabase",
-		EnableValidation:      true,
-		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+		SpecDefinitionName:      "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.DormantDatabase",
+		EnableValidation:        false,
+		GetOpenAPIDefinitions:   GetOpenAPIDefinitions,
+		EnableStatusSubresource: EnableStatusSubresource,
 	}, setNameSchema)
 }
