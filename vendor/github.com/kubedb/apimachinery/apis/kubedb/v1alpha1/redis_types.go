@@ -59,6 +59,10 @@ type RedisSpec struct {
 	// If specified, these secrets will be passed to individual puller implementations for them to use.
 	// +optional
 	ImagePullSecrets []core.LocalObjectReference `json:"imagePullSecrets,omitempty"`
+	// List of environment variables to set in the container.
+	// Cannot be updated.
+	// +optional
+	Env []core.EnvVar `json:"env,omitempty" protobuf:"bytes,7,rep,name=env"`
 }
 
 type RedisStatus struct {

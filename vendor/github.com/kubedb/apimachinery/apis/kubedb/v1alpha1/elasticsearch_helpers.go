@@ -103,9 +103,10 @@ func (r Elasticsearch) CustomResourceDefinition() *crd_api.CustomResourceDefinit
 		Labels: crdutils.Labels{
 			LabelsMap: map[string]string{"app": "kubedb"},
 		},
-		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Elasticsearch",
-		EnableValidation:      true,
-		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+		SpecDefinitionName:      "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Elasticsearch",
+		EnableValidation:        true,
+		GetOpenAPIDefinitions:   GetOpenAPIDefinitions,
+		EnableStatusSubresource: EnableStatusSubresource,
 	}, setNameSchema)
 }
 

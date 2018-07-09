@@ -96,8 +96,9 @@ func (m Memcached) CustomResourceDefinition() *crd_api.CustomResourceDefinition 
 		Labels: crdutils.Labels{
 			LabelsMap: map[string]string{"app": "kubedb"},
 		},
-		SpecDefinitionName:    "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Memcached",
-		EnableValidation:      true,
-		GetOpenAPIDefinitions: GetOpenAPIDefinitions,
+		SpecDefinitionName:      "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Memcached",
+		EnableValidation:        true,
+		GetOpenAPIDefinitions:   GetOpenAPIDefinitions,
+		EnableStatusSubresource: EnableStatusSubresource,
 	}, setNameSchema)
 }

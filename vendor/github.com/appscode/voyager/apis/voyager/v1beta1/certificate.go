@@ -15,6 +15,8 @@ const (
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
+// Certificate is a collection of domains for which a SSL certificate is
+// issued from Let's Encrypt.
 type Certificate struct {
 	metav1.TypeMeta   `json:",inline,omitempty"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -44,25 +46,9 @@ type CertificateSpec struct {
 	// Storage backend to store the certificates currently, kubernetes secret and vault.
 	Storage CertificateStorage `json:"storage,omitempty"`
 
-	// Following fields are deprecated and will removed in future version.
-	// https://github.com/appscode/voyager/pull/506
-	// Deprecated. DNS Provider.
-	Provider string `json:"provider,omitempty"`
-	// Deprecated
-	Email string `json:"email,omitempty"`
-
-	// This is the ingress Reference that will be used if provider is http
-	// Deprecated
-	HTTPProviderIngressReference LocalTypedReference `json:"httpProviderIngressReference,omitempty"`
-
-	// ProviderCredentialSecretName is used to create the acme client, that will do
-	// needed processing in DNS.
-	// Deprecated
-	ProviderCredentialSecretName string `json:"providerCredentialSecretName,omitempty"`
-
-	// ACME server that will be used to obtain this certificate.
-	// Deprecated
-	ACMEServerURL string `json:"acmeStagingURL,omitempty"`
+	// Indicates that the certificate is paused.
+	// +optional
+	Paused bool `json:"paused,omitempty"`
 }
 
 type ChallengeProvider struct {
@@ -94,14 +80,6 @@ type CertificateStatus struct {
 	CreationTime          *metav1.Time           `json:"creationTime,omitempty"`
 	Conditions            []CertificateCondition `json:"conditions,omitempty"`
 	LastIssuedCertificate *CertificateDetails    `json:"lastIssuedCertificate,omitempty"`
-	// Deprecated
-	CertificateObtained bool `json:"certificateObtained,omitempty"`
-	// Deprecated
-	Message string `json:"message, omitempty"`
-	// Deprecated
-	ACMEUserSecretName string `json:"acmeUserSecretName,omitempty"`
-	// Deprecated
-	Details *ACMECertificateDetails `json:"details,omitempty"`
 }
 
 type ACMECertificateDetails struct {

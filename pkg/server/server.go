@@ -4,8 +4,6 @@ import (
 	"github.com/appscode/kubed/apis/kubed/install"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/operator"
-	"k8s.io/apimachinery/pkg/apimachinery/announced"
-	"k8s.io/apimachinery/pkg/apimachinery/registered"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -16,14 +14,12 @@ import (
 )
 
 var (
-	groupFactoryRegistry = make(announced.APIGroupFactoryRegistry)
-	registry             = registered.NewOrDie("")
-	Scheme               = runtime.NewScheme()
-	Codecs               = serializer.NewCodecFactory(Scheme)
+	Scheme = runtime.NewScheme()
+	Codecs = serializer.NewCodecFactory(Scheme)
 )
 
 func init() {
-	install.Install(groupFactoryRegistry, registry, Scheme)
+	install.Install(Scheme)
 
 	// we need to add the options to empty v1
 	// TODO fix the server code to avoid this
@@ -83,7 +79,7 @@ func (c *KubedConfig) Complete() CompletedConfig {
 
 // New returns a new instance of KubedServer from the given config.
 func (c completedConfig) New() (*KubedServer, error) {
-	genericServer, err := c.GenericConfig.New("kubed-server", genericapiserver.EmptyDelegate) // completion is done in Complete, no need for a second time
+	genericServer, err := c.GenericConfig.New("kubed-server", genericapiserver.NewEmptyDelegate()) // completion is done in Complete, no need for a second time
 	if err != nil {
 		return nil, err
 	}
@@ -97,8 +93,7 @@ func (c completedConfig) New() (*KubedServer, error) {
 		Operator:         operator,
 	}
 
-	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(api.GroupName, registry, Scheme, metav1.ParameterCodec, Codecs)
-	apiGroupInfo.GroupMeta.GroupVersion = api.SchemeGroupVersion
+	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(api.GroupName, Scheme, metav1.ParameterCodec, Codecs)
 	v1alpha1storage := map[string]rest.Storage{}
 	v1alpha1storage["searchresults"] = operator.Indexer.NewREST()
 	apiGroupInfo.VersionedResourcesStorageMap["v1alpha1"] = v1alpha1storage
