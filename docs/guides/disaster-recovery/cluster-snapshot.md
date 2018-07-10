@@ -500,9 +500,7 @@ metadata:
 type: Opaque
 ```
 
-Now, deploy Kubed operator in your cluster. Since, `snapshotter.local.path` is set to `/var/data`, mount your local volume at that path. You can find example installation scripts below:
- - [Without RBAC](/docs/examples/cluster-snapshot/local/without-rbac.yaml)
- - [With RBAC](/docs/examples/cluster-snapshot/local/with-rbac.yaml)
+Now, deploy Kubed operator in your cluster. Since, `snapshotter.local.path` is set to `/var/data`, mount your local volume at that path.
 
 Once the operator pod is running, check your container. You should see the data from initial snapshot operation.
 
