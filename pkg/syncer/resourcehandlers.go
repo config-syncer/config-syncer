@@ -162,5 +162,20 @@ func (s *nsSyncer) OnAdd(obj interface{}) {
 		s.SyncIntoNamespace(res.Name)
 	}
 }
-func (s *nsSyncer) OnUpdate(oldObj, newObj interface{}) {}
-func (s *nsSyncer) OnDelete(obj interface{})            {}
+
+func (s *nsSyncer) OnUpdate(oldObj, newObj interface{}) {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
+	if !s.enable {
+		return
+	}
+
+	old := oldObj.(*core.Namespace)
+	nu := newObj.(*core.Namespace)
+	if !reflect.DeepEqual(old.Labels, nu.Labels) {
+		s.SyncIntoNamespace(nu.Name)
+	}
+}
+
+func (s *nsSyncer) OnDelete(obj interface{}) {}
