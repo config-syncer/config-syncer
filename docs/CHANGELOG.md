@@ -2,35 +2,67 @@
 title: Changelog | Kubed
 description: Changelog
 menu:
-  product_kubed_0.7.0:
+  product_kubed_0.8.0:
     identifier: changelog-kubed
     name: Changelog
     parent: welcome
     weight: 10
 product_name: kubed
-menu_name: product_kubed_0.7.0
+menu_name: product_kubed_0.8.0
 section_menu_id: welcome
-url: /products/kubed/0.7.0/welcome/changelog/
+url: /products/kubed/0.8.0/welcome/changelog/
 aliases:
-  - /products/kubed/0.7.0/CHANGELOG/
+  - /products/kubed/0.8.0/CHANGELOG/
 ---
 
 # Change Log
 
-## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
-
-[Full Changelog](https://github.com/appscode/kubed/compare/0.7.0-rc.2...HEAD)
-
-**Closed issues:**
-
-- Event Forwarder Hipchat notifier sends messages not notifications [\#260](https://github.com/appscode/kubed/issues/260)
-
-## [0.7.0-rc.2](https://github.com/appscode/kubed/tree/0.7.0-rc.2) (2018-05-31)
-[Full Changelog](https://github.com/appscode/kubed/compare/0.7.0-rc.1...0.7.0-rc.2)
+## [0.8.0](https://github.com/appscode/kubed/tree/0.8.0) (2018-07-10)
+[Full Changelog](https://github.com/appscode/kubed/compare/0.7.0...0.8.0)
 
 **Fixed bugs:**
 
+- Handle syncing for updated namespaces [\#299](https://github.com/appscode/kubed/pull/299) ([tamalsaha](https://github.com/tamalsaha))
+- Remove infinite spin loop from operator [\#294](https://github.com/appscode/kubed/pull/294) ([tamalsaha](https://github.com/tamalsaha))
+
+**Merged pull requests:**
+
+- Add chart config for event forwarder and recycle bin [\#300](https://github.com/appscode/kubed/pull/300) ([tamalsaha](https://github.com/tamalsaha))
+- Improve logging for syncer [\#298](https://github.com/appscode/kubed/pull/298) ([tamalsaha](https://github.com/tamalsaha))
+- Expose webhook server to expose operator metrics [\#297](https://github.com/appscode/kubed/pull/297) ([tamalsaha](https://github.com/tamalsaha))
+- Remove outdated installer links [\#296](https://github.com/appscode/kubed/pull/296) ([tamalsaha](https://github.com/tamalsaha))
+- Use yaml file to create service account in installer script [\#295](https://github.com/appscode/kubed/pull/295) ([tamalsaha](https://github.com/tamalsaha))
+- Use osm 0.7.1 [\#293](https://github.com/appscode/kubed/pull/293) ([tamalsaha](https://github.com/tamalsaha))
+- Deploy in kube-system namespace using Helm [\#292](https://github.com/appscode/kubed/pull/292) ([tamalsaha](https://github.com/tamalsaha))
+- Update client-go to v8.0.0 [\#291](https://github.com/appscode/kubed/pull/291) ([tamalsaha](https://github.com/tamalsaha))
+- Format shell script [\#290](https://github.com/appscode/kubed/pull/290) ([tamalsaha](https://github.com/tamalsaha))
+- Fix openapi schema for metav1.Duration [\#289](https://github.com/appscode/kubed/pull/289) ([tamalsaha](https://github.com/tamalsaha))
+- Move openapi-spec to api folder [\#288](https://github.com/appscode/kubed/pull/288) ([tamalsaha](https://github.com/tamalsaha))
+- Add togglable tabs for Installation: Script & Helm [\#287](https://github.com/appscode/kubed/pull/287) ([sajibcse68](https://github.com/sajibcse68))
+
+## [0.7.0](https://github.com/appscode/kubed/tree/0.7.0) (2018-06-01)
+[Full Changelog](https://github.com/appscode/kubed/compare/0.7.0-rc.2...0.7.0)
+
+**Fixed bugs:**
+
+- secrets syncing is not proper [\#233](https://github.com/appscode/kubed/issues/233)
 - Ensure bad backups are not used to overwrite last good backup [\#176](https://github.com/appscode/kubed/issues/176)
+
+**Closed issues:**
+
+- kubectl returns results super slow after installing kubed [\#279](https://github.com/appscode/kubed/issues/279)
+- Event Forwarder Hipchat notifier sends messages not notifications [\#260](https://github.com/appscode/kubed/issues/260)
+- Fix backup manage RBAC issue [\#256](https://github.com/appscode/kubed/issues/256)
+- Fix tests [\#240](https://github.com/appscode/kubed/issues/240)
+- invalid header field value error when setting up with S3. [\#161](https://github.com/appscode/kubed/issues/161)
+- Restart kubed in e2e tests when config.yaml changes [\#158](https://github.com/appscode/kubed/issues/158)
+
+**Merged pull requests:**
+
+- Prepare 0.7.0 release [\#286](https://github.com/appscode/kubed/pull/286) ([tamalsaha](https://github.com/tamalsaha))
+
+## [0.7.0-rc.2](https://github.com/appscode/kubed/tree/0.7.0-rc.2) (2018-05-31)
+[Full Changelog](https://github.com/appscode/kubed/compare/0.7.0-rc.1...0.7.0-rc.2)
 
 **Merged pull requests:**
 
@@ -47,19 +79,11 @@ aliases:
 **Fixed bugs:**
 
 - ConfigSyncer does not sync configmap/secret when new namespace is created [\#266](https://github.com/appscode/kubed/issues/266)
-- secrets syncing is not proper [\#233](https://github.com/appscode/kubed/issues/233)
-
-**Closed issues:**
-
-- Fix backup manage RBAC issue [\#256](https://github.com/appscode/kubed/issues/256)
-- Fix tests [\#240](https://github.com/appscode/kubed/issues/240)
-- invalid header field value error when setting up with S3. [\#161](https://github.com/appscode/kubed/issues/161)
-- Restart kubed in e2e tests when config.yaml changes [\#158](https://github.com/appscode/kubed/issues/158)
 
 **Merged pull requests:**
 
 - Prepare docs for 0.7.0-rc.1 [\#278](https://github.com/appscode/kubed/pull/278) ([tamalsaha](https://github.com/tamalsaha))
-- Fixed secret type of synced secret [\#277](https://github.com/appscode/kubed/pull/277) ([emruz-hossain](https://github.com/emruz-hossain))
+- Fixed secret type of synced secret [\#277](https://github.com/appscode/kubed/pull/277) ([hossainemruz](https://github.com/hossainemruz))
 - concourse - delete cluster on exit [\#275](https://github.com/appscode/kubed/pull/275) ([tahsinrahman](https://github.com/tahsinrahman))
 
 ## [0.7.0-rc.0](https://github.com/appscode/kubed/tree/0.7.0-rc.0) (2018-05-28)
@@ -92,16 +116,16 @@ aliases:
 - Prepare docs for 7.0.0-rc.0 [\#273](https://github.com/appscode/kubed/pull/273) ([tamalsaha](https://github.com/tamalsaha))
 - Add concourse test [\#272](https://github.com/appscode/kubed/pull/272) ([tahsinrahman](https://github.com/tahsinrahman))
 - Improve installer [\#271](https://github.com/appscode/kubed/pull/271) ([tamalsaha](https://github.com/tamalsaha))
-- Improve e2e test [\#270](https://github.com/appscode/kubed/pull/270) ([emruz-hossain](https://github.com/emruz-hossain))
+- Improve e2e test [\#270](https://github.com/appscode/kubed/pull/270) ([hossainemruz](https://github.com/hossainemruz))
 - Revendor dependencies [\#269](https://github.com/appscode/kubed/pull/269) ([tamalsaha](https://github.com/tamalsaha))
-- Add missing RBAC rules [\#268](https://github.com/appscode/kubed/pull/268) ([emruz-hossain](https://github.com/emruz-hossain))
+- Add missing RBAC rules [\#268](https://github.com/appscode/kubed/pull/268) ([hossainemruz](https://github.com/hossainemruz))
 - Don't panic if admission options is nil [\#264](https://github.com/appscode/kubed/pull/264) ([tamalsaha](https://github.com/tamalsaha))
 - Disable admission controllers for webhook server [\#263](https://github.com/appscode/kubed/pull/263) ([tamalsaha](https://github.com/tamalsaha))
 - Sync secret Kind [\#262](https://github.com/appscode/kubed/pull/262) ([farcaller](https://github.com/farcaller))
 - Update client-go to 7.0.0 [\#261](https://github.com/appscode/kubed/pull/261) ([tamalsaha](https://github.com/tamalsaha))
 - Support private registry for chart [\#259](https://github.com/appscode/kubed/pull/259) ([tamalsaha](https://github.com/tamalsaha))
 - Improve installer [\#258](https://github.com/appscode/kubed/pull/258) ([tamalsaha](https://github.com/tamalsaha))
-- Add support for SSL certificate for S3 compatible custom server \(i.e. Minio\) [\#257](https://github.com/appscode/kubed/pull/257) ([emruz-hossain](https://github.com/emruz-hossain))
+- Add support for SSL certificate for S3 compatible custom server \(i.e. Minio\) [\#257](https://github.com/appscode/kubed/pull/257) ([hossainemruz](https://github.com/hossainemruz))
 - Rename snapshot command to backup [\#255](https://github.com/appscode/kubed/pull/255) ([tamalsaha](https://github.com/tamalsaha))
 - Correctly load default config [\#253](https://github.com/appscode/kubed/pull/253) ([tamalsaha](https://github.com/tamalsaha))
 - Add RBAC instructions for GKE cluster [\#252](https://github.com/appscode/kubed/pull/252) ([tamalsaha](https://github.com/tamalsaha))

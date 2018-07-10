@@ -8,12 +8,12 @@
 # Kubed
 Kubed (pronounced Cube-Dee) by AppsCode is a Kubernetes Cluster Operator Daemon. Kubed can do the following things for you:
 
- - Kubed can protect your Kubernetes cluster from [various disasters scenarios](https://appscode.com/products/kubed/0.7.0/guides/disaster-recovery/).
- - Kubed can keep [ConfigMaps and Secrets synchronized across namespaces and/or clusters](https://appscode.com/products/kubed/0.7.0/guides/config-syncer/).
- - Kubed can [forward cluster events](https://appscode.com/products/kubed/0.7.0/guides/cluster-events/) to various destinations.
- - Kubed can setup [janitors](https://appscode.com/products/kubed/0.7.0/guides/janitors/) for Elasticsearch and InfluxDB.
- - Kubed can [send notifications](https://appscode.com/products/kubed/0.7.0/guides/cluster-events/notifiers/) via Email, SMS or Chat.
- - Kubed has a built-in [search engine](https://appscode.com/products/kubed/0.7.0/guides/apiserver/) for your cluster objects using [bleve](https://github.com/blevesearch/bleve).
+ - Kubed can protect your Kubernetes cluster from [various disasters scenarios](https://appscode.com/products/kubed/0.8.0/guides/disaster-recovery/).
+ - Kubed can keep [ConfigMaps and Secrets synchronized across namespaces and/or clusters](https://appscode.com/products/kubed/0.8.0/guides/config-syncer/).
+ - Kubed can [forward cluster events](https://appscode.com/products/kubed/0.8.0/guides/cluster-events/) to various destinations.
+ - Kubed can setup [janitors](https://appscode.com/products/kubed/0.8.0/guides/janitors/) for Elasticsearch and InfluxDB.
+ - Kubed can [send notifications](https://appscode.com/products/kubed/0.8.0/guides/cluster-events/notifiers/) via Email, SMS or Chat.
+ - Kubed has a built-in [search engine](https://appscode.com/products/kubed/0.8.0/guides/apiserver/) for your cluster objects using [bleve](https://github.com/blevesearch/bleve).
 
 
 ## Supported Versions
@@ -21,15 +21,15 @@ Please pick a version of Kubed that matches your Kubernetes installation.
 
 | Kubed Version                                                 | Docs                                                            | Kubernetes Version |
 |---------------------------------------------------------------|-----------------------------------------------------------------|--------------------|
-| [0.7.0](https://github.com/appscode/kubed/releases/tag/0.7.0) | [User Guide](https://appscode.com/products/kubed/0.7.0/)        | 1.8.x+             |
+| [0.8.0](https://github.com/appscode/kubed/releases/tag/0.8.0) | [User Guide](https://appscode.com/products/kubed/0.8.0/)        | 1.8.x+             |
 | [0.5.0](https://github.com/appscode/kubed/releases/tag/0.5.0) | [User Guide](https://appscode.com/products/kubed/0.5.0/)        | 1.7.x              |
 | [0.2.0](https://github.com/appscode/kubed/releases/tag/0.2.0) | [User Guide](https://github.com/appscode/kubed/tree/0.2.0/docs) | 1.5.x - 1.6.x      |
 
 ## Installation
-To install Kubed, please follow the guide [here](https://appscode.com/products/kubed/0.7.0/setup/install/).
+To install Kubed, please follow the guide [here](https://appscode.com/products/kubed/0.8.0/setup/install/).
 
 ## Using Kubed
-Want to learn how to use Kubed? Please start [here](https://appscode.com/products/kubed/0.7.0/).
+Want to learn how to use Kubed? Please start [here](https://appscode.com/products/kubed/0.8.0/).
 
 ## Kubed API Clients
 You can use Kubed api clients to programmatically access its apis. Here are the supported clients:
@@ -38,7 +38,7 @@ You can use Kubed api clients to programmatically access its apis. Here are the 
 - Java: https://github.com/kubed-client/java
 
 ## Contribution guidelines
-Want to help improve Kubed? Please start [here](https://appscode.com/products/kubed/0.7.0/welcome/contributing/).
+Want to help improve Kubed? Please start [here](https://appscode.com/products/kubed/0.8.0/welcome/contributing/).
 
 ---
 

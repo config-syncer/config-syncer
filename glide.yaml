@@ -17,7 +17,7 @@ import:
 - package: github.com/appscode/voyager
   version: master
 - package: github.com/blevesearch/bleve
-  version: v0.7.0
+  version: v0.8.0
 - package: github.com/codeskyblue/go-sh
   version: master
 - package: github.com/coreos/prometheus-operator
