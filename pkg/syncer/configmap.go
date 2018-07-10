@@ -5,6 +5,7 @@ import (
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/eventer"
 	core_util "github.com/appscode/kutil/core/v1"
+	"github.com/golang/glog"
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,6 +22,7 @@ func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
 		if err != nil {
 			return err
 		}
+		glog.Infof("configmap %s/%s will be synced into namespaces %v if needed", src.Namespace, src.Name, newNs.List())
 		if err := s.syncConfigMapIntoNamespaces(s.kubeClient, src, newNs, true, ""); err != nil {
 			return err
 		}
