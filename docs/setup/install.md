@@ -190,11 +190,13 @@ appscode/kubed  0.7.0    0.7.0    Kubed by AppsCode - Kubernetes daemon
 
 # Kubernetes 1.8.x
 $ helm install appscode/kubed --name kubed --version 0.7.0 \
+  --namespace kube-system \
   --set config.clusterName=<your-cluster-name> \
   --set apiserver.enabled=false
 
 # Kubernetes 1.9.0 or later
 $ helm install appscode/kubed --name kubed --version 0.7.0 \
+  --namespace kube-system \
   --set apiserver.ca="$(onessl get kube-ca)" \
   --set config.clusterName=<your-cluster-name>
 ```
