@@ -16,24 +16,65 @@ section_menu_id: guides
 
 # Monitoring Kubed
 
-Kubed has native support for monitoring via Prometheus. Kubed operator exposes Prometheus native monitoring data via `/metrics` endpoint on `:56790` port. You can setup a [CoreOS Prometheus ServiceMonitor](https://github.com/coreos/prometheus-operator) using `kubed-operator` service. To change the port, use `--web.address` flag on Kubed operator.
+Kubed operator exposes Prometheus ready metrics via the following endpoints on port `:8443`:
 
-```console
-$ kubectl get pods -n kube-system
-NAME                              READY     STATUS    RESTARTS   AGE
-kube-addon-manager-minikube       1/1       Running   0          33m
-kube-dns-1301475494-hglm0         3/3       Running   0          33m
-kubed-operator-3234987584-sbgrf   1/1       Running   0          19s
-kubernetes-dashboard-l8vlj        1/1       Running   0          33m
+- `/metrics`: Scrape this to monitor operator.
 
+Follow the steps below to view the metrics:
 
-$ kubectl port-forward $(kubectl get pods --all-namespaces -l app=kubed -o jsonpath={.items[0].metadata.name}) -n kube-system 56790
-Forwarding from 127.0.0.1:56790 -> 56790
-E0727 03:50:34.668103   22871 portforward.go:212] Unable to create listener: Error listen tcp6 [::1]:56790: bind: cannot assign requested address
-Handling connection for 56790
+1. Give `system:anonymous` user access to `/metrics` url. **This is not safe to do on a production cluster.**
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: appscode:system:metrics-collector
+rules:
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: appscode:system:metrics-collector
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: appscode:system:metrics-collector
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: system:anonymous
 ```
 
-Now, open the URL [http://127.0.0.1:56790/metrics](http://127.0.0.1:56790/metrics) in your browser.
+```console
+$ kubectl auth reconcile -f docs/examples/monitoring/metrics-collector.yaml
+clusterrole.rbac.authorization.k8s.io "appscode:system:metrics-collector" reconciled
+clusterrolebinding.rbac.authorization.k8s.io "appscode:system:metrics-collector" reconciled
+```
+
+2. Now, forward the port `:8443` to your workstation.
+
+```
+$ kubectl get pods -n kube-system | grep voyager
+voyager-operator-f89dcccdb-plvmt        1/1       Running   0          27m
+
+$ kubectl port-forward -n kube-system voyager-operator-f89dcccdb-plvmt 8443
+Forwarding from 127.0.0.1:8443 -> 8443
+Forwarding from [::1]:8443 -> 8443
+```
+
+3. Now, visit the url: https://127.0.0.1:8443/metrics
+
+![operator-metrics](/docs/images/monitoring/operator-metrics.png)
+
+4. Once you are done, remove access to `system:anonymous` user.
+
+```console
+$ kubectl delete -f docs/examples/monitoring/metrics-collector.yaml
+clusterrole.rbac.authorization.k8s.io "appscode:system:metrics-collector" deleted
+clusterrolebinding.rbac.authorization.k8s.io "appscode:system:metrics-collector" deleted
+```
 
 ## Next Steps
  - Learn how to use Kubed to protect your Kubernetes cluster from disasters [here](/docs/guides/disaster-recovery/).

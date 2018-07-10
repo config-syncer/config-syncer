@@ -17,7 +17,6 @@ import (
 
 type OperatorOptions struct {
 	ConfigPath string
-	OpsAddress string
 	ScratchDir string
 
 	QPS          float32
@@ -31,7 +30,6 @@ type OperatorOptions struct {
 func NewOperatorOptions() *OperatorOptions {
 	return &OperatorOptions{
 		ConfigPath: "/srv/kubed/config.yaml",
-		OpsAddress: ":56790",
 		ScratchDir: "/tmp",
 		// ref: https://github.com/kubernetes/ingress-nginx/blob/e4d53786e771cc6bdd55f180674b79f5b692e552/pkg/ingress/controller/launch.go#L252-L259
 		// High enough QPS to fit all expected use cases. QPS=0 is not set here, because client code is overriding it.
@@ -52,7 +50,6 @@ func (s *OperatorOptions) AddFlags(fs *pflag.FlagSet) {
 
 	fs.StringVar(&s.ConfigPath, "clusterconfig", s.ConfigPath, "Path to cluster config file")
 	fs.StringVar(&s.ScratchDir, "scratch-dir", s.ScratchDir, "Directory used to store temporary files. Use an `emptyDir` in Kubernetes.")
-	fs.StringVar(&s.OpsAddress, "ops-address", s.OpsAddress, "Address to listen on for web interface and telemetry.")
 
 	fs.Float32Var(&s.QPS, "qps", s.QPS, "The maximum QPS to the master from this client")
 	fs.IntVar(&s.Burst, "burst", s.Burst, "The maximum burst for throttle")
@@ -87,7 +84,6 @@ func (s *OperatorOptions) ApplyTo(cfg *operator.OperatorConfig) error {
 		return err
 	}
 
-	cfg.OpsAddress = s.OpsAddress
 	cfg.ScratchDir = s.ScratchDir
 	cfg.ConfigPath = s.ConfigPath
 

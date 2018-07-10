@@ -28,7 +28,6 @@ type Config struct {
 	ScratchDir        string
 	ConfigPath        string
 	OperatorNamespace string
-	OpsAddress        string
 	ResyncPeriod      time.Duration
 	Test              bool
 }
