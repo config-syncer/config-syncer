@@ -553,43 +553,35 @@ func (op *Operator) RunSnapshotter() error {
 }
 
 func (op *Operator) Run(stopCh <-chan struct{}) {
-	startOperator := true
-	for {
-		select {
-		case <-stopCh:
-			return
-		default:
-			if startOperator {
-				startOperator = false
-				if err := op.RunElasticsearchCleaner(); err != nil {
-					log.Fatalln(err.Error())
-				}
-
-				if err := op.RunTrashCanCleaner(); err != nil {
-					log.Fatalln(err.Error())
-				}
-
-				if err := op.RunSnapshotter(); err != nil {
-					log.Fatalln(err.Error())
-				}
-
-				op.RunWatchers(stopCh)
-
-				go op.watcher.Run(stopCh)
-
-				if !op.Test { // don't run prometheus server for test. it can't be restarted for consecutive tests.
-					go func() {
-						m := pat.New()
-						m.Get("/metrics", promhttp.Handler())
-						http.Handle("/", m)
-						log.Infoln("Listening on", op.OpsAddress)
-						err := http.ListenAndServe(op.OpsAddress, nil)
-						if err != nil {
-							log.Fatalln(err.Error())
-						}
-					}()
-				}
-			}
-		}
+	if err := op.RunElasticsearchCleaner(); err != nil {
+		log.Fatalln(err.Error())
 	}
+
+	if err := op.RunTrashCanCleaner(); err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	if err := op.RunSnapshotter(); err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	op.RunWatchers(stopCh)
+
+	go op.watcher.Run(stopCh)
+
+	if !op.Test { // don't run prometheus server for test. it can't be restarted for consecutive tests.
+		go func() {
+			m := pat.New()
+			m.Get("/metrics", promhttp.Handler())
+			http.Handle("/", m)
+			log.Infoln("Listening on", op.OpsAddress)
+			err := http.ListenAndServe(op.OpsAddress, nil)
+			if err != nil {
+				log.Fatalln(err.Error())
+			}
+		}()
+	}
+
+	<-stopCh
+	log.Infoln("Stopping kubed controller")
 }
