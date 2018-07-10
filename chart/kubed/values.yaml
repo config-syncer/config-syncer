@@ -60,3 +60,5 @@ config:
   # so that you can distinguish notifications sent by kubed
   clusterName: unicorn
   enableConfigSyncer: true
+  enableEventForwarder: false
+  enableRecycleBin: true
