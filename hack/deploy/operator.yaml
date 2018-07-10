@@ -32,11 +32,9 @@ spec:
         - --audit-log-path=-
         - --tls-cert-file=/var/serving-cert/tls.crt
         - --tls-private-key-file=/var/serving-cert/tls.key
-        - --ops-address=:56790
         - --enable-analytics=${KUBED_ENABLE_ANALYTICS}
         ports:
         - containerPort: 8443
-        - containerPort: 56790
         volumeMounts:
         - name: config
           mountPath: /srv/kubed
@@ -89,8 +87,5 @@ spec:
   - name: api
     port: 443
     targetPort: 8443
-  - name: ops
-    port: 56790
-    targetPort: 56790
   selector:
     app: kubed

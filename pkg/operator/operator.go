@@ -1,7 +1,6 @@
 package operator
 
 import (
-	"net/http"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -24,7 +23,6 @@ import (
 	"github.com/appscode/kutil/tools/backup"
 	"github.com/appscode/kutil/tools/fsnotify"
 	"github.com/appscode/kutil/tools/queue"
-	"github.com/appscode/pat"
 	searchlight_api "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
 	searchlightinformers "github.com/appscode/searchlight/client/informers/externalversions"
@@ -40,7 +38,6 @@ import (
 	kcs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	kubedbinformers "github.com/kubedb/apimachinery/client/informers/externalversions"
 	"github.com/pkg/errors"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
 	apps "k8s.io/api/apps/v1"
 	batch "k8s.io/api/batch/v1"
@@ -566,21 +563,7 @@ func (op *Operator) Run(stopCh <-chan struct{}) {
 	}
 
 	op.RunWatchers(stopCh)
-
 	go op.watcher.Run(stopCh)
-
-	if !op.Test { // don't run prometheus server for test. it can't be restarted for consecutive tests.
-		go func() {
-			m := pat.New()
-			m.Get("/metrics", promhttp.Handler())
-			http.Handle("/", m)
-			log.Infoln("Listening on", op.OpsAddress)
-			err := http.ListenAndServe(op.OpsAddress, nil)
-			if err != nil {
-				log.Fatalln(err.Error())
-			}
-		}()
-	}
 
 	<-stopCh
 	log.Infoln("Stopping kubed controller")
