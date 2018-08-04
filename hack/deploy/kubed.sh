@@ -168,7 +168,7 @@ while test $# -gt 0; do
     --enable-analytics*)
       val=$(echo $1 | sed -e 's/^[^=]*=//g')
       if [ "$val" = "false" ]; then
-        export SEARCHLIGHT_ENABLE_ANALYTICS=false
+        export KUBED_ENABLE_ANALYTICS=false
       fi
       shift
       ;;
