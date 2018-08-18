@@ -22,6 +22,7 @@ type Message struct {
 	readerAttachments []ReaderAttachment
 	inlines           []string
 	readerInlines     []ReaderAttachment
+	bufferAttachments []BufferAttachment
 
 	nativeSend         bool
 	testMode           bool
@@ -45,6 +46,11 @@ type Message struct {
 type ReaderAttachment struct {
 	Filename   string
 	ReadCloser io.ReadCloser
+}
+
+type BufferAttachment struct {
+	Filename   string
+	Buffer []byte
 }
 
 // StoredMessage structures contain the (parsed) message content for an email
@@ -228,6 +234,16 @@ func (mg *MailgunImpl) NewMIMEMessage(body io.ReadCloser, to ...string) *Message
 func (m *Message) AddReaderAttachment(filename string, readCloser io.ReadCloser) {
 	ra := ReaderAttachment{Filename: filename, ReadCloser: readCloser}
 	m.readerAttachments = append(m.readerAttachments, ra)
+}
+
+// AddBufferAttachment arranges to send a file along with the e-mail message.
+// File contents are read from the []byte array provided
+// The filename parameter is the resulting filename of the attachment.
+// The buffer parameter is the []byte array which contains the actual bytes to be used
+// as the contents of the attached file.
+func (m *Message) AddBufferAttachment(filename string, buffer []byte) {
+	ba := BufferAttachment{Filename: filename, Buffer: buffer}
+	m.bufferAttachments = append(m.bufferAttachments, ba)
 }
 
 // AddAttachment arranges to send a file from the filesystem along with the e-mail message.
@@ -513,6 +529,11 @@ func (m *MailgunImpl) Send(message *Message) (mes string, id string, err error) 
 	if message.readerAttachments != nil {
 		for _, readerAttachment := range message.readerAttachments {
 			payload.addReadCloser("attachment", readerAttachment.Filename, readerAttachment.ReadCloser)
+		}
+	}
+	if message.bufferAttachments != nil {
+		for _, bufferAttachment := range message.bufferAttachments {
+			payload.addBuffer("attachment", bufferAttachment.Filename, bufferAttachment.Buffer)
 		}
 	}
 	if message.inlines != nil {

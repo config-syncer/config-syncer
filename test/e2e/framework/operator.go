@@ -261,7 +261,7 @@ func (f *Invocation) RestartKubedOperator(config *api.ClusterConfig) error {
 		}
 	}
 
-	deployment, err := f.KubeClient.AppsV1beta1().Deployments(OperatorNamespace).Get(OperatorName, metav1.GetOptions{})
+	deployment, err := f.KubeClient.AppsV1().Deployments(OperatorNamespace).Get(OperatorName, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}

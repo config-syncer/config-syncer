@@ -10,7 +10,7 @@ import (
 	. "github.com/appscode/kubed/test/e2e/matcher"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	apps "k8s.io/api/apps/v1beta1"
+	apps "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -87,7 +87,7 @@ var _ = Describe("API server", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(result.Total).Should(BeNumerically(">", 0))
 
-				dp, err := f.KubeClient.AppsV1beta1().Deployments(deployment.Namespace).Get(deployment.Name, metav1.GetOptions{})
+				dp, err := f.KubeClient.AppsV1().Deployments(deployment.Namespace).Get(deployment.Name, metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())
 
 				By("Checking search result returns the deployment")

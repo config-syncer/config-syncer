@@ -37,12 +37,12 @@ func newDfaBuilder(insts prog) *dfaBuilder {
 	d := &dfaBuilder{
 		dfa: &dfa{
 			insts:  insts,
-			states: make([]*state, 0, 16),
+			states: make([]state, 0, 16),
 		},
 		cache: make(map[string]int, 1024),
 	}
 	// add 0 state that is invalid
-	d.dfa.states = append(d.dfa.states, &state{
+	d.dfa.states = append(d.dfa.states, state{
 		next:  make([]int, 256),
 		match: false,
 	})
@@ -128,7 +128,7 @@ func (d *dfaBuilder) cachedState(set *sparseSet,
 	if ok {
 		return v, insts
 	}
-	d.dfa.states = append(d.dfa.states, &state{
+	d.dfa.states = append(d.dfa.states, state{
 		insts: insts,
 		next:  make([]int, 256),
 		match: isMatch,
@@ -140,7 +140,7 @@ func (d *dfaBuilder) cachedState(set *sparseSet,
 
 type dfa struct {
 	insts  prog
-	states []*state
+	states []state
 }
 
 func (d *dfa) add(set *sparseSet, ip uint) {

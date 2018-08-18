@@ -18,6 +18,8 @@ import (
 	"regexp/syntax"
 	"unicode"
 
+	unicode_utf8 "unicode/utf8"
+
 	"github.com/couchbase/vellum/utf8"
 )
 
@@ -25,11 +27,18 @@ type compiler struct {
 	sizeLimit uint
 	insts     prog
 	instsPool []inst
+
+	sequences  utf8.Sequences
+	rangeStack utf8.RangeStack
+	startBytes []byte
+	endBytes   []byte
 }
 
 func newCompiler(sizeLimit uint) *compiler {
 	return &compiler{
-		sizeLimit: sizeLimit,
+		sizeLimit:  sizeLimit,
+		startBytes: make([]byte, unicode_utf8.UTFMax),
+		endBytes:   make([]byte, unicode_utf8.UTFMax),
 	}
 }
 
@@ -44,7 +53,7 @@ func (c *compiler) compile(ast *syntax.Regexp) (prog, error) {
 	return c.insts, nil
 }
 
-func (c *compiler) c(ast *syntax.Regexp) error {
+func (c *compiler) c(ast *syntax.Regexp) (err error) {
 	if ast.Flags&syntax.NonGreedy > 1 {
 		return ErrNoLazy
 	}
@@ -68,11 +77,12 @@ func (c *compiler) c(ast *syntax.Regexp) error {
 				next.Rune = next.Rune0[0:2]
 				return c.c(&next)
 			}
-			seqs, err := utf8.NewSequences(r, r)
+			c.sequences, c.rangeStack, err = utf8.NewSequencesPrealloc(
+				r, r, c.sequences, c.rangeStack, c.startBytes, c.endBytes)
 			if err != nil {
 				return err
 			}
-			for _, seq := range seqs {
+			for _, seq := range c.sequences {
 				c.compileUtf8Ranges(seq)
 			}
 		}
@@ -188,8 +198,8 @@ func (c *compiler) c(ast *syntax.Regexp) error {
 				return err
 			}
 		}
-		splits := make([]uint, 0, ast.Max - ast.Min)
-		starts := make([]uint, 0, ast.Max - ast.Min)
+		splits := make([]uint, 0, ast.Max-ast.Min)
+		starts := make([]uint, 0, ast.Max-ast.Min)
 		for i := ast.Min; i < ast.Max; i++ {
 			splits = append(splits, c.emptySplit())
 			starts = append(starts, uint(len(c.insts)))
@@ -249,15 +259,16 @@ func (c *compiler) compileClass(ast *syntax.Regexp) error {
 	return nil
 }
 
-func (c *compiler) compileClassRange(startR, endR rune) error {
-	seqs, err := utf8.NewSequences(startR, endR)
+func (c *compiler) compileClassRange(startR, endR rune) (err error) {
+	c.sequences, c.rangeStack, err = utf8.NewSequencesPrealloc(
+		startR, endR, c.sequences, c.rangeStack, c.startBytes, c.endBytes)
 	if err != nil {
 		return err
 	}
-	jmps := make([]uint, 0, len(seqs)-1)
+	jmps := make([]uint, 0, len(c.sequences)-1)
 	// does not do last entry
-	for i := 0; i < len(seqs)-1; i++ {
-		seq := seqs[i]
+	for i := 0; i < len(c.sequences)-1; i++ {
+		seq := c.sequences[i]
 		split := c.emptySplit()
 		j1 := c.top()
 		c.compileUtf8Ranges(seq)
@@ -266,7 +277,7 @@ func (c *compiler) compileClassRange(startR, endR rune) error {
 		c.setSplit(split, j1, j2)
 	}
 	// handle last entry
-	c.compileUtf8Ranges(seqs[len(seqs)-1])
+	c.compileUtf8Ranges(c.sequences[len(c.sequences)-1])
 	end := c.top()
 	for _, jmp := range jmps {
 		c.setJump(jmp, end)

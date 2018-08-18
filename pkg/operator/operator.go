@@ -153,19 +153,19 @@ func (op *Operator) Configure() error {
 }
 
 func (op *Operator) setupWorkloadInformers() {
-	deploymentInformer := op.kubeInformerFactory.Apps().V1beta1().Deployments().Informer()
+	deploymentInformer := op.kubeInformerFactory.Apps().V1().Deployments().Informer()
 	op.addEventHandlers(deploymentInformer, apps.SchemeGroupVersion.WithKind("Deployment"))
 
 	rcInformer := op.kubeInformerFactory.Core().V1().ReplicationControllers().Informer()
 	op.addEventHandlers(rcInformer, core.SchemeGroupVersion.WithKind("ReplicationController"))
 
-	rsInformer := op.kubeInformerFactory.Extensions().V1beta1().ReplicaSets().Informer()
-	op.addEventHandlers(rsInformer, extensions.SchemeGroupVersion.WithKind("ReplicaSet"))
+	rsInformer := op.kubeInformerFactory.Apps().V1().ReplicaSets().Informer()
+	op.addEventHandlers(rsInformer, apps.SchemeGroupVersion.WithKind("ReplicaSet"))
 
-	daemonSetInformer := op.kubeInformerFactory.Extensions().V1beta1().DaemonSets().Informer()
-	op.addEventHandlers(daemonSetInformer, extensions.SchemeGroupVersion.WithKind("DaemonSet"))
+	daemonSetInformer := op.kubeInformerFactory.Apps().V1().DaemonSets().Informer()
+	op.addEventHandlers(daemonSetInformer, apps.SchemeGroupVersion.WithKind("DaemonSet"))
 
-	statefulSetInformer := op.kubeInformerFactory.Apps().V1beta1().StatefulSets().Informer()
+	statefulSetInformer := op.kubeInformerFactory.Apps().V1().StatefulSets().Informer()
 	op.addEventHandlers(statefulSetInformer, apps.SchemeGroupVersion.WithKind("StatefulSet"))
 
 	jobInformer := op.kubeInformerFactory.Batch().V1().Jobs().Informer()

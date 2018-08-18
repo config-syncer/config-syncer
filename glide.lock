@@ -1,5 +1,5 @@
-hash: 9eba084b73b229004a7cac95b75f5fa9856c6fb2d5b5c4a4b3df5c6e98012389
-updated: 2018-07-08T19:36:17.118963407-07:00
+hash: 44cfa0a1061f1ee25f49d602ec9346cab395d97d91e358b98ec4ba117e419552
+updated: 2018-08-18T10:13:57.085402066-07:00
 imports:
 - name: bitbucket.org/atlassian/go-stride
   version: 78855f0a5d80b2683b11f3825a580a87e32a9f71
@@ -54,9 +54,8 @@ imports:
 - name: github.com/appscode/jsonpatch
   version: 1359b374de83fa14fd58ab10aa8ea4935f84d249
 - name: github.com/appscode/kube-mon
-  version: 6844d3b8506f97e79663419dfe8a3b7bfe1b3264
+  version: 2b926a410fbfe224acd3297619e15734eb0ad75d
   subpackages:
-  - api
   - prometheus/v1
 - name: github.com/appscode/kubernetes-webhook-util
   version: 73ca8be3135ee210b778c7dc19709c24bf3481eb
@@ -64,7 +63,7 @@ imports:
   - apis/workload/v1
   - client/workload/v1
 - name: github.com/appscode/kutil
-  version: ade0469e223909a181ae7a020024aa7adeb3dde6
+  version: 569ee52ec2c8bb3c151daa20a8433cfa6cc1bfce
   subpackages:
   - apiextensions/v1beta1
   - core/v1
@@ -89,7 +88,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 06c4756841b9be42277fbc94dbc98ef05fe85dbf
+  version: b2ed168fbbad79f67f587626fccf8e9efd43dc82
   subpackages:
   - apis/incidents
   - apis/incidents/v1alpha1
@@ -105,7 +104,7 @@ imports:
   - client/informers/externalversions/monitoring/v1alpha1
   - client/listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: 6913f84066f61b4fd96876b1aa9d453a484917a2
+  version: 7c69854aa1d4a1edc1906986fede418bdb87cf69
   subpackages:
   - apis/repositories
   - apis/repositories/v1alpha1
@@ -121,7 +120,7 @@ imports:
   - client/informers/externalversions/stash/v1alpha1
   - client/listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 731fa87e8bce6fcfe4d588e669982aa4257fa69a
+  version: 5b0e69cbff50d254c68ca2c577baf3f9e260b734
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -323,7 +322,7 @@ imports:
   subpackages:
   - pkg/client/monitoring/v1
 - name: github.com/couchbase/vellum
-  version: 77a271452dad6888851352f69597ddb214aa956e
+  version: dc6110ee42850a6553b6469bf0dc03383900353d
   subpackages:
   - regexp
   - utf8
@@ -366,7 +365,7 @@ imports:
 - name: github.com/go-openapi/jsonreference
   version: 13c6e3589ad90f49bd3e3bbe2c2cb3d7a4142272
 - name: github.com/go-openapi/spec
-  version: 1de3e0542de65ad8d75452a595886fdd0befb363
+  version: 384415f06ee238aae1df5caad877de6ceac3a5c4
 - name: github.com/go-openapi/swag
   version: f3f9494671f93fcff853e3c6e9e948b3eb71e590
 - name: github.com/gogo/protobuf
@@ -428,7 +427,7 @@ imports:
 - name: github.com/gorilla/websocket
   version: 6eb6ad425a89d9da7a5549bc6da8f79ba5c17844
 - name: github.com/graymeta/stow
-  version: 749bd5039731d827684b5d49a59b01d4c5316b65
+  version: afce6d90444a3ba63c6d6671498c6cdc79375369
   repo: https://github.com/appscode/stow.git
   vcs: git
   subpackages:
@@ -464,7 +463,7 @@ imports:
 - name: github.com/json-iterator/go
   version: ab8a2e0c74be9d3be70b3184d9acc634935ded82
 - name: github.com/kubedb/apimachinery
-  version: cb8c61a4c4cbec3fe08a61ead39ba252ec29bfa6
+  version: 2eee45f2c9c0edc1b631998b36d065a9650db87b
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -477,7 +476,7 @@ imports:
   - client/informers/externalversions/kubedb/v1alpha1
   - client/listers/kubedb/v1alpha1
 - name: github.com/mailgun/mailgun-go
-  version: 15f93e2afc54c83d7664adcfd233be4e68606a09
+  version: bbe57f98d55000a70d2c2d54fb67558e571cb3e9
 - name: github.com/mailru/easyjson
   version: 2f5df55504ebc322e4d52d34df6a1f5b503bf26d
   subpackages:
@@ -501,13 +500,13 @@ imports:
 - name: github.com/mschoch/smat
   version: 90eadee771aeab36e8bf796039b8c261bebebe4f
 - name: github.com/ncw/swift
-  version: b2a7479cf26fa841ff90dd932d0221cb5c50782d
+  version: bd8b704d15b2f5357186ac39c863bd74eb837291
 - name: github.com/nlopes/slack
-  version: 13510604f06044c100aab2c446b0c0a28e4e8c18
+  version: 7cfa5619e6becd3db5dfb8e26c06798918e123b2
 - name: github.com/NYTimes/gziphandler
   version: 56545f4a5d46df9a6648819d1664c3a03a13ffdb
 - name: github.com/olekukonko/tablewriter
-  version: cca8bbc0798408af109aaaa239cbd2634846b340
+  version: d4647c9c7a84d847478d890b816b7d8b62b0b279
 - name: github.com/onsi/ginkgo
   version: fa5fabab2a1bfbd924faf4c067d07ae414e2aedf
   subpackages:
@@ -566,7 +565,6 @@ imports:
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
   - prometheus
-  - prometheus/promhttp
 - name: github.com/prometheus/client_model
   version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
   subpackages:
@@ -591,7 +589,7 @@ imports:
 - name: github.com/robfig/cron
   version: b41be1df696709bb6395fe435af20370037c0b4c
 - name: github.com/rs/zerolog
-  version: 9cd6f6eef2d7e9041629e2dd853778a9b2abddbd
+  version: 85255a5e26e0508529801070fa4ce521d9994d61
   subpackages:
   - internal/cbor
   - internal/json
@@ -601,13 +599,14 @@ imports:
 - name: github.com/satori/go.uuid
   version: 879c5887cd475cd7864858769793b2ceb0d44feb
 - name: github.com/sergi/go-diff
-  version: 97b2266dfe4bd4ea1b81a463322f04f8b724801e
+  version: 24e2351369ec4949b2ed0dc5c477afdd4c4034e8
+  repo: https://github.com/sergi/go-diff
   subpackages:
   - diffmatchpatch
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/sirupsen/logrus
-  version: f006c2ac4710855cf0f916dd6b77acf6b048dc6e
+  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
 - name: github.com/Smerity/govarint
   version: 7265e41f48f15fd61751e16da866af3c704bb3ab
 - name: github.com/spf13/afero
@@ -645,11 +644,12 @@ imports:
   version: 2e6e8094ef4745224150c88c16191c7dceaad16f
   repo: https://github.com/willf/bitset
 - name: github.com/yudai/gojsondiff
-  version: 7b1b7adf999dab73a6eb02669c3d82dbb27a3dd6
+  version: 0525c875b75ca60b9e67ddc44496aa16f21066b0
   subpackages:
   - formatter
 - name: github.com/yudai/golcs
   version: d1c525dea8ce39ea9a783d33cf08932305373f2c
+  repo: https://github.com/yudai/golcs
 - name: golang.org/x/crypto
   version: 49796115aa4b964c318aad4f3084fdb41e9aa067
   subpackages:
@@ -716,7 +716,7 @@ imports:
   subpackages:
   - rate
 - name: google.golang.org/api
-  version: ac730e38c5514b49097b1459b3acbe1bf905e930
+  version: e21acd801f91da814261b938941d193bb036441a
   subpackages:
   - gensupport
   - googleapi
@@ -971,7 +971,9 @@ imports:
   - plugin/pkg/authenticator/token/webhook
   - plugin/pkg/authorizer/webhook
 - name: k8s.io/client-go
-  version: 7d04d0e2a0a1a4d4a1cd6baa432a2301492e4e65
+  version: 066b071dea4a96506eb2e32b68de755e7d37b331
+  repo: https://github.com/pharmer/client-go.git
+  vcs: git
   subpackages:
   - deprecated-dynamic
   - discovery
@@ -1152,7 +1154,7 @@ imports:
   - pkg/client/clientset_generated/clientset/typed/apiregistration/v1
   - pkg/client/clientset_generated/clientset/typed/apiregistration/v1beta1
 - name: k8s.io/kube-openapi
-  version: d83b052f768a50a309c692a9c271da3f3276ff88
+  version: e3762e86a74c878ffed47484592986685639c2cd
   subpackages:
   - pkg/builder
   - pkg/common
@@ -1164,6 +1166,24 @@ imports:
   subpackages:
   - pkg/api/legacyscheme
   - pkg/util/hash
+- name: kmodules.xyz/monitoring-agent-api
+  version: 2b926a410fbfe224acd3297619e15734eb0ad75d
+  repo: https://github.com/kmodules/monitoring-agent-api.git
+  vcs: git
+  subpackages:
+  - api/v1
+- name: kmodules.xyz/objectstore-api
+  version: 94d68f0dfad22b23d98d8461344ebabc1f8a4a7c
+  repo: https://github.com/kmodules/objectstore-api.git
+  vcs: git
+  subpackages:
+  - api/v1
+- name: kmodules.xyz/offshoot-api
+  version: 5ff9de954aeb2148edc7a831671f3f875aa56f30
+  repo: https://github.com/kmodules/offshoot-api.git
+  vcs: git
+  subpackages:
+  - api/v1
 testImports:
 - name: github.com/pmezard/go-difflib
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d

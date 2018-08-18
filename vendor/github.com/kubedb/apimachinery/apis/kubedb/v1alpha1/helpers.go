@@ -30,3 +30,13 @@ func setNameSchema(openapiSpec map[string]common.OpenAPIDefinition) {
 		},
 	}
 }
+
+func (e *BackupScheduleSpec) Migrate() {
+	if e == nil {
+		return
+	}
+	if e.Resources != nil {
+		e.PodTemplate.Spec.Resources = *e.Resources
+		e.Resources = nil
+	}
+}

@@ -31,1736 +31,654 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlert": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlert":          schema_searchlight_apis_monitoring_v1alpha1_ClusterAlert(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlertList":      schema_searchlight_apis_monitoring_v1alpha1_ClusterAlertList(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlertSpec":      schema_searchlight_apis_monitoring_v1alpha1_ClusterAlertSpec(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IcingaCommand":         schema_searchlight_apis_monitoring_v1alpha1_IcingaCommand(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Incident":              schema_searchlight_apis_monitoring_v1alpha1_Incident(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentList":          schema_searchlight_apis_monitoring_v1alpha1_IncidentList(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentNotification":  schema_searchlight_apis_monitoring_v1alpha1_IncidentNotification(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentStatus":        schema_searchlight_apis_monitoring_v1alpha1_IncidentStatus(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlert":             schema_searchlight_apis_monitoring_v1alpha1_NodeAlert(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlertList":         schema_searchlight_apis_monitoring_v1alpha1_NodeAlertList(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlertSpec":         schema_searchlight_apis_monitoring_v1alpha1_NodeAlertSpec(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginArguments":       schema_searchlight_apis_monitoring_v1alpha1_PluginArguments(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarField":        schema_searchlight_apis_monitoring_v1alpha1_PluginVarField(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars":            schema_searchlight_apis_monitoring_v1alpha1_PluginVars(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlert":              schema_searchlight_apis_monitoring_v1alpha1_PodAlert(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlertList":          schema_searchlight_apis_monitoring_v1alpha1_PodAlertList(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlertSpec":          schema_searchlight_apis_monitoring_v1alpha1_PodAlertSpec(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver":              schema_searchlight_apis_monitoring_v1alpha1_Receiver(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Registry":              schema_searchlight_apis_monitoring_v1alpha1_Registry(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPlugin":     schema_searchlight_apis_monitoring_v1alpha1_SearchlightPlugin(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPluginList": schema_searchlight_apis_monitoring_v1alpha1_SearchlightPluginList(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPluginSpec": schema_searchlight_apis_monitoring_v1alpha1_SearchlightPluginSpec(ref),
+		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.WebhookServiceSpec":    schema_searchlight_apis_monitoring_v1alpha1_WebhookServiceSpec(ref),
+		"k8s.io/apimachinery/pkg/api/resource.Quantity":                                  schema_apimachinery_pkg_api_resource_Quantity(ref),
+		"k8s.io/apimachinery/pkg/api/resource.int64Amount":                               schema_apimachinery_pkg_api_resource_int64Amount(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.APIGroup":                                  schema_pkg_apis_meta_v1_APIGroup(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.APIGroupList":                              schema_pkg_apis_meta_v1_APIGroupList(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.APIResource":                               schema_pkg_apis_meta_v1_APIResource(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.APIResourceList":                           schema_pkg_apis_meta_v1_APIResourceList(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.APIVersions":                               schema_pkg_apis_meta_v1_APIVersions(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.DeleteOptions":                             schema_pkg_apis_meta_v1_DeleteOptions(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.Duration":                                  schema_pkg_apis_meta_v1_Duration(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.ExportOptions":                             schema_pkg_apis_meta_v1_ExportOptions(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.GetOptions":                                schema_pkg_apis_meta_v1_GetOptions(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupKind":                                 schema_pkg_apis_meta_v1_GroupKind(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupResource":                             schema_pkg_apis_meta_v1_GroupResource(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersion":                              schema_pkg_apis_meta_v1_GroupVersion(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersionForDiscovery":                  schema_pkg_apis_meta_v1_GroupVersionForDiscovery(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersionKind":                          schema_pkg_apis_meta_v1_GroupVersionKind(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersionResource":                      schema_pkg_apis_meta_v1_GroupVersionResource(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.Initializer":                               schema_pkg_apis_meta_v1_Initializer(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.Initializers":                              schema_pkg_apis_meta_v1_Initializers(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.InternalEvent":                             schema_pkg_apis_meta_v1_InternalEvent(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector":                             schema_pkg_apis_meta_v1_LabelSelector(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelectorRequirement":                  schema_pkg_apis_meta_v1_LabelSelectorRequirement(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.List":                                      schema_pkg_apis_meta_v1_List(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta":                                  schema_pkg_apis_meta_v1_ListMeta(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.ListOptions":                               schema_pkg_apis_meta_v1_ListOptions(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.MicroTime":                                 schema_pkg_apis_meta_v1_MicroTime(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta":                                schema_pkg_apis_meta_v1_ObjectMeta(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.OwnerReference":                            schema_pkg_apis_meta_v1_OwnerReference(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.Patch":                                     schema_pkg_apis_meta_v1_Patch(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.Preconditions":                             schema_pkg_apis_meta_v1_Preconditions(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.RootPaths":                                 schema_pkg_apis_meta_v1_RootPaths(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.ServerAddressByClientCIDR":                 schema_pkg_apis_meta_v1_ServerAddressByClientCIDR(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.Status":                                    schema_pkg_apis_meta_v1_Status(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.StatusCause":                               schema_pkg_apis_meta_v1_StatusCause(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.StatusDetails":                             schema_pkg_apis_meta_v1_StatusDetails(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.Time":                                      schema_pkg_apis_meta_v1_Time(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.Timestamp":                                 schema_pkg_apis_meta_v1_Timestamp(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.TypeMeta":                                  schema_pkg_apis_meta_v1_TypeMeta(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.WatchEvent":                                schema_pkg_apis_meta_v1_WatchEvent(ref),
+		"k8s.io/apimachinery/pkg/runtime.RawExtension":                                   schema_k8sio_apimachinery_pkg_runtime_RawExtension(ref),
+		"k8s.io/apimachinery/pkg/runtime.TypeMeta":                                       schema_k8sio_apimachinery_pkg_runtime_TypeMeta(ref),
+		"k8s.io/apimachinery/pkg/runtime.Unknown":                                        schema_k8sio_apimachinery_pkg_runtime_Unknown(ref),
+		"k8s.io/apimachinery/pkg/version.Info":                                           schema_k8sio_apimachinery_pkg_version_Info(ref),
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_ClusterAlert(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"metadata": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-							},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
-						"spec": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Spec is the desired state of the ClusterAlert. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status",
-								Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlertSpec"),
-							},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec is the desired state of the ClusterAlert. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status",
+							Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlertSpec"),
 						},
 					},
 				},
 			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlertSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlertList": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "ClusterAlertList is a collection of ClusterAlert.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"metadata": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-							},
-						},
-						"items": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Items is the list of ClusterAlert.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlert"),
-										},
-									},
-								},
-							},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlertSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_ClusterAlertList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ClusterAlertList is a collection of ClusterAlert.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
-					Required: []string{"items"},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlert", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlertSpec": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "ClusterAlertSpec describes the ClusterAlert the user wishes to create.",
-					Properties: map[string]spec.Schema{
-						"check": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Icinga CheckCommand name",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"checkInterval": {
-							SchemaProps: spec.SchemaProps{
-								Description: "How frequently Icinga Service will be checked",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-							},
-						},
-						"alertInterval": {
-							SchemaProps: spec.SchemaProps{
-								Description: "How frequently notifications will be send",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-							},
-						},
-						"notifierSecretName": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Secret containing notifier credentials",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"receivers": {
-							SchemaProps: spec.SchemaProps{
-								Description: "NotifierParams contains information to send notifications for Incident State, UserUid, Method",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver"),
-										},
-									},
-								},
-							},
-						},
-						"vars": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Vars contains Icinga Service variables to be used in CheckCommand",
-								Type:        []string{"object"},
-								AdditionalProperties: &spec.SchemaOrBool{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
-						},
-						"paused": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Indicates that Check is paused Icinga Services are removed",
-								Type:        []string{"boolean"},
-								Format:      "",
-							},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver", "k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IcingaCommand": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"Name": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"Vars": {
-							SchemaProps: spec.SchemaProps{
-								Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"),
-							},
-						},
-						"States": {
-							SchemaProps: spec.SchemaProps{
-								Type: []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
 						},
 					},
-					Required: []string{"Name", "Vars", "States"},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Incident": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"metadata": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-							},
-						},
-						"status": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Derived information about the incident.",
-								Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentStatus"),
-							},
-						},
-					},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentList": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "IncidentList is a collection of Incident.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"metadata": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-							},
-						},
-						"items": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Items is the list of Incident.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.Incident"),
-										},
-									},
-								},
-							},
-						},
-					},
-					Required: []string{"items"},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Incident", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentNotification": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"type": {
-							SchemaProps: spec.SchemaProps{
-								Description: "incident notification type.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"checkOutput": {
-							SchemaProps: spec.SchemaProps{
-								Description: "brief output of check command for the incident",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"author": {
-							SchemaProps: spec.SchemaProps{
-								Description: "name of user making comment",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"comment": {
-							SchemaProps: spec.SchemaProps{
-								Description: "comment made by user",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"firstTimestamp": {
-							SchemaProps: spec.SchemaProps{
-								Description: "The time at which this notification was first recorded. (Time of server receipt is in TypeMeta.)",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-							},
-						},
-						"lastTimestamp": {
-							SchemaProps: spec.SchemaProps{
-								Description: "The time at which the most recent occurrence of this notification was recorded.",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-							},
-						},
-						"state": {
-							SchemaProps: spec.SchemaProps{
-								Description: "state of incident, such as Critical, Warning, OK, Unknown",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-					},
-					Required: []string{"type", "state"},
-				},
-			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentStatus": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"lastNotificationType": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Type of last notification, such as problem, acknowledgement, recovery or custom",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"notifications": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Notifications for the incident, such as problem or acknowledgement.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentNotification"),
-										},
-									},
-								},
-							},
-						},
-					},
-					Required: []string{"lastNotificationType"},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentNotification"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlert": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"metadata": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-							},
-						},
-						"spec": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Spec is the desired state of the NodeAlert. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status",
-								Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlertSpec"),
-							},
-						},
-					},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlertSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlertList": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "NodeAlertList is a collection of NodeAlert.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"metadata": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-							},
-						},
-						"items": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Items is the list of NodeAlert.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlert"),
-										},
-									},
-								},
-							},
-						},
-					},
-					Required: []string{"items"},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlert", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlertSpec": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "NodeAlertSpec describes the NodeAlert the user wishes to create.",
-					Properties: map[string]spec.Schema{
-						"selector": {
-							SchemaProps: spec.SchemaProps{
-								Type: []string{"object"},
-								AdditionalProperties: &spec.SchemaOrBool{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
-						},
-						"nodeName": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"check": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Icinga CheckCommand name",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"checkInterval": {
-							SchemaProps: spec.SchemaProps{
-								Description: "How frequently Icinga Service will be checked",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-							},
-						},
-						"alertInterval": {
-							SchemaProps: spec.SchemaProps{
-								Description: "How frequently notifications will be send",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-							},
-						},
-						"notifierSecretName": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Secret containing notifier credentials",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"receivers": {
-							SchemaProps: spec.SchemaProps{
-								Description: "NotifierParams contains information to send notifications for Incident State, UserUid, Method",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver"),
-										},
-									},
-								},
-							},
-						},
-						"vars": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Vars contains Icinga Service variables to be used in CheckCommand",
-								Type:        []string{"object"},
-								AdditionalProperties: &spec.SchemaOrBool{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
-						},
-						"paused": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Indicates that Check is paused Icinga Services are removed",
-								Type:        []string{"boolean"},
-								Format:      "",
-							},
-						},
-					},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver", "k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginArguments": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"vars": {
-							SchemaProps: spec.SchemaProps{
-								Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"),
-							},
-						},
-						"host": {
-							SchemaProps: spec.SchemaProps{
-								Type: []string{"object"},
-								AdditionalProperties: &spec.SchemaOrBool{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Items is the list of ClusterAlert.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlert"),
 									},
 								},
 							},
 						},
 					},
 				},
+				Required: []string{"items"},
 			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"},
 		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarField": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"description": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"type": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.ClusterAlert", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_ClusterAlertSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ClusterAlertSpec describes the ClusterAlert the user wishes to create.",
+				Properties: map[string]spec.Schema{
+					"check": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Icinga CheckCommand name",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
-					Required: []string{"type"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"fields": {
-							SchemaProps: spec.SchemaProps{
-								Type: []string{"object"},
-								AdditionalProperties: &spec.SchemaOrBool{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarField"),
-										},
-									},
-								},
-							},
-						},
-						"required": {
-							SchemaProps: spec.SchemaProps{
-								Type: []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
+					"checkInterval": {
+						SchemaProps: spec.SchemaProps{
+							Description: "How frequently Icinga Service will be checked",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
 						},
 					},
-					Required: []string{"fields"},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarField"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlert": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"metadata": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-							},
-						},
-						"spec": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Spec is the desired state of the PodAlert. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status",
-								Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlertSpec"),
-							},
+					"alertInterval": {
+						SchemaProps: spec.SchemaProps{
+							Description: "How frequently notifications will be send",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
 						},
 					},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlertSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlertList": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "PodAlertList is a collection of PodAlert.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					"notifierSecretName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Secret containing notifier credentials",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"metadata": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-							},
-						},
-						"items": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Items is the list of PodAlert.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlert"),
-										},
+					},
+					"receivers": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NotifierParams contains information to send notifications for Incident State, UserUid, Method",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver"),
 									},
 								},
 							},
 						},
 					},
-					Required: []string{"items"},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlert", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlertSpec": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "PodAlertSpec describes the PodAlert the user wishes to create.",
-					Properties: map[string]spec.Schema{
-						"selector": {
-							SchemaProps: spec.SchemaProps{
-								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
-							},
-						},
-						"podName": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"check": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Icinga CheckCommand name",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"checkInterval": {
-							SchemaProps: spec.SchemaProps{
-								Description: "How frequently Icinga Service will be checked",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-							},
-						},
-						"alertInterval": {
-							SchemaProps: spec.SchemaProps{
-								Description: "How frequently notifications will be send",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
-							},
-						},
-						"notifierSecretName": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Secret containing notifier credentials",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"receivers": {
-							SchemaProps: spec.SchemaProps{
-								Description: "NotifierParams contains information to send notifications for Incident State, UserUid, Method",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver"),
-										},
-									},
-								},
-							},
-						},
-						"vars": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Vars contains Icinga Service variables to be used in CheckCommand",
-								Type:        []string{"object"},
-								AdditionalProperties: &spec.SchemaOrBool{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
-						},
-						"paused": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Indicates that Check is paused Icinga Services are removed",
-								Type:        []string{"boolean"},
-								Format:      "",
-							},
-						},
-					},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver", "k8s.io/apimachinery/pkg/apis/meta/v1.Duration", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"state": {
-							SchemaProps: spec.SchemaProps{
-								Description: "For which state notification will be sent",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"to": {
-							SchemaProps: spec.SchemaProps{
-								Description: "To whom notification will be sent",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
-						},
-						"notifier": {
-							SchemaProps: spec.SchemaProps{
-								Description: "How this notification will be sent",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-					},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Registry": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"reg": {
-							SchemaProps: spec.SchemaProps{
-								Type: []string{"object"},
-								AdditionalProperties: &spec.SchemaOrBool{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.IcingaCommand"),
-										},
-									},
-								},
-							},
-						},
-						"mu": {
-							SchemaProps: spec.SchemaProps{
-								Ref: ref("sync.RWMutex"),
-							},
-						},
-					},
-					Required: []string{"reg", "mu"},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IcingaCommand", "sync.RWMutex"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPlugin": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"metadata": {
-							SchemaProps: spec.SchemaProps{
-								Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-							},
-						},
-						"spec": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Spec is the desired state of the SearchlightPlugin. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status",
-								Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPluginSpec"),
-							},
-						},
-					},
-				},
-			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPluginSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPluginList": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "SearchlightPluginList is a collection of SearchlightPlugin.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"metadata": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-							},
-						},
-						"items": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Items is the list of SearchlightPlugin.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPlugin"),
-										},
+					"vars": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Vars contains Icinga Service variables to be used in CheckCommand",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
 						},
 					},
-					Required: []string{"items"},
+					"paused": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Indicates that Check is paused Icinga Services are removed",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
 				},
 			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPlugin", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
 		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPluginSpec": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "SearchlightPluginSpec describes the SearchlightPlugin the user wishes to create.",
-					Properties: map[string]spec.Schema{
-						"command": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Check Command",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver", "k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_IcingaCommand(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"Name": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
 						},
-						"webhook": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Webhook provides a reference to the service for this SearchlightPlugin. It must communicate on port 80",
-								Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.WebhookServiceSpec"),
-							},
+					},
+					"Vars": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"),
 						},
-						"alertKinds": {
-							SchemaProps: spec.SchemaProps{
-								Description: "AlertKinds refers to supports Alert kinds for this plugin",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
-						},
-						"arguments": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Supported arguments for SearchlightPlugin",
-								Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginArguments"),
-							},
-						},
-						"states": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Supported Icinga Service State",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
+					},
+					"States": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
 						},
 					},
-					Required: []string{"alertKinds", "states"},
 				},
+				Required: []string{"Name", "Vars", "States"},
 			},
-			Dependencies: []string{
-				"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginArguments", "github.com/appscode/searchlight/apis/monitoring/v1alpha1.WebhookServiceSpec"},
 		},
-		"github.com/appscode/searchlight/apis/monitoring/v1alpha1.WebhookServiceSpec": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Properties: map[string]spec.Schema{
-						"namespace": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Namespace is the namespace of the service",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"name": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Name is the name of the service",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_Incident(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
-					Required: []string{"name"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/api/resource.Quantity": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Type:   resource.Quantity{}.OpenAPISchemaType(),
-					Format: resource.Quantity{}.OpenAPISchemaFormat(),
-				},
-			},
-		},
-		"k8s.io/apimachinery/pkg/api/resource.int64Amount": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "int64Amount represents a fixed precision numerator and arbitrary scale exponent. It is faster than operations on inf.Dec for values that can be represented as int64.",
-					Properties: map[string]spec.Schema{
-						"value": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"integer"},
-								Format: "int64",
-							},
-						},
-						"scale": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"integer"},
-								Format: "int32",
-							},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
-					Required: []string{"value", "scale"},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Derived information about the incident.",
+							Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentStatus"),
+						},
+					},
 				},
 			},
-			Dependencies: []string{},
 		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.APIGroup": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "APIGroup contains the name, the supported versions, and the preferred version of a group.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_IncidentList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "IncidentList is a collection of Incident.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"name": {
-							SchemaProps: spec.SchemaProps{
-								Description: "name is the name of the group.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
 						},
-						"versions": {
-							SchemaProps: spec.SchemaProps{
-								Description: "versions are the versions supported in this group.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersionForDiscovery"),
-										},
-									},
-								},
-							},
-						},
-						"preferredVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "preferredVersion is the version preferred by the API server, which probably is the storage version.",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersionForDiscovery"),
-							},
-						},
-						"serverAddressByClientCIDRs": {
-							SchemaProps: spec.SchemaProps{
-								Description: "a map of client CIDR to server address that is serving this group. This is to help clients reach servers in the most network-efficient way possible. Clients can use the appropriate server address as per the CIDR that they match. In case of multiple matches, clients should use the longest matching CIDR. The server returns only those CIDRs that it thinks that the client can match. For example: the master will return an internal IP CIDR only, if the client reaches the server using an internal IP. Server looks at X-Forwarded-For header or X-Real-Ip header or request.RemoteAddr (in that order) to get the client IP.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ServerAddressByClientCIDR"),
-										},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Items is the list of Incident.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.Incident"),
 									},
 								},
 							},
 						},
 					},
-					Required: []string{"name", "versions", "serverAddressByClientCIDRs"},
 				},
+				Required: []string{"items"},
 			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersionForDiscovery", "k8s.io/apimachinery/pkg/apis/meta/v1.ServerAddressByClientCIDR"},
 		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.APIGroupList": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "APIGroupList is a list of APIGroup, to allow clients to discover the API at /apis.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Incident", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_IncidentNotification(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "incident notification type.",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					},
+					"checkOutput": {
+						SchemaProps: spec.SchemaProps{
+							Description: "brief output of check command for the incident",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"groups": {
-							SchemaProps: spec.SchemaProps{
-								Description: "groups is a list of APIGroup.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.APIGroup"),
-										},
+					},
+					"author": {
+						SchemaProps: spec.SchemaProps{
+							Description: "name of user making comment",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"comment": {
+						SchemaProps: spec.SchemaProps{
+							Description: "comment made by user",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"firstTimestamp": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The time at which this notification was first recorded. (Time of server receipt is in TypeMeta.)",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+					"lastTimestamp": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The time at which the most recent occurrence of this notification was recorded.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Description: "state of incident, such as Critical, Warning, OK, Unknown",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"type", "state"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_IncidentStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"lastNotificationType": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type of last notification, such as problem, acknowledgement, recovery or custom",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"notifications": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Notifications for the incident, such as problem or acknowledgement.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentNotification"),
 									},
 								},
 							},
 						},
 					},
-					Required: []string{"groups"},
+				},
+				Required: []string{"lastNotificationType"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IncidentNotification"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_NodeAlert(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec is the desired state of the NodeAlert. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status",
+							Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlertSpec"),
+						},
+					},
 				},
 			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/apis/meta/v1.APIGroup"},
 		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.APIResource": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "APIResource specifies the name of a resource and whether it is namespaced.",
-					Properties: map[string]spec.Schema{
-						"name": {
-							SchemaProps: spec.SchemaProps{
-								Description: "name is the plural name of the resource.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlertSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_NodeAlertList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NodeAlertList is a collection of NodeAlert.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"singularName": {
-							SchemaProps: spec.SchemaProps{
-								Description: "singularName is the singular name of the resource.  This allows clients to handle plural and singular opaquely. The singularName is more correct for reporting status on a single item and both singular and plural are allowed from the kubectl CLI interface.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"namespaced": {
-							SchemaProps: spec.SchemaProps{
-								Description: "namespaced indicates if a resource is namespaced or not.",
-								Type:        []string{"boolean"},
-								Format:      "",
-							},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
 						},
-						"group": {
-							SchemaProps: spec.SchemaProps{
-								Description: "group is the preferred group of the resource.  Empty implies the group of the containing resource list. For subresources, this may have a different value, for example: Scale\".",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"version": {
-							SchemaProps: spec.SchemaProps{
-								Description: "version is the preferred version of the resource.  Empty implies the version of the containing resource list For subresources, this may have a different value, for example: v1 (while inside a v1beta1 version of the core resource's group)\".",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "kind is the kind for the resource (e.g. 'Foo' is the kind for a resource 'foo')",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"verbs": {
-							SchemaProps: spec.SchemaProps{
-								Description: "verbs is a list of supported kube verbs (this includes get, list, watch, create, update, patch, delete, deletecollection, and proxy)",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
-						},
-						"shortNames": {
-							SchemaProps: spec.SchemaProps{
-								Description: "shortNames is a list of suggested short names of the resource.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
-						},
-						"categories": {
-							SchemaProps: spec.SchemaProps{
-								Description: "categories is a list of the grouped resources this resource belongs to (e.g. 'all')",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Items is the list of NodeAlert.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlert"),
 									},
 								},
 							},
 						},
 					},
-					Required: []string{"name", "singularName", "namespaced", "kind", "verbs"},
 				},
+				Required: []string{"items"},
 			},
-			Dependencies: []string{},
 		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.APIResourceList": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "APIResourceList is a list of APIResource, it is used to expose the name of the resources supported in a specific group and version, and if the resource is namespaced.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"groupVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "groupVersion is the group and version this APIResourceList is for.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"resources": {
-							SchemaProps: spec.SchemaProps{
-								Description: "resources contains the name of the resources and if they are namespaced.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.APIResource"),
-										},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.NodeAlert", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_NodeAlertSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NodeAlertSpec describes the NodeAlert the user wishes to create.",
+				Properties: map[string]spec.Schema{
+					"selector": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
 						},
 					},
-					Required: []string{"groupVersion", "resources"},
-				},
-			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/apis/meta/v1.APIResource"},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.APIVersions": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "APIVersions lists the versions that are available, to allow clients to discover the API at /api, which is the root path of the legacy v1 API.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					"nodeName": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
 						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					},
+					"check": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Icinga CheckCommand name",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"versions": {
-							SchemaProps: spec.SchemaProps{
-								Description: "versions are the api versions that are available.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
+					},
+					"checkInterval": {
+						SchemaProps: spec.SchemaProps{
+							Description: "How frequently Icinga Service will be checked",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
 						},
-						"serverAddressByClientCIDRs": {
-							SchemaProps: spec.SchemaProps{
-								Description: "a map of client CIDR to server address that is serving this group. This is to help clients reach servers in the most network-efficient way possible. Clients can use the appropriate server address as per the CIDR that they match. In case of multiple matches, clients should use the longest matching CIDR. The server returns only those CIDRs that it thinks that the client can match. For example: the master will return an internal IP CIDR only, if the client reaches the server using an internal IP. Server looks at X-Forwarded-For header or X-Real-Ip header or request.RemoteAddr (in that order) to get the client IP.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ServerAddressByClientCIDR"),
-										},
+					},
+					"alertInterval": {
+						SchemaProps: spec.SchemaProps{
+							Description: "How frequently notifications will be send",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
+						},
+					},
+					"notifierSecretName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Secret containing notifier credentials",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"receivers": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NotifierParams contains information to send notifications for Incident State, UserUid, Method",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver"),
 									},
 								},
 							},
 						},
 					},
-					Required: []string{"versions", "serverAddressByClientCIDRs"},
-				},
-			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/apis/meta/v1.ServerAddressByClientCIDR"},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.DeleteOptions": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "DeleteOptions may be provided when deleting an API object.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"gracePeriodSeconds": {
-							SchemaProps: spec.SchemaProps{
-								Description: "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
-								Type:        []string{"integer"},
-								Format:      "int64",
-							},
-						},
-						"preconditions": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Must be fulfilled before a deletion is carried out. If not possible, a 409 Conflict status will be returned.",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Preconditions"),
-							},
-						},
-						"orphanDependents": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the \"orphan\" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.",
-								Type:        []string{"boolean"},
-								Format:      "",
-							},
-						},
-						"propagationPolicy": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Whether and how garbage collection will be performed. Either this field or OrphanDependents may be set, but not both. The default policy is decided by the existing finalizer set in the metadata.finalizers and the resource-specific default policy. Acceptable values are: 'Orphan' - orphan the dependents; 'Background' - allow the garbage collector to delete the dependents in the background; 'Foreground' - a cascading policy that deletes all dependents in the foreground.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-					},
-				},
-			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/apis/meta/v1.Preconditions"},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.Duration": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Type:   v1.Duration{}.OpenAPISchemaType(),
-					Format: v1.Duration{}.OpenAPISchemaFormat(),
-				},
-			},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.ExportOptions": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "ExportOptions is the query options to the standard REST get call.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"export": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Should this value be exported.  Export strips fields that a user can not specify.",
-								Type:        []string{"boolean"},
-								Format:      "",
-							},
-						},
-						"exact": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Should the export be exact.  Exact export maintains cluster-specific fields like 'Namespace'.",
-								Type:        []string{"boolean"},
-								Format:      "",
-							},
-						},
-					},
-					Required: []string{"export", "exact"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.GetOptions": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "GetOptions is the standard query options to the standard REST get call.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"resourceVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "When specified: - if unset, then the result is returned from remote storage based on quorum-read flag; - if it's 0, then we simply return what we currently have in cache, no guarantee; - if set to non zero, then the result is at least as fresh as given rv.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"includeUninitialized": {
-							SchemaProps: spec.SchemaProps{
-								Description: "If true, partially initialized resources are included in the response.",
-								Type:        []string{"boolean"},
-								Format:      "",
-							},
-						},
-					},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupKind": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "GroupKind specifies a Group and a Kind, but does not force a version.  This is useful for identifying concepts during lookup stages without having partially valid types",
-					Properties: map[string]spec.Schema{
-						"group": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-					},
-					Required: []string{"group", "kind"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupResource": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "GroupResource specifies a Group and a Resource, but does not force a version.  This is useful for identifying concepts during lookup stages without having partially valid types",
-					Properties: map[string]spec.Schema{
-						"group": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"resource": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-					},
-					Required: []string{"group", "resource"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersion": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "GroupVersion contains the \"group\" and the \"version\", which uniquely identifies the API.",
-					Properties: map[string]spec.Schema{
-						"group": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"version": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-					},
-					Required: []string{"group", "version"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersionForDiscovery": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "GroupVersion contains the \"group/version\" and \"version\" string of a version. It is made a struct to keep extensibility.",
-					Properties: map[string]spec.Schema{
-						"groupVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "groupVersion specifies the API group and version in the form \"group/version\"",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"version": {
-							SchemaProps: spec.SchemaProps{
-								Description: "version specifies the version in the form of \"version\". This is to save the clients the trouble of splitting the GroupVersion.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-					},
-					Required: []string{"groupVersion", "version"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersionKind": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "GroupVersionKind unambiguously identifies a kind.  It doesn't anonymously include GroupVersion to avoid automatic coersion.  It doesn't use a GroupVersion to avoid custom marshalling",
-					Properties: map[string]spec.Schema{
-						"group": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"version": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-					},
-					Required: []string{"group", "version", "kind"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersionResource": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "GroupVersionResource unambiguously identifies a resource.  It doesn't anonymously include GroupVersion to avoid automatic coersion.  It doesn't use a GroupVersion to avoid custom marshalling",
-					Properties: map[string]spec.Schema{
-						"group": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"version": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"resource": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-					},
-					Required: []string{"group", "version", "resource"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.Initializer": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "Initializer is information about an initializer that has not yet completed.",
-					Properties: map[string]spec.Schema{
-						"name": {
-							SchemaProps: spec.SchemaProps{
-								Description: "name of the process that is responsible for initializing this object.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-					},
-					Required: []string{"name"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.Initializers": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "Initializers tracks the progress of initialization.",
-					Properties: map[string]spec.Schema{
-						"pending": {
-							VendorExtensible: spec.VendorExtensible{
-								Extensions: spec.Extensions{
-									"x-kubernetes-patch-merge-key": "name",
-									"x-kubernetes-patch-strategy":  "merge",
-								},
-							},
-							SchemaProps: spec.SchemaProps{
-								Description: "Pending is a list of initializers that must execute in order before this object is visible. When the last pending initializer is removed, and no failing result is set, the initializers struct will be set to nil and the object is considered as initialized and visible to all clients.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.Initializer"),
-										},
+					"vars": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Vars contains Icinga Service variables to be used in CheckCommand",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
 						},
-						"result": {
-							SchemaProps: spec.SchemaProps{
-								Description: "If result is set with the Failure field, the object will be persisted to storage and then deleted, ensuring that other clients can observe the deletion.",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Status"),
-							},
+					},
+					"paused": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Indicates that Check is paused Icinga Services are removed",
+							Type:        []string{"boolean"},
+							Format:      "",
 						},
 					},
-					Required: []string{"pending"},
 				},
 			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/apis/meta/v1.Initializer", "k8s.io/apimachinery/pkg/apis/meta/v1.Status"},
 		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.InternalEvent": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "InternalEvent makes watch.Event versioned",
-					Properties: map[string]spec.Schema{
-						"Type": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"Object": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Object is:\n * If Type is Added or Modified: the new state of the object.\n * If Type is Deleted: the state of the object immediately before deletion.\n * If Type is Error: *api.Status is recommended; other types may make sense\n   depending on context.",
-								Ref:         ref("k8s.io/apimachinery/pkg/runtime.Object"),
-							},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver", "k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_PluginArguments(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"vars": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"),
 						},
 					},
-					Required: []string{"Type", "Object"},
-				},
-			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/runtime.Object"},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects.",
-					Properties: map[string]spec.Schema{
-						"matchLabels": {
-							SchemaProps: spec.SchemaProps{
-								Description: "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-								Type:        []string{"object"},
-								AdditionalProperties: &spec.SchemaOrBool{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
-						},
-						"matchExpressions": {
-							SchemaProps: spec.SchemaProps{
-								Description: "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelectorRequirement"),
-										},
+					"host": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
@@ -1768,889 +686,2239 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 					},
 				},
 			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelectorRequirement"},
 		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelectorRequirement": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
-					Properties: map[string]spec.Schema{
-						"key": {
-							VendorExtensible: spec.VendorExtensible{
-								Extensions: spec.Extensions{
-									"x-kubernetes-patch-merge-key": "key",
-									"x-kubernetes-patch-strategy":  "merge",
-								},
-							},
-							SchemaProps: spec.SchemaProps{
-								Description: "key is the label key that the selector applies to.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVars"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_PluginVarField(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"description": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
 						},
-						"operator": {
-							SchemaProps: spec.SchemaProps{
-								Description: "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					},
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
 						},
-						"values": {
-							SchemaProps: spec.SchemaProps{
-								Description: "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
+					},
+				},
+				Required: []string{"type"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_PluginVars(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"fields": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarField"),
 									},
 								},
 							},
 						},
 					},
-					Required: []string{"key", "operator"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.List": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "List holds a list of objects, which may not be known by the server.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"metadata": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-							},
-						},
-						"items": {
-							SchemaProps: spec.SchemaProps{
-								Description: "List of objects",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
-										},
+					"required": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
 									},
 								},
 							},
 						},
 					},
-					Required: []string{"items"},
 				},
+				Required: []string{"fields"},
 			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/apimachinery/pkg/runtime.RawExtension"},
 		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "ListMeta describes metadata that synthetic resources must have, including lists and various status objects. A resource may have only one of {ObjectMeta, ListMeta}.",
-					Properties: map[string]spec.Schema{
-						"selfLink": {
-							SchemaProps: spec.SchemaProps{
-								Description: "selfLink is a URL representing this object. Populated by the system. Read-only.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginVarField"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_PodAlert(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"resourceVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "String that identifies the server's internal version of this object that can be used by clients to determine when objects have changed. Value must be treated as opaque by clients and passed unmodified back to the server. Populated by the system. Read-only. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#concurrency-control-and-consistency",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"continue": {
-							SchemaProps: spec.SchemaProps{
-								Description: "continue may be set if the user set a limit on the number of items returned, and indicates that the server has more data available. The value is opaque and may be used to issue another request to the endpoint that served this list to retrieve the next set of available objects. Continuing a list may not be possible if the server configuration has changed or more than a few minutes have passed. The resourceVersion field returned when using this continue value will be identical to the value in the first response.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec is the desired state of the PodAlert. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status",
+							Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlertSpec"),
 						},
 					},
 				},
 			},
-			Dependencies: []string{},
 		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.ListOptions": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "ListOptions is the query options to a standard REST list call.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"labelSelector": {
-							SchemaProps: spec.SchemaProps{
-								Description: "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"fieldSelector": {
-							SchemaProps: spec.SchemaProps{
-								Description: "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"includeUninitialized": {
-							SchemaProps: spec.SchemaProps{
-								Description: "If true, partially initialized resources are included in the response.",
-								Type:        []string{"boolean"},
-								Format:      "",
-							},
-						},
-						"watch": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
-								Type:        []string{"boolean"},
-								Format:      "",
-							},
-						},
-						"resourceVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history. When specified for list: - if unset, then the result is returned from remote storage based on quorum-read flag; - if it's 0, then we simply return what we currently have in cache, no guarantee; - if set to non zero, then the result is at least as fresh as given rv.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"timeoutSeconds": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
-								Type:        []string{"integer"},
-								Format:      "int64",
-							},
-						},
-						"limit": {
-							SchemaProps: spec.SchemaProps{
-								Description: "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
-								Type:        []string{"integer"},
-								Format:      "int64",
-							},
-						},
-						"continue": {
-							SchemaProps: spec.SchemaProps{
-								Description: "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server the server will respond with a 410 ResourceExpired error indicating the client must restart their list without the continue field. This field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlertSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_PodAlertList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PodAlertList is a collection of PodAlert.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.MicroTime": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Type:   v1.MicroTime{}.OpenAPISchemaType(),
-					Format: v1.MicroTime{}.OpenAPISchemaFormat(),
-				},
-			},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.",
-					Properties: map[string]spec.Schema{
-						"name": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: http://kubernetes.io/docs/user-guide/identifiers#names",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"generateName": {
-							SchemaProps: spec.SchemaProps{
-								Description: "GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.\n\nIf this field is specified and the generated name exists, the server will NOT return a 409 - instead, it will either return 201 Created or 500 with Reason ServerTimeout indicating a unique name could not be found in the time allotted, and the client should retry (optionally after the time indicated in the Retry-After header).\n\nApplied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#idempotency",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"namespace": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Namespace defines the space within each name must be unique. An empty namespace is equivalent to the \"default\" namespace, but \"default\" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.\n\nMust be a DNS_LABEL. Cannot be updated. More info: http://kubernetes.io/docs/user-guide/namespaces",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"selfLink": {
-							SchemaProps: spec.SchemaProps{
-								Description: "SelfLink is a URL representing this object. Populated by the system. Read-only.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"uid": {
-							SchemaProps: spec.SchemaProps{
-								Description: "UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.\n\nPopulated by the system. Read-only. More info: http://kubernetes.io/docs/user-guide/identifiers#uids",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"resourceVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.\n\nPopulated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#concurrency-control-and-consistency",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"generation": {
-							SchemaProps: spec.SchemaProps{
-								Description: "A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.",
-								Type:        []string{"integer"},
-								Format:      "int64",
-							},
-						},
-						"creationTimestamp": {
-							SchemaProps: spec.SchemaProps{
-								Description: "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.\n\nPopulated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-							},
-						},
-						"deletionTimestamp": {
-							SchemaProps: spec.SchemaProps{
-								Description: "DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource is expected to be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field, once the finalizers list is empty. As long as the finalizers list contains items, deletion is blocked. Once the deletionTimestamp is set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time. For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react by sending a graceful termination signal to the containers in the pod. After that 30 seconds, the Kubelet will send a hard termination signal (SIGKILL) to the container and after cleanup, remove the pod from the API. In the presence of network partitions, this object may still exist after this timestamp, until an administrator or automated process can determine the resource is fully terminated. If not set, graceful deletion of the object has not been requested.\n\nPopulated by the system when a graceful deletion is requested. Read-only. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-							},
-						},
-						"deletionGracePeriodSeconds": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.",
-								Type:        []string{"integer"},
-								Format:      "int64",
-							},
-						},
-						"labels": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: http://kubernetes.io/docs/user-guide/labels",
-								Type:        []string{"object"},
-								AdditionalProperties: &spec.SchemaOrBool{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
-						},
-						"annotations": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: http://kubernetes.io/docs/user-guide/annotations",
-								Type:        []string{"object"},
-								AdditionalProperties: &spec.SchemaOrBool{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
-						},
-						"ownerReferences": {
-							VendorExtensible: spec.VendorExtensible{
-								Extensions: spec.Extensions{
-									"x-kubernetes-patch-merge-key": "uid",
-									"x-kubernetes-patch-strategy":  "merge",
-								},
-							},
-							SchemaProps: spec.SchemaProps{
-								Description: "List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.OwnerReference"),
-										},
-									},
-								},
-							},
-						},
-						"initializers": {
-							SchemaProps: spec.SchemaProps{
-								Description: "An initializer is a controller which enforces some system invariant at object creation time. This field is a list of initializers that have not yet acted on this object. If nil or empty, this object has been completely initialized. Otherwise, the object is considered uninitialized and is hidden (in list/watch and get calls) from clients that haven't explicitly asked to observe uninitialized objects.\n\nWhen an object is created, the system will populate this list with the current set of initializers. Only privileged users may set or modify this list. Once it is empty, it may not be modified further by any user.",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Initializers"),
-							},
-						},
-						"finalizers": {
-							VendorExtensible: spec.VendorExtensible{
-								Extensions: spec.Extensions{
-									"x-kubernetes-patch-strategy": "merge",
-								},
-							},
-							SchemaProps: spec.SchemaProps{
-								Description: "Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
-									},
-								},
-							},
-						},
-						"clusterName": {
-							SchemaProps: spec.SchemaProps{
-								Description: "The name of the cluster which the object belongs to. This is used to distinguish resources with same name and namespace in different clusters. This field is not set anywhere right now and apiserver is going to ignore it if set in create or update request.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
-				},
-			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/apis/meta/v1.Initializers", "k8s.io/apimachinery/pkg/apis/meta/v1.OwnerReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.OwnerReference": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "OwnerReference contains enough information to let you identify an owning object. Currently, an owning object must be in the same namespace, so there is no namespace field.",
-					Properties: map[string]spec.Schema{
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "API version of the referent.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"name": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Name of the referent. More info: http://kubernetes.io/docs/user-guide/identifiers#names",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"uid": {
-							SchemaProps: spec.SchemaProps{
-								Description: "UID of the referent. More info: http://kubernetes.io/docs/user-guide/identifiers#uids",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"controller": {
-							SchemaProps: spec.SchemaProps{
-								Description: "If true, this reference points to the managing controller.",
-								Type:        []string{"boolean"},
-								Format:      "",
-							},
-						},
-						"blockOwnerDeletion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "If true, AND if the owner has the \"foregroundDeletion\" finalizer, then the owner cannot be deleted from the key-value store until this reference is removed. Defaults to false. To set this field, a user needs \"delete\" permission of the owner, otherwise 422 (Unprocessable Entity) will be returned.",
-								Type:        []string{"boolean"},
-								Format:      "",
-							},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
 						},
 					},
-					Required: []string{"apiVersion", "kind", "name", "uid"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.Patch": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "Patch is provided to give a concrete name and type to the Kubernetes PATCH request body.",
-					Properties:  map[string]spec.Schema{},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.Preconditions": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "Preconditions must be fulfilled before an operation (update, delete, etc.) is carried out.",
-					Properties: map[string]spec.Schema{
-						"uid": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Specifies the target UID.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-					},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.RootPaths": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "RootPaths lists the paths available at root. For example: \"/healthz\", \"/apis\".",
-					Properties: map[string]spec.Schema{
-						"paths": {
-							SchemaProps: spec.SchemaProps{
-								Description: "paths are the paths available at root.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Type:   []string{"string"},
-											Format: "",
-										},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Items is the list of PodAlert.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlert"),
 									},
 								},
 							},
 						},
 					},
-					Required: []string{"paths"},
 				},
+				Required: []string{"items"},
 			},
-			Dependencies: []string{},
 		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.ServerAddressByClientCIDR": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "ServerAddressByClientCIDR helps the client to determine the server address that they should use, depending on the clientCIDR that they match.",
-					Properties: map[string]spec.Schema{
-						"clientCIDR": {
-							SchemaProps: spec.SchemaProps{
-								Description: "The CIDR with which clients can match their IP to figure out the server address that they should use.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"serverAddress": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Address of this server, suitable for a client that matches the above CIDR. This can be a hostname, hostname:port, IP or IP:port.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PodAlert", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_PodAlertSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PodAlertSpec describes the PodAlert the user wishes to create.",
+				Properties: map[string]spec.Schema{
+					"selector": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
 						},
 					},
-					Required: []string{"clientCIDR", "serverAddress"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.Status": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "Status is a return value for calls that don't return other objects.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"metadata": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-							},
-						},
-						"status": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Status of the operation. One of: \"Success\" or \"Failure\". More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"message": {
-							SchemaProps: spec.SchemaProps{
-								Description: "A human-readable description of the status of this operation.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"reason": {
-							SchemaProps: spec.SchemaProps{
-								Description: "A machine-readable description of why this operation is in the \"Failure\" status. If this value is empty there is no information available. A Reason clarifies an HTTP status code but does not override it.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"details": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Extended data associated with the reason.  Each reason may define its own extended details. This field is optional and the data returned is not guaranteed to conform to any schema except that defined by the reason type.",
-								Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.StatusDetails"),
-							},
-						},
-						"code": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Suggested HTTP return code for this status, 0 if not set.",
-								Type:        []string{"integer"},
-								Format:      "int32",
-							},
+					"podName": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
 						},
 					},
-				},
-			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/apimachinery/pkg/apis/meta/v1.StatusDetails"},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.StatusCause": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "StatusCause provides more information about an api.Status failure, including cases when multiple errors are encountered.",
-					Properties: map[string]spec.Schema{
-						"reason": {
-							SchemaProps: spec.SchemaProps{
-								Description: "A machine-readable description of the cause of the error. If this value is empty there is no information available.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"message": {
-							SchemaProps: spec.SchemaProps{
-								Description: "A human-readable description of the cause of the error.  This field may be presented as-is to a reader.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"field": {
-							SchemaProps: spec.SchemaProps{
-								Description: "The field of the resource that has caused this error, as named by its JSON serialization. May include dot and postfix notation for nested attributes. Arrays are zero-indexed.  Fields may appear more than once in an array of causes due to fields having multiple errors. Optional.\n\nExamples:\n  \"name\" - the field \"name\" on the current resource\n  \"items[0].name\" - the field \"name\" on the first array entry in \"items\"",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					"check": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Icinga CheckCommand name",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.StatusDetails": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "StatusDetails is a set of additional properties that MAY be set by the server to provide additional information about a response. The Reason field of a Status object defines what attributes will be set. Clients must ignore fields that do not match the defined type of each attribute, and should assume that any attribute may be empty, invalid, or under defined.",
-					Properties: map[string]spec.Schema{
-						"name": {
-							SchemaProps: spec.SchemaProps{
-								Description: "The name attribute of the resource associated with the status StatusReason (when there is a single name which can be described).",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					"checkInterval": {
+						SchemaProps: spec.SchemaProps{
+							Description: "How frequently Icinga Service will be checked",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
 						},
-						"group": {
-							SchemaProps: spec.SchemaProps{
-								Description: "The group attribute of the resource associated with the status StatusReason.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					},
+					"alertInterval": {
+						SchemaProps: spec.SchemaProps{
+							Description: "How frequently notifications will be send",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
 						},
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "The kind attribute of the resource associated with the status StatusReason. On some operations may differ from the requested resource Kind. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					},
+					"notifierSecretName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Secret containing notifier credentials",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"uid": {
-							SchemaProps: spec.SchemaProps{
-								Description: "UID of the resource. (when there is a single resource which can be described). More info: http://kubernetes.io/docs/user-guide/identifiers#uids",
-								Type:        []string{"string"},
-								Format:      "",
-							},
-						},
-						"causes": {
-							SchemaProps: spec.SchemaProps{
-								Description: "The Causes array includes more details associated with the StatusReason failure. Not all StatusReasons may provide detailed causes.",
-								Type:        []string{"array"},
-								Items: &spec.SchemaOrArray{
-									Schema: &spec.Schema{
-										SchemaProps: spec.SchemaProps{
-											Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.StatusCause"),
-										},
+					},
+					"receivers": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NotifierParams contains information to send notifications for Incident State, UserUid, Method",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver"),
 									},
 								},
 							},
 						},
-						"retryAfterSeconds": {
-							SchemaProps: spec.SchemaProps{
-								Description: "If specified, the time in seconds before the operation should be retried. Some errors may indicate the client must take an alternate action - for those errors this field may indicate how long to wait before taking the alternate action.",
-								Type:        []string{"integer"},
-								Format:      "int32",
+					},
+					"vars": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Vars contains Icinga Service variables to be used in CheckCommand",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"paused": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Indicates that Check is paused Icinga Services are removed",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.Receiver", "k8s.io/apimachinery/pkg/apis/meta/v1.Duration", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_Receiver(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Description: "For which state notification will be sent",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"to": {
+						SchemaProps: spec.SchemaProps{
+							Description: "To whom notification will be sent",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"notifier": {
+						SchemaProps: spec.SchemaProps{
+							Description: "How this notification will be sent",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_Registry(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"reg": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.IcingaCommand"),
+									},
+								},
+							},
+						},
+					},
+					"mu": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("sync.RWMutex"),
+						},
+					},
+				},
+				Required: []string{"reg", "mu"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.IcingaCommand", "sync.RWMutex"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_SearchlightPlugin(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec is the desired state of the SearchlightPlugin. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#spec-and-status",
+							Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPluginSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPluginSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_SearchlightPluginList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SearchlightPluginList is a collection of SearchlightPlugin.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata. More info: http://releases.k8s.io/release-1.2/docs/devel/api-conventions.md#metadata",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Items is the list of SearchlightPlugin.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPlugin"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.SearchlightPlugin", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_SearchlightPluginSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SearchlightPluginSpec describes the SearchlightPlugin the user wishes to create.",
+				Properties: map[string]spec.Schema{
+					"command": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Check Command",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"webhook": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Webhook provides a reference to the service for this SearchlightPlugin. It must communicate on port 80",
+							Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.WebhookServiceSpec"),
+						},
+					},
+					"alertKinds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AlertKinds refers to supports Alert kinds for this plugin",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"arguments": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Supported arguments for SearchlightPlugin",
+							Ref:         ref("github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginArguments"),
+						},
+					},
+					"states": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Supported Icinga Service State",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"alertKinds", "states"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/appscode/searchlight/apis/monitoring/v1alpha1.PluginArguments", "github.com/appscode/searchlight/apis/monitoring/v1alpha1.WebhookServiceSpec"},
+	}
+}
+
+func schema_searchlight_apis_monitoring_v1alpha1_WebhookServiceSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespace is the namespace of the service",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the service",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_apimachinery_pkg_api_resource_Quantity(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Quantity is a fixed-point representation of a number. It provides convenient marshaling/unmarshaling in JSON and YAML, in addition to String() and Int64() accessors.\n\nThe serialization format is:\n\n<quantity>        ::= <signedNumber><suffix>\n  (Note that <suffix> may be empty, from the \"\" case in <decimalSI>.)\n<digit>           ::= 0 | 1 | ... | 9 <digits>          ::= <digit> | <digit><digits> <number>          ::= <digits> | <digits>.<digits> | <digits>. | .<digits> <sign>            ::= \"+\" | \"-\" <signedNumber>    ::= <number> | <sign><number> <suffix>          ::= <binarySI> | <decimalExponent> | <decimalSI> <binarySI>        ::= Ki | Mi | Gi | Ti | Pi | Ei\n  (International System of units; See: http://physics.nist.gov/cuu/Units/binary.html)\n<decimalSI>       ::= m | \"\" | k | M | G | T | P | E\n  (Note that 1024 = 1Ki but 1000 = 1k; I didn't choose the capitalization.)\n<decimalExponent> ::= \"e\" <signedNumber> | \"E\" <signedNumber>\n\nNo matter which of the three exponent forms is used, no quantity may represent a number greater than 2^63-1 in magnitude, nor may it have more than 3 decimal places. Numbers larger or more precise will be capped or rounded up. (E.g.: 0.1m will rounded up to 1m.) This may be extended in the future if we require larger or smaller quantities.\n\nWhen a Quantity is parsed from a string, it will remember the type of suffix it had, and will use the same type again when it is serialized.\n\nBefore serializing, Quantity will be put in \"canonical form\". This means that Exponent/suffix will be adjusted up or down (with a corresponding increase or decrease in Mantissa) such that:\n  a. No precision is lost\n  b. No fractional digits will be emitted\n  c. The exponent (or suffix) is as large as possible.\nThe sign will be omitted unless the number is negative.\n\nExamples:\n  1.5 will be serialized as \"1500m\"\n  1.5Gi will be serialized as \"1536Mi\"\n\nNOTE: We reserve the right to amend this canonical format, perhaps to\n  allow 1.5 to be canonical.\n  or after March 2015.\n\nNote that the quantity will NEVER be internally represented by a floating point number. That is the whole point of this exercise.\n\nNon-canonical values will still parse as long as they are well formed, but will be re-emitted in their canonical form. (So always use canonical form, or don't diff.)\n\nThis format is intended to make it difficult to use these numbers without writing some sort of special handling code in the hopes that that will cause implementors to also use a fixed point implementation.",
+				Type:        resource.Quantity{}.OpenAPISchemaType(),
+				Format:      resource.Quantity{}.OpenAPISchemaFormat(),
+			},
+		},
+	}
+}
+
+func schema_apimachinery_pkg_api_resource_int64Amount(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "int64Amount represents a fixed precision numerator and arbitrary scale exponent. It is faster than operations on inf.Dec for values that can be represented as int64.",
+				Properties: map[string]spec.Schema{
+					"value": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int64",
+						},
+					},
+					"scale": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+				},
+				Required: []string{"value", "scale"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_APIGroup(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "APIGroup contains the name, the supported versions, and the preferred version of a group.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "name is the name of the group.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"versions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "versions are the versions supported in this group.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersionForDiscovery"),
+									},
+								},
+							},
+						},
+					},
+					"preferredVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "preferredVersion is the version preferred by the API server, which probably is the storage version.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersionForDiscovery"),
+						},
+					},
+					"serverAddressByClientCIDRs": {
+						SchemaProps: spec.SchemaProps{
+							Description: "a map of client CIDR to server address that is serving this group. This is to help clients reach servers in the most network-efficient way possible. Clients can use the appropriate server address as per the CIDR that they match. In case of multiple matches, clients should use the longest matching CIDR. The server returns only those CIDRs that it thinks that the client can match. For example: the master will return an internal IP CIDR only, if the client reaches the server using an internal IP. Server looks at X-Forwarded-For header or X-Real-Ip header or request.RemoteAddr (in that order) to get the client IP.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ServerAddressByClientCIDR"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"name", "versions"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.GroupVersionForDiscovery", "k8s.io/apimachinery/pkg/apis/meta/v1.ServerAddressByClientCIDR"},
+	}
+}
+
+func schema_pkg_apis_meta_v1_APIGroupList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "APIGroupList is a list of APIGroup, to allow clients to discover the API at /apis.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"groups": {
+						SchemaProps: spec.SchemaProps{
+							Description: "groups is a list of APIGroup.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.APIGroup"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"groups"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.APIGroup"},
+	}
+}
+
+func schema_pkg_apis_meta_v1_APIResource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "APIResource specifies the name of a resource and whether it is namespaced.",
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "name is the plural name of the resource.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"singularName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "singularName is the singular name of the resource.  This allows clients to handle plural and singular opaquely. The singularName is more correct for reporting status on a single item and both singular and plural are allowed from the kubectl CLI interface.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"namespaced": {
+						SchemaProps: spec.SchemaProps{
+							Description: "namespaced indicates if a resource is namespaced or not.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "group is the preferred group of the resource.  Empty implies the group of the containing resource list. For subresources, this may have a different value, for example: Scale\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"version": {
+						SchemaProps: spec.SchemaProps{
+							Description: "version is the preferred version of the resource.  Empty implies the version of the containing resource list For subresources, this may have a different value, for example: v1 (while inside a v1beta1 version of the core resource's group)\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "kind is the kind for the resource (e.g. 'Foo' is the kind for a resource 'foo')",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"verbs": {
+						SchemaProps: spec.SchemaProps{
+							Description: "verbs is a list of supported kube verbs (this includes get, list, watch, create, update, patch, delete, deletecollection, and proxy)",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"shortNames": {
+						SchemaProps: spec.SchemaProps{
+							Description: "shortNames is a list of suggested short names of the resource.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"categories": {
+						SchemaProps: spec.SchemaProps{
+							Description: "categories is a list of the grouped resources this resource belongs to (e.g. 'all')",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"name", "singularName", "namespaced", "kind", "verbs"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_APIResourceList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "APIResourceList is a list of APIResource, it is used to expose the name of the resources supported in a specific group and version, and if the resource is namespaced.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"groupVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "groupVersion is the group and version this APIResourceList is for.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"resources": {
+						SchemaProps: spec.SchemaProps{
+							Description: "resources contains the name of the resources and if they are namespaced.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.APIResource"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"groupVersion", "resources"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.APIResource"},
+	}
+}
+
+func schema_pkg_apis_meta_v1_APIVersions(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "APIVersions lists the versions that are available, to allow clients to discover the API at /api, which is the root path of the legacy v1 API.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"versions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "versions are the api versions that are available.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"serverAddressByClientCIDRs": {
+						SchemaProps: spec.SchemaProps{
+							Description: "a map of client CIDR to server address that is serving this group. This is to help clients reach servers in the most network-efficient way possible. Clients can use the appropriate server address as per the CIDR that they match. In case of multiple matches, clients should use the longest matching CIDR. The server returns only those CIDRs that it thinks that the client can match. For example: the master will return an internal IP CIDR only, if the client reaches the server using an internal IP. Server looks at X-Forwarded-For header or X-Real-Ip header or request.RemoteAddr (in that order) to get the client IP.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ServerAddressByClientCIDR"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"versions", "serverAddressByClientCIDRs"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ServerAddressByClientCIDR"},
+	}
+}
+
+func schema_pkg_apis_meta_v1_DeleteOptions(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "DeleteOptions may be provided when deleting an API object.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"gracePeriodSeconds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"preconditions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Must be fulfilled before a deletion is carried out. If not possible, a 409 Conflict status will be returned.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Preconditions"),
+						},
+					},
+					"orphanDependents": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the \"orphan\" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"propagationPolicy": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Whether and how garbage collection will be performed. Either this field or OrphanDependents may be set, but not both. The default policy is decided by the existing finalizer set in the metadata.finalizers and the resource-specific default policy. Acceptable values are: 'Orphan' - orphan the dependents; 'Background' - allow the garbage collector to delete the dependents in the background; 'Foreground' - a cascading policy that deletes all dependents in the foreground.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Preconditions"},
+	}
+}
+
+func schema_pkg_apis_meta_v1_Duration(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Duration is a wrapper around time.Duration which supports correct marshaling to YAML and JSON. In particular, it marshals into strings, which can be used as map keys in json.",
+				Type:        v1.Duration{}.OpenAPISchemaType(),
+				Format:      v1.Duration{}.OpenAPISchemaFormat(),
+			},
+		},
+	}
+}
+
+func schema_pkg_apis_meta_v1_ExportOptions(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ExportOptions is the query options to the standard REST get call.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"export": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Should this value be exported.  Export strips fields that a user can not specify.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"exact": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Should the export be exact.  Exact export maintains cluster-specific fields like 'Namespace'.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"export", "exact"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_GetOptions(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GetOptions is the standard query options to the standard REST get call.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"resourceVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "When specified: - if unset, then the result is returned from remote storage based on quorum-read flag; - if it's 0, then we simply return what we currently have in cache, no guarantee; - if set to non zero, then the result is at least as fresh as given rv.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"includeUninitialized": {
+						SchemaProps: spec.SchemaProps{
+							Description: "If true, partially initialized resources are included in the response.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_GroupKind(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GroupKind specifies a Group and a Kind, but does not force a version.  This is useful for identifying concepts during lookup stages without having partially valid types",
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+				},
+				Required: []string{"group", "kind"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_GroupResource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GroupResource specifies a Group and a Resource, but does not force a version.  This is useful for identifying concepts during lookup stages without having partially valid types",
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"resource": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+				},
+				Required: []string{"group", "resource"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_GroupVersion(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GroupVersion contains the \"group\" and the \"version\", which uniquely identifies the API.",
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"version": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+				},
+				Required: []string{"group", "version"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_GroupVersionForDiscovery(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GroupVersion contains the \"group/version\" and \"version\" string of a version. It is made a struct to keep extensibility.",
+				Properties: map[string]spec.Schema{
+					"groupVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "groupVersion specifies the API group and version in the form \"group/version\"",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"version": {
+						SchemaProps: spec.SchemaProps{
+							Description: "version specifies the version in the form of \"version\". This is to save the clients the trouble of splitting the GroupVersion.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"groupVersion", "version"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_GroupVersionKind(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GroupVersionKind unambiguously identifies a kind.  It doesn't anonymously include GroupVersion to avoid automatic coersion.  It doesn't use a GroupVersion to avoid custom marshalling",
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"version": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+				},
+				Required: []string{"group", "version", "kind"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_GroupVersionResource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GroupVersionResource unambiguously identifies a resource.  It doesn't anonymously include GroupVersion to avoid automatic coersion.  It doesn't use a GroupVersion to avoid custom marshalling",
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"version": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"resource": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+				},
+				Required: []string{"group", "version", "resource"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_Initializer(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Initializer is information about an initializer that has not yet completed.",
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "name of the process that is responsible for initializing this object.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_Initializers(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Initializers tracks the progress of initialization.",
+				Properties: map[string]spec.Schema{
+					"pending": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "name",
+								"x-kubernetes-patch-strategy":  "merge",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Pending is a list of initializers that must execute in order before this object is visible. When the last pending initializer is removed, and no failing result is set, the initializers struct will be set to nil and the object is considered as initialized and visible to all clients.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.Initializer"),
+									},
+								},
+							},
+						},
+					},
+					"result": {
+						SchemaProps: spec.SchemaProps{
+							Description: "If result is set with the Failure field, the object will be persisted to storage and then deleted, ensuring that other clients can observe the deletion.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Status"),
+						},
+					},
+				},
+				Required: []string{"pending"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Initializer", "k8s.io/apimachinery/pkg/apis/meta/v1.Status"},
+	}
+}
+
+func schema_pkg_apis_meta_v1_InternalEvent(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "InternalEvent makes watch.Event versioned",
+				Properties: map[string]spec.Schema{
+					"Type": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"Object": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Object is:\n * If Type is Added or Modified: the new state of the object.\n * If Type is Deleted: the state of the object immediately before deletion.\n * If Type is Error: *api.Status is recommended; other types may make sense\n   depending on context.",
+							Ref:         ref("k8s.io/apimachinery/pkg/runtime.Object"),
+						},
+					},
+				},
+				Required: []string{"Type", "Object"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/runtime.Object"},
+	}
+}
+
+func schema_pkg_apis_meta_v1_LabelSelector(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects.",
+				Properties: map[string]spec.Schema{
+					"matchLabels": {
+						SchemaProps: spec.SchemaProps{
+							Description: "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"matchExpressions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelectorRequirement"),
+									},
+								},
 							},
 						},
 					},
 				},
 			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/apis/meta/v1.StatusCause"},
 		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.Time": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Type:   v1.Time{}.OpenAPISchemaType(),
-					Format: v1.Time{}.OpenAPISchemaFormat(),
-				},
-			},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.Timestamp": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "Timestamp is a struct that is equivalent to Time, but intended for protobuf marshalling/unmarshalling. It is generated into a serialization that matches Time. Do not use in Go structs.",
-					Properties: map[string]spec.Schema{
-						"seconds": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Represents seconds of UTC time since Unix epoch 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z inclusive.",
-								Type:        []string{"integer"},
-								Format:      "int64",
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelectorRequirement"},
+	}
+}
+
+func schema_pkg_apis_meta_v1_LabelSelectorRequirement(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+				Properties: map[string]spec.Schema{
+					"key": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "key",
+								"x-kubernetes-patch-strategy":  "merge",
 							},
 						},
-						"nanos": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Non-negative fractions of a second at nanosecond resolution. Negative second values with fractions must still have non-negative nanos values that count forward in time. Must be from 0 to 999,999,999 inclusive. This field may be limited in precision depending on context.",
-								Type:        []string{"integer"},
-								Format:      "int32",
-							},
+						SchemaProps: spec.SchemaProps{
+							Description: "key is the label key that the selector applies to.",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
-					Required: []string{"seconds", "nanos"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.TypeMeta": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "TypeMeta describes an individual object in an API response or request with strings representing the type of the object and its API schema version. Structures that are versioned or persisted should inline TypeMeta.",
-					Properties: map[string]spec.Schema{
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					"operator": {
+						SchemaProps: spec.SchemaProps{
+							Description: "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-								Type:        []string{"string"},
-								Format:      "",
+					},
+					"values": {
+						SchemaProps: spec.SchemaProps{
+							Description: "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
 							},
 						},
 					},
 				},
+				Required: []string{"key", "operator"},
 			},
-			Dependencies: []string{},
 		},
-		"k8s.io/apimachinery/pkg/apis/meta/v1.WatchEvent": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "Event represents a single event to a watched resource.",
-					Properties: map[string]spec.Schema{
-						"type": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"object": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Object is:\n * If Type is Added or Modified: the new state of the object.\n * If Type is Deleted: the state of the object immediately before deletion.\n * If Type is Error: *Status is recommended; other types may make sense\n   depending on context.",
-								Ref:         ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
-							},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_List(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "List holds a list of objects, which may not be known by the server.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
-					Required: []string{"type", "object"},
-				},
-			},
-			Dependencies: []string{
-				"k8s.io/apimachinery/pkg/runtime.RawExtension"},
-		},
-		"k8s.io/apimachinery/pkg/runtime.RawExtension": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "RawExtension is used to hold extensions in external versions.\n\nTo use this, make a field which has RawExtension as its type in your external, versioned struct, and Object in your internal struct. You also need to register your various plugin types.\n\n// Internal package: type MyAPIObject struct {\n\truntime.TypeMeta `json:\",inline\"`\n\tMyPlugin runtime.Object `json:\"myPlugin\"`\n} type PluginA struct {\n\tAOption string `json:\"aOption\"`\n}\n\n// External package: type MyAPIObject struct {\n\truntime.TypeMeta `json:\",inline\"`\n\tMyPlugin runtime.RawExtension `json:\"myPlugin\"`\n} type PluginA struct {\n\tAOption string `json:\"aOption\"`\n}\n\n// On the wire, the JSON will look something like this: {\n\t\"kind\":\"MyAPIObject\",\n\t\"apiVersion\":\"v1\",\n\t\"myPlugin\": {\n\t\t\"kind\":\"PluginA\",\n\t\t\"aOption\":\"foo\",\n\t},\n}\n\nSo what happens? Decode first uses json or yaml to unmarshal the serialized data into your external MyAPIObject. That causes the raw JSON to be stored, but not unpacked. The next step is to copy (using pkg/conversion) into the internal struct. The runtime package's DefaultScheme has conversion functions installed which will unpack the JSON stored in RawExtension, turning it into the correct object type, and storing it in the Object. (TODO: In the case where the object is of an unknown type, a runtime.Unknown object will be created and stored.)",
-					Properties: map[string]spec.Schema{
-						"Raw": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Raw is the underlying serialization of this object.",
-								Type:        []string{"string"},
-								Format:      "byte",
-							},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
-					Required: []string{"Raw"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/runtime.TypeMeta": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "TypeMeta is shared by all top level objects. The proper way to use it is to inline it in your type, like this: type MyAwesomeAPIObject struct {\n     runtime.TypeMeta    `json:\",inline\"`\n     ... // other fields\n} func (obj *MyAwesomeAPIObject) SetGroupVersionKind(gvk *metav1.GroupVersionKind) { metav1.UpdateTypeMeta(obj,gvk) }; GroupVersionKind() *GroupVersionKind\n\nTypeMeta is provided here for convenience. You may use it directly from this package or define your own with the same fields.",
-					Properties: map[string]spec.Schema{
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
 						},
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "List of objects",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
+									},
+								},
 							},
 						},
 					},
 				},
+				Required: []string{"items"},
 			},
-			Dependencies: []string{},
 		},
-		"k8s.io/apimachinery/pkg/runtime.Unknown": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "Unknown allows api objects with unknown types to be passed-through. This can be used to deal with the API objects from a plug-in. Unknown objects still have functioning TypeMeta features-- kind, version, etc. metadata and field mutatation.",
-					Properties: map[string]spec.Schema{
-						"apiVersion": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/apimachinery/pkg/runtime.RawExtension"},
+	}
+}
+
+func schema_pkg_apis_meta_v1_ListMeta(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ListMeta describes metadata that synthetic resources must have, including lists and various status objects. A resource may have only one of {ObjectMeta, ListMeta}.",
+				Properties: map[string]spec.Schema{
+					"selfLink": {
+						SchemaProps: spec.SchemaProps{
+							Description: "selfLink is a URL representing this object. Populated by the system. Read-only.",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"kind": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
+					},
+					"resourceVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "String that identifies the server's internal version of this object that can be used by clients to determine when objects have changed. Value must be treated as opaque by clients and passed unmodified back to the server. Populated by the system. Read-only. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#concurrency-control-and-consistency",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"Raw": {
-							SchemaProps: spec.SchemaProps{
-								Description: "Raw will hold the complete serialized object which couldn't be matched with a registered type. Most likely, nothing should be done with this except for passing it through the system.",
-								Type:        []string{"string"},
-								Format:      "byte",
-							},
+					},
+					"continue": {
+						SchemaProps: spec.SchemaProps{
+							Description: "continue may be set if the user set a limit on the number of items returned, and indicates that the server has more data available. The value is opaque and may be used to issue another request to the endpoint that served this list to retrieve the next set of available objects. Continuing a list may not be possible if the server configuration has changed or more than a few minutes have passed. The resourceVersion field returned when using this continue value will be identical to the value in the first response.",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"ContentEncoding": {
-							SchemaProps: spec.SchemaProps{
-								Description: "ContentEncoding is encoding used to encode 'Raw' data. Unspecified means no encoding.",
-								Type:        []string{"string"},
-								Format:      "",
-							},
+					},
+				},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_ListOptions(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ListOptions is the query options to a standard REST list call.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
 						},
-						"ContentType": {
-							SchemaProps: spec.SchemaProps{
-								Description: "ContentType  is serialization method used to serialize 'Raw'. Unspecified means ContentTypeJSON.",
-								Type:        []string{"string"},
-								Format:      "",
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"labelSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"fieldSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"includeUninitialized": {
+						SchemaProps: spec.SchemaProps{
+							Description: "If true, partially initialized resources are included in the response.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"watch": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"resourceVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history. When specified for list: - if unset, then the result is returned from remote storage based on quorum-read flag; - if it's 0, then we simply return what we currently have in cache, no guarantee; - if set to non zero, then the result is at least as fresh as given rv.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"timeoutSeconds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"limit": {
+						SchemaProps: spec.SchemaProps{
+							Description: "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"continue": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server the server will respond with a 410 ResourceExpired error indicating the client must restart their list without the continue field. This field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_MicroTime(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MicroTime is version of Time with microsecond level precision.",
+				Type:        v1.MicroTime{}.OpenAPISchemaType(),
+				Format:      v1.MicroTime{}.OpenAPISchemaFormat(),
+			},
+		},
+	}
+}
+
+func schema_pkg_apis_meta_v1_ObjectMeta(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.",
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: http://kubernetes.io/docs/user-guide/identifiers#names",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"generateName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.\n\nIf this field is specified and the generated name exists, the server will NOT return a 409 - instead, it will either return 201 Created or 500 with Reason ServerTimeout indicating a unique name could not be found in the time allotted, and the client should retry (optionally after the time indicated in the Retry-After header).\n\nApplied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#idempotency",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespace defines the space within each name must be unique. An empty namespace is equivalent to the \"default\" namespace, but \"default\" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.\n\nMust be a DNS_LABEL. Cannot be updated. More info: http://kubernetes.io/docs/user-guide/namespaces",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"selfLink": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SelfLink is a URL representing this object. Populated by the system. Read-only.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"uid": {
+						SchemaProps: spec.SchemaProps{
+							Description: "UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.\n\nPopulated by the system. Read-only. More info: http://kubernetes.io/docs/user-guide/identifiers#uids",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"resourceVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.\n\nPopulated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#concurrency-control-and-consistency",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"generation": {
+						SchemaProps: spec.SchemaProps{
+							Description: "A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"creationTimestamp": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.\n\nPopulated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+					"deletionTimestamp": {
+						SchemaProps: spec.SchemaProps{
+							Description: "DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource is expected to be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field, once the finalizers list is empty. As long as the finalizers list contains items, deletion is blocked. Once the deletionTimestamp is set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time. For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react by sending a graceful termination signal to the containers in the pod. After that 30 seconds, the Kubelet will send a hard termination signal (SIGKILL) to the container and after cleanup, remove the pod from the API. In the presence of network partitions, this object may still exist after this timestamp, until an administrator or automated process can determine the resource is fully terminated. If not set, graceful deletion of the object has not been requested.\n\nPopulated by the system when a graceful deletion is requested. Read-only. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+					"deletionGracePeriodSeconds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"labels": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: http://kubernetes.io/docs/user-guide/labels",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
 							},
 						},
 					},
-					Required: []string{"Raw", "ContentEncoding", "ContentType"},
-				},
-			},
-			Dependencies: []string{},
-		},
-		"k8s.io/apimachinery/pkg/version.Info": {
-			Schema: spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Description: "Info contains versioning information. how we'll want to distribute that information.",
-					Properties: map[string]spec.Schema{
-						"major": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"minor": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"gitVersion": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"gitCommit": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"gitTreeState": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"buildDate": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"goVersion": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"compiler": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
-							},
-						},
-						"platform": {
-							SchemaProps: spec.SchemaProps{
-								Type:   []string{"string"},
-								Format: "",
+					"annotations": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: http://kubernetes.io/docs/user-guide/annotations",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
 							},
 						},
 					},
-					Required: []string{"major", "minor", "gitVersion", "gitCommit", "gitTreeState", "buildDate", "goVersion", "compiler", "platform"},
+					"ownerReferences": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "uid",
+								"x-kubernetes-patch-strategy":  "merge",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.OwnerReference"),
+									},
+								},
+							},
+						},
+					},
+					"initializers": {
+						SchemaProps: spec.SchemaProps{
+							Description: "An initializer is a controller which enforces some system invariant at object creation time. This field is a list of initializers that have not yet acted on this object. If nil or empty, this object has been completely initialized. Otherwise, the object is considered uninitialized and is hidden (in list/watch and get calls) from clients that haven't explicitly asked to observe uninitialized objects.\n\nWhen an object is created, the system will populate this list with the current set of initializers. Only privileged users may set or modify this list. Once it is empty, it may not be modified further by any user.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Initializers"),
+						},
+					},
+					"finalizers": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-strategy": "merge",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"clusterName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The name of the cluster which the object belongs to. This is used to distinguish resources with same name and namespace in different clusters. This field is not set anywhere right now and apiserver is going to ignore it if set in create or update request.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 				},
 			},
-			Dependencies: []string{},
 		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Initializers", "k8s.io/apimachinery/pkg/apis/meta/v1.OwnerReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_pkg_apis_meta_v1_OwnerReference(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "OwnerReference contains enough information to let you identify an owning object. Currently, an owning object must be in the same namespace, so there is no namespace field.",
+				Properties: map[string]spec.Schema{
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "API version of the referent.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name of the referent. More info: http://kubernetes.io/docs/user-guide/identifiers#names",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"uid": {
+						SchemaProps: spec.SchemaProps{
+							Description: "UID of the referent. More info: http://kubernetes.io/docs/user-guide/identifiers#uids",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"controller": {
+						SchemaProps: spec.SchemaProps{
+							Description: "If true, this reference points to the managing controller.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"blockOwnerDeletion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "If true, AND if the owner has the \"foregroundDeletion\" finalizer, then the owner cannot be deleted from the key-value store until this reference is removed. Defaults to false. To set this field, a user needs \"delete\" permission of the owner, otherwise 422 (Unprocessable Entity) will be returned.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"apiVersion", "kind", "name", "uid"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_Patch(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Patch is provided to give a concrete name and type to the Kubernetes PATCH request body.",
+				Properties:  map[string]spec.Schema{},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_Preconditions(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Preconditions must be fulfilled before an operation (update, delete, etc.) is carried out.",
+				Properties: map[string]spec.Schema{
+					"uid": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Specifies the target UID.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_RootPaths(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "RootPaths lists the paths available at root. For example: \"/healthz\", \"/apis\".",
+				Properties: map[string]spec.Schema{
+					"paths": {
+						SchemaProps: spec.SchemaProps{
+							Description: "paths are the paths available at root.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"paths"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_ServerAddressByClientCIDR(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ServerAddressByClientCIDR helps the client to determine the server address that they should use, depending on the clientCIDR that they match.",
+				Properties: map[string]spec.Schema{
+					"clientCIDR": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The CIDR with which clients can match their IP to figure out the server address that they should use.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"serverAddress": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Address of this server, suitable for a client that matches the above CIDR. This can be a hostname, hostname:port, IP or IP:port.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"clientCIDR", "serverAddress"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_Status(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Status is a return value for calls that don't return other objects.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status of the operation. One of: \"Success\" or \"Failure\". More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "A human-readable description of the status of this operation.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "A machine-readable description of why this operation is in the \"Failure\" status. If this value is empty there is no information available. A Reason clarifies an HTTP status code but does not override it.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"details": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Extended data associated with the reason.  Each reason may define its own extended details. This field is optional and the data returned is not guaranteed to conform to any schema except that defined by the reason type.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.StatusDetails"),
+						},
+					},
+					"code": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Suggested HTTP return code for this status, 0 if not set.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "k8s.io/apimachinery/pkg/apis/meta/v1.StatusDetails"},
+	}
+}
+
+func schema_pkg_apis_meta_v1_StatusCause(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "StatusCause provides more information about an api.Status failure, including cases when multiple errors are encountered.",
+				Properties: map[string]spec.Schema{
+					"reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "A machine-readable description of the cause of the error. If this value is empty there is no information available.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "A human-readable description of the cause of the error.  This field may be presented as-is to a reader.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"field": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The field of the resource that has caused this error, as named by its JSON serialization. May include dot and postfix notation for nested attributes. Arrays are zero-indexed.  Fields may appear more than once in an array of causes due to fields having multiple errors. Optional.\n\nExamples:\n  \"name\" - the field \"name\" on the current resource\n  \"items[0].name\" - the field \"name\" on the first array entry in \"items\"",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_StatusDetails(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "StatusDetails is a set of additional properties that MAY be set by the server to provide additional information about a response. The Reason field of a Status object defines what attributes will be set. Clients must ignore fields that do not match the defined type of each attribute, and should assume that any attribute may be empty, invalid, or under defined.",
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The name attribute of the resource associated with the status StatusReason (when there is a single name which can be described).",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The group attribute of the resource associated with the status StatusReason.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The kind attribute of the resource associated with the status StatusReason. On some operations may differ from the requested resource Kind. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"uid": {
+						SchemaProps: spec.SchemaProps{
+							Description: "UID of the resource. (when there is a single resource which can be described). More info: http://kubernetes.io/docs/user-guide/identifiers#uids",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"causes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The Causes array includes more details associated with the StatusReason failure. Not all StatusReasons may provide detailed causes.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.StatusCause"),
+									},
+								},
+							},
+						},
+					},
+					"retryAfterSeconds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "If specified, the time in seconds before the operation should be retried. Some errors may indicate the client must take an alternate action - for those errors this field may indicate how long to wait before taking the alternate action.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.StatusCause"},
+	}
+}
+
+func schema_pkg_apis_meta_v1_Time(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.",
+				Type:        v1.Time{}.OpenAPISchemaType(),
+				Format:      v1.Time{}.OpenAPISchemaFormat(),
+			},
+		},
+	}
+}
+
+func schema_pkg_apis_meta_v1_Timestamp(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Timestamp is a struct that is equivalent to Time, but intended for protobuf marshalling/unmarshalling. It is generated into a serialization that matches Time. Do not use in Go structs.",
+				Properties: map[string]spec.Schema{
+					"seconds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Represents seconds of UTC time since Unix epoch 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z inclusive.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"nanos": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Non-negative fractions of a second at nanosecond resolution. Negative second values with fractions must still have non-negative nanos values that count forward in time. Must be from 0 to 999,999,999 inclusive. This field may be limited in precision depending on context.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+				Required: []string{"seconds", "nanos"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_TypeMeta(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TypeMeta describes an individual object in an API response or request with strings representing the type of the object and its API schema version. Structures that are versioned or persisted should inline TypeMeta.",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_meta_v1_WatchEvent(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Event represents a single event to a watched resource.",
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"object": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Object is:\n * If Type is Added or Modified: the new state of the object.\n * If Type is Deleted: the state of the object immediately before deletion.\n * If Type is Error: *Status is recommended; other types may make sense\n   depending on context.",
+							Ref:         ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
+						},
+					},
+				},
+				Required: []string{"type", "object"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/runtime.RawExtension"},
+	}
+}
+
+func schema_k8sio_apimachinery_pkg_runtime_RawExtension(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "RawExtension is used to hold extensions in external versions.\n\nTo use this, make a field which has RawExtension as its type in your external, versioned struct, and Object in your internal struct. You also need to register your various plugin types.\n\n// Internal package: type MyAPIObject struct {\n\truntime.TypeMeta `json:\",inline\"`\n\tMyPlugin runtime.Object `json:\"myPlugin\"`\n} type PluginA struct {\n\tAOption string `json:\"aOption\"`\n}\n\n// External package: type MyAPIObject struct {\n\truntime.TypeMeta `json:\",inline\"`\n\tMyPlugin runtime.RawExtension `json:\"myPlugin\"`\n} type PluginA struct {\n\tAOption string `json:\"aOption\"`\n}\n\n// On the wire, the JSON will look something like this: {\n\t\"kind\":\"MyAPIObject\",\n\t\"apiVersion\":\"v1\",\n\t\"myPlugin\": {\n\t\t\"kind\":\"PluginA\",\n\t\t\"aOption\":\"foo\",\n\t},\n}\n\nSo what happens? Decode first uses json or yaml to unmarshal the serialized data into your external MyAPIObject. That causes the raw JSON to be stored, but not unpacked. The next step is to copy (using pkg/conversion) into the internal struct. The runtime package's DefaultScheme has conversion functions installed which will unpack the JSON stored in RawExtension, turning it into the correct object type, and storing it in the Object. (TODO: In the case where the object is of an unknown type, a runtime.Unknown object will be created and stored.)",
+				Properties: map[string]spec.Schema{
+					"Raw": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Raw is the underlying serialization of this object.",
+							Type:        []string{"string"},
+							Format:      "byte",
+						},
+					},
+				},
+				Required: []string{"Raw"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_k8sio_apimachinery_pkg_runtime_TypeMeta(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TypeMeta is shared by all top level objects. The proper way to use it is to inline it in your type, like this: type MyAwesomeAPIObject struct {\n     runtime.TypeMeta    `json:\",inline\"`\n     ... // other fields\n} func (obj *MyAwesomeAPIObject) SetGroupVersionKind(gvk *metav1.GroupVersionKind) { metav1.UpdateTypeMeta(obj,gvk) }; GroupVersionKind() *GroupVersionKind\n\nTypeMeta is provided here for convenience. You may use it directly from this package or define your own with the same fields.",
+				Properties: map[string]spec.Schema{
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_k8sio_apimachinery_pkg_runtime_Unknown(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Unknown allows api objects with unknown types to be passed-through. This can be used to deal with the API objects from a plug-in. Unknown objects still have functioning TypeMeta features-- kind, version, etc. metadata and field mutatation.",
+				Properties: map[string]spec.Schema{
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"Raw": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Raw will hold the complete serialized object which couldn't be matched with a registered type. Most likely, nothing should be done with this except for passing it through the system.",
+							Type:        []string{"string"},
+							Format:      "byte",
+						},
+					},
+					"ContentEncoding": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ContentEncoding is encoding used to encode 'Raw' data. Unspecified means no encoding.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"ContentType": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ContentType  is serialization method used to serialize 'Raw'. Unspecified means ContentTypeJSON.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"Raw", "ContentEncoding", "ContentType"},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_k8sio_apimachinery_pkg_version_Info(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Info contains versioning information. how we'll want to distribute that information.",
+				Properties: map[string]spec.Schema{
+					"major": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"minor": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"gitVersion": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"gitCommit": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"gitTreeState": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"buildDate": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"goVersion": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"compiler": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"platform": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+				},
+				Required: []string{"major", "minor", "gitVersion", "gitCommit", "gitTreeState", "buildDate", "goVersion", "compiler", "platform"},
+			},
+		},
+		Dependencies: []string{},
 	}
 }
