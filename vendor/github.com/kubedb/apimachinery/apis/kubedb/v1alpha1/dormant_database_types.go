@@ -76,11 +76,14 @@ const (
 )
 
 type DormantDatabaseStatus struct {
-	CreationTime *metav1.Time         `json:"creationTime,omitempty"`
-	PausingTime  *metav1.Time         `json:"pausingTime,omitempty"`
-	WipeOutTime  *metav1.Time         `json:"wipeOutTime,omitempty"`
-	Phase        DormantDatabasePhase `json:"phase,omitempty"`
-	Reason       string               `json:"reason,omitempty"`
+	PausingTime *metav1.Time         `json:"pausingTime,omitempty"`
+	WipeOutTime *metav1.Time         `json:"wipeOutTime,omitempty"`
+	Phase       DormantDatabasePhase `json:"phase,omitempty"`
+	Reason      string               `json:"reason,omitempty"`
+	// observedGeneration is the most recent generation observed for this resource. It corresponds to the
+	// resource's generation, which is updated on mutation by the API Server.
+	// +optional
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

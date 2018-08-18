@@ -2,6 +2,8 @@ package v1alpha1
 
 import (
 	core "k8s.io/api/core/v1"
+	store "kmodules.xyz/objectstore-api/api/v1"
+	ofst "kmodules.xyz/offshoot-api/api/v1"
 )
 
 type InitSpec struct {
@@ -21,10 +23,18 @@ type SnapshotSourceSpec struct {
 }
 
 type BackupScheduleSpec struct {
-	CronExpression      string `json:"cronExpression,omitempty"`
-	SnapshotStorageSpec `json:",inline,omitempty"`
-	// Compute Resources required by the sidecar container.
-	Resources core.ResourceRequirements `json:"resources,omitempty"`
+	CronExpression string `json:"cronExpression,omitempty"`
+
+	store.Backend `json:",inline,omitempty"`
+
+	// PodTemplate is an optional configuration for pods used for backup and recovery
+	// +optional
+	PodTemplate ofst.PodTemplateSpec `json:"podTemplate,omitempty"`
+
+	// -------------------------------------------------------------------------
+
+	// Deprecated: Use podTemplate.spec.resources
+	Resources *core.ResourceRequirements `json:"resources,omitempty"`
 }
 
 const (
@@ -63,43 +73,6 @@ const (
 	OS_AUTH_TOKEN  = "OS_AUTH_TOKEN"
 )
 
-type SnapshotStorageSpec struct {
-	StorageSecretName string `json:"storageSecretName,omitempty"`
-
-	Local *LocalSpec `json:"local,omitempty"`
-	S3    *S3Spec    `json:"s3,omitempty"`
-	GCS   *GCSSpec   `json:"gcs,omitempty"`
-	Azure *AzureSpec `json:"azure,omitempty"`
-	Swift *SwiftSpec `json:"swift,omitempty"`
-}
-
-type LocalSpec struct {
-	core.VolumeSource `json:",inline"`
-	MountPath         string `json:"mountPath,omitempty"`
-	SubPath           string `json:"subPath,omitempty"`
-}
-
-type S3Spec struct {
-	Endpoint string `json:"endpoint,omitempty"`
-	Bucket   string `json:"bucket,omiempty"`
-	Prefix   string `json:"prefix,omitempty"`
-}
-
-type GCSSpec struct {
-	Bucket string `json:"bucket,omiempty"`
-	Prefix string `json:"prefix,omitempty"`
-}
-
-type AzureSpec struct {
-	Container string `json:"container,omitempty"`
-	Prefix    string `json:"prefix,omitempty"`
-}
-
-type SwiftSpec struct {
-	Container string `json:"container,omitempty"`
-	Prefix    string `json:"prefix,omitempty"`
-}
-
 type DatabasePhase string
 
 const (
@@ -111,4 +84,13 @@ const (
 	DatabasePhaseInitializing DatabasePhase = "Initializing"
 	// used for Databases that are Failed
 	DatabasePhaseFailed DatabasePhase = "Failed"
+)
+
+type StorageType string
+
+const (
+	// default storage type and requires spec.storage to be configured
+	StorageTypeDurable StorageType = "Durable"
+	// Uses emptyDir as storage
+	StorageTypeEphemeral StorageType = "Ephemeral"
 )

@@ -28,7 +28,7 @@ func deleteInForeground() *metav1.DeleteOptions {
 
 func (fi *Invocation) WaitUntilDeploymentReady(meta metav1.ObjectMeta) error {
 	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
-		if obj, err := fi.KubeClient.AppsV1beta1().Deployments(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err == nil {
+		if obj, err := fi.KubeClient.AppsV1().Deployments(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err == nil {
 			return types.Int32(obj.Spec.Replicas) == obj.Status.ReadyReplicas, nil
 		}
 		return false, nil

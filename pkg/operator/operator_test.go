@@ -117,7 +117,7 @@ func TestRestMapper(t *testing.T) {
 		{&core.Secret{}, core.SchemeGroupVersion.WithResource("secrets")},
 		{&core.ServiceAccount{}, core.SchemeGroupVersion.WithResource("serviceaccounts")},
 		{&core.Service{}, core.SchemeGroupVersion.WithResource("services")},
-		{&extensions.DaemonSet{}, extensions.SchemeGroupVersion.WithResource("daemonsets")},
+		{&apps.DaemonSet{}, apps.SchemeGroupVersion.WithResource("daemonsets")},
 		{&extensions.Ingress{}, extensions.SchemeGroupVersion.WithResource("ingresses")},
 		{&networking.NetworkPolicy{}, networking.SchemeGroupVersion.WithResource("networkpolicies")},
 		{&policy.PodDisruptionBudget{}, policy.SchemeGroupVersion.WithResource("poddisruptionbudgets")},
