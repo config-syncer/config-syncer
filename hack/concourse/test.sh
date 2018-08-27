@@ -18,9 +18,6 @@ popd
 
 source $REPO_NAME/hack/libbuild/concourse/init.sh
 
-cp creds/gcs.json /gcs.json
-cp creds/stash/.env $GOPATH/src/github.com/$ORG_NAME/$REPO_NAME/hack/config/.env
-
 pushd $GOPATH/src/github.com/$ORG_NAME/$REPO_NAME
 
 # install dependencies
@@ -28,6 +25,6 @@ pushd $GOPATH/src/github.com/$ORG_NAME/$REPO_NAME
 ./hack/docker/setup.sh build
 ./hack/docker/setup.sh push
 
-source ./hack/deploy/kubed.sh --docker-registry=$DOCKER_REGISTRY
+./hack/deploy/kubed.sh --docker-registry=$DOCKER_REGISTRY
 ./hack/make.py test e2e --v=3 --kubeconfig=/root/.kube/config --selfhosted-operator=true
 popd
