@@ -16,9 +16,7 @@ function cleanup() {
 }
 
 export APPSCODE_ENV=${APPSCODE_ENV:-prod}
-if [ "$APPSCODE_ENV" != "test-concourse" ]; then
-  trap cleanup EXIT
-fi
+trap cleanup EXIT
 
 # ref: https://github.com/appscodelabs/libbuild/blob/master/common/lib.sh#L55
 inside_git_repo() {
@@ -108,7 +106,7 @@ export KUBED_CONFIG_CLUSTER_NAME=unicorn
 export KUBED_CONFIG_ENABLE_APISERVER=false
 
 export SCRIPT_LOCATION="curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.8.0/"
-if [[ "$APPSCODE_ENV" == "dev" || "$APPSCODE_ENV" == "test-concourse" ]]; then
+if [[ "$APPSCODE_ENV" == "dev" ]]; then
   detect_tag
   export SCRIPT_LOCATION="cat "
   export KUBED_IMAGE_TAG=$TAG
