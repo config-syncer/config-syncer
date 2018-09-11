@@ -2,12 +2,10 @@ package v1alpha1
 
 import (
 	"fmt"
-	"reflect"
 
-	"github.com/appscode/go/log"
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	meta_util "github.com/appscode/kutil/meta"
-	"github.com/golang/glog"
+	apps "k8s.io/api/apps/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
 )
@@ -131,18 +129,20 @@ func (p Postgres) CustomResourceDefinition() *apiextensions.CustomResourceDefini
 	}, setNameSchema)
 }
 
-func (p *Postgres) Migrate() {
+func (p *Postgres) SetDefaults() {
 	if p == nil {
 		return
 	}
-	p.Spec.Migrate()
+	p.Spec.SetDefaults()
 }
 
-func (p *PostgresSpec) Migrate() {
+func (p *PostgresSpec) SetDefaults() {
 	if p == nil {
 		return
 	}
-	p.BackupSchedule.Migrate()
+
+	// migrate first to avoid incorrect defaulting
+	p.BackupSchedule.SetDefaults()
 	if len(p.NodeSelector) > 0 {
 		p.PodTemplate.Spec.NodeSelector = p.NodeSelector
 		p.NodeSelector = nil
@@ -167,36 +167,27 @@ func (p *PostgresSpec) Migrate() {
 		p.PodTemplate.Spec.ImagePullSecrets = p.ImagePullSecrets
 		p.ImagePullSecrets = nil
 	}
+
+	// perform defaulting
+	if p.StorageType == "" {
+		p.StorageType = StorageTypeDurable
+	}
+	if p.UpdateStrategy.Type == "" {
+		p.UpdateStrategy.Type = apps.RollingUpdateStatefulSetStrategyType
+	}
+	if p.TerminationPolicy == "" {
+		p.TerminationPolicy = TerminationPolicyPause
+	}
 }
 
-func (p *Postgres) AlreadyObserved(other *Postgres) bool {
-	if p == nil {
-		return other == nil
-	}
-	if other == nil { // && d != nil
-		return false
-	}
-	if p == other {
-		return true
+func (e *PostgresSpec) GetSecrets() []string {
+	if e == nil {
+		return nil
 	}
 
-	var match bool
-
-	if EnableStatusSubresource {
-		match = p.Status.ObservedGeneration >= p.Generation
-	} else {
-		match = meta_util.Equal(p.Spec, other.Spec)
+	var secrets []string
+	if e.DatabaseSecret != nil {
+		secrets = append(secrets, e.DatabaseSecret.SecretName)
 	}
-	if match {
-		match = reflect.DeepEqual(p.Labels, other.Labels)
-	}
-	if match {
-		match = meta_util.EqualAnnotation(p.Annotations, other.Annotations)
-	}
-
-	if !match && bool(glog.V(log.LevelDebug)) {
-		diff := meta_util.Diff(other, p)
-		glog.V(log.LevelDebug).Infof("%s %s/%s has changed. Diff: %s", meta_util.GetKind(p), p.Namespace, p.Name, diff)
-	}
-	return match
+	return secrets
 }

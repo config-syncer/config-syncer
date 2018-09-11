@@ -7,112 +7,39 @@ import (
 	"github.com/pkg/errors"
 )
 
-type eventResponse struct {
-	Events []Event `json:"items"`
-	Paging Paging  `json:"paging"`
-}
+// Events are open-ended, loosely-defined JSON documents.
+// They will always have an event and a timestamp field, however.
+type Event map[string]interface{}
 
-type Event struct {
-	// Mandatory fields present in each event
-	ID        string        `json:"id"`
-	Timestamp TimestampNano `json:"timestamp"`
-	Event     EventType     `json:"event"`
-
-	// Delivery related values
-	DeliveryStatus *DeliveryStatus `json:"delivery-status,omitempty"`
-	Reason         *EventReason    `json:"reason,omitempty"`
-	Severity       *EventSeverity  `json:"severity,omitempty"`
-
-	// Message classification / grouping
-	Tags      []string   `json:"tags,omitempty"`
-	Campaigns []Campaign `json:"campaigns,omitempty"`
-
-	// Recipient information (for recipient-initiated events: opens, clicks etc)
-	ClientInfo  *ClientInfo  `json:"client-info,omitempty"`
-	Geolocation *Geolocation `json:"geolocation,omitempty"`
-	IP          *IP          `json:"ip,omitempty"`
-	Envelope    *Envelope    `json:"envelope,omitempty"`
-
-	// Clicked
-	URL *string `json:"url,omitempty"`
-
-	// Message
-	// TODO: unify message types
-	Message       *EventMessage     `json:"message,omitempty"`
-	Batch         *Batch            `json:"batch,omitempty"`
-	Recipient     *Recipient        `json:"recipient,omitempty"`
-	Routes        []Route           `json:"routes,omitempty"`
-	Storage       *Storage          `json:"storage,omitempty"`
-	UserVariables map[string]string `json:"user-variables"`
-
-	// API
-	Method *Method     `json:"method,omitempty"`
-	Flags  *EventFlags `json:"flags,omitempty"`
-}
-
-type DeliveryStatus struct {
-	Message     *string     `json:"message,omitempty"`
-	Code        interface{} `json:"code,omitempty"`
-	Description *string     `json:"description,omitempty"`
-	Retry       *int        `json:"retry-seconds,omitempty"`
-}
-
-type EventFlags struct {
-	Authenticated bool `json:"is-authenticated"`
-	Batch         bool `json:"is-batch"`
-	Big           bool `json:"is-big"`
-	Callback      bool `json:"is-callback"`
-	DelayedBounce bool `json:"is-delayed-bounce"`
-	SystemTest    bool `json:"is-system-test"`
-	TestMode      bool `json:"is-test-mode"`
-}
-
-type ClientInfo struct {
-	ClientType *ClientType `json:"client-type,omitempty"`
-	ClientOS   *string     `json:"client-os,omitempty"`
-	ClientName *string     `json:"client-name,omitempty"`
-	DeviceType *DeviceType `json:"device-type,omitempty"`
-	UserAgent  *string     `json:"user-agent,omitempty"`
-}
-
-type Geolocation struct {
-	Country *string `json:"country,omitempty"`
-	Region  *string `json:"region,omitempty"`
-	City    *string `json:"city,omitempty"`
-}
-
-type Storage struct {
-	URL string `json:"url"`
-	Key string `json:"key"`
-}
-
-type Batch struct {
-	ID string `json:"id"`
-}
-
-type Envelope struct {
-	Sender      *string          `json:"sender,omitempty"`
-	SendingHost *string          `json:"sending-host,omitempty"`
-	SendingIP   *IP              `json:"sending-ip,omitempty"`
-	Targets     *string          `json:"targets,omitempty"`
-	Transport   *TransportMethod `json:"transport,omitempty"`
-}
-
-type EventMessage struct {
-	Headers     map[string]string  `json:"headers,omitempty"`
-	Recipients  []string           `json:"recipients,omitempty"`
-	Attachments []StoredAttachment `json:"attachments,omitempty"`
-	Size        *int               `json:"size,omitempty"`
-}
-
-func (em *EventMessage) ID() (string, error) {
-	if em != nil && em.Headers != nil {
-		if id, ok := em.Headers["message-id"]; ok {
-			return id, nil
-		}
+// Parse the timestamp field for this event into a Time object
+func (e Event) ParseTimeStamp() (time.Time, error) {
+	obj, ok := e["timestamp"]
+	if !ok {
+		return time.Time{}, errors.New("'timestamp' field not found in event")
 	}
-	return "", errors.New("message id not set")
+	timestamp, ok := obj.(float64)
+	if !ok {
+		return time.Time{}, errors.New("'timestamp' field not a float64")
+	}
+	microseconds := int64(timestamp * 1000000)
+	return time.Unix(0, microseconds*int64(time.Microsecond/time.Nanosecond)).UTC(), nil
 }
+
+func (e Event) ParseMessageId() (string, error) {
+	message, err := toMapInterface("message", e)
+	if err != nil {
+		return "", err
+	}
+	headers, err := toMapInterface("headers", message)
+	if err != nil {
+		return "", err
+	}
+	return headers["message-id"].(string), nil
+}
+
+// noTime always equals an uninitialized Time structure.
+// It's used to detect when a time parameter is provided.
+var noTime time.Time
 
 // GetEventsOptions lets the caller of GetEvents() specify how the results are to be returned.
 // Begin and End time-box the results returned.
@@ -125,7 +52,7 @@ func (em *EventMessage) ID() (string, error) {
 // Filter allows the caller to provide more specialized filters on the query.
 // Consult the Mailgun documentation for more details.
 type EventsOptions struct {
-	Begin, End                               *time.Time
+	Begin, End                               time.Time
 	ForceAscending, ForceDescending, Compact bool
 	Limit                                    int
 	Filter                                   map[string]string
@@ -135,7 +62,7 @@ type EventsOptions struct {
 
 // Depreciated See `ListEvents()`
 type GetEventsOptions struct {
-	Begin, End                               *time.Time
+	Begin, End                               time.Time
 	ForceAscending, ForceDescending, Compact bool
 	Limit                                    int
 	Filter                                   map[string]string
@@ -143,9 +70,10 @@ type GetEventsOptions struct {
 
 // EventIterator maintains the state necessary for paging though small parcels of a larger set of events.
 type EventIterator struct {
-	eventResponse
-	mg  Mailgun
-	err error
+	events                              []Event
+	NextURL, PrevURL, FirstURL, LastURL string
+	mg                                  Mailgun
+	err                                 error
 }
 
 // NewEventIterator creates a new iterator for events.
@@ -171,7 +99,7 @@ func (mg *MailgunImpl) NewEventIterator() *EventIterator {
 func (mg *MailgunImpl) ListEvents(opts *EventsOptions) *EventIterator {
 	req := newHTTPRequest(generateApiUrl(mg, eventsEndpoint))
 	if opts != nil {
-		if opts.Limit > 0 {
+		if opts.Limit != 0 {
 			req.addParameter("limit", fmt.Sprintf("%d", opts.Limit))
 		}
 		if opts.Compact {
@@ -179,14 +107,15 @@ func (mg *MailgunImpl) ListEvents(opts *EventsOptions) *EventIterator {
 		}
 		if opts.ForceAscending {
 			req.addParameter("ascending", "yes")
-		} else if opts.ForceDescending {
+		}
+		if opts.ForceDescending {
 			req.addParameter("ascending", "no")
 		}
-		if opts.Begin != nil {
-			req.addParameter("begin", formatMailgunTime(opts.Begin))
+		if opts.Begin != noTime {
+			req.addParameter("begin", formatMailgunTime(&opts.Begin))
 		}
-		if opts.End != nil {
-			req.addParameter("end", formatMailgunTime(opts.End))
+		if opts.End != noTime {
+			req.addParameter("end", formatMailgunTime(&opts.End))
 		}
 		if opts.Filter != nil {
 			for k, v := range opts.Filter {
@@ -196,15 +125,23 @@ func (mg *MailgunImpl) ListEvents(opts *EventsOptions) *EventIterator {
 	}
 	url, err := req.generateUrlWithParameters()
 	return &EventIterator{
-		mg:            mg,
-		eventResponse: eventResponse{Paging: Paging{Next: url, First: url}},
-		err:           err,
+		mg:       mg,
+		NextURL:  url,
+		FirstURL: url,
+		PrevURL:  "",
+		err:      err,
 	}
 }
 
 // If an error occurred during iteration `Err()` will return non nil
 func (ei *EventIterator) Err() error {
 	return ei.err
+}
+
+// Events returns the most recently retrieved batch of events.
+// The length is guaranteed to fall between 0 and the limit set in the GetEventsOptions structure passed to GetFirstPage.
+func (ei *EventIterator) Events() []Event {
+	return ei.events
 }
 
 // GetFirstPage retrieves the first batch of events, according to your criteria.
@@ -227,11 +164,11 @@ func (ei *EventIterator) GetFirstPage(opts GetEventsOptions) error {
 	if opts.ForceDescending {
 		payload.addValue("ascending", "no")
 	}
-	if opts.Begin != nil {
-		payload.addValue("begin", formatMailgunTime(opts.Begin))
+	if opts.Begin != noTime {
+		payload.addValue("begin", formatMailgunTime(&opts.Begin))
 	}
-	if opts.End != nil {
-		payload.addValue("end", formatMailgunTime(opts.End))
+	if opts.End != noTime {
+		payload.addValue("end", formatMailgunTime(&opts.End))
 	}
 	if opts.Filter != nil {
 		for k, v := range opts.Filter {
@@ -249,13 +186,13 @@ func (ei *EventIterator) GetFirstPage(opts GetEventsOptions) error {
 // Retrieves the chronologically previous batch of events, if any exist.
 // You know you're at the end of the list when len(Events())==0.
 func (ei *EventIterator) GetPrevious() error {
-	return ei.fetch(ei.Paging.Previous)
+	return ei.fetch(ei.PrevURL)
 }
 
 // Retrieves the chronologically next batch of events, if any exist.
 // You know you're at the end of the list when len(Events())==0.
 func (ei *EventIterator) GetNext() error {
-	return ei.fetch(ei.Paging.Next)
+	return ei.fetch(ei.NextURL)
 }
 
 // Retrieves the next page of events from the api. Returns false when there
@@ -265,12 +202,12 @@ func (ei *EventIterator) Next(events *[]Event) bool {
 	if ei.err != nil {
 		return false
 	}
-	ei.err = ei.fetch(ei.Paging.Next)
+	ei.err = ei.fetch(ei.NextURL)
 	if ei.err != nil {
 		return false
 	}
-	*events = ei.Events
-	if len(ei.Events) == 0 {
+	*events = ei.events
+	if len(ei.events) == 0 {
 		return false
 	}
 	return true
@@ -283,11 +220,11 @@ func (ei *EventIterator) First(events *[]Event) bool {
 	if ei.err != nil {
 		return false
 	}
-	ei.err = ei.fetch(ei.Paging.First)
+	ei.err = ei.fetch(ei.FirstURL)
 	if ei.err != nil {
 		return false
 	}
-	*events = ei.Events
+	*events = ei.events
 	return true
 }
 
@@ -299,11 +236,11 @@ func (ei *EventIterator) Last(events *[]Event) bool {
 	if ei.err != nil {
 		return false
 	}
-	ei.err = ei.fetch(ei.Paging.Last)
+	ei.err = ei.fetch(ei.LastURL)
 	if ei.err != nil {
 		return false
 	}
-	*events = ei.Events
+	*events = ei.events
 	return true
 }
 
@@ -314,15 +251,15 @@ func (ei *EventIterator) Previous(events *[]Event) bool {
 	if ei.err != nil {
 		return false
 	}
-	if ei.Paging.Previous == "" {
+	if ei.PrevURL == "" {
 		return false
 	}
-	ei.err = ei.fetch(ei.Paging.Previous)
+	ei.err = ei.fetch(ei.PrevURL)
 	if ei.err != nil {
 		return false
 	}
-	*events = ei.Events
-	if len(ei.Events) == 0 {
+	*events = ei.events
+	if len(ei.events) == 0 {
 		return false
 	}
 	return true
@@ -362,9 +299,8 @@ func (mg *MailgunImpl) PollEvents(opts *EventsOptions) *EventPoller {
 	opts.ForceAscending = true
 
 	// Default begin time is 30 minutes ago
-	if opts.Begin == nil {
-		t := now.Add(time.Minute * -30)
-		opts.Begin = &t
+	if opts.Begin == noTime {
+		opts.Begin = now.Add(time.Minute * -30)
 	}
 
 	// Default threshold age is 30 minutes
@@ -393,13 +329,13 @@ func (ep *EventPoller) Poll(events *[]Event) bool {
 	var currentPage string
 	ep.thresholdTime = time.Now().UTC().Add(ep.opts.ThresholdAge)
 	for {
-		if !ep.sleepUntil.IsZero() {
+		if ep.sleepUntil != noTime {
 			// Sleep the rest of our duration
 			time.Sleep(ep.sleepUntil.Sub(time.Now()))
 		}
 
 		// Remember our current page url
-		currentPage = ep.it.Paging.Next
+		currentPage = ep.it.NextURL
 
 		// Attempt to get a page of events
 		var page []Event
@@ -416,7 +352,11 @@ func (ep *EventPoller) Poll(events *[]Event) bool {
 		// Last event on the page
 		lastEvent := page[len(page)-1]
 
-		timeStamp := time.Time(lastEvent.Timestamp)
+		timeStamp, err := lastEvent.ParseTimeStamp()
+		if err != nil {
+			ep.err = errors.Wrap(err, "event timestamp error")
+			return false
+		}
 		// Record the next time we should query for new events
 		ep.sleepUntil = time.Now().Add(ep.opts.PollInterval)
 
@@ -430,7 +370,7 @@ func (ep *EventPoller) Poll(events *[]Event) bool {
 		}
 		// Since we didn't find an event older than our
 		// threshold, fetch this same page again
-		ep.it.Paging.Next = currentPage
+		ep.it.NextURL = currentPage
 	}
 }
 
@@ -440,6 +380,39 @@ func (ei *EventIterator) fetch(url string) error {
 	r := newHTTPRequest(url)
 	r.setClient(ei.mg.Client())
 	r.setBasicAuth(basicAuthUser, ei.mg.ApiKey())
+	var response map[string]interface{}
+	err := getResponseFromJSON(r, &response)
+	if err != nil {
+		return err
+	}
 
-	return getResponseFromJSON(r, &ei.eventResponse)
+	items := response["items"].([]interface{})
+	ei.events = make([]Event, len(items))
+	for i, item := range items {
+		ei.events[i] = item.(map[string]interface{})
+	}
+
+	pagings := response["paging"].(map[string]interface{})
+	links := make(map[string]string, len(pagings))
+	for key, page := range pagings {
+		links[key] = page.(string)
+	}
+	ei.NextURL = links["next"]
+	ei.PrevURL = links["previous"]
+	ei.FirstURL = links["first"]
+	ei.LastURL = links["last"]
+	return err
+}
+
+func toMapInterface(field string, thingy map[string]interface{}) (map[string]interface{}, error) {
+	var empty map[string]interface{}
+	obj, ok := thingy[field]
+	if !ok {
+		return empty, errors.Errorf("'%s' field not found in event", field)
+	}
+	result, ok := obj.(map[string]interface{})
+	if !ok {
+		return empty, errors.Errorf("'%s' field not a map[string]interface{}", field)
+	}
+	return result, nil
 }

@@ -2,12 +2,10 @@ package v1alpha1
 
 import (
 	"fmt"
-	"reflect"
 
-	"github.com/appscode/go/log"
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	meta_util "github.com/appscode/kutil/meta"
-	"github.com/golang/glog"
+	apps "k8s.io/api/apps/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
 )
@@ -129,47 +127,30 @@ func (e Etcd) CustomResourceDefinition() *apiextensions.CustomResourceDefinition
 	}, setNameSchema)
 }
 
-func (e *Etcd) Migrate() {
+func (e *Etcd) SetDefaults() {
 	if e == nil {
 		return
 	}
-	e.Spec.Migrate()
+	e.Spec.SetDefaults()
 }
 
-func (e *EtcdSpec) Migrate() {
+func (e *EtcdSpec) SetDefaults() {
 	if e == nil {
 		return
 	}
+
+	// perform defaulting
+	if e.StorageType == "" {
+		e.StorageType = StorageTypeDurable
+	}
+	if e.UpdateStrategy.Type == "" {
+		e.UpdateStrategy.Type = apps.RollingUpdateStatefulSetStrategyType
+	}
+	if e.TerminationPolicy == "" {
+		e.TerminationPolicy = TerminationPolicyPause
+	}
 }
 
-func (e *Etcd) AlreadyObserved(other *Etcd) bool {
-	if e == nil {
-		return other == nil
-	}
-	if other == nil { // && d != nil
-		return false
-	}
-	if e == other {
-		return true
-	}
-
-	var match bool
-
-	if EnableStatusSubresource {
-		match = e.Status.ObservedGeneration >= e.Generation
-	} else {
-		match = meta_util.Equal(e.Spec, other.Spec)
-	}
-	if match {
-		match = reflect.DeepEqual(e.Labels, other.Labels)
-	}
-	if match {
-		match = meta_util.EqualAnnotation(e.Annotations, other.Annotations)
-	}
-
-	if !match && bool(glog.V(log.LevelDebug)) {
-		diff := meta_util.Diff(other, e)
-		glog.V(log.LevelDebug).Infof("%s %s/%s has changed. Diff: %s", meta_util.GetKind(e), e.Namespace, e.Name, diff)
-	}
-	return match
+func (e *EtcdSpec) GetSecrets() []string {
+	return nil
 }

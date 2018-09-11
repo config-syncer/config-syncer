@@ -2,12 +2,10 @@ package v1alpha1
 
 import (
 	"fmt"
-	"reflect"
 
-	"github.com/appscode/go/log"
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	meta_util "github.com/appscode/kutil/meta"
-	"github.com/golang/glog"
+	apps "k8s.io/api/apps/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
 )
@@ -125,17 +123,19 @@ func (r Redis) CustomResourceDefinition() *apiextensions.CustomResourceDefinitio
 	}, setNameSchema)
 }
 
-func (r *Redis) Migrate() {
+func (r *Redis) SetDefaults() {
 	if r == nil {
 		return
 	}
-	r.Spec.Migrate()
+	r.Spec.SetDefaults()
 }
 
-func (r *RedisSpec) Migrate() {
+func (r *RedisSpec) SetDefaults() {
 	if r == nil {
 		return
 	}
+
+	// migrate first to avoid incorrect defaulting
 	if len(r.NodeSelector) > 0 {
 		r.PodTemplate.Spec.NodeSelector = r.NodeSelector
 		r.NodeSelector = nil
@@ -160,36 +160,19 @@ func (r *RedisSpec) Migrate() {
 		r.PodTemplate.Spec.ImagePullSecrets = r.ImagePullSecrets
 		r.ImagePullSecrets = nil
 	}
+
+	// perform defaulting
+	if r.StorageType == "" {
+		r.StorageType = StorageTypeDurable
+	}
+	if r.UpdateStrategy.Type == "" {
+		r.UpdateStrategy.Type = apps.RollingUpdateStatefulSetStrategyType
+	}
+	if r.TerminationPolicy == "" {
+		r.TerminationPolicy = TerminationPolicyPause
+	}
 }
 
-func (r *Redis) AlreadyObserved(other *Redis) bool {
-	if r == nil {
-		return other == nil
-	}
-	if other == nil { // && d != nil
-		return false
-	}
-	if r == other {
-		return true
-	}
-
-	var match bool
-
-	if EnableStatusSubresource {
-		match = r.Status.ObservedGeneration >= r.Generation
-	} else {
-		match = meta_util.Equal(r.Spec, other.Spec)
-	}
-	if match {
-		match = reflect.DeepEqual(r.Labels, other.Labels)
-	}
-	if match {
-		match = meta_util.EqualAnnotation(r.Annotations, other.Annotations)
-	}
-
-	if !match && bool(glog.V(log.LevelDebug)) {
-		diff := meta_util.Diff(other, r)
-		glog.V(log.LevelDebug).Infof("%s %s/%s has changed. Diff: %s", meta_util.GetKind(r), r.Namespace, r.Name, diff)
-	}
-	return match
+func (e *RedisSpec) GetSecrets() []string {
+	return nil
 }

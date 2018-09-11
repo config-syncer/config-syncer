@@ -116,6 +116,24 @@ func (in *PodSpec) DeepCopyInto(out *PodSpec) {
 			(*in).DeepCopyInto(*out)
 		}
 	}
+	if in.LivenessProbe != nil {
+		in, out := &in.LivenessProbe, &out.LivenessProbe
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(core_v1.Probe)
+			(*in).DeepCopyInto(*out)
+		}
+	}
+	if in.ReadinessProbe != nil {
+		in, out := &in.ReadinessProbe, &out.ReadinessProbe
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(core_v1.Probe)
+			(*in).DeepCopyInto(*out)
+		}
+	}
 	return
 }
 

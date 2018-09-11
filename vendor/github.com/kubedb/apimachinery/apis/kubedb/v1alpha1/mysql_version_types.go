@@ -25,13 +25,16 @@ type MySQLVersion struct {
 // MySQLVersionSpec is the spec for postgres version
 type MySQLVersionSpec struct {
 	// Version
-	Version string `json:"version,omitempty"`
+	Version string `json:"version"`
 	// Database Image
 	DB MySQLVersionDatabase `json:"db"`
 	// Exporter Image
 	Exporter MySQLVersionExporter `json:"exporter"`
 	// Tools Image
 	Tools MySQLVersionTools `json:"tools"`
+	// Deprecated versions usable but regarded as obsolete and best avoided, typically due to having been superseded.
+	// +optional
+	Deprecated bool `json:"deprecated,omitempty"`
 }
 
 // MySQLVersionDatabase is the MySQL Database image

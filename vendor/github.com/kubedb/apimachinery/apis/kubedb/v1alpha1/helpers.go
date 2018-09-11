@@ -31,7 +31,7 @@ func setNameSchema(openapiSpec map[string]common.OpenAPIDefinition) {
 	}
 }
 
-func (e *BackupScheduleSpec) Migrate() {
+func (e *BackupScheduleSpec) SetDefaults() {
 	if e == nil {
 		return
 	}

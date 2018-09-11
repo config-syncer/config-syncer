@@ -25,13 +25,16 @@ type PostgresVersion struct {
 // PostgresVersionSpec is the spec for postgres version
 type PostgresVersionSpec struct {
 	// Version
-	Version string `json:"version,omitempty"`
+	Version string `json:"version"`
 	// Database Image
 	DB PostgresVersionDatabase `json:"db"`
 	// Exporter Image
 	Exporter PostgresVersionExporter `json:"exporter"`
 	// Tools Image
 	Tools PostgresVersionTools `json:"tools"`
+	// Deprecated versions usable but regarded as obsolete and best avoided, typically due to having been superseded.
+	// +optional
+	Deprecated bool `json:"deprecated,omitempty"`
 }
 
 // PostgresVersionDatabase is the Postgres Database image
