@@ -214,7 +214,7 @@ func (f *Invocation) SecretForMinioBackend(includeCert bool) core.Secret {
 	}
 
 	if includeCert {
-		secret.Data[api.CA_CERT_DATA] = f.CertStore.CACert()
+		secret.Data[api.CA_CERT_DATA] = f.CertStore.CACertBytes()
 	}
 
 	return secret
