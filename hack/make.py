@@ -157,13 +157,14 @@ def update_registry():
 
 
 def install():
-    die(call('GO15VENDOREXPERIMENT=1 ' + libbuild.GOC + ' install .'))
+    die(call(libbuild.GOC + ' install .'))
 
 
 def default():
     gen()
     fmt()
-    die(call('GO15VENDOREXPERIMENT=1 ' + libbuild.GOC + ' install . ./test/...'))
+    die(call(libbuild.GOC + ' install . ./test/...'))
+
 
 def test(type, *args):
     pydotenv.load_dotenv(join(libbuild.REPO_ROOT, 'hack/config/.env'))
@@ -175,6 +176,10 @@ def test(type, *args):
         die(call('ginkgo -r -v -progress -trace test/e2e -- ' + " ".join(args)))
     else:
         print '{test unit|e2e}'
+
+
+def revendor():
+    libbuild.revendor()
 
 
 if __name__ == "__main__":
