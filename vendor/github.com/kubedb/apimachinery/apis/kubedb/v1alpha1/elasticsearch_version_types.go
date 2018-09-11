@@ -25,13 +25,16 @@ type ElasticsearchVersion struct {
 // ElasticsearchVersionSpec is the spec for elasticsearch version
 type ElasticsearchVersionSpec struct {
 	// Version
-	Version string `json:"version,omitempty"`
+	Version string `json:"version"`
 	// Database Image
 	DB ElasticsearchVersionDatabase `json:"db"`
 	// Exporter Image
 	Exporter ElasticsearchVersionExporter `json:"exporter"`
 	// Tools Image
 	Tools ElasticsearchVersionTools `json:"tools"`
+	// Deprecated versions usable but regarded as obsolete and best avoided, typically due to having been superseded.
+	// +optional
+	Deprecated bool `json:"deprecated,omitempty"`
 }
 
 // ElasticsearchVersionDatabase is the Elasticsearch Database image

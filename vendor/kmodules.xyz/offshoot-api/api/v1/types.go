@@ -114,6 +114,20 @@ type PodSpec struct {
 	// Optional: Defaults to empty.  See type description for default values of each field.
 	// +optional
 	SecurityContext *core.PodSecurityContext `json:"securityContext,omitempty"`
+
+	// Periodic probe of container liveness.
+	// Container will be restarted if the probe fails.
+	// Cannot be updated.
+	// More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
+	// +optional
+	LivenessProbe *core.Probe `json:"livenessProbe,omitempty"`
+
+	// Periodic probe of container service readiness.
+	// Container will be removed from service endpoints if the probe fails.
+	// Cannot be updated.
+	// More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
+	// +optional
+	ReadinessProbe *core.Probe `json:"readinessProbe,omitempty"`
 }
 
 // ServiceTemplateSpec describes the data a service should have when created from a template

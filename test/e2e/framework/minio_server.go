@@ -77,7 +77,7 @@ func (fi *Invocation) CreateMinioServer(tls bool, ips []net.IP) (string, error) 
 }
 
 func (fi *Invocation) SecretForMinioServer(ips []net.IP) core.Secret {
-	crt, key, err := fi.CertStore.NewServerCertPair("server", fi.MinioServerSANs(ips))
+	crt, key, err := fi.CertStore.NewServerCertPairBytes(fi.MinioServerSANs(ips))
 	Expect(err).NotTo(HaveOccurred())
 
 	return core.Secret{
@@ -86,7 +86,7 @@ func (fi *Invocation) SecretForMinioServer(ips []net.IP) core.Secret {
 			Namespace: fi.namespace,
 		},
 		Data: map[string][]byte{
-			MINIO_PUBLIC_CRT_NAME:  []byte(string(crt) + "\n" + string(fi.CertStore.CACert())),
+			MINIO_PUBLIC_CRT_NAME:  []byte(string(crt) + "\n" + string(fi.CertStore.CACertBytes())),
 			MINIO_PRIVATE_KEY_NAME: key,
 		},
 	}
@@ -285,13 +285,10 @@ func (f *Framework) DeleteServiceForMinioServer(meta metav1.ObjectMeta) error {
 }
 
 func (fi *Invocation) MinioServerSANs(ips []net.IP) cert.AltNames {
-	altNames := cert.AltNames{
-		DNSNames: []string{fi.MinioServiceAddres()},
+	return cert.AltNames{
+		DNSNames: []string{"server", fi.MinioServiceAddres()},
+		IPs:      ips,
 	}
-	if ips != nil {
-		altNames.IPs = ips
-	}
-	return altNames
 }
 
 func (fi *Invocation) MinioServiceAddres() string {

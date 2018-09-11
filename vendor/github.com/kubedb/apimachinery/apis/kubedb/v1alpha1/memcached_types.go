@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	"github.com/appscode/go/encoding/json/types"
+	apps "k8s.io/api/apps/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
@@ -55,6 +56,14 @@ type MemcachedSpec struct {
 	// +optional
 	ServiceTemplate ofst.ServiceTemplateSpec `json:"serviceTemplate,omitempty"`
 
+	// The deployment strategy to use to replace existing pods with new ones.
+	// +optional
+	UpdateStrategy apps.DeploymentStrategy `json:"strategy,omitempty" protobuf:"bytes,4,opt,name=strategy"`
+
+	// TerminationPolicy controls the delete operation for database
+	// +optional
+	TerminationPolicy TerminationPolicy `json:"terminationPolicy,omitempty"`
+
 	// -------------------------------------------------------------------------
 
 	// NodeSelector is a selector which must be true for the pod to fit on a node
@@ -95,7 +104,7 @@ type MemcachedStatus struct {
 	// observedGeneration is the most recent generation observed for this resource. It corresponds to the
 	// resource's generation, which is updated on mutation by the API Server.
 	// +optional
-	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	ObservedGeneration *types.IntHash `json:"observedGeneration,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

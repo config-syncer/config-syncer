@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	"github.com/appscode/go/encoding/json/types"
+	apps "k8s.io/api/apps/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
@@ -61,6 +62,15 @@ type RedisSpec struct {
 	// +optional
 	ServiceTemplate ofst.ServiceTemplateSpec `json:"serviceTemplate,omitempty"`
 
+	// updateStrategy indicates the StatefulSetUpdateStrategy that will be
+	// employed to update Pods in the StatefulSet when a revision is made to
+	// Template.
+	UpdateStrategy apps.StatefulSetUpdateStrategy `json:"updateStrategy,omitempty"`
+
+	// TerminationPolicy controls the delete operation for database
+	// +optional
+	TerminationPolicy TerminationPolicy `json:"terminationPolicy,omitempty"`
+
 	// -------------------------------------------------------------------------
 
 	// NodeSelector is a selector which must be true for the pod to fit on a node
@@ -101,7 +111,7 @@ type RedisStatus struct {
 	// observedGeneration is the most recent generation observed for this resource. It corresponds to the
 	// resource's generation, which is updated on mutation by the API Server.
 	// +optional
-	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	ObservedGeneration *types.IntHash `json:"observedGeneration,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

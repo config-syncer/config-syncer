@@ -23,6 +23,7 @@ limitations under the License.
 package v1beta1
 
 import (
+	types "github.com/appscode/go/encoding/json/types"
 	spec "github.com/go-openapi/spec"
 	resource "k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,6 +33,7 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
+		"github.com/appscode/go/encoding/json/types.IntHash":                      schema_go_encoding_json_types_IntHash(ref),
 		"github.com/appscode/voyager/apis/voyager/v1beta1.ACMECertificateDetails": schema_voyager_apis_voyager_v1beta1_ACMECertificateDetails(ref),
 		"github.com/appscode/voyager/apis/voyager/v1beta1.AuthOption":             schema_voyager_apis_voyager_v1beta1_AuthOption(ref),
 		"github.com/appscode/voyager/apis/voyager/v1beta1.BasicAuth":              schema_voyager_apis_voyager_v1beta1_BasicAuth(ref),
@@ -303,6 +305,18 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/apimachinery/pkg/runtime.Unknown":                                 schema_k8sio_apimachinery_pkg_runtime_Unknown(ref),
 		"k8s.io/apimachinery/pkg/util/intstr.IntOrString":                         schema_apimachinery_pkg_util_intstr_IntOrString(ref),
 		"k8s.io/apimachinery/pkg/version.Info":                                    schema_k8sio_apimachinery_pkg_version_Info(ref),
+	}
+}
+
+func schema_go_encoding_json_types_IntHash(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "IntHash represents as int64 Generation and string Hash. It is json serialized into <int64>$<hash_string>.",
+				Type:        types.IntHash{}.OpenAPISchemaType(),
+				Format:      types.IntHash{}.OpenAPISchemaFormat(),
+			},
+		},
 	}
 }
 
@@ -640,8 +654,7 @@ func schema_voyager_apis_voyager_v1beta1_CertificateStatus(ref common.ReferenceC
 					"observedGeneration": {
 						SchemaProps: spec.SchemaProps{
 							Description: "observedGeneration is the most recent generation observed for this resource. It corresponds to the resource's generation, which is updated on mutation by the API Server.",
-							Type:        []string{"integer"},
-							Format:      "int64",
+							Ref:         ref("github.com/appscode/go/encoding/json/types.IntHash"),
 						},
 					},
 					"creationTime": {
@@ -670,7 +683,7 @@ func schema_voyager_apis_voyager_v1beta1_CertificateStatus(ref common.ReferenceC
 			},
 		},
 		Dependencies: []string{
-			"github.com/appscode/voyager/apis/voyager/v1beta1.CertificateCondition", "github.com/appscode/voyager/apis/voyager/v1beta1.CertificateDetails", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"github.com/appscode/go/encoding/json/types.IntHash", "github.com/appscode/voyager/apis/voyager/v1beta1.CertificateCondition", "github.com/appscode/voyager/apis/voyager/v1beta1.CertificateDetails", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 
@@ -1472,8 +1485,7 @@ func schema_voyager_apis_voyager_v1beta1_IngressStatus(ref common.ReferenceCallb
 					"observedGeneration": {
 						SchemaProps: spec.SchemaProps{
 							Description: "observedGeneration is the most recent generation observed for this resource. It corresponds to the resource's generation, which is updated on mutation by the API Server.",
-							Type:        []string{"integer"},
-							Format:      "int64",
+							Ref:         ref("github.com/appscode/go/encoding/json/types.IntHash"),
 						},
 					},
 					"loadBalancer": {
@@ -1486,7 +1498,7 @@ func schema_voyager_apis_voyager_v1beta1_IngressStatus(ref common.ReferenceCallb
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/core/v1.LoadBalancerStatus"},
+			"github.com/appscode/go/encoding/json/types.IntHash", "k8s.io/api/core/v1.LoadBalancerStatus"},
 	}
 }
 
@@ -2116,7 +2128,7 @@ func schema_k8sio_api_core_v1_CSIPersistentVolumeSource(ref common.ReferenceCall
 					},
 					"fsType": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Filesystem type to mount. Must be a filesystem type supported by the host operating system. Ex. \"ext4\", \"xfs\", \"ntfs\". Implicitly inferred to be \"ext4\" if unspecified.",
+							Description: "Filesystem type to mount. Must be a filesystem type supported by the host operating system. Ex. \"ext4\", \"xfs\", \"ntfs\".",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -11111,7 +11123,7 @@ func schema_k8sio_api_core_v1_VolumeMount(ref common.ReferenceCallback) common.O
 					},
 					"mountPropagation": {
 						SchemaProps: spec.SchemaProps{
-							Description: "mountPropagation determines how mounts are propagated from the host to container and the other way around. When not set, MountPropagationHostToContainer is used. This field is beta in 1.10.",
+							Description: "mountPropagation determines how mounts are propagated from the host to container and the other way around. When not set, MountPropagationNone is used. This field is beta in 1.10.",
 							Type:        []string{"string"},
 							Format:      "",
 						},

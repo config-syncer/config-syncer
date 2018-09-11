@@ -2,12 +2,10 @@ package v1alpha1
 
 import (
 	"fmt"
-	"reflect"
 
-	"github.com/appscode/go/log"
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	meta_util "github.com/appscode/kutil/meta"
-	"github.com/golang/glog"
+	apps "k8s.io/api/apps/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
 )
@@ -125,18 +123,20 @@ func (m MongoDB) CustomResourceDefinition() *apiextensions.CustomResourceDefinit
 	}, setNameSchema)
 }
 
-func (m *MongoDB) Migrate() {
+func (m *MongoDB) SetDefaults() {
 	if m == nil {
 		return
 	}
-	m.Spec.Migrate()
+	m.Spec.SetDefaults()
 }
 
-func (m *MongoDBSpec) Migrate() {
+func (m *MongoDBSpec) SetDefaults() {
 	if m == nil {
 		return
 	}
-	m.BackupSchedule.Migrate()
+
+	// migrate first to avoid incorrect defaulting
+	m.BackupSchedule.SetDefaults()
 	if len(m.NodeSelector) > 0 {
 		m.PodTemplate.Spec.NodeSelector = m.NodeSelector
 		m.NodeSelector = nil
@@ -161,36 +161,30 @@ func (m *MongoDBSpec) Migrate() {
 		m.PodTemplate.Spec.ImagePullSecrets = m.ImagePullSecrets
 		m.ImagePullSecrets = nil
 	}
+
+	// perform defaulting
+	if m.StorageType == "" {
+		m.StorageType = StorageTypeDurable
+	}
+	if m.UpdateStrategy.Type == "" {
+		m.UpdateStrategy.Type = apps.RollingUpdateStatefulSetStrategyType
+	}
+	if m.TerminationPolicy == "" {
+		m.TerminationPolicy = TerminationPolicyPause
+	}
 }
 
-func (m *MongoDB) AlreadyObserved(other *MongoDB) bool {
-	if m == nil {
-		return other == nil
-	}
-	if other == nil { // && d != nil
-		return false
-	}
-	if m == other {
-		return true
+func (e *MongoDBSpec) GetSecrets() []string {
+	if e == nil {
+		return nil
 	}
 
-	var match bool
-
-	if EnableStatusSubresource {
-		match = m.Status.ObservedGeneration >= m.Generation
-	} else {
-		match = meta_util.Equal(m.Spec, other.Spec)
+	var secrets []string
+	if e.DatabaseSecret != nil {
+		secrets = append(secrets, e.DatabaseSecret.SecretName)
 	}
-	if match {
-		match = reflect.DeepEqual(m.Labels, other.Labels)
+	if e.ReplicaSet != nil {
+		secrets = append(secrets, e.ReplicaSet.KeyFile.SecretName)
 	}
-	if match {
-		match = meta_util.EqualAnnotation(m.Annotations, other.Annotations)
-	}
-
-	if !match && bool(glog.V(log.LevelDebug)) {
-		diff := meta_util.Diff(other, m)
-		glog.V(log.LevelDebug).Infof("%s %s/%s has changed. Diff: %s", meta_util.GetKind(m), m.Namespace, m.Name, diff)
-	}
-	return match
+	return secrets
 }

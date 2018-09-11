@@ -86,8 +86,8 @@ func (f *Framework) NewKubedServerOptions() *options.RecommendedOptions {
 			},
 		},
 		ExtraAdmissionInitializers: func(c *genericapiserver.RecommendedConfig) ([]admission.PluginInitializer, error) { return nil, nil },
-		Etcd:      nil,
-		Admission: nil,
+		Etcd:                       nil,
+		Admission:                  nil,
 	}
 }
 
@@ -127,9 +127,9 @@ func (f *Invocation) APIService(service *core.Service) *apireg.APIService {
 		},
 		Spec: apireg.APIServiceSpec{
 			InsecureSkipTLSVerify: true,
-			Group:                api.GroupName,
-			GroupPriorityMinimum: MaxRetry,
-			VersionPriority:      15,
+			Group:                 api.GroupName,
+			GroupPriorityMinimum:  MaxRetry,
+			VersionPriority:       15,
 			Service: &apireg.ServiceReference{
 				Name:      service.Name,
 				Namespace: service.Namespace,

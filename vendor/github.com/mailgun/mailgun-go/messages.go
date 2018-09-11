@@ -22,9 +22,7 @@ type Message struct {
 	readerAttachments []ReaderAttachment
 	inlines           []string
 	readerInlines     []ReaderAttachment
-	bufferAttachments []BufferAttachment
 
-	nativeSend         bool
 	testMode           bool
 	tracking           bool
 	trackingClicks     bool
@@ -32,7 +30,6 @@ type Message struct {
 	headers            map[string]string
 	variables          map[string]string
 	recipientVariables map[string]map[string]interface{}
-	domain             string
 
 	dkimSet           bool
 	trackingSet       bool
@@ -46,11 +43,6 @@ type Message struct {
 type ReaderAttachment struct {
 	Filename   string
 	ReadCloser io.ReadCloser
-}
-
-type BufferAttachment struct {
-	Filename   string
-	Buffer []byte
 }
 
 // StoredMessage structures contain the (parsed) message content for an email
@@ -236,16 +228,6 @@ func (m *Message) AddReaderAttachment(filename string, readCloser io.ReadCloser)
 	m.readerAttachments = append(m.readerAttachments, ra)
 }
 
-// AddBufferAttachment arranges to send a file along with the e-mail message.
-// File contents are read from the []byte array provided
-// The filename parameter is the resulting filename of the attachment.
-// The buffer parameter is the []byte array which contains the actual bytes to be used
-// as the contents of the attached file.
-func (m *Message) AddBufferAttachment(filename string, buffer []byte) {
-	ba := BufferAttachment{Filename: filename, Buffer: buffer}
-	m.bufferAttachments = append(m.bufferAttachments, ba)
-}
-
 // AddAttachment arranges to send a file from the filesystem along with the e-mail message.
 // The attachment parameter is a filename, which must refer to a file which actually resides
 // in the local filesystem.
@@ -389,12 +371,6 @@ func (m *Message) SetDKIM(dkim bool) {
 	m.dkimSet = true
 }
 
-// EnableNativeSend allows the return path to match the address in the Message.Headers.From:
-// field when sending from Mailgun rather than the usual bounce+ address in the return path.
-func (m *Message) EnableNativeSend() {
-	m.nativeSend = true
-}
-
 // EnableTestMode allows submittal of a message, such that it will be discarded by Mailgun.
 // This facilitates testing client-side software without actually consuming e-mail resources.
 func (m *Message) EnableTestMode() {
@@ -457,11 +433,6 @@ func (m *Message) AddVariable(variable string, value interface{}) error {
 	return nil
 }
 
-// AddDomain allows you to use a separate domain for the type of messages you are sending.
-func (m *Message) AddDomain(domain string) {
-	m.domain = domain
-}
-
 // Send attempts to queue a message (see Message, NewMessage, and its methods) for delivery.
 // It returns the Mailgun server response, which consists of two components:
 // a human-readable status message, and a message ID.  The status and message ID are set only
@@ -469,98 +440,86 @@ func (m *Message) AddDomain(domain string) {
 func (m *MailgunImpl) Send(message *Message) (mes string, id string, err error) {
 	if !isValid(message) {
 		err = errors.New("Message not valid")
-		return
-	}
-	payload := newFormDataPayload()
+	} else {
+		payload := newFormDataPayload()
 
-	message.specific.addValues(payload)
-	for _, to := range message.to {
-		payload.addValue("to", to)
-	}
-	for _, tag := range message.tags {
-		payload.addValue("o:tag", tag)
-	}
-	for _, campaign := range message.campaigns {
-		payload.addValue("o:campaign", campaign)
-	}
-	if message.dkimSet {
-		payload.addValue("o:dkim", yesNo(message.dkim))
-	}
-	if message.deliveryTime != nil {
-		payload.addValue("o:deliverytime", formatMailgunTime(message.deliveryTime))
-	}
-	if message.nativeSend {
-		payload.addValue("o:native-send", "yes")
-	}
-	if message.testMode {
-		payload.addValue("o:testmode", "yes")
-	}
-	if message.trackingSet {
-		payload.addValue("o:tracking", yesNo(message.tracking))
-	}
-	if message.trackingClicksSet {
-		payload.addValue("o:tracking-clicks", yesNo(message.trackingClicks))
-	}
-	if message.trackingOpensSet {
-		payload.addValue("o:tracking-opens", yesNo(message.trackingOpens))
-	}
-	if message.headers != nil {
-		for header, value := range message.headers {
-			payload.addValue("h:"+header, value)
+		message.specific.addValues(payload)
+		for _, to := range message.to {
+			payload.addValue("to", to)
 		}
-	}
-	if message.variables != nil {
-		for variable, value := range message.variables {
-			payload.addValue("v:"+variable, value)
+		for _, tag := range message.tags {
+			payload.addValue("o:tag", tag)
 		}
-	}
-	if message.recipientVariables != nil {
-		j, err := json.Marshal(message.recipientVariables)
-		if err != nil {
-			return "", "", err
+		for _, campaign := range message.campaigns {
+			payload.addValue("o:campaign", campaign)
 		}
-		payload.addValue("recipient-variables", string(j))
-	}
-	if message.attachments != nil {
-		for _, attachment := range message.attachments {
-			payload.addFile("attachment", attachment)
+		if message.dkimSet {
+			payload.addValue("o:dkim", yesNo(message.dkim))
 		}
-	}
-	if message.readerAttachments != nil {
-		for _, readerAttachment := range message.readerAttachments {
-			payload.addReadCloser("attachment", readerAttachment.Filename, readerAttachment.ReadCloser)
+		if message.deliveryTime != nil {
+			payload.addValue("o:deliverytime", formatMailgunTime(message.deliveryTime))
 		}
-	}
-	if message.bufferAttachments != nil {
-		for _, bufferAttachment := range message.bufferAttachments {
-			payload.addBuffer("attachment", bufferAttachment.Filename, bufferAttachment.Buffer)
+		if message.testMode {
+			payload.addValue("o:testmode", "yes")
 		}
-	}
-	if message.inlines != nil {
-		for _, inline := range message.inlines {
-			payload.addFile("inline", inline)
+		if message.trackingSet {
+			payload.addValue("o:tracking", yesNo(message.tracking))
 		}
-	}
+		if message.trackingClicksSet {
+			payload.addValue("o:tracking-clicks", yesNo(message.trackingClicks))
+		}
+		if message.trackingOpensSet {
+			payload.addValue("o:tracking-opens", yesNo(message.trackingOpens))
+		}
+		if message.headers != nil {
+			for header, value := range message.headers {
+				payload.addValue("h:"+header, value)
+			}
+		}
+		if message.variables != nil {
+			for variable, value := range message.variables {
+				payload.addValue("v:"+variable, value)
+			}
+		}
+		if message.recipientVariables != nil {
+			j, err := json.Marshal(message.recipientVariables)
+			if err != nil {
+				return "", "", err
+			}
+			payload.addValue("recipient-variables", string(j))
+		}
+		if message.attachments != nil {
+			for _, attachment := range message.attachments {
+				payload.addFile("attachment", attachment)
+			}
+		}
+		if message.readerAttachments != nil {
+			for _, readerAttachment := range message.readerAttachments {
+				payload.addReadCloser("attachment", readerAttachment.Filename, readerAttachment.ReadCloser)
+			}
+		}
+		if message.inlines != nil {
+			for _, inline := range message.inlines {
+				payload.addFile("inline", inline)
+			}
+		}
 
-	if message.readerInlines != nil {
-		for _, readerAttachment := range message.readerInlines {
-			payload.addReadCloser("inline", readerAttachment.Filename, readerAttachment.ReadCloser)
+		if message.readerInlines != nil {
+			for _, readerAttachment := range message.readerInlines {
+				payload.addReadCloser("inline", readerAttachment.Filename, readerAttachment.ReadCloser)
+			}
 		}
-	}
 
-	if message.domain == "" {
-		message.domain = m.Domain()
-	}
+		r := newHTTPRequest(generateApiUrl(m, message.specific.endpoint()))
+		r.setClient(m.Client())
+		r.setBasicAuth(basicAuthUser, m.ApiKey())
 
-	r := newHTTPRequest(generateApiUrlWithDomain(m, message.specific.endpoint(), message.domain))
-	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
-
-	var response sendMessageResponse
-	err = postResponseFromJSON(r, payload, &response)
-	if err == nil {
-		mes = response.Message
-		id = response.Id
+		var response sendMessageResponse
+		err = postResponseFromJSON(r, payload, &response)
+		if err == nil {
+			mes = response.Message
+			id = response.Id
+		}
 	}
 
 	return
@@ -692,32 +651,6 @@ func (mg *MailgunImpl) GetStoredMessage(id string) (StoredMessage, error) {
 // thus delegates to the caller the required parsing.
 func (mg *MailgunImpl) GetStoredMessageRaw(id string) (StoredMessageRaw, error) {
 	url := generateStoredMessageUrl(mg, messagesEndpoint, id)
-	r := newHTTPRequest(url)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
-	r.addHeader("Accept", "message/rfc2822")
-
-	var response StoredMessageRaw
-	err := getResponseFromJSON(r, &response)
-	return response, err
-}
-
-// GetStoredMessageForURL retrieves information about a received e-mail message.
-// This provides visibility into, e.g., replies to a message sent to a mailing list.
-func (mg *MailgunImpl) GetStoredMessageForURL(url string) (StoredMessage, error) {
-	r := newHTTPRequest(url)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
-
-	var response StoredMessage
-	err := getResponseFromJSON(r, &response)
-	return response, err
-}
-
-// GetStoredMessageRawForURL retrieves the raw MIME body of a received e-mail message.
-// Compared to GetStoredMessage, it gives access to the unparsed MIME body, and
-// thus delegates to the caller the required parsing.
-func (mg *MailgunImpl) GetStoredMessageRawForURL(url string) (StoredMessageRaw, error) {
 	r := newHTTPRequest(url)
 	r.setClient(mg.Client())
 	r.setBasicAuth(basicAuthUser, mg.ApiKey())

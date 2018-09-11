@@ -25,13 +25,16 @@ type EtcdVersion struct {
 // EtcdVersionSpec is the spec for postgres version
 type EtcdVersionSpec struct {
 	// Version
-	Version string `json:"version,omitempty"`
+	Version string `json:"version"`
 	// Database Image
 	DB EtcdVersionDatabase `json:"db"`
 	// Exporter Image
 	Exporter EtcdVersionExporter `json:"exporter"`
 	// Tools Image
 	Tools EtcdVersionTools `json:"tools"`
+	// Deprecated versions usable but regarded as obsolete and best avoided, typically due to having been superseded.
+	// +optional
+	Deprecated bool `json:"deprecated,omitempty"`
 }
 
 // EtcdVersionDatabase is the Etcd Database image

@@ -26,4 +26,9 @@ const (
 
 	JobTypeBackup  = "backup"
 	JobTypeRestore = "restore"
+
+	ElasticsearchRestPort     = 9200
+	ElasticsearchRestPortName = "http"
+	ElasticsearchNodePort     = 9300
+	ElasticsearchNodePortName = "transport"
 )
