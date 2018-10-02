@@ -8,6 +8,7 @@ import (
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	resource_indexer "github.com/appscode/kubed/pkg/registry/resource"
 	"github.com/appscode/kubed/pkg/syncer"
+	"github.com/appscode/kutil/discovery"
 	"github.com/appscode/kutil/tools/fsnotify"
 	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
 	searchlightinformers "github.com/appscode/searchlight/client/informers/externalversions"
@@ -51,6 +52,10 @@ func NewOperatorConfig(clientConfig *rest.Config) *OperatorConfig {
 }
 
 func (c *OperatorConfig) New() (*Operator, error) {
+	if err := discovery.IsDefaultSupportedVersion(c.KubeClient); err != nil {
+		return nil, err
+	}
+
 	op := &Operator{
 		Config:            c.Config,
 		ClientConfig:      c.ClientConfig,

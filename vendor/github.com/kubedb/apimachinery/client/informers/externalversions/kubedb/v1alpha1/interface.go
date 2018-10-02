@@ -28,32 +28,18 @@ type Interface interface {
 	DormantDatabases() DormantDatabaseInformer
 	// Elasticsearches returns a ElasticsearchInformer.
 	Elasticsearches() ElasticsearchInformer
-	// ElasticsearchVersions returns a ElasticsearchVersionInformer.
-	ElasticsearchVersions() ElasticsearchVersionInformer
 	// Etcds returns a EtcdInformer.
 	Etcds() EtcdInformer
-	// EtcdVersions returns a EtcdVersionInformer.
-	EtcdVersions() EtcdVersionInformer
 	// Memcacheds returns a MemcachedInformer.
 	Memcacheds() MemcachedInformer
-	// MemcachedVersions returns a MemcachedVersionInformer.
-	MemcachedVersions() MemcachedVersionInformer
 	// MongoDBs returns a MongoDBInformer.
 	MongoDBs() MongoDBInformer
-	// MongoDBVersions returns a MongoDBVersionInformer.
-	MongoDBVersions() MongoDBVersionInformer
 	// MySQLs returns a MySQLInformer.
 	MySQLs() MySQLInformer
-	// MySQLVersions returns a MySQLVersionInformer.
-	MySQLVersions() MySQLVersionInformer
 	// Postgreses returns a PostgresInformer.
 	Postgreses() PostgresInformer
-	// PostgresVersions returns a PostgresVersionInformer.
-	PostgresVersions() PostgresVersionInformer
 	// Redises returns a RedisInformer.
 	Redises() RedisInformer
-	// RedisVersions returns a RedisVersionInformer.
-	RedisVersions() RedisVersionInformer
 	// Snapshots returns a SnapshotInformer.
 	Snapshots() SnapshotInformer
 }
@@ -79,19 +65,9 @@ func (v *version) Elasticsearches() ElasticsearchInformer {
 	return &elasticsearchInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// ElasticsearchVersions returns a ElasticsearchVersionInformer.
-func (v *version) ElasticsearchVersions() ElasticsearchVersionInformer {
-	return &elasticsearchVersionInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
-}
-
 // Etcds returns a EtcdInformer.
 func (v *version) Etcds() EtcdInformer {
 	return &etcdInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// EtcdVersions returns a EtcdVersionInformer.
-func (v *version) EtcdVersions() EtcdVersionInformer {
-	return &etcdVersionInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // Memcacheds returns a MemcachedInformer.
@@ -99,19 +75,9 @@ func (v *version) Memcacheds() MemcachedInformer {
 	return &memcachedInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// MemcachedVersions returns a MemcachedVersionInformer.
-func (v *version) MemcachedVersions() MemcachedVersionInformer {
-	return &memcachedVersionInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
-}
-
 // MongoDBs returns a MongoDBInformer.
 func (v *version) MongoDBs() MongoDBInformer {
 	return &mongoDBInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// MongoDBVersions returns a MongoDBVersionInformer.
-func (v *version) MongoDBVersions() MongoDBVersionInformer {
-	return &mongoDBVersionInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // MySQLs returns a MySQLInformer.
@@ -119,29 +85,14 @@ func (v *version) MySQLs() MySQLInformer {
 	return &mySQLInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// MySQLVersions returns a MySQLVersionInformer.
-func (v *version) MySQLVersions() MySQLVersionInformer {
-	return &mySQLVersionInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
-}
-
 // Postgreses returns a PostgresInformer.
 func (v *version) Postgreses() PostgresInformer {
 	return &postgresInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// PostgresVersions returns a PostgresVersionInformer.
-func (v *version) PostgresVersions() PostgresVersionInformer {
-	return &postgresVersionInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
-}
-
 // Redises returns a RedisInformer.
 func (v *version) Redises() RedisInformer {
 	return &redisInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// RedisVersions returns a RedisVersionInformer.
-func (v *version) RedisVersions() RedisVersionInformer {
-	return &redisVersionInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // Snapshots returns a SnapshotInformer.

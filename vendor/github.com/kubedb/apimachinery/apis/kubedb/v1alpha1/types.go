@@ -20,6 +20,8 @@ type ScriptSourceSpec struct {
 type SnapshotSourceSpec struct {
 	Namespace string `json:"namespace"`
 	Name      string `json:"name"`
+	// Arguments to the restore job
+	Args []string `json:"args,omitempty"`
 }
 
 type BackupScheduleSpec struct {

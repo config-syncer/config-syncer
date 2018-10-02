@@ -4,12 +4,14 @@ import (
 	"fmt"
 
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
-	"github.com/appscode/kutil/meta"
 	meta_util "github.com/appscode/kutil/meta"
+	"github.com/kubedb/apimachinery/apis"
 	apps "k8s.io/api/apps/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
 )
+
+var _ apis.ResourceInfo = &Elasticsearch{}
 
 func (e Elasticsearch) OffshootName() string {
 	return e.Name
@@ -25,8 +27,6 @@ func (e Elasticsearch) OffshootSelectors() map[string]string {
 func (e Elasticsearch) OffshootLabels() map[string]string {
 	return meta_util.FilterKeys(GenericKey, e.OffshootSelectors(), e.Labels)
 }
-
-var _ ResourceInfo = &Elasticsearch{}
 
 func (e Elasticsearch) ResourceShortCode() string {
 	return ResourceCodeElasticsearch
@@ -121,7 +121,7 @@ func (e Elasticsearch) CustomResourceDefinition() *apiextensions.CustomResourceD
 		SpecDefinitionName:      "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Elasticsearch",
 		EnableValidation:        true,
 		GetOpenAPIDefinitions:   GetOpenAPIDefinitions,
-		EnableStatusSubresource: EnableStatusSubresource,
+		EnableStatusSubresource: apis.EnableStatusSubresource,
 		AdditionalPrinterColumns: []apiextensions.CustomResourceColumnDefinition{
 			{
 				Name:     "Version",
@@ -139,7 +139,7 @@ func (e Elasticsearch) CustomResourceDefinition() *apiextensions.CustomResourceD
 				JSONPath: ".metadata.creationTimestamp",
 			},
 		},
-	}, setNameSchema)
+	}, apis.SetNameSchema)
 }
 
 func (e *Elasticsearch) SetDefaults() {
@@ -182,6 +182,9 @@ func (e *ElasticsearchSpec) SetDefaults() {
 	}
 
 	// perform defaulting
+	if e.AuthPlugin == "" {
+		e.AuthPlugin = ElasticsearchAuthPluginSearchGuard
+	}
 	if e.StorageType == "" {
 		e.StorageType = StorageTypeDurable
 	}
@@ -206,13 +209,4 @@ func (e *ElasticsearchSpec) GetSecrets() []string {
 		secrets = append(secrets, e.CertificateSecret.SecretName)
 	}
 	return secrets
-}
-
-const (
-	ESSearchGuardDisabled = ElasticsearchKey + "/searchguard-disabled"
-)
-
-func (e Elasticsearch) SearchGuardDisabled() bool {
-	v, _ := meta.GetBoolValue(e.Annotations, ESSearchGuardDisabled)
-	return v
 }

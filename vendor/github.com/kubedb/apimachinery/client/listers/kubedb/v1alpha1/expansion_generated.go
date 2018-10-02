@@ -34,10 +34,6 @@ type ElasticsearchListerExpansion interface{}
 // ElasticsearchNamespaceLister.
 type ElasticsearchNamespaceListerExpansion interface{}
 
-// ElasticsearchVersionListerExpansion allows custom methods to be added to
-// ElasticsearchVersionLister.
-type ElasticsearchVersionListerExpansion interface{}
-
 // EtcdListerExpansion allows custom methods to be added to
 // EtcdLister.
 type EtcdListerExpansion interface{}
@@ -45,10 +41,6 @@ type EtcdListerExpansion interface{}
 // EtcdNamespaceListerExpansion allows custom methods to be added to
 // EtcdNamespaceLister.
 type EtcdNamespaceListerExpansion interface{}
-
-// EtcdVersionListerExpansion allows custom methods to be added to
-// EtcdVersionLister.
-type EtcdVersionListerExpansion interface{}
 
 // MemcachedListerExpansion allows custom methods to be added to
 // MemcachedLister.
@@ -58,10 +50,6 @@ type MemcachedListerExpansion interface{}
 // MemcachedNamespaceLister.
 type MemcachedNamespaceListerExpansion interface{}
 
-// MemcachedVersionListerExpansion allows custom methods to be added to
-// MemcachedVersionLister.
-type MemcachedVersionListerExpansion interface{}
-
 // MongoDBListerExpansion allows custom methods to be added to
 // MongoDBLister.
 type MongoDBListerExpansion interface{}
@@ -69,10 +57,6 @@ type MongoDBListerExpansion interface{}
 // MongoDBNamespaceListerExpansion allows custom methods to be added to
 // MongoDBNamespaceLister.
 type MongoDBNamespaceListerExpansion interface{}
-
-// MongoDBVersionListerExpansion allows custom methods to be added to
-// MongoDBVersionLister.
-type MongoDBVersionListerExpansion interface{}
 
 // MySQLListerExpansion allows custom methods to be added to
 // MySQLLister.
@@ -82,10 +66,6 @@ type MySQLListerExpansion interface{}
 // MySQLNamespaceLister.
 type MySQLNamespaceListerExpansion interface{}
 
-// MySQLVersionListerExpansion allows custom methods to be added to
-// MySQLVersionLister.
-type MySQLVersionListerExpansion interface{}
-
 // PostgresListerExpansion allows custom methods to be added to
 // PostgresLister.
 type PostgresListerExpansion interface{}
@@ -94,10 +74,6 @@ type PostgresListerExpansion interface{}
 // PostgresNamespaceLister.
 type PostgresNamespaceListerExpansion interface{}
 
-// PostgresVersionListerExpansion allows custom methods to be added to
-// PostgresVersionLister.
-type PostgresVersionListerExpansion interface{}
-
 // RedisListerExpansion allows custom methods to be added to
 // RedisLister.
 type RedisListerExpansion interface{}
@@ -105,10 +81,6 @@ type RedisListerExpansion interface{}
 // RedisNamespaceListerExpansion allows custom methods to be added to
 // RedisNamespaceLister.
 type RedisNamespaceListerExpansion interface{}
-
-// RedisVersionListerExpansion allows custom methods to be added to
-// RedisVersionLister.
-type RedisVersionListerExpansion interface{}
 
 // SnapshotListerExpansion allows custom methods to be added to
 // SnapshotLister.

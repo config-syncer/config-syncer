@@ -19,6 +19,7 @@ limitations under the License.
 package scheme
 
 import (
+	catalogv1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
 	kubedbv1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -50,5 +51,6 @@ func init() {
 // After this, RawExtensions in Kubernetes types will serialize kube-aggregator types
 // correctly.
 func AddToScheme(scheme *runtime.Scheme) {
+	catalogv1alpha1.AddToScheme(scheme)
 	kubedbv1alpha1.AddToScheme(scheme)
 }

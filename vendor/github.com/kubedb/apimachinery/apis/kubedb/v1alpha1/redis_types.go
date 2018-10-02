@@ -16,6 +16,13 @@ const (
 	ResourcePluralRedis   = "redises"
 )
 
+type RedisMode string
+
+const (
+	RedisModeStandalone RedisMode = "Standalone"
+	RedisModeCluster    RedisMode = "Cluster"
+)
+
 // +genclient
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -32,8 +39,15 @@ type RedisSpec struct {
 	// Version of Redis to be deployed.
 	Version types.StrYo `json:"version"`
 
-	// Number of instances to deploy for a Redis database.
+	// Number of instances to deploy for a MySQL database.
 	Replicas *int32 `json:"replicas,omitempty"`
+
+	// Default is "Standalone". If set to "Cluster", ClusterSpec is required and redis servers will
+	// start in cluster mode
+	Mode RedisMode `json:"mode,omitempty"`
+
+	// Redis cluster configuration for running redis servers in cluster mode. Required if Mode is set to "Cluster"
+	Cluster *RedisClusterSpec `json:"cluster,omitempty"`
 
 	// StorageType can be durable (default) or ephemeral
 	StorageType StorageType `json:"storageType,omitempty"`
@@ -103,6 +117,14 @@ type RedisSpec struct {
 	// +optional
 	// Deprecated: Use podTemplate.spec.imagePullSecrets
 	ImagePullSecrets []core.LocalObjectReference `json:"imagePullSecrets,omitempty"`
+}
+
+type RedisClusterSpec struct {
+	// Number of master nodes. It must be >= 3. If not specified, defaults to 3.
+	Master *int32 `json:"master,omitempty"`
+
+	// Number of replica(s) per master node. If not specified, defaults to 1.
+	Replicas *int32 `json:"replicas,omitempty"`
 }
 
 type RedisStatus struct {

@@ -3,12 +3,16 @@ package v1alpha1
 import (
 	"fmt"
 
+	"github.com/appscode/go/types"
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	meta_util "github.com/appscode/kutil/meta"
+	"github.com/kubedb/apimachinery/apis"
 	apps "k8s.io/api/apps/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
 )
+
+var _ apis.ResourceInfo = &Redis{}
 
 func (r Redis) OffshootName() string {
 	return r.Name
@@ -42,6 +46,10 @@ func (r Redis) ResourcePlural() string {
 }
 
 func (r Redis) ServiceName() string {
+	return r.OffshootName()
+}
+
+func (r Redis) ConfigMapName() string {
 	return r.OffshootName()
 }
 
@@ -102,7 +110,7 @@ func (r Redis) CustomResourceDefinition() *apiextensions.CustomResourceDefinitio
 		SpecDefinitionName:      "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Redis",
 		EnableValidation:        true,
 		GetOpenAPIDefinitions:   GetOpenAPIDefinitions,
-		EnableStatusSubresource: EnableStatusSubresource,
+		EnableStatusSubresource: apis.EnableStatusSubresource,
 		AdditionalPrinterColumns: []apiextensions.CustomResourceColumnDefinition{
 			{
 				Name:     "Version",
@@ -120,7 +128,7 @@ func (r Redis) CustomResourceDefinition() *apiextensions.CustomResourceDefinitio
 				JSONPath: ".metadata.creationTimestamp",
 			},
 		},
-	}, setNameSchema)
+	}, apis.SetNameSchema)
 }
 
 func (r *Redis) SetDefaults() {
@@ -162,6 +170,19 @@ func (r *RedisSpec) SetDefaults() {
 	}
 
 	// perform defaulting
+	if r.Mode == "" {
+		r.Mode = RedisModeStandalone
+	} else if r.Mode == RedisModeCluster {
+		if r.Cluster == nil {
+			r.Cluster = &RedisClusterSpec{}
+		}
+		if r.Cluster.Master == nil {
+			r.Cluster.Master = types.Int32P(3)
+		}
+		if r.Cluster.Replicas == nil {
+			r.Cluster.Replicas = types.Int32P(1)
+		}
+	}
 	if r.StorageType == "" {
 		r.StorageType = StorageTypeDurable
 	}

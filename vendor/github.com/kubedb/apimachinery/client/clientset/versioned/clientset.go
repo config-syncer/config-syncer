@@ -19,6 +19,7 @@ limitations under the License.
 package versioned
 
 import (
+	catalogv1alpha1 "github.com/kubedb/apimachinery/client/clientset/versioned/typed/catalog/v1alpha1"
 	kubedbv1alpha1 "github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
@@ -27,6 +28,9 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
+	CatalogV1alpha1() catalogv1alpha1.CatalogV1alpha1Interface
+	// Deprecated: please explicitly pick a version if possible.
+	Catalog() catalogv1alpha1.CatalogV1alpha1Interface
 	KubedbV1alpha1() kubedbv1alpha1.KubedbV1alpha1Interface
 	// Deprecated: please explicitly pick a version if possible.
 	Kubedb() kubedbv1alpha1.KubedbV1alpha1Interface
@@ -36,7 +40,19 @@ type Interface interface {
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	kubedbV1alpha1 *kubedbv1alpha1.KubedbV1alpha1Client
+	catalogV1alpha1 *catalogv1alpha1.CatalogV1alpha1Client
+	kubedbV1alpha1  *kubedbv1alpha1.KubedbV1alpha1Client
+}
+
+// CatalogV1alpha1 retrieves the CatalogV1alpha1Client
+func (c *Clientset) CatalogV1alpha1() catalogv1alpha1.CatalogV1alpha1Interface {
+	return c.catalogV1alpha1
+}
+
+// Deprecated: Catalog retrieves the default version of CatalogClient.
+// Please explicitly pick a version.
+func (c *Clientset) Catalog() catalogv1alpha1.CatalogV1alpha1Interface {
+	return c.catalogV1alpha1
 }
 
 // KubedbV1alpha1 retrieves the KubedbV1alpha1Client
@@ -66,6 +82,10 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	}
 	var cs Clientset
 	var err error
+	cs.catalogV1alpha1, err = catalogv1alpha1.NewForConfig(&configShallowCopy)
+	if err != nil {
+		return nil, err
+	}
 	cs.kubedbV1alpha1, err = kubedbv1alpha1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
@@ -82,6 +102,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 // panics if there is an error in the config.
 func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
+	cs.catalogV1alpha1 = catalogv1alpha1.NewForConfigOrDie(c)
 	cs.kubedbV1alpha1 = kubedbv1alpha1.NewForConfigOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
@@ -91,6 +112,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
+	cs.catalogV1alpha1 = catalogv1alpha1.New(c)
 	cs.kubedbV1alpha1 = kubedbv1alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)

@@ -37,10 +37,10 @@ type PostgresSpec struct {
 	Replicas *int32 `json:"replicas,omitempty"`
 
 	// Standby mode
-	StandbyMode *StandbyMode `json:"standbyMode,omitempty"`
+	StandbyMode *PostgresStandbyMode `json:"standbyMode,omitempty"`
 
 	// Streaming mode
-	StreamingMode *StreamingMode `json:"streamingMode,omitempty"`
+	StreamingMode *PostgresStreamingMode `json:"streamingMode,omitempty"`
 
 	// Archive for wal files
 	Archiver *PostgresArchiverSpec `json:"archiver,omitempty"`
@@ -170,16 +170,24 @@ type PostgresWALSourceSpec struct {
 	store.Backend `json:",inline,omitempty"`
 }
 
-type StandbyMode string
+type PostgresStandbyMode string
 
 const (
-	HotStandby  StandbyMode = "hot"
-	WarmStandby StandbyMode = "warm"
+	HotPostgresStandbyMode  PostgresStandbyMode = "Hot"
+	WarmPostgresStandbyMode PostgresStandbyMode = "Warm"
+
+	// Deprecated
+	DeprecatedHotStandby PostgresStandbyMode = "hot"
+	// Deprecated
+	DeprecatedWarmStandby PostgresStandbyMode = "warm"
 )
 
-type StreamingMode string
+type PostgresStreamingMode string
 
 const (
-	SynchronousStreaming  StreamingMode = "synchronous"
-	AsynchronousStreaming StreamingMode = "asynchronous"
+	SynchronousPostgresStreamingMode  PostgresStreamingMode = "Synchronous"
+	AsynchronousPostgresStreamingMode PostgresStreamingMode = "Asynchronous"
+
+	// Deprecated
+	DeprecatedAsynchronousStreaming PostgresStreamingMode = "asynchronous"
 )

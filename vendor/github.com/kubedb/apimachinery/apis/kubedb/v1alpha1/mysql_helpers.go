@@ -5,10 +5,13 @@ import (
 
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	meta_util "github.com/appscode/kutil/meta"
+	"github.com/kubedb/apimachinery/apis"
 	apps "k8s.io/api/apps/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
 )
+
+var _ apis.ResourceInfo = &MySQL{}
 
 func (m MySQL) OffshootName() string {
 	return m.Name
@@ -24,8 +27,6 @@ func (m MySQL) OffshootSelectors() map[string]string {
 func (m MySQL) OffshootLabels() map[string]string {
 	return meta_util.FilterKeys(GenericKey, m.OffshootSelectors(), m.Labels)
 }
-
-var _ ResourceInfo = &MySQL{}
 
 func (m MySQL) ResourceShortCode() string {
 	return ResourceCodeMySQL
@@ -104,7 +105,7 @@ func (m MySQL) CustomResourceDefinition() *apiextensions.CustomResourceDefinitio
 		SpecDefinitionName:      "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.MySQL",
 		EnableValidation:        true,
 		GetOpenAPIDefinitions:   GetOpenAPIDefinitions,
-		EnableStatusSubresource: EnableStatusSubresource,
+		EnableStatusSubresource: apis.EnableStatusSubresource,
 		AdditionalPrinterColumns: []apiextensions.CustomResourceColumnDefinition{
 			{
 				Name:     "Version",
@@ -122,7 +123,7 @@ func (m MySQL) CustomResourceDefinition() *apiextensions.CustomResourceDefinitio
 				JSONPath: ".metadata.creationTimestamp",
 			},
 		},
-	}, setNameSchema)
+	}, apis.SetNameSchema)
 }
 
 func (m *MySQL) SetDefaults() {

@@ -44,6 +44,9 @@ type ElasticsearchSpec struct {
 	// Secret with SSL certificates
 	CertificateSecret *core.SecretVolumeSource `json:"certificateSecret,omitempty"`
 
+	// Authentication plugin used by Elasticsearch cluster. If unset, defaults to SearchGuard.
+	AuthPlugin ElasticsearchAuthPlugin `json:"authPlugin,omitempty"`
+
 	// Database authentication secret
 	DatabaseSecret *core.SecretVolumeSource `json:"databaseSecret,omitempty"`
 
@@ -167,3 +170,11 @@ type ElasticsearchSummary struct {
 	Mapping interface{}      `json:"mapping"`
 	Setting interface{}      `json:"setting"`
 }
+
+type ElasticsearchAuthPlugin string
+
+const (
+	ElasticsearchAuthPluginSearchGuard ElasticsearchAuthPlugin = "SearchGuard" // Default
+	ElasticsearchAuthPluginNone        ElasticsearchAuthPlugin = "None"
+	ElasticsearchAuthPluginXpack       ElasticsearchAuthPlugin = "X-Pack"
+)
