@@ -5,9 +5,12 @@ import (
 	"path/filepath"
 
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
+	"github.com/kubedb/apimachinery/apis"
 	"github.com/pkg/errors"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 )
+
+var _ apis.ResourceInfo = &Snapshot{}
 
 func (s Snapshot) OffshootName() string {
 	return s.Name
@@ -71,7 +74,7 @@ func (s Snapshot) CustomResourceDefinition() *apiextensions.CustomResourceDefini
 		SpecDefinitionName:      "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1.Snapshot",
 		EnableValidation:        true,
 		GetOpenAPIDefinitions:   GetOpenAPIDefinitions,
-		EnableStatusSubresource: EnableStatusSubresource,
+		EnableStatusSubresource: apis.EnableStatusSubresource,
 		AdditionalPrinterColumns: []apiextensions.CustomResourceColumnDefinition{
 			{
 				Name:     "DatabaseName",
@@ -89,7 +92,7 @@ func (s Snapshot) CustomResourceDefinition() *apiextensions.CustomResourceDefini
 				JSONPath: ".metadata.creationTimestamp",
 			},
 		},
-	}, setNameSchema)
+	}, apis.SetNameSchema)
 }
 
 func (s *Snapshot) SetDefaults() {
