@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	catalog_v1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
+	catalogv1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
 	versioned "github.com/kubedb/apimachinery/client/clientset/versioned"
 	internalinterfaces "github.com/kubedb/apimachinery/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/kubedb/apimachinery/client/listers/catalog/v1alpha1"
@@ -69,7 +69,7 @@ func NewFilteredMemcachedVersionInformer(client versioned.Interface, resyncPerio
 				return client.CatalogV1alpha1().MemcachedVersions().Watch(options)
 			},
 		},
-		&catalog_v1alpha1.MemcachedVersion{},
+		&catalogv1alpha1.MemcachedVersion{},
 		resyncPeriod,
 		indexers,
 	)
@@ -80,7 +80,7 @@ func (f *memcachedVersionInformer) defaultInformer(client versioned.Interface, r
 }
 
 func (f *memcachedVersionInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&catalog_v1alpha1.MemcachedVersion{}, f.defaultInformer)
+	return f.factory.InformerFor(&catalogv1alpha1.MemcachedVersion{}, f.defaultInformer)
 }
 
 func (f *memcachedVersionInformer) Lister() v1alpha1.MemcachedVersionLister {

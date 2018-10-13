@@ -59,7 +59,7 @@ func (mg *MailgunImpl) GetRoutes(limit, skip int) (int, []Route, error) {
 // The route structure you provide serves as a template, and
 // only a subset of the fields influence the operation.
 // See the Route structure definition for more details.
-func (mg *MailgunImpl) CreateRoute(prototype Route) (Route, error) {
+func (mg *MailgunImpl) CreateRoute(prototype Route) (_ignored Route, err error) {
 	r := newHTTPRequest(generatePublicApiUrl(mg, routesEndpoint))
 	r.setClient(mg.Client())
 	r.setBasicAuth(basicAuthUser, mg.ApiKey())
@@ -74,7 +74,9 @@ func (mg *MailgunImpl) CreateRoute(prototype Route) (Route, error) {
 		Message string `json:"message"`
 		*Route  `json:"route"`
 	}
-	err := postResponseFromJSON(r, p, &envelope)
+	if err = postResponseFromJSON(r, p, &envelope); err != nil {
+		return _ignored, err
+	}
 	return *envelope.Route, err
 }
 

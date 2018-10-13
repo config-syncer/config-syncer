@@ -45,11 +45,18 @@ type keyNameRC struct {
 	value io.ReadCloser
 }
 
+type keyNameBuff struct {
+	key   string
+	name  string
+	value []byte
+}
+
 type formDataPayload struct {
 	contentType string
 	Values      []keyValuePair
 	Files       []keyValuePair
 	ReadClosers []keyNameRC
+	Buffers     []keyNameBuff
 }
 
 type urlEncodedPayload struct {
@@ -120,6 +127,10 @@ func (f *formDataPayload) addFile(key, file string) {
 	f.Files = append(f.Files, keyValuePair{key: key, value: file})
 }
 
+func (f *formDataPayload) addBuffer(key, file string, buff []byte) {
+	f.Buffers = append(f.Buffers, keyNameBuff{key: key, name: file, value:buff})
+}
+
 func (f *formDataPayload) addReadCloser(key, name string, rc io.ReadCloser) {
 	f.ReadClosers = append(f.ReadClosers, keyNameRC{key: key, name: name, value: rc})
 }
@@ -154,6 +165,15 @@ func (f *formDataPayload) getPayloadBuffer() (*bytes.Buffer, error) {
 		if tmp, err := writer.CreateFormFile(file.key, file.name); err == nil {
 			defer file.value.Close()
 			io.Copy(tmp, file.value)
+		} else {
+			return nil, err
+		}
+	}
+
+	for _, buff := range f.Buffers {
+		if tmp, err := writer.CreateFormFile(buff.key, buff.name); err == nil {
+			r := bytes.NewReader(buff.value)
+			io.Copy(tmp, r)
 		} else {
 			return nil, err
 		}

@@ -6,8 +6,10 @@ import (
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	meta_util "github.com/appscode/kutil/meta"
 	"github.com/kubedb/apimachinery/apis"
+	"github.com/kubedb/apimachinery/apis/kubedb"
 	apps "k8s.io/api/apps/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	appcat "kmodules.xyz/custom-resources/apis/appcatalog/v1alpha1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
 )
 
@@ -64,6 +66,22 @@ func (e *Elasticsearch) GetConnectionURL() string {
 	return fmt.Sprintf("%v://%s.%s:%d", e.GetConnectionScheme(), e.OffshootName(), e.Namespace, ElasticsearchRestPort)
 }
 
+type elasticsearchApp struct {
+	*Elasticsearch
+}
+
+func (r elasticsearchApp) Name() string {
+	return fmt.Sprintf("kubedb:%s:%s:%s", ResourceSingularElasticsearch, r.Elasticsearch.Namespace, r.Elasticsearch.Name)
+}
+
+func (r elasticsearchApp) Type() appcat.AppType {
+	return appcat.AppType(fmt.Sprintf("%s/%s", kubedb.GroupName, ResourceSingularElasticsearch))
+}
+
+func (r Elasticsearch) AppBindingMeta() appcat.AppBindingMeta {
+	return &elasticsearchApp{&r}
+}
+
 type elasticsearchStatsService struct {
 	*Elasticsearch
 }
@@ -81,7 +99,7 @@ func (e elasticsearchStatsService) ServiceMonitorName() string {
 }
 
 func (e elasticsearchStatsService) Path() string {
-	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", e.Namespace, e.ResourcePlural(), e.Name)
+	return "/metrics"
 }
 
 func (e elasticsearchStatsService) Scheme() string {
@@ -156,6 +174,10 @@ func (e *ElasticsearchSpec) SetDefaults() {
 
 	// migrate first to avoid incorrect defaulting
 	e.BackupSchedule.SetDefaults()
+	if e.DoNotPause {
+		e.TerminationPolicy = TerminationPolicyDoNotTerminate
+		e.DoNotPause = false
+	}
 	if len(e.NodeSelector) > 0 {
 		e.PodTemplate.Spec.NodeSelector = e.NodeSelector
 		e.NodeSelector = nil
@@ -192,7 +214,11 @@ func (e *ElasticsearchSpec) SetDefaults() {
 		e.UpdateStrategy.Type = apps.RollingUpdateStatefulSetStrategyType
 	}
 	if e.TerminationPolicy == "" {
-		e.TerminationPolicy = TerminationPolicyPause
+		if e.StorageType == StorageTypeEphemeral {
+			e.TerminationPolicy = TerminationPolicyDelete
+		} else {
+			e.TerminationPolicy = TerminationPolicyPause
+		}
 	}
 }
 

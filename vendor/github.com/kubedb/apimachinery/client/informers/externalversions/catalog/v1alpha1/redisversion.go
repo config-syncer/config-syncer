@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	catalog_v1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
+	catalogv1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
 	versioned "github.com/kubedb/apimachinery/client/clientset/versioned"
 	internalinterfaces "github.com/kubedb/apimachinery/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/kubedb/apimachinery/client/listers/catalog/v1alpha1"
@@ -69,7 +69,7 @@ func NewFilteredRedisVersionInformer(client versioned.Interface, resyncPeriod ti
 				return client.CatalogV1alpha1().RedisVersions().Watch(options)
 			},
 		},
-		&catalog_v1alpha1.RedisVersion{},
+		&catalogv1alpha1.RedisVersion{},
 		resyncPeriod,
 		indexers,
 	)
@@ -80,7 +80,7 @@ func (f *redisVersionInformer) defaultInformer(client versioned.Interface, resyn
 }
 
 func (f *redisVersionInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&catalog_v1alpha1.RedisVersion{}, f.defaultInformer)
+	return f.factory.InformerFor(&catalogv1alpha1.RedisVersion{}, f.defaultInformer)
 }
 
 func (f *redisVersionInformer) Lister() v1alpha1.RedisVersionLister {

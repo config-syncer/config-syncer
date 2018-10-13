@@ -18,17 +18,26 @@ type EmailVerificationParts struct {
 // See the ValidateEmail method and example for more details.
 //
 // IsValid indicates whether an email address conforms to IETF RFC standards.
+// MailboxVerification indicates whether an email address is deliverable.
 // Parts records the different subfields of an email address.
 // Address echoes the address provided.
 // DidYouMean provides a simple recommendation in case the address is invalid or
 // Mailgun thinks you might have a typo.
 // DidYouMean may be empty (""), in which case Mailgun has no recommendation to give.
 // The existence of DidYouMean does NOT imply the email provided has anything wrong with it.
+// IsDisposableAddress indicates whether Mailgun thinks the address is from a known
+// disposable mailbox provider.
+// IsRoleAddress indicates whether Mailgun thinks the address is an email distribution list.
+// Reason contains error's description.
 type EmailVerification struct {
-	IsValid    bool                   `json:"is_valid"`
-	Parts      EmailVerificationParts `json:"parts"`
-	Address    string                 `json:"address"`
-	DidYouMean string                 `json:"did_you_mean"`
+	IsValid             bool                   `json:"is_valid"`
+	MailboxVerification bool                   `json:"mailbox_verification,string"`
+	Parts               EmailVerificationParts `json:"parts"`
+	Address             string                 `json:"address"`
+	DidYouMean          string                 `json:"did_you_mean"`
+	IsDisposableAddress bool                   `json:"is_disposable_address"`
+	IsRoleAddress       bool                   `json:"is_role_address"`
+	Reason              string                 `json:"reason"`
 }
 
 type addressParseResult struct {
@@ -43,6 +52,7 @@ func (m *MailgunImpl) ValidateEmail(email string) (EmailVerification, error) {
 	r := newHTTPRequest(generatePublicApiUrl(m, addressValidateEndpoint))
 	r.setClient(m.Client())
 	r.addParameter("address", email)
+	r.addParameter("mailbox_verification", "true")
 	r.setBasicAuth(basicAuthUser, m.PublicApiKey())
 
 	var response EmailVerification

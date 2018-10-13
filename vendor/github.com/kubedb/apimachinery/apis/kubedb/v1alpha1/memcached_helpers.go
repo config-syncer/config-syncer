@@ -6,8 +6,10 @@ import (
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	meta_util "github.com/appscode/kutil/meta"
 	"github.com/kubedb/apimachinery/apis"
+	"github.com/kubedb/apimachinery/apis/kubedb"
 	apps "k8s.io/api/apps/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	appcat "kmodules.xyz/custom-resources/apis/appcatalog/v1alpha1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
 )
 
@@ -48,6 +50,22 @@ func (m Memcached) ServiceName() string {
 	return m.OffshootName()
 }
 
+type memcachedApp struct {
+	*Memcached
+}
+
+func (r memcachedApp) Name() string {
+	return fmt.Sprintf("kubedb:%s:%s:%s", ResourceSingularMemcached, r.Memcached.Namespace, r.Memcached.Name)
+}
+
+func (r memcachedApp) Type() appcat.AppType {
+	return appcat.AppType(fmt.Sprintf("%s/%s", kubedb.GroupName, ResourceSingularMemcached))
+}
+
+func (r Memcached) AppBindingMeta() appcat.AppBindingMeta {
+	return &memcachedApp{&r}
+}
+
 type memcachedStatsService struct {
 	*Memcached
 }
@@ -65,7 +83,7 @@ func (m memcachedStatsService) ServiceMonitorName() string {
 }
 
 func (m memcachedStatsService) Path() string {
-	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", m.Namespace, m.ResourcePlural(), m.Name)
+	return "/metrics"
 }
 
 func (m memcachedStatsService) Scheme() string {
@@ -139,6 +157,10 @@ func (m *MemcachedSpec) SetDefaults() {
 	}
 
 	// migrate first to avoid incorrect defaulting
+	if m.DoNotPause {
+		m.TerminationPolicy = TerminationPolicyDoNotTerminate
+		m.DoNotPause = false
+	}
 	if len(m.NodeSelector) > 0 {
 		m.PodTemplate.Spec.NodeSelector = m.NodeSelector
 		m.NodeSelector = nil

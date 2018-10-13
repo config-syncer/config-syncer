@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	monitoring_v1alpha1 "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
+	monitoringv1alpha1 "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	versioned "github.com/appscode/searchlight/client/clientset/versioned"
 	internalinterfaces "github.com/appscode/searchlight/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/appscode/searchlight/client/listers/monitoring/v1alpha1"
@@ -70,7 +70,7 @@ func NewFilteredNodeAlertInformer(client versioned.Interface, namespace string, 
 				return client.MonitoringV1alpha1().NodeAlerts(namespace).Watch(options)
 			},
 		},
-		&monitoring_v1alpha1.NodeAlert{},
+		&monitoringv1alpha1.NodeAlert{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *nodeAlertInformer) defaultInformer(client versioned.Interface, resyncPe
 }
 
 func (f *nodeAlertInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&monitoring_v1alpha1.NodeAlert{}, f.defaultInformer)
+	return f.factory.InformerFor(&monitoringv1alpha1.NodeAlert{}, f.defaultInformer)
 }
 
 func (f *nodeAlertInformer) Lister() v1alpha1.NodeAlertLister {

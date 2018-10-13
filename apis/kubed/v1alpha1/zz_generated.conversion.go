@@ -34,13 +34,28 @@ func init() {
 
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
-func RegisterConversions(scheme *runtime.Scheme) error {
-	return scheme.AddGeneratedConversionFuncs(
-		Convert_v1alpha1_ResultEntry_To_kubed_ResultEntry,
-		Convert_kubed_ResultEntry_To_v1alpha1_ResultEntry,
-		Convert_v1alpha1_SearchResult_To_kubed_SearchResult,
-		Convert_kubed_SearchResult_To_v1alpha1_SearchResult,
-	)
+func RegisterConversions(s *runtime.Scheme) error {
+	if err := s.AddGeneratedConversionFunc((*ResultEntry)(nil), (*kubed.ResultEntry)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ResultEntry_To_kubed_ResultEntry(a.(*ResultEntry), b.(*kubed.ResultEntry), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*kubed.ResultEntry)(nil), (*ResultEntry)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_kubed_ResultEntry_To_v1alpha1_ResultEntry(a.(*kubed.ResultEntry), b.(*ResultEntry), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*SearchResult)(nil), (*kubed.SearchResult)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_SearchResult_To_kubed_SearchResult(a.(*SearchResult), b.(*kubed.SearchResult), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*kubed.SearchResult)(nil), (*SearchResult)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_kubed_SearchResult_To_v1alpha1_SearchResult(a.(*kubed.SearchResult), b.(*SearchResult), scope)
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func autoConvert_v1alpha1_ResultEntry_To_kubed_ResultEntry(in *ResultEntry, out *kubed.ResultEntry, s conversion.Scope) error {

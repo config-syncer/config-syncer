@@ -43,12 +43,12 @@ var (
 //
 // AccessLevel may be one of ReadOnly, Members, or Everyone.
 type List struct {
-	Address      string `json:"address",omitempty"`
-	Name         string `json:"name",omitempty"`
-	Description  string `json:"description",omitempty"`
-	AccessLevel  string `json:"access_level",omitempty"`
-	CreatedAt    string `json:"created_at",omitempty"`
-	MembersCount int    `json:"members_count",omitempty"`
+	Address      string `json:"address,omitempty"`
+	Name         string `json:"name,omitempty"`
+	Description  string `json:"description,omitempty"`
+	AccessLevel  string `json:"access_level,omitempty"`
+	CreatedAt    string `json:"created_at,omitempty"`
+	MembersCount int    `json:"members_count,omitempty"`
 }
 
 // A Member structure represents a member of the mailing list.

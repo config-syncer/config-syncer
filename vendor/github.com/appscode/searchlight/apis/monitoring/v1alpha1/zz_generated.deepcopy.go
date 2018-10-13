@@ -182,21 +182,13 @@ func (in *IncidentNotification) DeepCopyInto(out *IncidentNotification) {
 	*out = *in
 	if in.Author != nil {
 		in, out := &in.Author, &out.Author
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(string)
-			**out = **in
-		}
+		*out = new(string)
+		**out = **in
 	}
 	if in.Comment != nil {
 		in, out := &in.Comment, &out.Comment
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(string)
-			**out = **in
-		}
+		*out = new(string)
+		**out = **in
 	}
 	in.FirstTimestamp.DeepCopyInto(&out.FirstTimestamp)
 	in.LastTimestamp.DeepCopyInto(&out.LastTimestamp)
@@ -308,12 +300,8 @@ func (in *NodeAlertSpec) DeepCopyInto(out *NodeAlertSpec) {
 	}
 	if in.NodeName != nil {
 		in, out := &in.NodeName, &out.NodeName
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(string)
-			**out = **in
-		}
+		*out = new(string)
+		**out = **in
 	}
 	out.CheckInterval = in.CheckInterval
 	out.AlertInterval = in.AlertInterval
@@ -349,12 +337,8 @@ func (in *PluginArguments) DeepCopyInto(out *PluginArguments) {
 	*out = *in
 	if in.Vars != nil {
 		in, out := &in.Vars, &out.Vars
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(PluginVars)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(PluginVars)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Host != nil {
 		in, out := &in.Host, &out.Host
@@ -485,21 +469,13 @@ func (in *PodAlertSpec) DeepCopyInto(out *PodAlertSpec) {
 	*out = *in
 	if in.Selector != nil {
 		in, out := &in.Selector, &out.Selector
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(v1.LabelSelector)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(v1.LabelSelector)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.PodName != nil {
 		in, out := &in.PodName, &out.PodName
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(string)
-			**out = **in
-		}
+		*out = new(string)
+		**out = **in
 	}
 	out.CheckInterval = in.CheckInterval
 	out.AlertInterval = in.AlertInterval
@@ -616,12 +592,8 @@ func (in *SearchlightPluginSpec) DeepCopyInto(out *SearchlightPluginSpec) {
 	*out = *in
 	if in.Webhook != nil {
 		in, out := &in.Webhook, &out.Webhook
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(WebhookServiceSpec)
-			**out = **in
-		}
+		*out = new(WebhookServiceSpec)
+		**out = **in
 	}
 	if in.AlertKinds != nil {
 		in, out := &in.AlertKinds, &out.AlertKinds

@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	catalog_v1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
+	catalogv1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
 	versioned "github.com/kubedb/apimachinery/client/clientset/versioned"
 	internalinterfaces "github.com/kubedb/apimachinery/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/kubedb/apimachinery/client/listers/catalog/v1alpha1"
@@ -69,7 +69,7 @@ func NewFilteredMongoDBVersionInformer(client versioned.Interface, resyncPeriod 
 				return client.CatalogV1alpha1().MongoDBVersions().Watch(options)
 			},
 		},
-		&catalog_v1alpha1.MongoDBVersion{},
+		&catalogv1alpha1.MongoDBVersion{},
 		resyncPeriod,
 		indexers,
 	)
@@ -80,7 +80,7 @@ func (f *mongoDBVersionInformer) defaultInformer(client versioned.Interface, res
 }
 
 func (f *mongoDBVersionInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&catalog_v1alpha1.MongoDBVersion{}, f.defaultInformer)
+	return f.factory.InformerFor(&catalogv1alpha1.MongoDBVersion{}, f.defaultInformer)
 }
 
 func (f *mongoDBVersionInformer) Lister() v1alpha1.MongoDBVersionLister {

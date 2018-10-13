@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	monitoring_v1alpha1 "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
+	monitoringv1alpha1 "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	versioned "github.com/appscode/searchlight/client/clientset/versioned"
 	internalinterfaces "github.com/appscode/searchlight/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/appscode/searchlight/client/listers/monitoring/v1alpha1"
@@ -70,7 +70,7 @@ func NewFilteredClusterAlertInformer(client versioned.Interface, namespace strin
 				return client.MonitoringV1alpha1().ClusterAlerts(namespace).Watch(options)
 			},
 		},
-		&monitoring_v1alpha1.ClusterAlert{},
+		&monitoringv1alpha1.ClusterAlert{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *clusterAlertInformer) defaultInformer(client versioned.Interface, resyn
 }
 
 func (f *clusterAlertInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&monitoring_v1alpha1.ClusterAlert{}, f.defaultInformer)
+	return f.factory.InformerFor(&monitoringv1alpha1.ClusterAlert{}, f.defaultInformer)
 }
 
 func (f *clusterAlertInformer) Lister() v1alpha1.ClusterAlertLister {

@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	catalog_v1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
+	catalogv1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
 	versioned "github.com/kubedb/apimachinery/client/clientset/versioned"
 	internalinterfaces "github.com/kubedb/apimachinery/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/kubedb/apimachinery/client/listers/catalog/v1alpha1"
@@ -69,7 +69,7 @@ func NewFilteredElasticsearchVersionInformer(client versioned.Interface, resyncP
 				return client.CatalogV1alpha1().ElasticsearchVersions().Watch(options)
 			},
 		},
-		&catalog_v1alpha1.ElasticsearchVersion{},
+		&catalogv1alpha1.ElasticsearchVersion{},
 		resyncPeriod,
 		indexers,
 	)
@@ -80,7 +80,7 @@ func (f *elasticsearchVersionInformer) defaultInformer(client versioned.Interfac
 }
 
 func (f *elasticsearchVersionInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&catalog_v1alpha1.ElasticsearchVersion{}, f.defaultInformer)
+	return f.factory.InformerFor(&catalogv1alpha1.ElasticsearchVersion{}, f.defaultInformer)
 }
 
 func (f *elasticsearchVersionInformer) Lister() v1alpha1.ElasticsearchVersionLister {
