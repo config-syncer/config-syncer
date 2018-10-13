@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	kubedb_v1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	kubedbv1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	versioned "github.com/kubedb/apimachinery/client/clientset/versioned"
 	internalinterfaces "github.com/kubedb/apimachinery/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/kubedb/apimachinery/client/listers/kubedb/v1alpha1"
@@ -70,7 +70,7 @@ func NewFilteredSnapshotInformer(client versioned.Interface, namespace string, r
 				return client.KubedbV1alpha1().Snapshots(namespace).Watch(options)
 			},
 		},
-		&kubedb_v1alpha1.Snapshot{},
+		&kubedbv1alpha1.Snapshot{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *snapshotInformer) defaultInformer(client versioned.Interface, resyncPer
 }
 
 func (f *snapshotInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&kubedb_v1alpha1.Snapshot{}, f.defaultInformer)
+	return f.factory.InformerFor(&kubedbv1alpha1.Snapshot{}, f.defaultInformer)
 }
 
 func (f *snapshotInformer) Lister() v1alpha1.SnapshotLister {

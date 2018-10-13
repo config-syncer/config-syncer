@@ -70,4 +70,6 @@ const (
 	TerminationPolicyDelete TerminationPolicy = "Delete"
 	// Deletes database pods, service, pvcs and snapshot data. This will not create a DormantDatabase.
 	TerminationPolicyWipeOut TerminationPolicy = "WipeOut"
+	// Rejects attempt to delete database using ValidationWebhook. This replaces spec.doNotPause = true
+	TerminationPolicyDoNotTerminate TerminationPolicy = "DoNotTerminate"
 )

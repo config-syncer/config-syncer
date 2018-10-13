@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	kubedb_v1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	kubedbv1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	versioned "github.com/kubedb/apimachinery/client/clientset/versioned"
 	internalinterfaces "github.com/kubedb/apimachinery/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/kubedb/apimachinery/client/listers/kubedb/v1alpha1"
@@ -70,7 +70,7 @@ func NewFilteredMemcachedInformer(client versioned.Interface, namespace string, 
 				return client.KubedbV1alpha1().Memcacheds(namespace).Watch(options)
 			},
 		},
-		&kubedb_v1alpha1.Memcached{},
+		&kubedbv1alpha1.Memcached{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *memcachedInformer) defaultInformer(client versioned.Interface, resyncPe
 }
 
 func (f *memcachedInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&kubedb_v1alpha1.Memcached{}, f.defaultInformer)
+	return f.factory.InformerFor(&kubedbv1alpha1.Memcached{}, f.defaultInformer)
 }
 
 func (f *memcachedInformer) Lister() v1alpha1.MemcachedLister {

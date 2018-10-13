@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	monitoring_v1alpha1 "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
+	monitoringv1alpha1 "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	versioned "github.com/appscode/searchlight/client/clientset/versioned"
 	internalinterfaces "github.com/appscode/searchlight/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/appscode/searchlight/client/listers/monitoring/v1alpha1"
@@ -69,7 +69,7 @@ func NewFilteredSearchlightPluginInformer(client versioned.Interface, resyncPeri
 				return client.MonitoringV1alpha1().SearchlightPlugins().Watch(options)
 			},
 		},
-		&monitoring_v1alpha1.SearchlightPlugin{},
+		&monitoringv1alpha1.SearchlightPlugin{},
 		resyncPeriod,
 		indexers,
 	)
@@ -80,7 +80,7 @@ func (f *searchlightPluginInformer) defaultInformer(client versioned.Interface, 
 }
 
 func (f *searchlightPluginInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&monitoring_v1alpha1.SearchlightPlugin{}, f.defaultInformer)
+	return f.factory.InformerFor(&monitoringv1alpha1.SearchlightPlugin{}, f.defaultInformer)
 }
 
 func (f *searchlightPluginInformer) Lister() v1alpha1.SearchlightPluginLister {

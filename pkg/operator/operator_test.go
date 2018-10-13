@@ -1,45 +1,36 @@
 package operator
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/appscode/go/log"
+	apiext_util "github.com/appscode/kutil/apiextensions/v1beta1"
 	"github.com/appscode/kutil/discovery"
 	searchlight_api "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	stash_api "github.com/appscode/stash/apis/stash/v1alpha1"
 	voyager_api "github.com/appscode/voyager/apis/voyager/v1beta1"
 	kubedb_api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
-	core "k8s.io/api/core/v1"
-	storage_v1 "k8s.io/api/storage/v1"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
-
-	// admission "k8s.io/api/admission/v1beta1"
-	// admissionregistration "k8s.io/api/admissionregistration/v1beta1"
-	apps "k8s.io/api/apps/v1"
-	// authentication "k8s.io/api/authentication/v1"
+	apps "k8s.io/api/apps/v1" // authentication "k8s.io/api/authentication/v1"
 	// authorization "k8s.io/api/authorization/v1"
 	autoscaling "k8s.io/api/autoscaling/v1"
 	batch_v1 "k8s.io/api/batch/v1"
 	batch_v1beta1 "k8s.io/api/batch/v1beta1"
-	certificates "k8s.io/api/certificates/v1beta1"
-
-	// events "k8s.io/api/events/v1beta1"
-	extensions "k8s.io/api/extensions/v1beta1"
-	// imagepolicy "k8s.io/api/imagepolicy/v1alpha1"
+	certificates "k8s.io/api/certificates/v1beta1" // events "k8s.io/api/events/v1beta1"
+	core "k8s.io/api/core/v1"
+	extensions "k8s.io/api/extensions/v1beta1" // imagepolicy "k8s.io/api/imagepolicy/v1alpha1"
 	networking "k8s.io/api/networking/v1"
 	policy "k8s.io/api/policy/v1beta1"
-	rbac "k8s.io/api/rbac/v1"
-
-	// scheduling "k8s.io/api/scheduling/v1alpha1"
-	"os"
-
-	apiext_util "github.com/appscode/kutil/apiextensions/v1beta1"
+	rbac "k8s.io/api/rbac/v1" // scheduling "k8s.io/api/scheduling/v1alpha1"
+	storage_v1 "k8s.io/api/storage/v1"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	crd_cs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/util/homedir" // admission "k8s.io/api/admission/v1beta1"
+	// admissionregistration "k8s.io/api/admissionregistration/v1beta1"
 )
 
 func TestRestMapper(t *testing.T) {

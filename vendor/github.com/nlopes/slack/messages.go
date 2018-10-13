@@ -8,7 +8,6 @@ type OutgoingMessage struct {
 	Text            string `json:"text,omitempty"`
 	Type            string `json:"type,omitempty"`
 	ThreadTimestamp string `json:"thread_ts,omitempty"`
-	ThreadBroadcast bool   `json:"reply_broadcast,omitempty"`
 }
 
 // Message is an auxiliary type to allow us to have a message containing sub messages
@@ -27,7 +26,7 @@ type Msg struct {
 	Timestamp       string       `json:"ts,omitempty"`
 	ThreadTimestamp string       `json:"thread_ts,omitempty"`
 	IsStarred       bool         `json:"is_starred,omitempty"`
-	PinnedTo        []string     `json:"pinned_to,omitempty"`
+	PinnedTo        []string     `json:"pinned_to, omitempty"`
 	Attachments     []Attachment `json:"attachments,omitempty"`
 	Edited          *Edited      `json:"edited,omitempty"`
 	LastRead        string       `json:"last_read,omitempty"`
@@ -69,7 +68,7 @@ type Msg struct {
 	ParentUserId string  `json:"parent_user_id,omitempty"`
 
 	// file_share, file_comment, file_mention
-	Files []File `json:"files,omitempty"`
+	File *File `json:"file,omitempty"`
 
 	// file_share
 	Upload bool `json:"upload,omitempty"`
@@ -89,8 +88,7 @@ type Msg struct {
 
 	// slash commands and interactive messages
 	ResponseType    string `json:"response_type,omitempty"`
-	ReplaceOriginal bool   `json:"replace_original"`
-	DeleteOriginal  bool   `json:"delete_original"`
+	ReplaceOriginal bool   `json:"replace_original,omitempty"`
 }
 
 // Icon is used for bot messages
@@ -118,33 +116,27 @@ type Event struct {
 
 // Ping contains information about a Ping Event
 type Ping struct {
-	ID        int    `json:"id"`
-	Type      string `json:"type"`
-	Timestamp int64  `json:"timestamp"`
+	ID   int    `json:"id"`
+	Type string `json:"type"`
 }
 
 // Pong contains information about a Pong Event
 type Pong struct {
-	Type      string `json:"type"`
-	ReplyTo   int    `json:"reply_to"`
-	Timestamp int64  `json:"timestamp"`
+	Type    string `json:"type"`
+	ReplyTo int    `json:"reply_to"`
 }
 
 // NewOutgoingMessage prepares an OutgoingMessage that the user can
 // use to send a message. Use this function to properly set the
 // messageID.
-func (rtm *RTM) NewOutgoingMessage(text string, channelID string, options ...RTMsgOption) *OutgoingMessage {
+func (rtm *RTM) NewOutgoingMessage(text string, channelID string) *OutgoingMessage {
 	id := rtm.idGen.Next()
-	msg := OutgoingMessage{
+	return &OutgoingMessage{
 		ID:      id,
 		Type:    "message",
 		Channel: channelID,
 		Text:    text,
 	}
-	for _, option := range options {
-		option(&msg)
-	}
-	return &msg
 }
 
 // NewTypingMessage prepares an OutgoingMessage that the user can
@@ -157,22 +149,4 @@ func (rtm *RTM) NewTypingMessage(channelID string) *OutgoingMessage {
 		Type:    "typing",
 		Channel: channelID,
 	}
-}
-
-// RTMsgOption allows configuration of various options available for sending an RTM message
-type RTMsgOption func(*OutgoingMessage)
-
-// RTMsgOptionTS sets thead timestamp of an outgoing message in order to respond to a thread
-func RTMsgOptionTS(threadTimestamp string) RTMsgOption {
-	return func(msg *OutgoingMessage) {
-		msg.ThreadTimestamp = threadTimestamp
-	}
-}
-
-// RTMsgOptionBroadcast sets broadcast reply to channel to "true"
-func RTMsgOptionBroadcast() RTMsgOption {
-	return func(msg *OutgoingMessage) {
-		msg.ThreadBroadcast = true
-	}
-
 }

@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	monitoring_v1alpha1 "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
+	monitoringv1alpha1 "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	versioned "github.com/appscode/searchlight/client/clientset/versioned"
 	internalinterfaces "github.com/appscode/searchlight/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/appscode/searchlight/client/listers/monitoring/v1alpha1"
@@ -70,7 +70,7 @@ func NewFilteredIncidentInformer(client versioned.Interface, namespace string, r
 				return client.MonitoringV1alpha1().Incidents(namespace).Watch(options)
 			},
 		},
-		&monitoring_v1alpha1.Incident{},
+		&monitoringv1alpha1.Incident{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *incidentInformer) defaultInformer(client versioned.Interface, resyncPer
 }
 
 func (f *incidentInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&monitoring_v1alpha1.Incident{}, f.defaultInformer)
+	return f.factory.InformerFor(&monitoringv1alpha1.Incident{}, f.defaultInformer)
 }
 
 func (f *incidentInformer) Lister() v1alpha1.IncidentLister {

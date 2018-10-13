@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	kubedb_v1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	kubedbv1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	versioned "github.com/kubedb/apimachinery/client/clientset/versioned"
 	internalinterfaces "github.com/kubedb/apimachinery/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/kubedb/apimachinery/client/listers/kubedb/v1alpha1"
@@ -70,7 +70,7 @@ func NewFilteredDormantDatabaseInformer(client versioned.Interface, namespace st
 				return client.KubedbV1alpha1().DormantDatabases(namespace).Watch(options)
 			},
 		},
-		&kubedb_v1alpha1.DormantDatabase{},
+		&kubedbv1alpha1.DormantDatabase{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *dormantDatabaseInformer) defaultInformer(client versioned.Interface, re
 }
 
 func (f *dormantDatabaseInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&kubedb_v1alpha1.DormantDatabase{}, f.defaultInformer)
+	return f.factory.InformerFor(&kubedbv1alpha1.DormantDatabase{}, f.defaultInformer)
 }
 
 func (f *dormantDatabaseInformer) Lister() v1alpha1.DormantDatabaseLister {

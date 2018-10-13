@@ -6,8 +6,10 @@ import (
 	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
 	meta_util "github.com/appscode/kutil/meta"
 	"github.com/kubedb/apimachinery/apis"
+	"github.com/kubedb/apimachinery/apis/kubedb"
 	apps "k8s.io/api/apps/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	appcat "kmodules.xyz/custom-resources/apis/appcatalog/v1alpha1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
 )
 
@@ -48,32 +50,48 @@ func (m MySQL) ServiceName() string {
 	return m.OffshootName()
 }
 
-type mySQLStatsService struct {
+type mysqlApp struct {
 	*MySQL
 }
 
-func (m mySQLStatsService) GetNamespace() string {
+func (r mysqlApp) Name() string {
+	return fmt.Sprintf("kubedb:%s:%s:%s", ResourceSingularMySQL, r.MySQL.Namespace, r.MySQL.Name)
+}
+
+func (r mysqlApp) Type() appcat.AppType {
+	return appcat.AppType(fmt.Sprintf("%s/%s", kubedb.GroupName, ResourceSingularMySQL))
+}
+
+func (r MySQL) AppBindingMeta() appcat.AppBindingMeta {
+	return &mysqlApp{&r}
+}
+
+type mysqlStatsService struct {
+	*MySQL
+}
+
+func (m mysqlStatsService) GetNamespace() string {
 	return m.MySQL.GetNamespace()
 }
 
-func (m mySQLStatsService) ServiceName() string {
+func (m mysqlStatsService) ServiceName() string {
 	return m.OffshootName() + "-stats"
 }
 
-func (m mySQLStatsService) ServiceMonitorName() string {
+func (m mysqlStatsService) ServiceMonitorName() string {
 	return fmt.Sprintf("kubedb-%s-%s", m.Namespace, m.Name)
 }
 
-func (m mySQLStatsService) Path() string {
-	return fmt.Sprintf("/kubedb.com/v1alpha1/namespaces/%s/%s/%s/metrics", m.Namespace, m.ResourcePlural(), m.Name)
+func (m mysqlStatsService) Path() string {
+	return "/metrics"
 }
 
-func (m mySQLStatsService) Scheme() string {
+func (m mysqlStatsService) Scheme() string {
 	return ""
 }
 
 func (m MySQL) StatsService() mona.StatsAccessor {
-	return &mySQLStatsService{&m}
+	return &mysqlStatsService{&m}
 }
 
 func (m *MySQL) GetMonitoringVendor() string {
@@ -140,6 +158,10 @@ func (m *MySQLSpec) SetDefaults() {
 
 	// migrate first to avoid incorrect defaulting
 	m.BackupSchedule.SetDefaults()
+	if m.DoNotPause {
+		m.TerminationPolicy = TerminationPolicyDoNotTerminate
+		m.DoNotPause = false
+	}
 	if len(m.NodeSelector) > 0 {
 		m.PodTemplate.Spec.NodeSelector = m.NodeSelector
 		m.NodeSelector = nil
@@ -173,7 +195,11 @@ func (m *MySQLSpec) SetDefaults() {
 		m.UpdateStrategy.Type = apps.RollingUpdateStatefulSetStrategyType
 	}
 	if m.TerminationPolicy == "" {
-		m.TerminationPolicy = TerminationPolicyPause
+		if m.StorageType == StorageTypeEphemeral {
+			m.TerminationPolicy = TerminationPolicyDelete
+		} else {
+			m.TerminationPolicy = TerminationPolicyPause
+		}
 	}
 }
 

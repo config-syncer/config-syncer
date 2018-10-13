@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	monitoring_v1alpha1 "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
+	monitoringv1alpha1 "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	versioned "github.com/appscode/searchlight/client/clientset/versioned"
 	internalinterfaces "github.com/appscode/searchlight/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/appscode/searchlight/client/listers/monitoring/v1alpha1"
@@ -70,7 +70,7 @@ func NewFilteredPodAlertInformer(client versioned.Interface, namespace string, r
 				return client.MonitoringV1alpha1().PodAlerts(namespace).Watch(options)
 			},
 		},
-		&monitoring_v1alpha1.PodAlert{},
+		&monitoringv1alpha1.PodAlert{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *podAlertInformer) defaultInformer(client versioned.Interface, resyncPer
 }
 
 func (f *podAlertInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&monitoring_v1alpha1.PodAlert{}, f.defaultInformer)
+	return f.factory.InformerFor(&monitoringv1alpha1.PodAlert{}, f.defaultInformer)
 }
 
 func (f *podAlertInformer) Lister() v1alpha1.PodAlertLister {

@@ -38,7 +38,7 @@ func (b *backoff) Duration() time.Duration {
 	}
 	//calculate this duration
 	dur := float64(b.Min) * math.Pow(b.Factor, float64(b.attempts))
-	if b.Jitter {
+	if b.Jitter == true {
 		dur = rand.Float64()*(dur-float64(b.Min)) + float64(b.Min)
 	}
 	//cap!

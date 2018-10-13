@@ -45,48 +45,28 @@ func (in *Backend) DeepCopyInto(out *Backend) {
 	*out = *in
 	if in.Local != nil {
 		in, out := &in.Local, &out.Local
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(LocalSpec)
-			**out = **in
-		}
+		*out = new(LocalSpec)
+		**out = **in
 	}
 	if in.S3 != nil {
 		in, out := &in.S3, &out.S3
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(S3Spec)
-			**out = **in
-		}
+		*out = new(S3Spec)
+		**out = **in
 	}
 	if in.GCS != nil {
 		in, out := &in.GCS, &out.GCS
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(GCSSpec)
-			**out = **in
-		}
+		*out = new(GCSSpec)
+		**out = **in
 	}
 	if in.Azure != nil {
 		in, out := &in.Azure, &out.Azure
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(AzureSpec)
-			**out = **in
-		}
+		*out = new(AzureSpec)
+		**out = **in
 	}
 	if in.Swift != nil {
 		in, out := &in.Swift, &out.Swift
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(SwiftSpec)
-			**out = **in
-		}
+		*out = new(SwiftSpec)
+		**out = **in
 	}
 	return
 }
@@ -107,30 +87,18 @@ func (in *ClusterConfig) DeepCopyInto(out *ClusterConfig) {
 	out.TypeMeta = in.TypeMeta
 	if in.Snapshotter != nil {
 		in, out := &in.Snapshotter, &out.Snapshotter
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(SnapshotSpec)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(SnapshotSpec)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.RecycleBin != nil {
 		in, out := &in.RecycleBin, &out.RecycleBin
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(RecycleBinSpec)
-			**out = **in
-		}
+		*out = new(RecycleBinSpec)
+		**out = **in
 	}
 	if in.EventForwarder != nil {
 		in, out := &in.EventForwarder, &out.EventForwarder
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(EventForwarderSpec)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(EventForwarderSpec)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Janitors != nil {
 		in, out := &in.Janitors, &out.Janitors
@@ -181,48 +149,28 @@ func (in *EventForwarderSpec) DeepCopyInto(out *EventForwarderSpec) {
 	*out = *in
 	if in.NodeAdded != nil {
 		in, out := &in.NodeAdded, &out.NodeAdded
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(ForwarderSpec)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(ForwarderSpec)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.StorageAdded != nil {
 		in, out := &in.StorageAdded, &out.StorageAdded
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(ForwarderSpec)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(ForwarderSpec)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.IngressAdded != nil {
 		in, out := &in.IngressAdded, &out.IngressAdded
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(ForwarderSpec)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(ForwarderSpec)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.WarningEvents != nil {
 		in, out := &in.WarningEvents, &out.WarningEvents
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(ForwarderSpec)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(ForwarderSpec)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.CSREvents != nil {
 		in, out := &in.CSREvents, &out.CSREvents
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(ForwarderSpec)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(ForwarderSpec)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Rules != nil {
 		in, out := &in.Rules, &out.Rules
@@ -367,21 +315,13 @@ func (in *JanitorSpec) DeepCopyInto(out *JanitorSpec) {
 	out.TTL = in.TTL
 	if in.Elasticsearch != nil {
 		in, out := &in.Elasticsearch, &out.Elasticsearch
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(ElasticsearchSpec)
-			**out = **in
-		}
+		*out = new(ElasticsearchSpec)
+		**out = **in
 	}
 	if in.InfluxDB != nil {
 		in, out := &in.InfluxDB, &out.InfluxDB
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(InfluxDBSpec)
-			**out = **in
-		}
+		*out = new(InfluxDBSpec)
+		**out = **in
 	}
 	return
 }

@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	kubedb_v1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	kubedbv1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	versioned "github.com/kubedb/apimachinery/client/clientset/versioned"
 	internalinterfaces "github.com/kubedb/apimachinery/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/kubedb/apimachinery/client/listers/kubedb/v1alpha1"
@@ -70,7 +70,7 @@ func NewFilteredEtcdInformer(client versioned.Interface, namespace string, resyn
 				return client.KubedbV1alpha1().Etcds(namespace).Watch(options)
 			},
 		},
-		&kubedb_v1alpha1.Etcd{},
+		&kubedbv1alpha1.Etcd{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *etcdInformer) defaultInformer(client versioned.Interface, resyncPeriod 
 }
 
 func (f *etcdInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&kubedb_v1alpha1.Etcd{}, f.defaultInformer)
+	return f.factory.InformerFor(&kubedbv1alpha1.Etcd{}, f.defaultInformer)
 }
 
 func (f *etcdInformer) Lister() v1alpha1.EtcdLister {

@@ -3,7 +3,6 @@ package slack
 import (
 	"encoding/json"
 	"errors"
-	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -20,9 +19,8 @@ const (
 //
 // Create this element with Client's NewRTM() or NewRTMWithOptions(*RTMOptions)
 type RTM struct {
-	idGen        IDGenerator
-	pingInterval time.Duration
-	pingDeadman  *time.Timer
+	idGen IDGenerator
+	pings map[int]time.Time
 
 	// Connection life-cycle
 	conn             *websocket.Conn
@@ -46,13 +44,6 @@ type RTM struct {
 	// rtm.start to connect to Slack, otherwise it will use
 	// rtm.connect
 	useRTMStart bool
-
-	// dialer is a gorilla/websocket Dialer. If nil, use the default
-	// Dialer.
-	dialer *websocket.Dialer
-
-	// mu is mutex used to prevent RTM connection race conditions
-	mu *sync.Mutex
 }
 
 // RTMOptions allows configuration of various options available for RTM messaging
@@ -69,23 +60,21 @@ type RTMOptions struct {
 
 // Disconnect and wait, blocking until a successful disconnection.
 func (rtm *RTM) Disconnect() error {
-	// avoid RTM disconnect race conditions
-	rtm.mu.Lock()
-	defer rtm.mu.Unlock()
-
-	// always push into the disconnected channel when invoked,
-	// this lets the ManagedConnection() function properly clean up.
-	// if the buffer is full then just continue on.
-	select {
-	case rtm.disconnected <- struct{}{}:
-	default:
-	}
+	// this channel is always closed on disconnect. lets the ManagedConnection() function
+	// properly clean up.
+	close(rtm.disconnected)
 
 	if !rtm.isConnected {
 		return errors.New("Invalid call to Disconnect - Slack API is already disconnected")
 	}
 
 	rtm.killChannel <- true
+	return nil
+}
+
+// Reconnect only makes sense if you've successfully disconnectd with Disconnect().
+func (rtm *RTM) Reconnect() error {
+	logger.Println("RTM::Reconnect not implemented!")
 	return nil
 }
 
@@ -107,12 +96,4 @@ func (rtm *RTM) SendMessage(msg *OutgoingMessage) {
 	}
 
 	rtm.outgoingMessages <- *msg
-}
-
-func (rtm *RTM) resetDeadman() {
-	timerReset(rtm.pingDeadman, deadmanDuration(rtm.pingInterval))
-}
-
-func deadmanDuration(d time.Duration) time.Duration {
-	return d * 4
 }

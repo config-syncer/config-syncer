@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	catalog_v1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
+	catalogv1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
 	versioned "github.com/kubedb/apimachinery/client/clientset/versioned"
 	internalinterfaces "github.com/kubedb/apimachinery/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/kubedb/apimachinery/client/listers/catalog/v1alpha1"
@@ -69,7 +69,7 @@ func NewFilteredMySQLVersionInformer(client versioned.Interface, resyncPeriod ti
 				return client.CatalogV1alpha1().MySQLVersions().Watch(options)
 			},
 		},
-		&catalog_v1alpha1.MySQLVersion{},
+		&catalogv1alpha1.MySQLVersion{},
 		resyncPeriod,
 		indexers,
 	)
@@ -80,7 +80,7 @@ func (f *mySQLVersionInformer) defaultInformer(client versioned.Interface, resyn
 }
 
 func (f *mySQLVersionInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&catalog_v1alpha1.MySQLVersion{}, f.defaultInformer)
+	return f.factory.InformerFor(&catalogv1alpha1.MySQLVersion{}, f.defaultInformer)
 }
 
 func (f *mySQLVersionInformer) Lister() v1alpha1.MySQLVersionLister {

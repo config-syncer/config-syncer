@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// DefaultLimit and DefaultSkip instruct the SDK to rely on Mailgun's reasonable defaults for pagination settings.
+// DefaultLimit and DefaultSkip instruct the SDK to rely on Mailgun's reasonable defaults for Paging settings.
 const (
 	DefaultLimit = -1
 	DefaultSkip  = -1

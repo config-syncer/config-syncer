@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	kubedb_v1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	kubedbv1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	versioned "github.com/kubedb/apimachinery/client/clientset/versioned"
 	internalinterfaces "github.com/kubedb/apimachinery/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/kubedb/apimachinery/client/listers/kubedb/v1alpha1"
@@ -70,7 +70,7 @@ func NewFilteredMySQLInformer(client versioned.Interface, namespace string, resy
 				return client.KubedbV1alpha1().MySQLs(namespace).Watch(options)
 			},
 		},
-		&kubedb_v1alpha1.MySQL{},
+		&kubedbv1alpha1.MySQL{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *mySQLInformer) defaultInformer(client versioned.Interface, resyncPeriod
 }
 
 func (f *mySQLInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&kubedb_v1alpha1.MySQL{}, f.defaultInformer)
+	return f.factory.InformerFor(&kubedbv1alpha1.MySQL{}, f.defaultInformer)
 }
 
 func (f *mySQLInformer) Lister() v1alpha1.MySQLLister {

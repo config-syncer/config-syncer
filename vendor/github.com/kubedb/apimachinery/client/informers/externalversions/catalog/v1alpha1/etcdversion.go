@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	catalog_v1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
+	catalogv1alpha1 "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
 	versioned "github.com/kubedb/apimachinery/client/clientset/versioned"
 	internalinterfaces "github.com/kubedb/apimachinery/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/kubedb/apimachinery/client/listers/catalog/v1alpha1"
@@ -69,7 +69,7 @@ func NewFilteredEtcdVersionInformer(client versioned.Interface, resyncPeriod tim
 				return client.CatalogV1alpha1().EtcdVersions().Watch(options)
 			},
 		},
-		&catalog_v1alpha1.EtcdVersion{},
+		&catalogv1alpha1.EtcdVersion{},
 		resyncPeriod,
 		indexers,
 	)
@@ -80,7 +80,7 @@ func (f *etcdVersionInformer) defaultInformer(client versioned.Interface, resync
 }
 
 func (f *etcdVersionInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&catalog_v1alpha1.EtcdVersion{}, f.defaultInformer)
+	return f.factory.InformerFor(&catalogv1alpha1.EtcdVersion{}, f.defaultInformer)
 }
 
 func (f *etcdVersionInformer) Lister() v1alpha1.EtcdVersionLister {

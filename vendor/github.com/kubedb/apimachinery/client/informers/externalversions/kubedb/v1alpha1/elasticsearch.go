@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	kubedb_v1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	kubedbv1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	versioned "github.com/kubedb/apimachinery/client/clientset/versioned"
 	internalinterfaces "github.com/kubedb/apimachinery/client/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/kubedb/apimachinery/client/listers/kubedb/v1alpha1"
@@ -70,7 +70,7 @@ func NewFilteredElasticsearchInformer(client versioned.Interface, namespace stri
 				return client.KubedbV1alpha1().Elasticsearches(namespace).Watch(options)
 			},
 		},
-		&kubedb_v1alpha1.Elasticsearch{},
+		&kubedbv1alpha1.Elasticsearch{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *elasticsearchInformer) defaultInformer(client versioned.Interface, resy
 }
 
 func (f *elasticsearchInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&kubedb_v1alpha1.Elasticsearch{}, f.defaultInformer)
+	return f.factory.InformerFor(&kubedbv1alpha1.Elasticsearch{}, f.defaultInformer)
 }
 
 func (f *elasticsearchInformer) Lister() v1alpha1.ElasticsearchLister {

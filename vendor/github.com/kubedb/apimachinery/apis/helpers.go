@@ -5,6 +5,10 @@ import (
 	"k8s.io/kube-openapi/pkg/common"
 )
 
+const (
+	Finalizer = "kubedb.com"
+)
+
 var (
 	EnableStatusSubresource bool
 )

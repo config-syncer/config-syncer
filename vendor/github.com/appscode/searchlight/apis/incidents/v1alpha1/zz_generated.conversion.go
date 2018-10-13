@@ -32,15 +32,38 @@ func init() {
 
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
-func RegisterConversions(scheme *runtime.Scheme) error {
-	return scheme.AddGeneratedConversionFuncs(
-		Convert_v1alpha1_Acknowledgement_To_incidents_Acknowledgement,
-		Convert_incidents_Acknowledgement_To_v1alpha1_Acknowledgement,
-		Convert_v1alpha1_AcknowledgementRequest_To_incidents_AcknowledgementRequest,
-		Convert_incidents_AcknowledgementRequest_To_v1alpha1_AcknowledgementRequest,
-		Convert_v1alpha1_AcknowledgementResponse_To_incidents_AcknowledgementResponse,
-		Convert_incidents_AcknowledgementResponse_To_v1alpha1_AcknowledgementResponse,
-	)
+func RegisterConversions(s *runtime.Scheme) error {
+	if err := s.AddGeneratedConversionFunc((*Acknowledgement)(nil), (*incidents.Acknowledgement)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_Acknowledgement_To_incidents_Acknowledgement(a.(*Acknowledgement), b.(*incidents.Acknowledgement), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*incidents.Acknowledgement)(nil), (*Acknowledgement)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_incidents_Acknowledgement_To_v1alpha1_Acknowledgement(a.(*incidents.Acknowledgement), b.(*Acknowledgement), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*AcknowledgementRequest)(nil), (*incidents.AcknowledgementRequest)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_AcknowledgementRequest_To_incidents_AcknowledgementRequest(a.(*AcknowledgementRequest), b.(*incidents.AcknowledgementRequest), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*incidents.AcknowledgementRequest)(nil), (*AcknowledgementRequest)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_incidents_AcknowledgementRequest_To_v1alpha1_AcknowledgementRequest(a.(*incidents.AcknowledgementRequest), b.(*AcknowledgementRequest), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*AcknowledgementResponse)(nil), (*incidents.AcknowledgementResponse)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_AcknowledgementResponse_To_incidents_AcknowledgementResponse(a.(*AcknowledgementResponse), b.(*incidents.AcknowledgementResponse), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*incidents.AcknowledgementResponse)(nil), (*AcknowledgementResponse)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_incidents_AcknowledgementResponse_To_v1alpha1_AcknowledgementResponse(a.(*incidents.AcknowledgementResponse), b.(*AcknowledgementResponse), scope)
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func autoConvert_v1alpha1_Acknowledgement_To_incidents_Acknowledgement(in *Acknowledgement, out *incidents.Acknowledgement, s conversion.Scope) error {
