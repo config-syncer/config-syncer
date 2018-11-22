@@ -117,6 +117,8 @@ type PodSpec struct {
 
 	// Periodic probe of container liveness.
 	// Container will be restarted if the probe fails.
+	// Controllers may set default LivenessProbe if no liveness probe is provided.
+	// To ignore defaulting, set the value to empty LivenessProbe "{}".
 	// Cannot be updated.
 	// More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
 	// +optional
@@ -125,6 +127,8 @@ type PodSpec struct {
 	// Periodic probe of container service readiness.
 	// Container will be removed from service endpoints if the probe fails.
 	// Cannot be updated.
+	// Controllers may set default ReadinessProbe if no readyness probe is provided.
+	// To ignore defaulting, set the value to empty ReadynessProbe "{}".
 	// More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
 	// +optional
 	ReadinessProbe *core.Probe `json:"readinessProbe,omitempty"`

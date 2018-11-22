@@ -31,59 +31,59 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// MongoDBRoleBindingInformer provides access to a shared informer and lister for
-// MongoDBRoleBindings.
-type MongoDBRoleBindingInformer interface {
+// DatabaseAccessRequestInformer provides access to a shared informer and lister for
+// DatabaseAccessRequests.
+type DatabaseAccessRequestInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.MongoDBRoleBindingLister
+	Lister() v1alpha1.DatabaseAccessRequestLister
 }
 
-type mongoDBRoleBindingInformer struct {
+type databaseAccessRequestInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewMongoDBRoleBindingInformer constructs a new informer for MongoDBRoleBinding type.
+// NewDatabaseAccessRequestInformer constructs a new informer for DatabaseAccessRequest type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewMongoDBRoleBindingInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredMongoDBRoleBindingInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewDatabaseAccessRequestInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredDatabaseAccessRequestInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredMongoDBRoleBindingInformer constructs a new informer for MongoDBRoleBinding type.
+// NewFilteredDatabaseAccessRequestInformer constructs a new informer for DatabaseAccessRequest type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredMongoDBRoleBindingInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredDatabaseAccessRequestInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.AuthorizationV1alpha1().MongoDBRoleBindings(namespace).List(options)
+				return client.AuthorizationV1alpha1().DatabaseAccessRequests(namespace).List(options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.AuthorizationV1alpha1().MongoDBRoleBindings(namespace).Watch(options)
+				return client.AuthorizationV1alpha1().DatabaseAccessRequests(namespace).Watch(options)
 			},
 		},
-		&authorizationv1alpha1.MongoDBRoleBinding{},
+		&authorizationv1alpha1.DatabaseAccessRequest{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *mongoDBRoleBindingInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredMongoDBRoleBindingInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *databaseAccessRequestInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredDatabaseAccessRequestInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *mongoDBRoleBindingInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&authorizationv1alpha1.MongoDBRoleBinding{}, f.defaultInformer)
+func (f *databaseAccessRequestInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&authorizationv1alpha1.DatabaseAccessRequest{}, f.defaultInformer)
 }
 
-func (f *mongoDBRoleBindingInformer) Lister() v1alpha1.MongoDBRoleBindingLister {
-	return v1alpha1.NewMongoDBRoleBindingLister(f.Informer().GetIndexer())
+func (f *databaseAccessRequestInformer) Lister() v1alpha1.DatabaseAccessRequestLister {
+	return v1alpha1.NewDatabaseAccessRequestLister(f.Informer().GetIndexer())
 }

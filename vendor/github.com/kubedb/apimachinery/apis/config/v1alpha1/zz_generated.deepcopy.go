@@ -53,7 +53,6 @@ func (in *MongoDBConfiguration) DeepCopyObject() runtime.Object {
 func (in *MySQLConfiguration) DeepCopyInto(out *MySQLConfiguration) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
 	return
 }
 

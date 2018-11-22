@@ -7,7 +7,7 @@ import:
 - package: github.com/appscode/go
   version: master
 - package: github.com/appscode/osm
-  version: 0.7.1
+  version: 0.9.0
 - package: github.com/appscode/pat
   version: master
 - package: github.com/appscode/searchlight
@@ -21,9 +21,7 @@ import:
 - package: github.com/codeskyblue/go-sh
   version: master
 - package: github.com/coreos/prometheus-operator
-  repo: https://github.com/kmodules/prometheus-operator.git
-  vcs: git
-  version: k-1.12
+  version: v0.25.0
 - package: github.com/ghodss/yaml
   version: v1.0.0
 - package: github.com/go-openapi/spec
@@ -66,7 +64,7 @@ import:
 - package: github.com/spf13/cobra
   version: v0.0.3
 - package: github.com/spf13/pflag
-  version: v1.0.1
+  version: v1.0.3
 - package: gopkg.in/olivere/elastic.v5
   version: v5.0.61
 - package: k8s.io/api
@@ -119,3 +117,11 @@ import:
   version: de0752318171da717af4ce24d0a2e8626afaeb11
 - package: github.com/davecgh/go-spew
   version: v1.1.1
+- package: github.com/russross/blackfriday
+  version: v1.5.2
+- package: gopkg.in/yaml.v2
+  version: v2.2.1
+- package: github.com/gorilla/websocket
+  version: v1.4.0
+- package: github.com/bwmarrin/discordgo
+  version: v0.19.0

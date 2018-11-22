@@ -10,6 +10,7 @@ import (
 	"github.com/kubedb/apimachinery/apis"
 	"github.com/kubedb/apimachinery/apis/kubedb"
 	apps "k8s.io/api/apps/v1"
+	core "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	appcat "kmodules.xyz/custom-resources/apis/appcatalog/v1alpha1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
@@ -65,9 +66,9 @@ func (m MongoDB) GoverningServiceName() string {
 func (m MongoDB) HostAddress() string {
 	host := m.ServiceName()
 	if m.Spec.ReplicaSet != nil {
-		host = m.Spec.ReplicaSet.Name + "/" + m.Name + "-0." + m.GoverningServiceName() + ".svc"
+		host = m.Spec.ReplicaSet.Name + "/" + m.Name + "-0." + m.GoverningServiceName() + "." + m.Namespace + ".svc"
 		for i := 1; i < int(types.Int32(m.Spec.Replicas)); i++ {
-			host += "," + m.Name + "-" + strconv.Itoa(i) + m.GoverningServiceName() + ".svc"
+			host += "," + m.Name + "-" + strconv.Itoa(i) + "." + m.GoverningServiceName() + "." + m.Namespace + ".svc"
 		}
 	}
 	return host
@@ -222,6 +223,45 @@ func (m *MongoDBSpec) SetDefaults() {
 			m.TerminationPolicy = TerminationPolicyDelete
 		} else {
 			m.TerminationPolicy = TerminationPolicyPause
+		}
+	}
+	m.setDefaultProbes()
+}
+
+// setDefaultProbes sets defaults only when probe fields are nil.
+// In operator, check if the value of probe fields is "{}".
+// For "{}", ignore readinessprobe or livenessprobe in statefulset.
+// ref: https://github.com/helm/charts/blob/345ba987722350ffde56ec34d2928c0b383940aa/stable/mongodb/templates/deployment-standalone.yaml#L93
+func (m *MongoDBSpec) setDefaultProbes() {
+	cmd := []string{
+		"mongo",
+		"--eval",
+		"db.adminCommand('ping')",
+	}
+	if m.PodTemplate.Spec.LivenessProbe == nil {
+		m.PodTemplate.Spec.LivenessProbe = &core.Probe{
+			Handler: core.Handler{
+				Exec: &core.ExecAction{
+					Command: cmd,
+				},
+			},
+			FailureThreshold: 3,
+			PeriodSeconds:    10,
+			SuccessThreshold: 1,
+			TimeoutSeconds:   5,
+		}
+	}
+	if m.PodTemplate.Spec.ReadinessProbe == nil {
+		m.PodTemplate.Spec.ReadinessProbe = &core.Probe{
+			Handler: core.Handler{
+				Exec: &core.ExecAction{
+					Command: cmd,
+				},
+			},
+			FailureThreshold: 3,
+			PeriodSeconds:    10,
+			SuccessThreshold: 1,
+			TimeoutSeconds:   1,
 		}
 	}
 }

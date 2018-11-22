@@ -55,18 +55,14 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=authorization.kubedb.com, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithResource("databaseaccessrequests"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Authorization().V1alpha1().DatabaseAccessRequests().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("mongodbroles"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Authorization().V1alpha1().MongoDBRoles().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("mongodbrolebindings"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Authorization().V1alpha1().MongoDBRoleBindings().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("mysqlroles"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Authorization().V1alpha1().MySQLRoles().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("mysqlrolebindings"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Authorization().V1alpha1().MySQLRoleBindings().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("postgresroles"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Authorization().V1alpha1().PostgresRoles().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("postgresrolebindings"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Authorization().V1alpha1().PostgresRoleBindings().Informer()}, nil
 
 		// Group=catalog.kubedb.com, Version=v1alpha1
 	case catalogv1alpha1.SchemeGroupVersion.WithResource("elasticsearchversions"):
