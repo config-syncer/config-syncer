@@ -34,16 +34,12 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
 		&PostgresRole{},
 		&PostgresRoleList{},
-		&PostgresRoleBinding{},
-		&PostgresRoleBindingList{},
 		&MySQLRole{},
 		&MySQLRoleList{},
-		&MySQLRoleBinding{},
-		&MySQLRoleBindingList{},
 		&MongoDBRole{},
 		&MongoDBRoleList{},
-		&MongoDBRoleBinding{},
-		&MongoDBRoleBindingList{},
+		&DatabaseAccessRequest{},
+		&DatabaseAccessRequestList{},
 	)
 
 	scheme.AddKnownTypes(SchemeGroupVersion,

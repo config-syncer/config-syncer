@@ -14,6 +14,11 @@ const (
 type MongoDBConfiguration struct {
 	metav1.TypeMeta `json:",inline,omitempty"`
 
+	// Specifies the name of the plugin to use for this connection.
+	// Default plugin:
+	//  - for mongodb: mongodb-database-plugin
+	PluginName string `json:"pluginName,omitempty"`
+
 	// List of the roles allowed to use this connection.
 	// Defaults to empty (no roles), if contains a "*" any role can use this connection.
 	AllowedRoles string `json:"allowedRoles,omitempty"`

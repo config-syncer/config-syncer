@@ -18,6 +18,14 @@ limitations under the License.
 
 package v1alpha1
 
+// DatabaseAccessRequestListerExpansion allows custom methods to be added to
+// DatabaseAccessRequestLister.
+type DatabaseAccessRequestListerExpansion interface{}
+
+// DatabaseAccessRequestNamespaceListerExpansion allows custom methods to be added to
+// DatabaseAccessRequestNamespaceLister.
+type DatabaseAccessRequestNamespaceListerExpansion interface{}
+
 // MongoDBRoleListerExpansion allows custom methods to be added to
 // MongoDBRoleLister.
 type MongoDBRoleListerExpansion interface{}
@@ -25,14 +33,6 @@ type MongoDBRoleListerExpansion interface{}
 // MongoDBRoleNamespaceListerExpansion allows custom methods to be added to
 // MongoDBRoleNamespaceLister.
 type MongoDBRoleNamespaceListerExpansion interface{}
-
-// MongoDBRoleBindingListerExpansion allows custom methods to be added to
-// MongoDBRoleBindingLister.
-type MongoDBRoleBindingListerExpansion interface{}
-
-// MongoDBRoleBindingNamespaceListerExpansion allows custom methods to be added to
-// MongoDBRoleBindingNamespaceLister.
-type MongoDBRoleBindingNamespaceListerExpansion interface{}
 
 // MySQLRoleListerExpansion allows custom methods to be added to
 // MySQLRoleLister.
@@ -42,14 +42,6 @@ type MySQLRoleListerExpansion interface{}
 // MySQLRoleNamespaceLister.
 type MySQLRoleNamespaceListerExpansion interface{}
 
-// MySQLRoleBindingListerExpansion allows custom methods to be added to
-// MySQLRoleBindingLister.
-type MySQLRoleBindingListerExpansion interface{}
-
-// MySQLRoleBindingNamespaceListerExpansion allows custom methods to be added to
-// MySQLRoleBindingNamespaceLister.
-type MySQLRoleBindingNamespaceListerExpansion interface{}
-
 // PostgresRoleListerExpansion allows custom methods to be added to
 // PostgresRoleLister.
 type PostgresRoleListerExpansion interface{}
@@ -57,11 +49,3 @@ type PostgresRoleListerExpansion interface{}
 // PostgresRoleNamespaceListerExpansion allows custom methods to be added to
 // PostgresRoleNamespaceLister.
 type PostgresRoleNamespaceListerExpansion interface{}
-
-// PostgresRoleBindingListerExpansion allows custom methods to be added to
-// PostgresRoleBindingLister.
-type PostgresRoleBindingListerExpansion interface{}
-
-// PostgresRoleBindingNamespaceListerExpansion allows custom methods to be added to
-// PostgresRoleBindingNamespaceLister.
-type PostgresRoleBindingNamespaceListerExpansion interface{}

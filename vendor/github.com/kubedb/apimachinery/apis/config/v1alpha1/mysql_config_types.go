@@ -12,8 +12,12 @@ const (
 // https://www.vaultproject.io/api/secret/databases/index.html
 // https://www.vaultproject.io/api/secret/databases/mysql-maria.html#configure-connection
 type MySQLConfiguration struct {
-	metav1.TypeMeta   `json:",inline,omitempty"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta `json:",inline,omitempty"`
+
+	// Specifies the name of the plugin to use for this connection.
+	// Default plugin:
+	//  - for mysql: mysql-database-plugin
+	PluginName string `json:"pluginName,omitempty"`
 
 	// List of the roles allowed to use this connection.
 	// Defaults to empty (no roles), if contains a "*" any role can use this connection.

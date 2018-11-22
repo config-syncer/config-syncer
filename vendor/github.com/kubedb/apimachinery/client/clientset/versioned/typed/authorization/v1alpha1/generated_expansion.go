@@ -18,14 +18,10 @@ limitations under the License.
 
 package v1alpha1
 
-type MongoDBRoleExpansion interface{}
+type DatabaseAccessRequestExpansion interface{}
 
-type MongoDBRoleBindingExpansion interface{}
+type MongoDBRoleExpansion interface{}
 
 type MySQLRoleExpansion interface{}
 
-type MySQLRoleBindingExpansion interface{}
-
 type PostgresRoleExpansion interface{}
-
-type PostgresRoleBindingExpansion interface{}
