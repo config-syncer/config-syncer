@@ -56,7 +56,7 @@ type postgresApp struct {
 }
 
 func (r postgresApp) Name() string {
-	return fmt.Sprintf("kubedb:%s:%s:%s", ResourceSingularPostgres, r.Postgres.Namespace, r.Postgres.Name)
+	return r.Postgres.Name
 }
 
 func (r postgresApp) Type() appcat.AppType {

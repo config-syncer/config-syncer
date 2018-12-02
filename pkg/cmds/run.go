@@ -4,7 +4,9 @@ import (
 	"io"
 
 	"github.com/appscode/go/log"
+	v "github.com/appscode/go/version"
 	"github.com/appscode/kubed/pkg/cmds/server"
+	"github.com/appscode/kutil/tools/cli"
 	"github.com/spf13/cobra"
 )
 
@@ -17,6 +19,9 @@ func NewCmdRun(out, errOut io.Writer, stopCh <-chan struct{}) *cobra.Command {
 		Short:             "Launch Kubernetes Cluster Daemon",
 		Long:              "Launch Kubernetes Cluster Daemon",
 		DisableAutoGenTag: true,
+		PreRun: func(c *cobra.Command, args []string) {
+			cli.SendAnalytics(c, v.Version.Version)
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			log.Infoln("Starting kubed...")
 

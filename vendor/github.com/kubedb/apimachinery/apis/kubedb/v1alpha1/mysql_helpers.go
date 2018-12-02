@@ -55,7 +55,7 @@ type mysqlApp struct {
 }
 
 func (r mysqlApp) Name() string {
-	return fmt.Sprintf("kubedb:%s:%s:%s", ResourceSingularMySQL, r.MySQL.Namespace, r.MySQL.Name)
+	return r.MySQL.Name
 }
 
 func (r mysqlApp) Type() appcat.AppType {

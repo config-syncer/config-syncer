@@ -1,5 +1,5 @@
 hash: 1b32a991fee8904fa42fe28d1188d63a8091b772bc248477303086e96cb6bb9f
-updated: 2018-11-22T12:44:03.657047979-08:00
+updated: 2018-12-01T22:55:18.583640595-08:00
 imports:
 - name: bitbucket.org/atlassian/go-stride
   version: 78855f0a5d80b2683b11f3825a580a87e32a9f71
@@ -63,7 +63,7 @@ imports:
   - apis/workload/v1
   - client/workload/v1
 - name: github.com/appscode/kutil
-  version: 5e4dc08e9e6e00fcf397b7186a3918dc4dcb9426
+  version: 239838b6231b8a27a66426e25678351ce50c4cfd
   subpackages:
   - apiextensions/v1beta1
   - core/v1
@@ -73,6 +73,7 @@ imports:
   - tools/analytics
   - tools/backup
   - tools/certstore
+  - tools/cli
   - tools/clientcmd
   - tools/exec
   - tools/fsnotify
@@ -88,7 +89,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: a74b3d971efc2b23d7ce94152da4d48bf0df91a9
+  version: 2483f3c7d686e2ddeeac79bfdce81f2f5cc728a0
   subpackages:
   - apis/incidents
   - apis/incidents/v1alpha1
@@ -104,7 +105,7 @@ imports:
   - client/informers/externalversions/monitoring/v1alpha1
   - client/listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: fcb6cfdfdc4d5e8fc6e7e4aa031b04e4b3416e6e
+  version: dddb09f86fabb90d8d1b07fafe448f7e48ca447e
   subpackages:
   - apis/repositories
   - apis/repositories/v1alpha1
@@ -120,7 +121,7 @@ imports:
   - client/informers/externalversions/stash/v1alpha1
   - client/listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: 6b00d2a1a163b6b3a464af23b9dc226c0f079875
+  version: 75798f543993ab97ac47fa153cf111c99a56dbf0
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -482,7 +483,7 @@ imports:
 - name: github.com/json-iterator/go
   version: 1624edc4454b8682399def8740d46db5e4362ba4
 - name: github.com/kubedb/apimachinery
-  version: 2a7cb21fc0d7604e31ae2149d5ee9097fe4340eb
+  version: 4cebffe1a7709b9b1ed48766040ea6072957be65
   subpackages:
   - apis
   - apis/authorization

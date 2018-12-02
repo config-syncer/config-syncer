@@ -7,6 +7,7 @@ import (
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/operator"
 	"github.com/appscode/kubed/pkg/server"
+	"github.com/appscode/kutil/tools/clientcmd"
 	"github.com/pkg/errors"
 	"github.com/spf13/pflag"
 	genericapiserver "k8s.io/apiserver/pkg/server"
@@ -60,6 +61,7 @@ func (o KubedOptions) Config() (*server.KubedConfig, error) {
 	if err := o.RecommendedOptions.ApplyTo(serverConfig, server.Scheme); err != nil {
 		return nil, err
 	}
+	clientcmd.Fix(serverConfig.ClientConfig)
 
 	operatorConfig := operator.NewOperatorConfig(serverConfig.ClientConfig)
 	if err := o.OperatorOptions.ApplyTo(operatorConfig); err != nil {
