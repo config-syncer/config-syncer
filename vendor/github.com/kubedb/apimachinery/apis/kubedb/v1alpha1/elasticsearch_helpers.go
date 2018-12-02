@@ -71,7 +71,7 @@ type elasticsearchApp struct {
 }
 
 func (r elasticsearchApp) Name() string {
-	return fmt.Sprintf("kubedb:%s:%s:%s", ResourceSingularElasticsearch, r.Elasticsearch.Namespace, r.Elasticsearch.Name)
+	return r.Elasticsearch.Name
 }
 
 func (r elasticsearchApp) Type() appcat.AppType {

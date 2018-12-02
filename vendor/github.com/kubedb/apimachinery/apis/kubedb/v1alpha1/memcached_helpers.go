@@ -55,7 +55,7 @@ type memcachedApp struct {
 }
 
 func (r memcachedApp) Name() string {
-	return fmt.Sprintf("kubedb:%s:%s:%s", ResourceSingularMemcached, r.Memcached.Namespace, r.Memcached.Name)
+	return r.Memcached.Name
 }
 
 func (r memcachedApp) Type() appcat.AppType {

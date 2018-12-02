@@ -60,7 +60,7 @@ type redisApp struct {
 }
 
 func (r redisApp) Name() string {
-	return fmt.Sprintf("kubedb:%s:%s:%s", ResourceSingularRedis, r.Redis.Namespace, r.Redis.Name)
+	return r.Redis.Name
 }
 
 func (r redisApp) Type() appcat.AppType {

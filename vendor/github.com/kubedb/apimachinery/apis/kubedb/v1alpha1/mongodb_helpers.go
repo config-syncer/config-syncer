@@ -79,7 +79,7 @@ type mongoDBApp struct {
 }
 
 func (r mongoDBApp) Name() string {
-	return fmt.Sprintf("kubedb:%s:%s:%s", ResourceSingularMongoDB, r.MongoDB.Namespace, r.MongoDB.Name)
+	return r.MongoDB.Name
 }
 
 func (r mongoDBApp) Type() appcat.AppType {
