@@ -200,16 +200,16 @@ func (op *Operator) setupConfigInformers() {
 }
 
 func (op *Operator) setupRBACInformers() {
-	clusterRoleInformer := op.kubeInformerFactory.Rbac().V1beta1().ClusterRoles().Informer()
+	clusterRoleInformer := op.kubeInformerFactory.Rbac().V1().ClusterRoles().Informer()
 	op.addEventHandlers(clusterRoleInformer, rbac.SchemeGroupVersion.WithKind("ClusterRole"))
 
-	clusterRoleBindingInformer := op.kubeInformerFactory.Rbac().V1beta1().ClusterRoleBindings().Informer()
+	clusterRoleBindingInformer := op.kubeInformerFactory.Rbac().V1().ClusterRoleBindings().Informer()
 	op.addEventHandlers(clusterRoleBindingInformer, rbac.SchemeGroupVersion.WithKind("ClusterRoleBinding"))
 
-	roleInformer := op.kubeInformerFactory.Rbac().V1beta1().Roles().Informer()
+	roleInformer := op.kubeInformerFactory.Rbac().V1().Roles().Informer()
 	op.addEventHandlers(roleInformer, rbac.SchemeGroupVersion.WithKind("Role"))
 
-	roleBindingInformer := op.kubeInformerFactory.Rbac().V1beta1().RoleBindings().Informer()
+	roleBindingInformer := op.kubeInformerFactory.Rbac().V1().RoleBindings().Informer()
 	op.addEventHandlers(roleBindingInformer, rbac.SchemeGroupVersion.WithKind("RoleBinding"))
 }
 
