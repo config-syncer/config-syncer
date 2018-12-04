@@ -11,7 +11,7 @@ import (
 
 	"github.com/appscode/go/log"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-	"gopkg.in/olivere/elastic.v5"
+	elastic "gopkg.in/olivere/elastic.v5"
 )
 
 type Janitor struct {

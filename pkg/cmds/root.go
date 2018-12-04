@@ -2,9 +2,9 @@ package cmds
 
 import (
 	"flag"
-	"log"
 	"os"
 
+	"github.com/appscode/go/flags"
 	v "github.com/appscode/go/version"
 	prom_util "github.com/appscode/kube-mon/prometheus/v1"
 	"github.com/appscode/kutil/tools/cli"
@@ -13,7 +13,6 @@ import (
 	voyagerscheme "github.com/appscode/voyager/client/clientset/versioned/scheme"
 	kubedbscheme "github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	_ "k8s.io/client-go/kubernetes/fake"
 	clientsetscheme "k8s.io/client-go/kubernetes/scheme"
@@ -26,9 +25,7 @@ func NewCmdKubed(version string) *cobra.Command {
 		Long:              `Kubed is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/appscode/kubed/tree/master/docs`,
 		DisableAutoGenTag: true,
 		PersistentPreRun: func(c *cobra.Command, args []string) {
-			c.Flags().VisitAll(func(flag *pflag.Flag) {
-				log.Printf("FLAG: --%s=%q", flag.Name, flag.Value)
-			})
+			flags.DumpAll(c.Flags())
 			cli.SendAnalytics(c, v.Version.Version)
 
 			voyagerscheme.AddToScheme(clientsetscheme.Scheme)

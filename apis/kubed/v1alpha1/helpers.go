@@ -8,7 +8,7 @@ import (
 
 	yc "github.com/appscode/go/encoding/yaml"
 	"github.com/ghodss/yaml"
-	"github.com/json-iterator/go"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 )
 

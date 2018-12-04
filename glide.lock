@@ -1,5 +1,5 @@
 hash: 1b32a991fee8904fa42fe28d1188d63a8091b772bc248477303086e96cb6bb9f
-updated: 2018-12-01T22:55:18.583640595-08:00
+updated: 2018-12-04T06:45:34.516801277-08:00
 imports:
 - name: bitbucket.org/atlassian/go-stride
   version: 78855f0a5d80b2683b11f3825a580a87e32a9f71
@@ -15,7 +15,7 @@ imports:
 - name: github.com/appscode/envconfig
   version: 183bbe643a2875eaa69c85627ac6b25813983203
 - name: github.com/appscode/go
-  version: a6d58457b39324ead2ffb1f24be7a0a638c9f112
+  version: aa0a55d74dac66f9b9bec9c0e7b67944115a3f44
   subpackages:
   - analytics
   - context
@@ -83,7 +83,7 @@ imports:
 - name: github.com/appscode/ocutil
   version: 9e3ab89e810deaabe1fd353d01913aaf7dbe6e6d
 - name: github.com/appscode/osm
-  version: 1afd84f09007c717e2a46e9d87e30902d8331b91
+  version: fb08059eb9264578f9e15dc796f7afdb1bd40294
   subpackages:
   - context
 - name: github.com/appscode/pat
@@ -105,7 +105,7 @@ imports:
   - client/informers/externalversions/monitoring/v1alpha1
   - client/listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: dddb09f86fabb90d8d1b07fafe448f7e48ca447e
+  version: 92779d6c05f663e95044519bf81de005b64adbf0
   subpackages:
   - apis/repositories
   - apis/repositories/v1alpha1
@@ -333,7 +333,7 @@ imports:
   subpackages:
   - pkg/client/monitoring/v1
 - name: github.com/couchbase/vellum
-  version: 01d5c56e609533acd717717c8acc0d2dea6bfb89
+  version: 609ab1425291ab3f1fef8c34215318cbb000fe7c
   subpackages:
   - regexp
   - utf8
@@ -483,7 +483,7 @@ imports:
 - name: github.com/json-iterator/go
   version: 1624edc4454b8682399def8740d46db5e4362ba4
 - name: github.com/kubedb/apimachinery
-  version: 4cebffe1a7709b9b1ed48766040ea6072957be65
+  version: edf77e9609ff15a2ad16582deda49eef5a0b80f4
   subpackages:
   - apis
   - apis/authorization
@@ -749,7 +749,7 @@ imports:
   - googleapi/internal/uritemplates
   - storage/v1
 - name: google.golang.org/appengine
-  version: 4a4468ece617fc8205e99368fa2200e9d1fad421
+  version: 12d5545dc1cfa6047a286d5e853841b6471f4c19
   subpackages:
   - internal
   - internal/app_identity
