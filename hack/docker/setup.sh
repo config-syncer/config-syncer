@@ -15,7 +15,7 @@ source "$REPO_ROOT/hack/libbuild/common/public_image.sh"
 
 APPSCODE_ENV=${APPSCODE_ENV:-dev}
 IMG=kubed
-OSM_VER=${OSM_VER:-0.7.1}
+OSM_VER=${OSM_VER:-0.9.0}
 
 DIST=$REPO_ROOT/dist
 mkdir -p $DIST
@@ -61,7 +61,7 @@ COPY osm /usr/bin/osm
 COPY kubed /usr/bin/kubed
 ENTRYPOINT ["kubed"]
 EOL
-  local cmd="docker build -t $DOCKER_REGISTRY/$IMG:$TAG ."
+  local cmd="docker build --pull -t $DOCKER_REGISTRY/$IMG:$TAG ."
   echo $cmd; $cmd
 
   rm kubed osm Dockerfile
