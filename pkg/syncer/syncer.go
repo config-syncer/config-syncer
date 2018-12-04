@@ -6,7 +6,7 @@ import (
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	clientcmd_util "github.com/appscode/kutil/tools/clientcmd"
-	"github.com/json-iterator/go"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

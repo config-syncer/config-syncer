@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/appscode/envconfig"
-	"github.com/appscode/go-notify"
+	notify "github.com/appscode/go-notify"
 	"github.com/appscode/go-notify/unified"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	discovery_util "github.com/appscode/kutil/discovery"
