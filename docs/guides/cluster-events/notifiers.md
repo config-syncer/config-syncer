@@ -2,13 +2,13 @@
 title: Notifiers
 description: Notifiers
 menu:
-  product_kubed_0.8.0:
+  product_kubed_0.9.0:
     identifier: events-notifier
     name: Notifiers
     parent: cluster-events
     weight: 15
 product_name: kubed
-menu_name: product_kubed_0.8.0
+menu_name: product_kubed_0.9.0
 section_menu_id: guides
 ---
 
