@@ -2,17 +2,17 @@
 title: Disaster Recovery | Kubernetes
 description: Disaster Recovery for Kubernetes Clusters
 menu:
-  product_kubed_0.8.0:
+  product_kubed_0.9.0:
     identifier: readme-dr
     name: Overview
     parent: disaster-recovery
     weight: -1
 product_name: kubed
-menu_name: product_kubed_0.8.0
+menu_name: product_kubed_0.9.0
 section_menu_id: guides
-url: /products/kubed/0.8.0/guides/disaster-recovery/
+url: /products/kubed/0.9.0/guides/disaster-recovery/
 aliases:
-  - /products/kubed/0.8.0/guides/disaster-recovery/README
+  - /products/kubed/0.9.0/guides/disaster-recovery/README
 ---
 
 # Disaster Recovery

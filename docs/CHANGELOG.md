@@ -2,20 +2,47 @@
 title: Changelog | Kubed
 description: Changelog
 menu:
-  product_kubed_0.8.0:
+  product_kubed_0.9.0:
     identifier: changelog-kubed
     name: Changelog
     parent: welcome
     weight: 10
 product_name: kubed
-menu_name: product_kubed_0.8.0
+menu_name: product_kubed_0.9.0
 section_menu_id: welcome
-url: /products/kubed/0.8.0/welcome/changelog/
+url: /products/kubed/0.9.0/welcome/changelog/
 aliases:
-  - /products/kubed/0.8.0/CHANGELOG/
+  - /products/kubed/0.9.0/CHANGELOG/
 ---
 
 # Change Log
+
+## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
+
+[Full Changelog](https://github.com/appscode/kubed/compare/0.8.0...HEAD)
+
+**Fixed bugs:**
+
+- Fix analytics flag [\#305](https://github.com/appscode/kubed/pull/305) ([tamalsaha](https://github.com/tamalsaha))
+
+**Closed issues:**
+
+- New version release [\#318](https://github.com/appscode/kubed/issues/318)
+
+**Merged pull requests:**
+
+- Use flags.DumpAll to dump flags [\#322](https://github.com/appscode/kubed/pull/322) ([tamalsaha](https://github.com/tamalsaha))
+- Set periodic analytics [\#321](https://github.com/appscode/kubed/pull/321) ([tamalsaha](https://github.com/tamalsaha))
+- Update Kubernetes client libraries to 1.12.0 [\#319](https://github.com/appscode/kubed/pull/319) ([tamalsaha](https://github.com/tamalsaha))
+- Update kubernetes client libraries to 1.12.0 [\#314](https://github.com/appscode/kubed/pull/314) ([tamalsaha](https://github.com/tamalsaha))
+- Check if Kubernetes version is supported before running operator [\#313](https://github.com/appscode/kubed/pull/313) ([tamalsaha](https://github.com/tamalsaha))
+- Use kubernetes-1.11.3 [\#311](https://github.com/appscode/kubed/pull/311) ([tamalsaha](https://github.com/tamalsaha))
+-  Update pipeline [\#310](https://github.com/appscode/kubed/pull/310) ([tahsinrahman](https://github.com/tahsinrahman))
+- fix uninstall for concourse [\#309](https://github.com/appscode/kubed/pull/309) ([tahsinrahman](https://github.com/tahsinrahman))
+- Improve Helm chart options [\#308](https://github.com/appscode/kubed/pull/308) ([tamalsaha](https://github.com/tamalsaha))
+- Revendor apis [\#307](https://github.com/appscode/kubed/pull/307) ([tamalsaha](https://github.com/tamalsaha))
+- Use concourse scripts from libbuild [\#306](https://github.com/appscode/kubed/pull/306) ([tahsinrahman](https://github.com/tahsinrahman))
+- Fix extended apiserver issues with Kubernetes 1.11 [\#302](https://github.com/appscode/kubed/pull/302) ([tamalsaha](https://github.com/tamalsaha))
 
 ## [0.8.0](https://github.com/appscode/kubed/tree/0.8.0) (2018-07-10)
 [Full Changelog](https://github.com/appscode/kubed/compare/0.7.0...0.8.0)
@@ -27,6 +54,7 @@ aliases:
 
 **Merged pull requests:**
 
+- Prepare docs for 0.8.0 [\#301](https://github.com/appscode/kubed/pull/301) ([tamalsaha](https://github.com/tamalsaha))
 - Add chart config for event forwarder and recycle bin [\#300](https://github.com/appscode/kubed/pull/300) ([tamalsaha](https://github.com/tamalsaha))
 - Improve logging for syncer [\#298](https://github.com/appscode/kubed/pull/298) ([tamalsaha](https://github.com/tamalsaha))
 - Expose webhook server to expose operator metrics [\#297](https://github.com/appscode/kubed/pull/297) ([tamalsaha](https://github.com/tamalsaha))

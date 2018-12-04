@@ -1,12 +1,12 @@
 ---
 title: Kubed Version
 menu:
-  product_kubed_0.8.0:
+  product_kubed_0.9.0:
     identifier: kubed-version
     name: Kubed Version
     parent: reference
 product_name: kubed
-menu_name: product_kubed_0.8.0
+menu_name: product_kubed_0.9.0
 section_menu_id: reference
 ---
 ## kubed version
