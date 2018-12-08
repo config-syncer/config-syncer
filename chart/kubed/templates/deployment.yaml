@@ -43,6 +43,8 @@ spec:
         - --enable-analytics={{ .Values.enableAnalytics }}
         ports:
         - containerPort: 8443
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
         volumeMounts:
         - name: config
           mountPath: /srv/kubed

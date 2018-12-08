@@ -38,6 +38,11 @@ tolerations: {}
 ##
 affinity: {}
 
+## Compute resource for the kubed container
+## https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
+##
+resources: {}
+
 ## Install Default RBAC roles and bindings
 rbac:
   # Specifies whether RBAC resources should be created
