@@ -9,7 +9,6 @@ import (
 
 	"github.com/appscode/envconfig"
 	"github.com/appscode/go/log"
-	prom_util "github.com/appscode/kube-mon/prometheus/v1"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	es "github.com/appscode/kubed/pkg/elasticsearch"
 	"github.com/appscode/kubed/pkg/eventer"
@@ -58,6 +57,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
+	prom_util "kmodules.xyz/monitoring-agent-api/prometheus/v1"
 )
 
 type Operator struct {
