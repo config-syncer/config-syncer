@@ -6,7 +6,6 @@ import (
 
 	"github.com/appscode/go/flags"
 	v "github.com/appscode/go/version"
-	prom_util "github.com/appscode/kube-mon/prometheus/v1"
 	"github.com/appscode/kutil/tools/cli"
 	searchlightcheme "github.com/appscode/searchlight/client/clientset/versioned/scheme"
 	stashscheme "github.com/appscode/stash/client/clientset/versioned/scheme"
@@ -16,6 +15,7 @@ import (
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	_ "k8s.io/client-go/kubernetes/fake"
 	clientsetscheme "k8s.io/client-go/kubernetes/scheme"
+	prom_util "kmodules.xyz/monitoring-agent-api/prometheus/v1"
 )
 
 func NewCmdKubed(version string) *cobra.Command {

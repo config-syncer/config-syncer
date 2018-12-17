@@ -1,13 +1,23 @@
 package: github.com/appscode/kubed
 import:
+- package: cloud.google.com/go
+  version: v0.23.0
+- package: github.com/Azure/azure-sdk-for-go
+  version: v19.0.0
+- package: github.com/Azure/go-autorest
+  version: v10.14.0
 - package: github.com/appscode/envconfig
-  version: master
-- package: github.com/appscode/go-notify
   version: master
 - package: github.com/appscode/go
   version: master
+- package: github.com/appscode/go-notify
+  version: master
+- package: github.com/appscode/kubernetes-webhook-util
+  version: release-9.0
+- package: github.com/appscode/kutil
+  version: release-9.0
 - package: github.com/appscode/osm
-  version: 0.9.0
+  version: 0.9.1
 - package: github.com/appscode/pat
   version: master
 - package: github.com/appscode/searchlight
@@ -16,30 +26,34 @@ import:
   version: master
 - package: github.com/appscode/voyager
   version: master
+- package: github.com/aws/aws-sdk-go
+  version: v1.14.12
 - package: github.com/blevesearch/bleve
   version: v0.7.0
+- package: github.com/bwmarrin/discordgo
+  version: v0.19.0
 - package: github.com/codeskyblue/go-sh
   version: master
 - package: github.com/coreos/prometheus-operator
   version: v0.25.0
+- package: github.com/cpuguy83/go-md2man
+  version: v1.0.8
+- package: github.com/davecgh/go-spew
+  version: v1.1.1
 - package: github.com/ghodss/yaml
   version: v1.0.0
 - package: github.com/go-openapi/spec
 - package: github.com/golang/glog
+- package: github.com/golang/protobuf
+  version: v1.0.0
+- package: github.com/gorilla/websocket
+  version: v1.4.0
 - package: github.com/graymeta/stow
   repo: https://github.com/appscode/stow.git
   vcs: git
   version: master
-- package: github.com/Azure/azure-sdk-for-go
-  version: v19.0.0
-- package: github.com/Azure/go-autorest
-  version: v10.14.0
-- package: github.com/aws/aws-sdk-go
-  version: v1.14.12
-- package: google.golang.org/api/storage/v1
-  version: 3639d6d93f377f39a1de765fa4ef37b3c7ca8bd9
-- package: cloud.google.com/go
-  version: v0.2.0
+- package: github.com/imdario/mergo
+  version: v0.3.5
 - package: github.com/influxdata/influxdb
   version: v1.5.3
 - package: github.com/jpillora/go-ogle-analytics
@@ -47,26 +61,46 @@ import:
   version: 1.1.5
 - package: github.com/kubedb/apimachinery
   version: master
+- package: github.com/mailru/easyjson
+  version: 2f5df55504ebc322e4d52d34df6a1f5b503bf26d
 - package: github.com/onsi/ginkgo
   version: v1.5.0
 - package: github.com/onsi/gomega
   version: v1.4.0
 - package: github.com/pkg/errors
-  version: v0.9.0
+  version: v0.8.0
 - package: github.com/prometheus/client_golang
-  version: v0.9.0
+  version: v0.8.0
 - package: github.com/prometheus/common
   version: 3233b24a36715a2fe36d162260457857a56d672d
 - package: github.com/robfig/cron
   version: master
+- package: github.com/russross/blackfriday
+  version: v1.5.2
 - package: github.com/spf13/afero
   version: v1.1.2
 - package: github.com/spf13/cobra
   version: v0.0.3
 - package: github.com/spf13/pflag
   version: v1.0.3
+- package: github.com/stretchr/testify
+  version: v1.2.2
+- package: golang.org/x/crypto
+  version: de0752318171da717af4ce24d0a2e8626afaeb11
+- package: golang.org/x/net
+  version: 1c05540f6879653db88113bc4a2b70aec4bd491f
+- package: golang.org/x/sys
+  version: 95c6576299259db960f6c5b9b69ea52422860fce
+- package: golang.org/x/text
+  version: b19bf474d317b857955b12035d2c5acb57ce8b01
+- package: google.golang.org/api/storage/v1
+  version: 3639d6d93f377f39a1de765fa4ef37b3c7ca8bd9
 - package: gopkg.in/olivere/elastic.v5
   version: v5.0.61
+- package: gopkg.in/square/go-jose.v2
+  version: v2.2.1
+- package: gopkg.in/yaml.v2
+  version: v2.2.1
 - package: k8s.io/api
   version: kubernetes-1.12.0
 - package: k8s.io/apiextensions-apiserver
@@ -85,43 +119,7 @@ import:
   version: kubernetes-1.12.0
 - package: k8s.io/kube-openapi
   version: 0cf8f7e6ed1d2e3d47d02e3b6e559369af24d803
-- package: github.com/appscode/kutil
+- package: kmodules.xyz/monitoring-agent-api
+  repo: https://github.com/kmodules/monitoring-agent-api.git
+  vcs: git
   version: release-9.0
-- package: github.com/appscode/kube-mon
-  version: release-8.0
-- package: github.com/appscode/kubernetes-webhook-util
-  version: release-9.0
-- package: github.com/openshift/api
-  version: 31a7bbd2266d178da3c12bb83f5274d387f775e6
-- package: github.com/openshift/client-go
-  version: 4688ad28de2e88110c0ea30179c51b9b205f99be
-- package: github.com/openshift/origin
-  version: fecffb2fce100260088a1b9f268c0901a778cf2b
-- package: github.com/appscode/ocutil
-  version: release-3.11
-- package: github.com/mailru/easyjson
-  version: 2f5df55504ebc322e4d52d34df6a1f5b503bf26d
-- package: github.com/stretchr/testify
-  version: v1.2.2
-- package: github.com/cpuguy83/go-md2man
-  version: v1.0.8
-- package: golang.org/x/text
-  version: b19bf474d317b857955b12035d2c5acb57ce8b01
-- package: golang.org/x/net
-  version: 1c05540f6879653db88113bc4a2b70aec4bd491f
-- package: golang.org/x/sys
-  version: 95c6576299259db960f6c5b9b69ea52422860fce
-- package: github.com/golang/protobuf
-  version: v1.1.0
-- package: golang.org/x/crypto
-  version: de0752318171da717af4ce24d0a2e8626afaeb11
-- package: github.com/davecgh/go-spew
-  version: v1.1.1
-- package: github.com/russross/blackfriday
-  version: v1.5.2
-- package: gopkg.in/yaml.v2
-  version: v2.2.1
-- package: github.com/gorilla/websocket
-  version: v1.4.0
-- package: github.com/bwmarrin/discordgo
-  version: v0.19.0

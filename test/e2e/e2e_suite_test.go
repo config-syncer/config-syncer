@@ -6,7 +6,6 @@ import (
 	"time"
 
 	logs "github.com/appscode/go/log/golog"
-	prom_util "github.com/appscode/kube-mon/prometheus/v1"
 	"github.com/appscode/kubed/test/e2e/framework"
 	"github.com/appscode/kutil/tools/clientcmd"
 	searchlightcheme "github.com/appscode/searchlight/client/clientset/versioned/scheme"
@@ -18,6 +17,7 @@ import (
 	. "github.com/onsi/gomega"
 	rbac "k8s.io/api/rbac/v1"
 	clientsetscheme "k8s.io/client-go/kubernetes/scheme"
+	prom_util "kmodules.xyz/monitoring-agent-api/prometheus/v1"
 )
 
 const TestTimeout = 3 * time.Minute

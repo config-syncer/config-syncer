@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ghodss/yaml"
 	"github.com/golang/glog"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -20,6 +19,7 @@ import (
 	"k8s.io/client-go/discovery"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
+	"sigs.k8s.io/yaml"
 )
 
 const (
