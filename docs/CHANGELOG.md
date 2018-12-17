@@ -17,9 +17,8 @@ aliases:
 
 # Change Log
 
-## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
-
-[Full Changelog](https://github.com/appscode/kubed/compare/0.8.0...HEAD)
+## [0.9.0](https://github.com/appscode/kubed/tree/0.9.0) (2018-12-17)
+[Full Changelog](https://github.com/appscode/kubed/compare/0.8.0...0.9.0)
 
 **Fixed bugs:**
 
@@ -27,10 +26,18 @@ aliases:
 
 **Closed issues:**
 
+- Dependabot couldn't find a Gopkg.toml for this project [\#320](https://github.com/appscode/kubed/issues/320)
 - New version release [\#318](https://github.com/appscode/kubed/issues/318)
+- Resource Requests and Limits in helm chart [\#315](https://github.com/appscode/kubed/issues/315)
 
 **Merged pull requests:**
 
+- Update osm version to 0.9.1 [\#329](https://github.com/appscode/kubed/pull/329) ([tamalsaha](https://github.com/tamalsaha))
+- Update dependencies [\#328](https://github.com/appscode/kubed/pull/328) ([tamalsaha](https://github.com/tamalsaha))
+- Permit specifying compute resources for the kubed container. [\#327](https://github.com/appscode/kubed/pull/327) ([niclic](https://github.com/niclic))
+- Use rbac/v1 api [\#325](https://github.com/appscode/kubed/pull/325) ([tamalsaha](https://github.com/tamalsaha))
+- Prepare docs for 0.9.0 release [\#324](https://github.com/appscode/kubed/pull/324) ([tamalsaha](https://github.com/tamalsaha))
+- Update osm version to 0.9.0 [\#323](https://github.com/appscode/kubed/pull/323) ([tamalsaha](https://github.com/tamalsaha))
 - Use flags.DumpAll to dump flags [\#322](https://github.com/appscode/kubed/pull/322) ([tamalsaha](https://github.com/tamalsaha))
 - Set periodic analytics [\#321](https://github.com/appscode/kubed/pull/321) ([tamalsaha](https://github.com/tamalsaha))
 - Update Kubernetes client libraries to 1.12.0 [\#319](https://github.com/appscode/kubed/pull/319) ([tamalsaha](https://github.com/tamalsaha))
