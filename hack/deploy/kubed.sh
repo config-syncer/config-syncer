@@ -14,8 +14,6 @@ echo ""
 function cleanup() {
   rm -rf $ONESSL ca.crt ca.key server.crt server.key
 }
-
-export APPSCODE_ENV=${APPSCODE_ENV:-prod}
 trap cleanup EXIT
 
 # ref: https://github.com/appscodelabs/libbuild/blob/master/common/lib.sh#L55
@@ -58,26 +56,38 @@ detect_tag() {
   export commit_timestamp
 }
 
-# https://stackoverflow.com/a/677212/244009
-if [ -x "$(command -v onessl)" ]; then
-  export ONESSL=onessl
-else
+onessl_found() {
+  # https://stackoverflow.com/a/677212/244009
+  if [ -x "$(command -v onessl)" ]; then
+    onessl wait-until-has -h >/dev/null 2>&1 || {
+      # old version of onessl found
+      echo "Found outdated onessl"
+      return 1
+    }
+    export ONESSL=onessl
+    return 0
+  fi
+  return 1
+}
+
+onessl_found || {
+  echo "Downloading onessl ..."
   # ref: https://stackoverflow.com/a/27776822/244009
   case "$(uname -s)" in
     Darwin)
-      curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-darwin-amd64
+      curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.9.0/onessl-darwin-amd64
       chmod +x onessl
       export ONESSL=./onessl
       ;;
 
     Linux)
-      curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-linux-amd64
+      curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.9.0/onessl-linux-amd64
       chmod +x onessl
       export ONESSL=./onessl
       ;;
 
     CYGWIN* | MINGW32* | MSYS*)
-      curl -fsSL -o onessl.exe https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-windows-amd64.exe
+      curl -fsSL -o onessl.exe https://github.com/kubepack/onessl/releases/download/0.9.0/onessl-windows-amd64.exe
       chmod +x onessl.exe
       export ONESSL=./onessl.exe
       ;;
@@ -85,7 +95,7 @@ else
       echo 'other OS'
       ;;
   esac
-fi
+}
 
 # ref: https://stackoverflow.com/a/7069755/244009
 # ref: https://jonalmeida.com/posts/2013/05/26/different-ways-to-implement-flags-in-bash/
@@ -106,6 +116,7 @@ export KUBED_UNINSTALL=0
 export KUBED_CONFIG_CLUSTER_NAME=unicorn
 export KUBED_CONFIG_ENABLE_APISERVER=false
 
+export APPSCODE_ENV=${APPSCODE_ENV:-prod}
 export SCRIPT_LOCATION="curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.9.0/"
 if [[ "$APPSCODE_ENV" == "dev" ]]; then
   detect_tag
