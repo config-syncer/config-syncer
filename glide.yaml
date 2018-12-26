@@ -42,6 +42,8 @@ import:
   version: v1.1.1
 - package: github.com/ghodss/yaml
   version: v1.0.0
+- package: github.com/go-ini/ini
+  version: v1.40.0
 - package: github.com/go-openapi/spec
 - package: github.com/golang/glog
 - package: github.com/golang/protobuf
@@ -63,6 +65,8 @@ import:
   version: master
 - package: github.com/mailru/easyjson
   version: 2f5df55504ebc322e4d52d34df6a1f5b503bf26d
+- package: github.com/mitchellh/mapstructure
+  version: v1.1.2
 - package: github.com/onsi/ginkgo
   version: v1.5.0
 - package: github.com/onsi/gomega
@@ -95,6 +99,8 @@ import:
   version: b19bf474d317b857955b12035d2c5acb57ce8b01
 - package: google.golang.org/api/storage/v1
   version: 3639d6d93f377f39a1de765fa4ef37b3c7ca8bd9
+- package: gopkg.in/ini.v1
+  version: v1.40.0
 - package: gopkg.in/olivere/elastic.v5
   version: v5.0.61
 - package: gopkg.in/square/go-jose.v2

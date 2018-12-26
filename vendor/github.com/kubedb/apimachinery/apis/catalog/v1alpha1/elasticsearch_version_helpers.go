@@ -31,7 +31,7 @@ func (p ElasticsearchVersion) CustomResourceDefinition() *apiextensions.CustomRe
 		Singular:      ResourceSingularElasticsearchVersion,
 		Kind:          ResourceKindElasticsearchVersion,
 		ShortNames:    []string{ResourceCodeElasticsearchVersion},
-		Categories:    []string{"datastore", "kubedb", "appscode", "all"},
+		Categories:    []string{"datastore", "kubedb", "appscode"},
 		ResourceScope: string(apiextensions.ClusterScoped),
 		Versions: []apiextensions.CustomResourceDefinitionVersion{
 			{

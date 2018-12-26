@@ -99,6 +99,7 @@ export KUBED_DOCKER_REGISTRY=${DOCKER_REGISTRY:-appscode}
 export KUBED_IMAGE_TAG=0.9.0
 export KUBED_IMAGE_PULL_SECRET=
 export KUBED_IMAGE_PULL_POLICY=IfNotPresent
+export KUBED_USE_KUBEAPISERVER_FQDN_FOR_AKS=true
 export KUBED_ENABLE_ANALYTICS=true
 export KUBED_UNINSTALL=0
 
@@ -122,16 +123,17 @@ show_help() {
   echo "kubed.sh [options]"
   echo " "
   echo "options:"
-  echo "-h, --help                         show brief help"
-  echo "-n, --namespace=NAMESPACE          specify namespace (default: kube-system)"
-  echo "    --rbac                         create RBAC roles and bindings (default: true)"
-  echo "    --docker-registry              docker registry used to pull kubed images (default: appscode)"
-  echo "    --image-pull-secret            name of secret used to pull kubed operator images"
-  echo "    --run-on-master                run kubed operator on master"
-  echo "    --cluster-name                 name of cluster (default: unicorn)"
-  echo "    --enable-apiserver             enable/disable kubed apiserver"
-  echo "    --enable-analytics             send usage events to Google Analytics (default: true)"
-  echo "    --uninstall                    uninstall kubed"
+  echo "-h, --help                             show brief help"
+  echo "-n, --namespace=NAMESPACE              specify namespace (default: kube-system)"
+  echo "    --rbac                             create RBAC roles and bindings (default: true)"
+  echo "    --docker-registry                  docker registry used to pull kubed images (default: appscode)"
+  echo "    --image-pull-secret                name of secret used to pull kubed operator images"
+  echo "    --run-on-master                    run kubed operator on master"
+  echo "    --cluster-name                     name of cluster (default: unicorn)"
+  echo "    --enable-apiserver                 enable/disable kubed apiserver"
+  echo "    --use-kubeapiserver-fqdn-for-aks   if true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 (default true)"
+  echo "    --enable-analytics                 send usage events to Google Analytics (default: true)"
+  echo "    --uninstall                        uninstall kubed"
 }
 
 while test $# -gt 0; do
@@ -161,6 +163,15 @@ while test $# -gt 0; do
     --image-pull-secret*)
       secret=$(echo $1 | sed -e 's/^[^=]*=//g')
       export KUBED_IMAGE_PULL_SECRET="name: '$secret'"
+      shift
+      ;;
+    --use-kubeapiserver-fqdn-for-aks*)
+      val=$(echo $1 | sed -e 's/^[^=]*=//g')
+      if [ "$val" = "false" ]; then
+        export KUBED_USE_KUBEAPISERVER_FQDN_FOR_AKS=false
+      else
+        export KUBED_USE_KUBEAPISERVER_FQDN_FOR_AKS=true
+      fi
       shift
       ;;
     --enable-analytics*)

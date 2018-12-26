@@ -1,5 +1,5 @@
-hash: 49903906442922d13ca57ae515505166f8f0a357164bd7a06fe4a5651320b969
-updated: 2018-12-17T07:01:25.371393086-08:00
+hash: 1796639882de00a8907050704466064354e59767f9c740f1c0836bf44441a567
+updated: 2018-12-26T11:51:30.304250643-08:00
 imports:
 - name: bitbucket.org/atlassian/go-stride
   version: 78855f0a5d80b2683b11f3825a580a87e32a9f71
@@ -82,7 +82,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 2607214002910256e84fb6597554dcf48b4741eb
+  version: 48a5863f41a534743d03a1c6e194b251990ecb33
   subpackages:
   - apis/incidents
   - apis/incidents/v1alpha1
@@ -98,7 +98,7 @@ imports:
   - client/informers/externalversions/monitoring/v1alpha1
   - client/listers/monitoring/v1alpha1
 - name: github.com/appscode/stash
-  version: a931bbd90fb2dd4f1c7899fc1b28828b31f6dbcf
+  version: 903d96499f175d2193ee2d62473fb1951600b89c
   subpackages:
   - apis/repositories
   - apis/repositories/v1alpha1
@@ -114,7 +114,7 @@ imports:
   - client/informers/externalversions/stash/v1alpha1
   - client/listers/stash/v1alpha1
 - name: github.com/appscode/voyager
-  version: eb48b888f8d325e5ada875143d7537dfb17ca620
+  version: 120d4aa1ebd513725fe82316ce77ac2defce6b23
   subpackages:
   - apis/voyager
   - apis/voyager/v1beta1
@@ -370,7 +370,7 @@ imports:
 - name: github.com/glycerine/go-unsnap-stream
   version: 62a9a9eb44fd8932157b1a8ace2149eff5971af6
 - name: github.com/go-ini/ini
-  version: 300e940a926eb277d3901b20bdfcc54928ad3642
+  version: a9da9309fb4822643ceebb765f80025c35ac19a1
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -476,7 +476,7 @@ imports:
 - name: github.com/json-iterator/go
   version: 1624edc4454b8682399def8740d46db5e4362ba4
 - name: github.com/kubedb/apimachinery
-  version: 6319e29148b40f1ac9a7ea312394754e83feba8e
+  version: 4c42014d5745345e56a41261142b9ae4b977d696
   subpackages:
   - apis
   - apis/authorization
@@ -530,7 +530,7 @@ imports:
 - name: github.com/mschoch/smat
   version: 90eadee771aeab36e8bf796039b8c261bebebe4f
 - name: github.com/ncw/swift
-  version: 6f342da371d063863f2f354f183e4ab0ef72d287
+  version: 3d63426e3fec66c303577c2257565bd19a5ca3bc
 - name: github.com/nlopes/slack
   version: 8ab4d0b364ef1e9af5d102531da20d5ec902b6c4
 - name: github.com/NYTimes/gziphandler
@@ -780,6 +780,8 @@ imports:
   version: 81ebce5c23dfd25c6c67194b37d3dd3f338c98b1
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
+- name: gopkg.in/ini.v1
+  version: a9da9309fb4822643ceebb765f80025c35ac19a1
 - name: gopkg.in/natefinch/lumberjack.v2
   version: 20b71e5b60d756d3d2f80def009790325acc2b23
 - name: gopkg.in/olivere/elastic.v5
@@ -900,7 +902,7 @@ imports:
   - third_party/forked/golang/netutil
   - third_party/forked/golang/reflect
 - name: k8s.io/apiserver
-  version: 70f523ccd088c9dca12de68b719d9b29f8e8c7d2
+  version: 419ab4faf457be27411fc8125ed110a03be373e8
   repo: https://github.com/kmodules/apiserver.git
   vcs: git
   subpackages:
@@ -1201,7 +1203,7 @@ imports:
   - pkg/api/legacyscheme
   - pkg/util/hash
 - name: kmodules.xyz/custom-resources
-  version: 6d398bd2d81b1d6a811ad026c1dd24f1564a1f3c
+  version: b4ef1fe08b7a09681a676c1b697cf66fd74b7ed4
   repo: https://github.com/kmodules/custom-resources.git
   vcs: git
   subpackages:
