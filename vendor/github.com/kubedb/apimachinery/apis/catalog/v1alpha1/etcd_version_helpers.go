@@ -31,7 +31,7 @@ func (p EtcdVersion) CustomResourceDefinition() *apiextensions.CustomResourceDef
 		Singular:      ResourceSingularEtcdVersion,
 		Kind:          ResourceKindEtcdVersion,
 		ShortNames:    []string{ResourceCodeEtcdVersion},
-		Categories:    []string{"datastore", "kubedb", "appscode", "all"},
+		Categories:    []string{"datastore", "kubedb", "appscode"},
 		ResourceScope: string(apiextensions.ClusterScoped),
 		Versions: []apiextensions.CustomResourceDefinitionVersion{
 			{
