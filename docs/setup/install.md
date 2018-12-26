@@ -133,16 +133,17 @@ kubed.sh - install Kubernetes cluster daemon
 kubed.sh [options]
 
 options:
--h, --help                         show brief help
--n, --namespace=NAMESPACE          specify namespace (default: kube-system)
-    --rbac                         create RBAC roles and bindings (default: true)
-    --docker-registry              docker registry used to pull kubed images (default: appscode)
-    --image-pull-secret            name of secret used to pull kubed operator images
-    --run-on-master                run kubed operator on master
-    --cluster-name                 name of cluster (default: unicorn)
-    --enable-apiserver             enable/disable kubed apiserver
-    --enable-analytics             send usage events to Google Analytics (default: true)
-    --uninstall                    uninstall kubed
+-h, --help                             show brief help
+-n, --namespace=NAMESPACE              specify namespace (default: kube-system)
+    --rbac                             create RBAC roles and bindings (default: true)
+    --docker-registry                  docker registry used to pull kubed images (default: appscode)
+    --image-pull-secret                name of secret used to pull kubed operator images
+    --run-on-master                    run kubed operator on master
+    --cluster-name                     name of cluster (default: unicorn)
+    --enable-apiserver                 enable/disable kubed apiserver
+    --use-kubeapiserver-fqdn-for-aks   if true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 (default true)
+    --enable-analytics                 send usage events to Google Analytics (default: true)
+    --uninstall                        uninstall kubed
 ```
 
 If you would like to run Kubed operator pod in `master` instances, pass the `--run-on-master` flag:
@@ -197,27 +198,7 @@ $ helm install appscode/kubed --name kubed --version 0.9.0 \
 # Kubernetes 1.9.0 or later
 $ helm install appscode/kubed --name kubed --version 0.9.0 \
   --namespace kube-system \
-  --set apiserver.ca="$(onessl get kube-ca)" \
   --set config.clusterName=<your-cluster-name>
-```
-
-To install `onessl`, run the following commands:
-
-```console
-# Mac OSX amd64:
-curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-darwin-amd64 \
-  && chmod +x onessl \
-  && sudo mv onessl /usr/local/bin/
-
-# Linux amd64:
-curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-linux-amd64 \
-  && chmod +x onessl \
-  && sudo mv onessl /usr/local/bin/
-
-# Linux arm64:
-curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/0.3.0/onessl-linux-arm64 \
-  && chmod +x onessl \
-  && sudo mv onessl /usr/local/bin/
 ```
 
 To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/0.9.0/chart/kubed).

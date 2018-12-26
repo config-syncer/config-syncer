@@ -63,7 +63,6 @@ The following table lists the configurable parameters of the Kubed chart and the
 | `apiserver.enabled`              | If `true`, enable kubed api server                                | `true`             |
 | `apiserver.groupPriorityMinimum` | The minimum priority the group should have.                       | 10000              |
 | `apiserver.versionPriority`      | The ordering of this API inside of the group.                     | 15                 |
-| `apiserver.ca`                   | CA certificate used by main Kubernetes api server                 | ``                 |
 | `apiserver.useKubeapiserverFqdnForAks` | If true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 | `true`             |
 | `apiserver.healthcheck.enabled`  | Enable readiness and liveliness probes                            | `true`             |
 | `enableAnalytics`                | Send usage events to Google Analytics                             | `true`             |
