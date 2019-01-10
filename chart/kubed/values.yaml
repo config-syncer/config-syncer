@@ -83,3 +83,13 @@ config:
   enableConfigSyncer: true
   enableEventForwarder: false
   enableRecycleBin: true
+
+  # so you can include any other config required for kubed directly
+#  include:
+#    snapshotter:
+#      gcs:
+#          bucket: bucket-for-snapshot
+#          prefix: minikube
+#          storageSecretName: gcs-secret
+#      sanitize: true
+#      schedule: '@every 6h'
