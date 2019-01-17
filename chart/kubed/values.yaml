@@ -43,6 +43,20 @@ affinity: {}
 ##
 resources: {}
 
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  enabled: false
+  # storageClassName: default
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+  # annotations: {}
+  # subPath: ""
+  # existingClaim:
+
+
 ## Install Default RBAC roles and bindings
 rbac:
   # Specifies whether RBAC resources should be created
