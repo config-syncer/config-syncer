@@ -115,6 +115,7 @@ export KUBED_UNINSTALL=0
 
 export KUBED_CONFIG_CLUSTER_NAME=unicorn
 export KUBED_CONFIG_ENABLE_APISERVER=false
+export KUBED_PRIORITY_CLASS=system-cluster-critical
 
 export APPSCODE_ENV=${APPSCODE_ENV:-prod}
 export SCRIPT_LOCATION="curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.9.0/"
@@ -227,6 +228,10 @@ while test $# -gt 0; do
       ;;
   esac
 done
+
+if [ "$KUBED_NAMESPACE" != "kube-system" ]; then
+    export KUBED_PRIORITY_CLASS=""
+fi
 
 if [ "$KUBED_UNINSTALL" -eq 1 ]; then
   # delete webhooks and apiservices
