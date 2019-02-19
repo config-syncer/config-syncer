@@ -23,6 +23,10 @@ criticalAddon: false
 ## Log level for kubed
 logLevel: 3
 
+## Annotations passed to operator pod(s).
+##
+annotations: {}
+
 ## Node labels for pod assignment
 ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
