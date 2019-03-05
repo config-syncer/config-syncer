@@ -8,21 +8,22 @@ import (
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	resource_indexer "github.com/appscode/kubed/pkg/registry/resource"
 	"github.com/appscode/kubed/pkg/syncer"
-	"github.com/appscode/kutil/discovery"
-	"github.com/appscode/kutil/tools/fsnotify"
 	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
 	searchlightinformers "github.com/appscode/searchlight/client/informers/externalversions"
 	scs "github.com/appscode/stash/client/clientset/versioned"
 	stashinformers "github.com/appscode/stash/client/informers/externalversions"
 	vcs "github.com/appscode/voyager/client/clientset/versioned"
 	voyagerinformers "github.com/appscode/voyager/client/informers/externalversions"
-	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
+	prominformers "github.com/coreos/prometheus-operator/pkg/client/informers/externalversions"
+	pcm "github.com/coreos/prometheus-operator/pkg/client/versioned"
 	kcs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	kubedbinformers "github.com/kubedb/apimachinery/client/informers/externalversions"
 	"github.com/robfig/cron"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"kmodules.xyz/client-go/discovery"
+	"kmodules.xyz/client-go/tools/fsnotify"
 )
 
 type Config struct {
@@ -42,7 +43,7 @@ type OperatorConfig struct {
 	SearchlightClient srch_cs.Interface
 	StashClient       scs.Interface
 	KubeDBClient      kcs.Interface
-	PromClient        prom.MonitoringV1Interface
+	PromClient        pcm.Interface
 }
 
 func NewOperatorConfig(clientConfig *rest.Config) *OperatorConfig {
@@ -90,6 +91,7 @@ func (c *OperatorConfig) New() (*Operator, error) {
 	op.stashInformerFactory = stashinformers.NewSharedInformerFactory(op.StashClient, c.ResyncPeriod)
 	op.searchlightInformerFactory = searchlightinformers.NewSharedInformerFactory(op.SearchlightClient, c.ResyncPeriod)
 	op.kubedbInformerFactory = kubedbinformers.NewSharedInformerFactory(op.KubeDBClient, c.ResyncPeriod)
+	op.promInformerFactory = prominformers.NewSharedInformerFactory(op.PromClient, c.ResyncPeriod)
 	// ---------------------------
 	op.setupWorkloadInformers()
 	op.setupNetworkInformers()

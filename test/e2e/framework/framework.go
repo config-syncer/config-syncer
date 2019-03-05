@@ -7,12 +7,12 @@ import (
 
 	"github.com/appscode/go/crypto/rand"
 	kcs "github.com/appscode/kubed/client/clientset/versioned"
-	"github.com/appscode/kutil/tools/certstore"
 	sls "github.com/appscode/searchlight/client/clientset/versioned"
 	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
 	scs "github.com/appscode/stash/client/clientset/versioned"
 	vcs "github.com/appscode/voyager/client/clientset/versioned"
-	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
+	prom "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
+	pcs "github.com/coreos/prometheus-operator/pkg/client/versioned"
 	kdbcs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
@@ -22,6 +22,7 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	ka "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
+	"kmodules.xyz/client-go/tools/certstore"
 )
 
 const (
@@ -40,7 +41,7 @@ type Framework struct {
 	SearchlightClient  srch_cs.Interface
 	StashClient        scs.Interface
 	KubeDBClient       kdbcs.Interface
-	PromClient         prom.MonitoringV1Interface
+	PromClient         pcs.Interface
 	crdClient          ecs.ApiextensionsV1beta1Interface
 	namespace          string
 	Mutex              sync.Mutex
@@ -51,7 +52,7 @@ type Framework struct {
 }
 
 func New(config *rest.Config) *Framework {
-	promClient, err := prom.NewForConfig(&prom.DefaultCrdKinds, prom.Group, config)
+	promClient, err := pcs.NewForConfig(config)
 	Expect(err).NotTo(HaveOccurred())
 
 	store, err := certstore.NewCertStore(afero.NewMemMapFs(), filepath.Join("", "pki"))
@@ -94,18 +95,18 @@ type Invocation struct {
 }
 
 func (f *Framework) EnsureCreatedCRDs() error {
-	_, pErr := f.PromClient.Prometheuses(f.namespace).List(metav1.ListOptions{})
-	_, sErr := f.PromClient.ServiceMonitors(f.namespace).List(metav1.ListOptions{})
+	_, pErr := f.PromClient.MonitoringV1().Prometheuses(f.namespace).List(metav1.ListOptions{})
+	_, sErr := f.PromClient.MonitoringV1().ServiceMonitors(f.namespace).List(metav1.ListOptions{})
 	if pErr == nil && sErr == nil {
 		return nil
 	}
 	promCrd := &extensionsobj.CustomResourceDefinition{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: prom.PrometheusName + "." + prom.Group,
+			Name: prom.PrometheusName + "." + prom.SchemeGroupVersion.Group,
 		},
 
 		Spec: extensionsobj.CustomResourceDefinitionSpec{
-			Group:   prom.Group,
+			Group:   prom.SchemeGroupVersion.Group,
 			Version: prom.Version,
 			Scope:   extensionsobj.NamespaceScoped,
 			Names: extensionsobj.CustomResourceDefinitionNames{
@@ -120,11 +121,11 @@ func (f *Framework) EnsureCreatedCRDs() error {
 	}
 	svcMonitorCrd := &extensionsobj.CustomResourceDefinition{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: prom.ServiceMonitorName + "." + prom.Group,
+			Name: prom.ServiceMonitorName + "." + prom.SchemeGroupVersion.Group,
 		},
 
 		Spec: extensionsobj.CustomResourceDefinitionSpec{
-			Group:   prom.Group,
+			Group:   prom.SchemeGroupVersion.Group,
 			Version: prom.Version,
 			Scope:   extensionsobj.NamespaceScoped,
 			Names: extensionsobj.CustomResourceDefinitionNames{
@@ -140,11 +141,11 @@ func (f *Framework) EnsureCreatedCRDs() error {
 
 	alertMgr := &extensionsobj.CustomResourceDefinition{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: prom.AlertmanagerName + "." + prom.Group,
+			Name: prom.AlertmanagerName + "." + prom.SchemeGroupVersion.Group,
 		},
 
 		Spec: extensionsobj.CustomResourceDefinitionSpec{
-			Group:   prom.Group,
+			Group:   prom.SchemeGroupVersion.Group,
 			Version: prom.Version,
 			Scope:   extensionsobj.NamespaceScoped,
 			Names: extensionsobj.CustomResourceDefinitionNames{

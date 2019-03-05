@@ -45,6 +45,10 @@ type PostgresSpec struct {
 	// Archive for wal files
 	Archiver *PostgresArchiverSpec `json:"archiver,omitempty"`
 
+	// Leader election configuration
+	// +optional
+	LeaderElection *LeaderElectionConfig `json:"leaderElection,omitempty"`
+
 	// Database authentication secret
 	DatabaseSecret *core.SecretVolumeSource `json:"databaseSecret,omitempty"`
 
@@ -77,6 +81,10 @@ type PostgresSpec struct {
 	// ServiceTemplate is an optional configuration for service used to expose database
 	// +optional
 	ServiceTemplate ofst.ServiceTemplateSpec `json:"serviceTemplate,omitempty"`
+
+	// ReplicaServiceTemplate is an optional configuration for service used to expose postgres replicas
+	// +optional
+	ReplicaServiceTemplate ofst.ServiceTemplateSpec `json:"replicaServiceTemplate,omitempty"`
 
 	// updateStrategy indicates the StatefulSetUpdateStrategy that will be
 	// employed to update Pods in the StatefulSet when a revision is made to

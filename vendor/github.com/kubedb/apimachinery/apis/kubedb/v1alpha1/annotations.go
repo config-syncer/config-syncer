@@ -31,4 +31,8 @@ const (
 	ElasticsearchRestPortName = "http"
 	ElasticsearchNodePort     = 9300
 	ElasticsearchNodePortName = "transport"
+
+	RedisShardKey   = RedisKey + "/shard"
+	RedisNodePort   = 6379
+	RedisGossipPort = 16379
 )

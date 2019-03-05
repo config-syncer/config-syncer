@@ -7,14 +7,14 @@ import (
 	"github.com/appscode/go/log"
 	stringz "github.com/appscode/go/strings"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-	"github.com/appscode/kutil/discovery"
-	meta_util "github.com/appscode/kutil/meta"
 	"github.com/ghodss/yaml"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
+	"kmodules.xyz/client-go/discovery"
+	meta_util "kmodules.xyz/client-go/meta"
 )
 
 const (

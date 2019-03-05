@@ -6,7 +6,6 @@ import (
 	"github.com/appscode/go/crypto/rand"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/syncer"
-	"github.com/appscode/kutil/tools/clientcmd"
 	"github.com/ghodss/yaml"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
@@ -15,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
+	"kmodules.xyz/client-go/tools/clientcmd"
 )
 
 func (f *Invocation) NewSecret() *core.Secret {

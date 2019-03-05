@@ -2,12 +2,12 @@ package framework
 
 import (
 	"github.com/appscode/go/crypto/rand"
-	"github.com/appscode/kutil/tools/clientcmd"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"kmodules.xyz/client-go/tools/clientcmd"
 )
 
 func (f *Framework) Namespace() string {

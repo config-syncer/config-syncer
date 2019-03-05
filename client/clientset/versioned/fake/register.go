@@ -1,5 +1,5 @@
 /*
-Copyright 2018 The Kubed Authors.
+Copyright 2019 The Kubed Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

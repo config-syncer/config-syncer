@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/appscode/go/types"
-	crdutils "github.com/appscode/kutil/apiextensions/v1beta1"
-	meta_util "github.com/appscode/kutil/meta"
 	"github.com/kubedb/apimachinery/apis"
 	"github.com/kubedb/apimachinery/apis/kubedb"
 	apps "k8s.io/api/apps/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	crdutils "kmodules.xyz/client-go/apiextensions/v1beta1"
+	meta_util "kmodules.xyz/client-go/meta"
 	appcat "kmodules.xyz/custom-resources/apis/appcatalog/v1alpha1"
 	mona "kmodules.xyz/monitoring-agent-api/api/v1"
 )
@@ -53,6 +53,14 @@ func (r Redis) ServiceName() string {
 
 func (r Redis) ConfigMapName() string {
 	return r.OffshootName()
+}
+
+func (r Redis) BaseNameForShard() string {
+	return fmt.Sprintf("%s-shard", r.OffshootName())
+}
+
+func (r Redis) StatefulSetNameWithShard(i int) string {
+	return fmt.Sprintf("%s%d", r.BaseNameForShard(), i)
 }
 
 type redisApp struct {

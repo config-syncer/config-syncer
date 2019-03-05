@@ -7,11 +7,11 @@ import (
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/test/e2e/framework"
 	. "github.com/appscode/kubed/test/e2e/matcher"
-	core_util "github.com/appscode/kutil/core/v1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	core_util "kmodules.xyz/client-go/core/v1"
 )
 
 var _ = Describe("RecycleBin", func() {

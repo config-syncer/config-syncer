@@ -17,11 +17,6 @@ import (
 	indexers "github.com/appscode/kubed/pkg/registry/resource"
 	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
-	_ "github.com/appscode/kutil/apiextensions/v1beta1"
-	"github.com/appscode/kutil/discovery"
-	"github.com/appscode/kutil/tools/backup"
-	"github.com/appscode/kutil/tools/fsnotify"
-	"github.com/appscode/kutil/tools/queue"
 	searchlight_api "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
 	searchlightinformers "github.com/appscode/searchlight/client/informers/externalversions"
@@ -32,7 +27,9 @@ import (
 	vcs "github.com/appscode/voyager/client/clientset/versioned"
 	voyagerinformers "github.com/appscode/voyager/client/informers/externalversions"
 	shell "github.com/codeskyblue/go-sh"
-	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
+	promapi "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
+	prominformers "github.com/coreos/prometheus-operator/pkg/client/informers/externalversions"
+	pcm "github.com/coreos/prometheus-operator/pkg/client/versioned"
 	kubedb_api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	kcs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	kubedbinformers "github.com/kubedb/apimachinery/client/informers/externalversions"
@@ -57,7 +54,11 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
-	prom_util "kmodules.xyz/monitoring-agent-api/prometheus/v1"
+	_ "kmodules.xyz/client-go/apiextensions/v1beta1"
+	"kmodules.xyz/client-go/discovery"
+	"kmodules.xyz/client-go/tools/backup"
+	"kmodules.xyz/client-go/tools/fsnotify"
+	"kmodules.xyz/client-go/tools/queue"
 )
 
 type Operator struct {
@@ -78,16 +79,14 @@ type Operator struct {
 	SearchlightClient srch_cs.Interface
 	StashClient       scs.Interface
 	KubeDBClient      kcs.Interface
-	PromClient        prom.MonitoringV1Interface
+	PromClient        pcm.Interface
 
 	kubeInformerFactory        informers.SharedInformerFactory
 	voyagerInformerFactory     voyagerinformers.SharedInformerFactory
 	stashInformerFactory       stashinformers.SharedInformerFactory
 	searchlightInformerFactory searchlightinformers.SharedInformerFactory
 	kubedbInformerFactory      kubedbinformers.SharedInformerFactory
-	promInf                    cache.SharedIndexInformer
-	smonInf                    cache.SharedIndexInformer
-	amgrInf                    cache.SharedIndexInformer
+	promInformerFactory        prominformers.SharedInformerFactory
 
 	Indexer *indexers.ResourceIndexer
 
@@ -317,33 +316,18 @@ func (op *Operator) setupKubeDBInformers() {
 }
 
 func (op *Operator) setupPrometheusInformers() {
-	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), prom_util.SchemeGroupVersion.String(), prom.PrometheusesKind) {
-		op.promInf = cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc:  op.PromClient.Prometheuses(core.NamespaceAll).List,
-				WatchFunc: op.PromClient.Prometheuses(core.NamespaceAll).Watch,
-			},
-			&prom.Prometheus{}, op.ResyncPeriod, cache.Indexers{},
-		)
-		op.addEventHandlers(op.promInf, prom_util.SchemeGroupVersion.WithKind(prom.PrometheusesKind))
+	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), promapi.SchemeGroupVersion.String(), promapi.PrometheusesKind) {
+		promInf := op.promInformerFactory.Monitoring().V1().Prometheuses().Informer()
+		op.addEventHandlers(promInf, promapi.SchemeGroupVersion.WithKind(promapi.PrometheusesKind))
 
-		op.smonInf = cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc:  op.PromClient.ServiceMonitors(core.NamespaceAll).List,
-				WatchFunc: op.PromClient.ServiceMonitors(core.NamespaceAll).Watch,
-			},
-			&prom.ServiceMonitor{}, op.ResyncPeriod, cache.Indexers{},
-		)
-		op.addEventHandlers(op.smonInf, prom_util.SchemeGroupVersion.WithKind(prom.ServiceMonitorsKind))
+		ruleInf := op.promInformerFactory.Monitoring().V1().PrometheusRules().Informer()
+		op.addEventHandlers(ruleInf, promapi.SchemeGroupVersion.WithKind(promapi.PrometheusRuleKind))
 
-		op.amgrInf = cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc:  op.PromClient.Alertmanagers(core.NamespaceAll).List,
-				WatchFunc: op.PromClient.Alertmanagers(core.NamespaceAll).Watch,
-			},
-			&prom.Alertmanager{}, op.ResyncPeriod, cache.Indexers{},
-		)
-		op.addEventHandlers(op.amgrInf, prom_util.SchemeGroupVersion.WithKind(prom.AlertmanagersKind))
+		smonInf := op.promInformerFactory.Monitoring().V1().ServiceMonitors().Informer()
+		op.addEventHandlers(smonInf, promapi.SchemeGroupVersion.WithKind(promapi.ServiceMonitorsKind))
+
+		amgrInf := op.promInformerFactory.Monitoring().V1().Alertmanagers().Informer()
+		op.addEventHandlers(amgrInf, promapi.SchemeGroupVersion.WithKind(promapi.AlertmanagersKind))
 	}
 }
 
@@ -379,11 +363,7 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 	op.stashInformerFactory.Start(stopCh)
 	op.searchlightInformerFactory.Start(stopCh)
 	op.kubedbInformerFactory.Start(stopCh)
-	if op.promInf != nil {
-		go op.promInf.Run(stopCh)
-		go op.smonInf.Run(stopCh)
-		go op.amgrInf.Run(stopCh)
-	}
+	op.promInformerFactory.Start(stopCh)
 
 	var res map[reflect.Type]bool
 
@@ -427,16 +407,9 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 		}
 	}
 
-	if op.promInf != nil {
-		if !cache.WaitForCacheSync(stopCh, op.promInf.HasSynced) {
-			runtime.HandleError(errors.Errorf("timed out waiting for caches to sync"))
-			return
-		}
-		if !cache.WaitForCacheSync(stopCh, op.smonInf.HasSynced) {
-			runtime.HandleError(errors.Errorf("timed out waiting for caches to sync"))
-			return
-		}
-		if !cache.WaitForCacheSync(stopCh, op.amgrInf.HasSynced) {
+	res = op.promInformerFactory.WaitForCacheSync(stopCh)
+	for _, v := range res {
+		if !v {
 			runtime.HandleError(errors.Errorf("timed out waiting for caches to sync"))
 			return
 		}

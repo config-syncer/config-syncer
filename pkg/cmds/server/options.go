@@ -1,18 +1,17 @@
 package server
 
 import (
-	"flag"
 	"time"
 
 	"github.com/appscode/kubed/pkg/operator"
-	"github.com/appscode/kutil/meta"
 	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
 	scs "github.com/appscode/stash/client/clientset/versioned"
 	vcs "github.com/appscode/voyager/client/clientset/versioned"
-	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
+	pcm "github.com/coreos/prometheus-operator/pkg/client/versioned"
 	kcs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	"github.com/spf13/pflag"
 	"k8s.io/client-go/kubernetes"
+	"kmodules.xyz/client-go/meta"
 )
 
 type OperatorOptions struct {
@@ -22,9 +21,6 @@ type OperatorOptions struct {
 	QPS          float32
 	Burst        int
 	ResyncPeriod time.Duration
-
-	PrometheusCrdGroup string
-	PrometheusCrdKinds prom.CrdKinds
 }
 
 func NewOperatorOptions() *OperatorOptions {
@@ -35,19 +31,12 @@ func NewOperatorOptions() *OperatorOptions {
 		// High enough QPS to fit all expected use cases. QPS=0 is not set here, because client code is overriding it.
 		QPS: 1e6,
 		// High enough Burst to fit all expected use cases. Burst=0 is not set here, because client code is overriding it.
-		Burst:              1e6,
-		ResyncPeriod:       10 * time.Minute,
-		PrometheusCrdGroup: prom.Group,
-		PrometheusCrdKinds: prom.DefaultCrdKinds,
+		Burst:        1e6,
+		ResyncPeriod: 10 * time.Minute,
 	}
 }
 
 func (s *OperatorOptions) AddFlags(fs *pflag.FlagSet) {
-	pfs := flag.NewFlagSet("prometheus", flag.ExitOnError)
-	pfs.StringVar(&s.PrometheusCrdGroup, "prometheus-crd-apigroup", s.PrometheusCrdGroup, "prometheus CRD  API group name")
-	pfs.Var(&s.PrometheusCrdKinds, "prometheus-crd-kinds", " - EXPERIMENTAL (could be removed in future releases) - customize CRD kind names")
-	fs.AddGoFlagSet(pfs)
-
 	fs.StringVar(&s.ConfigPath, "clusterconfig", s.ConfigPath, "Path to cluster config file")
 	fs.StringVar(&s.ScratchDir, "scratch-dir", s.ScratchDir, "Directory used to store temporary files. Use an `emptyDir` in Kubernetes.")
 
@@ -80,7 +69,7 @@ func (s *OperatorOptions) ApplyTo(cfg *operator.OperatorConfig) error {
 	if cfg.KubeDBClient, err = kcs.NewForConfig(cfg.ClientConfig); err != nil {
 		return err
 	}
-	if cfg.PromClient, err = prom.NewForConfig(&s.PrometheusCrdKinds, s.PrometheusCrdGroup, cfg.ClientConfig); err != nil {
+	if cfg.PromClient, err = pcm.NewForConfig(cfg.ClientConfig); err != nil {
 		return err
 	}
 
