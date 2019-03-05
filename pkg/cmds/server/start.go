@@ -7,11 +7,12 @@ import (
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/operator"
 	"github.com/appscode/kubed/pkg/server"
-	"github.com/appscode/kutil/tools/clientcmd"
 	"github.com/pkg/errors"
 	"github.com/spf13/pflag"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
+	"kmodules.xyz/client-go/meta"
+	"kmodules.xyz/client-go/tools/clientcmd"
 )
 
 const defaultEtcdPathPrefix = "/registry/kubed.appscode.com"
@@ -27,10 +28,14 @@ type KubedOptions struct {
 func NewKubedOptions(out, errOut io.Writer) *KubedOptions {
 	o := &KubedOptions{
 		// TODO we will nil out the etcd storage options.  This requires a later level of k8s.io/apiserver
-		RecommendedOptions: genericoptions.NewRecommendedOptions(defaultEtcdPathPrefix, server.Codecs.LegacyCodec(api.SchemeGroupVersion)),
-		OperatorOptions:    NewOperatorOptions(),
-		StdOut:             out,
-		StdErr:             errOut,
+		RecommendedOptions: genericoptions.NewRecommendedOptions(
+			defaultEtcdPathPrefix,
+			server.Codecs.LegacyCodec(api.SchemeGroupVersion),
+			genericoptions.NewProcessInfo("kubed", meta.Namespace()),
+		),
+		OperatorOptions: NewOperatorOptions(),
+		StdOut:          out,
+		StdErr:          errOut,
 	}
 	o.RecommendedOptions.Etcd = nil
 	o.RecommendedOptions.Admission = nil

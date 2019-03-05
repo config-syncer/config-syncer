@@ -1,5 +1,5 @@
 /*
-Copyright 2018 The Stash Authors.
+Copyright 2019 The Stash Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package scheme
 import (
 	repositoriesv1alpha1 "github.com/appscode/stash/apis/repositories/v1alpha1"
 	stashv1alpha1 "github.com/appscode/stash/apis/stash/v1alpha1"
+	stashv1beta1 "github.com/appscode/stash/apis/stash/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -34,6 +35,7 @@ var ParameterCodec = runtime.NewParameterCodec(Scheme)
 var localSchemeBuilder = runtime.SchemeBuilder{
 	repositoriesv1alpha1.AddToScheme,
 	stashv1alpha1.AddToScheme,
+	stashv1beta1.AddToScheme,
 }
 
 // AddToScheme adds all types of this clientset into the given scheme. This allows composition

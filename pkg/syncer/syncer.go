@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-	clientcmd_util "github.com/appscode/kutil/tools/clientcmd"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
@@ -14,6 +13,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/record"
+	clientcmd_util "kmodules.xyz/client-go/tools/clientcmd"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary

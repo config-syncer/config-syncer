@@ -8,7 +8,6 @@ import (
 
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/go/types"
-	core_util "github.com/appscode/kutil/core/v1"
 	. "github.com/onsi/gomega"
 	apps "k8s.io/api/apps/v1"
 	core "k8s.io/api/core/v1"
@@ -16,6 +15,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/util/cert"
+	core_util "kmodules.xyz/client-go/core/v1"
 )
 
 const (

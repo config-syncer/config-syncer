@@ -6,11 +6,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/appscode/kutil"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation"
+	kutil "kmodules.xyz/client-go"
 )
 
 // +k8s:openapi-gen=false
@@ -84,6 +84,11 @@ func (r Ingress) IsValid(cloudProvider string) error {
 		}
 	}
 
+	// check if both alpn and proto specified in the same rule/backend
+	if err := r.ProtoWithALPN(); err != nil {
+		return err
+	}
+
 	addrs := make(map[string]*address)
 	nodePorts := make(map[int]int)
 	usesHTTPRule := false
@@ -144,6 +149,11 @@ func (r Ingress) IsValid(cloudProvider string) error {
 					return errors.Errorf("spec.rules[%d].HTTP has conflicting ALPN spec with spec.rules[%d].HTTP", ri, ea.FirstRuleIndex)
 				}
 
+				// check for conflicting Proto
+				if rule.HTTP.Proto != r.Spec.Rules[ea.FirstRuleIndex].HTTP.Proto {
+					return errors.Errorf("spec.rules[%d].HTTP has conflicting Proto spec with spec.rules[%d].HTTP", ri, ea.FirstRuleIndex)
+				}
+
 				a = ea // paths will be merged into the original one
 			} else {
 				a = &address{
@@ -178,9 +188,6 @@ func (r Ingress) IsValid(cloudProvider string) error {
 				}
 				if errs := validation.IsDNS1123Subdomain(path.Backend.ServiceName); len(errs) > 0 {
 					return errors.Errorf("spec.rules[%d].http.paths[%d] is using invalid serviceName for addr %s. Reason: %s", ri, pi, a, strings.Join(errs, ","))
-				}
-				if _, err := checkRequiredPort(path.Backend.ServicePort); err != nil {
-					return errors.Errorf("spec.rules[%d].http.paths[%d] is using invalid servicePort %s for addr %s and path %s. Reason: %s", ri, pi, path.Backend.ServicePort.String(), a, path.Path, err)
 				}
 				for hi, hdr := range path.Backend.HeaderRules {
 					if len(strings.Fields(hdr)) == 1 {
@@ -250,6 +257,11 @@ func (r Ingress) IsValid(cloudProvider string) error {
 					return errors.Errorf("spec.rules[%d].TCP has conflicting ALPN spec with spec.rules[%d].TCP", ri, ea.FirstRuleIndex)
 				}
 
+				// check for conflicting Proto
+				if rule.TCP.Proto != r.Spec.Rules[ea.FirstRuleIndex].TCP.Proto {
+					return errors.Errorf("spec.rules[%d].TCP has conflicting Proto spec with spec.rules[%d].TCP", ri, ea.FirstRuleIndex)
+				}
+
 				a = ea
 			} else {
 				a = &address{
@@ -284,9 +296,6 @@ func (r Ingress) IsValid(cloudProvider string) error {
 			}
 			if errs := validation.IsDNS1123Subdomain(rule.TCP.Backend.ServiceName); len(errs) > 0 {
 				return errors.Errorf("spec.rules[%d].tcp is using invalid serviceName for addr %s. Reason: %s", ri, a, strings.Join(errs, ","))
-			}
-			if _, err := checkRequiredPort(rule.TCP.Backend.ServicePort); err != nil {
-				return errors.Errorf("spec.rules[%d].tcp is using invalid servicePort %s for addr %s. Reason: %s", ri, rule.TCP.Backend.ServicePort.String(), a, err)
 			}
 		} else if rule.TCP == nil && rule.HTTP == nil {
 			return errors.Errorf("spec.rules[%d] is missing both HTTP and TCP specification", ri)

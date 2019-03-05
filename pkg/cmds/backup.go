@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/appscode/go/flags"
-	"github.com/appscode/kutil/tools/backup"
-	"github.com/appscode/kutil/tools/clientcmd"
 	"github.com/spf13/cobra"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"kmodules.xyz/client-go/tools/backup"
+	"kmodules.xyz/client-go/tools/clientcmd"
 )
 
 func NewCmdBackup() *cobra.Command {

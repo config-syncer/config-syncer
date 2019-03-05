@@ -11,13 +11,13 @@ import (
 	"github.com/appscode/go/encoding/yaml"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/storage"
-	exec_util "github.com/appscode/kutil/tools/exec"
 	"github.com/graymeta/stow"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
 	apps "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"kmodules.xyz/client-go/tools/exec"
 )
 
 const (
@@ -76,7 +76,7 @@ func (f *Invocation) ListSnapshotInsideOperatorPod() string {
 	pod, err := f.OperatorPod()
 	Expect(err).NotTo(HaveOccurred())
 
-	output, err := exec_util.ExecIntoPod(f.ClientConfig, pod, "ls", TEST_LOCAL_BACKUP_DIR)
+	output, err := exec.ExecIntoPod(f.ClientConfig, pod, exec.Command("ls", TEST_LOCAL_BACKUP_DIR))
 	Expect(err).NotTo(HaveOccurred())
 	return output
 }
@@ -120,7 +120,7 @@ func (f *Invocation) MakeDirInsideOperatorPod(dir string) error {
 		return err
 	}
 
-	_, err = exec_util.ExecIntoPod(f.ClientConfig, pod, "mkdir", "-p", dir)
+	_, err = exec.ExecIntoPod(f.ClientConfig, pod, exec.Command("mkdir", "-p", dir))
 	if err != nil {
 		return err
 	}

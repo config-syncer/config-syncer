@@ -6,10 +6,10 @@ import (
 
 	"github.com/appscode/go/runtime"
 	"github.com/appscode/go/types"
-	exec_util "github.com/appscode/kutil/tools/exec"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"kmodules.xyz/client-go/tools/exec"
 )
 
 var (
@@ -50,7 +50,7 @@ func (fi *Invocation) RemoveFromOperatorPod(dir string) error {
 		return err
 	}
 
-	_, err = exec_util.ExecIntoPod(fi.ClientConfig, pod, "rm", "-rf", dir)
+	_, err = exec.ExecIntoPod(fi.ClientConfig, pod, exec.Command("rm", "-rf", dir))
 	if err != nil {
 		return err
 	}

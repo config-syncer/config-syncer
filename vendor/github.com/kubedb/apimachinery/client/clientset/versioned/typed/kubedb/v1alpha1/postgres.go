@@ -1,5 +1,5 @@
 /*
-Copyright 2018 The KubeDB Authors.
+Copyright 2019 The KubeDB Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"time"
+
 	v1alpha1 "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	scheme "github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -76,11 +78,16 @@ func (c *postgreses) Get(name string, options v1.GetOptions) (result *v1alpha1.P
 
 // List takes label and field selectors, and returns the list of Postgreses that match those selectors.
 func (c *postgreses) List(opts v1.ListOptions) (result *v1alpha1.PostgresList, err error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
 	result = &v1alpha1.PostgresList{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("postgreses").
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Timeout(timeout).
 		Do().
 		Into(result)
 	return
@@ -88,11 +95,16 @@ func (c *postgreses) List(opts v1.ListOptions) (result *v1alpha1.PostgresList, e
 
 // Watch returns a watch.Interface that watches the requested postgreses.
 func (c *postgreses) Watch(opts v1.ListOptions) (watch.Interface, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
 	opts.Watch = true
 	return c.client.Get().
 		Namespace(c.ns).
 		Resource("postgreses").
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Timeout(timeout).
 		Watch()
 }
 
@@ -150,10 +162,15 @@ func (c *postgreses) Delete(name string, options *v1.DeleteOptions) error {
 
 // DeleteCollection deletes a collection of objects.
 func (c *postgreses) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
+	var timeout time.Duration
+	if listOptions.TimeoutSeconds != nil {
+		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
+	}
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("postgreses").
 		VersionedParams(&listOptions, scheme.ParameterCodec).
+		Timeout(timeout).
 		Body(options).
 		Do().
 		Error()

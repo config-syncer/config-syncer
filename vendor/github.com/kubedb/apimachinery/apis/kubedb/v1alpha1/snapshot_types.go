@@ -33,9 +33,21 @@ type SnapshotSpec struct {
 	// Snapshot Spec
 	store.Backend `json:",inline"`
 
+	// StorageType can be durable or ephemeral.
+	// If not given, database storage type will be used.
+	// +optional
+	StorageType *StorageType `json:"storageType,omitempty"`
+
 	// PodTemplate is an optional configuration for pods used to take database snapshots
 	// +optional
 	PodTemplate ofst.PodTemplateSpec `json:"podTemplate,omitempty"`
+
+	// PodVolumeClaimSpec is used to specify temporary storage for backup/restore Job.
+	// If not given, database's PvcSpec will be used.
+	// If storageType is durable, then a PVC be will created using this PVCSpec.
+	// If storageType is ephemeral, then an empty directory will be created of size PvcSpec.Resources.Requests[core.ResourceStorage].
+	// +optional
+	PodVolumeClaimSpec *core.PersistentVolumeClaimSpec `json:"podVolumeClaimSpec,omitempty"`
 
 	// -------------------------------------------------------------------------
 

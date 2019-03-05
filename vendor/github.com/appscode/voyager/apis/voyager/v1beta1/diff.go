@@ -2,19 +2,19 @@ package v1beta1
 
 import (
 	"crypto/x509"
+	"fmt"
 	"net"
 	"reflect"
-	"sort"
 	"strings"
 	"time"
 
-	core_util "github.com/appscode/kutil/core/v1"
 	"github.com/appscode/voyager/apis/voyager"
 	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
+	core_util "kmodules.xyz/client-go/core/v1"
 )
 
 const (
@@ -229,7 +229,11 @@ func (c Certificate) MatchesDomains(crt *x509.Certificate) bool {
 }
 
 func (c Certificate) ShouldRenew(crt *x509.Certificate) bool {
-	return !crt.NotAfter.After(time.Now().Add(time.Hour * 24 * 7))
+	bufferDays := c.Spec.RenewalBufferDays
+	if bufferDays <= 0 {
+		bufferDays = 15 // default 15 days
+	}
+	return !crt.NotAfter.After(time.Now().Add(time.Duration(bufferDays) * 24 * time.Hour))
 }
 
 func (c Certificate) IsRateLimited() bool {
@@ -277,19 +281,96 @@ func (r IngressRule) GetHost() string {
 }
 
 func (r IngressRule) ParseALPNOptions() string {
-	var opts []string
 	if r.HTTP != nil {
 		if len(r.HTTP.ALPN) > 0 {
-			opts = append(opts, r.HTTP.ALPN...) // copy slice, don't modify the input
-		} else {
-			opts = []string{"http/1.1"} //maintain backward compatibility
+			return "alpn " + strings.Join(r.HTTP.ALPN, ",")
+		} else if r.HTTP.Proto == "" {
+			return "alpn http/1.1" // maintain backward compatibility
 		}
-	} else if r.TCP != nil {
-		opts = append(opts, r.TCP.ALPN...) // copy slice, don't modify the input
 	}
-	if len(opts) <= 0 {
-		return ""
+	if r.TCP != nil && len(r.TCP.ALPN) > 0 {
+		return "alpn " + strings.Join(r.TCP.ALPN, ",")
 	}
-	sort.Strings(opts)
-	return "alpn " + strings.Join(opts, ",")
+	return ""
+}
+
+func (r IngressBackend) ParseALPNOptions() string {
+	if len(r.ALPN) > 0 {
+		return "alpn " + strings.Join(r.ALPN, ",")
+	}
+	return ""
+}
+
+// check if both alpn and proto specified in the same rule/backend
+func (r Ingress) ProtoWithALPN() error {
+	// check default backend
+	if r.Spec.Backend != nil {
+		if r.Spec.Backend.Proto != "" && len(r.Spec.Backend.ALPN) > 0 {
+			return fmt.Errorf("both proto and ALPN specified for spec.backend")
+		}
+	}
+	for ri, rule := range r.Spec.Rules {
+		if rule.HTTP != nil {
+			if rule.HTTP.Proto != "" && len(rule.HTTP.ALPN) > 0 {
+				return fmt.Errorf("both proto and ALPN specified for spec.rules[%d].http", ri)
+			}
+			for pi, path := range rule.HTTP.Paths {
+				if path.Backend.Proto != "" && len(path.Backend.ALPN) > 0 {
+					return fmt.Errorf("both proto and ALPN specified for spec.rules[%d].http.paths[%d]", ri, pi)
+				}
+			}
+		}
+		if rule.TCP != nil {
+			if rule.TCP.Proto != "" && len(rule.TCP.ALPN) > 0 {
+				return fmt.Errorf("both proto and ALPN specified for spec.rules[%d].tcp", ri)
+			}
+			if rule.TCP.Backend.Proto != "" && len(rule.TCP.Backend.ALPN) > 0 {
+				return fmt.Errorf("both proto and ALPN specified for spec.rules[%d].tcp.backend", ri)
+			}
+		}
+	}
+	return nil
+}
+
+// check any alpn/proto contains "h2"
+func (r Ingress) UseHTX() bool {
+	// check default backend
+	if r.Spec.Backend != nil {
+		if containsH2(r.Spec.Backend.Proto, r.Spec.Backend.ALPN) {
+			return true
+		}
+	}
+	for _, rule := range r.Spec.Rules {
+		if rule.HTTP != nil {
+			if containsH2(rule.HTTP.Proto, rule.HTTP.ALPN) {
+				return true
+			}
+			for _, path := range rule.HTTP.Paths {
+				if containsH2(path.Backend.Proto, path.Backend.ALPN) {
+					return true
+				}
+			}
+		}
+		if rule.TCP != nil {
+			if containsH2(rule.TCP.Proto, rule.TCP.ALPN) {
+				return true
+			}
+			if containsH2(rule.TCP.Backend.Proto, rule.TCP.Backend.ALPN) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func containsH2(proto string, alpn []string) bool {
+	if proto == "h2" {
+		return true
+	}
+	for _, option := range alpn {
+		if option == "h2" {
+			return true
+		}
+	}
+	return false
 }

@@ -6,10 +6,10 @@ import (
 	"reflect"
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-	wapi "github.com/appscode/kubernetes-webhook-util/apis/workload/v1"
-	wcs "github.com/appscode/kubernetes-webhook-util/client/workload/v1"
 	"github.com/onsi/gomega/types"
 	"k8s.io/apimachinery/pkg/runtime"
+	wapi "kmodules.xyz/webhook-runtime/apis/workload/v1"
+	wcs "kmodules.xyz/webhook-runtime/client/workload/v1"
 )
 
 func HaveObject(expected runtime.Object) types.GomegaMatcher {

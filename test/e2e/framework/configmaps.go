@@ -9,14 +9,14 @@ import (
 
 	"github.com/appscode/go/encoding/yaml"
 	"github.com/appscode/kubed/pkg/syncer"
-	"github.com/appscode/kutil/tools/clientcmd"
-	exec_util "github.com/appscode/kutil/tools/exec"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
+	"kmodules.xyz/client-go/tools/clientcmd"
+	"kmodules.xyz/client-go/tools/exec"
 )
 
 func (f *Invocation) NewConfigMap() *core.ConfigMap {
@@ -188,7 +188,7 @@ func (f *Invocation) ReadConfigMapFromRecycleBin(recycleBinLocation string, cm *
 		}
 
 		// list the name of recycled configMaps
-		output, err := exec_util.ExecIntoPod(f.ClientConfig, pod, "ls", dir)
+		output, err := exec.ExecIntoPod(f.ClientConfig, pod, exec.Command("ls", dir))
 		if err != nil {
 			return nil, err
 		}
@@ -202,7 +202,7 @@ func (f *Invocation) ReadConfigMapFromRecycleBin(recycleBinLocation string, cm *
 				break
 			}
 		}
-		output, err = exec_util.ExecIntoPod(f.ClientConfig, pod, "cat", filepath.Join(dir, recycledCMName))
+		output, err = exec.ExecIntoPod(f.ClientConfig, pod, exec.Command("cat", filepath.Join(dir, recycledCMName)))
 		if err != nil {
 			return nil, err
 		}

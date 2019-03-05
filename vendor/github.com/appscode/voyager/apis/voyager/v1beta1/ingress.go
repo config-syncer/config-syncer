@@ -63,6 +63,9 @@ type IngressSpec struct {
 	// port according to the hostname specified through the SNI TLS extension.
 	TLS []IngressTLS `json:"tls,omitempty"`
 
+	// Config volumes are used to mount any secret or configmap into HAProxy pods.
+	ConfigVolumes []VolumeSource `json:"configVolumes,omitempty"`
+
 	// Frontend rules specifies a set of rules that should be applied in
 	// HAProxy frontend configuration. The set of keywords are from here
 	// https://cbonte.github.io/haproxy-dconv/1.7/configuration.html#4.1
@@ -254,7 +257,16 @@ type HTTPIngressRuleValue struct {
 	// If provided a list of alpn will be added to port as alpn option1,option2,...
 	// If SecretName is Provided this secret will be used to terminate SSL with alpn options.
 	// If Secret name is not provided backend server is responsible for handling SSL.
+	// Note that, the order of the options indicates the preference
+	// If the ALPN list contains "h2",  "option http-use-htx" will be added to enable HTX mode
+	// https://cbonte.github.io/haproxy-dconv/1.9/configuration.html#option%20http-use-htx
+	// https://cbonte.github.io/haproxy-dconv/1.9/configuration.html#alpn
 	ALPN []string `json:"alpn,omitempty"`
+
+	// HTTP protocol to use
+	// If the Proto contains "h2",  "option http-use-htx" will be added to enable HTX mode
+	// https://www.haproxy.com/blog/haproxy-1-9-2-adds-grpc-support/
+	Proto string `json:"proto,omitempty"`
 
 	// A collection of paths that map requests to backends.
 	Paths []HTTPIngressPath `json:"paths"`
@@ -284,7 +296,16 @@ type TCPIngressRuleValue struct {
 	// If provided a list of alpn will be added to port as alpn option1,option2,...
 	// If SecretName is Provided this secret will be used to terminate SSL with alpn options.
 	// If Secret name is not provided backend server is responsible for handling SSL.
+	// Note that, the order of the options indicates the preference
+	// If the ALPN list contains "h2",  "option http-use-htx" will be added to enable HTX mode
+	// https://cbonte.github.io/haproxy-dconv/1.9/configuration.html#option%20http-use-htx
+	// https://cbonte.github.io/haproxy-dconv/1.9/configuration.html#alpn
 	ALPN []string `json:"alpn,omitempty"`
+
+	// HTTP protocol to use
+	// If the Proto contains "h2",  "option http-use-htx" will be added to enable HTX mode
+	// https://www.haproxy.com/blog/haproxy-1-9-2-adds-grpc-support/
+	Proto string `json:"proto,omitempty"`
 }
 
 // HTTPIngressPath associates a path regex with a backend. Incoming urls matching
@@ -329,6 +350,29 @@ type IngressBackend struct {
 	// request, response or header rewrite. acls also can be used.
 	// https://cbonte.github.io/haproxy-dconv/1.7/configuration.html#1
 	BackendRules []string `json:"backendRules,omitempty"`
+
+	// Application-Layer Protocol Negotiation (ALPN) is a Transport Layer Security (TLS)
+	// extension for application layer protocol negotiation. ALPN allows the application
+	// layer to negotiate which protocol should be performed over a secure connection in a
+	// manner which avoids additional round trips and which is independent of the application
+	// layer protocols. It is used by HTTP/2.
+	// If provided a list of alpn will be added to port as alpn option1,option2,...
+	// If SecretName is Provided this secret will be used to terminate SSL with alpn options.
+	// If Secret name is not provided backend server is responsible for handling SSL.
+	// Note that, the order of the options indicates the preference
+	// If the ALPN list contains "h2",  "option http-use-htx" will be added to enable HTX mode
+	// https://cbonte.github.io/haproxy-dconv/1.9/configuration.html#option%20http-use-htx
+	// https://cbonte.github.io/haproxy-dconv/1.9/configuration.html#alpn
+	ALPN []string `json:"alpn,omitempty"`
+
+	// HTTP protocol to use
+	// If the Proto contains "h2",  "option http-use-htx" will be added to enable HTX mode
+	// https://www.haproxy.com/blog/haproxy-1-9-2-adds-grpc-support/
+	Proto string `json:"proto,omitempty"`
+
+	// Define the load balancing algorithm to be used in a backend.
+	// https://cbonte.github.io/haproxy-dconv/1.9/configuration.html#balance
+	LoadBalanceOn string `json:"loadBalanceOn,omitempty"`
 }
 
 type HTTPIngressBackend struct {

@@ -6,8 +6,8 @@ import (
 	"github.com/appscode/go/log"
 	v "github.com/appscode/go/version"
 	"github.com/appscode/kubed/pkg/cmds/server"
-	"github.com/appscode/kutil/tools/cli"
 	"github.com/spf13/cobra"
+	"kmodules.xyz/client-go/tools/cli"
 )
 
 // runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml"

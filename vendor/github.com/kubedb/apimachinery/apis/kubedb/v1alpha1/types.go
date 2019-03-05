@@ -33,10 +33,31 @@ type BackupScheduleSpec struct {
 	// +optional
 	PodTemplate ofst.PodTemplateSpec `json:"podTemplate,omitempty"`
 
+	// PodVolumeClaimSpec is used to specify temporary storage for backup/restore Job
+	// +optional
+	PodVolumeClaimSpec *core.PersistentVolumeClaimSpec `json:"podVolumeClaimSpec,omitempty"`
+
 	// -------------------------------------------------------------------------
 
 	// Deprecated: Use podTemplate.spec.resources
 	Resources *core.ResourceRequirements `json:"resources,omitempty"`
+}
+
+// LeaderElectionConfig contains essential attributes of leader election.
+// ref: https://github.com/kubernetes/client-go/blob/6134db91200ea474868bc6775e62cc294a74c6c6/tools/leaderelection/leaderelection.go#L105-L114
+type LeaderElectionConfig struct {
+	// LeaseDuration is the duration in second that non-leader candidates will
+	// wait to force acquire leadership. This is measured against time of
+	// last observed ack. Default 15
+	LeaseDurationSeconds int32 `json:"leaseDurationSeconds"`
+	// RenewDeadline is the duration in second that the acting master will retry
+	// refreshing leadership before giving up. Normally, LeaseDuration * 2 / 3.
+	// Default 10
+	RenewDeadlineSeconds int32 `json:"renewDeadlineSeconds"`
+	// RetryPeriod is the duration in second the LeaderElector clients should wait
+	// between tries of actions. Normally, LeaseDuration / 3.
+	// Default 2
+	RetryPeriodSeconds int32 `json:"retryPeriodSeconds"`
 }
 
 type DatabasePhase string

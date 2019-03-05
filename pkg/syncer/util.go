@@ -5,11 +5,11 @@ import (
 
 	"github.com/appscode/go/types"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-	"github.com/appscode/kutil/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
+	"kmodules.xyz/client-go/meta"
 )
 
 type SyncOptions struct {

@@ -6,7 +6,6 @@ import (
 
 	"github.com/appscode/go/flags"
 	v "github.com/appscode/go/version"
-	"github.com/appscode/kutil/tools/cli"
 	searchlightcheme "github.com/appscode/searchlight/client/clientset/versioned/scheme"
 	stashscheme "github.com/appscode/stash/client/clientset/versioned/scheme"
 	voyagerscheme "github.com/appscode/voyager/client/clientset/versioned/scheme"
@@ -15,6 +14,8 @@ import (
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	_ "k8s.io/client-go/kubernetes/fake"
 	clientsetscheme "k8s.io/client-go/kubernetes/scheme"
+	"kmodules.xyz/client-go/logs"
+	"kmodules.xyz/client-go/tools/cli"
 	prom_util "kmodules.xyz/monitoring-agent-api/prometheus/v1"
 )
 
@@ -36,8 +37,7 @@ func NewCmdKubed(version string) *cobra.Command {
 		},
 	}
 	cmd.PersistentFlags().AddGoFlagSet(flag.CommandLine)
-	// ref: https://github.com/kubernetes/kubernetes/issues/17162#issuecomment-225596212
-	flag.CommandLine.Parse([]string{})
+	logs.ParseFlags()
 	cmd.PersistentFlags().BoolVar(&cli.EnableAnalytics, "enable-analytics", cli.EnableAnalytics, "send usage events to Google Analytics")
 
 	stopCh := genericapiserver.SetupSignalHandler()

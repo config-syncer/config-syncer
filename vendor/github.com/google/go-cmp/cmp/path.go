@@ -29,16 +29,47 @@ type (
 	// these types as values of this type will be returned by this package.
 	PathStep interface {
 		String() string
-		Type() reflect.Type // Resulting type after performing the path step
-		isPathStep()
+
+		// Type is the resulting type after performing the path step.
+		Type() reflect.Type
+
+		// Values is the resulting values after performing the path step.
+		// The type of each valid value is guaranteed to be identical to Type.
+		//
+		// In some cases, one or both may be invalid or have restrictions:
+		//	• For StructField, both are not interface-able if the current field
+		//	is unexported and the struct type is not explicitly permitted by
+		//	AllowUnexported to traverse unexported fields.
+		//	• For SliceIndex, one may be invalid if an element is missing from
+		//	either the x or y slice.
+		//	• For MapIndex, one may be invalid if an entry is missing from
+		//	either the x or y map.
+		//
+		// The provided values must not be mutated.
+		Values() (vx, vy reflect.Value)
 	}
 
+	// StructField represents a struct field access on a field called Name.
+	StructField interface {
+		PathStep
+
+		// Name is the field name.
+		Name() string
+
+		// Index is the index of the field in the parent struct type.
+		// See reflect.Type.Field.
+		Index() int
+
+		isStructField()
+	}
 	// SliceIndex is an index operation on a slice or array at some index Key.
 	SliceIndex interface {
 		PathStep
-		Key() int // May return -1 if in a split state
 
-		// SplitKeys returns the indexes for indexing into slices in the
+		// Key is the index key; it may return -1 if in a split state
+		Key() int
+
+		// SplitKeys are the indexes for indexing into slices in the
 		// x and y values, respectively. These indexes may differ due to the
 		// insertion or removal of an element in one of the slices, causing
 		// all of the indexes to be shifted. If an index is -1, then that
@@ -47,37 +78,39 @@ type (
 		// Key is guaranteed to return -1 if and only if the indexes returned
 		// by SplitKeys are not the same. SplitKeys will never return -1 for
 		// both indexes.
-		SplitKeys() (x int, y int)
+		SplitKeys() (ix, iy int)
 
 		isSliceIndex()
 	}
 	// MapIndex is an index operation on a map at some index Key.
 	MapIndex interface {
 		PathStep
+
+		// Key is the value of the map key.
 		Key() reflect.Value
+
 		isMapIndex()
-	}
-	// TypeAssertion represents a type assertion on an interface.
-	TypeAssertion interface {
-		PathStep
-		isTypeAssertion()
-	}
-	// StructField represents a struct field access on a field called Name.
-	StructField interface {
-		PathStep
-		Name() string
-		Index() int
-		isStructField()
 	}
 	// Indirect represents pointer indirection on the parent type.
 	Indirect interface {
 		PathStep
+
 		isIndirect()
+	}
+	// TypeAssertion represents a type assertion on an interface.
+	TypeAssertion interface {
+		PathStep
+
+		isTypeAssertion()
 	}
 	// Transform is a transformation from the parent type to the current type.
 	Transform interface {
 		PathStep
+
+		// Name is the name of the Transformer.
 		Name() string
+
+		// Func is the function pointer to the transformer function.
 		Func() reflect.Value
 
 		// Option returns the originally constructed Transformer option.
@@ -185,20 +218,10 @@ func (pa Path) GoString() string {
 
 type (
 	pathStep struct {
-		typ reflect.Type
+		typ    reflect.Type
+		vx, vy reflect.Value
 	}
 
-	sliceIndex struct {
-		pathStep
-		xkey, ykey int
-	}
-	mapIndex struct {
-		pathStep
-		key reflect.Value
-	}
-	typeAssertion struct {
-		pathStep
-	}
 	structField struct {
 		pathStep
 		name string
@@ -207,11 +230,22 @@ type (
 		// These fields are used for forcibly accessing an unexported field.
 		// pvx, pvy, and field are only valid if unexported is true.
 		unexported bool
-		force      bool                // Forcibly allow visibility
+		mayForce   bool                // Forcibly allow visibility
 		pvx, pvy   reflect.Value       // Parent values
 		field      reflect.StructField // Field information
 	}
+	sliceIndex struct {
+		pathStep
+		xkey, ykey int
+	}
+	mapIndex struct {
+		pathStep
+		key reflect.Value
+	}
 	indirect struct {
+		pathStep
+	}
+	typeAssertion struct {
 		pathStep
 	}
 	transform struct {
@@ -220,7 +254,8 @@ type (
 	}
 )
 
-func (ps pathStep) Type() reflect.Type { return ps.typ }
+func (ps pathStep) Type() reflect.Type             { return ps.typ }
+func (ps pathStep) Values() (vx, vy reflect.Value) { return ps.vx, ps.vy }
 func (ps pathStep) String() string {
 	if ps.typ == nil {
 		return "<nil>"
@@ -231,6 +266,25 @@ func (ps pathStep) String() string {
 	}
 	return fmt.Sprintf("{%s}", s)
 }
+func (ps pathStep) isPathStep() {}
+
+func (sf structField) Values() (vx, vy reflect.Value) {
+	if !sf.unexported {
+		return sf.vx, sf.vy // CanInterface reports true
+	}
+
+	// Forcibly obtain read-write access to an unexported struct field.
+	if sf.mayForce {
+		vx = retrieveUnexportedField(sf.pvx, sf.field)
+		vy = retrieveUnexportedField(sf.pvy, sf.field)
+		return vx, vy // CanInterface reports true
+	}
+	return sf.vx, sf.vy // CanInterface reports false
+}
+func (sf structField) String() string { return fmt.Sprintf(".%s", sf.name) }
+func (sf structField) Name() string   { return sf.name }
+func (sf structField) Index() int     { return sf.idx }
+func (sf structField) isStructField() {}
 
 func (si sliceIndex) String() string {
 	switch {
@@ -247,63 +301,42 @@ func (si sliceIndex) String() string {
 		return fmt.Sprintf("[%d->%d]", si.xkey, si.ykey)
 	}
 }
-func (mi mapIndex) String() string      { return fmt.Sprintf("[%#v]", mi.key) }
-func (ta typeAssertion) String() string { return fmt.Sprintf(".(%v)", ta.typ) }
-func (sf structField) String() string   { return fmt.Sprintf(".%s", sf.name) }
-func (in indirect) String() string      { return "*" }
-func (tf transform) String() string     { return fmt.Sprintf("%s()", tf.trans.name) }
-
 func (si sliceIndex) Key() int {
 	if si.xkey != si.ykey {
 		return -1
 	}
 	return si.xkey
 }
-func (si sliceIndex) SplitKeys() (x, y int) { return si.xkey, si.ykey }
-func (mi mapIndex) Key() reflect.Value      { return mi.key }
-func (sf structField) Name() string         { return sf.name }
-func (sf structField) Index() int           { return sf.idx }
-func (tf transform) Name() string           { return tf.trans.name }
-func (tf transform) Func() reflect.Value    { return tf.trans.fnc }
-func (tf transform) Option() Option         { return tf.trans }
+func (si sliceIndex) SplitKeys() (ix, iy int) { return si.xkey, si.ykey }
+func (si sliceIndex) isSliceIndex()           {}
 
-func (pathStep) isPathStep()           {}
-func (sliceIndex) isSliceIndex()       {}
-func (mapIndex) isMapIndex()           {}
-func (typeAssertion) isTypeAssertion() {}
-func (structField) isStructField()     {}
-func (indirect) isIndirect()           {}
-func (transform) isTransform()         {}
+func (mi mapIndex) String() string     { return fmt.Sprintf("[%#v]", mi.key) }
+func (mi mapIndex) Key() reflect.Value { return mi.key }
+func (mi mapIndex) isMapIndex()        {}
+
+func (in indirect) String() string { return "*" }
+func (in indirect) isIndirect()    {}
+
+func (ta typeAssertion) String() string   { return fmt.Sprintf(".(%v)", ta.typ) }
+func (ta typeAssertion) isTypeAssertion() {}
+
+func (tf transform) String() string      { return fmt.Sprintf("%s()", tf.trans.name) }
+func (tf transform) Name() string        { return tf.trans.name }
+func (tf transform) Func() reflect.Value { return tf.trans.fnc }
+func (tf transform) Option() Option      { return tf.trans }
+func (tf transform) isTransform()        {}
 
 var (
-	_ SliceIndex    = sliceIndex{}
-	_ MapIndex      = mapIndex{}
-	_ TypeAssertion = typeAssertion{}
-	_ StructField   = structField{}
-	_ Indirect      = indirect{}
-	_ Transform     = transform{}
-
-	_ PathStep = sliceIndex{}
-	_ PathStep = mapIndex{}
-	_ PathStep = typeAssertion{}
-	_ PathStep = structField{}
-	_ PathStep = indirect{}
-	_ PathStep = transform{}
+	_ PathStep = StructField(structField{})
+	_ PathStep = SliceIndex(sliceIndex{})
+	_ PathStep = MapIndex(mapIndex{})
+	_ PathStep = Indirect(indirect{})
+	_ PathStep = TypeAssertion(typeAssertion{})
+	_ PathStep = Transform(transform{})
 )
 
 // isExported reports whether the identifier is exported.
 func isExported(id string) bool {
 	r, _ := utf8.DecodeRuneInString(id)
 	return unicode.IsUpper(r)
-}
-
-// isValid reports whether the identifier is valid.
-// Empty and underscore-only strings are not valid.
-func isValid(id string) bool {
-	ok := id != "" && id != "_"
-	for j, c := range id {
-		ok = ok && (j > 0 || !unicode.IsDigit(c))
-		ok = ok && (c == '_' || unicode.IsLetter(c) || unicode.IsDigit(c))
-	}
-	return ok
 }
