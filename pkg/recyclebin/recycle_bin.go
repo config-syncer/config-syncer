@@ -62,7 +62,7 @@ func (c *RecycleBin) OnDelete(obj interface{}) {
 	}
 }
 
-func (c *RecycleBin) update(oldObj, newObj interface{}) error {
+func (c *RecycleBin) update(oldObj, _ interface{}) error {
 	om, err := meta.Accessor(oldObj)
 	if err != nil {
 		return err
