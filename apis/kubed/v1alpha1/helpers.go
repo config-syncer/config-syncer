@@ -105,7 +105,7 @@ func (b SnapshotSpec) Location(filename string) (string, error) {
 	} else if b.Swift != nil {
 		return filepath.Join(b.Swift.Prefix, ts), nil
 	}
-	return "", errors.New("No storage provider is configured.")
+	return "", errors.New("no storage provider is configured")
 }
 
 func (b Backend) Container() (string, error) {
@@ -120,7 +120,7 @@ func (b Backend) Container() (string, error) {
 	} else if b.Swift != nil {
 		return b.Swift.Container, nil
 	}
-	return "", errors.New("No storage provider is configured.")
+	return "", errors.New("no storage provider is configured")
 }
 
 func (b Backend) GetBucketAndPrefix() (string, string, error) {
@@ -135,7 +135,7 @@ func (b Backend) GetBucketAndPrefix() (string, string, error) {
 	} else if b.Local != nil {
 		return b.Local.Path, "", nil
 	}
-	return "", "", errors.New("unknown backend type.")
+	return "", "", errors.New("unknown backend type")
 }
 
 func LoadJanitorAuthInfo(data map[string][]byte) *JanitorAuthInfo {
