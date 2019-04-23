@@ -38,6 +38,9 @@ type MongoDBSpec struct {
 	// MongoDB replica set
 	ReplicaSet *MongoDBReplicaSet `json:"replicaSet,omitempty"`
 
+	// MongoDB sharding topology.
+	ShardTopology *MongoDBShardingTopology `json:"shardTopology,omitempty"`
+
 	// StorageType can be durable (default) or ephemeral
 	StorageType StorageType `json:"storageType,omitempty"`
 
@@ -46,6 +49,10 @@ type MongoDBSpec struct {
 
 	// Database authentication secret
 	DatabaseSecret *core.SecretVolumeSource `json:"databaseSecret,omitempty"`
+
+	// Secret for KeyFile or SSL certificates. Contains `tls.pem` or keyfile `key.txt` depending on enableSSL.
+	// Currently SSL support is not enabled.
+	CertificateSecret *core.SecretVolumeSource `json:"certificateSecret,omitempty"`
 
 	// Init is used to initialize database
 	// +optional
@@ -65,7 +72,7 @@ type MongoDBSpec struct {
 
 	// PodTemplate is an optional configuration for pods used to expose database
 	// +optional
-	PodTemplate ofst.PodTemplateSpec `json:"podTemplate,omitempty"`
+	PodTemplate *ofst.PodTemplateSpec `json:"podTemplate,omitempty"`
 
 	// ServiceTemplate is an optional configuration for service used to expose database
 	// +optional
@@ -79,50 +86,77 @@ type MongoDBSpec struct {
 	// TerminationPolicy controls the delete operation for database
 	// +optional
 	TerminationPolicy TerminationPolicy `json:"terminationPolicy,omitempty"`
-
-	// -------------------------------------------------------------------------
-
-	// If DoNotPause is true, controller will prevent to delete this MongoDB object.
-	// Controller will create same MongoDB object and ignore other process.
-	// +optional
-	// Deprecated: Use terminationPolicy = DoNotTerminate
-	DoNotPause bool `json:"doNotPause,omitempty"`
-
-	// NodeSelector is a selector which must be true for the pod to fit on a node
-	// +optional
-	// Deprecated: Use podTemplate.spec.nodeSelector
-	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
-
-	// Compute Resources required by the sidecar container.
-	// Deprecated: Use podTemplate.spec.resources
-	Resources *core.ResourceRequirements `json:"resources,omitempty"`
-
-	// If specified, the pod's scheduling constraints
-	// +optional
-	// Deprecated: Use podTemplate.spec.affinity
-	Affinity *core.Affinity `json:"affinity,omitempty"`
-
-	// If specified, the pod will be dispatched by specified scheduler.
-	// If not specified, the pod will be dispatched by default scheduler.
-	// +optional
-	// Deprecated: Use podTemplate.spec.schedulerName
-	SchedulerName string `json:"schedulerName,omitempty"`
-
-	// If specified, the pod's tolerations.
-	// +optional
-	// Deprecated: Use podTemplate.spec.tolerations
-	Tolerations []core.Toleration `json:"tolerations,omitempty"`
-
-	// ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec.
-	// If specified, these secrets will be passed to individual puller implementations for them to use.
-	// +optional
-	// Deprecated: Use podTemplate.spec.imagePullSecrets
-	ImagePullSecrets []core.LocalObjectReference `json:"imagePullSecrets,omitempty"`
 }
 
 type MongoDBReplicaSet struct {
-	Name    string                   `json:"name"`
+	// Name of replicaset
+	Name string `json:"name"`
+
+	// Deprecated: Use spec.certificateSecret
 	KeyFile *core.SecretVolumeSource `json:"keyFile,omitempty"`
+}
+
+type MongoDBShardingTopology struct {
+	// Shard component of mongodb.
+	// More info: https://docs.mongodb.com/manual/core/sharded-cluster-shards/
+	Shard MongoDBShardNode `json:"shard"`
+
+	// Config Server (metadata) component of mongodb.
+	// More info: https://docs.mongodb.com/manual/core/sharded-cluster-config-servers/
+	ConfigServer MongoDBConfigNode `json:"configServer"`
+
+	// Mongos (router) component of mongodb.
+	// More info: https://docs.mongodb.com/manual/core/sharded-cluster-query-router/
+	Mongos MongoDBMongosNode `json:"mongos"`
+}
+
+type MongoDBShardNode struct {
+	// Shards represents number of shards for shard type of node
+	// More info: https://docs.mongodb.com/manual/core/sharded-cluster-shards/
+	Shards int32 `json:"shards"`
+
+	// MongoDB sharding node configs
+	MongoDBNode `json:",inline"`
+
+	// Storage to specify how storage shall be used.
+	Storage *core.PersistentVolumeClaimSpec `json:"storage,omitempty"`
+}
+
+type MongoDBConfigNode struct {
+	// MongoDB config server node configs
+	MongoDBNode `json:",inline"`
+
+	// Storage to specify how storage shall be used.
+	Storage *core.PersistentVolumeClaimSpec `json:"storage,omitempty"`
+}
+
+type MongoDBMongosNode struct {
+	// MongoDB mongos node configs
+	MongoDBNode `json:",inline"`
+
+	// The deployment strategy to use to replace existing pods with new ones.
+	// +optional
+	Strategy apps.DeploymentStrategy `json:"strategy,omitempty" protobuf:"bytes,4,opt,name=strategy"`
+}
+
+type MongoDBNode struct {
+	// Replicas represents number of replicas of this specific node.
+	// If current node has replicaset enabled, then replicas is the amount of replicaset nodes.
+	Replicas int32 `json:"replicas"`
+
+	// Prefix is the name prefix of this node.
+	Prefix string `json:"prefix,omitempty"`
+
+	// Compute Resources required by the sidecar container.
+	Resources core.ResourceRequirements `json:"resources,omitempty"`
+
+	// ConfigSource is an optional field to provide custom configuration file for database (i.e mongod.cnf).
+	// If specified, this file will be used as configuration file otherwise default configuration file will be used.
+	ConfigSource *core.VolumeSource `json:"configSource,omitempty"`
+
+	// PodTemplate is an optional configuration for pods used to expose database
+	// +optional
+	PodTemplate ofst.PodTemplateSpec `json:"podTemplate,omitempty"`
 }
 
 type MongoDBStatus struct {

@@ -27,20 +27,24 @@ type SnapshotSourceSpec struct {
 type BackupScheduleSpec struct {
 	CronExpression string `json:"cronExpression,omitempty"`
 
-	store.Backend `json:",inline,omitempty"`
+	// Snapshot Spec
+	store.Backend `json:",inline"`
 
-	// PodTemplate is an optional configuration for pods used for backup and recovery
+	// StorageType can be durable or ephemeral.
+	// If not given, database storage type will be used.
+	// +optional
+	StorageType *StorageType `json:"storageType,omitempty"`
+
+	// PodTemplate is an optional configuration for pods used to take database snapshots
 	// +optional
 	PodTemplate ofst.PodTemplateSpec `json:"podTemplate,omitempty"`
 
-	// PodVolumeClaimSpec is used to specify temporary storage for backup/restore Job
+	// PodVolumeClaimSpec is used to specify temporary storage for backup/restore Job.
+	// If not given, database's PvcSpec will be used.
+	// If storageType is durable, then a PVC will be created using this PVCSpec.
+	// If storageType is ephemeral, then an empty directory will be created of size PvcSpec.Resources.Requests[core.ResourceStorage].
 	// +optional
 	PodVolumeClaimSpec *core.PersistentVolumeClaimSpec `json:"podVolumeClaimSpec,omitempty"`
-
-	// -------------------------------------------------------------------------
-
-	// Deprecated: Use podTemplate.spec.resources
-	Resources *core.ResourceRequirements `json:"resources,omitempty"`
 }
 
 // LeaderElectionConfig contains essential attributes of leader election.

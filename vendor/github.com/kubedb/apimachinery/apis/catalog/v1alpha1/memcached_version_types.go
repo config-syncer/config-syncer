@@ -33,6 +33,8 @@ type MemcachedVersionSpec struct {
 	// Deprecated versions usable but regarded as obsolete and best avoided, typically due to having been superseded.
 	// +optional
 	Deprecated bool `json:"deprecated,omitempty"`
+	// PSP names
+	PodSecurityPolicies MemcachedVersionPodSecurityPolicy `json:"podSecurityPolicies"`
 }
 
 // MemcachedVersionDatabase is the Memcached Database image
@@ -43,6 +45,11 @@ type MemcachedVersionDatabase struct {
 // MemcachedVersionExporter is the image for the Memcached exporter
 type MemcachedVersionExporter struct {
 	Image string `json:"image"`
+}
+
+// MemcachedVersionPodSecurityPolicy is the Memcached pod security policies
+type MemcachedVersionPodSecurityPolicy struct {
+	DatabasePolicyName string `json:"databasePolicyName"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

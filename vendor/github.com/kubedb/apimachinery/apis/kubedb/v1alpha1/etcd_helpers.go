@@ -27,7 +27,13 @@ func (e Etcd) OffshootSelectors() map[string]string {
 }
 
 func (e Etcd) OffshootLabels() map[string]string {
-	return meta_util.FilterKeys(GenericKey, e.OffshootSelectors(), e.Labels)
+	out := e.OffshootSelectors()
+	out[meta_util.NameLabelKey] = ResourceSingularEtcd
+	out[meta_util.VersionLabelKey] = string(e.Spec.Version)
+	out[meta_util.InstanceLabelKey] = e.Name
+	out[meta_util.ComponentLabelKey] = "database"
+	out[meta_util.ManagedByLabelKey] = GenericKey
+	return meta_util.FilterKeys(GenericKey, out, e.Labels)
 }
 
 func (e Etcd) ResourceShortCode() string {
@@ -101,6 +107,12 @@ func (e etcdStatsService) Scheme() string {
 
 func (e Etcd) StatsService() mona.StatsAccessor {
 	return &etcdStatsService{&e}
+}
+
+func (e Etcd) StatsServiceLabels() map[string]string {
+	lbl := meta_util.FilterKeys(GenericKey, e.OffshootSelectors(), e.Labels)
+	lbl[LabelRole] = "stats"
+	return lbl
 }
 
 func (e *Etcd) GetMonitoringVendor() string {

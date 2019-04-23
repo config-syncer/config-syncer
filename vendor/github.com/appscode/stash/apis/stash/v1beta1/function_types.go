@@ -96,6 +96,9 @@ type FunctionSpec struct {
 	// RuntimeSettings allow to specify Resources, LivenessProbe, ReadinessProbe, Lifecycle, SecurityContext etc.
 	//+optional
 	RuntimeSettings *ofst.ContainerRuntimeSettings `json:"runtimeSettings,omitempty"`
+	// Name of PodSecurityPolicy(PSP) required by this function
+	//+optional
+	PodSecurityPolicyName string `json:"podSecurityPolicyName,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

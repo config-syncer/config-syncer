@@ -27,7 +27,13 @@ func (m Memcached) OffshootSelectors() map[string]string {
 }
 
 func (m Memcached) OffshootLabels() map[string]string {
-	return meta_util.FilterKeys(GenericKey, m.OffshootSelectors(), m.Labels)
+	out := m.OffshootSelectors()
+	out[meta_util.NameLabelKey] = ResourceSingularMemcached
+	out[meta_util.VersionLabelKey] = string(m.Spec.Version)
+	out[meta_util.InstanceLabelKey] = m.Name
+	out[meta_util.ComponentLabelKey] = "database"
+	out[meta_util.ManagedByLabelKey] = GenericKey
+	return meta_util.FilterKeys(GenericKey, out, m.Labels)
 }
 
 func (m Memcached) ResourceShortCode() string {
@@ -62,8 +68,8 @@ func (r memcachedApp) Type() appcat.AppType {
 	return appcat.AppType(fmt.Sprintf("%s/%s", kubedb.GroupName, ResourceSingularMemcached))
 }
 
-func (r Memcached) AppBindingMeta() appcat.AppBindingMeta {
-	return &memcachedApp{&r}
+func (m Memcached) AppBindingMeta() appcat.AppBindingMeta {
+	return &memcachedApp{&m}
 }
 
 type memcachedStatsService struct {
@@ -92,6 +98,12 @@ func (m memcachedStatsService) Scheme() string {
 
 func (m Memcached) StatsService() mona.StatsAccessor {
 	return &memcachedStatsService{&m}
+}
+
+func (m Memcached) StatsServiceLabels() map[string]string {
+	lbl := meta_util.FilterKeys(GenericKey, m.OffshootSelectors(), m.Labels)
+	lbl[LabelRole] = "stats"
+	return lbl
 }
 
 func (m *Memcached) GetMonitoringVendor() string {
@@ -154,36 +166,6 @@ func (m *Memcached) SetDefaults() {
 func (m *MemcachedSpec) SetDefaults() {
 	if m == nil {
 		return
-	}
-
-	// migrate first to avoid incorrect defaulting
-	if m.DoNotPause {
-		m.TerminationPolicy = TerminationPolicyDoNotTerminate
-		m.DoNotPause = false
-	}
-	if len(m.NodeSelector) > 0 {
-		m.PodTemplate.Spec.NodeSelector = m.NodeSelector
-		m.NodeSelector = nil
-	}
-	if m.Resources != nil {
-		m.PodTemplate.Spec.Resources = *m.Resources
-		m.Resources = nil
-	}
-	if m.Affinity != nil {
-		m.PodTemplate.Spec.Affinity = m.Affinity
-		m.Affinity = nil
-	}
-	if len(m.SchedulerName) > 0 {
-		m.PodTemplate.Spec.SchedulerName = m.SchedulerName
-		m.SchedulerName = ""
-	}
-	if len(m.Tolerations) > 0 {
-		m.PodTemplate.Spec.Tolerations = m.Tolerations
-		m.Tolerations = nil
-	}
-	if len(m.ImagePullSecrets) > 0 {
-		m.PodTemplate.Spec.ImagePullSecrets = m.ImagePullSecrets
-		m.ImagePullSecrets = nil
 	}
 
 	// perform defaulting

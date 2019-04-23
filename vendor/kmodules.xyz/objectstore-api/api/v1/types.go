@@ -43,13 +43,13 @@ const (
 type Backend struct {
 	StorageSecretName string `json:"storageSecretName,omitempty"`
 
-	Local *LocalSpec `json:"local,omitempty"`
-	S3    *S3Spec    `json:"s3,omitempty"`
-	GCS   *GCSSpec   `json:"gcs,omitempty"`
-	Azure *AzureSpec `json:"azure,omitempty"`
-	Swift *SwiftSpec `json:"swift,omitempty"`
-	B2    *B2Spec    `json:"b2,omitempty"`
-	// Rest  *RestServerSpec `json:"rest,omitempty"`
+	Local *LocalSpec      `json:"local,omitempty"`
+	S3    *S3Spec         `json:"s3,omitempty"`
+	GCS   *GCSSpec        `json:"gcs,omitempty"`
+	Azure *AzureSpec      `json:"azure,omitempty"`
+	Swift *SwiftSpec      `json:"swift,omitempty"`
+	B2    *B2Spec         `json:"b2,omitempty"`
+	Rest  *RestServerSpec `json:"rest,omitempty"`
 }
 
 type LocalSpec struct {
@@ -65,13 +65,15 @@ type S3Spec struct {
 }
 
 type GCSSpec struct {
-	Bucket string `json:"bucket,omitempty"`
-	Prefix string `json:"prefix,omitempty"`
+	Bucket         string `json:"bucket,omitempty"`
+	Prefix         string `json:"prefix,omitempty"`
+	MaxConnections int    `json:"maxConnections,omitempty"`
 }
 
 type AzureSpec struct {
-	Container string `json:"container,omitempty"`
-	Prefix    string `json:"prefix,omitempty"`
+	Container      string `json:"container,omitempty"`
+	Prefix         string `json:"prefix,omitempty"`
+	MaxConnections int    `json:"maxConnections,omitempty"`
 }
 
 type SwiftSpec struct {
@@ -80,8 +82,9 @@ type SwiftSpec struct {
 }
 
 type B2Spec struct {
-	Bucket string `json:"bucket,omitempty"`
-	Prefix string `json:"prefix,omitempty"`
+	Bucket         string `json:"bucket,omitempty"`
+	Prefix         string `json:"prefix,omitempty"`
+	MaxConnections int    `json:"maxConnections,omitempty"`
 }
 
 type RestServerSpec struct {
