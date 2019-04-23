@@ -54,6 +54,12 @@ The following table lists the configurable parameters of the Kubed chart and the
 | `criticalAddon`                  | If true, installs kubed operator as critical addon                | `false`            |
 | `logLevel`                       | Log level for kubed                                               | `3`                |
 | `affinity`                       | Affinity rules for pod assignment                                 | `{}`               |
+| `persistence.enabled`            | Use persistent volume to store data                               | `false`            |
+| `persistence.size`               | Size of persistent volume claim                                   | `10Gi`             |
+| `persistence.existingClaim`      | Use an existing PVC to persist data                               | `nil`              |
+| `persistence.storageClassName`   | Type of persistent volume claim                                   | `nil`              |
+| `persistence.accessModes`        | Persistence access modes                                          | `[ReadWriteOnce]`  |
+| `persistence.subPath`            | Mount a sub dir of the persistent volume                          | `nil`              |
 | `nodeSelector`                   | Node labels for pod assignment                                    | `{}`               |
 | `tolerations`                    | Tolerations used pod assignment                                   | `{}`               |
 | `resources`                      | Compute resources for the kubed container                         | `{}`               |

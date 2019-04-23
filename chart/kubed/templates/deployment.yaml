@@ -72,6 +72,13 @@ spec:
           mountPath: /tmp
         - mountPath: /var/serving-cert
           name: serving-cert
+      {{- if .Values.persistence.enabled }}
+        - name: storage
+          mountPath: "/var/lib/kubed"
+        {{- if .Values.persistence.subPath }}
+            subPath: {{ .Values.persistence.subPath }}
+        {{- end }}
+      {{- end }}
       volumes:
       - name: config
         secret:
@@ -82,6 +89,11 @@ spec:
         secret:
           defaultMode: 420
           secretName: {{ template "kubed.fullname" . }}-apiserver-cert
+      {{- if .Values.persistence.enabled }}
+      - name: storage
+        persistentVolumeClaim:
+          claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "kubed.fullname" . }}{{- end }}
+      {{- end }}
 {{- if or .Values.tolerations (and .Values.criticalAddon (eq .Release.Namespace "kube-system")) }}
       tolerations:
 {{- if .Values.tolerations }}
