@@ -15,7 +15,7 @@ import (
 	"path/filepath"
 )
 
-func generateSwaggerJson() {
+func generateSwaggerJSON() {
 	var (
 		Scheme = runtime.NewScheme()
 		Codecs = serializer.NewCodecFactory(Scheme)
@@ -62,5 +62,5 @@ func generateSwaggerJson() {
 }
 
 func main() {
-	generateSwaggerJson()
+	generateSwaggerJSON()
 }

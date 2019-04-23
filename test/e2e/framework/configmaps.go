@@ -213,28 +213,29 @@ func (f *Invocation) ReadConfigMapFromRecycleBin(recycleBinLocation string, cm *
 		}
 		return deletedConfigMap, nil
 
-	} else {
-		files, err := ioutil.ReadDir(dir)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, file := range files {
-			if strings.HasPrefix(file.Name(), cm.Name) && strings.HasSuffix(file.Name(), ".yaml") {
-				data, err := ioutil.ReadFile(filepath.Join(dir, file.Name()))
-				if err != nil {
-					return nil, err
-				}
-
-				err = yaml.Unmarshal(data, &deletedConfigMap)
-				if err != nil {
-					return nil, err
-				}
-				return deletedConfigMap, nil
-			}
-		}
-		return deletedConfigMap, fmt.Errorf("configmap not found")
 	}
+
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, file := range files {
+		if strings.HasPrefix(file.Name(), cm.Name) && strings.HasSuffix(file.Name(), ".yaml") {
+			data, err := ioutil.ReadFile(filepath.Join(dir, file.Name()))
+			if err != nil {
+				return nil, err
+			}
+
+			err = yaml.Unmarshal(data, &deletedConfigMap)
+			if err != nil {
+				return nil, err
+			}
+			return deletedConfigMap, nil
+		}
+	}
+	return deletedConfigMap, fmt.Errorf("configmap not found")
+
 }
 
 func (f *Invocation) DeleteAllConfigmaps() {
