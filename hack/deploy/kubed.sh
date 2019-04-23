@@ -106,7 +106,7 @@ export KUBED_SERVICE_ACCOUNT=kubed-operator
 export KUBED_ENABLE_RBAC=true
 export KUBED_RUN_ON_MASTER=0
 export KUBED_DOCKER_REGISTRY=${DOCKER_REGISTRY:-appscode}
-export KUBED_IMAGE_TAG=0.9.0
+export KUBED_IMAGE_TAG=0.10.0
 export KUBED_IMAGE_PULL_SECRET=
 export KUBED_IMAGE_PULL_POLICY=IfNotPresent
 export KUBED_USE_KUBEAPISERVER_FQDN_FOR_AKS=true
@@ -118,7 +118,7 @@ export KUBED_CONFIG_ENABLE_APISERVER=false
 export KUBED_PRIORITY_CLASS=system-cluster-critical
 
 export APPSCODE_ENV=${APPSCODE_ENV:-prod}
-export SCRIPT_LOCATION="curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.9.0/"
+export SCRIPT_LOCATION="curl -fsSL https://raw.githubusercontent.com/appscode/kubed/0.10.0/"
 if [[ "$APPSCODE_ENV" == "dev" ]]; then
   detect_tag
   export SCRIPT_LOCATION="cat "

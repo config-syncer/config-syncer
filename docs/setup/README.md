@@ -2,17 +2,17 @@
 title: TOC | Setup
 description: TOC | Setup
 menu:
-  product_kubed_0.9.0:
+  product_kubed_0.10.0:
     identifier: setup-readme
     name: Readme
     parent: setup
     weight: -1
 product_name: kubed
-menu_name: product_kubed_0.9.0
+menu_name: product_kubed_0.10.0
 section_menu_id: setup
-url: /products/kubed/0.9.0/setup/
+url: /products/kubed/0.10.0/setup/
 aliases:
-  - /products/kubed/0.9.0/setup/README/
+  - /products/kubed/0.10.0/setup/README/
 ---
 
 # Setup

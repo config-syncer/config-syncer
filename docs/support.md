@@ -2,17 +2,17 @@
 title: Support | Kubed
 description: Support
 menu:
-  product_kubed_0.9.0:
+  product_kubed_0.10.0:
     identifier: support-kubed
     name: Support
     parent: welcome
     weight: 25
 product_name: kubed
-menu_name: product_kubed_0.9.0
+menu_name: product_kubed_0.10.0
 section_menu_id: welcome
-url: /products/kubed/0.9.0/welcome/support/
+url: /products/kubed/0.10.0/welcome/support/
 aliases:
-  - /products/kubed/0.9.0/support/
+  - /products/kubed/0.10.0/support/
 ---
 
 # Support
