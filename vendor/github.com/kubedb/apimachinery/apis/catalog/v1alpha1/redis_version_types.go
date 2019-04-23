@@ -33,6 +33,8 @@ type RedisVersionSpec struct {
 	// Deprecated versions usable but regarded as obsolete and best avoided, typically due to having been superseded.
 	// +optional
 	Deprecated bool `json:"deprecated,omitempty"`
+	// PSP names
+	PodSecurityPolicies RedisVersionPodSecurityPolicy `json:"podSecurityPolicies"`
 }
 
 // RedisVersionDatabase is the Redis Database image
@@ -43,6 +45,11 @@ type RedisVersionDatabase struct {
 // RedisVersionExporter is the image for the Redis exporter
 type RedisVersionExporter struct {
 	Image string `json:"image"`
+}
+
+// RedisVersionPodSecurityPolicy is the Redis pod security policies
+type RedisVersionPodSecurityPolicy struct {
+	DatabasePolicyName string `json:"databasePolicyName"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

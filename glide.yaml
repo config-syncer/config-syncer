@@ -36,14 +36,21 @@ import:
   version: v1.0.8
 - package: github.com/davecgh/go-spew
   version: v1.1.1
+- package: github.com/evanphx/json-patch
+  version: 5858425f75500d40c52783dce87d085a483ce135
 - package: github.com/ghodss/yaml
   version: v1.0.0
 - package: github.com/go-ini/ini
   version: v1.40.0
 - package: github.com/go-openapi/spec
+  version: v0.17.2
+- package: github.com/go-openapi/swag
+  version: v0.17.2
 - package: github.com/golang/glog
 - package: github.com/golang/protobuf
   version: v1.1.0
+- package: github.com/google/go-cmp
+  version: 6f77996f0c42f7b84e5a2b252227263f93432e9b
 - package: github.com/gorilla/websocket
   version: v1.4.0
 - package: github.com/graymeta/stow
@@ -77,6 +84,8 @@ import:
   version: master
 - package: github.com/russross/blackfriday
   version: v1.5.2
+- package: github.com/soheilhy/cmux
+  version: 8a8ea3c53959009183d7914522833c1ed8835020
 - package: github.com/spf13/afero
   version: v1.1.2
 - package: github.com/spf13/cobra
@@ -104,23 +113,25 @@ import:
 - package: gopkg.in/yaml.v2
   version: v2.2.1
 - package: k8s.io/api
-  version: kubernetes-1.13.0
+  version: kubernetes-1.13.5
 - package: k8s.io/apiextensions-apiserver
-  version: kubernetes-1.13.0
+  version: kubernetes-1.13.5
 - package: k8s.io/apimachinery
   repo: https://github.com/kmodules/apimachinery.git
   vcs: git
-  version: ac-1.13.0
+  version: ac-1.13.5
 - package: k8s.io/apiserver
   repo: https://github.com/kmodules/apiserver.git
   vcs: git
-  version: ac-1.13.0
+  version: ac-1.13.5
 - package: k8s.io/client-go
-  version: v10.0.0
+  version: kubernetes-1.13.5
 - package: k8s.io/kube-aggregator
-  version: kubernetes-1.13.0
+  version: kubernetes-1.13.5
 - package: k8s.io/kube-openapi
   version: c59034cc13d587f5ef4e85ca0ade0c1866ae8e1d
+- package: k8s.io/utils
+  version: 66066c83e385e385ccc3c964b44fd7dcd413d0ed
 - package: kmodules.xyz/client-go
   version: release-10.0
 - package: kmodules.xyz/monitoring-agent-api
@@ -129,3 +140,7 @@ import:
   version: release-10.0
 - package: sigs.k8s.io/yaml
   version: v1.1.0
+- package: github.com/olekukonko/tablewriter
+  version: 7e037d187b0c13d81ccf0dd1c6b990c2759e6597
+- package: github.com/jaytaylor/html2text
+  version: 01ec452cbe43774f989516272881441cae40c16b

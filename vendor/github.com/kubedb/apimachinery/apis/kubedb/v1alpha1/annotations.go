@@ -7,6 +7,7 @@ const (
 
 	LabelDatabaseKind = GenericKey + "/kind"
 	LabelDatabaseName = GenericKey + "/name"
+	LabelRole         = GenericKey + "/role"
 
 	PostgresKey         = ResourceSingularPostgres + "." + GenericKey
 	ElasticsearchKey    = ResourceSingularElasticsearch + "." + GenericKey
@@ -31,6 +32,10 @@ const (
 	ElasticsearchRestPortName = "http"
 	ElasticsearchNodePort     = 9300
 	ElasticsearchNodePortName = "transport"
+
+	MongoDBShardPort    = 27017
+	MongoDBConfigdbPort = 27017
+	MongoDBMongosPort   = 27017
 
 	RedisShardKey   = RedisKey + "/shard"
 	RedisNodePort   = 6379

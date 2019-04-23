@@ -35,6 +35,10 @@ type MySQLVersionSpec struct {
 	// Deprecated versions usable but regarded as obsolete and best avoided, typically due to having been superseded.
 	// +optional
 	Deprecated bool `json:"deprecated,omitempty"`
+	// Init container Image
+	InitContainer MySQLVersionInitContainer `json:"initContainer"`
+	// PSP names
+	PodSecurityPolicies MySQLVersionPodSecurityPolicy `json:"podSecurityPolicies"`
 }
 
 // MySQLVersionDatabase is the MySQL Database image
@@ -50,6 +54,17 @@ type MySQLVersionExporter struct {
 // MySQLVersionTools is the image for the postgres tools
 type MySQLVersionTools struct {
 	Image string `json:"image"`
+}
+
+// MySQLVersionInitContainer is the Elasticsearch Container initializer
+type MySQLVersionInitContainer struct {
+	Image string `json:"image"`
+}
+
+// MySQLVersionPodSecurityPolicy is the MySQL pod security policies
+type MySQLVersionPodSecurityPolicy struct {
+	DatabasePolicyName    string `json:"databasePolicyName"`
+	SnapshotterPolicyName string `json:"snapshotterPolicyName"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

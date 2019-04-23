@@ -27,7 +27,13 @@ func (e Elasticsearch) OffshootSelectors() map[string]string {
 }
 
 func (e Elasticsearch) OffshootLabels() map[string]string {
-	return meta_util.FilterKeys(GenericKey, e.OffshootSelectors(), e.Labels)
+	out := e.OffshootSelectors()
+	out[meta_util.NameLabelKey] = ResourceSingularElasticsearch
+	out[meta_util.VersionLabelKey] = string(e.Spec.Version)
+	out[meta_util.InstanceLabelKey] = e.Name
+	out[meta_util.ComponentLabelKey] = "database"
+	out[meta_util.ManagedByLabelKey] = GenericKey
+	return meta_util.FilterKeys(GenericKey, out, e.Labels)
 }
 
 func (e Elasticsearch) ResourceShortCode() string {
@@ -115,6 +121,12 @@ func (e Elasticsearch) StatsService() mona.StatsAccessor {
 	return &elasticsearchStatsService{&e}
 }
 
+func (e Elasticsearch) StatsServiceLabels() map[string]string {
+	lbl := meta_util.FilterKeys(GenericKey, e.OffshootSelectors(), e.Labels)
+	lbl[LabelRole] = "stats"
+	return lbl
+}
+
 func (e *Elasticsearch) GetMonitoringVendor() string {
 	if e.Spec.Monitor != nil {
 		return e.Spec.Monitor.Agent.Vendor()
@@ -177,38 +189,9 @@ func (e *ElasticsearchSpec) SetDefaults() {
 		return
 	}
 
-	// migrate first to avoid incorrect defaulting
-	e.BackupSchedule.SetDefaults()
-	if e.DoNotPause {
-		e.TerminationPolicy = TerminationPolicyDoNotTerminate
-		e.DoNotPause = false
-	}
-	if len(e.NodeSelector) > 0 {
-		e.PodTemplate.Spec.NodeSelector = e.NodeSelector
-		e.NodeSelector = nil
-	}
-	if e.Resources != nil {
-		e.PodTemplate.Spec.Resources = *e.Resources
-		e.Resources = nil
-	}
-	if e.Affinity != nil {
-		e.PodTemplate.Spec.Affinity = e.Affinity
-		e.Affinity = nil
-	}
-	if len(e.SchedulerName) > 0 {
-		e.PodTemplate.Spec.SchedulerName = e.SchedulerName
-		e.SchedulerName = ""
-	}
-	if len(e.Tolerations) > 0 {
-		e.PodTemplate.Spec.Tolerations = e.Tolerations
-		e.Tolerations = nil
-	}
-	if len(e.ImagePullSecrets) > 0 {
-		e.PodTemplate.Spec.ImagePullSecrets = e.ImagePullSecrets
-		e.ImagePullSecrets = nil
-	}
-
 	// perform defaulting
+	e.BackupSchedule.SetDefaults()
+
 	if e.AuthPlugin == "" {
 		e.AuthPlugin = ElasticsearchAuthPluginSearchGuard
 	}

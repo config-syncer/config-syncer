@@ -44,16 +44,10 @@ type SnapshotSpec struct {
 
 	// PodVolumeClaimSpec is used to specify temporary storage for backup/restore Job.
 	// If not given, database's PvcSpec will be used.
-	// If storageType is durable, then a PVC be will created using this PVCSpec.
+	// If storageType is durable, then a PVC will be created using this PVCSpec.
 	// If storageType is ephemeral, then an empty directory will be created of size PvcSpec.Resources.Requests[core.ResourceStorage].
 	// +optional
 	PodVolumeClaimSpec *core.PersistentVolumeClaimSpec `json:"podVolumeClaimSpec,omitempty"`
-
-	// -------------------------------------------------------------------------
-
-	// Compute Resources required by the pod used to take database snapshots
-	// Deprecated: Use podTemplate.spec.resources
-	Resources *core.ResourceRequirements `json:"resources,omitempty"`
 }
 
 type SnapshotPhase string

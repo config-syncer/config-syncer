@@ -35,6 +35,8 @@ type PostgresVersionSpec struct {
 	// Deprecated versions usable but regarded as obsolete and best avoided, typically due to having been superseded.
 	// +optional
 	Deprecated bool `json:"deprecated,omitempty"`
+	// PSP names
+	PodSecurityPolicies PostgresVersionPodSecurityPolicy `json:"podSecurityPolicies"`
 }
 
 // PostgresVersionDatabase is the Postgres Database image
@@ -50,6 +52,12 @@ type PostgresVersionExporter struct {
 // PostgresVersionTools is the image for the postgres tools
 type PostgresVersionTools struct {
 	Image string `json:"image"`
+}
+
+// PostgresVersionPodSecurityPolicy is the Postgres pod security policies
+type PostgresVersionPodSecurityPolicy struct {
+	DatabasePolicyName    string `json:"databasePolicyName"`
+	SnapshotterPolicyName string `json:"snapshotterPolicyName"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

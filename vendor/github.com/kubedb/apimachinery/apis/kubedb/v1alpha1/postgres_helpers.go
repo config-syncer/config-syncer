@@ -28,7 +28,13 @@ func (p Postgres) OffshootSelectors() map[string]string {
 }
 
 func (p Postgres) OffshootLabels() map[string]string {
-	return meta_util.FilterKeys(GenericKey, p.OffshootSelectors(), p.Labels)
+	out := p.OffshootSelectors()
+	out[meta_util.NameLabelKey] = ResourceSingularPostgres
+	out[meta_util.VersionLabelKey] = string(p.Spec.Version)
+	out[meta_util.InstanceLabelKey] = p.Name
+	out[meta_util.ComponentLabelKey] = "database"
+	out[meta_util.ManagedByLabelKey] = GenericKey
+	return meta_util.FilterKeys(GenericKey, out, p.Labels)
 }
 
 func (p Postgres) ResourceShortCode() string {
@@ -100,6 +106,12 @@ func (p Postgres) StatsService() mona.StatsAccessor {
 	return &postgresStatsService{&p}
 }
 
+func (p Postgres) StatsServiceLabels() map[string]string {
+	lbl := meta_util.FilterKeys(GenericKey, p.OffshootSelectors(), p.Labels)
+	lbl[LabelRole] = "stats"
+	return lbl
+}
+
 func (p *Postgres) GetMonitoringVendor() string {
 	if p.Spec.Monitor != nil {
 		return p.Spec.Monitor.Agent.Vendor()
@@ -166,38 +178,9 @@ func (p *PostgresSpec) SetDefaults() {
 		return
 	}
 
-	// migrate first to avoid incorrect defaulting
-	p.BackupSchedule.SetDefaults()
-	if p.DoNotPause {
-		p.TerminationPolicy = TerminationPolicyDoNotTerminate
-		p.DoNotPause = false
-	}
-	if len(p.NodeSelector) > 0 {
-		p.PodTemplate.Spec.NodeSelector = p.NodeSelector
-		p.NodeSelector = nil
-	}
-	if p.Resources != nil {
-		p.PodTemplate.Spec.Resources = *p.Resources
-		p.Resources = nil
-	}
-	if p.Affinity != nil {
-		p.PodTemplate.Spec.Affinity = p.Affinity
-		p.Affinity = nil
-	}
-	if len(p.SchedulerName) > 0 {
-		p.PodTemplate.Spec.SchedulerName = p.SchedulerName
-		p.SchedulerName = ""
-	}
-	if len(p.Tolerations) > 0 {
-		p.PodTemplate.Spec.Tolerations = p.Tolerations
-		p.Tolerations = nil
-	}
-	if len(p.ImagePullSecrets) > 0 {
-		p.PodTemplate.Spec.ImagePullSecrets = p.ImagePullSecrets
-		p.ImagePullSecrets = nil
-	}
-
 	// perform defaulting
+	p.BackupSchedule.SetDefaults()
+
 	if p.StorageType == "" {
 		p.StorageType = StorageTypeDurable
 	}
