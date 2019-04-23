@@ -2,17 +2,17 @@
 title: Contributing | Kubed
 description: Contributing
 menu:
-  product_kubed_0.9.0:
+  product_kubed_0.10.0:
     identifier: contributing-kubed
     name: Contributing
     parent: welcome
     weight: 15
 product_name: kubed
-menu_name: product_kubed_0.9.0
+menu_name: product_kubed_0.10.0
 section_menu_id: welcome
-url: /products/kubed/0.9.0/welcome/contributing/
+url: /products/kubed/0.10.0/welcome/contributing/
 aliases:
-  - /products/kubed/0.9.0/CONTRIBUTING/
+  - /products/kubed/0.10.0/CONTRIBUTING/
 ---
 
 # Contribution Guidelines

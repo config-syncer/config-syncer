@@ -2,18 +2,18 @@
 title: Weclome | Kubed
 description: Welcome to Kubed
 menu:
-  product_kubed_0.9.0:
+  product_kubed_0.10.0:
     identifier: readme-kubed
     name: Readme
     parent: welcome
     weight: -1
 product_name: kubed
-menu_name: product_kubed_0.9.0
+menu_name: product_kubed_0.10.0
 section_menu_id: welcome
-url: /products/kubed/0.9.0/welcome/
+url: /products/kubed/0.10.0/welcome/
 aliases:
-  - /products/kubed/0.9.0/
-  - /products/kubed/0.9.0/README/
+  - /products/kubed/0.10.0/
+  - /products/kubed/0.10.0/README/
 ---
 
 # Kubed

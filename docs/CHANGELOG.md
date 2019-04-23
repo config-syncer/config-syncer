@@ -2,20 +2,37 @@
 title: Changelog | Kubed
 description: Changelog
 menu:
-  product_kubed_0.9.0:
+  product_kubed_0.10.0:
     identifier: changelog-kubed
     name: Changelog
     parent: welcome
     weight: 10
 product_name: kubed
-menu_name: product_kubed_0.9.0
+menu_name: product_kubed_0.10.0
 section_menu_id: welcome
-url: /products/kubed/0.9.0/welcome/changelog/
+url: /products/kubed/0.10.0/welcome/changelog/
 aliases:
-  - /products/kubed/0.9.0/CHANGELOG/
+  - /products/kubed/0.10.0/CHANGELOG/
 ---
 
 # Change Log
+
+## [0.10.0](https://github.com/appscode/kubed/tree/0.10.0) (2019-04-23)
+[Full Changelog](https://github.com/appscode/kubed/compare/0.9.0...0.10.0)
+
+**Merged pull requests:**
+
+- Update Kubernetes client libraries to 1.13.5 [\#344](https://github.com/appscode/kubed/pull/344) ([tamalsaha](https://github.com/tamalsaha))
+- Improved code style and saying hello to good practices! [\#342](https://github.com/appscode/kubed/pull/342) ([AnikHasibul](https://github.com/AnikHasibul))
+- Update Kubernetes client libraries to 1.13.0 [\#341](https://github.com/appscode/kubed/pull/341) ([tamalsaha](https://github.com/tamalsaha))
+- Pass pod annotation to deployment [\#339](https://github.com/appscode/kubed/pull/339) ([tamalsaha](https://github.com/tamalsaha))
+- Don't use priority class when operator namespace is not kube-system [\#338](https://github.com/appscode/kubed/pull/338) ([tamalsaha](https://github.com/tamalsaha))
+- Use onessl 0.10.0 [\#337](https://github.com/appscode/kubed/pull/337) ([tamalsaha](https://github.com/tamalsaha))
+- Fix the case for deploying using MINGW64 for windows [\#336](https://github.com/appscode/kubed/pull/336) ([tamalsaha](https://github.com/tamalsaha))
+- Adds option to allocate/use pvc with helm installation [\#334](https://github.com/appscode/kubed/pull/334) ([DerekHeldtWerle](https://github.com/DerekHeldtWerle))
+- Add the ability to insert config sections directly [\#333](https://github.com/appscode/kubed/pull/333) ([pirtoo](https://github.com/pirtoo))
+- Remove apiserver.ca from chart and update onessl [\#332](https://github.com/appscode/kubed/pull/332) ([tamalsaha](https://github.com/tamalsaha))
+- Add certificate health checker [\#331](https://github.com/appscode/kubed/pull/331) ([tamalsaha](https://github.com/tamalsaha))
 
 ## [0.9.0](https://github.com/appscode/kubed/tree/0.9.0) (2018-12-17)
 [Full Changelog](https://github.com/appscode/kubed/compare/0.8.0...0.9.0)
@@ -28,6 +45,7 @@ aliases:
 
 - Dependabot couldn't find a Gopkg.toml for this project [\#320](https://github.com/appscode/kubed/issues/320)
 - New version release [\#318](https://github.com/appscode/kubed/issues/318)
+- Kubed fails to start on initial start [\#316](https://github.com/appscode/kubed/issues/316)
 - Resource Requests and Limits in helm chart [\#315](https://github.com/appscode/kubed/issues/315)
 
 **Merged pull requests:**

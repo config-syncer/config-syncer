@@ -21,6 +21,7 @@ Please pick a version of Kubed that matches your Kubernetes installation.
 
 | Kubed Version                                                 | Docs                                                            | Kubernetes Version |
 |---------------------------------------------------------------|-----------------------------------------------------------------|--------------------|
+| [0.10.0](https://github.com/appscode/kubed/releases/tag/0.10.0) | [User Guide](https://appscode.com/products/kubed/0.10.0/)        | 1.8.x+             |
 | [0.9.0](https://github.com/appscode/kubed/releases/tag/0.9.0) | [User Guide](https://appscode.com/products/kubed/0.9.0/)        | 1.8.x+             |
 | [0.5.0](https://github.com/appscode/kubed/releases/tag/0.5.0) | [User Guide](https://appscode.com/products/kubed/0.5.0/)        | 1.7.x              |
 | [0.2.0](https://github.com/appscode/kubed/releases/tag/0.2.0) | [User Guide](https://github.com/appscode/kubed/tree/0.2.0/docs) | 1.5.x - 1.6.x      |
