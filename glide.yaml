@@ -6,11 +6,11 @@ import:
   version: v21.3.0
 - package: github.com/Azure/go-autorest
   version: v11.1.0
-- package: github.com/appscode/envconfig
+- package: gomodules.xyz/envconfig
   version: master
 - package: github.com/appscode/go
   version: master
-- package: github.com/appscode/go-notify
+- package: gomodules.xyz/notify
   version: master
 - package: github.com/appscode/osm
   version: 0.10.0
@@ -146,3 +146,7 @@ import:
   version: 7e037d187b0c13d81ccf0dd1c6b990c2759e6597
 - package: github.com/jaytaylor/html2text
   version: 01ec452cbe43774f989516272881441cae40c16b
+- package: github.com/mailgun/mailgun-go
+  version: v2.0.0
+- package: github.com/nlopes/slack
+  version: v0.5.0

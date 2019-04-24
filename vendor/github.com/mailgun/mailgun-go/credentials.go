@@ -25,7 +25,7 @@ func (mg *MailgunImpl) GetCredentials(limit, skip int) (int, []Credential, error
 	if skip != DefaultSkip {
 		r.addParameter("skip", strconv.Itoa(skip))
 	}
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	var envelope struct {
 		TotalCount int          `json:"total_count"`
 		Items      []Credential `json:"items"`
@@ -44,7 +44,7 @@ func (mg *MailgunImpl) CreateCredential(login, password string) error {
 	}
 	r := newHTTPRequest(generateCredentialsUrl(mg, ""))
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	p := newUrlEncodedPayload()
 	p.addValue("login", login)
 	p.addValue("password", password)
@@ -59,7 +59,7 @@ func (mg *MailgunImpl) ChangeCredentialPassword(id, password string) error {
 	}
 	r := newHTTPRequest(generateCredentialsUrl(mg, id))
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	p := newUrlEncodedPayload()
 	p.addValue("password", password)
 	_, err := makePutRequest(r, p)
@@ -73,7 +73,7 @@ func (mg *MailgunImpl) DeleteCredential(id string) error {
 	}
 	r := newHTTPRequest(generateCredentialsUrl(mg, id))
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }

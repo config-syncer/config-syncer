@@ -24,8 +24,8 @@ type Event struct {
 	Severity       *EventSeverity  `json:"severity,omitempty"`
 
 	// Message classification / grouping
-	Tags      []string   `json:"tags,omitempty"`
-	Campaigns []Campaign `json:"campaigns,omitempty"`
+	Tags []string `json:"tags,omitempty"`
+	//Campaigns []Campaign `json:"campaigns,omitempty"`
 
 	// Recipient information (for recipient-initiated events: opens, clicks etc)
 	ClientInfo  *ClientInfo  `json:"client-info,omitempty"`
@@ -48,6 +48,35 @@ type Event struct {
 	// API
 	Method *Method     `json:"method,omitempty"`
 	Flags  *EventFlags `json:"flags,omitempty"`
+
+	// Mailing List
+	MailingList       MailingList       `json:"mailing-list,omitempty"`
+	Member            MailingListMember `json:"member,omitempty"`
+	MemberDescription string            `json:"member-description"`
+	Error             MailingListError  `json:"error"`
+	IsUpsert          bool              `json:"is-upsert"`
+	Format            string            `json:"format"`
+	UpsertedCount     int               `json:"upserted-count"`
+	FailedCount       int               `json:"failed-count"`
+	Subscribed        bool              `json:"subscribed"`
+	TaskID            string            `json:"task-id"`
+}
+
+type MailingListError struct {
+	Message string
+}
+
+type MailingList struct {
+	Address string `json:"address"`
+	ListID  string `json:"list-id"`
+	SID     string `json:"sid"`
+}
+
+type MailingListMember struct {
+	Subscribed bool
+	Address    string
+	Name       string
+	Vars       []string
 }
 
 type DeliveryStatus struct {
@@ -439,7 +468,7 @@ func (ep *EventPoller) Poll(events *[]Event) bool {
 func (ei *EventIterator) fetch(url string) error {
 	r := newHTTPRequest(url)
 	r.setClient(ei.mg.Client())
-	r.setBasicAuth(basicAuthUser, ei.mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, ei.mg.APIKey())
 
 	return getResponseFromJSON(r, &ei.eventResponse)
 }

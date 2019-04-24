@@ -1,20 +1,14 @@
-hash: 09167b219cf3f75e9196fa388ddc10c8bc5411cc8b951a6a847cea764148754c
-updated: 2019-04-24T08:05:39.553301265-07:00
+hash: b16fb7ff3f4d2655b5e7cd3147c2788d8fbc778797a3bb3d2d03f3ded397294b
+updated: 2019-04-24T12:18:23.641340907-07:00
 imports:
-- name: bitbucket.org/atlassian/go-stride
-  version: 78855f0a5d80b2683b11f3825a580a87e32a9f71
-  subpackages:
-  - pkg/stride
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
 - name: cloud.google.com/go
   version: 0fd7230b2a7505833d5f69b75cbd6c9582401479
   subpackages:
   - compute/metadata
-- name: github.com/appscode/envconfig
-  version: 183bbe643a2875eaa69c85627ac6b25813983203
 - name: github.com/appscode/go
-  version: 50c98d5fbcddac827713a481a7e34a26df5e4b57
+  version: 60025f1135c977fecd189c12dbfa259d837d7a18
   subpackages:
   - analytics
   - context
@@ -32,22 +26,6 @@ imports:
   - strings
   - types
   - version
-- name: github.com/appscode/go-notify
-  version: 55860fd1e4db260ba23cdc90a7431fd85108dced
-  subpackages:
-  - discord
-  - hipchat
-  - log
-  - mailgun
-  - plivo
-  - pushover
-  - slack
-  - smtp
-  - stride
-  - telegram
-  - twilio
-  - unified
-  - webhook
 - name: github.com/appscode/go-version
   version: 7aba545c679b0f45679eeb406dc662d2c8a04c26
 - name: github.com/appscode/jsonpatch
@@ -59,7 +37,7 @@ imports:
 - name: github.com/appscode/pat
   version: 48ff78925b7955367d8a048fc2b5cec8efadf8d3
 - name: github.com/appscode/searchlight
-  version: 9f147f8dcea0e626970ecb0aa80fe0da5a33eccb
+  version: be5a1e4baa1db0b9f7db6a523fe0bbae4cecd218
   subpackages:
   - apis/incidents
   - apis/incidents/v1alpha1
@@ -338,7 +316,7 @@ imports:
   subpackages:
   - spdy
 - name: github.com/edsrzf/mmap-go
-  version: 904c4ced31cdffe19e971afa0b3d319ff06d9c72
+  version: 935e0e8a636ca4ba70b713f3e38a19e1b77739e8
 - name: github.com/elazarl/go-bindata-assetfs
   version: 3dcc96556217539f50599357fb481ac0dc7439b9
 - name: github.com/emicklei/go-restful
@@ -367,6 +345,8 @@ imports:
   version: 5bae59e25b21498baea7f9d46e9c147ec106a42e
 - name: github.com/go-openapi/swag
   version: 5899d5c5e619fda5fa86e14795a835f473ca284c
+- name: github.com/gobuffalo/envy
+  version: 043cb4b8af871b49563291e32c66bb84378a60ac
 - name: github.com/gogo/protobuf
   version: 342cbe0a04158f6dcb03ca0079991a51a4248c02
   subpackages:
@@ -461,6 +441,8 @@ imports:
   version: 01ec452cbe43774f989516272881441cae40c16b
 - name: github.com/jmespath/go-jmespath
   version: 0b12d6b521d83fc7f755e7cfc1b1fbdd35a01a74
+- name: github.com/joho/godotenv
+  version: 5c0e6c6ab1a0a9ef0a8822cba3a05d62f7dad941
 - name: github.com/jpillora/go-ogle-analytics
   version: 14b04e0594ef6a9fd943363b135656f0ec8c9d0e
 - name: github.com/json-iterator/go
@@ -494,7 +476,7 @@ imports:
   - client/listers/catalog/v1alpha1
   - client/listers/kubedb/v1alpha1
 - name: github.com/mailgun/mailgun-go
-  version: 28c45085c063854b83107df6cf37ad8f88462105
+  version: 4071f66f00fb74b08ae720f28ee9fcd98ebfd69e
 - name: github.com/mailru/easyjson
   version: 2f5df55504ebc322e4d52d34df6a1f5b503bf26d
   subpackages:
@@ -522,7 +504,9 @@ imports:
 - name: github.com/ncw/swift
   version: 753d2090bb62619675997bd87a8e3af423a00f2d
 - name: github.com/nlopes/slack
-  version: 8ab4d0b364ef1e9af5d102531da20d5ec902b6c4
+  version: a7deeca7935c178aa865249bab511daf816288ba
+  subpackages:
+  - slackutilsx
 - name: github.com/NYTimes/gziphandler
   version: 56545f4a5d46df9a6648819d1664c3a03a13ffdb
 - name: github.com/olekukonko/tablewriter
@@ -597,12 +581,12 @@ imports:
   version: cefad6e4f79d4fa5d1d758ff937dde300641ccfa
 - name: github.com/robfig/cron
   version: b41be1df696709bb6395fe435af20370037c0b4c
-- name: github.com/rs/zerolog
-  version: 3e85c4b21c1adb254dd43a93d93263fbe7d9dc13
+- name: github.com/rogpeppe/go-internal
+  version: 438578804ca6f31be148c27683afc419ce47c06e
   subpackages:
-  - internal/cbor
-  - internal/json
-  - log
+  - modfile
+  - module
+  - semver
 - name: github.com/russross/blackfriday
   version: 05f3235734ad95d0016f6a23902f06461fcf567a
 - name: github.com/satori/go.uuid
@@ -636,10 +620,6 @@ imports:
   version: f35b8ab0b5a2cef36673838d662e249dd9c94686
   subpackages:
   - assert
-- name: github.com/tbruyelle/hipchat-go
-  version: 35aebc99209aa41498ab4823a83e254037f062fd
-  subpackages:
-  - hipchat
 - name: github.com/tinylib/msgp
   version: ad0ff2e232ad2e37faf67087fb24bf8d04a8ce20
   subpackages:
@@ -719,6 +699,23 @@ imports:
   version: f51c12702a4d776e4c1fa9b0fabab841babae631
   subpackages:
   - rate
+- name: gomodules.xyz/envconfig
+  version: 426f31af0d454ee4c9c4508cf5ffd27553087af9
+- name: gomodules.xyz/notify
+  version: af47cb5a07a41fb6fa752044d75dfc665fe9c77f
+  subpackages:
+  - discord
+  - log
+  - mailgun
+  - mattermost
+  - plivo
+  - pushover
+  - slack
+  - smtp
+  - telegram
+  - twilio
+  - unified
+  - webhook
 - name: google.golang.org/api
   version: 3639d6d93f377f39a1de765fa4ef37b3c7ca8bd9
   subpackages:

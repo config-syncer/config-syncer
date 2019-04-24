@@ -14,7 +14,7 @@ import (
 func (mg *MailgunImpl) GetWebhooks() (map[string]string, error) {
 	r := newHTTPRequest(generateDomainApiUrl(mg, webhooksEndpoint))
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	var envelope struct {
 		Webhooks map[string]interface{} `json:"webhooks"`
 	}
@@ -35,7 +35,7 @@ func (mg *MailgunImpl) GetWebhooks() (map[string]string, error) {
 func (mg *MailgunImpl) CreateWebhook(t, u string) error {
 	r := newHTTPRequest(generateDomainApiUrl(mg, webhooksEndpoint))
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	p := newUrlEncodedPayload()
 	p.addValue("id", t)
 	p.addValue("url", u)
@@ -47,7 +47,7 @@ func (mg *MailgunImpl) CreateWebhook(t, u string) error {
 func (mg *MailgunImpl) DeleteWebhook(t string) error {
 	r := newHTTPRequest(generateDomainApiUrl(mg, webhooksEndpoint) + "/" + t)
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }
@@ -56,7 +56,7 @@ func (mg *MailgunImpl) DeleteWebhook(t string) error {
 func (mg *MailgunImpl) GetWebhookByType(t string) (string, error) {
 	r := newHTTPRequest(generateDomainApiUrl(mg, webhooksEndpoint) + "/" + t)
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	var envelope struct {
 		Webhook struct {
 			Url string `json:"url"`
@@ -70,7 +70,7 @@ func (mg *MailgunImpl) GetWebhookByType(t string) (string, error) {
 func (mg *MailgunImpl) UpdateWebhook(t, u string) error {
 	r := newHTTPRequest(generateDomainApiUrl(mg, webhooksEndpoint) + "/" + t)
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	p := newUrlEncodedPayload()
 	p.addValue("url", u)
 	_, err := makePutRequest(r, p)
@@ -78,7 +78,7 @@ func (mg *MailgunImpl) UpdateWebhook(t, u string) error {
 }
 
 func (mg *MailgunImpl) VerifyWebhookRequest(req *http.Request) (verified bool, err error) {
-	h := hmac.New(sha256.New, []byte(mg.ApiKey()))
+	h := hmac.New(sha256.New, []byte(mg.APIKey()))
 	io.WriteString(h, req.FormValue("timestamp"))
 	io.WriteString(h, req.FormValue("token"))
 

@@ -22,7 +22,7 @@ func (mg *MailgunImpl) GetUnsubscribes(limit, skip int) (int, []Unsubscription, 
 		r.addParameter("skip", strconv.Itoa(skip))
 	}
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	var envelope struct {
 		TotalCount int              `json:"total_count"`
 		Items      []Unsubscription `json:"items"`
@@ -36,7 +36,7 @@ func (mg *MailgunImpl) GetUnsubscribes(limit, skip int) (int, []Unsubscription, 
 func (mg *MailgunImpl) GetUnsubscribesByAddress(a string) (int, []Unsubscription, error) {
 	r := newHTTPRequest(generateApiUrlWithTarget(mg, unsubscribesEndpoint, a))
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	var envelope struct {
 		TotalCount int              `json:"total_count"`
 		Items      []Unsubscription `json:"items"`
@@ -49,7 +49,7 @@ func (mg *MailgunImpl) GetUnsubscribesByAddress(a string) (int, []Unsubscription
 func (mg *MailgunImpl) Unsubscribe(a, t string) error {
 	r := newHTTPRequest(generateApiUrl(mg, unsubscribesEndpoint))
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	p := newUrlEncodedPayload()
 	p.addValue("address", a)
 	p.addValue("tag", t)
@@ -63,7 +63,7 @@ func (mg *MailgunImpl) Unsubscribe(a, t string) error {
 func (mg *MailgunImpl) RemoveUnsubscribe(a string) error {
 	r := newHTTPRequest(generateApiUrlWithTarget(mg, unsubscribesEndpoint, a))
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }
@@ -74,7 +74,7 @@ func (mg *MailgunImpl) RemoveUnsubscribe(a string) error {
 func (mg *MailgunImpl) RemoveUnsubscribeWithTag(a, t string) error {
 	r := newHTTPRequest(generateApiUrlWithTarget(mg, unsubscribesEndpoint, a))
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	r.addParameter("tag", t)
 	_, err := makeDeleteRequest(r)
 	return err

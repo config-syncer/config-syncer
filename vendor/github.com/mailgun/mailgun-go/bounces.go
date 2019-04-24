@@ -63,7 +63,7 @@ func (m *MailgunImpl) GetBounces(limit, skip int) (int, []Bounce, error) {
 	}
 
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 
 	var response bounceEnvelope
 	err := getResponseFromJSON(r, &response)
@@ -78,7 +78,7 @@ func (m *MailgunImpl) GetBounces(limit, skip int) (int, []Bounce, error) {
 func (m *MailgunImpl) GetSingleBounce(address string) (Bounce, error) {
 	r := newHTTPRequest(generateApiUrl(m, bouncesEndpoint) + "/" + address)
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 
 	var response Bounce
 	err := getResponseFromJSON(r, &response)
@@ -104,7 +104,7 @@ func (m *MailgunImpl) GetSingleBounce(address string) (Bounce, error) {
 func (m *MailgunImpl) AddBounce(address, code, error string) error {
 	r := newHTTPRequest(generateApiUrl(m, bouncesEndpoint))
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 
 	payload := newUrlEncodedPayload()
 	payload.addValue("address", address)
@@ -122,7 +122,7 @@ func (m *MailgunImpl) AddBounce(address, code, error string) error {
 func (m *MailgunImpl) DeleteBounce(address string) error {
 	r := newHTTPRequest(generateApiUrl(m, bouncesEndpoint) + "/" + address)
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }

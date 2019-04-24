@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/appscode/envconfig"
 	"github.com/appscode/go/log"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	es "github.com/appscode/kubed/pkg/elasticsearch"
@@ -35,6 +34,7 @@ import (
 	kubedbinformers "github.com/kubedb/apimachinery/client/informers/externalversions"
 	"github.com/pkg/errors"
 	"github.com/robfig/cron"
+	"gomodules.xyz/envconfig"
 	apps "k8s.io/api/apps/v1"
 	batch "k8s.io/api/batch/v1"
 	certificates "k8s.io/api/certificates/v1beta1"
