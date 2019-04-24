@@ -4,10 +4,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/appscode/envconfig"
-	notify "github.com/appscode/go-notify"
-	"github.com/appscode/go-notify/unified"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
+	"gomodules.xyz/envconfig"
+	notify "gomodules.xyz/notify"
+	"gomodules.xyz/notify/unified"
 	"k8s.io/client-go/discovery"
 	discovery_util "kmodules.xyz/client-go/discovery"
 )

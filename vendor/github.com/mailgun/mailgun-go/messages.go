@@ -554,7 +554,7 @@ func (m *MailgunImpl) Send(message *Message) (mes string, id string, err error) 
 
 	r := newHTTPRequest(generateApiUrlWithDomain(m, message.specific.endpoint(), message.domain))
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 
 	var response sendMessageResponse
 	err = postResponseFromJSON(r, payload, &response)
@@ -680,7 +680,7 @@ func (mg *MailgunImpl) GetStoredMessage(id string) (StoredMessage, error) {
 	url := generateStoredMessageUrl(mg, messagesEndpoint, id)
 	r := newHTTPRequest(url)
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 
 	var response StoredMessage
 	err := getResponseFromJSON(r, &response)
@@ -694,7 +694,7 @@ func (mg *MailgunImpl) GetStoredMessageRaw(id string) (StoredMessageRaw, error) 
 	url := generateStoredMessageUrl(mg, messagesEndpoint, id)
 	r := newHTTPRequest(url)
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	r.addHeader("Accept", "message/rfc2822")
 
 	var response StoredMessageRaw
@@ -707,7 +707,7 @@ func (mg *MailgunImpl) GetStoredMessageRaw(id string) (StoredMessageRaw, error) 
 func (mg *MailgunImpl) GetStoredMessageForURL(url string) (StoredMessage, error) {
 	r := newHTTPRequest(url)
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 
 	var response StoredMessage
 	err := getResponseFromJSON(r, &response)
@@ -720,7 +720,7 @@ func (mg *MailgunImpl) GetStoredMessageForURL(url string) (StoredMessage, error)
 func (mg *MailgunImpl) GetStoredMessageRawForURL(url string) (StoredMessageRaw, error) {
 	r := newHTTPRequest(url)
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	r.addHeader("Accept", "message/rfc2822")
 
 	var response StoredMessageRaw
@@ -736,7 +736,7 @@ func (mg *MailgunImpl) DeleteStoredMessage(id string) error {
 	url := generateStoredMessageUrl(mg, messagesEndpoint, id)
 	r := newHTTPRequest(url)
 	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.ApiKey())
+	r.setBasicAuth(basicAuthUser, mg.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }

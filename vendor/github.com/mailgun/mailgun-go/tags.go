@@ -33,7 +33,7 @@ type TagOptions struct {
 func (m *MailgunImpl) DeleteTag(tag string) error {
 	r := newHTTPRequest(generateApiUrl(m, tagsEndpoint) + "/" + tag)
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }
@@ -42,7 +42,7 @@ func (m *MailgunImpl) DeleteTag(tag string) error {
 func (m *MailgunImpl) GetTag(tag string) (TagItem, error) {
 	r := newHTTPRequest(generateApiUrl(m, tagsEndpoint) + "/" + tag)
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	var tagItem TagItem
 	return tagItem, getResponseFromJSON(r, &tagItem)
 }
@@ -154,7 +154,7 @@ func (t *TagIterator) Err() error {
 func (t *TagIterator) cursorRequest(tagPage *TagsPage, url string) error {
 	req := newHTTPRequest(url)
 	req.setClient(t.mg.Client())
-	req.setBasicAuth(basicAuthUser, t.mg.ApiKey())
+	req.setBasicAuth(basicAuthUser, t.mg.APIKey())
 	return getResponseFromJSON(req, tagPage)
 }
 

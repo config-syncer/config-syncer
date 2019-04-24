@@ -74,7 +74,7 @@ func (m *MailgunImpl) GetDomains(limit, skip int) (int, []Domain, error) {
 	if skip != DefaultSkip {
 		r.addParameter("skip", strconv.Itoa(skip))
 	}
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 
 	var envelope domainsEnvelope
 	err := getResponseFromJSON(r, &envelope)
@@ -88,7 +88,7 @@ func (m *MailgunImpl) GetDomains(limit, skip int) (int, []Domain, error) {
 func (m *MailgunImpl) GetSingleDomain(domain string) (Domain, []DNSRecord, []DNSRecord, error) {
 	r := newHTTPRequest(generatePublicApiUrl(m, domainsEndpoint) + "/" + domain)
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	var envelope singleDomainEnvelope
 	err := getResponseFromJSON(r, &envelope)
 	return envelope.Domain, envelope.ReceivingDNSRecords, envelope.SendingDNSRecords, err
@@ -103,7 +103,7 @@ func (m *MailgunImpl) GetSingleDomain(domain string) (Domain, []DNSRecord, []DNS
 func (m *MailgunImpl) CreateDomain(name string, smtpPassword string, spamAction string, wildcard bool) error {
 	r := newHTTPRequest(generatePublicApiUrl(m, domainsEndpoint))
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 
 	payload := newUrlEncodedPayload()
 	payload.addValue("name", name)
@@ -118,7 +118,7 @@ func (m *MailgunImpl) CreateDomain(name string, smtpPassword string, spamAction 
 func (m *MailgunImpl) DeleteDomain(name string) error {
 	r := newHTTPRequest(generatePublicApiUrl(m, domainsEndpoint) + "/" + name)
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }

@@ -94,7 +94,7 @@ func (m *MailgunImpl) GetStats(limit int, skip int, startDate *time.Time, event 
 		r.addParameter("event", e)
 	}
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 
 	var res statsEnvelope
 	err := getResponseFromJSON(r, &res)
@@ -129,7 +129,7 @@ func (m *MailgunImpl) GetStatsTotal(start *time.Time, end *time.Time, resolution
 		r.addParameter("event", e)
 	}
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 
 	var res StatsTotalResponse
 	err := getResponseFromJSON(r, &res)

@@ -29,7 +29,7 @@ type complaintsEnvelope struct {
 func (m *MailgunImpl) GetComplaints(limit, skip int) (int, []Complaint, error) {
 	r := newHTTPRequest(generateApiUrl(m, complaintsEndpoint))
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 
 	if limit != -1 {
 		r.addParameter("limit", strconv.Itoa(limit))
@@ -51,7 +51,7 @@ func (m *MailgunImpl) GetComplaints(limit, skip int) (int, []Complaint, error) {
 func (m *MailgunImpl) GetSingleComplaint(address string) (Complaint, error) {
 	r := newHTTPRequest(generateApiUrl(m, complaintsEndpoint) + "/" + address)
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 
 	var c Complaint
 	err := getResponseFromJSON(r, &c)
@@ -63,7 +63,7 @@ func (m *MailgunImpl) GetSingleComplaint(address string) (Complaint, error) {
 func (m *MailgunImpl) CreateComplaint(address string) error {
 	r := newHTTPRequest(generateApiUrl(m, complaintsEndpoint))
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	p := newUrlEncodedPayload()
 	p.addValue("address", address)
 	_, err := makePostRequest(r, p)
@@ -75,7 +75,7 @@ func (m *MailgunImpl) CreateComplaint(address string) error {
 func (m *MailgunImpl) DeleteComplaint(address string) error {
 	r := newHTTPRequest(generateApiUrl(m, complaintsEndpoint) + "/" + address)
 	r.setClient(m.Client())
-	r.setBasicAuth(basicAuthUser, m.ApiKey())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }

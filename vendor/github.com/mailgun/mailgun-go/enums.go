@@ -22,6 +22,9 @@ const (
 	EventComplained
 	EventStored
 	EventDropped
+	EventListMemberUploaded
+	EventListMemberUploadError
+	EventListUploaded
 )
 
 var eventTypes = []string{
@@ -36,6 +39,9 @@ var eventTypes = []string{
 	"complained",
 	"stored",
 	"dropped",
+	"list_member_uploaded",
+	"list_member_upload_error",
+	"list_uploaded",
 }
 
 func (et EventType) String() string {
@@ -56,7 +62,8 @@ func (et *EventType) UnmarshalText(text []byte) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("unknown event type '%s'", enum)
+	*et = EventType(EventUnknown)
+	return nil
 }
 
 type TimestampNano time.Time

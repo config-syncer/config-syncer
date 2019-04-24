@@ -4,7 +4,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/appscode/go-notify/unified"
+	"gomodules.xyz/notify/unified"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
