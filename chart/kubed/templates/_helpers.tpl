@@ -25,3 +25,10 @@ Create the name of the service account to use
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+{{- define "kubed.labels" -}}
+chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+app: "{{ template "kubed.name" . }}"
+release: {{ .Release.Name | quote}}
+heritage: "{{ .Release.Service }}"
+{{- end -}}
