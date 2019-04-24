@@ -10,6 +10,7 @@ import (
 	"github.com/ghodss/yaml"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
+	store "kmodules.xyz/objectstore-api/api/v1"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -108,7 +109,7 @@ func (b SnapshotSpec) Location(filename string) (string, error) {
 	return "", errors.New("no storage provider is configured")
 }
 
-func (b Backend) Container() (string, error) {
+func Container(b store.Backend) (string, error) {
 	if b.S3 != nil {
 		return b.S3.Bucket, nil
 	} else if b.GCS != nil {
@@ -116,14 +117,14 @@ func (b Backend) Container() (string, error) {
 	} else if b.Azure != nil {
 		return b.Azure.Container, nil
 	} else if b.Local != nil {
-		return b.Local.Path, nil
+		return b.Local.MountPath, nil
 	} else if b.Swift != nil {
 		return b.Swift.Container, nil
 	}
 	return "", errors.New("no storage provider is configured")
 }
 
-func (b Backend) GetBucketAndPrefix() (string, string, error) {
+func GetBucketAndPrefix(b store.Backend) (string, string, error) {
 	if b.S3 != nil {
 		return b.S3.Bucket, b.S3.Prefix, nil
 	} else if b.GCS != nil {
@@ -133,7 +134,7 @@ func (b Backend) GetBucketAndPrefix() (string, string, error) {
 	} else if b.Swift != nil {
 		return b.Swift.Container, b.Swift.Prefix, nil
 	} else if b.Local != nil {
-		return b.Local.Path, "", nil
+		return b.Local.MountPath, "", nil
 	}
 	return "", "", errors.New("unknown backend type")
 }

@@ -1,5 +1,5 @@
 snapshotter:
   local:
-    path: /var/data
+    mountPath: /var/data
   sanitize: true
   schedule: '@every 6h'

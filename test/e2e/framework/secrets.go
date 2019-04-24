@@ -15,6 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"kmodules.xyz/client-go/tools/clientcmd"
+	store "kmodules.xyz/objectstore-api/api/v1"
 )
 
 func (f *Invocation) NewSecret() *core.Secret {
@@ -208,13 +209,13 @@ func (f *Invocation) SecretForMinioBackend(includeCert bool) core.Secret {
 			Namespace: f.namespace,
 		},
 		Data: map[string][]byte{
-			api.AWS_ACCESS_KEY_ID:     []byte(MINIO_ACCESS_KEY_ID),
-			api.AWS_SECRET_ACCESS_KEY: []byte(MINIO_SECRET_ACCESS_KEY),
+			store.AWS_ACCESS_KEY_ID:     []byte(MINIO_ACCESS_KEY_ID),
+			store.AWS_SECRET_ACCESS_KEY: []byte(MINIO_SECRET_ACCESS_KEY),
 		},
 	}
 
 	if includeCert {
-		secret.Data[api.CA_CERT_DATA] = f.CertStore.CACertBytes()
+		secret.Data[store.CA_CERT_DATA] = f.CertStore.CACertBytes()
 	}
 
 	return secret

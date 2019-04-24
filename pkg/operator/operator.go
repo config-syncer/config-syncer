@@ -477,7 +477,7 @@ func (op *Operator) RunSnapshotter() error {
 		return err
 	}
 
-	container, err := op.clusterConfig.Snapshotter.Backend.Container()
+	container, err := api.Container(op.clusterConfig.Snapshotter.Backend)
 	if err != nil {
 		return err
 	}

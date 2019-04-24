@@ -32,28 +32,22 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/appscode/kubed/apis/kubed/v1alpha1.AzureSpec":                 schema_kubed_apis_kubed_v1alpha1_AzureSpec(ref),
-		"github.com/appscode/kubed/apis/kubed/v1alpha1.Backend":                   schema_kubed_apis_kubed_v1alpha1_Backend(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.ClusterConfig":             schema_kubed_apis_kubed_v1alpha1_ClusterConfig(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.ElasticsearchSpec":         schema_kubed_apis_kubed_v1alpha1_ElasticsearchSpec(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.EventForwarderSpec":        schema_kubed_apis_kubed_v1alpha1_EventForwarderSpec(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.ForwarderSpec":             schema_kubed_apis_kubed_v1alpha1_ForwarderSpec(ref),
-		"github.com/appscode/kubed/apis/kubed/v1alpha1.GCSSpec":                   schema_kubed_apis_kubed_v1alpha1_GCSSpec(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.GroupResources":            schema_kubed_apis_kubed_v1alpha1_GroupResources(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.InfluxDBSpec":              schema_kubed_apis_kubed_v1alpha1_InfluxDBSpec(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.JanitorAuthInfo":           schema_kubed_apis_kubed_v1alpha1_JanitorAuthInfo(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.JanitorSpec":               schema_kubed_apis_kubed_v1alpha1_JanitorSpec(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.KubedMetadata":             schema_kubed_apis_kubed_v1alpha1_KubedMetadata(ref),
-		"github.com/appscode/kubed/apis/kubed/v1alpha1.LocalSpec":                 schema_kubed_apis_kubed_v1alpha1_LocalSpec(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.NoNamespacedForwarderSpec": schema_kubed_apis_kubed_v1alpha1_NoNamespacedForwarderSpec(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.PolicyRule":                schema_kubed_apis_kubed_v1alpha1_PolicyRule(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.Receiver":                  schema_kubed_apis_kubed_v1alpha1_Receiver(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.RecycleBinSpec":            schema_kubed_apis_kubed_v1alpha1_RecycleBinSpec(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.ResultEntry":               schema_kubed_apis_kubed_v1alpha1_ResultEntry(ref),
-		"github.com/appscode/kubed/apis/kubed/v1alpha1.S3Spec":                    schema_kubed_apis_kubed_v1alpha1_S3Spec(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.SearchResult":              schema_kubed_apis_kubed_v1alpha1_SearchResult(ref),
 		"github.com/appscode/kubed/apis/kubed/v1alpha1.SnapshotSpec":              schema_kubed_apis_kubed_v1alpha1_SnapshotSpec(ref),
-		"github.com/appscode/kubed/apis/kubed/v1alpha1.SwiftSpec":                 schema_kubed_apis_kubed_v1alpha1_SwiftSpec(ref),
 		"k8s.io/api/core/v1.AWSElasticBlockStoreVolumeSource":                     schema_k8sio_api_core_v1_AWSElasticBlockStoreVolumeSource(ref),
 		"k8s.io/api/core/v1.Affinity":                                             schema_k8sio_api_core_v1_Affinity(ref),
 		"k8s.io/api/core/v1.AttachedVolume":                                       schema_k8sio_api_core_v1_AttachedVolume(ref),
@@ -297,74 +291,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 	}
 }
 
-func schema_kubed_apis_kubed_v1alpha1_AzureSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Properties: map[string]spec.Schema{
-					"container": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"prefix": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{},
-	}
-}
-
-func schema_kubed_apis_kubed_v1alpha1_Backend(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Properties: map[string]spec.Schema{
-					"storageSecretName": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"local": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/appscode/kubed/apis/kubed/v1alpha1.LocalSpec"),
-						},
-					},
-					"s3": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/appscode/kubed/apis/kubed/v1alpha1.S3Spec"),
-						},
-					},
-					"gcs": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/appscode/kubed/apis/kubed/v1alpha1.GCSSpec"),
-						},
-					},
-					"azure": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/appscode/kubed/apis/kubed/v1alpha1.AzureSpec"),
-						},
-					},
-					"swift": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/appscode/kubed/apis/kubed/v1alpha1.SwiftSpec"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"github.com/appscode/kubed/apis/kubed/v1alpha1.AzureSpec", "github.com/appscode/kubed/apis/kubed/v1alpha1.GCSSpec", "github.com/appscode/kubed/apis/kubed/v1alpha1.LocalSpec", "github.com/appscode/kubed/apis/kubed/v1alpha1.S3Spec", "github.com/appscode/kubed/apis/kubed/v1alpha1.SwiftSpec"},
-	}
-}
-
 func schema_kubed_apis_kubed_v1alpha1_ClusterConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -574,31 +500,6 @@ func schema_kubed_apis_kubed_v1alpha1_ForwarderSpec(ref common.ReferenceCallback
 	}
 }
 
-func schema_kubed_apis_kubed_v1alpha1_GCSSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Properties: map[string]spec.Schema{
-					"bucket": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"prefix": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-				},
-				Required: []string{"bucket"},
-			},
-		},
-		Dependencies: []string{},
-	}
-}
-
 func schema_kubed_apis_kubed_v1alpha1_GroupResources(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -792,24 +693,6 @@ func schema_kubed_apis_kubed_v1alpha1_KubedMetadata(ref common.ReferenceCallback
 	}
 }
 
-func schema_kubed_apis_kubed_v1alpha1_LocalSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Properties: map[string]spec.Schema{
-					"path": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{},
-	}
-}
-
 func schema_kubed_apis_kubed_v1alpha1_NoNamespacedForwarderSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -979,37 +862,6 @@ func schema_kubed_apis_kubed_v1alpha1_ResultEntry(ref common.ReferenceCallback) 
 	}
 }
 
-func schema_kubed_apis_kubed_v1alpha1_S3Spec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Properties: map[string]spec.Schema{
-					"endpoint": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"bucket": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"prefix": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-				},
-				Required: []string{"bucket"},
-			},
-		},
-		Dependencies: []string{},
-	}
-}
-
 func schema_kubed_apis_kubed_v1alpha1_SearchResult(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -1104,58 +956,44 @@ func schema_kubed_apis_kubed_v1alpha1_SnapshotSpec(ref common.ReferenceCallback)
 					},
 					"local": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/appscode/kubed/apis/kubed/v1alpha1.LocalSpec"),
+							Ref: ref("kmodules.xyz/objectstore-api/api/v1.LocalSpec"),
 						},
 					},
 					"s3": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/appscode/kubed/apis/kubed/v1alpha1.S3Spec"),
+							Ref: ref("kmodules.xyz/objectstore-api/api/v1.S3Spec"),
 						},
 					},
 					"gcs": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/appscode/kubed/apis/kubed/v1alpha1.GCSSpec"),
+							Ref: ref("kmodules.xyz/objectstore-api/api/v1.GCSSpec"),
 						},
 					},
 					"azure": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/appscode/kubed/apis/kubed/v1alpha1.AzureSpec"),
+							Ref: ref("kmodules.xyz/objectstore-api/api/v1.AzureSpec"),
 						},
 					},
 					"swift": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/appscode/kubed/apis/kubed/v1alpha1.SwiftSpec"),
+							Ref: ref("kmodules.xyz/objectstore-api/api/v1.SwiftSpec"),
+						},
+					},
+					"b2": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("kmodules.xyz/objectstore-api/api/v1.B2Spec"),
+						},
+					},
+					"rest": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("kmodules.xyz/objectstore-api/api/v1.RestServerSpec"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/appscode/kubed/apis/kubed/v1alpha1.AzureSpec", "github.com/appscode/kubed/apis/kubed/v1alpha1.GCSSpec", "github.com/appscode/kubed/apis/kubed/v1alpha1.LocalSpec", "github.com/appscode/kubed/apis/kubed/v1alpha1.S3Spec", "github.com/appscode/kubed/apis/kubed/v1alpha1.SwiftSpec"},
-	}
-}
-
-func schema_kubed_apis_kubed_v1alpha1_SwiftSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Properties: map[string]spec.Schema{
-					"container": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"prefix": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{},
+			"kmodules.xyz/objectstore-api/api/v1.AzureSpec", "kmodules.xyz/objectstore-api/api/v1.B2Spec", "kmodules.xyz/objectstore-api/api/v1.GCSSpec", "kmodules.xyz/objectstore-api/api/v1.LocalSpec", "kmodules.xyz/objectstore-api/api/v1.RestServerSpec", "kmodules.xyz/objectstore-api/api/v1.S3Spec", "kmodules.xyz/objectstore-api/api/v1.SwiftSpec"},
 	}
 }
 
@@ -7567,7 +7405,7 @@ func schema_k8sio_api_core_v1_PodSpec(ref common.ReferenceCallback) common.OpenA
 					},
 					"enableServiceLinks": {
 						SchemaProps: spec.SchemaProps{
-							Description: "EnableServiceLinks indicates whether information about services should be injected into pod's environment variables, matching the syntax of Docker links.",
+							Description: "EnableServiceLinks indicates whether information about services should be injected into pod's environment variables, matching the syntax of Docker links. Optional: Defaults to true.",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},

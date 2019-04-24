@@ -459,14 +459,14 @@ $ cat ./docs/examples/cluster-snapshot/local/config.yaml
 
 snapshotter:
   local:
-    path: /var/data
+    mountPath: /var/data
   sanitize: true
   schedule: '@every 6h'
 ```
 
 | Key                               | Description                                                                                                                       |
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `snapshotter.local.path`          | `Optional`. Path where snapshot will be stored                                                                                    |
+| `snapshotter.local.mountPath`     | `Optional`. Path where snapshot will be stored                                                                                    |
 | `snapshotter.overwrite`           | `Optional`. If set to `true`, snapshot folders are reused, otherwise a new folder is created at snapshot timestamp.               |
 | `snapshotter.sanitize`            | `Optional`. If set to `true`, various auto generated ObjectMeta and Spec fields are cleaned up before storing snapshots           |
 | `snapshotter.schedule`            | `Required`. [Cron expression](https://github.com/robfig/cron/blob/v2/doc.go#L26) specifying the schedule for snapshot operations. |
