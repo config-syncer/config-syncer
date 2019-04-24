@@ -17,7 +17,7 @@ kubed:
 ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
 ##
 imagePullPolicy: IfNotPresent
-## Installs Searchlight operator as critical addon
+## Installs Kubed operator as critical addon
 ## https://kubernetes.io/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/
 criticalAddon: false
 ## Log level for kubed
@@ -83,8 +83,6 @@ apiserver:
   # https://github.com/kubernetes/kube-aggregator/blob/release-1.9/pkg/apis/apiregistration/v1beta1/types.go#L66-L70
   # for more information on proper values of this field
   versionPriority: 15
-  # CA certificate used by main Kubernetes api server
-  ca:
   # If true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 (default true)
   useKubeapiserverFqdnForAks: true
   # healthcheck configures the readiness and liveliness probes for the operator pod.
