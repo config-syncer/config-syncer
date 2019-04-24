@@ -109,3 +109,28 @@ config:
 #          storageSecretName: gcs-secret
 #      sanitize: true
 #      schedule: '@every 6h'
+
+notifier:
+  mailgun:
+    domain: ''
+    apiKey: ''
+    publicAPIKey: ''
+    from: ''
+  smtp:
+    host: ''
+    port: ''
+    insecureSkipVerify: ''
+    username: ''
+    password: ''
+    from: ''
+  twilio:
+    accountSid: ''
+    authToken: ''
+    from: ''
+  slack:
+    authToken: ''
+    channel: ''
+  plivo:
+    authId: ''
+    authToken: ''
+    from: ''
