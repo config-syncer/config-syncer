@@ -5,9 +5,10 @@ import (
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	store "kmodules.xyz/objectstore-api/api/v1"
 )
 
-func SnapshotterClusterConfig(backend *api.Backend) api.ClusterConfig {
+func SnapshotterClusterConfig(backend *store.Backend) api.ClusterConfig {
 	return api.ClusterConfig{
 		Snapshotter: &api.SnapshotSpec{
 			Backend:  *backend,

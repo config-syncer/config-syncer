@@ -18,15 +18,16 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"kmodules.xyz/client-go/tools/exec"
+	store "kmodules.xyz/objectstore-api/api/v1"
 )
 
 const (
 	TEST_LOCAL_BACKUP_DIR = "/tmp/kubed/backup/snapshot"
 )
 
-func NewMinioBackend(bucket, prefix, endpoint, secretName string) *api.Backend {
-	return &api.Backend{
-		S3: &api.S3Spec{
+func NewMinioBackend(bucket, prefix, endpoint, secretName string) *store.Backend {
+	return &store.Backend{
+		S3: &store.S3Spec{
 			Bucket:   bucket,
 			Prefix:   prefix,
 			Endpoint: endpoint,
@@ -35,15 +36,15 @@ func NewMinioBackend(bucket, prefix, endpoint, secretName string) *api.Backend {
 	}
 }
 
-func NewLocalBackend(dir string) *api.Backend {
-	return &api.Backend{
-		Local: &api.LocalSpec{
-			Path: dir,
+func NewLocalBackend(dir string) *store.Backend {
+	return &store.Backend{
+		Local: &store.LocalSpec{
+			MountPath: dir,
 		},
 	}
 }
 
-func (f *Invocation) EventuallyBackupSnapshot(backend api.Backend) GomegaAsyncAssertion {
+func (f *Invocation) EventuallyBackupSnapshot(backend store.Backend) GomegaAsyncAssertion {
 	return Eventually(func() interface{} {
 		if backend.Local != nil && f.SelfHostedOperator {
 			return f.ListSnapshotInsideOperatorPod()
@@ -53,11 +54,11 @@ func (f *Invocation) EventuallyBackupSnapshot(backend api.Backend) GomegaAsyncAs
 	})
 }
 
-func (f *Invocation) GetItems(backend api.Backend) []stow.Item {
+func (f *Invocation) GetItems(backend store.Backend) []stow.Item {
 	loc, err := f.GetLocation(backend)
 	Expect(err).NotTo(HaveOccurred())
 
-	bucket, prefix, err := backend.GetBucketAndPrefix()
+	bucket, prefix, err := api.GetBucketAndPrefix(backend)
 	Expect(err).NotTo(HaveOccurred())
 	if backend.Local == nil {
 		prefix = prefix + "/"
@@ -81,7 +82,7 @@ func (f *Invocation) ListSnapshotInsideOperatorPod() string {
 	return output
 }
 
-func (f *Invocation) CreateBucketIfNotExist(backend api.Backend) error {
+func (f *Invocation) CreateBucketIfNotExist(backend store.Backend) error {
 	namespace := f.namespace
 	if f.SelfHostedOperator {
 		namespace = OperatorNamespace
@@ -98,7 +99,7 @@ func (f *Invocation) CreateBucketIfNotExist(backend api.Backend) error {
 			if err != nil {
 				return err
 			}
-			bucket, err := backend.Container()
+			bucket, err := api.Container(backend)
 			if err != nil {
 				return err
 			}
@@ -127,7 +128,7 @@ func (f *Invocation) MakeDirInsideOperatorPod(dir string) error {
 	return nil
 }
 
-func (f *Invocation) GetLocation(backend api.Backend) (stow.Location, error) {
+func (f *Invocation) GetLocation(backend store.Backend) (stow.Location, error) {
 	namespace := f.namespace
 	if f.SelfHostedOperator {
 		namespace = OperatorNamespace
