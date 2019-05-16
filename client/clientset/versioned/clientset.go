@@ -28,8 +28,6 @@ import (
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	KubedV1alpha1() kubedv1alpha1.KubedV1alpha1Interface
-	// Deprecated: please explicitly pick a version if possible.
-	Kubed() kubedv1alpha1.KubedV1alpha1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
@@ -41,12 +39,6 @@ type Clientset struct {
 
 // KubedV1alpha1 retrieves the KubedV1alpha1Client
 func (c *Clientset) KubedV1alpha1() kubedv1alpha1.KubedV1alpha1Interface {
-	return c.kubedV1alpha1
-}
-
-// Deprecated: Kubed retrieves the default version of KubedClient.
-// Please explicitly pick a version.
-func (c *Clientset) Kubed() kubedv1alpha1.KubedV1alpha1Interface {
 	return c.kubedV1alpha1
 }
 

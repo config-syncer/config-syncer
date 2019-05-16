@@ -1,0 +1,20 @@
+language: go
+go:
+ - 1.x
+ - tip
+
+cache:
+  directories:
+  - $HOME/.cache/go-build
+  - $GOPATH/pkg/mod
+
+go_import_path: kmodules.xyz/client-go
+
+install: true
+
+script:
+  - go build ./...
+  - ./hack/coverage.sh
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

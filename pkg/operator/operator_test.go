@@ -7,7 +7,6 @@ import (
 
 	"github.com/appscode/go/log"
 	searchlight_api "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
-	stash_api "github.com/appscode/stash/apis/stash/v1alpha1"
 	voyager_api "github.com/appscode/voyager/apis/voyager/v1beta1"
 	kubedb_api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	apps "k8s.io/api/apps/v1"
@@ -29,6 +28,7 @@ import (
 	"k8s.io/client-go/util/homedir" // admission "k8s.io/api/admission/v1beta1"
 	apiext_util "kmodules.xyz/client-go/apiextensions/v1beta1"
 	"kmodules.xyz/client-go/discovery"
+	stash_api "stash.appscode.dev/stash/apis/stash/v1alpha1"
 )
 
 func TestRestMapper(t *testing.T) {

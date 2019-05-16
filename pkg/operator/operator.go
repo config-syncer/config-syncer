@@ -19,9 +19,6 @@ import (
 	searchlight_api "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
 	searchlightinformers "github.com/appscode/searchlight/client/informers/externalversions"
-	stash_api "github.com/appscode/stash/apis/stash/v1alpha1"
-	scs "github.com/appscode/stash/client/clientset/versioned"
-	stashinformers "github.com/appscode/stash/client/informers/externalversions"
 	voyager_api "github.com/appscode/voyager/apis/voyager/v1beta1"
 	vcs "github.com/appscode/voyager/client/clientset/versioned"
 	voyagerinformers "github.com/appscode/voyager/client/informers/externalversions"
@@ -59,6 +56,9 @@ import (
 	"kmodules.xyz/client-go/tools/backup"
 	"kmodules.xyz/client-go/tools/fsnotify"
 	"kmodules.xyz/client-go/tools/queue"
+	stash_api "stash.appscode.dev/stash/apis/stash/v1alpha1"
+	scs "stash.appscode.dev/stash/client/clientset/versioned"
+	stashinformers "stash.appscode.dev/stash/client/informers/externalversions"
 )
 
 type Operator struct {

@@ -29,11 +29,7 @@ import (
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	IncidentsV1alpha1() incidentsv1alpha1.IncidentsV1alpha1Interface
-	// Deprecated: please explicitly pick a version if possible.
-	Incidents() incidentsv1alpha1.IncidentsV1alpha1Interface
 	MonitoringV1alpha1() monitoringv1alpha1.MonitoringV1alpha1Interface
-	// Deprecated: please explicitly pick a version if possible.
-	Monitoring() monitoringv1alpha1.MonitoringV1alpha1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
@@ -49,20 +45,8 @@ func (c *Clientset) IncidentsV1alpha1() incidentsv1alpha1.IncidentsV1alpha1Inter
 	return c.incidentsV1alpha1
 }
 
-// Deprecated: Incidents retrieves the default version of IncidentsClient.
-// Please explicitly pick a version.
-func (c *Clientset) Incidents() incidentsv1alpha1.IncidentsV1alpha1Interface {
-	return c.incidentsV1alpha1
-}
-
 // MonitoringV1alpha1 retrieves the MonitoringV1alpha1Client
 func (c *Clientset) MonitoringV1alpha1() monitoringv1alpha1.MonitoringV1alpha1Interface {
-	return c.monitoringV1alpha1
-}
-
-// Deprecated: Monitoring retrieves the default version of MonitoringClient.
-// Please explicitly pick a version.
-func (c *Clientset) Monitoring() monitoringv1alpha1.MonitoringV1alpha1Interface {
 	return c.monitoringV1alpha1
 }
 

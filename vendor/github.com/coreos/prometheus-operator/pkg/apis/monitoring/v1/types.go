@@ -15,7 +15,7 @@
 package v1
 
 import (
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -110,8 +110,13 @@ type PrometheusSpec struct {
 	// Number of instances to deploy for a Prometheus deployment.
 	Replicas *int32 `json:"replicas,omitempty"`
 	// Name of Prometheus external label used to denote replica name.
-	// Defaults to the value of `prometheus_replica`.
-	ReplicaExternalLabelName string `json:"replicaExternalLabelName,omitempty"`
+	// Defaults to the value of `prometheus_replica`. External label will
+	// _not_ be added when value is set to empty string (`""`).
+	ReplicaExternalLabelName *string `json:"replicaExternalLabelName,omitempty"`
+	// Name of Prometheus external label used to denote Prometheus instance
+	// name. Defaults to the value of `prometheus`. External label will
+	// _not_ be added when value is set to empty string (`""`).
+	PrometheusExternalLabelName *string `json:"prometheusExternalLabelName,omitempty"`
 	// Time duration Prometheus shall retain data for. Default is '24h',
 	// and must match the regular expression `[0-9]+(ms|s|m|h|d|w|y)` (milliseconds seconds minutes hours days weeks years).
 	Retention string `json:"retention,omitempty"`
@@ -183,14 +188,19 @@ type PrometheusSpec struct {
 	// If specified, the remote_read spec. This is an experimental feature, it may change in any upcoming release in a breaking way.
 	RemoteRead []RemoteReadSpec `json:"remoteRead,omitempty"`
 	// SecurityContext holds pod-level security attributes and common container settings.
-	// This defaults to non root user with uid 1000 and gid 2000 for Prometheus >v2.0 and
-	// default PodSecurityContext for other versions.
+	// This defaults to the default PodSecurityContext.
 	SecurityContext *v1.PodSecurityContext `json:"securityContext,omitempty"`
 	// ListenLocal makes the Prometheus server listen on loopback, so that it
 	// does not bind against the Pod IP.
 	ListenLocal bool `json:"listenLocal,omitempty"`
-	// Containers allows injecting additional containers. This is meant to
-	// allow adding an authentication proxy to a Prometheus pod.
+	// Containers allows injecting additional containers or modifying operator generated
+	// containers. This can be used to allow adding an authentication proxy to a Prometheus pod or
+	// to change the behavior of an operator generated container. Containers described here modify
+	// an operator generated container if they share the same name and modifications are done via a
+	// strategic merge patch. The current container names are: `prometheus`,
+	// `prometheus-config-reloader`, `rules-configmap-reloader`, and `thanos-sidecar`. Overriding
+	// containers is entirely outside the scope of what the maintainers will support and by doing
+	// so, you accept that this behaviour may break at any time without notice.
 	Containers []v1.Container `json:"containers,omitempty"`
 	// AdditionalScrapeConfigs allows specifying a key of a Secret containing
 	// additional Prometheus scrape configurations. Scrape configurations
@@ -293,6 +303,8 @@ type QuerySpec struct {
 	LookbackDelta *string `json:"lookbackDelta,omitempty"`
 	// Number of concurrent queries that can be run at once.
 	MaxConcurrency *int32 `json:"maxConcurrency,omitempty"`
+	// Maximum number of samples a single query can load into memory. Note that queries will fail if they would load more samples than this into memory, so this also limits the number of samples a query can return.
+	MaxSamples *int32 `json:"maxSamples,omitempty"`
 	// Maximum time a query may take before being aborted.
 	Timeout *string `json:"timeout,omitempty"`
 }
@@ -716,6 +728,8 @@ type AlertmanagerSpec struct {
 	ConfigMaps []string `json:"configMaps,omitempty"`
 	// Log level for Alertmanager to be configured with.
 	LogLevel string `json:"logLevel,omitempty"`
+	// Log format for Alertmanager to be configured with.
+	LogFormat string `json:"logFormat,omitempty"`
 	// Size is the expected size of the alertmanager cluster. The controller will
 	// eventually make the size of the running cluster equal to the expected
 	// size.
@@ -747,7 +761,7 @@ type AlertmanagerSpec struct {
 	// If specified, the pod's tolerations.
 	Tolerations []v1.Toleration `json:"tolerations,omitempty"`
 	// SecurityContext holds pod-level security attributes and common container settings.
-	// This defaults to non root user with uid 1000 and gid 2000.
+	// This defaults to the default PodSecurityContext.
 	SecurityContext *v1.PodSecurityContext `json:"securityContext,omitempty"`
 	// ServiceAccountName is the name of the ServiceAccount to use to run the
 	// Prometheus Pods.

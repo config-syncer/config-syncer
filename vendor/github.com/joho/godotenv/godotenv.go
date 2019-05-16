@@ -256,10 +256,7 @@ func parseLine(line string, envMap map[string]string) (key string, value string,
 	if strings.HasPrefix(key, "export") {
 		key = strings.TrimPrefix(key, "export")
 	}
-	key = strings.TrimSpace(key)
-
-  re := regexp.MustCompile(`^\s*(?:export\s+)?(.*?)\s*$`)
-	key = re.ReplaceAllString(splitString[0], "$1")
+	key = strings.Trim(key, " ")
 
 	// Parse the value
 	value = parseValue(splitString[1], envMap)
@@ -330,7 +327,7 @@ func expandVariables(v string, m map[string]string) string {
 }
 
 func isIgnoredLine(line string) bool {
-	trimmedLine := strings.TrimSpace(line)
+	trimmedLine := strings.Trim(line, " \n\t")
 	return len(trimmedLine) == 0 || strings.HasPrefix(trimmedLine, "#")
 }
 
