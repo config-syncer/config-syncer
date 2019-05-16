@@ -75,8 +75,3 @@ var _ clientset.Interface = &Clientset{}
 func (c *Clientset) KubedV1alpha1() kubedv1alpha1.KubedV1alpha1Interface {
 	return &fakekubedv1alpha1.FakeKubedV1alpha1{Fake: &c.Fake}
 }
-
-// Kubed retrieves the KubedV1alpha1Client
-func (c *Clientset) Kubed() kubedv1alpha1.KubedV1alpha1Interface {
-	return &fakekubedv1alpha1.FakeKubedV1alpha1{Fake: &c.Fake}
-}

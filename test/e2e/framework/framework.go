@@ -9,20 +9,20 @@ import (
 	kcs "github.com/appscode/kubed/client/clientset/versioned"
 	sls "github.com/appscode/searchlight/client/clientset/versioned"
 	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
-	scs "github.com/appscode/stash/client/clientset/versioned"
 	vcs "github.com/appscode/voyager/client/clientset/versioned"
 	prom "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	pcs "github.com/coreos/prometheus-operator/pkg/client/versioned"
 	kdbcs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
+	"gomodules.xyz/cert/certstore"
 	extensionsobj "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	ecs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	ka "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
-	"kmodules.xyz/client-go/tools/certstore"
+	scs "stash.appscode.dev/stash/client/clientset/versioned"
 )
 
 const (

@@ -10,8 +10,6 @@ import (
 	"github.com/appscode/kubed/pkg/syncer"
 	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
 	searchlightinformers "github.com/appscode/searchlight/client/informers/externalversions"
-	scs "github.com/appscode/stash/client/clientset/versioned"
-	stashinformers "github.com/appscode/stash/client/informers/externalversions"
 	vcs "github.com/appscode/voyager/client/clientset/versioned"
 	voyagerinformers "github.com/appscode/voyager/client/informers/externalversions"
 	prominformers "github.com/coreos/prometheus-operator/pkg/client/informers/externalversions"
@@ -24,6 +22,8 @@ import (
 	"k8s.io/client-go/rest"
 	"kmodules.xyz/client-go/discovery"
 	"kmodules.xyz/client-go/tools/fsnotify"
+	scs "stash.appscode.dev/stash/client/clientset/versioned"
+	stashinformers "stash.appscode.dev/stash/client/informers/externalversions"
 )
 
 type Config struct {

@@ -8,7 +8,6 @@ import (
 	logs "github.com/appscode/go/log/golog"
 	"github.com/appscode/kubed/test/e2e/framework"
 	searchlightcheme "github.com/appscode/searchlight/client/clientset/versioned/scheme"
-	stashscheme "github.com/appscode/stash/client/clientset/versioned/scheme"
 	voyagerscheme "github.com/appscode/voyager/client/clientset/versioned/scheme"
 	kubedbscheme "github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
 	. "github.com/onsi/ginkgo"
@@ -18,6 +17,7 @@ import (
 	clientsetscheme "k8s.io/client-go/kubernetes/scheme"
 	"kmodules.xyz/client-go/tools/clientcmd"
 	prom_util "kmodules.xyz/monitoring-agent-api/prometheus/v1"
+	stashscheme "stash.appscode.dev/stash/client/clientset/versioned/scheme"
 )
 
 const TestTimeout = 3 * time.Minute
