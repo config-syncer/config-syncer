@@ -47,7 +47,7 @@ menu_name: product_kubed_{{ .Version }}
 section_menu_id: reference
 {{- if .RootCmd }}
 aliases:
-  - products/kubed/{{ .Version }}/reference/
+  - /products/kubed/{{ .Version }}/reference/
 {{ end }}
 ---
 `))
