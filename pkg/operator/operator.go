@@ -185,11 +185,28 @@ func (op *Operator) setupNetworkInformers() {
 }
 
 func (op *Operator) setupConfigInformers() {
-	configMapInformer := op.kubeInformerFactory.Core().V1().ConfigMaps().Informer()
+//	configMapInformer := op.kubeInformerFactory.Core().V1().ConfigMaps().Informer()
+	configMapInformer := op.kubeInformerFactory.InformerFor(&core.ConfigMap{}, func(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+		return core_informers.NewFilteredConfigMapInformer(
+			client,
+			"commonconfig",
+			resyncPeriod,
+			cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+			func(options *metav1.ListOptions) {},
+		)
+	})
 	op.addEventHandlers(configMapInformer, core.SchemeGroupVersion.WithKind("ConfigMap"))
 	configMapInformer.AddEventHandler(op.configSyncer.ConfigMapHandler())
 
-	secretInformer := op.kubeInformerFactory.Core().V1().Secrets().Informer()
+	secretInformer := op.kubeInformerFactory.InformerFor(&core.Secret{}, func(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+		return core_informers.NewFilteredSecretInformer(
+			client,
+			"commonconfig",
+			resyncPeriod,
+			cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+			func(options *metav1.ListOptions) {},
+		)
+	})
 	op.addEventHandlers(secretInformer, core.SchemeGroupVersion.WithKind("Secret"))
 	secretInformer.AddEventHandler(op.configSyncer.SecretHandler())
 
