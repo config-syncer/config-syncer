@@ -27,6 +27,7 @@ type ClusterConfig struct {
 	metav1.TypeMeta `json:",inline"`
 
 	ClusterName        string              `json:"clusterName,omitempty"`
+	ConfigSourceNamespace	string         `json:"configSourceNamespace,omitempty"`
 	Snapshotter        *SnapshotSpec       `json:"snapshotter,omitempty"`
 	RecycleBin         *RecycleBinSpec     `json:"recycleBin,omitempty"`
 	EventForwarder     *EventForwarderSpec `json:"eventForwarder,omitempty"`

@@ -185,11 +185,10 @@ func (op *Operator) setupNetworkInformers() {
 }
 
 func (op *Operator) setupConfigInformers() {
-//	configMapInformer := op.kubeInformerFactory.Core().V1().ConfigMaps().Informer()
 	configMapInformer := op.kubeInformerFactory.InformerFor(&core.ConfigMap{}, func(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
 		return core_informers.NewFilteredConfigMapInformer(
 			client,
-			"commonconfig",
+			op.clusterConfig.ConfigSourceNamespace,
 			resyncPeriod,
 			cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
 			func(options *metav1.ListOptions) {},
@@ -201,7 +200,7 @@ func (op *Operator) setupConfigInformers() {
 	secretInformer := op.kubeInformerFactory.InformerFor(&core.Secret{}, func(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
 		return core_informers.NewFilteredSecretInformer(
 			client,
-			"commonconfig",
+			op.clusterConfig.ConfigSourceNamespace,
 			resyncPeriod,
 			cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
 			func(options *metav1.ListOptions) {},
