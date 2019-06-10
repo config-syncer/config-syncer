@@ -80,6 +80,8 @@ func (c *OperatorConfig) New() (*Operator, error) {
 	indexDir := filepath.Join(c.ScratchDir, "indices")
 	op.Indexer = resource_indexer.NewIndexer(indexDir)
 
+	op.Configure()
+
 	op.watcher = &fsnotify.Watcher{
 		WatchDir: filepath.Dir(c.ConfigPath),
 		Reload:   op.Configure,
