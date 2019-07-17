@@ -42,6 +42,14 @@ type EtcdListerExpansion interface{}
 // EtcdNamespaceLister.
 type EtcdNamespaceListerExpansion interface{}
 
+// MariaDBListerExpansion allows custom methods to be added to
+// MariaDBLister.
+type MariaDBListerExpansion interface{}
+
+// MariaDBNamespaceListerExpansion allows custom methods to be added to
+// MariaDBNamespaceLister.
+type MariaDBNamespaceListerExpansion interface{}
+
 // MemcachedListerExpansion allows custom methods to be added to
 // MemcachedLister.
 type MemcachedListerExpansion interface{}
@@ -65,6 +73,14 @@ type MySQLListerExpansion interface{}
 // MySQLNamespaceListerExpansion allows custom methods to be added to
 // MySQLNamespaceLister.
 type MySQLNamespaceListerExpansion interface{}
+
+// PerconaListerExpansion allows custom methods to be added to
+// PerconaLister.
+type PerconaListerExpansion interface{}
+
+// PerconaNamespaceListerExpansion allows custom methods to be added to
+// PerconaNamespaceLister.
+type PerconaNamespaceListerExpansion interface{}
 
 // PostgresListerExpansion allows custom methods to be added to
 // PostgresLister.

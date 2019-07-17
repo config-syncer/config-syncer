@@ -24,6 +24,10 @@ func (d DormantDatabase) OffshootSelectors() map[string]string {
 		selector[LabelDatabaseKind] = ResourceKindMongoDB
 	case d.Spec.Origin.Spec.MySQL != nil:
 		selector[LabelDatabaseKind] = ResourceKindMySQL
+	case d.Spec.Origin.Spec.Percona != nil:
+		selector[LabelDatabaseKind] = ResourceKindPercona
+	case d.Spec.Origin.Spec.MariaDB != nil:
+		selector[LabelDatabaseKind] = ResourceKindMariaDB
 	case d.Spec.Origin.Spec.Postgres != nil:
 		selector[LabelDatabaseKind] = ResourceKindPostgres
 	case d.Spec.Origin.Spec.Redis != nil:
@@ -101,6 +105,8 @@ func (d *DormantDatabase) SetDefaults() {
 	d.Spec.Origin.Spec.Elasticsearch.SetDefaults()
 	d.Spec.Origin.Spec.Postgres.SetDefaults()
 	d.Spec.Origin.Spec.MySQL.SetDefaults()
+	d.Spec.Origin.Spec.Percona.SetDefaults()
+	d.Spec.Origin.Spec.MariaDB.SetDefaults()
 	d.Spec.Origin.Spec.MongoDB.SetDefaults()
 	d.Spec.Origin.Spec.Redis.SetDefaults()
 	d.Spec.Origin.Spec.Memcached.SetDefaults()
@@ -116,6 +122,8 @@ func (d *DormantDatabase) GetDatabaseSecrets() []string {
 	secrets = append(secrets, d.Spec.Origin.Spec.Elasticsearch.GetSecrets()...)
 	secrets = append(secrets, d.Spec.Origin.Spec.Postgres.GetSecrets()...)
 	secrets = append(secrets, d.Spec.Origin.Spec.MySQL.GetSecrets()...)
+	secrets = append(secrets, d.Spec.Origin.Spec.Percona.GetSecrets()...)
+	secrets = append(secrets, d.Spec.Origin.Spec.MariaDB.GetSecrets()...)
 	secrets = append(secrets, d.Spec.Origin.Spec.MongoDB.GetSecrets()...)
 	secrets = append(secrets, d.Spec.Origin.Spec.Redis.GetSecrets()...)
 	secrets = append(secrets, d.Spec.Origin.Spec.Memcached.GetSecrets()...)

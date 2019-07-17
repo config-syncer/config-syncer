@@ -47,6 +47,12 @@ type OriginSpec struct {
 	// MySQL Spec
 	// +optional
 	MySQL *MySQLSpec `json:"mysql,omitempty"`
+	// Percona Spec
+	// +optional
+	Percona *PerconaSpec `json:"percona,omitempty"`
+	// MariaDB Spec
+	// +optional
+	MariaDB *MariaDBSpec `json:"mariadb,omitempty"`
 	// MongoDB Spec
 	// +optional
 	MongoDB *MongoDBSpec `json:"mongodb,omitempty"`

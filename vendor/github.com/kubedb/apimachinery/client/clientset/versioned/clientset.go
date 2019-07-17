@@ -31,17 +31,9 @@ import (
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	AuthorizationV1alpha1() authorizationv1alpha1.AuthorizationV1alpha1Interface
-	// Deprecated: please explicitly pick a version if possible.
-	Authorization() authorizationv1alpha1.AuthorizationV1alpha1Interface
 	CatalogV1alpha1() catalogv1alpha1.CatalogV1alpha1Interface
-	// Deprecated: please explicitly pick a version if possible.
-	Catalog() catalogv1alpha1.CatalogV1alpha1Interface
 	ConfigV1alpha1() configv1alpha1.ConfigV1alpha1Interface
-	// Deprecated: please explicitly pick a version if possible.
-	Config() configv1alpha1.ConfigV1alpha1Interface
 	KubedbV1alpha1() kubedbv1alpha1.KubedbV1alpha1Interface
-	// Deprecated: please explicitly pick a version if possible.
-	Kubedb() kubedbv1alpha1.KubedbV1alpha1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
@@ -59,20 +51,8 @@ func (c *Clientset) AuthorizationV1alpha1() authorizationv1alpha1.AuthorizationV
 	return c.authorizationV1alpha1
 }
 
-// Deprecated: Authorization retrieves the default version of AuthorizationClient.
-// Please explicitly pick a version.
-func (c *Clientset) Authorization() authorizationv1alpha1.AuthorizationV1alpha1Interface {
-	return c.authorizationV1alpha1
-}
-
 // CatalogV1alpha1 retrieves the CatalogV1alpha1Client
 func (c *Clientset) CatalogV1alpha1() catalogv1alpha1.CatalogV1alpha1Interface {
-	return c.catalogV1alpha1
-}
-
-// Deprecated: Catalog retrieves the default version of CatalogClient.
-// Please explicitly pick a version.
-func (c *Clientset) Catalog() catalogv1alpha1.CatalogV1alpha1Interface {
 	return c.catalogV1alpha1
 }
 
@@ -81,20 +61,8 @@ func (c *Clientset) ConfigV1alpha1() configv1alpha1.ConfigV1alpha1Interface {
 	return c.configV1alpha1
 }
 
-// Deprecated: Config retrieves the default version of ConfigClient.
-// Please explicitly pick a version.
-func (c *Clientset) Config() configv1alpha1.ConfigV1alpha1Interface {
-	return c.configV1alpha1
-}
-
 // KubedbV1alpha1 retrieves the KubedbV1alpha1Client
 func (c *Clientset) KubedbV1alpha1() kubedbv1alpha1.KubedbV1alpha1Interface {
-	return c.kubedbV1alpha1
-}
-
-// Deprecated: Kubedb retrieves the default version of KubedbClient.
-// Please explicitly pick a version.
-func (c *Clientset) Kubedb() kubedbv1alpha1.KubedbV1alpha1Interface {
 	return c.kubedbV1alpha1
 }
 

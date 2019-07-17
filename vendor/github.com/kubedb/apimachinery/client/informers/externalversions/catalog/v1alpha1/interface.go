@@ -34,6 +34,8 @@ type Interface interface {
 	MongoDBVersions() MongoDBVersionInformer
 	// MySQLVersions returns a MySQLVersionInformer.
 	MySQLVersions() MySQLVersionInformer
+	// PerconaVersions returns a PerconaVersionInformer.
+	PerconaVersions() PerconaVersionInformer
 	// PostgresVersions returns a PostgresVersionInformer.
 	PostgresVersions() PostgresVersionInformer
 	// RedisVersions returns a RedisVersionInformer.
@@ -74,6 +76,11 @@ func (v *version) MongoDBVersions() MongoDBVersionInformer {
 // MySQLVersions returns a MySQLVersionInformer.
 func (v *version) MySQLVersions() MySQLVersionInformer {
 	return &mySQLVersionInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// PerconaVersions returns a PerconaVersionInformer.
+func (v *version) PerconaVersions() PerconaVersionInformer {
+	return &perconaVersionInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // PostgresVersions returns a PostgresVersionInformer.

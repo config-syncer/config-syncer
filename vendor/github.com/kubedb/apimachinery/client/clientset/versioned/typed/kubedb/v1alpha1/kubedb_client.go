@@ -30,9 +30,11 @@ type KubedbV1alpha1Interface interface {
 	DormantDatabasesGetter
 	ElasticsearchesGetter
 	EtcdsGetter
+	MariaDBsGetter
 	MemcachedsGetter
 	MongoDBsGetter
 	MySQLsGetter
+	PerconasGetter
 	PostgresesGetter
 	RedisesGetter
 	SnapshotsGetter
@@ -55,6 +57,10 @@ func (c *KubedbV1alpha1Client) Etcds(namespace string) EtcdInterface {
 	return newEtcds(c, namespace)
 }
 
+func (c *KubedbV1alpha1Client) MariaDBs(namespace string) MariaDBInterface {
+	return newMariaDBs(c, namespace)
+}
+
 func (c *KubedbV1alpha1Client) Memcacheds(namespace string) MemcachedInterface {
 	return newMemcacheds(c, namespace)
 }
@@ -65,6 +71,10 @@ func (c *KubedbV1alpha1Client) MongoDBs(namespace string) MongoDBInterface {
 
 func (c *KubedbV1alpha1Client) MySQLs(namespace string) MySQLInterface {
 	return newMySQLs(c, namespace)
+}
+
+func (c *KubedbV1alpha1Client) Perconas(namespace string) PerconaInterface {
+	return newPerconas(c, namespace)
 }
 
 func (c *KubedbV1alpha1Client) Postgreses(namespace string) PostgresInterface {

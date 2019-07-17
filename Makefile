@@ -48,7 +48,7 @@ OSM_VER          := 0.9.1
 ### These variables should not need tweaking.
 ###
 
-SRC_PKGS := *.go apis client pkg hack/config
+SRC_PKGS := *.go apis client pkg hack/config hack/gendocs
 SRC_DIRS := $(SRC_PKGS) test # directories which hold app source (not vendored)
 
 DOCKER_PLATFORMS := linux/amd64 linux/arm linux/arm64

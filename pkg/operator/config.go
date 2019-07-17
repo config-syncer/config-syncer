@@ -16,7 +16,7 @@ import (
 	pcm "github.com/coreos/prometheus-operator/pkg/client/versioned"
 	kcs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	kubedbinformers "github.com/kubedb/apimachinery/client/informers/externalversions"
-	"github.com/robfig/cron"
+	"github.com/robfig/cron/v3"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
