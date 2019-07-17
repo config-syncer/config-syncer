@@ -1,0 +1,21 @@
+FROM debian:stretch
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN true
+
+RUN set -x \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends apt-transport-https ca-certificates curl
+
+RUN set -x                                                                                \
+  && curl -fsSL -o osm https://cdn.appscode.com/binaries/osm/{OSM_VER}/osm-alpine-amd64  \
+  && chmod 755 osm
+
+
+
+FROM {ARG_FROM}
+
+COPY --from=0 osm /bin/osm
+ADD bin/{ARG_OS}_{ARG_ARCH}/{ARG_BIN} /{ARG_BIN}
+
+ENTRYPOINT ["/{ARG_BIN}"]
