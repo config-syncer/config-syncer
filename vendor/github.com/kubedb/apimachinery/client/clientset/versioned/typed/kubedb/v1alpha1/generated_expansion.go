@@ -24,11 +24,15 @@ type ElasticsearchExpansion interface{}
 
 type EtcdExpansion interface{}
 
+type MariaDBExpansion interface{}
+
 type MemcachedExpansion interface{}
 
 type MongoDBExpansion interface{}
 
 type MySQLExpansion interface{}
+
+type PerconaExpansion interface{}
 
 type PostgresExpansion interface{}
 

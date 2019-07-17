@@ -30,7 +30,7 @@ import (
 	kcs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	kubedbinformers "github.com/kubedb/apimachinery/client/informers/externalversions"
 	"github.com/pkg/errors"
-	"github.com/robfig/cron"
+	"github.com/robfig/cron/v3"
 	"gomodules.xyz/envconfig"
 	apps "k8s.io/api/apps/v1"
 	batch "k8s.io/api/batch/v1"
@@ -474,12 +474,13 @@ func (op *Operator) RunTrashCanCleaner() error {
 		schedule = "@every 1m"
 	}
 
-	return op.cron.AddFunc(schedule, func() {
+	_, err := op.cron.AddFunc(schedule, func() {
 		err := op.trashCan.Cleanup()
 		if err != nil {
 			log.Errorln(err)
 		}
 	})
+	return err
 }
 
 func (op *Operator) RunSnapshotter() error {
@@ -528,12 +529,13 @@ func (op *Operator) RunSnapshotter() error {
 	}()
 
 	if !op.Test { // don't run cronjob for test. it cause problem for consecutive tests.
-		return op.cron.AddFunc(op.clusterConfig.Snapshotter.Schedule, func() {
+		_, err := op.cron.AddFunc(op.clusterConfig.Snapshotter.Schedule, func() {
 			err := snapshotter()
 			if err != nil {
 				log.Errorln(err)
 			}
 		})
+		return err
 	}
 	return nil
 }

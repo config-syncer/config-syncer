@@ -51,8 +51,15 @@ type MongoDBSpec struct {
 	DatabaseSecret *core.SecretVolumeSource `json:"databaseSecret,omitempty"`
 
 	// Secret for KeyFile or SSL certificates. Contains `tls.pem` or keyfile `key.txt` depending on enableSSL.
-	// Currently SSL support is not enabled.
 	CertificateSecret *core.SecretVolumeSource `json:"certificateSecret,omitempty"`
+
+	// ClusterAuthMode for replicaset or sharding. (default will be x509 if sslmode is not `disabled`.)
+	// See available ClusterAuthMode: https://docs.mongodb.com/manual/reference/program/mongod/#cmdoption-mongod-clusterauthmode
+	ClusterAuthMode ClusterAuthMode `json:"clusterAuthMode,omitempty"`
+
+	// SSLMode for both standalone and clusters. (default, disabled.)
+	// See more options: https://docs.mongodb.com/manual/reference/program/mongod/#cmdoption-mongod-sslmode
+	SSLMode SSLMode `json:"sslMode,omitempty"`
 
 	// Init is used to initialize database
 	// +optional
@@ -87,6 +94,48 @@ type MongoDBSpec struct {
 	// +optional
 	TerminationPolicy TerminationPolicy `json:"terminationPolicy,omitempty"`
 }
+
+// ClusterAuthMode represents the clusterAuthMode of mongodb clusters ( replicaset or sharding)
+// ref: https://docs.mongodb.com/manual/reference/program/mongod/#cmdoption-mongod-clusterauthmode
+type ClusterAuthMode string
+
+const (
+	// ClusterAuthModeKeyFile represents `keyFile` mongodb clusterAuthMode. In this mode, Use a keyfile for authentication. Accept only keyfiles.
+	ClusterAuthModeKeyFile ClusterAuthMode = "keyFile"
+
+	// ClusterAuthModeSendKeyFile represents `sendKeyFile` mongodb clusterAuthMode.
+	// This mode is for rolling upgrade purposes. Send a keyfile for authentication but can accept both keyfiles
+	// and x.509 certificates.
+	ClusterAuthModeSendKeyFile ClusterAuthMode = "sendKeyFile"
+
+	// ClusterAuthModeSendX509 represents `sendx509` mongodb clusterAuthMode. This mode is usually for rolling upgrade purposes.
+	// Send the x.509 certificate for authentication but can accept both keyfiles and x.509 certificates.
+	ClusterAuthModeSendX509 ClusterAuthMode = "sendX509"
+
+	// ClusterAuthModeX509 represents `x509` mongodb clusterAuthMode. This is the recommended clusterAuthMode.
+	// Send the x.509 certificate for authentication and accept only x.509 certificates.
+	ClusterAuthModeX509 ClusterAuthMode = "x509"
+)
+
+// SSLMode represents available sslmodes of mongodb.
+// ref: https://docs.mongodb.com/manual/reference/program/mongod/#cmdoption-mongod-sslmode
+type SSLMode string
+
+const (
+	// SSLModeDisabled represents `disabled` sslMode. It ensures that the server does not use TLS/SSL.
+	SSLModeDisabled SSLMode = "disabled"
+
+	// SSLModeAllowSSL represents `allowSSL` sslMode. It ensures that the connections between servers do not use TLS/SSL. For incoming connections,
+	// the server accepts both TLS/SSL and non-TLS/non-SSL.
+	SSLModeAllowSSL SSLMode = "allowSSL"
+
+	// SSLModePreferSSL represents `preferSSL` sslMode. It ensures that the connections between servers use TLS/SSL. For incoming connections,
+	// the server accepts both TLS/SSL and non-TLS/non-SSL.
+	SSLModePreferSSL SSLMode = "preferSSL"
+
+	// SSLModeRequireSSL represents `requiteSSL` sslmode. It ensures that the server uses and accepts only TLS/SSL encrypted connections.
+	SSLModeRequireSSL SSLMode = "requireSSL"
+)
 
 type MongoDBReplicaSet struct {
 	// Name of replicaset
@@ -146,9 +195,6 @@ type MongoDBNode struct {
 
 	// Prefix is the name prefix of this node.
 	Prefix string `json:"prefix,omitempty"`
-
-	// Compute Resources required by the sidecar container.
-	Resources core.ResourceRequirements `json:"resources,omitempty"`
 
 	// ConfigSource is an optional field to provide custom configuration file for database (i.e mongod.cnf).
 	// If specified, this file will be used as configuration file otherwise default configuration file will be used.

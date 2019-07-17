@@ -3,9 +3,11 @@ package v1alpha1
 import (
 	"fmt"
 
+	"github.com/appscode/go/types"
 	"github.com/kubedb/apimachinery/apis"
 	"github.com/kubedb/apimachinery/apis/kubedb"
 	apps "k8s.io/api/apps/v1"
+	core "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	crdutils "kmodules.xyz/client-go/apiextensions/v1beta1"
 	meta_util "kmodules.xyz/client-go/meta"
@@ -54,6 +56,10 @@ func (m MySQL) ResourcePlural() string {
 
 func (m MySQL) ServiceName() string {
 	return m.OffshootName()
+}
+
+func (m MySQL) GoverningServiceName() string {
+	return m.OffshootName() + "-gvr"
 }
 
 // Snapshot service account name.
@@ -166,6 +172,10 @@ func (m *MySQL) SetDefaults() {
 		return
 	}
 	m.Spec.SetDefaults()
+
+	if m.Spec.PodTemplate.Spec.ServiceAccountName == "" {
+		m.Spec.PodTemplate.Spec.ServiceAccountName = m.OffshootName()
+	}
 }
 
 func (m *MySQLSpec) SetDefaults() {
@@ -188,6 +198,47 @@ func (m *MySQLSpec) SetDefaults() {
 		} else {
 			m.TerminationPolicy = TerminationPolicyPause
 		}
+	}
+
+	if m.Topology != nil && m.Topology.Mode != nil && *m.Topology.Mode == MySQLClusterModeGroup {
+		if m.Replicas == nil {
+			m.Replicas = types.Int32P(MySQLDefaultGroupSize)
+		}
+		m.setDefaultProbes()
+	} else {
+		if m.Replicas == nil {
+			m.Replicas = types.Int32P(1)
+		}
+	}
+}
+
+// setDefaultProbes sets defaults only when probe fields are nil.
+// In operator, check if the value of probe fields is "{}".
+// For "{}", ignore readinessprobe or livenessprobe in statefulset.
+// Ref: https://github.com/mattlord/Docker-InnoDB-Cluster/blob/master/healthcheck.sh#L10
+func (m *MySQLSpec) setDefaultProbes() {
+	probe := &core.Probe{
+		Handler: core.Handler{
+			Exec: &core.ExecAction{
+				Command: []string{
+					"bash",
+					"-c",
+					`
+export MYSQL_PWD=${MYSQL_ROOT_PASSWORD}
+mysql -h localhost -nsLNE -e "select member_state from performance_schema.replication_group_members where member_id=@@server_uuid;" 2>/dev/null | grep -v "*" | egrep -v "ERROR|OFFLINE"
+`,
+				},
+			},
+		},
+		InitialDelaySeconds: 30,
+		PeriodSeconds:       5,
+	}
+
+	if m.PodTemplate.Spec.LivenessProbe == nil {
+		m.PodTemplate.Spec.LivenessProbe = probe
+	}
+	if m.PodTemplate.Spec.ReadinessProbe == nil {
+		m.PodTemplate.Spec.ReadinessProbe = probe
 	}
 }
 

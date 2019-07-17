@@ -30,12 +30,16 @@ type Interface interface {
 	Elasticsearches() ElasticsearchInformer
 	// Etcds returns a EtcdInformer.
 	Etcds() EtcdInformer
+	// MariaDBs returns a MariaDBInformer.
+	MariaDBs() MariaDBInformer
 	// Memcacheds returns a MemcachedInformer.
 	Memcacheds() MemcachedInformer
 	// MongoDBs returns a MongoDBInformer.
 	MongoDBs() MongoDBInformer
 	// MySQLs returns a MySQLInformer.
 	MySQLs() MySQLInformer
+	// Perconas returns a PerconaInformer.
+	Perconas() PerconaInformer
 	// Postgreses returns a PostgresInformer.
 	Postgreses() PostgresInformer
 	// Redises returns a RedisInformer.
@@ -70,6 +74,11 @@ func (v *version) Etcds() EtcdInformer {
 	return &etcdInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
+// MariaDBs returns a MariaDBInformer.
+func (v *version) MariaDBs() MariaDBInformer {
+	return &mariaDBInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
 // Memcacheds returns a MemcachedInformer.
 func (v *version) Memcacheds() MemcachedInformer {
 	return &memcachedInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
@@ -83,6 +92,11 @@ func (v *version) MongoDBs() MongoDBInformer {
 // MySQLs returns a MySQLInformer.
 func (v *version) MySQLs() MySQLInformer {
 	return &mySQLInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// Perconas returns a PerconaInformer.
+func (v *version) Perconas() PerconaInformer {
+	return &perconaInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Postgreses returns a PostgresInformer.

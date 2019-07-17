@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	cron "gopkg.in/robfig/cron.v2"
+	cron "github.com/robfig/cron/v3"
 )
 
 func (r Restic) IsValid() error {
@@ -25,7 +25,7 @@ func (r Restic) IsValid() error {
 		}
 	}
 
-	_, err := cron.Parse(r.Spec.Schedule)
+	_, err := cron.ParseStandard(r.Spec.Schedule)
 	if err != nil {
 		return fmt.Errorf("spec.schedule %s is invalid. Reason: %s", r.Spec.Schedule, err)
 	}

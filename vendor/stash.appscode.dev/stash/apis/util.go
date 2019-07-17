@@ -7,6 +7,8 @@ var (
 const (
 	StashKey   = "stash.appscode.com"
 	VersionTag = StashKey + "/tag"
+
+	KeyDeleteJobOnCompletion = StashKey + "/delete-job-on-completion"
 )
 
 const (

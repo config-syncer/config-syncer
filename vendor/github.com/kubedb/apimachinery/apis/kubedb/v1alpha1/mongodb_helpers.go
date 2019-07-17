@@ -203,7 +203,7 @@ func (m MongoDB) ConfigSvrDSN() string {
 	}
 	//	host := m.ConfigSvrRepSetName() + "/" + m.ConfigSvrNodeName() + "-0." + m.GvrSvcName(m.ConfigSvrNodeName()) + "." + m.Namespace + ".svc"
 	host := fmt.Sprintf("%v/", m.ConfigSvrRepSetName())
-	for i := 0; i < int(m.Spec.ShardTopology.Shard.Replicas); i++ {
+	for i := 0; i < int(m.Spec.ShardTopology.ConfigServer.Replicas); i++ {
 		if i != 0 {
 			host += ","
 		}
@@ -317,6 +317,24 @@ func (m *MongoDB) SetDefaults() {
 		return
 	}
 	m.Spec.SetDefaults()
+	if m.Spec.ShardTopology != nil {
+		if m.Spec.ShardTopology.ConfigServer.PodTemplate.Spec.ServiceAccountName == "" {
+			m.Spec.ShardTopology.ConfigServer.PodTemplate.Spec.ServiceAccountName = m.OffshootName()
+		}
+		if m.Spec.ShardTopology.Mongos.PodTemplate.Spec.ServiceAccountName == "" {
+			m.Spec.ShardTopology.Mongos.PodTemplate.Spec.ServiceAccountName = m.OffshootName()
+		}
+		if m.Spec.ShardTopology.Shard.PodTemplate.Spec.ServiceAccountName == "" {
+			m.Spec.ShardTopology.Shard.PodTemplate.Spec.ServiceAccountName = m.OffshootName()
+		}
+	} else {
+		if m.Spec.PodTemplate == nil {
+			m.Spec.PodTemplate = new(ofst.PodTemplateSpec)
+		}
+		if m.Spec.PodTemplate.Spec.ServiceAccountName == "" {
+			m.Spec.PodTemplate.Spec.ServiceAccountName = m.OffshootName()
+		}
+	}
 }
 
 func (m *MongoDBSpec) SetDefaults() {
@@ -338,6 +356,18 @@ func (m *MongoDBSpec) SetDefaults() {
 			m.TerminationPolicy = TerminationPolicyDelete
 		} else {
 			m.TerminationPolicy = TerminationPolicyPause
+		}
+	}
+
+	if m.SSLMode == "" {
+		m.SSLMode = SSLModeDisabled
+	}
+
+	if (m.ReplicaSet != nil || m.ShardTopology != nil) && m.ClusterAuthMode == "" {
+		if m.SSLMode == SSLModeDisabled {
+			m.ClusterAuthMode = ClusterAuthModeKeyFile
+		} else {
+			m.ClusterAuthMode = ClusterAuthModeX509
 		}
 	}
 
@@ -369,6 +399,7 @@ func (m *MongoDBSpec) SetDefaults() {
 		// set default probes
 		m.setDefaultProbes(m.PodTemplate)
 	}
+
 }
 
 // setDefaultProbes sets defaults only when probe fields are nil.
@@ -382,9 +413,19 @@ func (m *MongoDBSpec) setDefaultProbes(podTemplate *ofst.PodTemplateSpec) {
 
 	cmd := []string{
 		"mongo",
+		"--host=localhost",
 		"--eval",
 		"db.adminCommand('ping')",
 	}
+
+	if m.SSLMode == SSLModeRequireSSL {
+		cmd = append(cmd, []string{
+			"--ssl",
+			"--sslCAFile=/data/configdb/tls.crt",
+			"--sslPEMKeyFile=/data/configdb/mongo.pem",
+		}...)
+	}
+
 	if podTemplate.Spec.LivenessProbe == nil {
 		podTemplate.Spec.LivenessProbe = &core.Probe{
 			Handler: core.Handler{

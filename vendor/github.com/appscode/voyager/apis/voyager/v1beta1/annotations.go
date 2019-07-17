@@ -103,12 +103,17 @@ const (
 	//
 	// If the annotation is not set default values used to config defaults section will be:
 	//
-	// timeout  connect         50s
+	// timeout  connect         5s
 	// timeout  client          50s
 	// timeout  client-fin      50s
 	// timeout  server          50s
 	// timeout  tunnel          50s
 	DefaultsTimeOut = EngressKey + "/" + "default-timeout"
+
+	// Defines the maximum time allowed to perform a clean soft-stop.
+	// https://cbonte.github.io/haproxy-dconv/1.9/configuration.html#hard-stop-after
+	HardStopAfter        = EngressKey + "/" + "hard-stop-after"
+	DefaultHardStopAfter = "30s"
 
 	// https://github.com/appscode/voyager/issues/343
 	// Supports all valid options for defaults section of HAProxy config
@@ -139,7 +144,7 @@ const (
 	//     		- none : Doesn’t verify the certificate of the server
 	//     		- required (default value) : TLS handshake is aborted if the validation of the certificate presented by the server returns an error.
 	//
-	// verfyhost <hostname>: https://cbonte.github.io/haproxy-dconv/1.8/configuration.html#5.2-verifyhost
+	// verifyhost <hostname>: https://cbonte.github.io/haproxy-dconv/1.8/configuration.html#5.2-verifyhost
 	//    	Sets a <hostname> to look for in the Subject and SubjectAlternateNames fields provided in the
 	//    	certificate sent by the server. If <hostname> can’t be found, then the TLS handshake is aborted.
 	//    	This only applies when verify required is configured.
@@ -255,6 +260,11 @@ const (
 	// ref: https://github.com/appscode/voyager/issues/1054
 	NodeSelector = EngressKey + "/" + "node-selector"
 	Tolerations  = EngressKey + "/" + "tolerations"
+
+	// https://github.com/appscode/voyager/issues/1210
+	// http://cbonte.github.io/haproxy-dconv/1.8/configuration.html#agent-check
+	AgentPort     = EngressKey + "/" + "agent-port"
+	AgentInterval = EngressKey + "/" + "agent-interval"
 )
 
 var (
@@ -285,6 +295,7 @@ func init() {
 	registerParser(AuthTLSVerifyClient, meta.GetString)
 	registerParser(AuthTLSErrorPage, meta.GetString)
 	registerParser(ErrorFiles, meta.GetString)
+	registerParser(HardStopAfter, meta.GetString)
 	registerParser(CORSEnabled, meta.GetBool)
 	registerParser(UseNodePort, meta.GetBool)
 	registerParser(EnableHSTS, meta.GetBool)
@@ -657,7 +668,7 @@ var timeoutKeys = []string{
 
 var timeoutDefaults = map[string]string{
 	// Maximum time to wait for a connection attempt to a server to succeed.
-	"connect": "50s",
+	"connect": "5s",
 
 	// Maximum inactivity time on the client side.
 	// Applies when the client is expected to acknowledge or send data.
@@ -778,4 +789,11 @@ func (r Ingress) LimitRPM() int {
 func (r Ingress) LimitConnections() int {
 	value, _ := get[LimitConnection](r.Annotations)
 	return value.(int)
+}
+
+func (r Ingress) HardStopAfter() string {
+	if v, _ := get[HardStopAfter](r.Annotations); v != "" {
+		return v.(string)
+	}
+	return DefaultHardStopAfter
 }

@@ -28,6 +28,13 @@ import (
 func (in *MongoDBConfiguration) DeepCopyInto(out *MongoDBConfiguration) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
+	if in.ReplicaSets != nil {
+		in, out := &in.ReplicaSets, &out.ReplicaSets
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	return
 }
 
