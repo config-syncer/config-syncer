@@ -321,6 +321,12 @@ func schema_kubed_apis_kubed_v1alpha1_ClusterConfig(ref common.ReferenceCallback
 							Format: "",
 						},
 					},
+					"configSourceNamespace": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
 					"snapshotter": {
 						SchemaProps: spec.SchemaProps{
 							Ref: ref("github.com/appscode/kubed/apis/kubed/v1alpha1.SnapshotSpec"),
