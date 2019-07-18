@@ -10,7 +10,6 @@ import (
 
 	"github.com/appscode/go/encoding/yaml"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-	"github.com/appscode/kubed/pkg/storage"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
 	"gomodules.xyz/stow"
@@ -19,6 +18,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"kmodules.xyz/client-go/tools/exec"
 	store "kmodules.xyz/objectstore-api/api/v1"
+	storage "kmodules.xyz/objectstore-api/osm"
 )
 
 const (
