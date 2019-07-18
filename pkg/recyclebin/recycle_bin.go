@@ -111,6 +111,10 @@ func (c *RecycleBin) delete(obj interface{}) error {
 }
 
 func (c *RecycleBin) Cleanup() error {
+	if c.spec == nil {
+		return nil
+	}
+
 	now := time.Now()
 	return filepath.Walk(c.spec.Path, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
