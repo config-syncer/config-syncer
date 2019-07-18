@@ -28,10 +28,10 @@ type ConfigSyncer struct {
 	lock        sync.RWMutex
 }
 
-func New(KubeClient kubernetes.Interface, Recorder record.EventRecorder) *ConfigSyncer {
+func New(kc kubernetes.Interface, recorder record.EventRecorder) *ConfigSyncer {
 	return &ConfigSyncer{
-		kubeClient: KubeClient,
-		recorder:   Recorder,
+		kubeClient: kc,
+		recorder:   recorder,
 	}
 }
 

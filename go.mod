@@ -6,10 +6,8 @@ require (
 	github.com/RoaringBitmap/roaring v0.0.0-20180103163510-cefad6e4f79d // indirect
 	github.com/Smerity/govarint v0.0.0-20150407073650-7265e41f48f1 // indirect
 	github.com/appscode/go v0.0.0-20190621064509-6b292c9166e3
-	github.com/appscode/osm v0.12.0
 	github.com/appscode/searchlight v0.0.0-20190604163604-8a6c4c21504d
 	github.com/appscode/voyager v0.0.0-20190717194632-664837a7f865
-	github.com/aws/aws-sdk-go v1.20.20
 	github.com/blevesearch/bleve v0.7.0
 	github.com/blevesearch/blevex v0.0.0-20180227211930-4b158bb555a3 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.2 // indirect
@@ -63,7 +61,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20190510232812-a01b7d5d6c22
 	kmodules.xyz/client-go v0.0.0-20190715080709-7162a6c90b04
 	kmodules.xyz/monitoring-agent-api v0.0.0-20190513065523-186af167f817
-	kmodules.xyz/objectstore-api v0.0.0-20190715131036-28ef070833ef
+	kmodules.xyz/objectstore-api v0.0.0-20190718002052-da668b440b0b
 	kmodules.xyz/webhook-runtime v0.0.0-20190715115250-a84fbf77dd30
 	stash.appscode.dev/stash v0.0.0-20190717091949-1c51a7c58f08
 )

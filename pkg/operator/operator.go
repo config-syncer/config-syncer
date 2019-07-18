@@ -14,7 +14,6 @@ import (
 	influx "github.com/appscode/kubed/pkg/influxdb"
 	rbin "github.com/appscode/kubed/pkg/recyclebin"
 	indexers "github.com/appscode/kubed/pkg/registry/resource"
-	"github.com/appscode/kubed/pkg/storage"
 	"github.com/appscode/kubed/pkg/syncer"
 	searchlight_api "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
 	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
@@ -56,6 +55,7 @@ import (
 	"kmodules.xyz/client-go/tools/backup"
 	"kmodules.xyz/client-go/tools/fsnotify"
 	"kmodules.xyz/client-go/tools/queue"
+	storage "kmodules.xyz/objectstore-api/osm"
 	stash_api "stash.appscode.dev/stash/apis/stash/v1alpha1"
 	scs "stash.appscode.dev/stash/client/clientset/versioned"
 	stashinformers "stash.appscode.dev/stash/client/informers/externalversions"
@@ -489,7 +489,7 @@ func (op *Operator) RunSnapshotter() error {
 	}
 
 	osmconfigPath := filepath.Join(op.ScratchDir, "osm", "config.yaml")
-	err := storage.WriteOSMConfig(op.KubeClient, op.clusterConfig.Snapshotter.Backend, op.OperatorNamespace, osmconfigPath)
+	err := storage.WriteOSMConfig(op.KubeClient, op.OperatorNamespace, op.clusterConfig.Snapshotter.Backend, osmconfigPath)
 	if err != nil {
 		return err
 	}

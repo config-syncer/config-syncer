@@ -954,8 +954,9 @@ kmodules.xyz/custom-resources v0.0.0-20190508103408-464e8324c3ec h1:a7sxsWe1QYUZ
 kmodules.xyz/custom-resources v0.0.0-20190508103408-464e8324c3ec/go.mod h1:0C61XSEPGexAmkrayynpNnCTacvkwn4802CRAQ5tUPI=
 kmodules.xyz/monitoring-agent-api v0.0.0-20190513065523-186af167f817 h1:BibWdS5W/vFZyQLHYNdBu3axBJymBHB1U2GuMsOeCTs=
 kmodules.xyz/monitoring-agent-api v0.0.0-20190513065523-186af167f817/go.mod h1:ohfJV+DVctL54ybtYXE/XA0DOnGy/9KPrJht4rs4Ngw=
-kmodules.xyz/objectstore-api v0.0.0-20190715131036-28ef070833ef h1:eaSKE7rl/PpTChPQWk+KWQAB/axEYYbSkDN8wkGZnXc=
 kmodules.xyz/objectstore-api v0.0.0-20190715131036-28ef070833ef/go.mod h1:SwUpd3z5BvdUks/Nh8Wtyp8US2ATxhxQmMathe4lyOM=
+kmodules.xyz/objectstore-api v0.0.0-20190718002052-da668b440b0b h1:VRUyLLGvBjAezi9pQ89vGR+tcO+XROdJanGe2gPyGrY=
+kmodules.xyz/objectstore-api v0.0.0-20190718002052-da668b440b0b/go.mod h1:SwUpd3z5BvdUks/Nh8Wtyp8US2ATxhxQmMathe4lyOM=
 kmodules.xyz/offshoot-api v0.0.0-20190715115723-36c8fce142c1 h1:ak95Tpl+ur0n+18naC3FzNL01f6QmV9UR3zRF/SCFUs=
 kmodules.xyz/offshoot-api v0.0.0-20190715115723-36c8fce142c1/go.mod h1:A6ALSeFH5Qm9fEkBu6hKfa4cV4ulDWqGo4rm3l00QnI=
 kmodules.xyz/openshift v0.0.0-20190225002038-ca9787d09794/go.mod h1:OA2SQV7Rn2+E553Xfp0uY5nwG0A9FztRiaWgP12Ubz8=
