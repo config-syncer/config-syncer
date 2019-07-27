@@ -8,7 +8,6 @@ import (
 	v "github.com/appscode/go/version"
 	searchlightcheme "github.com/appscode/searchlight/client/clientset/versioned/scheme"
 	voyagerscheme "github.com/appscode/voyager/client/clientset/versioned/scheme"
-	kubedbscheme "github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
 	"github.com/spf13/cobra"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	_ "k8s.io/client-go/kubernetes/fake"
@@ -16,6 +15,7 @@ import (
 	"kmodules.xyz/client-go/logs"
 	"kmodules.xyz/client-go/tools/cli"
 	prom_util "kmodules.xyz/monitoring-agent-api/prometheus/v1"
+	kubedbscheme "kubedb.dev/apimachinery/client/clientset/versioned/scheme"
 	stashscheme "stash.appscode.dev/stash/client/clientset/versioned/scheme"
 )
 

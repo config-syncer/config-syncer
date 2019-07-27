@@ -5,9 +5,9 @@ go 1.12
 require (
 	github.com/RoaringBitmap/roaring v0.0.0-20180103163510-cefad6e4f79d // indirect
 	github.com/Smerity/govarint v0.0.0-20150407073650-7265e41f48f1 // indirect
-	github.com/appscode/go v0.0.0-20190621064509-6b292c9166e3
+	github.com/appscode/go v0.0.0-20190722173419-e454bf744023
 	github.com/appscode/searchlight v0.0.0-20190604163604-8a6c4c21504d
-	github.com/appscode/voyager v0.0.0-20190717194632-664837a7f865
+	github.com/appscode/voyager v0.0.0-20190722051248-5f4cb23f00da
 	github.com/blevesearch/bleve v0.7.0
 	github.com/blevesearch/blevex v0.0.0-20180227211930-4b158bb555a3 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.2 // indirect
@@ -29,7 +29,6 @@ require (
 	github.com/influxdata/influxdb v1.5.3
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.6
-	github.com/kubedb/apimachinery v0.0.0-20190717225257-5f6c0b43c6e3
 	github.com/mschoch/smat v0.0.0-20160514031455-90eadee771ae // indirect
 	github.com/onsi/ginkgo v1.8.0
 	github.com/onsi/gomega v1.5.0
@@ -63,7 +62,8 @@ require (
 	kmodules.xyz/monitoring-agent-api v0.0.0-20190513065523-186af167f817
 	kmodules.xyz/objectstore-api v0.0.0-20190718002052-da668b440b0b
 	kmodules.xyz/webhook-runtime v0.0.0-20190715115250-a84fbf77dd30
-	stash.appscode.dev/stash v0.0.0-20190717091949-1c51a7c58f08
+	kubedb.dev/apimachinery v0.0.0-20190727112531-78fa42a72786
+	stash.appscode.dev/stash v0.0.0-20190726135156-ae5eabd40c60
 )
 
 replace (

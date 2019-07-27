@@ -12,7 +12,6 @@ import (
 	vcs "github.com/appscode/voyager/client/clientset/versioned"
 	prom "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	pcs "github.com/coreos/prometheus-operator/pkg/client/versioned"
-	kdbcs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
 	"gomodules.xyz/cert/certstore"
@@ -22,6 +21,7 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	ka "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
+	kdbcs "kubedb.dev/apimachinery/client/clientset/versioned"
 	scs "stash.appscode.dev/stash/client/clientset/versioned"
 )
 

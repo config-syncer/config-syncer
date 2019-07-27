@@ -7,10 +7,10 @@ import (
 	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
 	vcs "github.com/appscode/voyager/client/clientset/versioned"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/versioned"
-	kcs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	"github.com/spf13/pflag"
 	"k8s.io/client-go/kubernetes"
 	"kmodules.xyz/client-go/meta"
+	kcs "kubedb.dev/apimachinery/client/clientset/versioned"
 	scs "stash.appscode.dev/stash/client/clientset/versioned"
 )
 
