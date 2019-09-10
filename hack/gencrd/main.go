@@ -28,7 +28,7 @@ func generateSwaggerJSON() {
 		Codecs: Codecs,
 		Info: spec.InfoProps{
 			Title:   "Kubed",
-			Version: "v0.10.0",
+			Version: "v0.11.0",
 			Contact: &spec.ContactInfo{
 				Name:  "AppsCode Inc.",
 				URL:   "https://appscode.com",
