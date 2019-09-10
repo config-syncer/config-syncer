@@ -93,6 +93,8 @@ spec:
         persistentVolumeClaim:
           claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "kubed.fullname" . }}{{- end }}
       {{- end }}
+      securityContext:
+        fsGroup: 65535
 {{- if or .Values.tolerations (and .Values.criticalAddon (eq .Release.Namespace "kube-system")) }}
       tolerations:
 {{- if .Values.tolerations }}

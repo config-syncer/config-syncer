@@ -65,6 +65,8 @@ spec:
         secret:
           defaultMode: 420
           secretName: kubed-apiserver-cert
+      securityContext:
+        fsGroup: 65535
       tolerations:
       - key: CriticalAddonsOnly
         operator: Exists
