@@ -2,13 +2,13 @@
 title: Backup & Restore Persistent Volumes
 description: Backup & Restore Persistent Volumes
 menu:
-  product_kubed_0.10.0:
+  product_kubed_0.11.0:
     identifier: stash-dr
     name: Backup Volumes
     parent: disaster-recovery
     weight: 20
 product_name: kubed
-menu_name: product_kubed_0.10.0
+menu_name: product_kubed_0.11.0
 section_menu_id: guides
 ---
 
