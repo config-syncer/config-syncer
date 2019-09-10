@@ -183,7 +183,6 @@ struct ltchars {
 #include <sys/socket.h>
 #include <sys/xattr.h>
 #include <linux/bpf.h>
-#include <linux/capability.h>
 #include <linux/errqueue.h>
 #include <linux/if.h>
 #include <linux/if_alg.h>

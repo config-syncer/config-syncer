@@ -28,7 +28,7 @@ type MongoDBVersionExpansion interface{}
 
 type MySQLVersionExpansion interface{}
 
-type PerconaVersionExpansion interface{}
+type PerconaXtraDBVersionExpansion interface{}
 
 type PostgresVersionExpansion interface{}
 

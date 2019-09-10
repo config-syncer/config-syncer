@@ -390,10 +390,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.MySQLStatus":                    schema_apimachinery_apis_kubedb_v1alpha1_MySQLStatus(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.Origin":                         schema_apimachinery_apis_kubedb_v1alpha1_Origin(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.OriginSpec":                     schema_apimachinery_apis_kubedb_v1alpha1_OriginSpec(ref),
-		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.Percona":                        schema_apimachinery_apis_kubedb_v1alpha1_Percona(ref),
-		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaList":                    schema_apimachinery_apis_kubedb_v1alpha1_PerconaList(ref),
-		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaSpec":                    schema_apimachinery_apis_kubedb_v1alpha1_PerconaSpec(ref),
-		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaStatus":                  schema_apimachinery_apis_kubedb_v1alpha1_PerconaStatus(ref),
+		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PXCSpec":                        schema_apimachinery_apis_kubedb_v1alpha1_PXCSpec(ref),
+		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDB":                  schema_apimachinery_apis_kubedb_v1alpha1_PerconaXtraDB(ref),
+		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDBList":              schema_apimachinery_apis_kubedb_v1alpha1_PerconaXtraDBList(ref),
+		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDBSpec":              schema_apimachinery_apis_kubedb_v1alpha1_PerconaXtraDBSpec(ref),
+		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDBStatus":            schema_apimachinery_apis_kubedb_v1alpha1_PerconaXtraDBStatus(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.Postgres":                       schema_apimachinery_apis_kubedb_v1alpha1_Postgres(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PostgresArchiverSpec":           schema_apimachinery_apis_kubedb_v1alpha1_PostgresArchiverSpec(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PostgresList":                   schema_apimachinery_apis_kubedb_v1alpha1_PostgresList(ref),
@@ -403,6 +404,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PostgresSummary":                schema_apimachinery_apis_kubedb_v1alpha1_PostgresSummary(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PostgresTableInfo":              schema_apimachinery_apis_kubedb_v1alpha1_PostgresTableInfo(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PostgresWALSourceSpec":          schema_apimachinery_apis_kubedb_v1alpha1_PostgresWALSourceSpec(ref),
+		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.ProxysqlSpec":                   schema_apimachinery_apis_kubedb_v1alpha1_ProxysqlSpec(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.RecoveryTarget":                 schema_apimachinery_apis_kubedb_v1alpha1_RecoveryTarget(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.Redis":                          schema_apimachinery_apis_kubedb_v1alpha1_Redis(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.RedisClusterSpec":               schema_apimachinery_apis_kubedb_v1alpha1_RedisClusterSpec(ref),
@@ -428,8 +430,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.mongoDBStatsService":            schema_apimachinery_apis_kubedb_v1alpha1_mongoDBStatsService(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.mysqlApp":                       schema_apimachinery_apis_kubedb_v1alpha1_mysqlApp(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.mysqlStatsService":              schema_apimachinery_apis_kubedb_v1alpha1_mysqlStatsService(ref),
-		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.perconaApp":                     schema_apimachinery_apis_kubedb_v1alpha1_perconaApp(ref),
-		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.perconaStatsService":            schema_apimachinery_apis_kubedb_v1alpha1_perconaStatsService(ref),
+		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.perconaXtraDBApp":               schema_apimachinery_apis_kubedb_v1alpha1_perconaXtraDBApp(ref),
+		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.perconaXtraDBStatsService":      schema_apimachinery_apis_kubedb_v1alpha1_perconaXtraDBStatsService(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.postgresApp":                    schema_apimachinery_apis_kubedb_v1alpha1_postgresApp(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.postgresStatsService":           schema_apimachinery_apis_kubedb_v1alpha1_postgresStatsService(ref),
 		"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.redisApp":                       schema_apimachinery_apis_kubedb_v1alpha1_redisApp(ref),
@@ -14630,7 +14632,14 @@ func schema_custom_resources_apis_appcatalog_v1alpha1_AppBindingSpec(ref common.
 				Properties: map[string]spec.Schema{
 					"type": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Used to facilitate programmatic handling of application.",
+							Description: "Type used to facilitate programmatic handling of application.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"version": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Version used to facilitate programmatic handling of application.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -17864,10 +17873,10 @@ func schema_apimachinery_apis_kubedb_v1alpha1_OriginSpec(ref common.ReferenceCal
 							Ref:         ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.MySQLSpec"),
 						},
 					},
-					"percona": {
+					"perconaxtradb": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Percona Spec",
-							Ref:         ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaSpec"),
+							Description: "PerconaXtraDB Spec",
+							Ref:         ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDBSpec"),
 						},
 					},
 					"mariadb": {
@@ -17904,11 +17913,38 @@ func schema_apimachinery_apis_kubedb_v1alpha1_OriginSpec(ref common.ReferenceCal
 			},
 		},
 		Dependencies: []string{
-			"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.ElasticsearchSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.EtcdSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.MariaDBSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.MemcachedSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.MongoDBSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.MySQLSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PostgresSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.RedisSpec"},
+			"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.ElasticsearchSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.EtcdSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.MariaDBSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.MemcachedSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.MongoDBSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.MySQLSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDBSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PostgresSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.RedisSpec"},
 	}
 }
 
-func schema_apimachinery_apis_kubedb_v1alpha1_Percona(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_kubedb_v1alpha1_PXCSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"clusterName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name of the cluster and should be identical on all nodes.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"proxysql": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Proxysql configuration",
+							Ref:         ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.ProxysqlSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.ProxysqlSpec"},
+	}
+}
+
+func schema_apimachinery_apis_kubedb_v1alpha1_PerconaXtraDB(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -17935,23 +17971,23 @@ func schema_apimachinery_apis_kubedb_v1alpha1_Percona(ref common.ReferenceCallba
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaSpec"),
+							Ref: ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDBSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaStatus"),
+							Ref: ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDBStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaStatus"},
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDBSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDBStatus"},
 	}
 }
 
-func schema_apimachinery_apis_kubedb_v1alpha1_PerconaList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_kubedb_v1alpha1_PerconaXtraDBList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -17978,12 +18014,12 @@ func schema_apimachinery_apis_kubedb_v1alpha1_PerconaList(ref common.ReferenceCa
 					},
 					"items": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Items is a list of Percona TPR objects",
+							Description: "Items is a list of PerconaXtraDB TPR objects",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.Percona"),
+										Ref: ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDB"),
 									},
 								},
 							},
@@ -17993,11 +18029,11 @@ func schema_apimachinery_apis_kubedb_v1alpha1_PerconaList(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.Percona"},
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDB"},
 	}
 }
 
-func schema_apimachinery_apis_kubedb_v1alpha1_PerconaSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_kubedb_v1alpha1_PerconaXtraDBSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -18005,16 +18041,22 @@ func schema_apimachinery_apis_kubedb_v1alpha1_PerconaSpec(ref common.ReferenceCa
 				Properties: map[string]spec.Schema{
 					"version": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Version of Percona to be deployed.",
+							Description: "Version of PerconaXtraDB to be deployed.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"replicas": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Number of instances to deploy for Percona",
+							Description: "Number of instances to deploy for PerconaXtraDB",
 							Type:        []string{"integer"},
 							Format:      "int32",
+						},
+					},
+					"pxc": {
+						SchemaProps: spec.SchemaProps{
+							Description: "PXC is the cluster specification for PerconaXtraDB Cluster",
+							Ref:         ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PXCSpec"),
 						},
 					},
 					"storageType": {
@@ -18084,11 +18126,11 @@ func schema_apimachinery_apis_kubedb_v1alpha1_PerconaSpec(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/apps/v1.StatefulSetUpdateStrategy", "k8s.io/api/core/v1.PersistentVolumeClaimSpec", "k8s.io/api/core/v1.SecretVolumeSource", "k8s.io/api/core/v1.VolumeSource", "kmodules.xyz/monitoring-agent-api/api/v1.AgentSpec", "kmodules.xyz/offshoot-api/api/v1.PodTemplateSpec", "kmodules.xyz/offshoot-api/api/v1.ServiceTemplateSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.InitSpec"},
+			"k8s.io/api/apps/v1.StatefulSetUpdateStrategy", "k8s.io/api/core/v1.PersistentVolumeClaimSpec", "k8s.io/api/core/v1.SecretVolumeSource", "k8s.io/api/core/v1.VolumeSource", "kmodules.xyz/monitoring-agent-api/api/v1.AgentSpec", "kmodules.xyz/offshoot-api/api/v1.PodTemplateSpec", "kmodules.xyz/offshoot-api/api/v1.ServiceTemplateSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.InitSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PXCSpec"},
 	}
 }
 
-func schema_apimachinery_apis_kubedb_v1alpha1_PerconaStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_kubedb_v1alpha1_PerconaXtraDBStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -18540,6 +18582,33 @@ func schema_apimachinery_apis_kubedb_v1alpha1_PostgresWALSourceSpec(ref common.R
 		},
 		Dependencies: []string{
 			"kmodules.xyz/objectstore-api/api/v1.AzureSpec", "kmodules.xyz/objectstore-api/api/v1.B2Spec", "kmodules.xyz/objectstore-api/api/v1.GCSSpec", "kmodules.xyz/objectstore-api/api/v1.LocalSpec", "kmodules.xyz/objectstore-api/api/v1.RestServerSpec", "kmodules.xyz/objectstore-api/api/v1.S3Spec", "kmodules.xyz/objectstore-api/api/v1.SwiftSpec", "kubedb.dev/apimachinery/apis/kubedb/v1alpha1.RecoveryTarget"},
+	}
+}
+
+func schema_apimachinery_apis_kubedb_v1alpha1_ProxysqlSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"replicas": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Number of Proxysql nodes. Currently we support only replicas = 1.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"podTemplate": {
+						SchemaProps: spec.SchemaProps{
+							Description: "PodTemplate is an optional configuration for pods used to expose proxysql",
+							Ref:         ref("kmodules.xyz/offshoot-api/api/v1.PodTemplateSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"kmodules.xyz/offshoot-api/api/v1.PodTemplateSpec"},
 	}
 }
 
@@ -19527,43 +19596,43 @@ func schema_apimachinery_apis_kubedb_v1alpha1_mysqlStatsService(ref common.Refer
 	}
 }
 
-func schema_apimachinery_apis_kubedb_v1alpha1_perconaApp(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_kubedb_v1alpha1_perconaXtraDBApp(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
-					"Percona": {
+					"PerconaXtraDB": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.Percona"),
+							Ref: ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDB"),
 						},
 					},
 				},
-				Required: []string{"Percona"},
+				Required: []string{"PerconaXtraDB"},
 			},
 		},
 		Dependencies: []string{
-			"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.Percona"},
+			"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDB"},
 	}
 }
 
-func schema_apimachinery_apis_kubedb_v1alpha1_perconaStatsService(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_kubedb_v1alpha1_perconaXtraDBStatsService(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
-					"Percona": {
+					"PerconaXtraDB": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.Percona"),
+							Ref: ref("kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDB"),
 						},
 					},
 				},
-				Required: []string{"Percona"},
+				Required: []string{"PerconaXtraDB"},
 			},
 		},
 		Dependencies: []string{
-			"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.Percona"},
+			"kubedb.dev/apimachinery/apis/kubedb/v1alpha1.PerconaXtraDB"},
 	}
 }
 

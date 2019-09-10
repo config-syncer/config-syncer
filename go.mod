@@ -5,16 +5,16 @@ go 1.12
 require (
 	github.com/RoaringBitmap/roaring v0.0.0-20180103163510-cefad6e4f79d // indirect
 	github.com/Smerity/govarint v0.0.0-20150407073650-7265e41f48f1 // indirect
-	github.com/appscode/go v0.0.0-20190722173419-e454bf744023
+	github.com/appscode/go v0.0.0-20190808133642-1d4ef1f1c1e0
 	github.com/appscode/searchlight v0.0.0-20190604163604-8a6c4c21504d
-	github.com/appscode/voyager v0.0.0-20190722051248-5f4cb23f00da
+	github.com/appscode/voyager v0.0.0-20190910022346-7060ae151478
 	github.com/blevesearch/bleve v0.7.0
 	github.com/blevesearch/blevex v0.0.0-20180227211930-4b158bb555a3 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.2 // indirect
 	github.com/blevesearch/segment v0.0.0-20160105220820-db70c57796cc // indirect
 	github.com/boltdb/bolt v0.0.0-20161028193645-4b1ebc1869ad // indirect
 	github.com/codeskyblue/go-sh v0.0.0-20190412065543-76bd3d59ff27
-	github.com/coreos/prometheus-operator v0.31.1
+	github.com/coreos/prometheus-operator v0.30.1
 	github.com/couchbase/vellum v0.0.0-20190328134517-462e86d8716b // indirect
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
 	github.com/cznic/mathutil v0.0.0-20181122101859-297441e03548 // indirect
@@ -25,7 +25,6 @@ require (
 	github.com/glycerine/goconvey v0.0.0-20190410193231-58a59202ab31 // indirect
 	github.com/go-openapi/spec v0.19.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
-	github.com/gophercloud/gophercloud v0.0.0-20190516144603-ad4210895ed0 // indirect
 	github.com/influxdata/influxdb v1.5.3
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.6
@@ -58,21 +57,24 @@ require (
 	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
 	k8s.io/kube-aggregator v0.0.0-20190515024249-81a6edcf70be
 	k8s.io/kube-openapi v0.0.0-20190510232812-a01b7d5d6c22
-	kmodules.xyz/client-go v0.0.0-20190715080709-7162a6c90b04
-	kmodules.xyz/monitoring-agent-api v0.0.0-20190513065523-186af167f817
-	kmodules.xyz/objectstore-api v0.0.0-20190718002052-da668b440b0b
-	kmodules.xyz/webhook-runtime v0.0.0-20190715115250-a84fbf77dd30
-	kubedb.dev/apimachinery v0.0.0-20190727112531-78fa42a72786
-	stash.appscode.dev/stash v0.0.0-20190726135156-ae5eabd40c60
+	kmodules.xyz/client-go v0.0.0-20190808141354-bbb9e14f60ab
+	kmodules.xyz/monitoring-agent-api v0.0.0-20190808150221-601a4005b7f7
+	kmodules.xyz/objectstore-api v0.0.0-20190824212210-196174aa0fc0
+	kmodules.xyz/webhook-runtime v0.0.0-20190808145328-4186c470d56b
+	kubedb.dev/apimachinery v0.13.0-rc.0
+	stash.appscode.dev/stash v0.9.0-rc.0
 )
 
 replace (
-	github.com/Azure/go-autorest => github.com/Azure/go-autorest/autorest v0.5.0
-	github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.4
+	cloud.google.com/go => cloud.google.com/go v0.34.0
+	git.apache.org/thrift.git => github.com/apache/thrift v0.12.0
+	github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.4.2+incompatible
+	github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.3
+	gomodules.xyz/envsubst => gomodules.xyz/envsubst v0.1.0
 	k8s.io/api => k8s.io/api v0.0.0-20190313235455-40a48860b5ab
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190315093550-53c4693659ed
 	k8s.io/apimachinery => github.com/kmodules/apimachinery v0.0.0-20190508045248-a52a97a7a2bf
-	k8s.io/apiserver => github.com/kmodules/apiserver v0.0.0-20190508082252-8397d761d4b5
+	k8s.io/apiserver => github.com/kmodules/apiserver v0.0.0-20190811223248-5a95b2df4348
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.0.0-20190314001948-2899ed30580f
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.0.0-20190314002645-c892ea32361a
 	k8s.io/component-base => k8s.io/component-base v0.0.0-20190314000054-4a91899592f4
@@ -81,4 +83,5 @@ replace (
 	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20190228160746-b3a7cee44a30
 	k8s.io/metrics => k8s.io/metrics v0.0.0-20190314001731-1bd6a4002213
 	k8s.io/utils => k8s.io/utils v0.0.0-20190221042446-c2654d5206da
+	sigs.k8s.io/structured-merge-diff => sigs.k8s.io/structured-merge-diff v0.0.0-20190302045857-e85c7b244fd2
 )

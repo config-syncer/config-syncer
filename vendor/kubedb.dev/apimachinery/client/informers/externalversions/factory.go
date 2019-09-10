@@ -28,7 +28,6 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 	versioned "kubedb.dev/apimachinery/client/clientset/versioned"
-	authorization "kubedb.dev/apimachinery/client/informers/externalversions/authorization"
 	catalog "kubedb.dev/apimachinery/client/informers/externalversions/catalog"
 	internalinterfaces "kubedb.dev/apimachinery/client/informers/externalversions/internalinterfaces"
 	kubedb "kubedb.dev/apimachinery/client/informers/externalversions/kubedb"
@@ -174,13 +173,8 @@ type SharedInformerFactory interface {
 	ForResource(resource schema.GroupVersionResource) (GenericInformer, error)
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
-	Authorization() authorization.Interface
 	Catalog() catalog.Interface
 	Kubedb() kubedb.Interface
-}
-
-func (f *sharedInformerFactory) Authorization() authorization.Interface {
-	return authorization.New(f, f.namespace, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Catalog() catalog.Interface {

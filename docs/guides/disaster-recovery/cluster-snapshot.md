@@ -2,13 +2,13 @@
 title: Cluster Snapshots
 description: Cluster Snapshots
 menu:
-  product_kubed_0.11.0:
+  product_kubed_v0.11.0:
     identifier: cluster-snapshots-dr
     name: Cluster Snapshots
     parent: disaster-recovery
     weight: 10
 product_name: kubed
-menu_name: product_kubed_0.11.0
+menu_name: product_kubed_v0.11.0
 section_menu_id: guides
 ---
 
