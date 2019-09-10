@@ -23,8 +23,7 @@ import (
 
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
-	v1alpha1 "kubedb.dev/apimachinery/apis/authorization/v1alpha1"
-	catalogv1alpha1 "kubedb.dev/apimachinery/apis/catalog/v1alpha1"
+	v1alpha1 "kubedb.dev/apimachinery/apis/catalog/v1alpha1"
 	kubedbv1alpha1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 )
 
@@ -54,32 +53,22 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
-	// Group=authorization.kubedb.com, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithResource("databaseaccessrequests"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Authorization().V1alpha1().DatabaseAccessRequests().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("mongodbroles"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Authorization().V1alpha1().MongoDBRoles().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("mysqlroles"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Authorization().V1alpha1().MySQLRoles().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("postgresroles"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Authorization().V1alpha1().PostgresRoles().Informer()}, nil
-
-		// Group=catalog.kubedb.com, Version=v1alpha1
-	case catalogv1alpha1.SchemeGroupVersion.WithResource("elasticsearchversions"):
+	// Group=catalog.kubedb.com, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithResource("elasticsearchversions"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Catalog().V1alpha1().ElasticsearchVersions().Informer()}, nil
-	case catalogv1alpha1.SchemeGroupVersion.WithResource("etcdversions"):
+	case v1alpha1.SchemeGroupVersion.WithResource("etcdversions"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Catalog().V1alpha1().EtcdVersions().Informer()}, nil
-	case catalogv1alpha1.SchemeGroupVersion.WithResource("memcachedversions"):
+	case v1alpha1.SchemeGroupVersion.WithResource("memcachedversions"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Catalog().V1alpha1().MemcachedVersions().Informer()}, nil
-	case catalogv1alpha1.SchemeGroupVersion.WithResource("mongodbversions"):
+	case v1alpha1.SchemeGroupVersion.WithResource("mongodbversions"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Catalog().V1alpha1().MongoDBVersions().Informer()}, nil
-	case catalogv1alpha1.SchemeGroupVersion.WithResource("mysqlversions"):
+	case v1alpha1.SchemeGroupVersion.WithResource("mysqlversions"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Catalog().V1alpha1().MySQLVersions().Informer()}, nil
-	case catalogv1alpha1.SchemeGroupVersion.WithResource("perconaversions"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Catalog().V1alpha1().PerconaVersions().Informer()}, nil
-	case catalogv1alpha1.SchemeGroupVersion.WithResource("postgresversions"):
+	case v1alpha1.SchemeGroupVersion.WithResource("perconaxtradbversions"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Catalog().V1alpha1().PerconaXtraDBVersions().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("postgresversions"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Catalog().V1alpha1().PostgresVersions().Informer()}, nil
-	case catalogv1alpha1.SchemeGroupVersion.WithResource("redisversions"):
+	case v1alpha1.SchemeGroupVersion.WithResource("redisversions"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Catalog().V1alpha1().RedisVersions().Informer()}, nil
 
 		// Group=kubedb.com, Version=v1alpha1
@@ -97,8 +86,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kubedb().V1alpha1().MongoDBs().Informer()}, nil
 	case kubedbv1alpha1.SchemeGroupVersion.WithResource("mysqls"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kubedb().V1alpha1().MySQLs().Informer()}, nil
-	case kubedbv1alpha1.SchemeGroupVersion.WithResource("perconas"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Kubedb().V1alpha1().Perconas().Informer()}, nil
+	case kubedbv1alpha1.SchemeGroupVersion.WithResource("perconaxtradbs"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Kubedb().V1alpha1().PerconaXtraDBs().Informer()}, nil
 	case kubedbv1alpha1.SchemeGroupVersion.WithResource("postgreses"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kubedb().V1alpha1().Postgreses().Informer()}, nil
 	case kubedbv1alpha1.SchemeGroupVersion.WithResource("redises"):

@@ -24,14 +24,6 @@ type AlertmanagerListerExpansion interface{}
 // AlertmanagerNamespaceLister.
 type AlertmanagerNamespaceListerExpansion interface{}
 
-// PodMonitorListerExpansion allows custom methods to be added to
-// PodMonitorLister.
-type PodMonitorListerExpansion interface{}
-
-// PodMonitorNamespaceListerExpansion allows custom methods to be added to
-// PodMonitorNamespaceLister.
-type PodMonitorNamespaceListerExpansion interface{}
-
 // PrometheusListerExpansion allows custom methods to be added to
 // PrometheusLister.
 type PrometheusListerExpansion interface{}

@@ -345,9 +345,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"kmodules.xyz/offshoot-api/api/v1.ServicePort":                                schema_kmodulesxyz_offshoot_api_api_v1_ServicePort(ref),
 		"kmodules.xyz/offshoot-api/api/v1.ServiceSpec":                                schema_kmodulesxyz_offshoot_api_api_v1_ServiceSpec(ref),
 		"kmodules.xyz/offshoot-api/api/v1.ServiceTemplateSpec":                        schema_kmodulesxyz_offshoot_api_api_v1_ServiceTemplateSpec(ref),
+		"kubedb.dev/apimachinery/apis/config/v1alpha1.GaleraArbitratorConfiguration":  schema_apimachinery_apis_config_v1alpha1_GaleraArbitratorConfiguration(ref),
 		"kubedb.dev/apimachinery/apis/config/v1alpha1.MongoDBConfiguration":           schema_apimachinery_apis_config_v1alpha1_MongoDBConfiguration(ref),
-		"kubedb.dev/apimachinery/apis/config/v1alpha1.MySQLConfiguration":             schema_apimachinery_apis_config_v1alpha1_MySQLConfiguration(ref),
-		"kubedb.dev/apimachinery/apis/config/v1alpha1.PostgresConfiguration":          schema_apimachinery_apis_config_v1alpha1_PostgresConfiguration(ref),
 	}
 }
 
@@ -14544,7 +14543,14 @@ func schema_custom_resources_apis_appcatalog_v1alpha1_AppBindingSpec(ref common.
 				Properties: map[string]spec.Schema{
 					"type": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Used to facilitate programmatic handling of application.",
+							Description: "Type used to facilitate programmatic handling of application.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"version": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Version used to facilitate programmatic handling of application.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -15625,6 +15631,54 @@ func schema_kmodulesxyz_offshoot_api_api_v1_ServiceTemplateSpec(ref common.Refer
 	}
 }
 
+func schema_apimachinery_apis_config_v1alpha1_GaleraArbitratorConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GaleraArbitratorConfiguration defines Galera ARBitrator Daemon (garbd) configuration. Ref: https://galeracluster.com/library/documentation/arbitrator.html\n\t\thttps://galeracluster.com/library/documentation/backup-cluster.html",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"address": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Address denotes the logical name of the galera cluster. It is used as the value of the variable named \"wsrep_cluster_name\" in the replication configuration for galera Ref: https://galeracluster.com/library/documentation/mysql-wsrep-options.html#wsrep-cluster-name",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Group denotes the collection of cluster members by IP address or resolvable domain name. This address is used as the value of the variable named \"wsrep_cluster_address\" in the replication configuration for galera. It must be in galera format. Ref: https://galeracluster.com/library/documentation/mysql-wsrep-options.html#wsrep-cluster-address",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"sstMethod": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SSTMethod denotes the method or script the node uses during a State Snapshot Transfer. This method is needed to form the SST request string that contains SST request to trigger state snapshot dump (state backup) on one of the other nodes. Ref: https://galeracluster.com/library/documentation/mysql-wsrep-options.html#wsrep-sst-method",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_apimachinery_apis_config_v1alpha1_MongoDBConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -15642,27 +15696,6 @@ func schema_apimachinery_apis_config_v1alpha1_MongoDBConfiguration(ref common.Re
 					"apiVersion": {
 						SchemaProps: spec.SchemaProps{
 							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"pluginName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Specifies the name of the plugin to use for this connection. Default plugin:\n - for mongodb: mongodb-database-plugin",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"allowedRoles": {
-						SchemaProps: spec.SchemaProps{
-							Description: "List of the roles allowed to use this connection. Defaults to empty (no roles), if contains a \"*\" any role can use this connection.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"writeConcern": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Specifies the MongoDB write concern. This is set for the entirety of the session, maintained for the lifecycle of the plugin process.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -15687,130 +15720,6 @@ func schema_apimachinery_apis_config_v1alpha1_MongoDBConfiguration(ref common.Re
 									},
 								},
 							},
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func schema_apimachinery_apis_config_v1alpha1_MySQLConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "MySQLConfiguration defines a MySQL app configuration. https://www.vaultproject.io/api/secret/databases/index.html https://www.vaultproject.io/api/secret/databases/mysql-maria.html#configure-connection",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"pluginName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Specifies the name of the plugin to use for this connection. Default plugin:\n - for mysql: mysql-database-plugin",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"allowedRoles": {
-						SchemaProps: spec.SchemaProps{
-							Description: "List of the roles allowed to use this connection. Defaults to empty (no roles), if contains a \"*\" any role can use this connection.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"maxOpenConnections": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Specifies the maximum number of open connections to the database.",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"maxIdleConnections": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Specifies the maximum number of idle connections to the database. A zero uses the value of max_open_connections and a negative value disables idle connections. If larger than max_open_connections it will be reduced to be equal.",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"maxConnectionLifetime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Specifies the maximum amount of time a connection may be reused. If <= 0s connections are reused forever.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func schema_apimachinery_apis_config_v1alpha1_PostgresConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "PostgresConfiguration defines a PostgreSQL app configuration. https://www.vaultproject.io/api/secret/databases/index.html https://www.vaultproject.io/api/secret/databases/postgresql.html#configure-connection",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"pluginName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Specifies the name of the plugin to use for this connection. Default plugin:\n\t- for postgres: postgresql-database-plugin",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"allowedRoles": {
-						SchemaProps: spec.SchemaProps{
-							Description: "List of the roles allowed to use this connection. Defaults to empty (no roles), if contains a \"*\" any role can use this connection.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"maxOpenConnections": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Specifies the maximum number of open connections to the database.",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"maxIdleConnections": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Specifies the maximum number of idle connections to the database. A zero uses the value of max_open_connections and a negative value disables idle connections. If larger than max_open_connections it will be reduced to be equal.",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"maxConnectionLifetime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Specifies the maximum amount of time a connection may be reused. If <= 0s connections are reused forever.",
-							Type:        []string{"string"},
-							Format:      "",
 						},
 					},
 				},

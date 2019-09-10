@@ -381,14 +381,14 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.MySQLVersionPodSecurityPolicy":         schema_apimachinery_apis_catalog_v1alpha1_MySQLVersionPodSecurityPolicy(ref),
 		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.MySQLVersionSpec":                      schema_apimachinery_apis_catalog_v1alpha1_MySQLVersionSpec(ref),
 		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.MySQLVersionTools":                     schema_apimachinery_apis_catalog_v1alpha1_MySQLVersionTools(ref),
-		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersion":                        schema_apimachinery_apis_catalog_v1alpha1_PerconaVersion(ref),
-		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionDatabase":                schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionDatabase(ref),
-		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionExporter":                schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionExporter(ref),
-		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionInitContainer":           schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionInitContainer(ref),
-		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionList":                    schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionList(ref),
-		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionPodSecurityPolicy":       schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionPodSecurityPolicy(ref),
-		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionProxysql":                schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionProxysql(ref),
-		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionSpec":                    schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionSpec(ref),
+		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersion":                  schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersion(ref),
+		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionDatabase":          schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionDatabase(ref),
+		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionExporter":          schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionExporter(ref),
+		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionInitContainer":     schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionInitContainer(ref),
+		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionList":              schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionList(ref),
+		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionPodSecurityPolicy": schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionPodSecurityPolicy(ref),
+		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionProxysql":          schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionProxysql(ref),
+		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionSpec":              schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionSpec(ref),
 		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PostgresVersion":                       schema_apimachinery_apis_catalog_v1alpha1_PostgresVersion(ref),
 		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PostgresVersionDatabase":               schema_apimachinery_apis_catalog_v1alpha1_PostgresVersionDatabase(ref),
 		"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PostgresVersionExporter":               schema_apimachinery_apis_catalog_v1alpha1_PostgresVersionExporter(ref),
@@ -14598,7 +14598,14 @@ func schema_custom_resources_apis_appcatalog_v1alpha1_AppBindingSpec(ref common.
 				Properties: map[string]spec.Schema{
 					"type": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Used to facilitate programmatic handling of application.",
+							Description: "Type used to facilitate programmatic handling of application.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"version": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Version used to facilitate programmatic handling of application.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -16818,7 +16825,7 @@ func schema_apimachinery_apis_catalog_v1alpha1_MySQLVersionTools(ref common.Refe
 	}
 }
 
-func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersion(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersion(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -16845,22 +16852,22 @@ func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersion(ref common.Referen
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionSpec"),
+							Ref: ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionSpec"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionSpec"},
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionSpec"},
 	}
 }
 
-func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionDatabase(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionDatabase(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PerconaVersionDatabase is the percona image",
+				Description: "PerconaXtraDBVersionDatabase is the perconaxtradb image",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"image": {
@@ -16876,11 +16883,11 @@ func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionDatabase(ref common
 	}
 }
 
-func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionExporter(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionExporter(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PerconaVersionExporter is the image for the Percona exporter",
+				Description: "PerconaXtraDBVersionExporter is the image for the PerconaXtraDB exporter",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"image": {
@@ -16896,11 +16903,11 @@ func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionExporter(ref common
 	}
 }
 
-func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionInitContainer(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionInitContainer(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PerconaVersionInitContainer is the Percona Container initializer",
+				Description: "PerconaXtraDBVersionInitContainer is the PerconaXtraDB Container initializer",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"image": {
@@ -16916,11 +16923,11 @@ func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionInitContainer(ref c
 	}
 }
 
-func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PerconaVersionList is a list of PerconaVersions",
+				Description: "PerconaXtraDBVersionList is a list of PerconaXtraDBVersions",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -16944,12 +16951,12 @@ func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionList(ref common.Ref
 					},
 					"items": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Items is a list of PerconaVersion CRD objects",
+							Description: "Items is a list of PerconaXtraDBVersion CRD objects",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersion"),
+										Ref: ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersion"),
 									},
 								},
 							},
@@ -16959,15 +16966,15 @@ func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionList(ref common.Ref
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersion"},
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersion"},
 	}
 }
 
-func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionPodSecurityPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionPodSecurityPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PerconaVersionPodSecurityPolicy is the Percona pod security policies",
+				Description: "PerconaXtraDBVersionPodSecurityPolicy is the PerconaXtraDB pod security policies",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"databasePolicyName": {
@@ -16983,11 +16990,11 @@ func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionPodSecurityPolicy(r
 	}
 }
 
-func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionProxysql(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionProxysql(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PerconaVersionProxysql is the proxysql image",
+				Description: "PerconaXtraDBVersionProxysql is the proxysql image",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"image": {
@@ -17003,11 +17010,11 @@ func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionProxysql(ref common
 	}
 }
 
-func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_apimachinery_apis_catalog_v1alpha1_PerconaXtraDBVersionSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PerconaVersionSpec is the spec for Percona version",
+				Description: "PerconaXtraDBVersionSpec is the spec for PerconaXtraDB version",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"version": {
@@ -17020,19 +17027,19 @@ func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionSpec(ref common.Ref
 					"db": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Database Image",
-							Ref:         ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionDatabase"),
+							Ref:         ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionDatabase"),
 						},
 					},
 					"proxysql": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Proxysql Image",
-							Ref:         ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionProxysql"),
+							Ref:         ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionProxysql"),
 						},
 					},
 					"exporter": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Exporter Image",
-							Ref:         ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionExporter"),
+							Ref:         ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionExporter"),
 						},
 					},
 					"deprecated": {
@@ -17045,13 +17052,13 @@ func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionSpec(ref common.Ref
 					"initContainer": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Init container Image",
-							Ref:         ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionInitContainer"),
+							Ref:         ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionInitContainer"),
 						},
 					},
 					"podSecurityPolicies": {
 						SchemaProps: spec.SchemaProps{
 							Description: "PSP names",
-							Ref:         ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionPodSecurityPolicy"),
+							Ref:         ref("kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionPodSecurityPolicy"),
 						},
 					},
 				},
@@ -17059,7 +17066,7 @@ func schema_apimachinery_apis_catalog_v1alpha1_PerconaVersionSpec(ref common.Ref
 			},
 		},
 		Dependencies: []string{
-			"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionDatabase", "kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionExporter", "kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionInitContainer", "kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionPodSecurityPolicy", "kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaVersionProxysql"},
+			"kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionDatabase", "kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionExporter", "kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionInitContainer", "kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionPodSecurityPolicy", "kubedb.dev/apimachinery/apis/catalog/v1alpha1.PerconaXtraDBVersionProxysql"},
 	}
 }
 

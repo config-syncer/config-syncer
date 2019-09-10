@@ -32,7 +32,7 @@ type MongoDBExpansion interface{}
 
 type MySQLExpansion interface{}
 
-type PerconaExpansion interface{}
+type PerconaXtraDBExpansion interface{}
 
 type PostgresExpansion interface{}
 
