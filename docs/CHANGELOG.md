@@ -17,11 +17,35 @@ aliases:
 
 # Change Log
 
+## [v0.11.0](https://github.com/appscode/kubed/tree/v0.11.0) (2019-09-10)
+[Full Changelog](https://github.com/appscode/kubed/compare/0.10.0...v0.11.0)
+
+**Closed issues:**
+
+- Feature request:  specify source namespaces via configuration \(one or all\) [\#355](https://github.com/appscode/kubed/issues/355)
+
+**Merged pull requests:**
+
+- Use v0.11.0 instead of 0.11.0 [\#365](https://github.com/appscode/kubed/pull/365) ([tamalsaha](https://github.com/tamalsaha))
+- Prepare docs for 0.11.0 release  [\#364](https://github.com/appscode/kubed/pull/364) ([tamalsaha](https://github.com/tamalsaha))
+- Use osm package from kmodules.xyz/objectstore-api [\#362](https://github.com/appscode/kubed/pull/362) ([tamalsaha](https://github.com/tamalsaha))
+- Fix nil pointer exception [\#361](https://github.com/appscode/kubed/pull/361) ([tamalsaha](https://github.com/tamalsaha))
+- Update dependencies [\#360](https://github.com/appscode/kubed/pull/360) ([tamalsaha](https://github.com/tamalsaha))
+- Add Makefile [\#359](https://github.com/appscode/kubed/pull/359) ([tamalsaha](https://github.com/tamalsaha))
+- Implementation of  \#355.  [\#356](https://github.com/appscode/kubed/pull/356) ([gralfca](https://github.com/gralfca))
+- Use absolute path as aliases for reference docs [\#353](https://github.com/appscode/kubed/pull/353) ([tamalsaha](https://github.com/tamalsaha))
+- Update to k8s 1.14.0 client libraries using go.mod [\#352](https://github.com/appscode/kubed/pull/352) ([tamalsaha](https://github.com/tamalsaha))
+- Update go-notify & envconfig packages [\#350](https://github.com/appscode/kubed/pull/350) ([tamalsaha](https://github.com/tamalsaha))
+- Add notifier secret to chart [\#349](https://github.com/appscode/kubed/pull/349) ([tamalsaha](https://github.com/tamalsaha))
+- Remove notifier instructions for Hipchat and Stride [\#348](https://github.com/appscode/kubed/pull/348) ([tamalsaha](https://github.com/tamalsaha))
+- Use Backend api objects from kmodules/objectstore-api. [\#347](https://github.com/appscode/kubed/pull/347) ([tamalsaha](https://github.com/tamalsaha))
+
 ## [0.10.0](https://github.com/appscode/kubed/tree/0.10.0) (2019-04-23)
 [Full Changelog](https://github.com/appscode/kubed/compare/0.9.0...0.10.0)
 
 **Merged pull requests:**
 
+- Prepare docs for 0.10.0 release [\#345](https://github.com/appscode/kubed/pull/345) ([tamalsaha](https://github.com/tamalsaha))
 - Update Kubernetes client libraries to 1.13.5 [\#344](https://github.com/appscode/kubed/pull/344) ([tamalsaha](https://github.com/tamalsaha))
 - Improved code style and saying hello to good practices! [\#342](https://github.com/appscode/kubed/pull/342) ([AnikHasibul](https://github.com/AnikHasibul))
 - Update Kubernetes client libraries to 1.13.0 [\#341](https://github.com/appscode/kubed/pull/341) ([tamalsaha](https://github.com/tamalsaha))
