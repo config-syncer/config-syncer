@@ -2,13 +2,13 @@
 title: Event Forwarder
 description: Event Forwarder
 menu:
-  product_kubed_v0.11.0:
+  product_kubed_{{ .version }}:
     identifier: event-forwarder
     name: Event Forwarder
     parent: cluster-events
     weight: 10
 product_name: kubed
-menu_name: product_kubed_v0.11.0
+menu_name: product_kubed_{{ .version }}
 section_menu_id: guides
 ---
 
