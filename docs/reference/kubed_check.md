@@ -1,12 +1,12 @@
 ---
 title: Kubed Check
 menu:
-  product_kubed_v0.11.0:
+  product_kubed_{{ .version }}:
     identifier: kubed-check
     name: Kubed Check
     parent: reference
 product_name: kubed
-menu_name: product_kubed_v0.11.0
+menu_name: product_kubed_{{ .version }}
 section_menu_id: reference
 ---
 ## kubed check

@@ -2,17 +2,17 @@
 title: Configuration Syncer | Kubernetes
 description: Configuration Syncer for Kubernetes Clusters
 menu:
-  product_kubed_v0.11.0:
+  product_kubed_{{ .version }}:
     identifier: readme-config-syncer
     name: Overview
     parent: config-syncer
     weight: -1
 product_name: kubed
-menu_name: product_kubed_v0.11.0
+menu_name: product_kubed_{{ .version }}
 section_menu_id: guides
-url: /products/kubed/v0.11.0/guides/config-syncer/
+url: /products/kubed/{{ .version }}/guides/config-syncer/
 aliases:
-  - /products/kubed/v0.11.0/guides/config-syncer/README
+  - /products/kubed/{{ .version }}/guides/config-syncer/README
 ---
 
 # Configuration Syncer

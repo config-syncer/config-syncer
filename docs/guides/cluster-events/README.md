@@ -2,17 +2,17 @@
 title: Cluster Events | Kubernetes
 description: Cluster Events for Kubernetes Clusters
 menu:
-  product_kubed_v0.11.0:
+  product_kubed_{{ .version }}:
     identifier: readme-cluster-events
     name: Overview
     parent: cluster-events
     weight: -1
 product_name: kubed
-menu_name: product_kubed_v0.11.0
+menu_name: product_kubed_{{ .version }}
 section_menu_id: guides
-url: /products/kubed/v0.11.0/guides/cluster-events/
+url: /products/kubed/{{ .version }}/guides/cluster-events/
 aliases:
-  - /products/kubed/v0.11.0/guides/cluster-events/README
+  - /products/kubed/{{ .version }}/guides/cluster-events/README
 ---
 
 # Cluster Events

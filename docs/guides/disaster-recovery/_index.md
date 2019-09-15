@@ -2,10 +2,10 @@
 title: Disaster Recovery | Kubernetes
 description: Disaster Recovery for Kubernetes
 menu:
-  product_kubed_v0.11.0:
+  product_kubed_{{ .version }}:
     identifier: disaster-recovery
     parent: guides
     name: Disaster Recovery
     weight: 10
-menu_name: product_kubed_v0.11.0
+menu_name: product_kubed_{{ .version }}
 ---
