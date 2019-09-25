@@ -207,13 +207,12 @@ container: bin/.container-$(DOTFILE_IMAGE)-PROD bin/.container-$(DOTFILE_IMAGE)-
 bin/.container-$(DOTFILE_IMAGE)-%: bin/$(OS)_$(ARCH)/$(BIN) $(DOCKERFILE_%)
 	@echo "container: $(IMAGE):$(TAG_$*)"
 	@sed                                    \
-	    -e 's|{ARG_BIN}|$(BIN)|g'           \
-	    -e 's|{ARG_ARCH}|$(ARCH)|g'         \
-	    -e 's|{ARG_OS}|$(OS)|g'             \
-	    -e 's|{ARG_FROM}|$(BASEIMAGE_$*)|g' \
-	    -e 's|{OSM_VER}|$(OSM_VER)|g'       \
-	    $(DOCKERFILE_$*) > bin/.dockerfile-$*-$(OS)_$(ARCH)
-	@docker build --pull -t $(IMAGE):$(TAG_$*) -f bin/.dockerfile-$*-$(OS)_$(ARCH) .
+		-e 's|{ARG_BIN}|$(BIN)|g'           \
+		-e 's|{ARG_ARCH}|$(ARCH)|g'         \
+		-e 's|{ARG_OS}|$(OS)|g'             \
+		-e 's|{ARG_FROM}|$(BASEIMAGE_$*)|g' \
+		$(DOCKERFILE_$*) > bin/.dockerfile-$*-$(OS)_$(ARCH)
+	@DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform $(OS)/$(ARCH) --load --pull -t $(IMAGE):$(TAG_$*) -f bin/.dockerfile-$*-$(OS)_$(ARCH) .
 	@docker images -q $(IMAGE):$(TAG_$*) > $@
 	@echo
 
