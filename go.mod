@@ -7,7 +7,6 @@ require (
 	github.com/NYTimes/gziphandler v1.1.1 // indirect
 	github.com/appscode/go v0.0.0-20191119085241-0887d8ec2ecc
 	github.com/blang/semver v3.5.1+incompatible // indirect
-	github.com/codeskyblue/go-sh v0.0.0-20190412065543-76bd3d59ff27
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
 	github.com/docker/spdystream v0.0.0-20181023171402-6480d4af844c // indirect
@@ -39,6 +38,7 @@ require (
 	github.com/spf13/afero v1.2.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.3
+	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5 // indirect
 	github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 // indirect
 	go.uber.org/atomic v1.4.0 // indirect
@@ -47,10 +47,8 @@ require (
 	golang.org/x/sys v0.0.0-20190801041406-cbf593c0f2f3 // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
 	gomodules.xyz/cert v1.0.2
-	gomodules.xyz/envconfig v1.3.0
-	gomodules.xyz/stow v0.2.3
-	google.golang.org/api v0.7.0 // indirect
 	google.golang.org/genproto v0.0.0-20190508193815-b515fa19cec8 // indirect
+	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	k8s.io/api v0.0.0-20191114100352-16d7abae0d2a
 	k8s.io/apiextensions-apiserver v0.0.0-20191114105449-027877536833
@@ -60,9 +58,6 @@ require (
 	k8s.io/kube-aggregator v0.0.0-20191114103820-f023614fb9ea
 	k8s.io/kube-openapi v0.0.0-20190816220812-743ec37842bf
 	kmodules.xyz/client-go v0.0.0-20191219184245-880ab4b0e5db
-	kmodules.xyz/objectstore-api v0.0.0-20191127144749-5881939b57f0
-	kmodules.xyz/openshift v0.0.0-20191127145035-f6c48a90dbb7 // indirect
-	kmodules.xyz/webhook-runtime v0.0.0-20191127075323-d4bfdee6974d
 )
 
 replace (

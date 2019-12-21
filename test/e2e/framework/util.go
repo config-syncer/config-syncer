@@ -26,6 +26,7 @@ import (
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	kutil "kmodules.xyz/client-go"
 	"kmodules.xyz/client-go/tools/exec"
 )
 
@@ -44,7 +45,7 @@ func deleteInForeground() *metav1.DeleteOptions {
 }
 
 func (fi *Invocation) WaitUntilDeploymentReady(meta metav1.ObjectMeta) error {
-	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
+	return wait.PollImmediate(kutil.RetryInterval, kutil.ReadinessTimeout, func() (done bool, err error) {
 		if obj, err := fi.KubeClient.AppsV1().Deployments(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err == nil {
 			return types.Int32(obj.Spec.Replicas) == obj.Status.ReadyReplicas, nil
 		}
@@ -53,7 +54,7 @@ func (fi *Invocation) WaitUntilDeploymentReady(meta metav1.ObjectMeta) error {
 }
 
 func (fi *Invocation) WaitUntilDeploymentTerminated(meta metav1.ObjectMeta) error {
-	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
+	return wait.PollImmediate(kutil.RetryInterval, kutil.GCTimeout, func() (done bool, err error) {
 		if pods, err := fi.KubeClient.CoreV1().Pods(meta.Namespace).List(metav1.ListOptions{}); err == nil {
 			return len(pods.Items) == 0, nil
 		}

@@ -76,7 +76,7 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 
 	// sync to contexts specified via annotation, do not ignore errors here
 	for _, ctx := range contexts.List() {
-		context, _ := s.contexts[ctx]
+		context := s.contexts[ctx]
 		if context.Namespace == "" { // use source namespace if not specified via context
 			context.Namespace = src.Namespace
 		}
@@ -102,8 +102,8 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 
 // upsert into newNs set, delete from (oldNs-newNs) set
 // use skipSrcNs = true for sync in source cluster
-func (s *ConfigSyncer) syncConfigMapIntoNamespaces(k8sClient kubernetes.Interface, src *core.ConfigMap, newNs sets.String, skipSrcNs bool, context string) error {
-	oldNs, err := namespaceSetForConfigMapSelector(k8sClient, s.syncerLabelSelector(src.Name, src.Namespace, s.clusterName))
+func (s *ConfigSyncer) syncConfigMapIntoNamespaces(kc kubernetes.Interface, src *core.ConfigMap, newNs sets.String, skipSrcNs bool, context string) error {
+	oldNs, err := namespaceSetForConfigMapSelector(kc, s.syncerLabelSelector(src.Name, src.Namespace, s.clusterName))
 	if err != nil {
 		return err
 	}
@@ -113,12 +113,12 @@ func (s *ConfigSyncer) syncConfigMapIntoNamespaces(k8sClient kubernetes.Interfac
 		newNs.Delete(src.Namespace)
 	}
 	for _, ns := range oldNs.List() {
-		if err := k8sClient.CoreV1().ConfigMaps(ns).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
+		if err := kc.CoreV1().ConfigMaps(ns).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
 			return err
 		}
 	}
 	for _, ns := range newNs.List() {
-		if err = s.upsertConfigMap(k8sClient, src, ns, context); err != nil {
+		if err = s.upsertConfigMap(kc, src, ns, context); err != nil {
 			return err
 		}
 	}
@@ -138,12 +138,12 @@ func (s *ConfigSyncer) syncConfigMapIntoNewNamespace(src *core.ConfigMap, namesp
 	return nil
 }
 
-func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core.ConfigMap, namespace, context string) error {
+func (s *ConfigSyncer) upsertConfigMap(kc kubernetes.Interface, src *core.ConfigMap, namespace, context string) error {
 	meta := metav1.ObjectMeta{
 		Name:      src.Name,
 		Namespace: namespace,
 	}
-	_, _, err := core_util.CreateOrPatchConfigMap(k8sClient, meta, func(obj *core.ConfigMap) *core.ConfigMap {
+	_, _, err := core_util.CreateOrPatchConfigMap(kc, meta, func(obj *core.ConfigMap) *core.ConfigMap {
 		// check origin cluster, if not match overwrite and create an event
 		if v, ok := obj.Labels[api.OriginClusterLabelKey]; ok && v != s.clusterName {
 			s.recorder.Eventf(
@@ -173,8 +173,8 @@ func (s *ConfigSyncer) upsertConfigMap(k8sClient kubernetes.Interface, src *core
 	return err
 }
 
-func namespaceSetForConfigMapSelector(k8sClient kubernetes.Interface, selector string) (sets.String, error) {
-	cfgMaps, err := k8sClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
+func namespaceSetForConfigMapSelector(kc kubernetes.Interface, selector string) (sets.String, error) {
+	cfgMaps, err := kc.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {

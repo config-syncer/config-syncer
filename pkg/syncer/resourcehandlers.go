@@ -22,6 +22,7 @@ import (
 	"github.com/appscode/go/log"
 
 	core "k8s.io/api/core/v1"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -176,7 +177,7 @@ func (s *nsSyncer) OnAdd(obj interface{}) {
 	}
 
 	if res, ok := obj.(*core.Namespace); ok {
-		s.SyncIntoNamespace(res.Name)
+		utilruntime.Must(s.SyncIntoNamespace(res.Name))
 	}
 }
 
@@ -191,7 +192,7 @@ func (s *nsSyncer) OnUpdate(oldObj, newObj interface{}) {
 	old := oldObj.(*core.Namespace)
 	nu := newObj.(*core.Namespace)
 	if !reflect.DeepEqual(old.Labels, nu.Labels) {
-		s.SyncIntoNamespace(nu.Name)
+		utilruntime.Must(s.SyncIntoNamespace(nu.Name))
 	}
 }
 

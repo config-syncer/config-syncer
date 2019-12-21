@@ -17,7 +17,6 @@ limitations under the License.
 package server
 
 import (
-	"github.com/appscode/kubed/apis/kubed/install"
 	"github.com/appscode/kubed/pkg/operator"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,7 +33,7 @@ var (
 )
 
 func init() {
-	install.Install(Scheme)
+	// install.Install(Scheme)
 
 	// we need to add the options to empty v1
 	// TODO fix the server code to avoid this

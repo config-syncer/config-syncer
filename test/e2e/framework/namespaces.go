@@ -50,19 +50,19 @@ func (f *Framework) NewNamespace(name string) *core.Namespace {
 		},
 	}
 }
-func (f *Invocation) NewNamespaceWithLabel() *core.Namespace {
+func (fi *Invocation) NewNamespaceWithLabel() *core.Namespace {
 	return &core.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: rand.WithUniqSuffix("kubed-e2e-labeled"),
 			Labels: map[string]string{
-				"app": f.App(),
+				"app": fi.App(),
 			},
 		},
 	}
 }
 
-func (f *Invocation) NumberOfNameSpace() int {
-	ns, err := f.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
+func (fi *Invocation) NumberOfNameSpace() int {
+	ns, err := fi.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
 	Expect(err).NotTo(HaveOccurred())
 	return len(ns.Items)
 }
@@ -82,14 +82,14 @@ func (f *Framework) EventuallyNamespaceDeleted(ns string) GomegaAsyncAssertion {
 	})
 }
 
-func (f *Invocation) EnsureNamespaceForContext(kubeConfigPath string, context string) {
+func (fi *Invocation) EnsureNamespaceForContext(kubeConfigPath string, context string) {
 	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 
 	if ns == "" {
-		ns = f.Namespace()
+		ns = fi.Namespace()
 	}
 
 	_, err = client.CoreV1().Namespaces().Get(ns, metav1.GetOptions{})
@@ -108,14 +108,14 @@ func (f *Invocation) EnsureNamespaceForContext(kubeConfigPath string, context st
 	}
 }
 
-func (f *Invocation) DeleteNamespaceForContext(kubeConfigPath string, context string) {
+func (fi *Invocation) DeleteNamespaceForContext(kubeConfigPath string, context string) {
 	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 
 	if ns == "" {
-		ns = f.Namespace()
+		ns = fi.Namespace()
 	}
 
 	err = client.CoreV1().Namespaces().Delete(ns, &metav1.DeleteOptions{})

@@ -48,7 +48,6 @@ func NewCmdKubed(version string) *cobra.Command {
 	stopCh := genericapiserver.SetupSignalHandler()
 	cmd.AddCommand(NewCmdRun(os.Stdout, os.Stderr, stopCh))
 	cmd.AddCommand(NewCmdBackup())
-	cmd.AddCommand(NewCmdCheck())
 	cmd.AddCommand(v.NewCmdVersion())
 
 	return cmd

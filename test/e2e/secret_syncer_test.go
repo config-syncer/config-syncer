@@ -18,7 +18,6 @@ package e2e_test
 
 import (
 	"os"
-	"time"
 
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/test/e2e/framework"
@@ -37,7 +36,6 @@ var _ = Describe("Secret-Syncer", func() {
 		f             *framework.Invocation
 		secret        *core.Secret
 		nsWithLabel   *core.Namespace
-		stopCh        chan struct{}
 		clusterConfig api.ClusterConfig
 	)
 
@@ -48,26 +46,12 @@ var _ = Describe("Secret-Syncer", func() {
 	})
 
 	JustBeforeEach(func() {
-		if f.SelfHostedOperator {
-			By("Restarting kubed operator")
-			err := f.RestartKubedOperator(&clusterConfig)
-			Expect(err).NotTo(HaveOccurred())
-		} else {
-			By("Starting Kubed")
-			stopCh = make(chan struct{})
-			err := f.RunKubed(stopCh, clusterConfig)
-			Expect(err).NotTo(HaveOccurred())
-
-			By("Waiting for API server to be ready")
-			root.EventuallyAPIServerReady().Should(Succeed())
-			time.Sleep(time.Second * 5)
-		}
+		By("Restarting kubed operator")
+		err := f.RestartKubedOperator(&clusterConfig)
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
-		if !f.SelfHostedOperator {
-			close(stopCh)
-		}
 		f.DeleteAllSecrets()
 
 		err := f.KubeClient.CoreV1().Namespaces().Delete(nsWithLabel.Name, &metav1.DeleteOptions{})
@@ -328,7 +312,7 @@ var _ = Describe("Secret-Syncer", func() {
 				f.EventuallyNumOfConfigmapsForContext(kubeConfigPath, context).Should(BeNumerically("==", 1))
 
 				By("Removing sync annotation")
-				secret, _, err = core_util.PatchSecret(f.KubeClient, secret, func(obj *core.Secret) *core.Secret {
+				_, _, err = core_util.PatchSecret(f.KubeClient, secret, func(obj *core.Secret) *core.Secret {
 					obj.Annotations = meta.RemoveKey(obj.Annotations, api.ConfigSyncContexts)
 					return obj
 				})

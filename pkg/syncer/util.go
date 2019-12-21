@@ -49,8 +49,8 @@ func GetSyncOptions(annotations map[string]string) SyncOptions {
 	return opts
 }
 
-func NamespacesForSelector(kubeClient kubernetes.Interface, selector string) (sets.String, error) {
-	namespaces, err := kubeClient.CoreV1().Namespaces().List(metav1.ListOptions{
+func NamespacesForSelector(kc kubernetes.Interface, selector string) (sets.String, error) {
+	namespaces, err := kc.CoreV1().Namespaces().List(metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {

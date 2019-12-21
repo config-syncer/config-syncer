@@ -52,7 +52,7 @@ endif
 ### These variables should not need tweaking.
 ###
 
-SRC_PKGS := api apis client pkg *.go # directories which hold app source excluding tests (not vendored)
+SRC_PKGS := api apis pkg *.go # directories which hold app source excluding tests (not vendored)
 SRC_DIRS := $(SRC_PKGS) test hack # directories which hold app source (not vendored)
 
 DOCKER_PLATFORMS := linux/amd64 linux/arm linux/arm64
@@ -385,25 +385,23 @@ endif
 .PHONY: install
 install:
 	@cd ../installer; \
-	helm install vault-operator charts/vault-operator \
+	helm install kubed charts/kubed \
 		--namespace=kube-system \
 		--set operator.registry=$(REGISTRY) \
 		--set operator.tag=$(TAG) \
 		--set imagePullPolicy=Always \
 		$(IMAGE_PULL_SECRETS); \
-	kubectl wait --for=condition=Ready pods -n kube-system -l app=vault-operator --timeout=5m; \
-	kubectl wait --for=condition=Available apiservice -l app=vault-operator --timeout=5m; \
-	helm install vault-catalog charts/vault-catalog --namespace=kube-system
+	kubectl wait --for=condition=Ready pods -n kube-system -l app=kubed --timeout=5m; \
+	kubectl wait --for=condition=Available apiservice -l app=kubed --timeout=5m
 
 .PHONY: uninstall
 uninstall:
 	@cd ../installer; \
-	helm uninstall vault-operator --namespace=kube-system || true; \
-	helm uninstall vault-catalog --namespace=kube-system || true
+	helm uninstall kubed --namespace=kube-system || true
 
 .PHONY: purge
 purge: uninstall
-	kubectl delete crds -l app=kubevault
+	true
 
 .PHONY: dev
 dev: gen fmt push
@@ -484,7 +482,7 @@ clean:
 
 .PHONY: run
 run:
-	GO111MODULE=on go run -mod=vendor ./cmd/vault-operator run \
+	GO111MODULE=on go run -mod=vendor ./cmd/kubed run \
 		--v=3 \
 		--secure-port=8443 \
 		--kubeconfig=$(KUBECONFIG) \

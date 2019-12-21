@@ -65,7 +65,9 @@ func (c *OperatorConfig) New() (*Operator, error) {
 	op.recorder = eventer.NewEventRecorder(op.KubeClient, "kubed")
 	op.configSyncer = syncer.New(op.KubeClient, op.recorder)
 
-	op.Configure()
+	if err := op.Configure(); err != nil {
+		return nil, err
+	}
 
 	op.watcher = &fsnotify.Watcher{
 		WatchDir: filepath.Dir(c.ConfigPath),

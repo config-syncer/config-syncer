@@ -34,7 +34,9 @@ func LoadConfig(configPath string) (*ClusterConfig, error) {
 	if _, err := os.Stat(configPath); err != nil {
 		return nil, errors.Errorf("failed to find file %s. Reason: %s", configPath, err)
 	}
-	os.Chmod(configPath, 0600)
+	if err := os.Chmod(configPath, 0600); err != nil {
+		return nil, err
+	}
 
 	cfg := &ClusterConfig{}
 	bytes, err := ioutil.ReadFile(configPath)
@@ -54,7 +56,10 @@ func (cfg ClusterConfig) Save(configPath string) error {
 	if err != nil {
 		return err
 	}
-	os.MkdirAll(filepath.Dir(configPath), 0755)
+	err = os.MkdirAll(filepath.Dir(configPath), 0755)
+	if err != nil {
+		return err
+	}
 	if err := ioutil.WriteFile(configPath, data, 0600); err != nil {
 		return err
 	}
