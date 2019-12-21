@@ -11,9 +11,12 @@ rules:
   - configmaps
   - secrets
   verbs: ["get", "create", "patch", "delete"]
-- apiGroups:
-    - ""
+- apiGroups: [""]
   resources:
     - namespaces
   verbs: ["get"]
+- apiGroups: [""]
+  resources:
+  - nodes
+  verbs: ["list"]
 {{ end }}
