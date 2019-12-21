@@ -1,3 +1,19 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package e2e_test
 
 import (
@@ -7,17 +23,12 @@ import (
 
 	logs "github.com/appscode/go/log/golog"
 	"github.com/appscode/kubed/test/e2e/framework"
-	searchlightcheme "github.com/appscode/searchlight/client/clientset/versioned/scheme"
-	voyagerscheme "github.com/appscode/voyager/client/clientset/versioned/scheme"
+
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/reporters"
 	. "github.com/onsi/gomega"
 	rbac "k8s.io/api/rbac/v1"
-	clientsetscheme "k8s.io/client-go/kubernetes/scheme"
 	"kmodules.xyz/client-go/tools/clientcmd"
-	prom_util "kmodules.xyz/monitoring-agent-api/prometheus/v1"
-	kubedbscheme "kubedb.dev/apimachinery/client/clientset/versioned/scheme"
-	stashscheme "stash.appscode.dev/stash/client/clientset/versioned/scheme"
 )
 
 const TestTimeout = 3 * time.Minute
@@ -37,12 +48,6 @@ func TestE2E(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	voyagerscheme.AddToScheme(clientsetscheme.Scheme)
-	searchlightcheme.AddToScheme(clientsetscheme.Scheme)
-	stashscheme.AddToScheme(clientsetscheme.Scheme)
-	kubedbscheme.AddToScheme(clientsetscheme.Scheme)
-	prom_util.AddToScheme(clientsetscheme.Scheme)
-
 	clientConfig, err := clientcmd.BuildConfigFromContext(options.KubeConfig, options.KubeContext)
 	Expect(err).NotTo(HaveOccurred())
 

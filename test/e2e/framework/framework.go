@@ -1,3 +1,19 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package framework
 
 import (
@@ -6,23 +22,14 @@ import (
 	"time"
 
 	"github.com/appscode/go/crypto/rand"
-	kcs "github.com/appscode/kubed/client/clientset/versioned"
-	sls "github.com/appscode/searchlight/client/clientset/versioned"
-	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
-	vcs "github.com/appscode/voyager/client/clientset/versioned"
-	prom "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
-	pcs "github.com/coreos/prometheus-operator/pkg/client/versioned"
+
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
 	"gomodules.xyz/cert/certstore"
 	extensionsobj "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	ecs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	ka "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
-	kdbcs "kubedb.dev/apimachinery/client/clientset/versioned"
-	scs "stash.appscode.dev/stash/client/clientset/versioned"
 )
 
 const (
@@ -35,14 +42,6 @@ const (
 
 type Framework struct {
 	KubeClient         clientset.Interface
-	KubedClient        kcs.Interface
-	KAClient           ka.Interface
-	VoyagerClient      vcs.Interface
-	SearchlightClient  srch_cs.Interface
-	StashClient        scs.Interface
-	KubeDBClient       kdbcs.Interface
-	PromClient         pcs.Interface
-	crdClient          ecs.ApiextensionsV1beta1Interface
 	namespace          string
 	Mutex              sync.Mutex
 	CertStore          *certstore.CertStore
@@ -52,9 +51,6 @@ type Framework struct {
 }
 
 func New(config *rest.Config) *Framework {
-	promClient, err := pcs.NewForConfig(config)
-	Expect(err).NotTo(HaveOccurred())
-
 	store, err := certstore.NewCertStore(afero.NewMemMapFs(), filepath.Join("", "pki"))
 	Expect(err).NotTo(HaveOccurred())
 
@@ -64,17 +60,9 @@ func New(config *rest.Config) *Framework {
 	return &Framework{
 		namespace: rand.WithUniqSuffix("test-kubed"),
 
-		ClientConfig:      config,
-		KubeClient:        clientset.NewForConfigOrDie(config),
-		KAClient:          ka.NewForConfigOrDie(config),
-		KubedClient:       kcs.NewForConfigOrDie(config),
-		crdClient:         ecs.NewForConfigOrDie(config),
-		CertStore:         store,
-		StashClient:       scs.NewForConfigOrDie(config),
-		VoyagerClient:     vcs.NewForConfigOrDie(config),
-		SearchlightClient: sls.NewForConfigOrDie(config),
-		KubeDBClient:      kdbcs.NewForConfigOrDie(config),
-		PromClient:        promClient,
+		ClientConfig: config,
+		KubeClient:   clientset.NewForConfigOrDie(config),
+		CertStore:    store,
 	}
 }
 

@@ -1,3 +1,19 @@
+/*
+Copyright The Kmodules Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package discovery
 
 import (
@@ -78,6 +94,7 @@ func (e *KnownBug) Error() string {
 
 var err62649_K1_9 = &KnownBug{URL: "https://github.com/kubernetes/kubernetes/pull/62649", Fix: "upgrade to Kubernetes 1.9.8 or later."}
 var err62649_K1_10 = &KnownBug{URL: "https://github.com/kubernetes/kubernetes/pull/62649", Fix: "upgrade to Kubernetes 1.10.2 or later."}
+var err83778_K1_16 = &KnownBug{URL: "https://github.com/kubernetes/kubernetes/pull/83787", Fix: "upgrade to Kubernetes 1.16.2 or later."}
 
 var (
 	DefaultConstraint                     = ">= 1.9.0"
@@ -93,6 +110,8 @@ var (
 		"1.9.7":  err62649_K1_9,
 		"1.10.0": err62649_K1_10,
 		"1.10.1": err62649_K1_10,
+		"1.16.0": err83778_K1_16,
+		"1.16.1": err83778_K1_16,
 	}
 )
 

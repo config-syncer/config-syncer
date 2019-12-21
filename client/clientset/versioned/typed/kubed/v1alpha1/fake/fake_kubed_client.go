@@ -20,6 +20,7 @@ package fake
 
 import (
 	v1alpha1 "github.com/appscode/kubed/client/clientset/versioned/typed/kubed/v1alpha1"
+
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )

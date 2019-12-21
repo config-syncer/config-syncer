@@ -1,15 +1,30 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package server
 
 import (
 	"github.com/appscode/kubed/apis/kubed/install"
-	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/operator"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/version"
-	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 )
 
@@ -91,15 +106,6 @@ func (c completedConfig) New() (*KubedServer, error) {
 	s := &KubedServer{
 		GenericAPIServer: genericServer,
 		Operator:         operator,
-	}
-
-	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(api.GroupName, Scheme, metav1.ParameterCodec, Codecs)
-	v1alpha1storage := map[string]rest.Storage{}
-	v1alpha1storage["searchresults"] = operator.Indexer.NewREST()
-	apiGroupInfo.VersionedResourcesStorageMap["v1alpha1"] = v1alpha1storage
-
-	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {
-		return nil, err
 	}
 
 	return s, nil

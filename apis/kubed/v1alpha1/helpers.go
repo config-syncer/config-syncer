@@ -1,16 +1,31 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package v1alpha1
 
 import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	yc "github.com/appscode/go/encoding/yaml"
+
 	"github.com/ghodss/yaml"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
-	store "kmodules.xyz/objectstore-api/api/v1"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -44,114 +59,4 @@ func (cfg ClusterConfig) Save(configPath string) error {
 		return err
 	}
 	return nil
-}
-
-func (cfg ClusterConfig) Validate() error {
-	if cfg.EventForwarder != nil {
-		if cfg.EventForwarder.NodeAdded != nil {
-			return errors.Errorf("convert `nodeAdded` spec to eventForwarder.rules format")
-		}
-		if cfg.EventForwarder.StorageAdded != nil {
-			return errors.Errorf("convert `storageAdded` spec to eventForwarder.rules format")
-		}
-		if cfg.EventForwarder.IngressAdded != nil {
-			return errors.Errorf("convert `ingressAdded` spec to eventForwarder.rules format")
-		}
-		if cfg.EventForwarder.WarningEvents != nil {
-			return errors.Errorf("convert `warningEvents` spec to eventForwarder.rules format")
-		}
-		if cfg.EventForwarder.CSREvents != nil {
-			return errors.Errorf("convert `csrEvents` spec to eventForwarder.rules format")
-		}
-
-		for i, rule := range cfg.EventForwarder.Rules {
-			for j, op := range rule.Operations {
-				if op != Create && op != Delete {
-					return errors.Errorf("unknown operation %s found at eventForwarder.rules[%d].operations[%d]", op, i, j)
-				}
-			}
-		}
-	}
-
-	for _, j := range cfg.Janitors {
-		switch j.Kind {
-		case JanitorElasticsearch:
-			if j.Elasticsearch == nil {
-				return errors.Errorf("missing spec for janitor kind %s", j.Kind)
-			}
-		case JanitorInfluxDB:
-			if j.InfluxDB == nil {
-				return errors.Errorf("missing spec for janitor kind %s", j.Kind)
-			}
-		default:
-			return errors.Errorf("unknown janitor kind %s", j.Kind)
-		}
-	}
-	return nil
-}
-
-func (b SnapshotSpec) Location(filename string) (string, error) {
-	ts := filename
-	if b.Overwrite {
-		ts = "snapshot.tar.gz"
-	}
-	if b.S3 != nil {
-		return filepath.Join(b.S3.Prefix, ts), nil
-	} else if b.GCS != nil {
-		return filepath.Join(b.GCS.Prefix, ts), nil
-	} else if b.Azure != nil {
-		return filepath.Join(b.Azure.Prefix, ts), nil
-	} else if b.Local != nil {
-		return ts, nil
-	} else if b.Swift != nil {
-		return filepath.Join(b.Swift.Prefix, ts), nil
-	}
-	return "", errors.New("no storage provider is configured")
-}
-
-func Container(b store.Backend) (string, error) {
-	if b.S3 != nil {
-		return b.S3.Bucket, nil
-	} else if b.GCS != nil {
-		return b.GCS.Bucket, nil
-	} else if b.Azure != nil {
-		return b.Azure.Container, nil
-	} else if b.Local != nil {
-		return b.Local.MountPath, nil
-	} else if b.Swift != nil {
-		return b.Swift.Container, nil
-	}
-	return "", errors.New("no storage provider is configured")
-}
-
-func GetBucketAndPrefix(b store.Backend) (string, string, error) {
-	if b.S3 != nil {
-		return b.S3.Bucket, b.S3.Prefix, nil
-	} else if b.GCS != nil {
-		return b.GCS.Bucket, b.GCS.Prefix, nil
-	} else if b.Azure != nil {
-		return b.Azure.Container, b.Azure.Prefix, nil
-	} else if b.Swift != nil {
-		return b.Swift.Container, b.Swift.Prefix, nil
-	} else if b.Local != nil {
-		return b.Local.MountPath, "", nil
-	}
-	return "", "", errors.New("unknown backend type")
-}
-
-func LoadJanitorAuthInfo(data map[string][]byte) *JanitorAuthInfo {
-	if data == nil {
-		return &JanitorAuthInfo{}
-	}
-	insecureSkipVerify, _ := strconv.ParseBool(string(data["INSECURE_SKIP_VERIFY"]))
-
-	return &JanitorAuthInfo{
-		CACertData:         data["CA_CERT_DATA"],
-		ClientCertData:     data["CLIENT_CERT_DATA"],
-		ClientKeyData:      data["CLIENT_KEY_DATA"],
-		InsecureSkipVerify: insecureSkipVerify,
-		Username:           string(data["USERNAME"]),
-		Password:           string(data["PASSWORD"]),
-		Token:              string(data["TOKEN"]),
-	}
 }

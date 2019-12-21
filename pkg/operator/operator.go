@@ -1,3 +1,19 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package operator
 
 import (
@@ -9,37 +25,15 @@ import (
 
 	"github.com/appscode/go/log"
 	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-	es "github.com/appscode/kubed/pkg/elasticsearch"
-	"github.com/appscode/kubed/pkg/eventer"
-	influx "github.com/appscode/kubed/pkg/influxdb"
-	rbin "github.com/appscode/kubed/pkg/recyclebin"
-	indexers "github.com/appscode/kubed/pkg/registry/resource"
 	"github.com/appscode/kubed/pkg/syncer"
-	searchlight_api "github.com/appscode/searchlight/apis/monitoring/v1alpha1"
-	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
-	searchlightinformers "github.com/appscode/searchlight/client/informers/externalversions"
-	voyager_api "github.com/appscode/voyager/apis/voyager/v1beta1"
-	vcs "github.com/appscode/voyager/client/clientset/versioned"
-	voyagerinformers "github.com/appscode/voyager/client/informers/externalversions"
+
 	shell "github.com/codeskyblue/go-sh"
-	promapi "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
-	prominformers "github.com/coreos/prometheus-operator/pkg/client/informers/externalversions"
-	pcm "github.com/coreos/prometheus-operator/pkg/client/versioned"
 	"github.com/pkg/errors"
-	"github.com/robfig/cron/v3"
 	"gomodules.xyz/envconfig"
-	apps "k8s.io/api/apps/v1"
-	batch "k8s.io/api/batch/v1"
-	certificates "k8s.io/api/certificates/v1beta1"
 	core "k8s.io/api/core/v1"
-	extensions "k8s.io/api/extensions/v1beta1"
-	rbac "k8s.io/api/rbac/v1"
-	storage_v1 "k8s.io/api/storage/v1"
 	_ "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/informers"
 	core_informers "k8s.io/client-go/informers/core/v1"
@@ -48,17 +42,9 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
 	_ "kmodules.xyz/client-go/apiextensions/v1beta1"
-	"kmodules.xyz/client-go/discovery"
 	"kmodules.xyz/client-go/tools/backup"
 	"kmodules.xyz/client-go/tools/fsnotify"
-	"kmodules.xyz/client-go/tools/queue"
 	storage "kmodules.xyz/objectstore-api/osm"
-	kubedb_api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
-	kcs "kubedb.dev/apimachinery/client/clientset/versioned"
-	kubedbinformers "kubedb.dev/apimachinery/client/informers/externalversions"
-	stash_api "stash.appscode.dev/stash/apis/stash/v1alpha1"
-	scs "stash.appscode.dev/stash/client/clientset/versioned"
-	stashinformers "stash.appscode.dev/stash/client/informers/externalversions"
 )
 
 type Operator struct {
@@ -66,27 +52,13 @@ type Operator struct {
 
 	ClientConfig *rest.Config
 
-	notifierCred   envconfig.LoaderFunc
-	recorder       record.EventRecorder
-	trashCan       *rbin.RecycleBin
-	eventProcessor *eventer.EventForwarder
-	configSyncer   *syncer.ConfigSyncer
+	notifierCred envconfig.LoaderFunc
+	recorder     record.EventRecorder
+	configSyncer *syncer.ConfigSyncer
 
-	cron *cron.Cron
+	KubeClient kubernetes.Interface
 
-	KubeClient        kubernetes.Interface
-	VoyagerClient     vcs.Interface
-	SearchlightClient srch_cs.Interface
-	StashClient       scs.Interface
-	KubeDBClient      kcs.Interface
-	PromClient        pcm.Interface
-
-	kubeInformerFactory        informers.SharedInformerFactory
-	voyagerInformerFactory     voyagerinformers.SharedInformerFactory
-	stashInformerFactory       stashinformers.SharedInformerFactory
-	searchlightInformerFactory searchlightinformers.SharedInformerFactory
-	kubedbInformerFactory      kubedbinformers.SharedInformerFactory
-	promInformerFactory        prominformers.SharedInformerFactory
+	kubeInformerFactory informers.SharedInformerFactory
 
 	Indexer *indexers.ResourceIndexer
 
@@ -151,39 +123,6 @@ func (op *Operator) Configure() error {
 	return nil
 }
 
-func (op *Operator) setupWorkloadInformers() {
-	deploymentInformer := op.kubeInformerFactory.Apps().V1().Deployments().Informer()
-	op.addEventHandlers(deploymentInformer, apps.SchemeGroupVersion.WithKind("Deployment"))
-
-	rcInformer := op.kubeInformerFactory.Core().V1().ReplicationControllers().Informer()
-	op.addEventHandlers(rcInformer, core.SchemeGroupVersion.WithKind("ReplicationController"))
-
-	rsInformer := op.kubeInformerFactory.Apps().V1().ReplicaSets().Informer()
-	op.addEventHandlers(rsInformer, apps.SchemeGroupVersion.WithKind("ReplicaSet"))
-
-	daemonSetInformer := op.kubeInformerFactory.Apps().V1().DaemonSets().Informer()
-	op.addEventHandlers(daemonSetInformer, apps.SchemeGroupVersion.WithKind("DaemonSet"))
-
-	statefulSetInformer := op.kubeInformerFactory.Apps().V1().StatefulSets().Informer()
-	op.addEventHandlers(statefulSetInformer, apps.SchemeGroupVersion.WithKind("StatefulSet"))
-
-	jobInformer := op.kubeInformerFactory.Batch().V1().Jobs().Informer()
-	op.addEventHandlers(jobInformer, batch.SchemeGroupVersion.WithKind("Job"))
-
-	op.kubeInformerFactory.Core().V1().Pods().Informer()
-}
-
-func (op *Operator) setupNetworkInformers() {
-	svcInformer := op.kubeInformerFactory.Core().V1().Services().Informer()
-	op.addEventHandlers(svcInformer, core.SchemeGroupVersion.WithKind("Service"))
-
-	ingressInformer := op.kubeInformerFactory.Extensions().V1beta1().Ingresses().Informer()
-	op.addEventHandlers(ingressInformer, extensions.SchemeGroupVersion.WithKind("Ingress"))
-
-	netPolicyInformer := op.kubeInformerFactory.Networking().V1().NetworkPolicies().Informer()
-	op.addEventHandlers(netPolicyInformer, core.SchemeGroupVersion.WithKind("NetworkPolicy"))
-}
-
 func (op *Operator) setupConfigInformers() {
 	configMapInformer := op.kubeInformerFactory.InformerFor(&core.ConfigMap{}, func(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
 		return core_informers.NewFilteredConfigMapInformer(
@@ -212,145 +151,6 @@ func (op *Operator) setupConfigInformers() {
 	nsInformer := op.kubeInformerFactory.Core().V1().Namespaces().Informer()
 	op.addEventHandlers(nsInformer, core.SchemeGroupVersion.WithKind("Namespace"))
 	nsInformer.AddEventHandler(op.configSyncer.NamespaceHandler())
-}
-
-func (op *Operator) setupRBACInformers() {
-	clusterRoleInformer := op.kubeInformerFactory.Rbac().V1().ClusterRoles().Informer()
-	op.addEventHandlers(clusterRoleInformer, rbac.SchemeGroupVersion.WithKind("ClusterRole"))
-
-	clusterRoleBindingInformer := op.kubeInformerFactory.Rbac().V1().ClusterRoleBindings().Informer()
-	op.addEventHandlers(clusterRoleBindingInformer, rbac.SchemeGroupVersion.WithKind("ClusterRoleBinding"))
-
-	roleInformer := op.kubeInformerFactory.Rbac().V1().Roles().Informer()
-	op.addEventHandlers(roleInformer, rbac.SchemeGroupVersion.WithKind("Role"))
-
-	roleBindingInformer := op.kubeInformerFactory.Rbac().V1().RoleBindings().Informer()
-	op.addEventHandlers(roleBindingInformer, rbac.SchemeGroupVersion.WithKind("RoleBinding"))
-}
-
-func (op *Operator) setupCoreInformers() {
-	nodeInformer := op.kubeInformerFactory.Core().V1().Nodes().Informer()
-	op.addEventHandlers(nodeInformer, core.SchemeGroupVersion.WithKind("Node"))
-
-	limitRangeInformer := op.kubeInformerFactory.Core().V1().LimitRanges().Informer()
-	op.addEventHandlers(limitRangeInformer, core.SchemeGroupVersion.WithKind("LimitRange"))
-
-	saInformer := op.kubeInformerFactory.Core().V1().ServiceAccounts().Informer()
-	op.addEventHandlers(saInformer, core.SchemeGroupVersion.WithKind("ServiceAccount"))
-}
-
-func (op *Operator) setupEventInformers() {
-	eventInformer := op.kubeInformerFactory.InformerFor(&core.Event{}, func(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-		return core_informers.NewFilteredEventInformer(
-			client,
-			core.NamespaceAll,
-			resyncPeriod,
-			cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
-			func(options *metav1.ListOptions) {
-				options.FieldSelector = fields.OneTermEqualSelector("type", core.EventTypeWarning).String()
-			},
-		)
-	})
-	eventInformer.AddEventHandler(op.eventProcessor)
-}
-
-func (op *Operator) setupCertificateInformers() {
-	csrInformer := op.kubeInformerFactory.Certificates().V1beta1().CertificateSigningRequests().Informer()
-	op.addEventHandlers(csrInformer, certificates.SchemeGroupVersion.WithKind("CertificateSigningRequest"))
-}
-
-func (op *Operator) setupStorageInformers() {
-	pvInformer := op.kubeInformerFactory.Core().V1().PersistentVolumes().Informer()
-	op.addEventHandlers(pvInformer, core.SchemeGroupVersion.WithKind("PersistentVolume"))
-
-	pvcInformer := op.kubeInformerFactory.Core().V1().PersistentVolumeClaims().Informer()
-	op.addEventHandlers(pvcInformer, core.SchemeGroupVersion.WithKind("PersistentVolumeClaim"))
-
-	storageClassInformer := op.kubeInformerFactory.Storage().V1().StorageClasses().Informer()
-	op.addEventHandlers(storageClassInformer, storage_v1.SchemeGroupVersion.WithKind("StorageClass"))
-}
-
-func (op *Operator) setupVoyagerInformers() {
-	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), voyager_api.SchemeGroupVersion.String(), voyager_api.ResourceKindIngress) {
-		voyagerIngressInformer := op.voyagerInformerFactory.Voyager().V1beta1().Ingresses().Informer()
-		op.addEventHandlers(voyagerIngressInformer, voyager_api.SchemeGroupVersion.WithKind(voyager_api.ResourceKindIngress))
-
-		voyagerCertificateInformer := op.voyagerInformerFactory.Voyager().V1beta1().Certificates().Informer()
-		op.addEventHandlers(voyagerCertificateInformer, voyager_api.SchemeGroupVersion.WithKind(voyager_api.ResourceKindCertificate))
-	}
-}
-
-func (op *Operator) setupStashInformers() {
-	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), stash_api.SchemeGroupVersion.String(), stash_api.ResourceKindRestic) {
-		resticsInformer := op.stashInformerFactory.Stash().V1alpha1().Restics().Informer()
-		op.addEventHandlers(resticsInformer, stash_api.SchemeGroupVersion.WithKind(stash_api.ResourceKindRestic))
-
-		recoveryInformer := op.stashInformerFactory.Stash().V1alpha1().Recoveries().Informer()
-		op.addEventHandlers(recoveryInformer, stash_api.SchemeGroupVersion.WithKind(stash_api.ResourceKindRecovery))
-	}
-}
-
-func (op *Operator) setupSearchlightInformers() {
-	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), searchlight_api.SchemeGroupVersion.String(), searchlight_api.ResourceKindClusterAlert) {
-		clusterAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().ClusterAlerts().Informer()
-		op.addEventHandlers(clusterAlertInformer, searchlight_api.SchemeGroupVersion.WithKind(searchlight_api.ResourceKindClusterAlert))
-
-		nodeAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().NodeAlerts().Informer()
-		op.addEventHandlers(nodeAlertInformer, searchlight_api.SchemeGroupVersion.WithKind(searchlight_api.ResourceKindNodeAlert))
-
-		podAlertInformer := op.searchlightInformerFactory.Monitoring().V1alpha1().PodAlerts().Informer()
-		op.addEventHandlers(podAlertInformer, searchlight_api.SchemeGroupVersion.WithKind(searchlight_api.ResourceKindPodAlert))
-	}
-}
-
-func (op *Operator) setupKubeDBInformers() {
-	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), kubedb_api.SchemeGroupVersion.String(), kubedb_api.ResourceKindPostgres) {
-		pgInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Postgreses().Informer()
-		op.addEventHandlers(pgInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindPostgres))
-
-		esInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Elasticsearches().Informer()
-		op.addEventHandlers(esInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindElasticsearch))
-
-		myInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().MySQLs().Informer()
-		op.addEventHandlers(myInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindMySQL))
-
-		mgInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().MongoDBs().Informer()
-		op.addEventHandlers(mgInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindMongoDB))
-
-		rdInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Redises().Informer()
-		op.addEventHandlers(rdInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindRedis))
-
-		mcInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Memcacheds().Informer()
-		op.addEventHandlers(mcInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindMemcached))
-
-		dbSnapshotInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().Snapshots().Informer()
-		op.addEventHandlers(dbSnapshotInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindSnapshot))
-
-		dormantDatabaseInformer := op.kubedbInformerFactory.Kubedb().V1alpha1().DormantDatabases().Informer()
-		op.addEventHandlers(dormantDatabaseInformer, kubedb_api.SchemeGroupVersion.WithKind(kubedb_api.ResourceKindDormantDatabase))
-	}
-}
-
-func (op *Operator) setupPrometheusInformers() {
-	if discovery.IsPreferredAPIResource(op.KubeClient.Discovery(), promapi.SchemeGroupVersion.String(), promapi.PrometheusesKind) {
-		promInf := op.promInformerFactory.Monitoring().V1().Prometheuses().Informer()
-		op.addEventHandlers(promInf, promapi.SchemeGroupVersion.WithKind(promapi.PrometheusesKind))
-
-		ruleInf := op.promInformerFactory.Monitoring().V1().PrometheusRules().Informer()
-		op.addEventHandlers(ruleInf, promapi.SchemeGroupVersion.WithKind(promapi.PrometheusRuleKind))
-
-		smonInf := op.promInformerFactory.Monitoring().V1().ServiceMonitors().Informer()
-		op.addEventHandlers(smonInf, promapi.SchemeGroupVersion.WithKind(promapi.ServiceMonitorsKind))
-
-		amgrInf := op.promInformerFactory.Monitoring().V1().Alertmanagers().Informer()
-		op.addEventHandlers(amgrInf, promapi.SchemeGroupVersion.WithKind(promapi.AlertmanagersKind))
-	}
-}
-
-func (op *Operator) addEventHandlers(informer cache.SharedIndexInformer, gvk schema.GroupVersionKind) {
-	informer.AddEventHandler(queue.NewVersionedHandler(op.trashCan, gvk))
-	informer.AddEventHandler(queue.NewVersionedHandler(op.eventProcessor, gvk))
-	informer.AddEventHandler(queue.NewVersionedHandler(op.Indexer, gvk))
 }
 
 func (op *Operator) getLoader() (envconfig.LoaderFunc, error) {

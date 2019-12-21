@@ -20,6 +20,7 @@ package fake
 
 import (
 	v1alpha1 "github.com/appscode/kubed/apis/kubed/v1alpha1"
+
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	testing "k8s.io/client-go/testing"

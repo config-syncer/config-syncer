@@ -1,17 +1,29 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package server
 
 import (
 	"time"
 
 	"github.com/appscode/kubed/pkg/operator"
-	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
-	vcs "github.com/appscode/voyager/client/clientset/versioned"
-	pcm "github.com/coreos/prometheus-operator/pkg/client/versioned"
+
 	"github.com/spf13/pflag"
 	"k8s.io/client-go/kubernetes"
 	"kmodules.xyz/client-go/meta"
-	kcs "kubedb.dev/apimachinery/client/clientset/versioned"
-	scs "stash.appscode.dev/stash/client/clientset/versioned"
 )
 
 type OperatorOptions struct {
@@ -55,21 +67,6 @@ func (s *OperatorOptions) ApplyTo(cfg *operator.OperatorConfig) error {
 	cfg.Test = false
 
 	if cfg.KubeClient, err = kubernetes.NewForConfig(cfg.ClientConfig); err != nil {
-		return err
-	}
-	if cfg.VoyagerClient, err = vcs.NewForConfig(cfg.ClientConfig); err != nil {
-		return err
-	}
-	if cfg.SearchlightClient, err = srch_cs.NewForConfig(cfg.ClientConfig); err != nil {
-		return err
-	}
-	if cfg.StashClient, err = scs.NewForConfig(cfg.ClientConfig); err != nil {
-		return err
-	}
-	if cfg.KubeDBClient, err = kcs.NewForConfig(cfg.ClientConfig); err != nil {
-		return err
-	}
-	if cfg.PromClient, err = pcm.NewForConfig(cfg.ClientConfig); err != nil {
 		return err
 	}
 
