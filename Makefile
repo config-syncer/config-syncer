@@ -384,24 +384,22 @@ endif
 
 .PHONY: install
 install:
-	@cd ../installer; \
-	helm install kubed-operator charts/kubed \
+	@helm install kubed-operator charts/kubed \
 		--namespace=kube-system \
 		--set kubed.registry=$(REGISTRY) \
 		--set kubed.tag=$(TAG) \
 		--set imagePullPolicy=Always \
 		$(IMAGE_PULL_SECRETS); \
-	kubectl wait --for=condition=Ready pods -n kube-system -l app=kubed-operator --timeout=5m; \
-	kubectl wait --for=condition=Available apiservice -l app=kubed-operator --timeout=5m
+	kubectl wait --for=condition=Ready pods -n kube-system -l app=kubed --timeout=5m; \
+	kubectl wait --for=condition=Available apiservice -l app=kubed --timeout=5m
 
 .PHONY: uninstall
 uninstall:
-	@cd ../installer; \
-	helm uninstall kubed-operator --namespace=kube-system || true
+	@helm uninstall kubed-operator --namespace=kube-system || true
 
 .PHONY: purge
 purge: uninstall
-	true
+	@true
 
 .PHONY: dev
 dev: gen fmt push
