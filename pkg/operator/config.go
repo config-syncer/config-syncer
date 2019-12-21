@@ -17,7 +17,6 @@ limitations under the License.
 package operator
 
 import (
-	"path/filepath"
 	"time"
 
 	"github.com/appscode/kubed/pkg/eventer"
@@ -27,15 +26,15 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"kmodules.xyz/client-go/discovery"
-	"kmodules.xyz/client-go/tools/fsnotify"
 )
 
 type Config struct {
-	ScratchDir        string
-	ConfigPath        string
-	OperatorNamespace string
-	ResyncPeriod      time.Duration
-	Test              bool
+	ClusterName           string
+	ConfigSourceNamespace string
+	KubeConfigFile        string
+
+	ResyncPeriod time.Duration
+	Test         bool
 }
 
 type OperatorConfig struct {
@@ -67,11 +66,6 @@ func (c *OperatorConfig) New() (*Operator, error) {
 
 	if err := op.Configure(); err != nil {
 		return nil, err
-	}
-
-	op.watcher = &fsnotify.Watcher{
-		WatchDir: filepath.Dir(c.ConfigPath),
-		Reload:   op.Configure,
 	}
 
 	// ---------------------------

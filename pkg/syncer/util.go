@@ -20,7 +20,6 @@ import (
 	"strings"
 
 	"github.com/appscode/go/types"
-	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -36,14 +35,14 @@ type SyncOptions struct {
 
 func GetSyncOptions(annotations map[string]string) SyncOptions {
 	opts := SyncOptions{}
-	if v, err := meta.GetStringValue(annotations, api.ConfigSyncKey); err == nil {
+	if v, err := meta.GetStringValue(annotations, ConfigSyncKey); err == nil {
 		if v == "true" {
 			opts.NamespaceSelector = types.StringP(labels.Everything().String())
 		} else {
 			opts.NamespaceSelector = &v
 		}
 	}
-	if contexts, _ := meta.GetStringValue(annotations, api.ConfigSyncContexts); contexts != "" {
+	if contexts, _ := meta.GetStringValue(annotations, ConfigSyncContexts); contexts != "" {
 		opts.Contexts = sets.NewString(strings.Split(contexts, ",")...)
 	}
 	return opts

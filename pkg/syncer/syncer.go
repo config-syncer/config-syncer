@@ -20,8 +20,6 @@ import (
 	"net/url"
 	"sync"
 
-	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
-
 	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
@@ -35,13 +33,22 @@ import (
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
+const (
+	ConfigSyncKey      = "kubed.appscode.com/sync"
+	ConfigOriginKey    = "kubed.appscode.com/origin"
+	ConfigSyncContexts = "kubed.appscode.com/sync-contexts"
+
+	OriginNameLabelKey      = "kubed.appscode.com/origin.name"
+	OriginNamespaceLabelKey = "kubed.appscode.com/origin.namespace"
+	OriginClusterLabelKey   = "kubed.appscode.com/origin.cluster"
+)
+
 type ConfigSyncer struct {
 	kubeClient kubernetes.Interface
 	recorder   record.EventRecorder
 
 	clusterName string
 	contexts    map[string]clusterContext
-	enable      bool
 	lock        sync.RWMutex
 }
 
@@ -52,13 +59,12 @@ func New(kc kubernetes.Interface, recorder record.EventRecorder) *ConfigSyncer {
 	}
 }
 
-func (s *ConfigSyncer) Configure(clusterName string, kubeconfigFile string, enable bool) error {
+func (s *ConfigSyncer) Configure(clusterName string, kubeconfigFile string) error {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
 	s.clusterName = clusterName
 	s.contexts = map[string]clusterContext{}
-	s.enable = enable
 
 	// Parse external kubeconfig file, assume that it doesn't include source cluster
 	if kubeconfigFile != "" {
@@ -137,9 +143,9 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 
 func (s *ConfigSyncer) syncerLabels(name, namespace, cluster string) labels.Set {
 	return labels.Set{
-		api.OriginNameLabelKey:      name,
-		api.OriginNamespaceLabelKey: namespace,
-		api.OriginClusterLabelKey:   cluster,
+		OriginNameLabelKey:      name,
+		OriginNamespaceLabelKey: namespace,
+		OriginClusterLabelKey:   cluster,
 	}
 }
 
@@ -151,22 +157,22 @@ func (s *ConfigSyncer) syncerAnnotations(oldAnnotations, srcAnnotations map[stri
 	newAnnotations := map[string]string{}
 
 	// preserve sync annotations
-	if v, ok := oldAnnotations[api.ConfigSyncKey]; ok {
-		newAnnotations[api.ConfigSyncKey] = v
+	if v, ok := oldAnnotations[ConfigSyncKey]; ok {
+		newAnnotations[ConfigSyncKey] = v
 	}
-	if v, ok := oldAnnotations[api.ConfigSyncContexts]; ok {
-		newAnnotations[api.ConfigSyncContexts] = v
+	if v, ok := oldAnnotations[ConfigSyncContexts]; ok {
+		newAnnotations[ConfigSyncContexts] = v
 	}
 
 	for k, v := range srcAnnotations {
-		if k != api.ConfigSyncKey && k != api.ConfigSyncContexts {
+		if k != ConfigSyncKey && k != ConfigSyncContexts {
 			newAnnotations[k] = v
 		}
 	}
 
 	// set origin reference
 	ref, _ := json.Marshal(srcRef)
-	newAnnotations[api.ConfigOriginKey] = string(ref)
+	newAnnotations[ConfigOriginKey] = string(ref)
 
 	return newAnnotations
 }

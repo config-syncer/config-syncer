@@ -19,10 +19,8 @@ package framework
 import (
 	"reflect"
 
-	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/syncer"
 
-	"github.com/ghodss/yaml"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
@@ -246,18 +244,4 @@ func (fi *Invocation) WaitUntilSecretDeleted(meta metav1.ObjectMeta) error {
 		}
 		return false, nil
 	})
-}
-
-func (f *Framework) KubeConfigSecret(config *api.ClusterConfig, meta metav1.ObjectMeta) (*core.Secret, error) {
-	data, err := yaml.Marshal(config)
-	if err != nil {
-		return nil, err
-	}
-
-	return &core.Secret{
-		ObjectMeta: meta,
-		Data: map[string][]byte{
-			"config.yaml": data,
-		},
-	}, nil
 }

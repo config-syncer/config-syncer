@@ -19,7 +19,8 @@ package e2e_test
 import (
 	"os"
 
-	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
+	"github.com/appscode/kubed/pkg/operator"
+	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kubed/test/e2e/framework"
 
 	. "github.com/onsi/ginkgo"
@@ -33,22 +34,16 @@ import (
 
 var _ = Describe("Config-Syncer", func() {
 	var (
-		f             *framework.Invocation
-		cfgMap        *core.ConfigMap
-		nsWithLabel   *core.Namespace
-		clusterConfig api.ClusterConfig
+		f           *framework.Invocation
+		cfgMap      *core.ConfigMap
+		nsWithLabel *core.Namespace
+		config      operator.Config
 	)
 
 	BeforeEach(func() {
 		f = root.Invoke()
 		cfgMap = f.NewConfigMap()
 		nsWithLabel = f.NewNamespaceWithLabel()
-	})
-
-	JustBeforeEach(func() {
-		By("Restarting kubed operator")
-		err := f.RestartKubedOperator(&clusterConfig)
-		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
@@ -73,7 +68,7 @@ var _ = Describe("Config-Syncer", func() {
 
 			By("Adding sync annotation")
 			sourceCM, _, err = core_util.PatchConfigMap(f.KubeClient, sourceCM, func(obj *core.ConfigMap) *core.ConfigMap {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -86,7 +81,7 @@ var _ = Describe("Config-Syncer", func() {
 	Describe("Across Namespaces", func() {
 
 		BeforeEach(func() {
-			clusterConfig = framework.ConfigSyncClusterConfig()
+			config = operator.Config{}
 		})
 
 		Context("All Namespaces", func() {
@@ -118,7 +113,7 @@ var _ = Describe("Config-Syncer", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				_, _, err = core_util.PatchConfigMap(f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
-					obj.Annotations = meta.RemoveKey(obj.Annotations, api.ConfigSyncKey)
+					obj.Annotations = meta.RemoveKey(obj.Annotations, syncer.ConfigSyncKey)
 					return obj
 				})
 				Expect(err).ShouldNot(HaveOccurred())
@@ -161,7 +156,7 @@ var _ = Describe("Config-Syncer", func() {
 
 				By("Adding sync=true annotation")
 				source, _, err = core_util.PatchConfigMap(f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
-					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "true")
+					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "true")
 					return obj
 				})
 				Expect(err).ShouldNot(HaveOccurred())
@@ -182,7 +177,7 @@ var _ = Describe("Config-Syncer", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				source, _, err = core_util.PatchConfigMap(f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
-					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "app="+f.App())
+					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "app="+f.App())
 					return obj
 				})
 				Expect(err).NotTo(HaveOccurred())
@@ -199,7 +194,7 @@ var _ = Describe("Config-Syncer", func() {
 
 				By("Changing selector annotation")
 				_, _, err = core_util.PatchConfigMap(f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
-					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "app=do-not-match")
+					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "app=do-not-match")
 					return obj
 				})
 				Expect(err).ShouldNot(HaveOccurred())
@@ -212,7 +207,7 @@ var _ = Describe("Config-Syncer", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				source, _, err = core_util.PatchConfigMap(f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
-					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "")
+					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "")
 					return obj
 				})
 				Expect(err).ShouldNot(HaveOccurred())
@@ -276,9 +271,9 @@ var _ = Describe("Config-Syncer", func() {
 			)
 
 			BeforeEach(func() {
-				clusterConfig = framework.ConfigSyncClusterConfig()
-				clusterConfig.ClusterName = "minikube"
-				clusterConfig.KubeConfigFile = kubeConfigPath
+				config = operator.Config{}
+				config.ClusterName = "minikube"
+				config.KubeConfigFile = kubeConfigPath
 
 				if _, err := os.Stat(kubeConfigPath); err != nil {
 					Skip(`"config" file not found on` + kubeConfigPath)
@@ -303,7 +298,7 @@ var _ = Describe("Config-Syncer", func() {
 
 				By("Adding sync annotation")
 				cfgMap, _, err = core_util.PatchConfigMap(f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
-					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncContexts, context)
+					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncContexts, context)
 					return obj
 				})
 				Expect(err).ShouldNot(HaveOccurred())
@@ -313,7 +308,7 @@ var _ = Describe("Config-Syncer", func() {
 
 				By("Removing sync annotation")
 				_, _, err = core_util.PatchConfigMap(f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
-					obj.Annotations = meta.RemoveKey(obj.Annotations, api.ConfigSyncContexts)
+					obj.Annotations = meta.RemoveKey(obj.Annotations, syncer.ConfigSyncContexts)
 					return obj
 				})
 				Expect(err).ShouldNot(HaveOccurred())

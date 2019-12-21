@@ -18,7 +18,6 @@ package syncer
 
 import (
 	"github.com/appscode/go/log"
-	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/eventer"
 
 	"github.com/golang/glog"
@@ -145,7 +144,7 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 	}
 	_, _, err := core_util.CreateOrPatchSecret(k8sClient, meta, func(obj *core.Secret) *core.Secret {
 		// check origin cluster, if not match overwrite and create an event
-		if v, ok := obj.Labels[api.OriginClusterLabelKey]; ok && v != s.clusterName {
+		if v, ok := obj.Labels[OriginClusterLabelKey]; ok && v != s.clusterName {
 			s.recorder.Eventf(
 				src,
 				core.EventTypeWarning,

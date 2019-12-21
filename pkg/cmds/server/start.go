@@ -20,7 +20,6 @@ import (
 	"io"
 	"net"
 
-	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/operator"
 	"github.com/appscode/kubed/pkg/server"
 
@@ -47,7 +46,7 @@ func NewKubedOptions(out, errOut io.Writer) *KubedOptions {
 		// TODO we will nil out the etcd storage options.  This requires a later level of k8s.io/apiserver
 		RecommendedOptions: genericoptions.NewRecommendedOptions(
 			defaultEtcdPathPrefix,
-			server.Codecs.LegacyCodec(api.SchemeGroupVersion),
+			server.Codecs.LegacyCodec(),
 			genericoptions.NewProcessInfo("kubed", meta.Namespace()),
 		),
 		OperatorOptions: NewOperatorOptions(),

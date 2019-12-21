@@ -39,6 +39,19 @@ func GetVersion(client discovery.DiscoveryInterface) (string, error) {
 	return gv.ToMutator().ResetMetadata().ResetPrerelease().String(), nil
 }
 
+func GetVersionInfo(client discovery.DiscoveryInterface) (int64, int64, int64, string, string, error) {
+	info, err := client.ServerVersion()
+	if err != nil {
+		return -1, -1, -1, "", "", err
+	}
+	gv, err := version.NewVersion(info.GitVersion)
+	if err != nil {
+		return -1, -1, -1, "", "", err
+	}
+	v := gv.ToMutator().ResetMetadata().ResetPrerelease()
+	return v.Major(), v.Minor(), v.Patch(), v.Prerelease(), v.Metadata(), nil
+}
+
 func GetBaseVersion(client discovery.DiscoveryInterface) (string, error) {
 	info, err := client.ServerVersion()
 	if err != nil {
@@ -97,8 +110,11 @@ var err62649_K1_10 = &KnownBug{URL: "https://github.com/kubernetes/kubernetes/pu
 var err83778_K1_16 = &KnownBug{URL: "https://github.com/kubernetes/kubernetes/pull/83787", Fix: "upgrade to Kubernetes 1.16.2 or later."}
 
 var (
-	DefaultConstraint                     = ">= 1.9.0"
-	DefaultBlackListedVersions            map[string]error
+	DefaultConstraint          = ">= 1.11.0"
+	DefaultBlackListedVersions = map[string]error{
+		"1.16.0": err83778_K1_16,
+		"1.16.1": err83778_K1_16,
+	}
 	DefaultBlackListedMultiMasterVersions = map[string]error{
 		"1.9.0":  err62649_K1_9,
 		"1.9.1":  err62649_K1_9,
@@ -110,8 +126,6 @@ var (
 		"1.9.7":  err62649_K1_9,
 		"1.10.0": err62649_K1_10,
 		"1.10.1": err62649_K1_10,
-		"1.16.0": err83778_K1_16,
-		"1.16.1": err83778_K1_16,
 	}
 )
 

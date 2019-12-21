@@ -17,11 +17,9 @@ limitations under the License.
 package operator
 
 import (
-	"sync"
 	"time"
 
 	"github.com/appscode/go/log"
-	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/syncer"
 
 	"github.com/pkg/errors"
@@ -29,7 +27,6 @@ import (
 	_ "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/informers"
 	core_informers "k8s.io/client-go/informers/core/v1"
 	"k8s.io/client-go/kubernetes"
@@ -37,7 +34,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
 	_ "kmodules.xyz/client-go/apiextensions/v1beta1"
-	"kmodules.xyz/client-go/tools/fsnotify"
 )
 
 type Operator struct {
@@ -48,43 +44,21 @@ type Operator struct {
 	recorder     record.EventRecorder
 	configSyncer *syncer.ConfigSyncer
 
-	KubeClient kubernetes.Interface
-
+	KubeClient          kubernetes.Interface
 	kubeInformerFactory informers.SharedInformerFactory
-
-	watcher *fsnotify.Watcher
-
-	clusterConfig api.ClusterConfig
-	lock          sync.RWMutex
 }
 
 func (op *Operator) Configure() error {
 	log.Infoln("configuring kubed ...")
 
-	op.lock.Lock()
-	defer op.lock.Unlock()
-
-	var err error
-
-	cfg, err := api.LoadConfig(op.ConfigPath)
-	if err != nil {
-		return err
-	}
-	op.clusterConfig = *cfg
-
-	err = op.configSyncer.Configure(op.clusterConfig.ClusterName, op.clusterConfig.KubeConfigFile, op.clusterConfig.EnableConfigSyncer)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return op.configSyncer.Configure(op.Config.ClusterName, op.Config.KubeConfigFile)
 }
 
 func (op *Operator) setupConfigInformers() {
 	configMapInformer := op.kubeInformerFactory.InformerFor(&core.ConfigMap{}, func(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
 		return core_informers.NewFilteredConfigMapInformer(
 			client,
-			op.clusterConfig.ConfigSourceNamespace,
+			op.Config.ConfigSourceNamespace,
 			resyncPeriod,
 			cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
 			func(options *metav1.ListOptions) {},
@@ -95,7 +69,7 @@ func (op *Operator) setupConfigInformers() {
 	secretInformer := op.kubeInformerFactory.InformerFor(&core.Secret{}, func(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
 		return core_informers.NewFilteredSecretInformer(
 			client,
-			op.clusterConfig.ConfigSourceNamespace,
+			op.Config.ConfigSourceNamespace,
 			resyncPeriod,
 			cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
 			func(options *metav1.ListOptions) {},
@@ -107,7 +81,7 @@ func (op *Operator) setupConfigInformers() {
 	nsInformer.AddEventHandler(op.configSyncer.NamespaceHandler())
 }
 
-func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
+func (op *Operator) Run(stopCh <-chan struct{}) {
 	op.kubeInformerFactory.Start(stopCh)
 
 	res := op.kubeInformerFactory.WaitForCacheSync(stopCh)
@@ -117,13 +91,6 @@ func (op *Operator) RunWatchers(stopCh <-chan struct{}) {
 			return
 		}
 	}
-}
-
-func (op *Operator) Run(stopCh <-chan struct{}) {
-	op.RunWatchers(stopCh)
-	go func() {
-		utilruntime.Must(op.watcher.Run(stopCh))
-	}()
 
 	<-stopCh
 	log.Infoln("Stopping kubed controller")

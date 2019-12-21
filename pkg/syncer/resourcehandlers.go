@@ -40,10 +40,6 @@ func (s *configmapSyncer) OnAdd(obj interface{}) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
-	if !s.enable {
-		return
-	}
-
 	if res, ok := obj.(*core.ConfigMap); ok {
 		if err := s.SyncConfigMap(res); err != nil {
 			log.Errorln(err)
@@ -54,10 +50,6 @@ func (s *configmapSyncer) OnAdd(obj interface{}) {
 func (s *configmapSyncer) OnUpdate(oldObj, newObj interface{}) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
-
-	if !s.enable {
-		return
-	}
 
 	oldRes, ok := oldObj.(*core.ConfigMap)
 	if !ok {
@@ -81,10 +73,6 @@ func (s *configmapSyncer) OnDelete(obj interface{}) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
-	if !s.enable {
-		return
-	}
-
 	if res, ok := obj.(*core.ConfigMap); ok {
 		if err := s.SyncDeletedConfigMap(res); err != nil {
 			log.Errorln(err)
@@ -106,10 +94,6 @@ func (s *secretSyncer) OnAdd(obj interface{}) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
-	if !s.enable {
-		return
-	}
-
 	if res, ok := obj.(*core.Secret); ok {
 		if err := s.SyncSecret(res); err != nil {
 			log.Errorln(err)
@@ -120,10 +104,6 @@ func (s *secretSyncer) OnAdd(obj interface{}) {
 func (s *secretSyncer) OnUpdate(oldObj, newObj interface{}) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
-
-	if !s.enable {
-		return
-	}
 
 	oldRes, ok := oldObj.(*core.Secret)
 	if !ok {
@@ -147,10 +127,6 @@ func (s *secretSyncer) OnDelete(obj interface{}) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
-	if !s.enable {
-		return
-	}
-
 	if res, ok := obj.(*core.Secret); ok {
 		if err := s.SyncDeletedSecret(res); err != nil {
 			log.Infoln(err)
@@ -172,10 +148,6 @@ func (s *nsSyncer) OnAdd(obj interface{}) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
-	if !s.enable {
-		return
-	}
-
 	if res, ok := obj.(*core.Namespace); ok {
 		utilruntime.Must(s.SyncIntoNamespace(res.Name))
 	}
@@ -184,10 +156,6 @@ func (s *nsSyncer) OnAdd(obj interface{}) {
 func (s *nsSyncer) OnUpdate(oldObj, newObj interface{}) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
-
-	if !s.enable {
-		return
-	}
 
 	old := oldObj.(*core.Namespace)
 	nu := newObj.(*core.Namespace)
