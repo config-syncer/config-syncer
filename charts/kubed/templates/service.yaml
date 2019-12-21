@@ -4,10 +4,7 @@ metadata:
   name: {{ template "kubed.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app: "{{ template "kubed.name" . }}"
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    release: "{{ .Release.Name }}"
-    heritage: "{{ .Release.Service }}"
+    {{- include "kubed.labels" . | nindent 4 }}
 spec:
   ports:
   # Port used to expose admission webhook apiserver

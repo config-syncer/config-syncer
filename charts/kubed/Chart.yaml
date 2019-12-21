@@ -5,7 +5,7 @@ version: v0.11.0
 kubeVersion: ">=1.9.0"
 appVersion: v0.11.0
 home: https://github.com/appscode/kubed
-icon: https://cdn.appscode.com/images/icon/kubed.png
+icon: https://cdn.appscode.com/images/products/kubed/icons/android-icon-192x192.png
 sources:
   - https://github.com/appscode/kubed
 maintainers:

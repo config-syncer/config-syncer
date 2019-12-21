@@ -4,10 +4,7 @@ metadata:
   name: {{ template "kubed.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: "{{ template "kubed.name" . }}"
-    heritage: "{{ .Release.Service }}"
-    release: "{{ .Release.Name }}"
+    {{- include "kubed.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -20,19 +17,12 @@ spec:
         {{- include "kubed.labels" . | nindent 8 }}
 {{- if or .Values.annotations (and .Values.criticalAddon (eq .Release.Namespace "kube-system")) }}
       annotations:
-{{- if and .Values.criticalAddon (eq .Release.Namespace "kube-system") }}
-        scheduler.alpha.kubernetes.io/critical-pod: ''
-{{- end }}
 {{- if .Values.annotations }}
 {{ toYaml .Values.annotations | indent 8 }}
 {{- end }}
 {{- end }}
     spec:
       serviceAccountName: {{ template "kubed.serviceAccountName" . }}
-      {{- if .Values.imagePullSecrets }}
-      imagePullSecrets:
-{{ toYaml .Values.imagePullSecrets | indent 6 }}
-      {{- end }}
       containers:
       - name: kubed
         image: {{ .Values.kubed.registry }}/{{ .Values.kubed.repository }}:{{ .Values.kubed.tag }}
@@ -71,13 +61,6 @@ spec:
           mountPath: /tmp
         - mountPath: /var/serving-cert
           name: serving-cert
-      {{- if .Values.persistence.enabled }}
-        - name: storage
-          mountPath: "/var/lib/kubed"
-        {{- if .Values.persistence.subPath }}
-            subPath: {{ .Values.persistence.subPath }}
-        {{- end }}
-      {{- end }}
       volumes:
       - name: config
         secret:
@@ -88,11 +71,6 @@ spec:
         secret:
           defaultMode: 420
           secretName: {{ template "kubed.fullname" . }}-apiserver-cert
-      {{- if .Values.persistence.enabled }}
-      - name: storage
-        persistentVolumeClaim:
-          claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "kubed.fullname" . }}{{- end }}
-      {{- end }}
       securityContext:
         fsGroup: 65535
 {{- if or .Values.tolerations (and .Values.criticalAddon (eq .Release.Namespace "kube-system")) }}

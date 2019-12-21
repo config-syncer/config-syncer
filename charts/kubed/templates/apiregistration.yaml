@@ -26,6 +26,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: {{ template "kubed.fullname" . }}-apiserver-cert
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "kubed.labels" . | nindent 4 }}
 type: Opaque

@@ -4,14 +4,8 @@ kind: ClusterRole
 metadata:
   name: {{ template "kubed.fullname" . }}
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: "{{ template "kubed.name" . }}"
-    heritage: "{{ .Release.Service }}"
-    release: "{{ .Release.Name }}"
+    {{- include "kubed.labels" . | nindent 4 }}
 rules:
-- apiGroups: ["*"]
-  resources: ["*"]
-  verbs: ["list", "watch"]
 - apiGroups: [""]
   resources:
   - configmaps

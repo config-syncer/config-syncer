@@ -6,7 +6,7 @@
 ```console
 $ helm repo add appscode https://charts.appscode.com/stable/
 $ helm repo update
-$ helm install appscode/kubed
+$ helm install kubed appscode/kubed -n kube-system
 ```
 
 ## Introduction
@@ -15,13 +15,13 @@ This chart bootstraps a [Kubed controller](https://github.com/appscode/kubed) de
 
 ## Prerequisites
 
-- Kubernetes 1.8+
+- Kubernetes 1.12+
 
 ## Installing the Chart
 To install the chart with the release name `my-release`:
 
 ```console
-$ helm install appscode/kubed --name my-release
+$ helm install my-release appscode/kubed -n kube-system
 ```
 
 The command deploys Kubed operator on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
@@ -33,7 +33,7 @@ The command deploys Kubed operator on the Kubernetes cluster in the default conf
 To uninstall/delete the `my-release`:
 
 ```console
-$ helm delete my-release
+$ helm delete my-release -n kube-system
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -48,8 +48,8 @@ The following table lists the configurable parameters of the Kubed chart and the
 | `replicaCount`                   | Number of kubed operator replicas to create (only 1 is supported) | `1`                |
 | `kubed.registry`                 | Docker registry used to pull Kubed image                          | `appscode`         |
 | `kubed.repository`               | Kubed container image                                             | `kubed`            |
-| `kubed.tag`                      | Kubed container image tag                                         | `v0.11.0`       |
-| `imagePullSecrets`               | Specify image pull secrets                                        | `nil` (does not add image pull secrets to deployed pods) |
+| `kubed.tag`                      | Kubed container image tag                                         | `v0.11.0`          |
+| `imagePullSecrets`               | Specify image pull secrets                                        | `[]`               |
 | `imagePullPolicy`                | Image pull policy                                                 | `IfNotPresent`     |
 | `criticalAddon`                  | If true, installs kubed operator as critical addon                | `false`            |
 | `logLevel`                       | Log level for kubed                                               | `3`                |
@@ -81,33 +81,12 @@ The following table lists the configurable parameters of the Kubed chart and the
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
 
 ```console
-$ helm install --name my-release --set image.tag=v0.2.1 appscode/kubed
+$ helm install my-release appscode/kubed -n kube-system --set image.tag=v0.2.1
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while
 installing the chart. For example:
 
 ```console
-$ helm install --name my-release --values values.yaml appscode/kubed
-```
-
-## RBAC
-By default the chart will not install the recommended RBAC roles and rolebindings.
-
-You need to have the flag `--authorization-mode=RBAC` on the api server. See the following document for how to enable [RBAC](https://kubernetes.io/docs/admin/authorization/rbac/).
-
-To determine if your cluster supports RBAC, run the the following command:
-
-```console
-$ kubectl api-versions | grep rbac
-```
-
-If the output contains "beta", you may install the chart with RBAC enabled (see below).
-
-### Enable RBAC role/rolebinding creation
-
-To enable the creation of RBAC resources (On clusters with RBAC). Do the following:
-
-```console
-$ helm install --name my-release appscode/kubed --set rbac.create=true
+$ helm install my-release appscode/kubed -n kube-system --values values.yaml
 ```
