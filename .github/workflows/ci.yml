@@ -48,6 +48,26 @@ jobs:
         docker login --username ${USERNAME} --password ${DOCKER_TOKEN}
         make push
 
+    - name: Install link checker
+      env:
+        GO111MODULE: on
+      run: |
+        export GOPATH=$(go env GOPATH)
+        export GOBIN=$GOPATH/bin
+        mkdir -p $GOBIN
+        mkdir -p $GOPATH/github.com/raviqqe
+        pushd $GOPATH/github.com/raviqqe
+        git clone https://github.com/appscodelabs/liche
+        cd liche
+        git checkout master
+        go install -v ./...
+        sudo mv $GOBIN/* /usr/local/bin
+        popd
+
+    - name: Check links
+      run: |
+        liche -r docs -d $(pwd) -c 10 -p -h -l -x '^*(voyager.appscode.ninja|www.kiteci.pro)*$'
+
   kubernetes:
     name: Kubernetes
     runs-on: ubuntu-latest
