@@ -60,7 +60,7 @@ apiserver:
   useKubeapiserverFqdnForAks: true
   # healthcheck configures the readiness and liveliness probes for the operator pod.
   healthcheck:
-    enabled: true
+    enabled: false
 
 # Send usage events to Google Analytics
 enableAnalytics: true
@@ -69,3 +69,5 @@ config:
   # set cluster-name to something meaningful to you, say, prod, prod-us-east, qa, etc.
   # so that you can distinguish notifications sent by kubed
   clusterName: unicorn
+  configSourceNamespace: ""
+  kubeconfigContent: ""

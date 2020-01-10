@@ -70,10 +70,8 @@ The following table lists the configurable parameters of the Kubed chart and the
 | `apiserver.healthcheck.enabled`  | Enable readiness and liveliness probes                            | `true`             |
 | `enableAnalytics`                | Send usage events to Google Analytics                             | `true`             |
 | `config.clusterName`             | Set cluster name to something meaningful to you, say, prod, prod-us-east, qa, etc. so that you can distinguish notifications sent by kubed | `unicorn`          |
-| `config.enableConfigSyncer`      | If `true`, enables configmap and secret syncer                    | `true`             |
-| `config.enableEventForwarder`    | If `true`, enables event forwarder                                | `false`            |
-| `config.enableRecycleBin`        | If `true`, enables recycle bin for deleted objects                | `true`             |
-
+| `config.configSourceNamespace`   | If set, configmaps and secrets from only this namespace will be synced | `unicorn`     |
+| `config.kubeconfigContent`       | kubeconfig file content for configmap and secret syncer           | ``                 |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
 
