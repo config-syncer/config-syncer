@@ -17,9 +17,8 @@ aliases:
 
 # Change Log
 
-## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
-
-[Full Changelog](https://github.com/appscode/kubed/compare/v0.11.0...HEAD)
+## [v0.12.0-rc.0](https://github.com/appscode/kubed/tree/v0.12.0-rc.0) (2020-01-10)
+[Full Changelog](https://github.com/appscode/kubed/compare/v0.11.0...v0.12.0-rc.0)
 
 **Merged pull requests:**
 
