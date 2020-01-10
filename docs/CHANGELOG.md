@@ -22,9 +22,13 @@ aliases:
 
 **Merged pull requests:**
 
+- Update syncer docs [\#376](https://github.com/appscode/kubed/pull/376) ([tamalsaha](https://github.com/tamalsaha))
+- Fix intra cluster sync docs [\#375](https://github.com/appscode/kubed/pull/375) ([tamalsaha](https://github.com/tamalsaha))
+- Update docs for v0.12.0-rc.0 [\#374](https://github.com/appscode/kubed/pull/374) ([tamalsaha](https://github.com/tamalsaha))
 - Reboot kubed project [\#373](https://github.com/appscode/kubed/pull/373) ([tamalsaha](https://github.com/tamalsaha))
 - Delete script based installer [\#372](https://github.com/appscode/kubed/pull/372) ([tamalsaha](https://github.com/tamalsaha))
 - Change old "extensions/v1beta1" to new "apps/v1" [\#370](https://github.com/appscode/kubed/pull/370) ([ruzickap](https://github.com/ruzickap))
+- helm chart: Add kube-config into secret if needed [\#368](https://github.com/appscode/kubed/pull/368) ([lonwern](https://github.com/lonwern))
 - Download onessl version v0.13.1 for Kubernetes 1.16 fix [\#367](https://github.com/appscode/kubed/pull/367) ([tamalsaha](https://github.com/tamalsaha))
 - Templatize front matter [\#366](https://github.com/appscode/kubed/pull/366) ([tamalsaha](https://github.com/tamalsaha))
 
