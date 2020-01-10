@@ -1,17 +1,17 @@
 ---
 title: Kubed
 menu:
-  product_kubed_{{ .version }}:
+  product_kubed_v0.11.0:
     identifier: kubed
     name: Kubed
     parent: reference
     weight: 0
 
 product_name: kubed
-menu_name: product_kubed_{{ .version }}
+menu_name: product_kubed_v0.11.0
 section_menu_id: reference
 aliases:
-  - /products/kubed/{{ .version }}/reference/
+  - /products/kubed/v0.11.0/reference/
 
 ---
 ## kubed
@@ -40,8 +40,6 @@ Kubed is a Kubernetes daemon to perform cluster management tasks. For more infor
 
 ### SEE ALSO
 
-* [kubed backup](/docs/reference/kubed_backup.md)	 - Takes a backup of Kubernetes api objects
-* [kubed check](/docs/reference/kubed_check.md)	 - Check cluster config
 * [kubed run](/docs/reference/kubed_run.md)	 - Launch Kubernetes Cluster Daemon
 * [kubed version](/docs/reference/kubed_version.md)	 - Prints binary version number.
 

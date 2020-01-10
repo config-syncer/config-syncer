@@ -1,12 +1,12 @@
 ---
 title: Kubed Version
 menu:
-  product_kubed_{{ .version }}:
+  product_kubed_v0.11.0:
     identifier: kubed-version
     name: Kubed Version
     parent: reference
 product_name: kubed
-menu_name: product_kubed_{{ .version }}
+menu_name: product_kubed_v0.11.0
 section_menu_id: reference
 ---
 ## kubed version
@@ -24,8 +24,9 @@ kubed version [flags]
 ### Options
 
 ```
-  -h, --help    help for version
-      --short   Print just the version number.
+      --check string   Check version constraint
+  -h, --help           help for version
+      --short          Print just the version number.
 ```
 
 ### Options inherited from parent commands

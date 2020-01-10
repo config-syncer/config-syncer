@@ -1,8 +1,0 @@
-snapshotter:
-  s3:
-    endpoint: 's3.amazonaws.com'
-    bucket: bucket-for-snapshot
-    prefix: minikube
-  storageSecretName: s3-secret
-  sanitize: true
-  schedule: '@every 6h'
