@@ -17,6 +17,37 @@ aliases:
 
 # Change Log
 
+## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
+
+[Full Changelog](https://github.com/appscode/kubed/compare/v0.12.0-rc.0...HEAD)
+
+**Closed issues:**
+
+- Kubernetes 1.16 and "extensions/v1beta1" [\#369](https://github.com/appscode/kubed/issues/369)
+- Project roadmap [\#363](https://github.com/appscode/kubed/issues/363)
+- kubed is messing up api-resources [\#351](https://github.com/appscode/kubed/issues/351)
+- Don't regenerate a certificate authority and a certificate everytime you deploy the helm chart [\#346](https://github.com/appscode/kubed/issues/346)
+- liveness check does not detect when kubed is not responding to API requests anymore [\#343](https://github.com/appscode/kubed/issues/343)
+- kube-controller-manager errors [\#340](https://github.com/appscode/kubed/issues/340)
+- Performance optimizing syncer [\#335](https://github.com/appscode/kubed/issues/335)
+- How to properly restore snapshot [\#303](https://github.com/appscode/kubed/issues/303)
+- Use audit policy server to forward events [\#194](https://github.com/appscode/kubed/issues/194)
+- Auto mount image pull secret for docker registry [\#191](https://github.com/appscode/kubed/issues/191)
+- Need automatic clean up of backed up yamls. [\#169](https://github.com/appscode/kubed/issues/169)
+- Use new Events api in 1.9 [\#148](https://github.com/appscode/kubed/issues/148)
+- watches for changes to ConfigMap objects and performs rolling upgrades on their associated deployments [\#145](https://github.com/appscode/kubed/issues/145)
+- Watch cloud provider specific forwarder. [\#108](https://github.com/appscode/kubed/issues/108)
+- Include processes running on host when OOM is reported. [\#107](https://github.com/appscode/kubed/issues/107)
+- Notifier routing [\#101](https://github.com/appscode/kubed/issues/101)
+- Show event UID in SMS/Chat version [\#93](https://github.com/appscode/kubed/issues/93)
+- Setup retention policy for snapshot operation [\#75](https://github.com/appscode/kubed/issues/75)
+- Add Dry Run option for janitors [\#60](https://github.com/appscode/kubed/issues/60)
+- Explore generic DELETE watcher [\#41](https://github.com/appscode/kubed/issues/41)
+
+**Merged pull requests:**
+
+- Remove Kubernetes dependency in chart [\#377](https://github.com/appscode/kubed/pull/377) ([tamalsaha](https://github.com/tamalsaha))
+
 ## [v0.12.0-rc.0](https://github.com/appscode/kubed/tree/v0.12.0-rc.0) (2020-01-10)
 [Full Changelog](https://github.com/appscode/kubed/compare/v0.11.0...v0.12.0-rc.0)
 
@@ -57,6 +88,11 @@ aliases:
 
 ## [0.10.0](https://github.com/appscode/kubed/tree/0.10.0) (2019-04-23)
 [Full Changelog](https://github.com/appscode/kubed/compare/0.9.0...0.10.0)
+
+**Closed issues:**
+
+- helm deployment doesn't use pre-existing kubed secret [\#312](https://github.com/appscode/kubed/issues/312)
+- kubed is using too much memory [\#304](https://github.com/appscode/kubed/issues/304)
 
 **Merged pull requests:**
 
