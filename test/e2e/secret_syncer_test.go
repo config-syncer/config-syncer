@@ -1,11 +1,28 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package e2e_test
 
 import (
 	"os"
-	"time"
 
-	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
+	"github.com/appscode/kubed/pkg/operator"
+	"github.com/appscode/kubed/pkg/syncer"
 	"github.com/appscode/kubed/test/e2e/framework"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
@@ -17,11 +34,10 @@ import (
 
 var _ = Describe("Secret-Syncer", func() {
 	var (
-		f             *framework.Invocation
-		secret        *core.Secret
-		nsWithLabel   *core.Namespace
-		stopCh        chan struct{}
-		clusterConfig api.ClusterConfig
+		f           *framework.Invocation
+		secret      *core.Secret
+		nsWithLabel *core.Namespace
+		config      operator.Config
 	)
 
 	BeforeEach(func() {
@@ -30,27 +46,7 @@ var _ = Describe("Secret-Syncer", func() {
 		nsWithLabel = f.NewNamespaceWithLabel()
 	})
 
-	JustBeforeEach(func() {
-		if f.SelfHostedOperator {
-			By("Restarting kubed operator")
-			err := f.RestartKubedOperator(&clusterConfig)
-			Expect(err).NotTo(HaveOccurred())
-		} else {
-			By("Starting Kubed")
-			stopCh = make(chan struct{})
-			err := f.RunKubed(stopCh, clusterConfig)
-			Expect(err).NotTo(HaveOccurred())
-
-			By("Waiting for API server to be ready")
-			root.EventuallyAPIServerReady().Should(Succeed())
-			time.Sleep(time.Second * 5)
-		}
-	})
-
 	AfterEach(func() {
-		if !f.SelfHostedOperator {
-			close(stopCh)
-		}
 		f.DeleteAllSecrets()
 
 		err := f.KubeClient.CoreV1().Namespaces().Delete(nsWithLabel.Name, &metav1.DeleteOptions{})
@@ -72,7 +68,7 @@ var _ = Describe("Secret-Syncer", func() {
 
 			By("Adding sync annotation")
 			sourceSecret, _, err = core_util.PatchSecret(f.KubeClient, sourceSecret, func(obj *core.Secret) *core.Secret {
-				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "")
+				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "")
 				return obj
 			})
 			Expect(err).ShouldNot(HaveOccurred())
@@ -85,7 +81,7 @@ var _ = Describe("Secret-Syncer", func() {
 	Describe("Across Namespaces", func() {
 
 		BeforeEach(func() {
-			clusterConfig = framework.ConfigSyncClusterConfig()
+			config = operator.Config{}
 		})
 
 		Context("All Namespaces", func() {
@@ -117,7 +113,7 @@ var _ = Describe("Secret-Syncer", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				_, _, err = core_util.PatchSecret(f.KubeClient, source, func(obj *core.Secret) *core.Secret {
-					obj.Annotations = meta.RemoveKey(obj.Annotations, api.ConfigSyncKey)
+					obj.Annotations = meta.RemoveKey(obj.Annotations, syncer.ConfigSyncKey)
 					return obj
 				})
 				Expect(err).ShouldNot(HaveOccurred())
@@ -160,7 +156,7 @@ var _ = Describe("Secret-Syncer", func() {
 
 				By("Adding sync=true annotation")
 				source, _, err = core_util.PatchSecret(f.KubeClient, source, func(obj *core.Secret) *core.Secret {
-					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "true")
+					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "true")
 					return obj
 				})
 				Expect(err).ShouldNot(HaveOccurred())
@@ -181,7 +177,7 @@ var _ = Describe("Secret-Syncer", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				source, _, err = core_util.PatchSecret(f.KubeClient, source, func(obj *core.Secret) *core.Secret {
-					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "app="+f.App())
+					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "app="+f.App())
 					return obj
 				})
 				Expect(err).NotTo(HaveOccurred())
@@ -198,7 +194,7 @@ var _ = Describe("Secret-Syncer", func() {
 
 				By("Changing selector annotation")
 				_, _, err = core_util.PatchSecret(f.KubeClient, source, func(obj *core.Secret) *core.Secret {
-					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "app=do-not-match")
+					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "app=do-not-match")
 					return obj
 				})
 				Expect(err).ShouldNot(HaveOccurred())
@@ -211,7 +207,7 @@ var _ = Describe("Secret-Syncer", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				source, _, err = core_util.PatchSecret(f.KubeClient, source, func(obj *core.Secret) *core.Secret {
-					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncKey, "")
+					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "")
 					return obj
 				})
 				Expect(err).ShouldNot(HaveOccurred())
@@ -275,9 +271,9 @@ var _ = Describe("Secret-Syncer", func() {
 			)
 
 			BeforeEach(func() {
-				clusterConfig = framework.ConfigSyncClusterConfig()
-				clusterConfig.ClusterName = "minikube"
-				clusterConfig.KubeConfigFile = kubeConfigPath
+				config = operator.Config{}
+				config.ClusterName = "minikube"
+				config.KubeConfigFile = kubeConfigPath
 
 				if _, err := os.Stat(kubeConfigPath); err != nil {
 					Skip(`"config" file not found on` + kubeConfigPath)
@@ -302,7 +298,7 @@ var _ = Describe("Secret-Syncer", func() {
 
 				By("Adding sync annotation")
 				secret, _, err = core_util.PatchSecret(f.KubeClient, secret, func(obj *core.Secret) *core.Secret {
-					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, api.ConfigSyncContexts, context)
+					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncContexts, context)
 					return obj
 				})
 				Expect(err).ShouldNot(HaveOccurred())
@@ -311,8 +307,8 @@ var _ = Describe("Secret-Syncer", func() {
 				f.EventuallyNumOfConfigmapsForContext(kubeConfigPath, context).Should(BeNumerically("==", 1))
 
 				By("Removing sync annotation")
-				secret, _, err = core_util.PatchSecret(f.KubeClient, secret, func(obj *core.Secret) *core.Secret {
-					obj.Annotations = meta.RemoveKey(obj.Annotations, api.ConfigSyncContexts)
+				_, _, err = core_util.PatchSecret(f.KubeClient, secret, func(obj *core.Secret) *core.Secret {
+					obj.Annotations = meta.RemoveKey(obj.Annotations, syncer.ConfigSyncContexts)
 					return obj
 				})
 				Expect(err).ShouldNot(HaveOccurred())

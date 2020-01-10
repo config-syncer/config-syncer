@@ -1,12 +1,26 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package framework
 
 import (
 	"reflect"
 
-	"github.com/appscode/go/crypto/rand"
-	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/syncer"
-	"github.com/ghodss/yaml"
+
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
@@ -14,48 +28,48 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
+	kutil "kmodules.xyz/client-go"
 	"kmodules.xyz/client-go/tools/clientcmd"
-	store "kmodules.xyz/objectstore-api/api/v1"
 )
 
-func (f *Invocation) NewSecret() *core.Secret {
+func (fi *Invocation) NewSecret() *core.Secret {
 	return &core.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      f.App(),
-			Namespace: f.Namespace(),
+			Name:      fi.App(),
+			Namespace: fi.Namespace(),
 			Labels: map[string]string{
-				"app": f.App(),
+				"app": fi.App(),
 			},
 		},
 		StringData: map[string]string{
-			"you":   "only",
-			"leave": "once",
+			"you":  "only",
+			"live": "once",
 		},
 	}
 }
 
-func (f *Invocation) EventuallyNumOfSecrets(namespace string) GomegaAsyncAssertion {
-	return f.EventuallyNumOfSecretsForClient(f.KubeClient, namespace)
+func (fi *Invocation) EventuallyNumOfSecrets(namespace string) GomegaAsyncAssertion {
+	return fi.EventuallyNumOfSecretsForClient(fi.KubeClient, namespace)
 }
 
-func (f *Invocation) EventuallyNumOfSecretsForContext(kubeConfigPath string, context string) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallyNumOfSecretsForContext(kubeConfigPath string, context string) GomegaAsyncAssertion {
 	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 
 	if ns == "" {
-		ns = f.Namespace()
+		ns = fi.Namespace()
 	}
 
-	return f.EventuallyNumOfSecretsForClient(client, ns)
+	return fi.EventuallyNumOfSecretsForClient(client, ns)
 }
 
-func (f *Invocation) EventuallyNumOfSecretsForClient(client kubernetes.Interface, namespace string) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallyNumOfSecretsForClient(client kubernetes.Interface, namespace string) GomegaAsyncAssertion {
 	return Eventually(func() int {
 		secrets, err := client.CoreV1().Secrets(namespace).List(metav1.ListOptions{
 			LabelSelector: labels.Set{
-				"app": f.App(),
+				"app": fi.App(),
 			}.String(),
 		})
 		Expect(err).NotTo(HaveOccurred())
@@ -63,44 +77,41 @@ func (f *Invocation) EventuallyNumOfSecretsForClient(client kubernetes.Interface
 	})
 }
 
-func (f *Invocation) EventuallySecretSynced(source *core.Secret) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallySecretSynced(source *core.Secret) GomegaAsyncAssertion {
 	opt := syncer.GetSyncOptions(source.Annotations)
 
 	return Eventually(func() bool {
 
 		if opt.NamespaceSelector != nil {
-			namespaces, err := syncer.NamespacesForSelector(f.KubeClient, *opt.NamespaceSelector)
+			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
 
 			for _, ns := range namespaces.List() {
 				if ns == source.Name {
 					continue
 				}
-				_, err := f.KubeClient.CoreV1().Secrets(ns).Get(source.Name, metav1.GetOptions{})
+				_, err := fi.KubeClient.CoreV1().Secrets(ns).Get(source.Name, metav1.GetOptions{})
 				if err != nil {
 					return false
 				}
 			}
 			return true
-
-		} else if opt.Contexts != nil {
-			//TODO: Check across context
 		}
 		return false
 	})
 }
 
-func (f *Invocation) EventuallySecretNotSynced(source *core.Secret) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallySecretNotSynced(source *core.Secret) GomegaAsyncAssertion {
 
 	return Eventually(func() bool {
-		namespaces, err := f.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
+		namespaces, err := fi.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
 		Expect(err).NotTo(HaveOccurred())
 
 		for _, ns := range namespaces.Items {
 			if ns.Name == source.Name {
 				continue
 			}
-			_, err := f.KubeClient.CoreV1().Secrets(ns.Namespace).Get(source.Name, metav1.GetOptions{})
+			_, err := fi.KubeClient.CoreV1().Secrets(ns.Namespace).Get(source.Name, metav1.GetOptions{})
 			if err == nil {
 				return false
 			}
@@ -109,31 +120,27 @@ func (f *Invocation) EventuallySecretNotSynced(source *core.Secret) GomegaAsyncA
 	})
 }
 
-func (f *Invocation) EventuallySecretSyncedToNamespace(source *core.Secret, namespace string) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallySecretSyncedToNamespace(source *core.Secret, namespace string) GomegaAsyncAssertion {
 	return Eventually(func() bool {
-		_, err := f.KubeClient.CoreV1().Secrets(namespace).Get(source.Name, metav1.GetOptions{})
-		if err != nil {
-			return false
-		}
-
-		return true
+		_, err := fi.KubeClient.CoreV1().Secrets(namespace).Get(source.Name, metav1.GetOptions{})
+		return err == nil
 	})
 }
 
-func (f *Invocation) EventuallySyncedSecretsUpdated(source *core.Secret) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallySyncedSecretsUpdated(source *core.Secret) GomegaAsyncAssertion {
 	opt := syncer.GetSyncOptions(source.Annotations)
 
 	return Eventually(func() bool {
 
 		if opt.NamespaceSelector != nil {
-			namespaces, err := syncer.NamespacesForSelector(f.KubeClient, *opt.NamespaceSelector)
+			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
 
 			for _, ns := range namespaces.List() {
 				if ns == source.Namespace {
 					continue
 				}
-				secretReplica, err := f.KubeClient.CoreV1().Secrets(ns).Get(source.Name, metav1.GetOptions{})
+				secretReplica, err := fi.KubeClient.CoreV1().Secrets(ns).Get(source.Name, metav1.GetOptions{})
 				if err != nil {
 					return false
 				}
@@ -142,51 +149,45 @@ func (f *Invocation) EventuallySyncedSecretsUpdated(source *core.Secret) GomegaA
 				}
 			}
 			return true
-
-		} else if opt.Contexts != nil {
-			//TODO: Check across context
 		}
 		return false
 	})
 }
 
-func (f *Invocation) EventuallySyncedSecretsDeleted(source *core.Secret) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallySyncedSecretsDeleted(source *core.Secret) GomegaAsyncAssertion {
 	opt := syncer.GetSyncOptions(source.Annotations)
 
 	return Eventually(func() bool {
 
 		if opt.NamespaceSelector != nil {
-			namespaces, err := syncer.NamespacesForSelector(f.KubeClient, *opt.NamespaceSelector)
+			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
 
 			for _, ns := range namespaces.List() {
 				if ns == source.Namespace {
 					continue
 				}
-				_, err := f.KubeClient.CoreV1().Secrets(ns).Get(source.Name, metav1.GetOptions{})
+				_, err := fi.KubeClient.CoreV1().Secrets(ns).Get(source.Name, metav1.GetOptions{})
 				if err == nil {
 					return false
 				}
 			}
 			return true
-
-		} else if opt.Contexts != nil {
-			//TODO: Check across context
 		}
 		return false
 	})
 }
 
-func (f *Invocation) DeleteAllSecrets() {
-	secrets, err := f.KubeClient.CoreV1().Secrets(metav1.NamespaceAll).List(metav1.ListOptions{
+func (fi *Invocation) DeleteAllSecrets() {
+	secrets, err := fi.KubeClient.CoreV1().Secrets(metav1.NamespaceAll).List(metav1.ListOptions{
 		LabelSelector: labels.Set{
-			"app": f.App(),
+			"app": fi.App(),
 		}.String(),
 	})
 	Expect(err).NotTo(HaveOccurred())
 
 	for _, value := range secrets.Items {
-		err := f.KubeClient.CoreV1().Secrets(value.Namespace).Delete(value.Name, &metav1.DeleteOptions{})
+		err := fi.KubeClient.CoreV1().Secrets(value.Namespace).Delete(value.Name, &metav1.DeleteOptions{})
 		if kerr.IsNotFound(err) {
 			err = nil
 		}
@@ -202,30 +203,8 @@ func (f *Framework) DeleteSecret(meta metav1.ObjectMeta) error {
 	return f.KubeClient.CoreV1().Secrets(meta.Namespace).Delete(meta.Name, deleteInForeground())
 }
 
-func (f *Invocation) SecretForMinioBackend(includeCert bool) core.Secret {
-	secret := core.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      rand.WithUniqSuffix(f.app + "-minio"),
-			Namespace: f.namespace,
-		},
-		Data: map[string][]byte{
-			store.AWS_ACCESS_KEY_ID:     []byte(MINIO_ACCESS_KEY_ID),
-			store.AWS_SECRET_ACCESS_KEY: []byte(MINIO_SECRET_ACCESS_KEY),
-		},
-	}
-
-	if includeCert {
-		secret.Data[store.CA_CERT_DATA] = f.CertStore.CACertBytes()
-	}
-
-	return secret
-}
-
 func (fi *Invocation) SecretForWebhookNotifier() *core.Secret {
-	namespace := fi.namespace
-	if fi.SelfHostedOperator {
-		namespace = OperatorNamespace
-	}
+	namespace := OperatorNamespace
 	return &core.Secret{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Secret",
@@ -241,9 +220,9 @@ func (fi *Invocation) SecretForWebhookNotifier() *core.Secret {
 	}
 }
 
-func (f *Invocation) WaitUntilSecretCreated(meta metav1.ObjectMeta) error {
-	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
-		if _, err := f.KubeClient.CoreV1().Secrets(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err != nil {
+func (fi *Invocation) WaitUntilSecretCreated(meta metav1.ObjectMeta) error {
+	return wait.PollImmediate(kutil.RetryInterval, kutil.ReadinessTimeout, func() (done bool, err error) {
+		if _, err := fi.KubeClient.CoreV1().Secrets(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err != nil {
 			if kerr.IsNotFound(err) {
 				return false, nil
 			} else {
@@ -254,9 +233,9 @@ func (f *Invocation) WaitUntilSecretCreated(meta metav1.ObjectMeta) error {
 	})
 }
 
-func (f *Invocation) WaitUntilSecretDeleted(meta metav1.ObjectMeta) error {
-	return wait.PollImmediate(interval, timeout, func() (done bool, err error) {
-		if _, err := f.KubeClient.CoreV1().Secrets(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err != nil {
+func (fi *Invocation) WaitUntilSecretDeleted(meta metav1.ObjectMeta) error {
+	return wait.PollImmediate(kutil.RetryInterval, kutil.GCTimeout, func() (done bool, err error) {
+		if _, err := fi.KubeClient.CoreV1().Secrets(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err != nil {
 			if kerr.IsNotFound(err) {
 				return true, nil
 			} else {
@@ -265,18 +244,4 @@ func (f *Invocation) WaitUntilSecretDeleted(meta metav1.ObjectMeta) error {
 		}
 		return false, nil
 	})
-}
-
-func (f *Framework) KubeConfigSecret(config *api.ClusterConfig, meta metav1.ObjectMeta) (*core.Secret, error) {
-	data, err := yaml.Marshal(config)
-	if err != nil {
-		return nil, err
-	}
-
-	return &core.Secret{
-		ObjectMeta: meta,
-		Data: map[string][]byte{
-			"config.yaml": data,
-		},
-	}, nil
 }

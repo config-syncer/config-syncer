@@ -16,81 +16,100 @@ section_menu_id: setup
 
 # Installation Guide
 
-## Create Cluster Config
-Before you can install Kubed, you need a cluster config for Kubed. Cluster config is defined in YAML format. You find an example config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/{{< param "info.version" >}}/hack/deploy/config.yaml).
+Kubed operator can be installed via a script or as a Helm chart.
 
-```yaml
-$ cat https://raw.githubusercontent.com/appscode/kubed/{{< param "info.version" >}}/hack/deploy/config.yaml
+<ul class="nav nav-tabs" id="installerTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="helm3-tab" data-toggle="tab" href="#helm3" role="tab" aria-controls="helm3" aria-selected="true">Helm 3 (Recommended)</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="helm2-tab" data-toggle="tab" href="#helm2" role="tab" aria-controls="helm2" aria-selected="false">Helm 2</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="script-tab" data-toggle="tab" href="#script" role="tab" aria-controls="script" aria-selected="false">YAML</a>
+  </li>
+</ul>
+<div class="tab-content" id="installerTabContent">
+  <div class="tab-pane fade show active" id="helm3" role="tabpanel" aria-labelledby="helm3-tab">
 
-clusterName: unicorn
-enableConfigSyncer: true
-eventForwarder:
-  receivers:
-  - notifier: Mailgun
-    to:
-    - ops@example.com
-  rules:
-  - namespaces:
-    - kube-system
-    operations:
-    - CREATE
-    resources:
-    - group: ""
-      resources:
-      - events
-  - operations:
-    - CREATE
-    resources:
-    - group: ""
-      resources:
-      - nodes
-      - persistentvolumes
-      - persistentvolumeclaims
-    - group: storage.k8s.io
-      resources:
-      - storageclasses
-    - group: extensions
-      resources:
-      - ingresses
-    - group: voyager.appscode.com
-      resources:
-      - ingresses
-    - group: certificates.k8s.io
-      resources:
-      - certificatesigningrequests
-    - group: networking.k8s.io
-      resources:
-      - networkpolicies
-notifierSecretName: notifier-config
-recycleBin:
-  handleUpdates: false
-  path: /tmp/kubed/trash
-  ttl: 168h0m0s
-```
+## Using Helm 3
 
-To understand the various configuration options, check Kubed [tutorials](/docs/guides/README.md). Once you are satisfied with the configuration, create a Secret with the Kubed cluster config under `config.yaml` key.
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
 
 ```console
-$ kubectl create secret generic kubed-config -n kube-system \
-    --from-literal=config.yaml=$(curl -fsSL https://raw.githubusercontent.com/appscode/kubed/{{< param "info.version" >}}/hack/deploy/config.yaml)
-secret "kubed-config" created
+$ helm repo add appscode https://charts.appscode.com/stable/
+$ helm repo update
+$ helm search repo appscode/kubed --version {{< param "info.version" >}}
+NAME            CHART VERSION APP VERSION DESCRIPTION
+appscode/kubed  {{< param "info.version" >}}    {{< param "info.version" >}}  Kubed by AppsCode - Kubernetes daemon
 
-# apply app=kubed label to easily cleanup later
-$ kubectl label secret kubed-config app=kubed -n kube-system
-secret "kubed-config" labeled
-
+$ helm install kubed appscode/kubed \
+  --version {{< param "info.version" >}} \
+  --namespace kube-system
 ```
 
-You may have to create another [Secret for notifiers](/docs/guides/cluster-events/notifiers.md), usually called `notifier-config`. If you are [storing cluster snapshots](/docs/guides/disaster-recovery/cluster-snapshot.md) in cloud storage, you have to create another Secret to provide cloud credentials.
+To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/{{< param "info.version" >}}/charts/kubed).
 
-### Generate Config using script
-If you are familiar with GO, you can use the [./hack/config/main.go](https://github.com/appscode/kubed/blob/{{< param "info.version" >}}/hack/config/main.go) script to generate a cluster config. Open this file in your favorite editor, update the config returned from `#CreateClusterConfig()` method. Then run the script to generate updated config in [./hack/deploy/config.yaml](https://raw.githubusercontent.com/appscode/kubed/{{< param "info.version" >}}/hack/deploy/config.yaml).
+</div>
+<div class="tab-pane fade" id="helm2" role="tabpanel" aria-labelledby="helm2-tab">
+
+## Using Helm 2
+
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
 
 ```console
-go run ./hack/config/main.go
+$ helm repo add appscode https://charts.appscode.com/stable/
+$ helm repo update
+$ helm search appscode/kubed --version {{< param "info.version" >}}
+NAME            CHART VERSION APP VERSION DESCRIPTION
+appscode/kubed  {{< param "info.version" >}}    {{< param "info.version" >}}  Kubed by AppsCode - Kubernetes daemon
+
+$ helm install appscode/kubed --name kubed \
+  --version {{< param "info.version" >}} \
+  --namespace kube-system
 ```
 
-### Verifying Cluster Config
+To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/{{< param "info.version" >}}/charts/kubed).
+
+</div>
+<div class="tab-pane fade" id="script" role="tabpanel" aria-labelledby="script-tab">
+
+## Using YAML
+
+If you prefer to not use Helm, you can generate YAMLs from Kubed chart and deploy using `kubectl`. Here we are going to show the prodecure using Helm 3.
+
+```console
+$ helm repo add appscode https://charts.appscode.com/stable/
+$ helm repo update
+$ helm search repo appscode/kubed --version {{< param "info.version" >}}
+NAME            CHART VERSION APP VERSION DESCRIPTION
+appscode/kubed  {{< param "info.version" >}}    {{< param "info.version" >}}  Kubed by AppsCode - Kubernetes daemon
+
+$ helm template kubed appscode/kubed \
+  --version {{< param "info.version" >}} \
+  --namespace kube-system \
+  --no-hooks | kubectl apply -f -
+```
+
+To see the detailed configuration options, visit [here](https://github.com/appscode/kubed/tree/{{< param "info.version" >}}/charts/kubed).
+
+</div>
+</div>
+
+### Installing in GKE Cluster
+
+If you are installing Kubed on a GKE cluster, you will need cluster admin permissions to install Kubed operator. Run the following command to grant admin permision to the cluster.
+
+```console
+$ kubectl create clusterrolebinding "cluster-admin-$(whoami)" \
+  --clusterrole=cluster-admin \
+  --user="$(gcloud config get-value core/account)"
+```
+
+In addition, if your GKE cluster is a [private cluster](https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters), you will need to either add an additional firewall rule that allows master nodes access port `8443/tcp` on worker nodes, or change the existing rule that allows access to ports `443/tcp` and `10250/tcp` to also allow access to port `8443/tcp`. The procedure to add or modify firewall rules is described in the official GKE documentation for private clusters mentioned before.
+
+## Verify installation
+
 Kubed includes a check command to verify a cluster config. Download the pre-built binary from [appscode/kubed Github releases](https://github.com/appscode/kubed/releases) and put the binary to some directory in your `PATH`.
 
 ```console
@@ -226,17 +245,3 @@ $ kubectl get pods --all-namespaces -l app=kubed --watch
 ```
 
 Once the operator pods are running, you can cancel the above command by typing `Ctrl+C`.
-
-
-## Configuring RBAC
-Kubed creates a custom resource: `SearchResult`. Kubed installer will create a user facing cluster role:
-
-| ClusterRole           | Aggregates To     | Desription                            |
-|-----------------------|-------------------|---------------------------------------|
-| appscode:voyager:view | admin, edit, view | Allows read-only access to Kubed resources, intended to be granted within a namespace using a RoleBinding. |
-
-These user facing roles supports [ClusterRole Aggregation](https://kubernetes.io/docs/admin/authorization/rbac/#aggregated-clusterroles) feature in Kubernetes 1.9 or later clusters.
-
-
-## Update Cluster Config
-If you would like to update cluster config, update the `kubed-config` Secret. Kubed will notice the change in config file and automatically apply the updated configuration.

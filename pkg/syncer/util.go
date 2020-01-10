@@ -1,10 +1,26 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package syncer
 
 import (
 	"strings"
 
 	"github.com/appscode/go/types"
-	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -19,21 +35,21 @@ type SyncOptions struct {
 
 func GetSyncOptions(annotations map[string]string) SyncOptions {
 	opts := SyncOptions{}
-	if v, err := meta.GetStringValue(annotations, api.ConfigSyncKey); err == nil {
+	if v, err := meta.GetStringValue(annotations, ConfigSyncKey); err == nil {
 		if v == "true" {
 			opts.NamespaceSelector = types.StringP(labels.Everything().String())
 		} else {
 			opts.NamespaceSelector = &v
 		}
 	}
-	if contexts, _ := meta.GetStringValue(annotations, api.ConfigSyncContexts); contexts != "" {
+	if contexts, _ := meta.GetStringValue(annotations, ConfigSyncContexts); contexts != "" {
 		opts.Contexts = sets.NewString(strings.Split(contexts, ",")...)
 	}
 	return opts
 }
 
-func NamespacesForSelector(kubeClient kubernetes.Interface, selector string) (sets.String, error) {
-	namespaces, err := kubeClient.CoreV1().Namespaces().List(metav1.ListOptions{
+func NamespacesForSelector(kc kubernetes.Interface, selector string) (sets.String, error) {
+	namespaces, err := kc.CoreV1().Namespaces().List(metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {

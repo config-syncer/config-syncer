@@ -1,14 +1,29 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package framework
 
 import (
-	"fmt"
-	"io/ioutil"
 	"path/filepath"
 	"reflect"
 	"strings"
 
 	"github.com/appscode/go/encoding/yaml"
 	"github.com/appscode/kubed/pkg/syncer"
+
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
@@ -19,43 +34,43 @@ import (
 	"kmodules.xyz/client-go/tools/exec"
 )
 
-func (f *Invocation) NewConfigMap() *core.ConfigMap {
+func (fi *Invocation) NewConfigMap() *core.ConfigMap {
 	return &core.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      f.App(),
-			Namespace: f.Namespace(),
+			Name:      fi.App(),
+			Namespace: fi.Namespace(),
 			Labels: map[string]string{
-				"app": f.App(),
+				"app": fi.App(),
 			},
 		},
 		Data: map[string]string{
-			"you":   "only",
-			"leave": "once",
+			"you":  "only",
+			"live": "once",
 		},
 	}
 }
 
-func (f *Invocation) EventuallyNumOfConfigmaps(namespace string) GomegaAsyncAssertion {
-	return f.EventuallyNumOfConfigmapsForClient(f.KubeClient, namespace)
+func (fi *Invocation) EventuallyNumOfConfigmaps(namespace string) GomegaAsyncAssertion {
+	return fi.EventuallyNumOfConfigmapsForClient(fi.KubeClient, namespace)
 }
 
-func (f *Invocation) EventuallyNumOfConfigmapsForContext(kubeConfigPath string, context string) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallyNumOfConfigmapsForContext(kubeConfigPath string, context string) GomegaAsyncAssertion {
 	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 	if ns == "" {
-		ns = f.Namespace()
+		ns = fi.Namespace()
 	}
 
-	return f.EventuallyNumOfConfigmapsForClient(client, ns)
+	return fi.EventuallyNumOfConfigmapsForClient(client, ns)
 }
 
-func (f *Invocation) EventuallyNumOfConfigmapsForClient(client kubernetes.Interface, namespace string) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallyNumOfConfigmapsForClient(client kubernetes.Interface, namespace string) GomegaAsyncAssertion {
 	return Eventually(func() int {
 		cfgMaps, err := client.CoreV1().ConfigMaps(namespace).List(metav1.ListOptions{
 			LabelSelector: labels.Set{
-				"app": f.App(),
+				"app": fi.App(),
 			}.String(),
 		})
 		Expect(err).NotTo(HaveOccurred())
@@ -63,44 +78,41 @@ func (f *Invocation) EventuallyNumOfConfigmapsForClient(client kubernetes.Interf
 	})
 }
 
-func (f *Invocation) EventuallyConfigMapSynced(source *core.ConfigMap) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallyConfigMapSynced(source *core.ConfigMap) GomegaAsyncAssertion {
 	opt := syncer.GetSyncOptions(source.Annotations)
 
 	return Eventually(func() bool {
 
 		if opt.NamespaceSelector != nil {
-			namespaces, err := syncer.NamespacesForSelector(f.KubeClient, *opt.NamespaceSelector)
+			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
 
 			for _, ns := range namespaces.List() {
 				if ns == source.Name {
 					continue
 				}
-				_, err := f.KubeClient.CoreV1().ConfigMaps(ns).Get(source.Name, metav1.GetOptions{})
+				_, err := fi.KubeClient.CoreV1().ConfigMaps(ns).Get(source.Name, metav1.GetOptions{})
 				if err != nil {
 					return false
 				}
 			}
 			return true
-
-		} else if opt.Contexts != nil {
-			//TODO: Check across context
 		}
 		return false
 	})
 }
 
-func (f *Invocation) EventuallyConfigMapNotSynced(source *core.ConfigMap) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallyConfigMapNotSynced(source *core.ConfigMap) GomegaAsyncAssertion {
 
 	return Eventually(func() bool {
-		namespaces, err := f.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
+		namespaces, err := fi.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
 		Expect(err).NotTo(HaveOccurred())
 
 		for _, ns := range namespaces.Items {
 			if ns.Name == source.Name {
 				continue
 			}
-			_, err := f.KubeClient.CoreV1().ConfigMaps(ns.Namespace).Get(source.Name, metav1.GetOptions{})
+			_, err := fi.KubeClient.CoreV1().ConfigMaps(ns.Namespace).Get(source.Name, metav1.GetOptions{})
 			if err == nil {
 				return false
 			}
@@ -109,31 +121,27 @@ func (f *Invocation) EventuallyConfigMapNotSynced(source *core.ConfigMap) Gomega
 	})
 }
 
-func (f *Invocation) EventuallyConfigMapSyncedToNamespace(source *core.ConfigMap, namespace string) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallyConfigMapSyncedToNamespace(source *core.ConfigMap, namespace string) GomegaAsyncAssertion {
 	return Eventually(func() bool {
-		_, err := f.KubeClient.CoreV1().ConfigMaps(namespace).Get(source.Name, metav1.GetOptions{})
-		if err != nil {
-			return false
-		}
-
-		return true
+		_, err := fi.KubeClient.CoreV1().ConfigMaps(namespace).Get(source.Name, metav1.GetOptions{})
+		return err == nil
 	})
 }
 
-func (f *Invocation) EventuallySyncedConfigMapsUpdated(source *core.ConfigMap) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallySyncedConfigMapsUpdated(source *core.ConfigMap) GomegaAsyncAssertion {
 	opt := syncer.GetSyncOptions(source.Annotations)
 
 	return Eventually(func() bool {
 
 		if opt.NamespaceSelector != nil {
-			namespaces, err := syncer.NamespacesForSelector(f.KubeClient, *opt.NamespaceSelector)
+			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
 
 			for _, ns := range namespaces.List() {
 				if ns == source.Namespace {
 					continue
 				}
-				cmReplica, err := f.KubeClient.CoreV1().ConfigMaps(ns).Get(source.Name, metav1.GetOptions{})
+				cmReplica, err := fi.KubeClient.CoreV1().ConfigMaps(ns).Get(source.Name, metav1.GetOptions{})
 				if err != nil {
 					return false
 				}
@@ -142,121 +150,90 @@ func (f *Invocation) EventuallySyncedConfigMapsUpdated(source *core.ConfigMap) G
 				}
 			}
 			return true
-
-		} else if opt.Contexts != nil {
-			//TODO: Check across context
 		}
 		return false
 	})
 }
 
-func (f *Invocation) EventuallySyncedConfigMapsDeleted(source *core.ConfigMap) GomegaAsyncAssertion {
+func (fi *Invocation) EventuallySyncedConfigMapsDeleted(source *core.ConfigMap) GomegaAsyncAssertion {
 	opt := syncer.GetSyncOptions(source.Annotations)
 
 	return Eventually(func() bool {
 
 		if opt.NamespaceSelector != nil {
-			namespaces, err := syncer.NamespacesForSelector(f.KubeClient, *opt.NamespaceSelector)
+			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
 
 			for _, ns := range namespaces.List() {
 				if ns == source.Namespace {
 					continue
 				}
-				_, err := f.KubeClient.CoreV1().ConfigMaps(ns).Get(source.Name, metav1.GetOptions{})
+				_, err := fi.KubeClient.CoreV1().ConfigMaps(ns).Get(source.Name, metav1.GetOptions{})
 				if err == nil {
 					return false
 				}
 			}
 			return true
-
-		} else if opt.Contexts != nil {
-			//TODO: Check across context
 		}
 		return false
 	})
 }
 
-func (f *Invocation) ReadConfigMapFromRecycleBin(recycleBinLocation string, cm *core.ConfigMap) (*core.ConfigMap, error) {
+func (fi *Invocation) ReadConfigMapFromRecycleBin(recycleBinLocation string, cm *core.ConfigMap) (*core.ConfigMap, error) {
 	deletedConfigMap := &core.ConfigMap{}
 	dir := filepath.Join(recycleBinLocation, filepath.Dir(cm.SelfLink))
 
-	if f.SelfHostedOperator {
-		pod, err := f.OperatorPod()
-		if err != nil {
-			return nil, err
-		}
-
-		// list the name of recycled configMaps
-		output, err := exec.ExecIntoPod(f.ClientConfig, pod, exec.Command("ls", dir))
-		if err != nil {
-			return nil, err
-		}
-
-		// read the recycled configMaps
-		var recycledCMName string
-		fileNames := strings.Split(output, "\n")
-		for _, fileName := range fileNames {
-			if strings.HasPrefix(fileName, cm.Name) && strings.HasSuffix(fileName, ".yaml") {
-				recycledCMName = fileName
-				break
-			}
-		}
-		output, err = exec.ExecIntoPod(f.ClientConfig, pod, exec.Command("cat", filepath.Join(dir, recycledCMName)))
-		if err != nil {
-			return nil, err
-		}
-
-		err = yaml.Unmarshal([]byte(output), &deletedConfigMap)
-		if err != nil {
-			return nil, err
-		}
-		return deletedConfigMap, nil
-
-	}
-
-	files, err := ioutil.ReadDir(dir)
+	pod, err := fi.OperatorPod()
 	if err != nil {
 		return nil, err
 	}
 
-	for _, file := range files {
-		if strings.HasPrefix(file.Name(), cm.Name) && strings.HasSuffix(file.Name(), ".yaml") {
-			data, err := ioutil.ReadFile(filepath.Join(dir, file.Name()))
-			if err != nil {
-				return nil, err
-			}
+	// list the name of recycled configMaps
+	output, err := exec.ExecIntoPod(fi.ClientConfig, pod, exec.Command("ls", dir))
+	if err != nil {
+		return nil, err
+	}
 
-			err = yaml.Unmarshal(data, &deletedConfigMap)
-			if err != nil {
-				return nil, err
-			}
-			return deletedConfigMap, nil
+	// read the recycled configMaps
+	var recycledCMName string
+	fileNames := strings.Split(output, "\n")
+	for _, fileName := range fileNames {
+		if strings.HasPrefix(fileName, cm.Name) && strings.HasSuffix(fileName, ".yaml") {
+			recycledCMName = fileName
+			break
 		}
 	}
-	return deletedConfigMap, fmt.Errorf("configmap not found")
+	output, err = exec.ExecIntoPod(fi.ClientConfig, pod, exec.Command("cat", filepath.Join(dir, recycledCMName)))
+	if err != nil {
+		return nil, err
+	}
 
+	err = yaml.Unmarshal([]byte(output), &deletedConfigMap)
+	if err != nil {
+		return nil, err
+	}
+	return deletedConfigMap, nil
 }
 
-func (f *Invocation) DeleteAllConfigmaps() {
-	cfgMaps, err := f.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
+func (fi *Invocation) DeleteAllConfigmaps() {
+	cfgMaps, err := fi.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
 		LabelSelector: labels.Set{
-			"app": f.App(),
+			"app": fi.App(),
 		}.String(),
 	})
 	Expect(err).NotTo(HaveOccurred())
 
 	for _, value := range cfgMaps.Items {
-		err := f.DeleteConfigMap(value.ObjectMeta)
+		err := fi.DeleteConfigMap(value.ObjectMeta)
 		if kerr.IsNotFound(err) {
 			Expect(err).NotTo(HaveOccurred())
 		}
 	}
 }
 
-func (f *Invocation) CreateConfigMap(configMap *core.ConfigMap) (*core.ConfigMap, error) {
-	return f.KubeClient.CoreV1().ConfigMaps(configMap.Namespace).Create(configMap)
+func (fi *Invocation) CreateConfigMap(configMap *core.ConfigMap) (*core.ConfigMap, error) {
+	return fi.KubeClient.CoreV1().ConfigMaps(configMap.Namespace).Create(configMap)
 }
-func (f *Invocation) DeleteConfigMap(meta metav1.ObjectMeta) error {
-	return f.KubeClient.CoreV1().ConfigMaps(meta.Namespace).Delete(meta.Name, &metav1.DeleteOptions{})
+func (fi *Invocation) DeleteConfigMap(meta metav1.ObjectMeta) error {
+	return fi.KubeClient.CoreV1().ConfigMaps(meta.Namespace).Delete(meta.Name, &metav1.DeleteOptions{})
 }

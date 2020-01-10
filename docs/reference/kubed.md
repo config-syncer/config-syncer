@@ -40,8 +40,6 @@ Kubed is a Kubernetes daemon to perform cluster management tasks. For more infor
 
 ### SEE ALSO
 
-* [kubed backup](/docs/reference/kubed_backup.md)	 - Takes a backup of Kubernetes api objects
-* [kubed check](/docs/reference/kubed_check.md)	 - Check cluster config
 * [kubed run](/docs/reference/kubed_run.md)	 - Launch Kubernetes Cluster Daemon
 * [kubed version](/docs/reference/kubed_version.md)	 - Prints binary version number.
 

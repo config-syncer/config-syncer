@@ -1,9 +1,25 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package syncer
 
 import (
 	"github.com/appscode/go/log"
-	api "github.com/appscode/kubed/apis/kubed/v1alpha1"
 	"github.com/appscode/kubed/pkg/eventer"
+
 	"github.com/golang/glog"
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
@@ -59,7 +75,7 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 
 	// sync to contexts specified via annotation, do not ignore errors here
 	for _, ctx := range contexts.List() {
-		context, _ := s.contexts[ctx]
+		context := s.contexts[ctx]
 		if context.Namespace == "" { // use source namespace if not specified via context
 			context.Namespace = src.Namespace
 		}
@@ -85,8 +101,8 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 
 // upsert into newNs set, delete from (oldNs-newNs) set
 // use skipSrcNs = true for sync in source cluster
-func (s *ConfigSyncer) syncSecretIntoNamespaces(k8sClient kubernetes.Interface, src *core.Secret, newNs sets.String, skipSrcNs bool, context string) error {
-	oldNs, err := namespaceSetForSecretSelector(k8sClient, s.syncerLabelSelector(src.Name, src.Namespace, s.clusterName))
+func (s *ConfigSyncer) syncSecretIntoNamespaces(kc kubernetes.Interface, src *core.Secret, newNs sets.String, skipSrcNs bool, context string) error {
+	oldNs, err := namespaceSetForSecretSelector(kc, s.syncerLabelSelector(src.Name, src.Namespace, s.clusterName))
 	if err != nil {
 		return err
 	}
@@ -96,12 +112,12 @@ func (s *ConfigSyncer) syncSecretIntoNamespaces(k8sClient kubernetes.Interface, 
 		newNs.Delete(src.Namespace)
 	}
 	for _, ns := range oldNs.List() {
-		if err := k8sClient.CoreV1().Secrets(ns).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
+		if err := kc.CoreV1().Secrets(ns).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
 			return err
 		}
 	}
 	for _, ns := range newNs.List() {
-		if err = s.upsertSecret(k8sClient, src, ns, context); err != nil {
+		if err = s.upsertSecret(kc, src, ns, context); err != nil {
 			return err
 		}
 	}
@@ -128,7 +144,7 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 	}
 	_, _, err := core_util.CreateOrPatchSecret(k8sClient, meta, func(obj *core.Secret) *core.Secret {
 		// check origin cluster, if not match overwrite and create an event
-		if v, ok := obj.Labels[api.OriginClusterLabelKey]; ok && v != s.clusterName {
+		if v, ok := obj.Labels[OriginClusterLabelKey]; ok && v != s.clusterName {
 			s.recorder.Eventf(
 				src,
 				core.EventTypeWarning,
@@ -158,8 +174,8 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 	return err
 }
 
-func namespaceSetForSecretSelector(k8sClient kubernetes.Interface, selector string) (sets.String, error) {
-	secret, err := k8sClient.CoreV1().Secrets(metav1.NamespaceAll).List(metav1.ListOptions{
+func namespaceSetForSecretSelector(kc kubernetes.Interface, selector string) (sets.String, error) {
+	secret, err := kc.CoreV1().Secrets(metav1.NamespaceAll).List(metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {

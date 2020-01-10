@@ -1,22 +1,34 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package server
 
 import (
 	"time"
 
 	"github.com/appscode/kubed/pkg/operator"
-	srch_cs "github.com/appscode/searchlight/client/clientset/versioned"
-	vcs "github.com/appscode/voyager/client/clientset/versioned"
-	pcm "github.com/coreos/prometheus-operator/pkg/client/versioned"
+
 	"github.com/spf13/pflag"
 	"k8s.io/client-go/kubernetes"
-	"kmodules.xyz/client-go/meta"
-	kcs "kubedb.dev/apimachinery/client/clientset/versioned"
-	scs "stash.appscode.dev/stash/client/clientset/versioned"
 )
 
 type OperatorOptions struct {
-	ConfigPath string
-	ScratchDir string
+	ClusterName           string
+	ConfigSourceNamespace string
+	KubeConfigFile        string
 
 	QPS          float32
 	Burst        int
@@ -25,8 +37,9 @@ type OperatorOptions struct {
 
 func NewOperatorOptions() *OperatorOptions {
 	return &OperatorOptions{
-		ConfigPath: "/srv/kubed/config.yaml",
-		ScratchDir: "/tmp",
+		ClusterName:           "",
+		ConfigSourceNamespace: "",
+		KubeConfigFile:        "",
 		// ref: https://github.com/kubernetes/ingress-nginx/blob/e4d53786e771cc6bdd55f180674b79f5b692e552/pkg/ingress/controller/launch.go#L252-L259
 		// High enough QPS to fit all expected use cases. QPS=0 is not set here, because client code is overriding it.
 		QPS: 1e6,
@@ -37,8 +50,9 @@ func NewOperatorOptions() *OperatorOptions {
 }
 
 func (s *OperatorOptions) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&s.ConfigPath, "clusterconfig", s.ConfigPath, "Path to cluster config file")
-	fs.StringVar(&s.ScratchDir, "scratch-dir", s.ScratchDir, "Directory used to store temporary files. Use an `emptyDir` in Kubernetes.")
+	fs.StringVar(&s.ClusterName, "cluster-name", s.ClusterName, "Name of cluster")
+	fs.StringVar(&s.ConfigSourceNamespace, "config-source-namespace", s.ConfigSourceNamespace, "Config source namespace")
+	fs.StringVar(&s.KubeConfigFile, "kubeconfig-file", s.KubeConfigFile, "kubeconfig file")
 
 	fs.Float32Var(&s.QPS, "qps", s.QPS, "The maximum QPS to the master from this client")
 	fs.IntVar(&s.Burst, "burst", s.Burst, "The maximum burst for throttle")
@@ -48,7 +62,6 @@ func (s *OperatorOptions) AddFlags(fs *pflag.FlagSet) {
 func (s *OperatorOptions) ApplyTo(cfg *operator.OperatorConfig) error {
 	var err error
 
-	cfg.OperatorNamespace = meta.Namespace()
 	cfg.ClientConfig.QPS = s.QPS
 	cfg.ClientConfig.Burst = s.Burst
 	cfg.ResyncPeriod = s.ResyncPeriod
@@ -57,24 +70,10 @@ func (s *OperatorOptions) ApplyTo(cfg *operator.OperatorConfig) error {
 	if cfg.KubeClient, err = kubernetes.NewForConfig(cfg.ClientConfig); err != nil {
 		return err
 	}
-	if cfg.VoyagerClient, err = vcs.NewForConfig(cfg.ClientConfig); err != nil {
-		return err
-	}
-	if cfg.SearchlightClient, err = srch_cs.NewForConfig(cfg.ClientConfig); err != nil {
-		return err
-	}
-	if cfg.StashClient, err = scs.NewForConfig(cfg.ClientConfig); err != nil {
-		return err
-	}
-	if cfg.KubeDBClient, err = kcs.NewForConfig(cfg.ClientConfig); err != nil {
-		return err
-	}
-	if cfg.PromClient, err = pcm.NewForConfig(cfg.ClientConfig); err != nil {
-		return err
-	}
 
-	cfg.ScratchDir = s.ScratchDir
-	cfg.ConfigPath = s.ConfigPath
+	cfg.ClusterName = s.ClusterName
+	cfg.ConfigSourceNamespace = s.ConfigSourceNamespace
+	cfg.KubeConfigFile = s.KubeConfigFile
 
 	return nil
 }

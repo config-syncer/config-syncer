@@ -1,3 +1,19 @@
+/*
+Copyright The Kmodules Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package meta
 
 import (
@@ -157,4 +173,17 @@ func ParseFor(key string, fn ParserFunc) GetFunc {
 	return func(m map[string]string) (interface{}, error) {
 		return fn(m, key)
 	}
+}
+
+func GetStringValueForKeys(m map[string]string, key string, alts ...string) (string, error) {
+	if m == nil {
+		return "", kutil.ErrNotFound
+	}
+	keys := append([]string{key}, alts...)
+	for _, k := range keys {
+		if v, ok := m[k]; ok {
+			return v, nil
+		}
+	}
+	return "", kutil.ErrNotFound
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2019 AppsCode Inc.
+# Copyright The Kubed Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,10 @@ export CGO_ENABLED=0
 export GO111MODULE=on
 export GOFLAGS="-mod=vendor"
 
+GINKGO_ARGS=${GINKGO_ARGS:-}
+TEST_ARGS=${TEST_ARGS:-}
+
 echo "Running e2e tests:"
-ginkgo -r --v --progress --trace test -- \
-    --selfhosted-operator=${SELFHOSTED_OPERATOR}
-echo
+cmd="ginkgo -r --v --progress --trace ${GINKGO_ARGS} test -- ${TEST_ARGS}"
+echo "$cmd"
+$cmd

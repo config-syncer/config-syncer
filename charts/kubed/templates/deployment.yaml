@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "kubed.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kubed.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: "{{ template "kubed.name" . }}"
+      release: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        {{- include "kubed.labels" . | nindent 8 }}
+{{- if or .Values.annotations (and .Values.criticalAddon (eq .Release.Namespace "kube-system")) }}
+      annotations:
+{{- if .Values.annotations }}
+{{ toYaml .Values.annotations | indent 8 }}
+{{- end }}
+{{- end }}
+    spec:
+      serviceAccountName: {{ template "kubed.serviceAccountName" . }}
+      containers:
+      - name: kubed
+        image: {{ .Values.kubed.registry }}/{{ .Values.kubed.repository }}:{{ .Values.kubed.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        args:
+        - run
+        - --v={{ .Values.logLevel }}
+        - --secure-port=8443
+        - --audit-log-path=-
+        - --tls-cert-file=/var/serving-cert/tls.crt
+        - --tls-private-key-file=/var/serving-cert/tls.key
+        - --use-kubeapiserver-fqdn-for-aks={{ .Values.apiserver.useKubeapiserverFqdnForAks }}
+        - --enable-analytics={{ .Values.enableAnalytics }}
+        ports:
+        - containerPort: 8443
+{{- if .Values.apiserver.healthcheck.enabled }}
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8443
+            scheme: HTTPS
+          initialDelaySeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8443
+            scheme: HTTPS
+          initialDelaySeconds: 5
+{{- end }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        volumeMounts:
+        - mountPath: /var/serving-cert
+          name: serving-cert
+      volumes:
+      - name: serving-cert
+        secret:
+          defaultMode: 420
+          secretName: {{ template "kubed.fullname" . }}-apiserver-cert
+      securityContext:
+        fsGroup: 65535
+{{- if or .Values.tolerations (and .Values.criticalAddon (eq .Release.Namespace "kube-system")) }}
+      tolerations:
+{{- if .Values.tolerations }}
+{{ toYaml .Values.tolerations | indent 8 }}
+{{- end -}}
+{{- if and .Values.criticalAddon (eq .Release.Namespace "kube-system") }}
+      - key: CriticalAddonsOnly
+        operator: Exists
+{{- end -}}
+{{- end -}}
+{{- if .Values.affinity }}
+      affinity:
+{{ toYaml .Values.affinity | indent 8 }}
+{{- end -}}
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end -}}
+{{- if and .Values.criticalAddon (eq .Release.Namespace "kube-system") }}
+      priorityClassName: system-cluster-critical
+{{- end -}}

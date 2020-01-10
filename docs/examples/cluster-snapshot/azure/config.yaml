@@ -1,7 +1,0 @@
-snapshotter:
-  azure:
-    container: bucket-for-snapshot
-    prefix: minikube
-  storageSecretName: azure-secret
-  sanitize: true
-  schedule: '@every 6h'

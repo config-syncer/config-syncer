@@ -1,7 +1,24 @@
+/*
+Copyright The Kubed Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package framework
 
 import (
 	"github.com/appscode/go/crypto/rand"
+
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -33,19 +50,19 @@ func (f *Framework) NewNamespace(name string) *core.Namespace {
 		},
 	}
 }
-func (f *Invocation) NewNamespaceWithLabel() *core.Namespace {
+func (fi *Invocation) NewNamespaceWithLabel() *core.Namespace {
 	return &core.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: rand.WithUniqSuffix("kubed-e2e-labeled"),
 			Labels: map[string]string{
-				"app": f.App(),
+				"app": fi.App(),
 			},
 		},
 	}
 }
 
-func (f *Invocation) NumberOfNameSpace() int {
-	ns, err := f.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
+func (fi *Invocation) NumberOfNameSpace() int {
+	ns, err := fi.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
 	Expect(err).NotTo(HaveOccurred())
 	return len(ns.Items)
 }
@@ -65,14 +82,14 @@ func (f *Framework) EventuallyNamespaceDeleted(ns string) GomegaAsyncAssertion {
 	})
 }
 
-func (f *Invocation) EnsureNamespaceForContext(kubeConfigPath string, context string) {
+func (fi *Invocation) EnsureNamespaceForContext(kubeConfigPath string, context string) {
 	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 
 	if ns == "" {
-		ns = f.Namespace()
+		ns = fi.Namespace()
 	}
 
 	_, err = client.CoreV1().Namespaces().Get(ns, metav1.GetOptions{})
@@ -91,14 +108,14 @@ func (f *Invocation) EnsureNamespaceForContext(kubeConfigPath string, context st
 	}
 }
 
-func (f *Invocation) DeleteNamespaceForContext(kubeConfigPath string, context string) {
+func (fi *Invocation) DeleteNamespaceForContext(kubeConfigPath string, context string) {
 	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
 	Expect(err).ShouldNot(HaveOccurred())
 
 	if ns == "" {
-		ns = f.Namespace()
+		ns = fi.Namespace()
 	}
 
 	err = client.CoreV1().Namespaces().Delete(ns, &metav1.DeleteOptions{})
