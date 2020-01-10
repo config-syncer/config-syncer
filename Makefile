@@ -367,12 +367,13 @@ endif
 
 .PHONY: install
 install:
-	@helm install kubed charts/kubed \
+	helm install kubed charts/kubed \
 		--namespace=kube-system \
 		--set kubed.registry=$(REGISTRY) \
 		--set kubed.tag=$(TAG) \
 		--set imagePullPolicy=Always \
-		$(IMAGE_PULL_SECRETS); \
+		$(IMAGE_PULL_SECRETS)
+	@echo
 	kubectl wait --for=condition=Ready pods -n kube-system -l app=kubed --timeout=5m
 
 .PHONY: uninstall
