@@ -17,8 +17,6 @@ limitations under the License.
 package framework
 
 const (
-	OperatorName      = "kubed-operator"
 	OperatorNamespace = "kube-system"
 	ContainerOperator = "operator"
-	OperatorConfig    = "kubed-config"
 )

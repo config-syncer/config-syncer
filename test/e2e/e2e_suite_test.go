@@ -55,10 +55,6 @@ var _ = BeforeSuite(func() {
 	By("Using Namespace " + root.Namespace())
 	err = root.EnsureNamespace()
 	Expect(err).NotTo(HaveOccurred())
-
-	By("Creating initial kubed configuration file")
-	err = framework.APIServerClusterConfig().Save(framework.KubedTestConfigFileDir)
-	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = AfterSuite(func() {
