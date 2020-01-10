@@ -16,7 +16,7 @@ Please pick a version of Kubed that matches your Kubernetes installation.
 
 | Kubed Version                                                     | Docs                                                            | Kubernetes Version |
 |-------------------------------------------------------------------|-----------------------------------------------------------------|--------------------|
-| [v0.12.0-rc.0-rc.0](https://github.com/appscode/kubed/releases/tag/v0.12.0-rc.0-rc.0) | [User Guide](https://appscode.com/products/kubed/v0.12.0-rc.0-rc.0/)      | 1.11.x+            |
+| [v0.12.0-rc.0](https://github.com/appscode/kubed/releases/tag/v0.12.0-rc.0) | [User Guide](https://appscode.com/products/kubed/v0.12.0-rc.0/)      | 1.11.x+            |
 
 ## Installation
 To install Kubed, please follow the guide [here](https://appscode.com/products/kubed/latest/setup/install/).

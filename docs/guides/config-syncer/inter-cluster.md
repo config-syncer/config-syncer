@@ -26,7 +26,7 @@ Note that, Kubed will error out if multiple contexts listed in annotation point 
 
 ## Before You Begin
 
-At first, you need to have a Kubernetes cluster and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [Minikube](https://github.com/kubernetes/minikube). You also need a `kube-config` file consisting cluster contexts where you want to sync your ConfigMap/Secret.
+At first, you need to have a Kubernetes cluster and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/). You also need a `kube-config` file consisting cluster contexts where you want to sync your ConfigMap/Secret.
 
 ## Deploy Kubed
 
@@ -139,9 +139,6 @@ It will create configmap "omni" in `cluster-1` and `cluster-2`. For `cluster-1` 
 Other concepts like updating source configmap, removing annotation, origin annotation, origin labels, etc. are similar to the tutorial described [here](/docs/guides/config-syncer/intra-cluster.md).
 
 ## Next Steps
- - Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/guides/config-syncer/intra-cluster.md).
- - Learn how to use Kubed to protect your Kubernetes cluster from disasters [here](/docs/guides/disaster-recovery/).
- - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/cluster-events/).
- - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
- - Wondering what features are coming next? Please visit [here](/docs/roadmap.md).
- - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).
+
+- Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/guides/config-syncer/intra-cluster.md).
+- Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).
