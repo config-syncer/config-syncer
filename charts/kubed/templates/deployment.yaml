@@ -55,18 +55,9 @@ spec:
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         volumeMounts:
-        - name: config
-          mountPath: /srv/kubed
-        - name: scratch
-          mountPath: /tmp
         - mountPath: /var/serving-cert
           name: serving-cert
       volumes:
-      - name: config
-        secret:
-          secretName: {{ template "kubed.fullname" . }}
-      - name: scratch
-        emptyDir: {}
       - name: serving-cert
         secret:
           defaultMode: 420

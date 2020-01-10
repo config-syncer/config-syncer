@@ -42,7 +42,7 @@ func (fi *Invocation) NewSecret() *core.Secret {
 			},
 		},
 		StringData: map[string]string{
-			"you":   "only",
+			"you":  "only",
 			"live": "once",
 		},
 	}

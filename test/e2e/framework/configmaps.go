@@ -44,7 +44,7 @@ func (fi *Invocation) NewConfigMap() *core.ConfigMap {
 			},
 		},
 		Data: map[string]string{
-			"you":   "only",
+			"you":  "only",
 			"live": "once",
 		},
 	}

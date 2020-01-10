@@ -15,9 +15,10 @@ This chart bootstraps a [Kubed controller](https://github.com/appscode/kubed) de
 
 ## Prerequisites
 
-- Kubernetes 1.12+
+- Kubernetes 1.11+
 
 ## Installing the Chart
+
 To install the chart with the release name `my-release`:
 
 ```console
@@ -63,12 +64,8 @@ The following table lists the configurable parameters of the Kubed chart and the
 | `nodeSelector`                   | Node labels for pod assignment                                    | `{}`               |
 | `tolerations`                    | Tolerations used pod assignment                                   | `{}`               |
 | `resources`                      | Compute resources for the kubed container                         | `{}`               |
-| `rbac.create`                    | If `true`, create and use RBAC resources                          | `true`             |
 | `serviceAccount.create`          | If `true`, create a new service account                           | `true`             |
 | `serviceAccount.name`            | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `` |
-| `apiserver.enabled`              | If `true`, enable kubed api server                                | `true`             |
-| `apiserver.groupPriorityMinimum` | The minimum priority the group should have.                       | 10000              |
-| `apiserver.versionPriority`      | The ordering of this API inside of the group.                     | 15                 |
 | `apiserver.useKubeapiserverFqdnForAks` | If true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 | `true`             |
 | `apiserver.healthcheck.enabled`  | Enable readiness and liveliness probes                            | `true`             |
 | `enableAnalytics`                | Send usage events to Google Analytics                             | `true`             |

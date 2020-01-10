@@ -4,24 +4,6 @@
 {{- $altName2 := printf "%s.%s.svc" $cn .Release.Namespace }}
 {{- $cert := genSignedCert $cn nil (list $altName1 $altName2) 3650 $ca }}
 
-{{ if .Values.apiserver.enabled }}
-apiVersion: apiregistration.k8s.io/v1beta1
-kind: APIService
-metadata:
-  name: v1alpha1.kubed.appscode.com
-  labels:
-    {{- include "kubed.labels" . | nindent 4 }}
-spec:
-  group: kubed.appscode.com
-  version: v1alpha1
-  service:
-    namespace: {{ .Release.Namespace }}
-    name: {{ template "kubed.fullname" . }}
-  caBundle: {{ b64enc $ca.Cert }}
-  groupPriorityMinimum: {{ .Values.apiserver.groupPriorityMinimum }}
-  versionPriority: {{ .Values.apiserver.versionPriority }}
-{{ end }}
----
 apiVersion: v1
 kind: Secret
 metadata:
@@ -34,7 +16,6 @@ data:
   tls.crt: {{ b64enc $cert.Cert }}
   tls.key: {{ b64enc $cert.Key }}
 ---
-{{ if .Values.rbac.create }}
 # to read the config for terminating authentication
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -67,4 +48,3 @@ subjects:
 - kind: ServiceAccount
   name: {{ template "kubed.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
-{{ end }}

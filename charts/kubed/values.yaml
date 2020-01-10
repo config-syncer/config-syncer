@@ -48,25 +48,6 @@ affinity: {}
 ##
 resources: {}
 
-## Enable persistence using Persistent Volume Claims
-## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
-##
-persistence:
-  enabled: false
-  # storageClassName: default
-  accessModes:
-    - ReadWriteOnce
-  size: 10Gi
-  # annotations: {}
-  # subPath: ""
-  # existingClaim:
-
-
-## Install Default RBAC roles and bindings
-rbac:
-  # Specifies whether RBAC resources should be created
-  create: true
-
 serviceAccount:
   # Specifies whether a ServiceAccount should be created
   create: true
@@ -75,15 +56,6 @@ serviceAccount:
   name:
 
 apiserver:
-  enabled: true
-  # groupPriorityMinimum is the minimum priority the group should have. Please see
-  # https://github.com/kubernetes/kube-aggregator/blob/release-1.9/pkg/apis/apiregistration/v1beta1/types.go#L58-L64
-  # for more information on proper values of this field.
-  groupPriorityMinimum: 10000
-  # versionPriority is the ordering of this API inside of the group. Please see
-  # https://github.com/kubernetes/kube-aggregator/blob/release-1.9/pkg/apis/apiregistration/v1beta1/types.go#L66-L70
-  # for more information on proper values of this field
-  versionPriority: 15
   # If true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 (default true)
   useKubeapiserverFqdnForAks: true
   # healthcheck configures the readiness and liveliness probes for the operator pod.
@@ -97,41 +69,3 @@ config:
   # set cluster-name to something meaningful to you, say, prod, prod-us-east, qa, etc.
   # so that you can distinguish notifications sent by kubed
   clusterName: unicorn
-  enableConfigSyncer: true
-  enableEventForwarder: false
-  enableRecycleBin: true
-
-  # so you can include any other config required for kubed directly
-#  include:
-#    snapshotter:
-#      gcs:
-#          bucket: bucket-for-snapshot
-#          prefix: minikube
-#          storageSecretName: gcs-secret
-#      sanitize: true
-#      schedule: '@every 6h'
-
-notifier:
-  mailgun:
-    domain: ''
-    apiKey: ''
-    publicAPIKey: ''
-    from: ''
-  smtp:
-    host: ''
-    port: ''
-    insecureSkipVerify: ''
-    username: ''
-    password: ''
-    from: ''
-  twilio:
-    accountSid: ''
-    authToken: ''
-    from: ''
-  slack:
-    authToken: ''
-    channel: ''
-  plivo:
-    authId: ''
-    authToken: ''
-    from: ''

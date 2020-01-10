@@ -1,4 +1,3 @@
-{{ if .Values.rbac.create }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -10,13 +9,12 @@ rules:
   resources:
   - configmaps
   - secrets
-  verbs: ["get", "create", "patch", "delete"]
+  verbs: ["get", "create", "patch", "delete", "list", "watch"]
 - apiGroups: [""]
   resources:
-    - namespaces
-  verbs: ["get"]
+  - namespaces
+  verbs: ["get", "list", "watch"]
 - apiGroups: [""]
   resources:
   - nodes
   verbs: ["list"]
-{{ end }}
