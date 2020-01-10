@@ -181,6 +181,17 @@ demo          omni                                 2         8m
 other         omni                                 2         5m
 ```
 
+## Restricting Source Namespace
+
+By default, Kubed will watch all namespaces for configmaps and secrets with `kubed.appscode.com/sync` annotation. But you can restrict the source namespace for configmaps and secrets by passing `config.configSourceNamespace` value during installation.
+
+```console
+$ helm install kubed appscode/kubed \
+  --namespace=kube-system \
+  --set imagePullPolicy=Always \
+  --set config.configSourceNamespace=demo
+```
+
 ## Remove Annotation
 
 Now, lets' remove the annotation from source ConfigMap `omni`. Please note that `-` after annotation key `kubed.appscode.com/sync-`. This tells kubectl to remove this annotation from ConfigMap `omni`.

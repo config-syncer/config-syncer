@@ -26,14 +26,14 @@ Note that, Kubed will error out if multiple contexts listed in annotation point 
 
 ## Before You Begin
 
-At first, you need to have a Kubernetes cluster and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/). You also need a `kubeconfig` file consisting cluster contexts where you want to sync your ConfigMap/Secret.
+At first, you need to have a Kubernetes cluster and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/).
 
 ## Deploy Kubed
 
-To enable config syncer for different clusters, you need a `kubeconfig` like below.
+To enable config syncer for different clusters, you need a `kubeconfig` file consisting cluster contexts where you want to sync your ConfigMap/Secret.
 
 ```yaml
-$ cat ./docs/examples/config-syncer/demo-kubeconfig.yaml
+$ cat ./docs/examples/cluster-syncer/demo-kubeconfig.yaml
 
 apiVersion: v1
 kind: Config
@@ -74,7 +74,7 @@ $ helm install kubed appscode/kubed \
   --version {{< param "info.version" >}} \
   --namespace kube-system \
   --set config.clusterName=kind \
-  --set config.kubeconfigContent=$(cat ./docs/examples/cluster-syncer/demo-kubeconfig.yaml)
+  --set config.kubeconfigContent="$(cat ./docs/examples/cluster-syncer/demo-kubeconfig.yaml)"
 ```
 
 Once the operator pod is running, go to the next section.
