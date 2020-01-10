@@ -17,9 +17,15 @@ aliases:
 
 # Change Log
 
-## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
+## [v0.12.0-rc.2](https://github.com/appscode/kubed/tree/v0.12.0-rc.2) (2020-01-10)
+[Full Changelog](https://github.com/appscode/kubed/compare/v0.12.0-rc.1...v0.12.0-rc.2)
 
-[Full Changelog](https://github.com/appscode/kubed/compare/v0.12.0-rc.0...HEAD)
+**Merged pull requests:**
+
+- Permit kubed to write events [\#379](https://github.com/appscode/kubed/pull/379) ([tamalsaha](https://github.com/tamalsaha))
+
+## [v0.12.0-rc.1](https://github.com/appscode/kubed/tree/v0.12.0-rc.1) (2020-01-10)
+[Full Changelog](https://github.com/appscode/kubed/compare/v0.12.0-rc.0...v0.12.0-rc.1)
 
 **Closed issues:**
 
@@ -46,6 +52,7 @@ aliases:
 
 **Merged pull requests:**
 
+- Prepare v0.12.0-rc.1 release [\#378](https://github.com/appscode/kubed/pull/378) ([tamalsaha](https://github.com/tamalsaha))
 - Remove Kubernetes dependency in chart [\#377](https://github.com/appscode/kubed/pull/377) ([tamalsaha](https://github.com/tamalsaha))
 
 ## [v0.12.0-rc.0](https://github.com/appscode/kubed/tree/v0.12.0-rc.0) (2020-01-10)
