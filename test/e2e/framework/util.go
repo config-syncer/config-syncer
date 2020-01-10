@@ -18,9 +18,7 @@ package framework
 
 import (
 	"fmt"
-	"path/filepath"
 
-	"github.com/appscode/go/runtime"
 	"github.com/appscode/go/types"
 
 	core "k8s.io/api/core/v1"
@@ -28,10 +26,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	kutil "kmodules.xyz/client-go"
 	"kmodules.xyz/client-go/tools/exec"
-)
-
-var (
-	KubedTestConfigFileDir = filepath.Join(runtime.GOPath(), "src", "github.com", "appscode", "kubed", "test", "e2e", "config.yaml")
 )
 
 func deleteInBackground() *metav1.DeleteOptions {

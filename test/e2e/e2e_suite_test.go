@@ -17,7 +17,6 @@ limitations under the License.
 package e2e_test
 
 import (
-	"os"
 	"testing"
 	"time"
 
@@ -41,7 +40,7 @@ func TestE2E(t *testing.T) {
 	logs.InitLogs()
 	RegisterFailHandler(Fail)
 	SetDefaultEventuallyTimeout(TestTimeout)
-	junitReporter := reporters.NewJUnitReporter("report.xml")
+	junitReporter := reporters.NewJUnitReporter("junit.xml")
 	RunSpecsWithDefaultAndCustomReporters(t, "Kubed E2E Suite", []Reporter{junitReporter})
 }
 
@@ -59,5 +58,4 @@ var _ = BeforeSuite(func() {
 
 var _ = AfterSuite(func() {
 	utilruntime.Must(root.DeleteNamespace(root.Namespace()))
-	utilruntime.Must(os.Remove(framework.KubedTestConfigFileDir))
 })
