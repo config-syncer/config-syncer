@@ -16,37 +16,21 @@ section_menu_id: guides
 
 # Synchronize Configuration across Clusters
 
-You can synchronize a ConfigMap or a Secret into different clusters using Kubed. For this you need to provide a `kube-config` file consisting cluster contexts and specify context names in comma separated format using __`kubed.appscode.com/sync-contexts`__ annotation. Kubed will create a copy of that ConfigMap/Secret in all clusters specified by the annotation. _For each cluster, it will sync into source namespace by default, but if namespace specified in the context (in the `kube-config` file), it will sync into that namespace._ Note that, Kubed will not create any namespace, it has to be created beforehand.
+You can synchronize a ConfigMap or a Secret into different clusters using Kubed. For this you need to provide a `kubeconfig` file consisting cluster contexts and specify context names in comma separated format using __`kubed.appscode.com/sync-contexts`__ annotation. Kubed will create a copy of that ConfigMap/Secret in all clusters specified by the annotation. _For each cluster, it will sync into source namespace by default, but if namespace specified in the context (in the `kubeconfig` file), it will sync into that namespace._ Note that, Kubed will not create any namespace, it has to be created beforehand.
 
 If the data in the source ConfigMap/Secret is updated, all the copies will be updated. Either delete the source ConfigMap/Secret or remove the annotation from the source ConfigMap/Secret to remove the copies.
 
 If the list of contexts specified by the annotation is updated, Kubed will synchronize the ConfigMap/Secret accordingly, ie. it will create ConfigMap/Secret  in the clusters listed in new annotation (if not already exists) and delete ConfigMap/Secret from the clusters that were synced before but not listed in new annotation.
 
-Note that, Kubed will error out if multiple contexts listed in annotation point same cluster. Also Kubed assumes that none of cluster contexts in `kube-config` file points the source cluster.
+Note that, Kubed will error out if multiple contexts listed in annotation point same cluster. Also Kubed assumes that none of cluster contexts in `kubeconfig` file points the source cluster.
 
 ## Before You Begin
 
-At first, you need to have a Kubernetes cluster and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/). You also need a `kube-config` file consisting cluster contexts where you want to sync your ConfigMap/Secret.
+At first, you need to have a Kubernetes cluster and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/). You also need a `kubeconfig` file consisting cluster contexts where you want to sync your ConfigMap/Secret.
 
 ## Deploy Kubed
 
-To enable config syncer for different clusters, you need a cluster config like below.
-
-```yaml
-$ cat ./docs/examples/cluster-syncer/config.yaml
-
-clusterName: minikube
-enableConfigSyncer: true
-kubeConfigFile: /srv/kubed/kubeConfigFile
-```
-
-| Key                  | Description                                                                                      |
-|----------------------|--------------------------------------------------------------------------------------------------|
-| `clusterName`        | `Optional`. Specifies the source cluster name used in label `kubed.appscode.com/origin.cluster`. |
-| `enableConfigSyncer` | `Required`. If set to `true`, ConfigMap/Secret synchronization operation will be enabled.        |
-| `kubeConfigFile`     | `Required`. Specifies the path of `kube-config` file.                                            |
-
-Lets' consider following demo `kube-config` file:
+To enable config syncer for different clusters, you need a `kubeconfig` like below.
 
 ```yaml
 $ cat ./docs/examples/config-syncer/demo-kubeconfig.yaml
@@ -83,37 +67,17 @@ contexts:
     namespace: demo-cluster-2
 ```
 
-Now, create a Secret with the Kubed cluster config under `config.yaml` key. Also include required `kube-config` file under `kubeConfigFile` key. You can use separate secret for `kube-config`.
+Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md). Below you can see the command to install Kubed using Helm 3.
 
-```yaml
-$ kubectl create secret generic kubed-config -n kube-system \
-    --from-file=./docs/examples/cluster-syncer/config.yaml \
-    --from-file=kubeConfigFile=./docs/examples/cluster-syncer/demo-kubeconfig.yaml
-secret "kubed-config" created
-
-# apply app=kubed label to easily cleanup later
-$ kubectl label secret kubed-config app=kubed -n kube-system
-secret "kubed-config" labeled
-
-$ kubectl get secret kubed-config -n kube-system -o yaml
-apiVersion: v1
-data:
-  config.yaml: ZW5hYmxlQ29uZmlnU3luY2VyOiB0cnVlCg==
-  kubeConfigFile: base64 endoded contents of kube-config file
-kind: Secret
-metadata:
-  creationTimestamp: 2017-07-26T10:25:33Z
-  labels:
-    app: kubed
-  name: kubed-config
-  namespace: kube-system
-  resourceVersion: "25114"
-  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: c207c236-71ec-11e7-a5ec-0800273df5f2
-type: Opaque
+```console
+$ helm install kubed appscode/kubed \
+  --version {{< param "info.version" >}} \
+  --namespace kube-system \
+  --set config.clusterName=kind \
+  --set config.kubeconfigContent=$(cat ./docs/examples/cluster-syncer/demo-kubeconfig.yaml)
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md).  It will mount the secret inside operator pod in path `/srv/kubed`. So kubed cluster config file will be available in path `/srv/kubed/config.yaml` and `kube-config` file will be available in path `/srv/kubed/kubeConfigFile`.  Once the operator pod is running, go to the next section.
+Once the operator pod is running, go to the next section.
 
 ## Synchronize ConfigMap
 
