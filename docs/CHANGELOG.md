@@ -17,6 +17,18 @@ aliases:
 
 # Change Log
 
+## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
+
+[Full Changelog](https://github.com/appscode/kubed/compare/v0.11.0...HEAD)
+
+**Merged pull requests:**
+
+- Reboot kubed project [\#373](https://github.com/appscode/kubed/pull/373) ([tamalsaha](https://github.com/tamalsaha))
+- Delete script based installer [\#372](https://github.com/appscode/kubed/pull/372) ([tamalsaha](https://github.com/tamalsaha))
+- Change old "extensions/v1beta1" to new "apps/v1" [\#370](https://github.com/appscode/kubed/pull/370) ([ruzickap](https://github.com/ruzickap))
+- Download onessl version v0.13.1 for Kubernetes 1.16 fix [\#367](https://github.com/appscode/kubed/pull/367) ([tamalsaha](https://github.com/tamalsaha))
+- Templatize front matter [\#366](https://github.com/appscode/kubed/pull/366) ([tamalsaha](https://github.com/tamalsaha))
+
 ## [v0.11.0](https://github.com/appscode/kubed/tree/v0.11.0) (2019-09-10)
 [Full Changelog](https://github.com/appscode/kubed/compare/0.10.0...v0.11.0)
 
