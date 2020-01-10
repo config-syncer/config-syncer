@@ -66,7 +66,7 @@ jobs:
 
     - name: Check links
       run: |
-        liche -r docs -d $(pwd) -c 10 -p -h -l -x '^*(voyager.appscode.ninja|www.kiteci.pro)*$'
+        liche -r docs -d $(pwd) -c 10 -p -h -l
 
   kubernetes:
     name: Kubernetes

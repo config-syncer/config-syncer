@@ -77,9 +77,5 @@ clusterrolebinding.rbac.authorization.k8s.io "appscode:system:metrics-collector"
 ```
 
 ## Next Steps
- - Learn how to use Kubed to protect your Kubernetes cluster from disasters [here](/docs/guides/disaster-recovery/).
  - Need to keep configmaps/secrets synchronized across namespaces or clusters? Try [Kubed config syncer](/docs/guides/config-syncer/).
- - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/cluster-events/).
- - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
- - Wondering what features are coming next? Please visit [here](/docs/roadmap.md).
  - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).

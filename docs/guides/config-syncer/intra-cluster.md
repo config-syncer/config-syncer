@@ -209,10 +209,6 @@ Kubed  operator will apply following labels on ConfigMap or Secret copies:
 
 This annotations are used by Kubed operator to list the copies for a specific source ConfigMap/Secret.
 
-## Disable Syncer
-
-If you would like to disable this feature, either remove the `enableConfigSyncer` field in your Kubed cluster config or set `enableConfigSyncer` to false. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
-
 ## Cleaning up
 
 To cleanup the Kubernetes resources created by this tutorial, run the following commands:
