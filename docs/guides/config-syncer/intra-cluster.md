@@ -25,53 +25,11 @@ If the data in the source ConfigMap/Secret is updated, all the copies will be up
 If the value of label-selector specified by annotation is updated, Kubed will synchronize the ConfigMap/Secret accordingly, ie. it will create ConfigMap/Secret in the namespaces that are selected by new label-selector (if not already exists) and delete from namespaces that were synced before but not selected by new label-selector.
 
 ## Before You Begin
-At first, you need to have a Kubernetes cluster and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [Minikube](https://github.com/kubernetes/minikube).
 
-## Deploy Kubed
-To enable config syncer, you need a cluster config like below.
-
-```yaml
-$ cat ./docs/examples/config-syncer/config.yaml
-
-enableConfigSyncer: true
-```
-
-| Key                   | Description                                                                               |
-|-----------------------|-------------------------------------------------------------------------------------------|
-| `enableConfigSyncer`  | `Required`. If set to `true`, ConfigMap/Secret synchronization operation will be enabled. |
-
-
-Now, create a Secret with the Kubed cluster config under `config.yaml` key.
-
-```yaml
-$ kubectl create secret generic kubed-config -n kube-system \
-    --from-file=./docs/examples/config-syncer/config.yaml
-secret "kubed-config" created
-
-# apply app=kubed label to easily cleanup later
-$ kubectl label secret kubed-config app=kubed -n kube-system
-secret "kubed-config" labeled
-
-$ kubectl get secret kubed-config -n kube-system -o yaml
-apiVersion: v1
-data:
-  config.yaml: ZW5hYmxlQ29uZmlnU3luY2VyOiB0cnVlCg==
-kind: Secret
-metadata:
-  creationTimestamp: 2017-07-26T10:25:33Z
-  labels:
-    app: kubed
-  name: kubed-config
-  namespace: kube-system
-  resourceVersion: "25114"
-  selfLink: /api/v1/namespaces/kube-system/secrets/kubed-config
-  uid: c207c236-71ec-11e7-a5ec-0800273df5f2
-type: Opaque
-```
-
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md). Once the operator pod is running, go to the next section.
+At first, you need to have a Kubernetes cluster and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/).
 
 ## Synchronize ConfigMap
+
 In this tutorial, a ConfigMap will be synced across all Kubernetes namespaces using Kubed. You can do the same for Secrets.
 
 To keep things isolated, this tutorial uses a separate namespace called `demo` throughout this tutorial. Run the following command to prepare your cluster for this tutorial:
@@ -200,6 +158,7 @@ metadata:
 Kubed operator notices that the source ConfigMap `omni` has been updated and propagates the change to all the copies in other namespaces.
 
 ## Namespace Selector
+
 Lets' change annotation value of source ConfigMap `omni`.
 
 ```console
@@ -235,24 +194,27 @@ demo          omni                                 2         18m
 ```
 
 ## Origin Annotation
+
 Since 0.9.0, Kubed operator will apply `kubed.appscode.com/origin` annotation on ConfigMap or Secret copies.
 
 ![origin annotation](/docs/images/config-syncer/config-origin.png)
 
 ## Origin Labels
+
 Kubed  operator will apply following labels on ConfigMap or Secret copies:
 
- - `kubed.appscode.com/origin.name`
- - `kubed.appscode.com/origin.namespace`
- - `kubed.appscode.com/origin.cluster`
+- `kubed.appscode.com/origin.name`
+- `kubed.appscode.com/origin.namespace`
+- `kubed.appscode.com/origin.cluster`
 
 This annotations are used by Kubed operator to list the copies for a specific source ConfigMap/Secret.
 
 ## Disable Syncer
+
 If you would like to disable this feature, either remove the `enableConfigSyncer` field in your Kubed cluster config or set `enableConfigSyncer` to false. Then update the `kubed-config` Secret and restart Kubed operator pod(s).
 
-
 ## Cleaning up
+
 To cleanup the Kubernetes resources created by this tutorial, run the following commands:
 
 ```console
@@ -265,11 +227,7 @@ namespace "demo" deleted
 
 To uninstall Kubed operator, please follow the steps [here](/docs/setup/uninstall.md).
 
-
 ## Next Steps
- - Learn how to sync config-maps or secrets across multiple cluster [here](/docs/guides/config-syncer/inter-cluster.md).
- - Learn how to use Kubed to protect your Kubernetes cluster from disasters [here](/docs/guides/disaster-recovery/).
- - Want to keep an eye on your cluster with automated notifications? Setup Kubed [event forwarder](/docs/guides/cluster-events/).
- - Out of disk space because of too much logs in Elasticsearch or metrics in InfluxDB? Configure [janitors](/docs/guides/janitors.md) to delete old data.
- - Wondering what features are coming next? Please visit [here](/docs/roadmap.md).
- - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).
+
+- Learn how to sync config-maps or secrets across multiple cluster [here](/docs/guides/config-syncer/inter-cluster.md).
+- Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).
