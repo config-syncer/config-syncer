@@ -1,5 +1,5 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/appscode/kubed)](https://goreportcard.com/report/github.com/appscode/kubed)
-[![Build Status](https://travis-ci.org/appscode/kubed.svg?branch=master)](https://travis-ci.org/appscode/kubed)
+[![Build Status](https://github.com/appscode/kubed/workflows/CI/badge.svg)](https://github.com/appscode/kubed/actions?workflow=CI)
 [![codecov](https://codecov.io/gh/appscode/kubed/branch/master/graph/badge.svg)](https://codecov.io/gh/appscode/kubed)
 [![Docker Pulls](https://img.shields.io/docker/pulls/appscode/kubed.svg)](https://hub.docker.com/r/appscode/kubed/)
 [![Slack](https://slack.appscode.com/badge.svg)](https://slack.appscode.com)
