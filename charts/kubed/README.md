@@ -68,6 +68,7 @@ The following table lists the configurable parameters of the Kubed chart and the
 | `serviceAccount.name`            | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `` |
 | `apiserver.useKubeapiserverFqdnForAks` | If true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 | `true`             |
 | `apiserver.healthcheck.enabled`  | Enable readiness and liveliness probes                            | `true`             |
+| `apiserver.servingCerts.generate` | If true, generate on install/upgrade the certs that allow the kube-apiserver (and potentially ServiceMonitor) to authenticate Stash operator pods. Otherwise specify in `apiserver.servingCerts.{serverCrt, serverKey}`.  | `true`                                                    |
 | `enableAnalytics`                | Send usage events to Google Analytics                             | `true`             |
 | `config.clusterName`             | Set cluster name to something meaningful to you, say, prod, prod-us-east, qa, etc. so that you can distinguish notifications sent by kubed | `unicorn`          |
 | `config.configSourceNamespace`   | If set, configmaps and secrets from only this namespace will be synced | `unicorn`     |
