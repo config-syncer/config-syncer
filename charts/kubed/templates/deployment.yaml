@@ -30,7 +30,7 @@ spec:
         args:
         - run
         - --v={{ .Values.logLevel }}
-        - --secure-port=8443
+        - --secure-port={{ .Values.config.securePort | default "8443" }}
         - --audit-log-path=-
         - --tls-cert-file=/var/serving-cert/tls.crt
         - --tls-private-key-file=/var/serving-cert/tls.key
@@ -45,19 +45,22 @@ spec:
 {{- if .Values.config.kubeconfigContent }}
         - --kubeconfig-file=/srv/kubed/kubeconfig
 {{- end }}
+{{- range .Values.config.additionalOptions }}
+        - {{ . }}
+{{- end }}
         ports:
-        - containerPort: 8443
+        - containerPort: {{ .Values.config.securePort | default "8443" }}
 {{- if .Values.apiserver.healthcheck.enabled }}
         readinessProbe:
           httpGet:
             path: /healthz
-            port: 8443
+            port: {{ .Values.config.securePort | default "8443" }}
             scheme: HTTPS
           initialDelaySeconds: 5
         livenessProbe:
           httpGet:
             path: /healthz
-            port: 8443
+            port: {{ .Values.config.securePort | default "8443" }}
             scheme: HTTPS
           initialDelaySeconds: 5
 {{- end }}
