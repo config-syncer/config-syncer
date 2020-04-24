@@ -80,3 +80,5 @@ config:
   clusterName: unicorn
   configSourceNamespace: ""
   kubeconfigContent: ""
+#  additionalOptions:
+#    - --authentication-skip-lookup
