@@ -72,9 +72,9 @@ TAG              := $(VERSION)_$(OS)_$(ARCH)
 TAG_PROD         := $(TAG)
 TAG_DBG          := $(VERSION)-dbg_$(OS)_$(ARCH)
 
-GO_VERSION       ?= 1.13.5
+GO_VERSION       ?= 1.14.2
 BUILD_IMAGE      ?= appscode/golang-dev:$(GO_VERSION)
-CHART_TEST_IMAGE ?= quay.io/helmpack/chart-testing:v3.0.0-beta.1
+CHART_TEST_IMAGE ?= quay.io/helmpack/chart-testing:v3.0.0-rc.1
 
 OUTBIN = bin/$(OS)_$(ARCH)/$(BIN)
 ifeq ($(OS),windows)
@@ -362,7 +362,7 @@ REGISTRY_SECRET ?=
 ifeq ($(strip $(REGISTRY_SECRET)),)
 	IMAGE_PULL_SECRETS =
 else
-	IMAGE_PULL_SECRETS = --set imagePullSecrets[0]=$(REGISTRY_SECRET)
+	IMAGE_PULL_SECRETS = --set imagePullSecrets[0].name=$(REGISTRY_SECRET)
 endif
 
 .PHONY: install
@@ -374,7 +374,7 @@ install:
 		--set imagePullPolicy=Always \
 		$(IMAGE_PULL_SECRETS)
 	@echo
-	kubectl wait --for=condition=Ready pods -n kube-system -l app=kubed --timeout=5m
+	kubectl wait --for=condition=Ready pods -n kube-system -l "app.kubernetes.io/name=kubed,app.kubernetes.io/instance=kubed" --timeout=5m
 
 .PHONY: uninstall
 uninstall:

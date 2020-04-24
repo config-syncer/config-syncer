@@ -10,7 +10,6 @@ spec:
   # Port used to expose admission webhook apiserver
   - name: api
     port: 443
-    targetPort: 8443
+    targetPort: {{ default "8443" .Values.apiserver.securePort }}
   selector:
-    app: "{{ template "kubed.name" . }}"
-    release: "{{ .Release.Name }}"
+    {{- include "kubed.selectorLabels" . | nindent 4 }}
