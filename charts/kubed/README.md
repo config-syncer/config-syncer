@@ -47,17 +47,19 @@ The following table lists the configurable parameters of the Kubed chart and the
 | Parameter                        | Description                                                       | Default            |
 | ---------------------------------| ------------------------------------------------------------------|--------------------|
 | `replicaCount`                   | Number of kubed operator replicas to create (only 1 is supported) | `1`                |
-| `kubed.registry`                 | Docker registry used to pull Kubed image                          | `appscode`         |
-| `kubed.repository`               | Kubed container image                                             | `kubed`            |
-| `kubed.tag`                      | Kubed container image tag                                         | `v0.12.0-rc.2`          |
+| `operator.registry`              | Docker registry used to pull Kubed image                          | `appscode`         |
+| `operator.repository`            | Kubed container image                                             | `image`            |
+| `operator.tag`                   | Kubed container image tag                                         | `v0.12.0-rc.2`     |
+| `operator.resources`             | Compute resources for the kubed container                         | `{}`               |
 | `imagePullSecrets`               | Specify image pull secrets                                        | `[]`               |
 | `imagePullPolicy`                | Image pull policy                                                 | `IfNotPresent`     |
 | `criticalAddon`                  | If true, installs kubed operator as critical addon                | `false`            |
 | `logLevel`                       | Log level for kubed                                               | `3`                |
 | `affinity`                       | Affinity rules for pod assignment                                 | `{}`               |
+| `annotations`                    | Annotations applied to operator deployment                        | `{}`               |
+| `podAnnotations`                 | Annotations applied to operator pod(s)                            | `{}`               |
 | `nodeSelector`                   | Node labels for pod assignment                                    | `{}`               |
 | `tolerations`                    | Tolerations used pod assignment                                   | `{}`               |
-| `resources`                      | Compute resources for the kubed container                         | `{}`               |
 | `serviceAccount.create`          | If `true`, create a new service account                           | `true`             |
 | `serviceAccount.name`            | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `` |
 | `apiserver.useKubeapiserverFqdnForAks` | If true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 | `true`             |

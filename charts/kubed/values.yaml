@@ -1,32 +1,45 @@
-##
-## Kubed chart configuration
-##
+# Default values for kubed.
+# This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
 replicaCount: 1
-kubed:
+
+operator:
   registry: appscode
   repository: kubed
   tag: v0.12.0-rc.2
+  resources: {}
+  securityContext: {}
+
 ## Optionally specify an array of imagePullSecrets.
 ## Secrets must be manually created in the namespace.
 ## ref: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
 ## example: helm template charts/kubed \
-##            --set imagePullSecrets[0]=abc \
-##            --set imagePullSecrets[1]=xyz
+##            --set imagePullSecrets[0].name=abc,imagePullSecrets[1].name=xyz
 imagePullSecrets: []
+
 ## Specify a imagePullPolicy
 ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
 ##
 imagePullPolicy: IfNotPresent
+
 ## Installs Kubed operator as critical addon
 ## https://kubernetes.io/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/
 criticalAddon: false
+
 ## Log level for kubed
 logLevel: 3
 
-## Annotations passed to operator pod(s).
+## Annotations passed to operator deployment.
 ##
 annotations: {}
+
+## Annotations passed to operator pod(s).
+##
+podAnnotations: {}
 
 ## Node labels for pod assignment
 ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -43,22 +56,20 @@ tolerations: {}
 ##
 affinity: {}
 
-## Compute resource for the kubed container
-## https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
-##
-resources: {}
-
-securityContext:
+podSecurityContext:
   fsGroup: 65535
 
 serviceAccount:
-  # Specifies whether a ServiceAccount should be created
+  # Specifies whether a service account should be created
   create: true
-  # The name of the ServiceAccount to use.
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
 
 apiserver:
+  securePort: "8443"
   # If true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 (default true)
   useKubeapiserverFqdnForAks: true
   # healthcheck configures the readiness and liveliness probes for the operator pod.
