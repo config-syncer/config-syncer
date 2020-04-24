@@ -30,7 +30,7 @@ spec:
         args:
         - run
         - --v={{ .Values.logLevel }}
-        - --secure-port={{ .Values.config.securePort | default "8443" }}
+        - --secure-port={{ default "8443" .Values.config.securePort }}
         - --audit-log-path=-
         - --tls-cert-file=/var/serving-cert/tls.crt
         - --tls-private-key-file=/var/serving-cert/tls.key
@@ -49,18 +49,18 @@ spec:
         - {{ . }}
 {{- end }}
         ports:
-        - containerPort: {{ .Values.config.securePort | default "8443" }}
+        - containerPort: {{ default "8443" .Values.config.securePort }}
 {{- if .Values.apiserver.healthcheck.enabled }}
         readinessProbe:
           httpGet:
             path: /healthz
-            port: {{ .Values.config.securePort | default "8443" }}
+            port: {{ default "8443" .Values.config.securePort }}
             scheme: HTTPS
           initialDelaySeconds: 5
         livenessProbe:
           httpGet:
             path: /healthz
-            port: {{ .Values.config.securePort | default "8443" }}
+            port: {{ default "8443" .Values.config.securePort }}
             scheme: HTTPS
           initialDelaySeconds: 5
 {{- end }}
