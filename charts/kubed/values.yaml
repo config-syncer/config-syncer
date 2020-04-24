@@ -48,6 +48,9 @@ affinity: {}
 ##
 resources: {}
 
+securityContext:
+  fsGroup: 65535
+
 serviceAccount:
   # Specifies whether a ServiceAccount should be created
   create: true
