@@ -17,6 +17,26 @@ aliases:
 
 # Change Log
 
+## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
+
+[Full Changelog](https://github.com/appscode/kubed/compare/v0.12.0-rc.2...HEAD)
+
+**Closed issues:**
+
+- Context not found in kubeconfig file [\#389](https://github.com/appscode/kubed/issues/389)
+- Crash when the namespace is terminating [\#380](https://github.com/appscode/kubed/issues/380)
+- Don't regenerate a certificate authority and a certificate everytime you deploy the helm chart [\#371](https://github.com/appscode/kubed/issues/371)
+- Kubed shows abnormal high I/O and memory usage [\#357](https://github.com/appscode/kubed/issues/357)
+
+**Merged pull requests:**
+
+- Publish Helm chart from release workflow [\#394](https://github.com/appscode/kubed/pull/394) ([tamalsaha](https://github.com/tamalsaha))
+- Apply various fixes to chart [\#393](https://github.com/appscode/kubed/pull/393) ([tamalsaha](https://github.com/tamalsaha))
+- Custom securityContext in template [\#392](https://github.com/appscode/kubed/pull/392) ([jsrolon](https://github.com/jsrolon))
+- Parameterizes run command and secure port in helm [\#390](https://github.com/appscode/kubed/pull/390) ([masstamike](https://github.com/masstamike))
+- Clean up Helm chart's README with removed attributes [\#387](https://github.com/appscode/kubed/pull/387) ([olivierlemasle](https://github.com/olivierlemasle))
+- Allow specifying rather than generating certs [\#385](https://github.com/appscode/kubed/pull/385) ([tamalsaha](https://github.com/tamalsaha))
+
 ## [v0.12.0-rc.2](https://github.com/appscode/kubed/tree/v0.12.0-rc.2) (2020-01-10)
 [Full Changelog](https://github.com/appscode/kubed/compare/v0.12.0-rc.1...v0.12.0-rc.2)
 

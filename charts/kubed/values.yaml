@@ -10,7 +10,7 @@ replicaCount: 1
 operator:
   registry: appscode
   repository: kubed
-  tag: v0.12.0-rc.2
+  tag: v0.12.0-rc.3
   resources: {}
   securityContext: {}
 
