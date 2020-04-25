@@ -17,9 +17,8 @@ aliases:
 
 # Change Log
 
-## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
-
-[Full Changelog](https://github.com/appscode/kubed/compare/v0.12.0-rc.2...HEAD)
+## [v0.12.0-rc.3](https://github.com/appscode/kubed/tree/v0.12.0-rc.3) (2020-04-25)
+[Full Changelog](https://github.com/appscode/kubed/compare/v0.12.0-rc.2...v0.12.0-rc.3)
 
 **Closed issues:**
 
@@ -30,6 +29,7 @@ aliases:
 
 **Merged pull requests:**
 
+- Prepare v0.12.0-rc.3 release [\#395](https://github.com/appscode/kubed/pull/395) ([tamalsaha](https://github.com/tamalsaha))
 - Publish Helm chart from release workflow [\#394](https://github.com/appscode/kubed/pull/394) ([tamalsaha](https://github.com/tamalsaha))
 - Apply various fixes to chart [\#393](https://github.com/appscode/kubed/pull/393) ([tamalsaha](https://github.com/tamalsaha))
 - Custom securityContext in template [\#392](https://github.com/appscode/kubed/pull/392) ([jsrolon](https://github.com/jsrolon))
