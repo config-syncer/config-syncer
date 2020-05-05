@@ -2,13 +2,11 @@ name: CI
 
 on:
   pull_request:
-    branches: 
+    branches:
       - '*'
   push:
-    branches-ignore:
-      - 'release-*'
-    tags-ignore:
-      - '*.*'
+    branches:
+      - master
 
 jobs:
 
@@ -24,8 +22,7 @@ jobs:
         go-version: 1.14
       id: go
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: Set up Docker Buildx
       id: buildx
@@ -36,7 +33,7 @@ jobs:
     - name: Available platforms
       run: echo ${{ steps.buildx.outputs.platforms }}
 
-    - name: Run checks
+    - name: Prepare Host
       run: |
         sudo apt-get -qq update || true
         sudo apt-get install -y bzr
@@ -48,6 +45,9 @@ jobs:
         curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/linux/amd64/kubectl
         chmod +x ./kubectl
         sudo mv ./kubectl /usr/local/bin/kubectl
+
+    - name: Run checks
+      run: |
         make ci
 
     - name: Build
@@ -85,7 +85,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        k8s: [v1.11.10, v1.12.10, v1.13.12, v1.14.10, v1.15.7, v1.16.4, v1.17.2, v1.18.0]
+        k8s: [v1.11.10, v1.12.10, v1.13.12, v1.14.10, v1.15.7, v1.16.4, v1.17.2, v1.18.2]
 
     steps:
 
@@ -112,12 +112,6 @@ jobs:
         kubectl get nodes
         echo
         kubectl version
-        echo
-        echo "installing local-path provisioner ..."
-        kubectl delete storageclass --all
-        kubectl apply -f https://github.com/rancher/local-path-provisioner/raw/v0.0.12/deploy/local-path-storage.yaml
-        kubectl wait --for=condition=Ready pods -n local-path-storage --all --timeout=5m
-        kubectl apply -f hack/kubernetes/storageclass/standard.yaml
         echo
         echo "install helm 3"
         curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
