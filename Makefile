@@ -135,9 +135,23 @@ version:
 	@echo ::set-output name=commit_hash::$(commit_hash)
 	@echo ::set-output name=commit_timestamp::$(commit_timestamp)
 
+.PHONY: gen-chart-doc
+gen-chart-doc: gen-chart-doc-kubed
+
+gen-chart-doc-%:
+	@echo "Generate $* chart docs"
+	@docker run --rm 	                                 \
+		-u $$(id -u):$$(id -g)                           \
+		-v /tmp:/.cache                                  \
+		-v $$(pwd):$(DOCKER_REPO_ROOT)                   \
+		-w $(DOCKER_REPO_ROOT)                           \
+		--env HTTP_PROXY=$(HTTP_PROXY)                   \
+		--env HTTPS_PROXY=$(HTTPS_PROXY)                 \
+		$(BUILD_IMAGE)                                   \
+		chart-doc-gen -d ./charts/$*/doc.yaml -v ./charts/$*/values.yaml > ./charts/$*/README.md
+
 .PHONY: gen
-gen:
-	@true
+gen: gen-chart-doc
 
 fmt: $(BUILD_DIRS)
 	@docker run                                                 \

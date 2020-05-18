@@ -1,0 +1,18 @@
+project:
+  name: Kubed by AppsCode
+  shortName: Kubed
+  url: https://github.com/appscode/kubed
+  description: A Kubernetes cluster manager daemon
+  app: a Kubed operator
+repository:
+  url: https://charts.appscode.com/stable/
+  name: appscode
+chart:
+  name: kubed
+  values: "-- generate from values file --"
+  valuesExample: "-- generate from values file --"
+prerequisites:
+- Kubernetes 1.11+
+release:
+  name: kubed
+  namespace: kube-system
