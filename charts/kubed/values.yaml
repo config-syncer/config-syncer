@@ -16,7 +16,7 @@ operator:
   # Kubed operator container image
   repository: kubed
   # Kubed operator container image tag
-  tag: v0.12.0-rc.3
+  tag: v0.12.0
   # Compute Resources required by the operator container
   resources: {}
   # Security options the operator container should run with

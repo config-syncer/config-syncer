@@ -17,6 +17,19 @@ aliases:
 
 # Change Log
 
+## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
+
+[Full Changelog](https://github.com/appscode/kubed/compare/v0.12.0-rc.3...HEAD)
+
+**Closed issues:**
+
+- unknown rbac rules [\#384](https://github.com/appscode/kubed/issues/384)
+
+**Merged pull requests:**
+
+- Auto generate chart readme file [\#397](https://github.com/appscode/kubed/pull/397) ([tamalsaha](https://github.com/tamalsaha))
+- Clean up CI pipeline [\#396](https://github.com/appscode/kubed/pull/396) ([tamalsaha](https://github.com/tamalsaha))
+
 ## [v0.12.0-rc.3](https://github.com/appscode/kubed/tree/v0.12.0-rc.3) (2020-04-25)
 [Full Changelog](https://github.com/appscode/kubed/compare/v0.12.0-rc.2...v0.12.0-rc.3)
 
