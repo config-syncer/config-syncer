@@ -17,6 +17,8 @@ limitations under the License.
 package syncer
 
 import (
+	context "context"
+
 	"github.com/appscode/go/log"
 	"github.com/appscode/kubed/pkg/eventer"
 
@@ -101,7 +103,7 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 
 // upsert into newNs set, delete from (oldNs-newNs) set
 // use skipSrcNs = true for sync in source cluster
-func (s *ConfigSyncer) syncSecretIntoNamespaces(kc kubernetes.Interface, src *core.Secret, newNs sets.String, skipSrcNs bool, context string) error {
+func (s *ConfigSyncer) syncSecretIntoNamespaces(kc kubernetes.Interface, src *core.Secret, newNs sets.String, skipSrcNs bool, ctx string) error {
 	oldNs, err := namespaceSetForSecretSelector(kc, s.syncerLabelSelector(src.Name, src.Namespace, s.clusterName))
 	if err != nil {
 		return err
@@ -112,12 +114,12 @@ func (s *ConfigSyncer) syncSecretIntoNamespaces(kc kubernetes.Interface, src *co
 		newNs.Delete(src.Namespace)
 	}
 	for _, ns := range oldNs.List() {
-		if err := kc.CoreV1().Secrets(ns).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
+		if err := kc.CoreV1().Secrets(ns).Delete(context.TODO(), src.Name, metav1.DeleteOptions{}); err != nil {
 			return err
 		}
 	}
 	for _, ns := range newNs.List() {
-		if err = s.upsertSecret(kc, src, ns, context); err != nil {
+		if err = s.upsertSecret(kc, src, ns, ctx); err != nil {
 			return err
 		}
 	}
@@ -137,19 +139,19 @@ func (s *ConfigSyncer) syncSecretIntoNewNamespace(src *core.Secret, namespace *c
 	return nil
 }
 
-func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Secret, namespace, context string) error {
+func (s *ConfigSyncer) upsertSecret(kc kubernetes.Interface, src *core.Secret, namespace, ctx string) error {
 	meta := metav1.ObjectMeta{
 		Name:      src.Name,
 		Namespace: namespace,
 	}
-	_, _, err := core_util.CreateOrPatchSecret(k8sClient, meta, func(obj *core.Secret) *core.Secret {
+	_, _, err := core_util.CreateOrPatchSecret(context.TODO(), kc, meta, func(obj *core.Secret) *core.Secret {
 		// check origin cluster, if not match overwrite and create an event
 		if v, ok := obj.Labels[OriginClusterLabelKey]; ok && v != s.clusterName {
 			s.recorder.Eventf(
 				src,
 				core.EventTypeWarning,
 				eventer.EventReasonOriginConflict,
-				"Origin cluster changed from %s in context %s", v, context,
+				"Origin cluster changed from %s in context %s", v, ctx,
 			)
 		}
 
@@ -169,13 +171,13 @@ func (s *ConfigSyncer) upsertSecret(k8sClient kubernetes.Interface, src *core.Se
 		obj.Annotations = s.syncerAnnotations(obj.Annotations, src.Annotations, ref)
 
 		return obj
-	}, true)
+	}, metav1.PatchOptions{})
 
 	return err
 }
 
 func namespaceSetForSecretSelector(kc kubernetes.Interface, selector string) (sets.String, error) {
-	secret, err := kc.CoreV1().Secrets(metav1.NamespaceAll).List(metav1.ListOptions{
+	secret, err := kc.CoreV1().Secrets(metav1.NamespaceAll).List(context.TODO(), metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {

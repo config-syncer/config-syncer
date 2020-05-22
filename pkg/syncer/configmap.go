@@ -17,6 +17,8 @@ limitations under the License.
 package syncer
 
 import (
+	context "context"
+
 	"github.com/appscode/go/log"
 	"github.com/appscode/kubed/pkg/eventer"
 
@@ -101,7 +103,7 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 
 // upsert into newNs set, delete from (oldNs-newNs) set
 // use skipSrcNs = true for sync in source cluster
-func (s *ConfigSyncer) syncConfigMapIntoNamespaces(kc kubernetes.Interface, src *core.ConfigMap, newNs sets.String, skipSrcNs bool, context string) error {
+func (s *ConfigSyncer) syncConfigMapIntoNamespaces(kc kubernetes.Interface, src *core.ConfigMap, newNs sets.String, skipSrcNs bool, ctx string) error {
 	oldNs, err := namespaceSetForConfigMapSelector(kc, s.syncerLabelSelector(src.Name, src.Namespace, s.clusterName))
 	if err != nil {
 		return err
@@ -112,12 +114,12 @@ func (s *ConfigSyncer) syncConfigMapIntoNamespaces(kc kubernetes.Interface, src 
 		newNs.Delete(src.Namespace)
 	}
 	for _, ns := range oldNs.List() {
-		if err := kc.CoreV1().ConfigMaps(ns).Delete(src.Name, &metav1.DeleteOptions{}); err != nil {
+		if err := kc.CoreV1().ConfigMaps(ns).Delete(context.TODO(), src.Name, metav1.DeleteOptions{}); err != nil {
 			return err
 		}
 	}
 	for _, ns := range newNs.List() {
-		if err = s.upsertConfigMap(kc, src, ns, context); err != nil {
+		if err = s.upsertConfigMap(kc, src, ns, ctx); err != nil {
 			return err
 		}
 	}
@@ -137,19 +139,19 @@ func (s *ConfigSyncer) syncConfigMapIntoNewNamespace(src *core.ConfigMap, namesp
 	return nil
 }
 
-func (s *ConfigSyncer) upsertConfigMap(kc kubernetes.Interface, src *core.ConfigMap, namespace, context string) error {
+func (s *ConfigSyncer) upsertConfigMap(kc kubernetes.Interface, src *core.ConfigMap, namespace, ctx string) error {
 	meta := metav1.ObjectMeta{
 		Name:      src.Name,
 		Namespace: namespace,
 	}
-	_, _, err := core_util.CreateOrPatchConfigMap(kc, meta, func(obj *core.ConfigMap) *core.ConfigMap {
+	_, _, err := core_util.CreateOrPatchConfigMap(context.TODO(), kc, meta, func(obj *core.ConfigMap) *core.ConfigMap {
 		// check origin cluster, if not match overwrite and create an event
 		if v, ok := obj.Labels[OriginClusterLabelKey]; ok && v != s.clusterName {
 			s.recorder.Eventf(
 				src,
 				core.EventTypeWarning,
 				eventer.EventReasonOriginConflict,
-				"Origin cluster changed from %s in context %s", v, context,
+				"Origin cluster changed from %s in context %s", v, ctx,
 			)
 		}
 
@@ -167,13 +169,13 @@ func (s *ConfigSyncer) upsertConfigMap(kc kubernetes.Interface, src *core.Config
 		obj.Annotations = s.syncerAnnotations(obj.Annotations, src.Annotations, ref)
 
 		return obj
-	})
+	}, metav1.PatchOptions{})
 
 	return err
 }
 
 func namespaceSetForConfigMapSelector(kc kubernetes.Interface, selector string) (sets.String, error) {
-	cfgMaps, err := kc.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
+	cfgMaps, err := kc.CoreV1().ConfigMaps(metav1.NamespaceAll).List(context.TODO(), metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {

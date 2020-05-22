@@ -17,6 +17,7 @@ limitations under the License.
 package syncer
 
 import (
+	"context"
 	"net/url"
 	"sync"
 
@@ -114,12 +115,12 @@ type clusterContext struct {
 }
 
 func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
-	ns, err := s.kubeClient.CoreV1().Namespaces().Get(namespace, metav1.GetOptions{})
+	ns, err := s.kubeClient.CoreV1().Namespaces().Get(context.TODO(), namespace, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
 
-	configMaps, err := s.kubeClient.CoreV1().ConfigMaps(core.NamespaceAll).List(metav1.ListOptions{})
+	configMaps, err := s.kubeClient.CoreV1().ConfigMaps(core.NamespaceAll).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
@@ -129,7 +130,7 @@ func (s *ConfigSyncer) SyncIntoNamespace(namespace string) error {
 		}
 	}
 
-	secrets, err := s.kubeClient.CoreV1().Secrets(core.NamespaceAll).List(metav1.ListOptions{})
+	secrets, err := s.kubeClient.CoreV1().Secrets(core.NamespaceAll).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return err
 	}

@@ -17,6 +17,7 @@ limitations under the License.
 package framework
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/appscode/go/types"
@@ -40,7 +41,7 @@ func deleteInForeground() *metav1.DeleteOptions {
 
 func (fi *Invocation) WaitUntilDeploymentReady(meta metav1.ObjectMeta) error {
 	return wait.PollImmediate(kutil.RetryInterval, kutil.ReadinessTimeout, func() (done bool, err error) {
-		if obj, err := fi.KubeClient.AppsV1().Deployments(meta.Namespace).Get(meta.Name, metav1.GetOptions{}); err == nil {
+		if obj, err := fi.KubeClient.AppsV1().Deployments(meta.Namespace).Get(context.TODO(), meta.Name, metav1.GetOptions{}); err == nil {
 			return types.Int32(obj.Spec.Replicas) == obj.Status.ReadyReplicas, nil
 		}
 		return false, nil
@@ -49,7 +50,7 @@ func (fi *Invocation) WaitUntilDeploymentReady(meta metav1.ObjectMeta) error {
 
 func (fi *Invocation) WaitUntilDeploymentTerminated(meta metav1.ObjectMeta) error {
 	return wait.PollImmediate(kutil.RetryInterval, kutil.GCTimeout, func() (done bool, err error) {
-		if pods, err := fi.KubeClient.CoreV1().Pods(meta.Namespace).List(metav1.ListOptions{}); err == nil {
+		if pods, err := fi.KubeClient.CoreV1().Pods(meta.Namespace).List(context.TODO(), metav1.ListOptions{}); err == nil {
 			return len(pods.Items) == 0, nil
 		}
 		return false, nil
@@ -71,7 +72,7 @@ func (fi *Invocation) RemoveFromOperatorPod(dir string) error {
 }
 
 func (fi *Invocation) OperatorPod() (*core.Pod, error) {
-	pods, err := fi.KubeClient.CoreV1().Pods(OperatorNamespace).List(metav1.ListOptions{})
+	pods, err := fi.KubeClient.CoreV1().Pods(OperatorNamespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -88,9 +89,9 @@ func (fi *Invocation) OperatorPod() (*core.Pod, error) {
 }
 
 func (fi *Invocation) DeleteService(meta metav1.ObjectMeta) error {
-	return fi.KubeClient.CoreV1().Services(meta.Namespace).Delete(meta.Name, deleteInBackground())
+	return fi.KubeClient.CoreV1().Services(meta.Namespace).Delete(context.TODO(), meta.Name, *deleteInBackground())
 }
 
 func (fi *Invocation) DeleteEndpoints(meta metav1.ObjectMeta) error {
-	return fi.KubeClient.CoreV1().Endpoints(meta.Namespace).Delete(meta.Name, deleteInBackground())
+	return fi.KubeClient.CoreV1().Endpoints(meta.Namespace).Delete(context.TODO(), meta.Name, *deleteInBackground())
 }
