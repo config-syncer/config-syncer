@@ -6,25 +6,30 @@
 [![Twitter](https://img.shields.io/twitter/follow/appscodehq.svg?style=social&logo=twitter&label=Follow)](https://twitter.com/intent/follow?screen_name=AppsCodeHQ)
 
 # Kubed
+
 Kubed (pronounced Cube-Dee) by AppsCode is a Kubernetes Cluster Operator Daemon. Kubed can do the following things for you:
 
- - Kubed can keep [ConfigMaps and Secrets synchronized across namespaces and/or clusters](https://appscode.com/products/kubed/latest/guides/config-syncer/).
-
+- Kubed can keep [ConfigMaps and Secrets synchronized across namespaces and/or clusters](https://appscode.com/products/kubed/latest/guides/config-syncer/).
 
 ## Supported Versions
+
 Please pick a version of Kubed that matches your Kubernetes installation.
 
-| Kubed Version                                                     | Docs                                                            | Kubernetes Version |
-|-------------------------------------------------------------------|-----------------------------------------------------------------|--------------------|
-| [v0.12.0](https://github.com/appscode/kubed/releases/tag/v0.12.0) | [User Guide](https://appscode.com/products/kubed/v0.12.0/)      | 1.11.x+            |
+| Kubed Version                                                                   | Docs                                                              | Kubernetes Version |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------ |
+| [v0.13.0-beta.0](https://github.com/appscode/kubed/releases/tag/v0.13.0-beta.0) | [User Guide](https://appscode.com/products/kubed/v0.13.0-beta.0/) | 1.11.x+            |
+| [v0.12.0](https://github.com/appscode/kubed/releases/tag/v0.12.0)               | [User Guide](https://appscode.com/products/kubed/v0.12.0/)        | 1.11.x+            |
 
 ## Installation
+
 To install Kubed, please follow the guide [here](https://appscode.com/products/kubed/latest/setup/install/).
 
 ## Using Kubed
+
 Want to learn how to use Kubed? Please start [here](https://appscode.com/products/kubed/latest/).
 
 ## Contribution guidelines
+
 Want to help improve Kubed? Please start [here](https://appscode.com/products/kubed/latest/welcome/contributing/).
 
 ---
@@ -34,6 +39,7 @@ Want to help improve Kubed? Please start [here](https://appscode.com/products/ku
 ---
 
 ## Support
+
 We use Slack for public discussions. To chit chat with us or the rest of the community, join us in the [AppsCode Slack team](https://appscode.slack.com/messages/C6HSHCKBL/details/) channel `#kubed`. To sign up, use our [Slack inviter](https://slack.appscode.com/).
 
 If you have found a bug with Kubed or want to request for new features, please [file an issue](https://github.com/appscode/kubed/issues/new).
