@@ -45,7 +45,7 @@ require (
 
 replace (
 	bitbucket.org/ww/goautoneg => gomodules.xyz/goautoneg v0.0.0-20120707110453-a547fc61f48d
-	git.apache.org/thrift.git => github.com/apache/thrift v0.12.0
+	git.apache.org/thrift.git => github.com/apache/thrift v0.13.0-beta.0
 	github.com/Azure/azure-sdk-for-go => github.com/Azure/azure-sdk-for-go v35.0.0+incompatible
 	github.com/Azure/go-ansiterm => github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78
 	github.com/Azure/go-autorest => github.com/Azure/go-autorest v13.0.0+incompatible

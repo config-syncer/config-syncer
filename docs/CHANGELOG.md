@@ -17,6 +17,14 @@ aliases:
 
 # Change Log
 
+## [Unreleased](https://github.com/appscode/kubed/tree/HEAD)
+
+[Full Changelog](https://github.com/appscode/kubed/compare/v0.12.0...HEAD)
+
+**Merged pull requests:**
+
+- Update to Kubernetes v1.18.3 [\#398](https://github.com/appscode/kubed/pull/398) ([tamalsaha](https://github.com/tamalsaha))
+
 ## [v0.12.0](https://github.com/appscode/kubed/tree/v0.12.0) (2020-05-18)
 [Full Changelog](https://github.com/appscode/kubed/compare/v0.12.0-rc.3...v0.12.0)
 
