@@ -17,6 +17,7 @@ limitations under the License.
 package syncer
 
 import (
+	"context"
 	"strings"
 
 	"github.com/appscode/go/types"
@@ -49,7 +50,7 @@ func GetSyncOptions(annotations map[string]string) SyncOptions {
 }
 
 func NamespacesForSelector(kc kubernetes.Interface, selector string) (sets.String, error) {
-	namespaces, err := kc.CoreV1().Namespaces().List(metav1.ListOptions{
+	namespaces, err := kc.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {

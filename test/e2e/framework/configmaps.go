@@ -17,6 +17,7 @@ limitations under the License.
 package framework
 
 import (
+	"context"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -68,7 +69,7 @@ func (fi *Invocation) EventuallyNumOfConfigmapsForContext(kubeConfigPath string,
 
 func (fi *Invocation) EventuallyNumOfConfigmapsForClient(client kubernetes.Interface, namespace string) GomegaAsyncAssertion {
 	return Eventually(func() int {
-		cfgMaps, err := client.CoreV1().ConfigMaps(namespace).List(metav1.ListOptions{
+		cfgMaps, err := client.CoreV1().ConfigMaps(namespace).List(context.TODO(), metav1.ListOptions{
 			LabelSelector: labels.Set{
 				"app": fi.App(),
 			}.String(),
@@ -91,7 +92,7 @@ func (fi *Invocation) EventuallyConfigMapSynced(source *core.ConfigMap) GomegaAs
 				if ns == source.Name {
 					continue
 				}
-				_, err := fi.KubeClient.CoreV1().ConfigMaps(ns).Get(source.Name, metav1.GetOptions{})
+				_, err := fi.KubeClient.CoreV1().ConfigMaps(ns).Get(context.TODO(), source.Name, metav1.GetOptions{})
 				if err != nil {
 					return false
 				}
@@ -105,14 +106,14 @@ func (fi *Invocation) EventuallyConfigMapSynced(source *core.ConfigMap) GomegaAs
 func (fi *Invocation) EventuallyConfigMapNotSynced(source *core.ConfigMap) GomegaAsyncAssertion {
 
 	return Eventually(func() bool {
-		namespaces, err := fi.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
+		namespaces, err := fi.KubeClient.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 		Expect(err).NotTo(HaveOccurred())
 
 		for _, ns := range namespaces.Items {
 			if ns.Name == source.Name {
 				continue
 			}
-			_, err := fi.KubeClient.CoreV1().ConfigMaps(ns.Namespace).Get(source.Name, metav1.GetOptions{})
+			_, err := fi.KubeClient.CoreV1().ConfigMaps(ns.Namespace).Get(context.TODO(), source.Name, metav1.GetOptions{})
 			if err == nil {
 				return false
 			}
@@ -123,7 +124,7 @@ func (fi *Invocation) EventuallyConfigMapNotSynced(source *core.ConfigMap) Gomeg
 
 func (fi *Invocation) EventuallyConfigMapSyncedToNamespace(source *core.ConfigMap, namespace string) GomegaAsyncAssertion {
 	return Eventually(func() bool {
-		_, err := fi.KubeClient.CoreV1().ConfigMaps(namespace).Get(source.Name, metav1.GetOptions{})
+		_, err := fi.KubeClient.CoreV1().ConfigMaps(namespace).Get(context.TODO(), source.Name, metav1.GetOptions{})
 		return err == nil
 	})
 }
@@ -141,7 +142,7 @@ func (fi *Invocation) EventuallySyncedConfigMapsUpdated(source *core.ConfigMap) 
 				if ns == source.Namespace {
 					continue
 				}
-				cmReplica, err := fi.KubeClient.CoreV1().ConfigMaps(ns).Get(source.Name, metav1.GetOptions{})
+				cmReplica, err := fi.KubeClient.CoreV1().ConfigMaps(ns).Get(context.TODO(), source.Name, metav1.GetOptions{})
 				if err != nil {
 					return false
 				}
@@ -168,7 +169,7 @@ func (fi *Invocation) EventuallySyncedConfigMapsDeleted(source *core.ConfigMap) 
 				if ns == source.Namespace {
 					continue
 				}
-				_, err := fi.KubeClient.CoreV1().ConfigMaps(ns).Get(source.Name, metav1.GetOptions{})
+				_, err := fi.KubeClient.CoreV1().ConfigMaps(ns).Get(context.TODO(), source.Name, metav1.GetOptions{})
 				if err == nil {
 					return false
 				}
@@ -216,7 +217,7 @@ func (fi *Invocation) ReadConfigMapFromRecycleBin(recycleBinLocation string, cm 
 }
 
 func (fi *Invocation) DeleteAllConfigmaps() {
-	cfgMaps, err := fi.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(metav1.ListOptions{
+	cfgMaps, err := fi.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(context.TODO(), metav1.ListOptions{
 		LabelSelector: labels.Set{
 			"app": fi.App(),
 		}.String(),
@@ -232,8 +233,8 @@ func (fi *Invocation) DeleteAllConfigmaps() {
 }
 
 func (fi *Invocation) CreateConfigMap(configMap *core.ConfigMap) (*core.ConfigMap, error) {
-	return fi.KubeClient.CoreV1().ConfigMaps(configMap.Namespace).Create(configMap)
+	return fi.KubeClient.CoreV1().ConfigMaps(configMap.Namespace).Create(context.TODO(), configMap, metav1.CreateOptions{})
 }
 func (fi *Invocation) DeleteConfigMap(meta metav1.ObjectMeta) error {
-	return fi.KubeClient.CoreV1().ConfigMaps(meta.Namespace).Delete(meta.Name, &metav1.DeleteOptions{})
+	return fi.KubeClient.CoreV1().ConfigMaps(meta.Namespace).Delete(context.TODO(), meta.Name, metav1.DeleteOptions{})
 }

@@ -17,6 +17,8 @@ limitations under the License.
 package framework
 
 import (
+	"context"
+
 	"github.com/appscode/go/crypto/rand"
 
 	. "github.com/onsi/gomega"
@@ -32,13 +34,13 @@ func (f *Framework) Namespace() string {
 }
 
 func (f *Framework) EnsureNamespace() error {
-	_, err := f.KubeClient.CoreV1().Namespaces().Get(f.namespace, metav1.GetOptions{})
+	_, err := f.KubeClient.CoreV1().Namespaces().Get(context.TODO(), f.namespace, metav1.GetOptions{})
 	if errors.IsNotFound(err) {
-		_, err = f.KubeClient.CoreV1().Namespaces().Create(&core.Namespace{
+		_, err = f.KubeClient.CoreV1().Namespaces().Create(context.TODO(), &core.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: f.namespace,
 			},
-		})
+		}, metav1.CreateOptions{})
 	}
 	return err
 }
@@ -62,70 +64,70 @@ func (fi *Invocation) NewNamespaceWithLabel() *core.Namespace {
 }
 
 func (fi *Invocation) NumberOfNameSpace() int {
-	ns, err := fi.KubeClient.CoreV1().Namespaces().List(metav1.ListOptions{})
+	ns, err := fi.KubeClient.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 	Expect(err).NotTo(HaveOccurred())
 	return len(ns.Items)
 }
 
 func (f *Framework) CreateNamespace(ns *core.Namespace) error {
-	_, err := f.KubeClient.CoreV1().Namespaces().Create(ns)
+	_, err := f.KubeClient.CoreV1().Namespaces().Create(context.TODO(), ns, metav1.CreateOptions{})
 	return err
 }
 func (f *Framework) DeleteNamespace(name string) error {
-	return f.KubeClient.CoreV1().Namespaces().Delete(name, &metav1.DeleteOptions{})
+	return f.KubeClient.CoreV1().Namespaces().Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
 
 func (f *Framework) EventuallyNamespaceDeleted(ns string) GomegaAsyncAssertion {
 	return Eventually(func() bool {
-		_, err := f.KubeClient.CoreV1().Namespaces().Get(ns, metav1.GetOptions{})
+		_, err := f.KubeClient.CoreV1().Namespaces().Get(context.TODO(), ns, metav1.GetOptions{})
 		return kerr.IsNotFound(err)
 	})
 }
 
-func (fi *Invocation) EnsureNamespaceForContext(kubeConfigPath string, context string) {
-	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
+func (fi *Invocation) EnsureNamespaceForContext(kubeConfigPath string, ctx string) {
+	client, err := clientcmd.ClientFromContext(kubeConfigPath, ctx)
 	Expect(err).ShouldNot(HaveOccurred())
-	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
+	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, ctx)
 	Expect(err).ShouldNot(HaveOccurred())
 
 	if ns == "" {
 		ns = fi.Namespace()
 	}
 
-	_, err = client.CoreV1().Namespaces().Get(ns, metav1.GetOptions{})
+	_, err = client.CoreV1().Namespaces().Get(context.TODO(), ns, metav1.GetOptions{})
 	if errors.IsNotFound(err) {
-		_, err = client.CoreV1().Namespaces().Create(&core.Namespace{
+		_, err = client.CoreV1().Namespaces().Create(context.TODO(), &core.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: ns,
 			},
-		})
+		}, metav1.CreateOptions{})
 		Expect(err).ShouldNot(HaveOccurred())
 
 		Eventually(func() bool {
-			_, err := client.CoreV1().Namespaces().Get(ns, metav1.GetOptions{})
+			_, err := client.CoreV1().Namespaces().Get(context.TODO(), ns, metav1.GetOptions{})
 			return kerr.IsNotFound(err)
 		}).Should(BeFalse())
 	}
 }
 
-func (fi *Invocation) DeleteNamespaceForContext(kubeConfigPath string, context string) {
-	client, err := clientcmd.ClientFromContext(kubeConfigPath, context)
+func (fi *Invocation) DeleteNamespaceForContext(kubeConfigPath string, ctx string) {
+	client, err := clientcmd.ClientFromContext(kubeConfigPath, ctx)
 	Expect(err).ShouldNot(HaveOccurred())
-	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, context)
+	ns, err := clientcmd.NamespaceFromContext(kubeConfigPath, ctx)
 	Expect(err).ShouldNot(HaveOccurred())
 
 	if ns == "" {
 		ns = fi.Namespace()
 	}
 
-	err = client.CoreV1().Namespaces().Delete(ns, &metav1.DeleteOptions{})
+	err = client.CoreV1().Namespaces().Delete(context.TODO(), ns, metav1.DeleteOptions{})
 	if errors.IsNotFound(err) {
 		err = nil
 	}
 	Expect(err).ShouldNot(HaveOccurred())
 
 	Eventually(func() bool {
-		_, err := client.CoreV1().Namespaces().Get(ns, metav1.GetOptions{})
+		_, err := client.CoreV1().Namespaces().Get(context.TODO(), ns, metav1.GetOptions{})
 		return kerr.IsNotFound(err)
 	}).Should(BeTrue())
 }

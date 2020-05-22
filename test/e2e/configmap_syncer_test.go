@@ -17,6 +17,7 @@ limitations under the License.
 package e2e_test
 
 import (
+	"context"
 	"os"
 
 	"github.com/appscode/kubed/pkg/operator"
@@ -49,7 +50,7 @@ var _ = Describe("Config-Syncer", func() {
 	AfterEach(func() {
 		f.DeleteAllConfigmaps()
 
-		err := f.KubeClient.CoreV1().Namespaces().Delete(nsWithLabel.Name, &metav1.DeleteOptions{})
+		err := f.KubeClient.CoreV1().Namespaces().Delete(context.TODO(), nsWithLabel.Name, metav1.DeleteOptions{})
 		if kerr.IsNotFound(err) {
 			err = nil
 		}
@@ -60,17 +61,17 @@ var _ = Describe("Config-Syncer", func() {
 	var (
 		shouldSyncConfigMapToAllNamespaces = func() {
 			By("Creating configMap")
-			sourceCM, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
+			sourceCM, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(context.TODO(), cfgMap, metav1.CreateOptions{})
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Checking configMap has not synced yet")
 			f.EventuallyConfigMapNotSynced(sourceCM).Should(BeTrue())
 
 			By("Adding sync annotation")
-			sourceCM, _, err = core_util.PatchConfigMap(f.KubeClient, sourceCM, func(obj *core.ConfigMap) *core.ConfigMap {
+			sourceCM, _, err = core_util.PatchConfigMap(context.TODO(), f.KubeClient, sourceCM, func(obj *core.ConfigMap) *core.ConfigMap {
 				metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "")
 				return obj
-			})
+			}, metav1.PatchOptions{})
 			Expect(err).ShouldNot(HaveOccurred())
 
 			By("Checking configMap has synced to all namespaces")
@@ -109,13 +110,13 @@ var _ = Describe("Config-Syncer", func() {
 				shouldSyncConfigMapToAllNamespaces()
 
 				By("Removing sync annotation")
-				source, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(cfgMap.Name, metav1.GetOptions{})
+				source, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(context.TODO(), cfgMap.Name, metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())
 
-				_, _, err = core_util.PatchConfigMap(f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
+				_, _, err = core_util.PatchConfigMap(context.TODO(), f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
 					obj.Annotations = meta.RemoveKey(obj.Annotations, syncer.ConfigSyncKey)
 					return obj
-				})
+				}, metav1.PatchOptions{})
 				Expect(err).ShouldNot(HaveOccurred())
 
 				By("Checking synced configMaps has been deleted")
@@ -129,13 +130,13 @@ var _ = Describe("Config-Syncer", func() {
 				shouldSyncConfigMapToAllNamespaces()
 
 				By("Updating source configMap")
-				source, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(cfgMap.Name, metav1.GetOptions{})
+				source, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(context.TODO(), cfgMap.Name, metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())
 
-				source, _, err = core_util.PatchConfigMap(f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
+				source, _, err = core_util.PatchConfigMap(context.TODO(), f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
 					obj.Data["data"] = "test"
 					return obj
-				})
+				}, metav1.PatchOptions{})
 				Expect(err).ShouldNot(HaveOccurred())
 
 				By("Checking synced configMaps has been updated")
@@ -155,10 +156,10 @@ var _ = Describe("Config-Syncer", func() {
 				f.EventuallyConfigMapNotSynced(source).Should(BeTrue())
 
 				By("Adding sync=true annotation")
-				source, _, err = core_util.PatchConfigMap(f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
+				source, _, err = core_util.PatchConfigMap(context.TODO(), f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
 					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "true")
 					return obj
-				})
+				}, metav1.PatchOptions{})
 				Expect(err).ShouldNot(HaveOccurred())
 
 				By("Checking configMap has synced to all namespaces")
@@ -173,13 +174,13 @@ var _ = Describe("Config-Syncer", func() {
 				shouldSyncConfigMapToAllNamespaces()
 
 				By("Adding selector annotation")
-				source, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(cfgMap.Name, metav1.GetOptions{})
+				source, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(context.TODO(), cfgMap.Name, metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())
 
-				source, _, err = core_util.PatchConfigMap(f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
+				source, _, err = core_util.PatchConfigMap(context.TODO(), f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
 					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "app="+f.App())
 					return obj
-				})
+				}, metav1.PatchOptions{})
 				Expect(err).NotTo(HaveOccurred())
 
 				By("Checking configMap has not synced to other namespaces")
@@ -193,23 +194,23 @@ var _ = Describe("Config-Syncer", func() {
 				f.EventuallyConfigMapSyncedToNamespace(source, nsWithLabel.Name)
 
 				By("Changing selector annotation")
-				_, _, err = core_util.PatchConfigMap(f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
+				_, _, err = core_util.PatchConfigMap(context.TODO(), f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
 					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "app=do-not-match")
 					return obj
-				})
+				}, metav1.PatchOptions{})
 				Expect(err).ShouldNot(HaveOccurred())
 
 				By("Checking synced configMap has been deleted")
 				f.EventuallySyncedConfigMapsDeleted(source)
 
 				By("Removing selector annotation")
-				source, err = f.KubeClient.CoreV1().ConfigMaps(source.Namespace).Get(source.Name, metav1.GetOptions{})
+				source, err = f.KubeClient.CoreV1().ConfigMaps(source.Namespace).Get(context.TODO(), source.Name, metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())
 
-				source, _, err = core_util.PatchConfigMap(f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
+				source, _, err = core_util.PatchConfigMap(context.TODO(), f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
 					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncKey, "")
 					return obj
-				})
+				}, metav1.PatchOptions{})
 				Expect(err).ShouldNot(HaveOccurred())
 
 				By("Checking configMap synced to all namespaces")
@@ -223,7 +224,7 @@ var _ = Describe("Config-Syncer", func() {
 				shouldSyncConfigMapToAllNamespaces()
 
 				By("Deleting source configMap")
-				source, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(cfgMap.Name, metav1.GetOptions{})
+				source, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(context.TODO(), cfgMap.Name, metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())
 
 				err = f.DeleteConfigMap(source.ObjectMeta)
@@ -251,7 +252,7 @@ var _ = Describe("Config-Syncer", func() {
 				shouldSyncConfigMapToAllNamespaces()
 
 				By("Deleting source namespace")
-				source, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(cfgMap.Name, metav1.GetOptions{})
+				source, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(context.TODO(), cfgMap.Name, metav1.GetOptions{})
 				Expect(err).NotTo(HaveOccurred())
 
 				err = f.DeleteNamespace(sourceNamespace.Name)
@@ -267,7 +268,7 @@ var _ = Describe("Config-Syncer", func() {
 		Context("ConfigMap Context Syncer Test", func() {
 			var (
 				kubeConfigPath = "/home/dipta/all/kubed-test/kubeconfig"
-				context        = "gke_tigerworks-kube_us-central1-f_kite"
+				ctx            = "gke_tigerworks-kube_us-central1-f_kite"
 			)
 
 			BeforeEach(func() {
@@ -280,41 +281,41 @@ var _ = Describe("Config-Syncer", func() {
 				}
 
 				By("Creating namespace for context")
-				f.EnsureNamespaceForContext(kubeConfigPath, context)
+				f.EnsureNamespaceForContext(kubeConfigPath, ctx)
 			})
 
 			AfterEach(func() {
 				By("Deleting namespaces for contexts")
-				f.DeleteNamespaceForContext(kubeConfigPath, context)
+				f.DeleteNamespaceForContext(kubeConfigPath, ctx)
 			})
 
 			It("Should add configmap to contexts", func() {
 				By("Creating source ns in remote cluster")
-				f.EnsureNamespaceForContext(kubeConfigPath, context)
+				f.EnsureNamespaceForContext(kubeConfigPath, ctx)
 
 				By("Creating configmap")
-				cfgMap, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(cfgMap)
+				cfgMap, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Create(context.TODO(), cfgMap, metav1.CreateOptions{})
 				Expect(err).NotTo(HaveOccurred())
 
 				By("Adding sync annotation")
-				cfgMap, _, err = core_util.PatchConfigMap(f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
-					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncContexts, context)
+				cfgMap, _, err = core_util.PatchConfigMap(context.TODO(), f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
+					metav1.SetMetaDataAnnotation(&obj.ObjectMeta, syncer.ConfigSyncContexts, ctx)
 					return obj
-				})
+				}, metav1.PatchOptions{})
 				Expect(err).ShouldNot(HaveOccurred())
 
 				By("Checking configmap added to contexts")
-				f.EventuallyNumOfConfigmapsForContext(kubeConfigPath, context).Should(BeNumerically("==", 1))
+				f.EventuallyNumOfConfigmapsForContext(kubeConfigPath, ctx).Should(BeNumerically("==", 1))
 
 				By("Removing sync annotation")
-				_, _, err = core_util.PatchConfigMap(f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
+				_, _, err = core_util.PatchConfigMap(context.TODO(), f.KubeClient, cfgMap, func(obj *core.ConfigMap) *core.ConfigMap {
 					obj.Annotations = meta.RemoveKey(obj.Annotations, syncer.ConfigSyncContexts)
 					return obj
-				})
+				}, metav1.PatchOptions{})
 				Expect(err).ShouldNot(HaveOccurred())
 
 				By("Checking configmap removed from contexts")
-				f.EventuallyNumOfConfigmapsForContext(kubeConfigPath, context).Should(BeNumerically("==", 0))
+				f.EventuallyNumOfConfigmapsForContext(kubeConfigPath, ctx).Should(BeNumerically("==", 0))
 			})
 		})
 	})
