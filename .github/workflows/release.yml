@@ -43,73 +43,33 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Parse Parameters
-        id: params
-        run: |
-          GIT_TAG=${GITHUB_REF#'refs/tags/'}
-          echo ::set-output name=git_tag::$GIT_TAG
-          while IFS=$': \t' read -r marker v; do
-            case $marker in
-              Release)
-                echo ::set-output name=release::$v
-                ;;
-              Release-tracker)
-                echo ::set-output name=release_tracker::$v
-                ;;
-            esac
-          done < <(git tag -l --format='%(body)' $GIT_TAG)
-
       - name: Install GitHub CLI
         run: |
           curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
           sudo mv bin/hub /usr/local/bin
 
+      - name: Install Helm 3
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
       - name: Clone charts repository
         env:
+          GITHUB_USER: 1gtm
           GITHUB_TOKEN: ${{ secrets.LGTM_GITHUB_TOKEN }}
+          CHART_REPOSITORY: ${{ secrets.CHART_REPOSITORY }}
         run: |
-          cd $HOME
-          git clone https://1gtm:${GITHUB_TOKEN}@github.com/appscode/charts.git
-          cd charts
-          git config user.name "1gtm"
-          git config user.email "1gtm@appscode.com"
+          url="https://${GITHUB_USER}:${GITHUB_TOKEN}@${CHART_REPOSITORY}.git"
+          cd $RUNNER_WORKSPACE
+          git clone $url
+          cd $(basename $CHART_REPOSITORY)
+          git config user.name "${GITHUB_USER}"
+          git config user.email "${GITHUB_USER}@appscode.com"
 
       - name: Package
-        run: |
-          echo "install helm 3"
-          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-          echo "package charts"
-          find charts -maxdepth 1 -mindepth 1 -type d -exec helm package {} -d {} \;
-          helm repo index --merge $HOME/charts/stable/index.yaml --url https://charts.appscode.com/stable/ charts
-          mv charts/index.yaml $HOME/charts/stable/index.yaml
-          cd charts
-          find . -maxdepth 1 -mindepth 1 -type d -exec mkdir -p $HOME/charts/stable/{} \;
-          find . -path ./charts -prune -o -name '*.tgz' -exec mv {} $HOME/charts/stable/{} \;
-
-      - name: Create pull request
         env:
+          GITHUB_USER: 1gtm
           GITHUB_TOKEN: ${{ secrets.LGTM_GITHUB_TOKEN }}
+          CHART_REPOSITORY: ${{ secrets.CHART_REPOSITORY }}
         run: |
-          pr_branch=${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}
-          cd $HOME/charts
-          git checkout -b $pr_branch
-          git add --all
-          ct_cmd="git commit -a -s -m \"Publish $GITHUB_REPOSITORY@${{ steps.params.outputs.git_tag }} charts\""
-          pr_cmd=$(cat <<EOF
-          hub pull-request \
-              --labels automerge \
-              --message "Publish $GITHUB_REPOSITORY@${{ steps.params.outputs.git_tag }} charts"
-          EOF
-          )
-          if [ ! -z  ${{ steps.params.outputs.release }} ]; then
-            ct_cmd="$ct_cmd --message \"Release: ${{ steps.params.outputs.release }}\""
-            pr_cmd="$pr_cmd --message \"Release: ${{ steps.params.outputs.release }}\""
-          fi
-          if [ ! -z  ${{ steps.params.outputs.release_tracker }} ]; then
-            ct_cmd="$ct_cmd --message \"Release-tracker: ${{ steps.params.outputs.release_tracker }}\""
-            pr_cmd="$pr_cmd --message \"Release-tracker: ${{ steps.params.outputs.release_tracker }}\""
-          fi
-          pr_cmd="$pr_cmd --message \"Signed-off-by: $(git config --get user.name) <$(git config --get user.email)>\""
-          eval "$ct_cmd"
-          git push -u origin HEAD -f
-          eval "$pr_cmd"
+          cd $RUNNER_WORKSPACE/$(basename $CHART_REPOSITORY)
+          ./hack/scripts/open-pr.sh $GITHUB_WORKSPACE
