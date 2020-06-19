@@ -119,7 +119,7 @@ func (s *ConfigSyncer) syncConfigMapIntoNamespaces(kc kubernetes.Interface, src 
 		glog.Infof("configmap %s/%s will be removed from namespaces %v", src.Namespace, src.Name, oldNs.List())
 	}
 	for _, ns := range oldNs.List() {
-		if err = s.deleteConfigMap(kc, src, ns, ctx); err != nil {
+		if err = s.deleteConfigMap(kc, src, ns); err != nil {
 			return err
 		}
 	}
@@ -144,7 +144,7 @@ func (s *ConfigSyncer) syncConfigMapIntoNewNamespace(src *core.ConfigMap, namesp
 	return nil
 }
 
-func (s *ConfigSyncer) deleteConfigMap(kc kubernetes.Interface, src *core.ConfigMap, namespace, ctx string) error {
+func (s *ConfigSyncer) deleteConfigMap(kc kubernetes.Interface, src *core.ConfigMap, namespace string) error {
 	glog.Infof("configmap %s/%s will be deleted", namespace, src.Name)
 	err := kc.CoreV1().ConfigMaps(namespace).Delete(context.TODO(), src.Name, metav1.DeleteOptions{})
 	return err
