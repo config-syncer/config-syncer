@@ -20,8 +20,8 @@ import (
 	"reflect"
 
 	"github.com/appscode/go/log"
-	"github.com/golang/glog"
 
+	"github.com/golang/glog"
 	core "k8s.io/api/core/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/tools/cache"
