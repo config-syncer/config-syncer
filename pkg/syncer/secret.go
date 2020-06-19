@@ -40,7 +40,6 @@ func (s *ConfigSyncer) SyncSecret(src *core.Secret) error {
 		if err != nil {
 			return err
 		}
-		glog.Infof("secret %s/%s will be synced into namespaces %v if needed", src.Namespace, src.Name, newNs.List())
 		if err := s.syncSecretIntoNamespaces(s.kubeClient, src, newNs, true, ""); err != nil {
 			return err
 		}
@@ -104,6 +103,9 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 // upsert into newNs set, delete from (oldNs-newNs) set
 // use skipSrcNs = true for sync in source cluster
 func (s *ConfigSyncer) syncSecretIntoNamespaces(kc kubernetes.Interface, src *core.Secret, newNs sets.String, skipSrcNs bool, ctx string) error {
+	if newNs.Len() > 0 {
+		glog.Infof("secret %s/%s will be synced into namespaces %v if needed", src.Namespace, src.Name, newNs.List())
+	}
 	oldNs, err := namespaceSetForSecretSelector(kc, s.syncerLabelSelector(src.Name, src.Namespace, s.clusterName))
 	if err != nil {
 		return err
@@ -113,8 +115,11 @@ func (s *ConfigSyncer) syncSecretIntoNamespaces(kc kubernetes.Interface, src *co
 		oldNs.Delete(src.Namespace)
 		newNs.Delete(src.Namespace)
 	}
+	if oldNs.Len() > 0 {
+		glog.Infof("secret %s/%s will be removed from namespaces %v", src.Namespace, src.Name, oldNs.List())
+	}
 	for _, ns := range oldNs.List() {
-		if err := kc.CoreV1().Secrets(ns).Delete(context.TODO(), src.Name, metav1.DeleteOptions{}); err != nil {
+		if err = s.deleteSecret(kc, src, ns, ctx); err != nil {
 			return err
 		}
 	}
@@ -139,7 +144,15 @@ func (s *ConfigSyncer) syncSecretIntoNewNamespace(src *core.Secret, namespace *c
 	return nil
 }
 
+func (s *ConfigSyncer) deleteSecret(kc kubernetes.Interface, src *core.Secret, namespace, ctx string) error {
+	glog.Infof("secret %s/%s will be deleted", namespace, src.Name)
+	err := kc.CoreV1().Secrets(namespace).Delete(context.TODO(), src.Name, metav1.DeleteOptions{})
+	return err
+}
+
 func (s *ConfigSyncer) upsertSecret(kc kubernetes.Interface, src *core.Secret, namespace, ctx string) error {
+	glog.Infof("secret %s/%s will be upserted", namespace, src.Name)
+
 	meta := metav1.ObjectMeta{
 		Name:      src.Name,
 		Namespace: namespace,
