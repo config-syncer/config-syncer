@@ -52,8 +52,8 @@ endif
 ### These variables should not need tweaking.
 ###
 
-SRC_PKGS := pkg *.go # directories which hold app source excluding tests (not vendored)
-SRC_DIRS := $(SRC_PKGS) test hack # directories which hold app source (not vendored)
+SRC_PKGS := pkg # directories which hold app source excluding tests (not vendored)
+SRC_DIRS := $(SRC_PKGS) *.go test hack # directories which hold app source (not vendored)
 
 DOCKER_PLATFORMS := linux/amd64 linux/arm linux/arm64
 BIN_PLATFORMS    := $(DOCKER_PLATFORMS)
@@ -72,7 +72,7 @@ TAG              := $(VERSION)_$(OS)_$(ARCH)
 TAG_PROD         := $(TAG)
 TAG_DBG          := $(VERSION)-dbg_$(OS)_$(ARCH)
 
-GO_VERSION       ?= 1.14
+GO_VERSION       ?= 1.15
 BUILD_IMAGE      ?= appscode/golang-dev:$(GO_VERSION)
 CHART_TEST_IMAGE ?= quay.io/helmpack/chart-testing:v3.0.0-rc.1
 
