@@ -7,7 +7,7 @@ require (
 	github.com/Azure/go-autorest/autorest v0.10.2 // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.8.3 // indirect
 	github.com/NYTimes/gziphandler v1.1.1 // indirect
-	github.com/appscode/go v0.0.0-20200323182826-54e98e09185a
+	github.com/appscode/go v0.0.0-20200928211031-cc0c23082d91
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/go-openapi/spec v0.19.8 // indirect
 	github.com/go-openapi/swag v0.19.9 // indirect
@@ -53,7 +53,7 @@ require (
 	k8s.io/apiserver v0.18.9
 	k8s.io/client-go v0.18.9
 	k8s.io/utils v0.0.0-20200414100711-2df71ebbae66 // indirect
-	kmodules.xyz/client-go v0.0.0-20200924114038-ef01fa7ccbed
+	kmodules.xyz/client-go v0.0.0-20200929030759-cce6a3c623c1
 )
 
 replace bitbucket.org/ww/goautoneg => gomodules.xyz/goautoneg v0.0.0-20120707110453-a547fc61f48d
