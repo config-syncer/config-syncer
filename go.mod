@@ -14,7 +14,6 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7 // indirect
-	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/googleapis/gnostic v0.4.0 // indirect
 	github.com/gophercloud/gophercloud v0.11.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0 // indirect
@@ -25,16 +24,14 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
-	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/onsi/ginkgo v1.11.0
 	github.com/onsi/gomega v1.8.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.6.0 // indirect
 	github.com/spf13/afero v1.2.2
-	github.com/spf13/cobra v0.0.5
+	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.5.1 // indirect
 	go.uber.org/atomic v1.6.0 // indirect
 	go.uber.org/zap v1.13.0 // indirect
 	golang.org/x/crypto v0.0.0-20200429183012-4b2356b1ed79 // indirect
@@ -44,6 +41,7 @@ require (
 	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
 	golang.org/x/tools v0.0.0-20200603131246-cc40288be839 // indirect
 	gomodules.xyz/cert v1.0.3
+	gomodules.xyz/pointer v0.0.0-20201105071923-daf60fa55209 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/genproto v0.0.0-20200603110839-e855014d5736 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
@@ -53,7 +51,7 @@ require (
 	k8s.io/apiserver v0.18.9
 	k8s.io/client-go v0.18.9
 	k8s.io/utils v0.0.0-20200414100711-2df71ebbae66 // indirect
-	kmodules.xyz/client-go v0.0.0-20201027113349-01a6d453d836
+	kmodules.xyz/client-go v0.0.0-20201105071625-0b277310b9b8
 )
 
 replace bitbucket.org/ww/goautoneg => gomodules.xyz/goautoneg v0.0.0-20120707110453-a547fc61f48d
