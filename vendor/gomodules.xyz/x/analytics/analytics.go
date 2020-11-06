@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/appscode/go/homedir"
 	"github.com/google/uuid"
+	"gomodules.xyz/homedir"
 )
 
 func ClientID() string {
