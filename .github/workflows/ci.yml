@@ -22,15 +22,15 @@ jobs:
 
       - uses: actions/checkout@v1
 
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v1
-        with:
-          buildx-version: latest
-          qemu-version: latest
+      - name: Set up QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@v1
 
       - name: Available platforms
-        run: echo ${{ steps.buildx.outputs.platforms }}
+        run: echo ${{steps.qemu.outputs.platforms}}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
       - name: Prepare Host
         run: |
@@ -74,7 +74,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        k8s: [v1.14.10, v1.15.11, v1.16.9, v1.17.5, v1.18.8, v1.20.0]
+        k8s: [v1.14.10, v1.15.11, v1.16.9, v1.17.5, v1.18.8, v1.19.4, v1.20.0]
 
     steps:
       - uses: actions/checkout@v1
