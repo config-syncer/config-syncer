@@ -34,7 +34,7 @@ Kubed operator can be installed via a script or as a Helm chart.
 
 ## Using Helm 3
 
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `kubed`:
 
 ```console
 $ helm repo add appscode https://charts.appscode.com/stable/
@@ -55,7 +55,7 @@ To see the detailed configuration options, visit [here](https://github.com/appsc
 
 ## Using Helm 2
 
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `kubed`:
 
 ```console
 $ helm repo add appscode https://charts.appscode.com/stable/
@@ -196,7 +196,7 @@ $ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/{{< param "info.ve
 <div class="tab-pane fade" id="helm" role="tabpanel" aria-labelledby="helm-tab">
 
 ## Using Helm
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/{{< param "info.version" >}}/chart/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/appscode/kubed/tree/{{< param "info.version" >}}/chart/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `kubed`:
 
 ```console
 $ helm repo add appscode https://charts.appscode.com/stable/
