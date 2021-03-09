@@ -49,7 +49,7 @@ require (
 	k8s.io/apiserver v0.18.9
 	k8s.io/client-go v0.18.9
 	k8s.io/utils v0.0.0-20200414100711-2df71ebbae66 // indirect
-	kmodules.xyz/client-go v0.0.0-20210218100652-8f345ddfe801
+	kmodules.xyz/client-go v0.0.0-20210220080427-fd7308e30bb4
 )
 
 replace bitbucket.org/ww/goautoneg => gomodules.xyz/goautoneg v0.0.0-20120707110453-a547fc61f48d
@@ -100,7 +100,7 @@ replace github.com/go-openapi/strfmt => github.com/go-openapi/strfmt v0.19.3
 
 replace github.com/go-openapi/swag => github.com/go-openapi/swag v0.19.5
 
-replace github.com/go-openapi/validate => github.com/go-openapi/validate v0.19.5
+replace github.com/go-openapi/validate => github.com/gomodules/validate v0.19.5-1.16
 
 replace github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.1
 
