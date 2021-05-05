@@ -20,14 +20,13 @@ import (
 	"io"
 	"net"
 
-	"github.com/appscode/kubed/pkg/operator"
-	"github.com/appscode/kubed/pkg/server"
+	"kubeops.dev/kubed/pkg/operator"
+	"kubeops.dev/kubed/pkg/server"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/pflag"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
-	"kmodules.xyz/client-go/meta"
 	"kmodules.xyz/client-go/tools/clientcmd"
 )
 
@@ -47,7 +46,6 @@ func NewKubedOptions(out, errOut io.Writer) *KubedOptions {
 		RecommendedOptions: genericoptions.NewRecommendedOptions(
 			defaultEtcdPathPrefix,
 			server.Codecs.LegacyCodec(),
-			genericoptions.NewProcessInfo("kubed", meta.Namespace()),
 		),
 		OperatorOptions: NewOperatorOptions(),
 		StdOut:          out,

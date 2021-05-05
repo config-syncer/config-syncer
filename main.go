@@ -20,7 +20,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/appscode/kubed/pkg/cmds"
+	"kubeops.dev/kubed/pkg/cmds"
 
 	_ "k8s.io/client-go/kubernetes/fake"
 	"kmodules.xyz/client-go/logs"

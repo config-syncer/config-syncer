@@ -15,14 +15,14 @@
 
 SHELL=/bin/bash -o pipefail
 
-GO_PKG   := github.com/appscode
+GO_PKG   := kubeops.dev
 REPO     := $(notdir $(shell pwd))
 BIN      := kubed
 COMPRESS ?= no
 
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS          ?= "crd:trivialVersions=true,preserveUnknownFields=false"
-CODE_GENERATOR_IMAGE ?= appscode/gengo:release-1.18
+CODE_GENERATOR_IMAGE ?= appscode/gengo:release-1.21
 API_GROUPS           ?= kubed:v1alpha1
 
 # Where to push the docker image.

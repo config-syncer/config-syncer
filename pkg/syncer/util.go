@@ -20,8 +20,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/appscode/go/types"
-
+	"gomodules.xyz/pointer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -38,7 +37,7 @@ func GetSyncOptions(annotations map[string]string) SyncOptions {
 	opts := SyncOptions{}
 	if v, err := meta.GetStringValue(annotations, ConfigSyncKey); err == nil {
 		if v == "true" {
-			opts.NamespaceSelector = types.StringP(labels.Everything().String())
+			opts.NamespaceSelector = pointer.StringP(labels.Everything().String())
 		} else {
 			opts.NamespaceSelector = &v
 		}
