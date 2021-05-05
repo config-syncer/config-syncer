@@ -22,9 +22,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/appscode/go/flags"
-	logs "github.com/appscode/go/log/golog"
-
+	"gomodules.xyz/x/flags"
+	logs "gomodules.xyz/x/log/golog"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/util/homedir"
 )

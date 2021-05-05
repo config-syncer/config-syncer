@@ -19,8 +19,7 @@ package operator
 import (
 	"time"
 
-	"github.com/appscode/go/log"
-	"github.com/appscode/kubed/pkg/syncer"
+	"kubeops.dev/kubed/pkg/syncer"
 
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
@@ -33,6 +32,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
+	"k8s.io/klog/v2"
 	_ "kmodules.xyz/client-go/apiextensions/v1beta1"
 )
 
@@ -49,7 +49,7 @@ type Operator struct {
 }
 
 func (op *Operator) Configure() error {
-	log.Infoln("configuring kubed ...")
+	klog.Infoln("configuring kubed ...")
 
 	return op.configSyncer.Configure(op.Config.ClusterName, op.Config.KubeConfigFile)
 }
@@ -93,5 +93,5 @@ func (op *Operator) Run(stopCh <-chan struct{}) {
 	}
 
 	<-stopCh
-	log.Infoln("Stopping kubed controller")
+	klog.Infoln("Stopping kubed controller")
 }

@@ -21,7 +21,7 @@ The following steps must be done from a Linux x64 bit machine.
 - Push all the changes to remote repo.
 - Build and push kubed docker image:
 ```console
-$ cd ~/go/src/github.com/appscode/kubed
+$ cd ~/go/src/kubeops.dev/kubed
 $ env APPSCODE_ENV=prod ./hack/make.py build
 $ ./hack/docker/setup.sh; env APPSCODE_ENV=prod ./hack/docker/setup.sh release
 ```

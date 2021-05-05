@@ -19,10 +19,9 @@ package syncer
 import (
 	"reflect"
 
-	"github.com/appscode/go/log"
-
 	core "k8s.io/api/core/v1"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/klog/v2"
 )
 
 func (s *ConfigSyncer) ConfigMapHandler() cache.ResourceEventHandler {
@@ -41,7 +40,7 @@ func (s *configmapSyncer) OnAdd(obj interface{}) {
 
 	if res, ok := obj.(*core.ConfigMap); ok {
 		if err := s.SyncConfigMap(res); err != nil {
-			log.Errorln(err)
+			klog.Errorln(err)
 		}
 	}
 }
@@ -63,7 +62,7 @@ func (s *configmapSyncer) OnUpdate(oldObj, newObj interface{}) {
 		!reflect.DeepEqual(oldRes.Data, newRes.Data) {
 
 		if err := s.SyncConfigMap(newRes); err != nil {
-			log.Errorln(err)
+			klog.Errorln(err)
 		}
 	}
 }
@@ -74,7 +73,7 @@ func (s *configmapSyncer) OnDelete(obj interface{}) {
 
 	if res, ok := obj.(*core.ConfigMap); ok {
 		if err := s.SyncDeletedConfigMap(res); err != nil {
-			log.Errorln(err)
+			klog.Errorln(err)
 		}
 	}
 }
@@ -95,7 +94,7 @@ func (s *secretSyncer) OnAdd(obj interface{}) {
 
 	if res, ok := obj.(*core.Secret); ok {
 		if err := s.SyncSecret(res); err != nil {
-			log.Errorln(err)
+			klog.Errorln(err)
 		}
 	}
 }
@@ -117,7 +116,7 @@ func (s *secretSyncer) OnUpdate(oldObj, newObj interface{}) {
 		!reflect.DeepEqual(oldRes.Data, newRes.Data) {
 
 		if err := s.SyncSecret(newRes); err != nil {
-			log.Errorln(err)
+			klog.Errorln(err)
 		}
 	}
 }
@@ -128,7 +127,7 @@ func (s *secretSyncer) OnDelete(obj interface{}) {
 
 	if res, ok := obj.(*core.Secret); ok {
 		if err := s.SyncDeletedSecret(res); err != nil {
-			log.Infoln(err)
+			klog.Infoln(err)
 		}
 	}
 }
@@ -149,7 +148,7 @@ func (s *nsSyncer) OnAdd(obj interface{}) {
 
 	if res, ok := obj.(*core.Namespace); ok {
 		if err := s.SyncIntoNamespace(res.Name); err != nil {
-			log.Errorln(err)
+			klog.Errorln(err)
 		}
 	}
 }
@@ -162,7 +161,7 @@ func (s *nsSyncer) OnUpdate(oldObj, newObj interface{}) {
 	nu := newObj.(*core.Namespace)
 	if !reflect.DeepEqual(old.Labels, nu.Labels) {
 		if err := s.SyncIntoNamespace(nu.Name); err != nil {
-			log.Errorln(err)
+			klog.Errorln(err)
 		}
 	}
 }

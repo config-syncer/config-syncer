@@ -1,35 +1,28 @@
-module github.com/appscode/kubed
+module kubeops.dev/kubed
 
-go 1.12
+go 1.15
 
 require (
-	github.com/appscode/go v0.0.0-20200928211031-cc0c23082d91
 	github.com/gogo/protobuf v1.3.2
-	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
-	github.com/imdario/mergo v0.3.6 // indirect
 	github.com/json-iterator/go v1.1.10
 	github.com/onsi/ginkgo v1.11.0
 	github.com/onsi/gomega v1.8.1
 	github.com/pkg/errors v0.9.1
-	github.com/spf13/afero v1.2.2
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/pflag v1.0.5
-	gomodules.xyz/cert v1.0.3
-	gomodules.xyz/pointer v0.0.0-20201105071923-daf60fa55209 // indirect
-	gomodules.xyz/x v0.0.3 // indirect
-	google.golang.org/appengine v1.6.5 // indirect
+	gomodules.xyz/blobfs v0.1.7
+	gomodules.xyz/cert v1.2.0
+	gomodules.xyz/pointer v0.0.0-20201105071923-daf60fa55209
+	gomodules.xyz/runtime v0.2.0
+	gomodules.xyz/x v0.0.3
 	k8s.io/api v0.21.0
 	k8s.io/apiextensions-apiserver v0.21.0
 	k8s.io/apimachinery v0.21.0
 	k8s.io/apiserver v0.21.0
 	k8s.io/client-go v0.21.0
-	k8s.io/utils v0.0.0-20210111153108-fddb29f9d009 // indirect
+	k8s.io/klog/v2 v2.8.0
 	kmodules.xyz/client-go v0.0.0-20210504024435-1eb80721e9b8
 )
-
-replace git.apache.org/thrift.git => github.com/apache/thrift v0.13.0
-
-replace github.com/Azure/go-autorest/autorest/azure/auth => github.com/Azure/go-autorest/autorest/azure/auth v0.2.0
 
 replace bitbucket.org/ww/goautoneg => gomodules.xyz/goautoneg v0.0.0-20120707110453-a547fc61f48d
 
@@ -114,6 +107,8 @@ replace google.golang.org/api => google.golang.org/api v0.20.0
 replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20201110150050-8816d57aaa9a
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.27.1
+
+replace gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.3.0
 
 replace helm.sh/helm/v3 => github.com/kubepack/helm/v3 v3.1.0-rc.1.0.20210503022716-7e2d4913a125
 
