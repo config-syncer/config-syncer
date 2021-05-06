@@ -12,16 +12,17 @@ require (
 	github.com/spf13/pflag v1.0.5
 	gomodules.xyz/blobfs v0.1.7
 	gomodules.xyz/cert v1.2.0
+	gomodules.xyz/kglog v0.0.1
 	gomodules.xyz/pointer v0.0.0-20201105071923-daf60fa55209
 	gomodules.xyz/runtime v0.2.0
-	gomodules.xyz/x v0.0.3
+	gomodules.xyz/x v0.0.4
 	k8s.io/api v0.21.0
 	k8s.io/apiextensions-apiserver v0.21.0
 	k8s.io/apimachinery v0.21.0
 	k8s.io/apiserver v0.21.0
 	k8s.io/client-go v0.21.0
 	k8s.io/klog/v2 v2.8.0
-	kmodules.xyz/client-go v0.0.0-20210504024435-1eb80721e9b8
+	kmodules.xyz/client-go v0.0.0-20210505231546-fa4fb8e1d04e
 )
 
 replace bitbucket.org/ww/goautoneg => gomodules.xyz/goautoneg v0.0.0-20120707110453-a547fc61f48d

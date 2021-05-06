@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,27 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
-
-import (
-	"os"
-	"runtime"
-
-	"kubeops.dev/kubed/pkg/cmds"
-
-	"gomodules.xyz/kglog"
-	_ "k8s.io/client-go/kubernetes/fake"
-)
-
-func main() {
-	kglog.InitLogs()
-	defer kglog.FlushLogs()
-
-	if len(os.Getenv("GOMAXPROCS")) == 0 {
-		runtime.GOMAXPROCS(runtime.NumCPU())
-	}
-
-	if err := cmds.NewCmdKubed(Version).Execute(); err != nil {
-		os.Exit(1)
-	}
-}
+// Package wait provides tools for polling or listening for changes
+// to a condition.
+package wait // import "gomodules.xyz/wait"
