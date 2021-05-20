@@ -170,7 +170,7 @@ demo          omni                                 2         8m
 ```
 
 Kubed operator removes the ConfigMap from all namespaces (except source) since no namespace matches the label-selector `app=kubed`.
-Now, lets' apply `app=kubed` annotation to `other` namespace. Kubed operator will then sync the ConfigMap to `other` namespace.
+Now, lets' apply `app=kubed` label to `other` namespace. Kubed operator will then sync the ConfigMap to `other` namespace.
 
 ```console
 $ kubectl label namespace other app=kubed
