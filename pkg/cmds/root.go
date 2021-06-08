@@ -17,12 +17,9 @@ limitations under the License.
 package cmds
 
 import (
-	"flag"
 	"os"
 
 	"github.com/spf13/cobra"
-	"gomodules.xyz/kglog"
-	"gomodules.xyz/x/flags"
 	v "gomodules.xyz/x/version"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	_ "k8s.io/client-go/kubernetes/fake"
@@ -33,15 +30,12 @@ func NewCmdKubed(version string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "kubed",
 		Short:             `Kubed by AppsCode - A Kubernetes Cluster Operator Daemon`,
-		Long:              `Kubed is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/kubeops-tools/kubed/tree/master/docs`,
+		Long:              `Kubed is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/kubeops/kubed/tree/master/docs`,
 		DisableAutoGenTag: true,
 		PersistentPreRun: func(c *cobra.Command, args []string) {
-			flags.DumpAll(c.Flags())
 			cli.SendAnalytics(c, v.Version.Version)
 		},
 	}
-	cmd.PersistentFlags().AddGoFlagSet(flag.CommandLine)
-	kglog.ParseFlags()
 	cmd.PersistentFlags().BoolVar(&cli.EnableAnalytics, "enable-analytics", cli.EnableAnalytics, "send usage events to Google Analytics")
 
 	stopCh := genericapiserver.SetupSignalHandler()

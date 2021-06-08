@@ -1,7 +1,7 @@
 project:
   name: Kubed by AppsCode
   shortName: Kubed
-  url: https://github.com/kubeops-tools/kubed
+  url: https://github.com/kubeops/kubed
   description: A Kubernetes cluster manager daemon
   app: a Kubed operator
 repository:
