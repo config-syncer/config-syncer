@@ -62,6 +62,10 @@ spec:
       {{- range .Values.config.additionalOptions }}
         - {{ . }}
       {{- end }}
+      {{- if .Values.extraEnvs }}
+        env:
+          {{- toYaml .Values.extraEnvs | nindent 8 }}
+      {{- end }}
         ports:
         - containerPort: {{ default "8443" .Values.apiserver.securePort }}
       {{- if .Values.apiserver.healthcheck.enabled }}

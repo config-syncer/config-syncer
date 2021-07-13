@@ -55,6 +55,17 @@ tolerations: []
 # Affinity rules for pod assignment
 affinity: {}
 
+# Additional environment variables to set
+extraEnvs: []
+# extraEnvs:
+#   - name: GOOGLE_APPLICATION_CREDENTIALS
+#     value: /srv/kubed/key.json
+
+# Additional secrets to be mounted within /srv/kubed
+extraSecrets: {}
+# extraSecrets:
+#   key.json: CONTENT
+
 # Security options the operator pod should run with.
 podSecurityContext:  # +doc-gen:break
   # ensure that s/a token is readable xref: https://issues.k8s.io/70679
