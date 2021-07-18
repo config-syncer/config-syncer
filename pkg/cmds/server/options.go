@@ -19,7 +19,7 @@ package server
 import (
 	"time"
 
-	"github.com/appscode/kubed/pkg/operator"
+	"kubeops.dev/kubed/pkg/operator"
 
 	"github.com/spf13/pflag"
 	"k8s.io/client-go/kubernetes"

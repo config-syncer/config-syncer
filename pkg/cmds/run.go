@@ -19,15 +19,15 @@ package cmds
 import (
 	"io"
 
-	"github.com/appscode/go/log"
-	v "github.com/appscode/go/version"
-	"github.com/appscode/kubed/pkg/cmds/server"
+	"kubeops.dev/kubed/pkg/cmds/server"
 
 	"github.com/spf13/cobra"
+	v "gomodules.xyz/x/version"
+	"k8s.io/klog/v2"
 	"kmodules.xyz/client-go/tools/cli"
 )
 
-// runtime.GOPath() + "/src/github.com/appscode/kubed/hack/config/clusterconfig.yaml"
+// runtime.GOPath() + "/src/kubeops.dev/kubed/hack/config/clusterconfig.yaml"
 func NewCmdRun(out, errOut io.Writer, stopCh <-chan struct{}) *cobra.Command {
 	o := server.NewKubedOptions(out, errOut)
 
@@ -40,7 +40,7 @@ func NewCmdRun(out, errOut io.Writer, stopCh <-chan struct{}) *cobra.Command {
 			cli.SendAnalytics(c, v.Version.Version)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			log.Infoln("Starting kubed...")
+			klog.Infoln("Starting kubed...")
 
 			if err := o.Complete(); err != nil {
 				return err

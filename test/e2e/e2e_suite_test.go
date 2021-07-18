@@ -20,12 +20,12 @@ import (
 	"testing"
 	"time"
 
-	logs "github.com/appscode/go/log/golog"
-	"github.com/appscode/kubed/test/e2e/framework"
+	"kubeops.dev/kubed/test/e2e/framework"
 
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/reporters"
 	. "github.com/onsi/gomega"
+	"gomodules.xyz/logs"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"kmodules.xyz/client-go/tools/clientcmd"
 )

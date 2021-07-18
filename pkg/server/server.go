@@ -17,7 +17,7 @@ limitations under the License.
 package server
 
 import (
-	"github.com/appscode/kubed/pkg/operator"
+	"kubeops.dev/kubed/pkg/operator"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"

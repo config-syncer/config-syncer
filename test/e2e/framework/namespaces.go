@@ -19,9 +19,8 @@ package framework
 import (
 	"context"
 
-	"github.com/appscode/go/crypto/rand"
-
 	. "github.com/onsi/gomega"
+	"gomodules.xyz/x/crypto/rand"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
