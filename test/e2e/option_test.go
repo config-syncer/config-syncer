@@ -22,8 +22,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	logs "gomodules.xyz/kglog"
-	"gomodules.xyz/x/flags"
+	"gomodules.xyz/logs"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/util/homedir"
 )
@@ -66,5 +65,5 @@ func enableLogging() {
 			return
 		}
 	}
-	flags.SetLogLevel(3)
+	_ = flag.Set("v", "3")
 }

@@ -34,7 +34,7 @@ Kubed operator can be installed via a script or as a Helm chart.
 
 ## Using Helm 3
 
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/kubeops-tools/kubed/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
 
 ```console
 $ helm repo add appscode https://charts.appscode.com/stable/
@@ -48,14 +48,14 @@ $ helm install kubed appscode/kubed \
   --namespace kube-system
 ```
 
-To see the detailed configuration options, visit [here](https://github.com/kubeops-tools/kubed/tree/{{< param "info.version" >}}/charts/kubed).
+To see the detailed configuration options, visit [here](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/charts/kubed).
 
 </div>
 <div class="tab-pane fade" id="helm2" role="tabpanel" aria-labelledby="helm2-tab">
 
 ## Using Helm 2
 
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/kubeops-tools/kubed/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
 
 ```console
 $ helm repo add appscode https://charts.appscode.com/stable/
@@ -69,7 +69,7 @@ $ helm install appscode/kubed --name kubed \
   --namespace kube-system
 ```
 
-To see the detailed configuration options, visit [here](https://github.com/kubeops-tools/kubed/tree/{{< param "info.version" >}}/charts/kubed).
+To see the detailed configuration options, visit [here](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/charts/kubed).
 
 </div>
 <div class="tab-pane fade" id="script" role="tabpanel" aria-labelledby="script-tab">
@@ -91,7 +91,7 @@ $ helm template kubed appscode/kubed \
   --no-hooks | kubectl apply -f -
 ```
 
-To see the detailed configuration options, visit [here](https://github.com/kubeops-tools/kubed/tree/{{< param "info.version" >}}/charts/kubed).
+To see the detailed configuration options, visit [here](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/charts/kubed).
 
 </div>
 </div>
@@ -110,7 +110,7 @@ In addition, if your GKE cluster is a [private cluster](https://cloud.google.com
 
 ## Verify installation
 
-Kubed includes a check command to verify a cluster config. Download the pre-built binary from [appscode/kubed Github releases](https://github.com/kubeops-tools/kubed/releases) and put the binary to some directory in your `PATH`.
+Kubed includes a check command to verify a cluster config. Download the pre-built binary from [appscode/kubed Github releases](https://github.com/kubeops/kubed/releases) and put the binary to some directory in your `PATH`.
 
 ```console
 $ kubed check --clusterconfig=./hack/deploy/config.yaml
@@ -132,7 +132,7 @@ Kubed can be installed via a script or as a Helm chart.
 
 ## Using Script
 
-Kubed can be installed via installer script included in the [/hack/deploy](https://github.com/kubeops-tools/kubed/tree/{{< param "info.version" >}}/hack/deploy) folder.
+Kubed can be installed via installer script included in the [/hack/deploy](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/hack/deploy) folder.
 
 ```console
 # set cluster-name to something meaningful to you, say, prod, prod-us-east, qa, etc.
@@ -196,7 +196,7 @@ $ curl -fsSL https://raw.githubusercontent.com/appscode/kubed/{{< param "info.ve
 <div class="tab-pane fade" id="helm" role="tabpanel" aria-labelledby="helm-tab">
 
 ## Using Helm
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/kubeops-tools/kubed/tree/{{< param "info.version" >}}/chart/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
+Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/chart/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `my-release`:
 
 ```console
 $ helm repo add appscode https://charts.appscode.com/stable/
@@ -220,7 +220,7 @@ $ helm install appscode/kubed --name kubed --version {{< param "info.version" >}
   --set config.clusterName=<your-cluster-name>
 ```
 
-To see the detailed configuration options, visit [here](https://github.com/kubeops-tools/kubed/tree/{{< param "info.version" >}}/chart/kubed).
+To see the detailed configuration options, visit [here](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/chart/kubed).
 
 </div>
 
