@@ -20,8 +20,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/appscode/go/types"
-
+	"gomodules.xyz/pointer"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -42,7 +41,7 @@ func deleteInForeground() *metav1.DeleteOptions {
 func (fi *Invocation) WaitUntilDeploymentReady(meta metav1.ObjectMeta) error {
 	return wait.PollImmediate(kutil.RetryInterval, kutil.ReadinessTimeout, func() (done bool, err error) {
 		if obj, err := fi.KubeClient.AppsV1().Deployments(meta.Namespace).Get(context.TODO(), meta.Name, metav1.GetOptions{}); err == nil {
-			return types.Int32(obj.Spec.Replicas) == obj.Status.ReadyReplicas, nil
+			return pointer.Int32(obj.Spec.Replicas) == obj.Status.ReadyReplicas, nil
 		}
 		return false, nil
 	})

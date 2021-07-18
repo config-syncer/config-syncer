@@ -1,5 +1,5 @@
 /*
-Copyright The Kmodules Authors.
+Copyright AppsCode Inc. and Contributors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -186,4 +186,17 @@ func GetStringValueForKeys(m map[string]string, key string, alts ...string) (str
 		}
 	}
 	return "", kutil.ErrNotFound
+}
+
+func GetBytesForKeys(m map[string][]byte, key string, alts ...string) ([]byte, error) {
+	if m == nil {
+		return nil, kutil.ErrNotFound
+	}
+	keys := append([]string{key}, alts...)
+	for _, k := range keys {
+		if v, ok := m[k]; ok {
+			return v, nil
+		}
+	}
+	return nil, kutil.ErrNotFound
 }

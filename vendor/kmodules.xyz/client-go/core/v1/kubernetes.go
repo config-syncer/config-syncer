@@ -1,5 +1,5 @@
 /*
-Copyright The Kmodules Authors.
+Copyright AppsCode Inc. and Contributors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@ package v1
 import (
 	"sort"
 
-	"github.com/imdario/mergo"
+	meta_util "kmodules.xyz/client-go/meta"
+
 	jsoniter "github.com/json-iterator/go"
+	"gomodules.xyz/mergo"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -71,10 +73,26 @@ func EnsureContainerDeleted(containers []core.Container, name string) []core.Con
 func UpsertContainer(containers []core.Container, upsert core.Container) []core.Container {
 	for i, container := range containers {
 		if container.Name == upsert.Name {
-			err := mergo.MergeWithOverwrite(&container, upsert)
+			err := mergo.Merge(&container, upsert, mergo.WithOverride)
 			if err != nil {
 				panic(err)
 			}
+			// mergo does not overwrite "dst (container)" using empty "src (upsert)" values.
+			// This causes problem we want to remove args or commands (eg, disable TLS).
+			// TODO: should this be done for all the []string type fields (eg, EnvFrom etc.)?
+			container.Command = upsert.Command
+			container.Args = upsert.Args
+			for i, env := range upsert.Env {
+				if env.ValueFrom != nil &&
+					env.ValueFrom.FieldRef != nil &&
+					env.ValueFrom.FieldRef.APIVersion == "" {
+					env.ValueFrom.FieldRef.APIVersion = "v1"
+				}
+				upsert.Env[i] = env
+			}
+			container.Env = upsert.Env
+			container.VolumeMounts = upsert.VolumeMounts
+			container.VolumeDevices = upsert.VolumeDevices
 			containers[i] = container
 			return containers
 		}
@@ -94,7 +112,10 @@ func UpsertVolume(volumes []core.Volume, nv ...core.Volume) []core.Volume {
 	upsert := func(v core.Volume) {
 		for i, vol := range volumes {
 			if vol.Name == v.Name {
-				volumes[i] = v
+				err := mergo.Merge(&volumes[i], v, mergo.WithOverride)
+				if err != nil {
+					panic(err)
+				}
 				return
 			}
 		}
@@ -105,13 +126,49 @@ func UpsertVolume(volumes []core.Volume, nv ...core.Volume) []core.Volume {
 		upsert(volume)
 	}
 	return volumes
+}
 
+func ReplaceVolumes(existing []core.Volume, desired ...core.Volume) ([]core.Volume, error) {
+	merge := func(cur core.Volume) error {
+		for i, v := range desired {
+			if v.Name == cur.Name {
+				if err := mergo.Merge(&cur, v, mergo.WithOverride); err != nil {
+					return err
+				}
+				desired[i] = cur
+				break
+			}
+		}
+		return nil
+	}
+
+	for _, cur := range existing {
+		if err := merge(cur); err != nil {
+			return nil, err
+		}
+	}
+	sort.Slice(desired, func(i, j int) bool {
+		return desired[i].Name < desired[j].Name
+	})
+	return desired, nil
+}
+
+func MustReplaceVolumes(existing []core.Volume, desired ...core.Volume) []core.Volume {
+	result, err := ReplaceVolumes(existing, desired...)
+	if err != nil {
+		panic(err)
+	}
+	return result
 }
 
 func UpsertVolumeClaim(volumeClaims []core.PersistentVolumeClaim, upsert core.PersistentVolumeClaim) []core.PersistentVolumeClaim {
 	for i, vc := range volumeClaims {
 		if vc.Name == upsert.Name {
-			volumeClaims[i] = upsert
+			volumeClaims[i].Labels = upsert.Labels
+			volumeClaims[i].Annotations = upsert.Annotations
+			if err := mergo.Merge(&volumeClaims[i].Spec, upsert.Spec, mergo.WithOverride); err != nil {
+				panic(err)
+			}
 			return volumeClaims
 		}
 	}
@@ -174,6 +231,12 @@ func EnsureVolumeMountDeletedByPath(mounts []core.VolumeMount, mountPath string)
 
 func UpsertEnvVars(vars []core.EnvVar, nv ...core.EnvVar) []core.EnvVar {
 	upsert := func(env core.EnvVar) {
+		if env.ValueFrom != nil &&
+			env.ValueFrom.FieldRef != nil &&
+			env.ValueFrom.FieldRef.APIVersion == "" {
+			env.ValueFrom.FieldRef.APIVersion = "v1"
+		}
+
 		for i, v := range vars {
 			if v.Name == env.Name {
 				vars[i] = env
@@ -198,14 +261,9 @@ func EnsureEnvVarDeleted(vars []core.EnvVar, name string) []core.EnvVar {
 	return vars
 }
 
+// Deprecated use meta_util.OverwriteKeys()
 func UpsertMap(maps, upsert map[string]string) map[string]string {
-	if maps == nil {
-		maps = make(map[string]string)
-	}
-	for k, v := range upsert {
-		maps[k] = v
-	}
-	return maps
+	return meta_util.OverwriteKeys(maps, upsert)
 }
 
 func MergeLocalObjectReferences(l1, l2 []core.LocalObjectReference) []core.LocalObjectReference {
@@ -298,6 +356,37 @@ func IsOwnedBy(dependent metav1.Object, owner metav1.Object) (owned bool, contro
 		}
 	}
 	return false, false
+}
+
+func IsOwnerOfGroup(ctrl *metav1.OwnerReference, group string) (bool, string, error) {
+	if ctrl == nil {
+		return false, "", nil
+	}
+	gv, err := schema.ParseGroupVersion(ctrl.APIVersion)
+	if err != nil {
+		return false, "", err
+	}
+	if gv.Group != group {
+		return false, "", nil
+	}
+	return true, ctrl.Kind, nil
+}
+
+func IsOwnerOfGroupKind(ctrl *metav1.OwnerReference, group, kind string) (bool, error) {
+	if ctrl == nil {
+		return false, nil
+	}
+	gv, err := schema.ParseGroupVersion(ctrl.APIVersion)
+	if err != nil {
+		return false, err
+	}
+	if gv.Group != group {
+		return false, nil
+	}
+	if ctrl.Kind != kind {
+		return false, nil
+	}
+	return true, nil
 }
 
 func UpsertToleration(tolerations []core.Toleration, upsert core.Toleration) []core.Toleration {

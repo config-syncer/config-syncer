@@ -19,12 +19,9 @@ package syncer
 import (
 	"reflect"
 
-	"github.com/appscode/go/log"
-
-	"github.com/golang/glog"
 	core "k8s.io/api/core/v1"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/klog/v2"
 )
 
 func (s *ConfigSyncer) ConfigMapHandler() cache.ResourceEventHandler {
@@ -44,7 +41,7 @@ func (s *configmapSyncer) OnAdd(obj interface{}) {
 	if res, ok := obj.(*core.ConfigMap); ok {
 		glog.Infof("configmap %s/%s was added", res.Namespace, res.Name)
 		if err := s.SyncConfigMap(res); err != nil {
-			log.Errorln(err)
+			klog.Errorln(err)
 		}
 	}
 }
@@ -67,7 +64,7 @@ func (s *configmapSyncer) OnUpdate(oldObj, newObj interface{}) {
 
 		glog.Infof("configmap %s/%s was updated", newRes.Namespace, newRes.Name)
 		if err := s.SyncConfigMap(newRes); err != nil {
-			log.Errorln(err)
+			klog.Errorln(err)
 		}
 	}
 }
@@ -79,7 +76,7 @@ func (s *configmapSyncer) OnDelete(obj interface{}) {
 	if res, ok := obj.(*core.ConfigMap); ok {
 		glog.Infof("configmap %s/%s was deleted", res.Namespace, res.Name)
 		if err := s.SyncDeletedConfigMap(res); err != nil {
-			log.Errorln(err)
+			klog.Errorln(err)
 		}
 	}
 }
@@ -101,7 +98,7 @@ func (s *secretSyncer) OnAdd(obj interface{}) {
 	if res, ok := obj.(*core.Secret); ok {
 		glog.Infof("secret %s/%s was added", res.Namespace, res.Name)
 		if err := s.SyncSecret(res); err != nil {
-			log.Errorln(err)
+			klog.Errorln(err)
 		}
 	}
 }
@@ -124,7 +121,7 @@ func (s *secretSyncer) OnUpdate(oldObj, newObj interface{}) {
 
 		glog.Infof("secret %s/%s was updated", newRes.Namespace, newRes.Name)
 		if err := s.SyncSecret(newRes); err != nil {
-			log.Errorln(err)
+			klog.Errorln(err)
 		}
 	}
 }
@@ -136,7 +133,7 @@ func (s *secretSyncer) OnDelete(obj interface{}) {
 	if res, ok := obj.(*core.Secret); ok {
 		glog.Infof("secret %s/%s was deleted", res.Namespace, res.Name)
 		if err := s.SyncDeletedSecret(res); err != nil {
-			log.Infoln(err)
+			klog.Infoln(err)
 		}
 	}
 }
@@ -156,8 +153,10 @@ func (s *nsSyncer) OnAdd(obj interface{}) {
 	defer s.lock.RUnlock()
 
 	if res, ok := obj.(*core.Namespace); ok {
-		glog.Infof("namespace %s was added", res.Name)
-		utilruntime.Must(s.SyncIntoNamespace(res.Name))
+    klog.Infof("namespace %s was added", res.Name)
+		if err := s.SyncIntoNamespace(res.Name); err != nil {
+			klog.Errorln(err)
+		}
 	}
 }
 
@@ -168,8 +167,10 @@ func (s *nsSyncer) OnUpdate(oldObj, newObj interface{}) {
 	old := oldObj.(*core.Namespace)
 	nu := newObj.(*core.Namespace)
 	if !reflect.DeepEqual(old.Labels, nu.Labels) {
-		glog.Infof("namespace %s was updated", nu.Name)
-		utilruntime.Must(s.SyncIntoNamespace(nu.Name))
+    klog.Infof("namespace %s was updated", nu.Name)
+		if err := s.SyncIntoNamespace(nu.Name); err != nil {
+			klog.Errorln(err)
+		}
 	}
 }
 

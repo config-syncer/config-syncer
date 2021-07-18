@@ -22,9 +22,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/appscode/go/flags"
-	logs "github.com/appscode/go/log/golog"
-
+	"gomodules.xyz/logs"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/util/homedir"
 )
@@ -67,5 +65,5 @@ func enableLogging() {
 			return
 		}
 	}
-	flags.SetLogLevel(3)
+	_ = flag.Set("v", "3")
 }

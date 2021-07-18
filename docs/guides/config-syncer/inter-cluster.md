@@ -94,7 +94,7 @@ configmap "omni" created
 Now, apply the `kubed.appscode.com/sync-contexts: "context-1,context-2"` annotation to ConfigMap `omni`.
 
 ```console
-$ kubectl annotate configmap omni kubed.appscode.com/sync="context-1,context-2" -n demo
+$ kubectl annotate configmap omni kubed.appscode.com/sync-contexts="context-1,context-2" -n demo
 configmap "omni" annotated
 ```
 

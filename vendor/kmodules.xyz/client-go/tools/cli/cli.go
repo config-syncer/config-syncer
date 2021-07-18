@@ -1,5 +1,5 @@
 /*
-Copyright The Kmodules Authors.
+Copyright AppsCode Inc. and Contributors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import (
 
 	"kmodules.xyz/client-go/tools/analytics"
 
-	"github.com/appscode/go/log/golog"
 	ga "github.com/jpillora/go-ogle-analytics"
 	"github.com/spf13/cobra"
 )
@@ -36,7 +35,6 @@ const (
 var (
 	AnalyticsClientID = analytics.ClientID()
 	EnableAnalytics   = true
-	LoggerOptions     golog.Options
 )
 
 func SendAnalytics(c *cobra.Command, version string) {
