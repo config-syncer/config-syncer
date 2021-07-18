@@ -3,10 +3,10 @@ description: 'Kubed by AppsCode - Kubernetes daemon'
 name: kubed
 version: v0.13.0-beta.0
 appVersion: v0.13.0-beta.0
-home: https://github.com/appscode/kubed
+home: https://github.com/kubeops/kubed
 icon: https://cdn.appscode.com/images/products/kubed/icons/android-icon-192x192.png
 sources:
-  - https://github.com/appscode/kubed
+  - https://github.com/kubeops/kubed
 maintainers:
   - name: appscode
     email: support@appscode.com

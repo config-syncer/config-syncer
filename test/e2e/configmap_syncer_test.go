@@ -20,9 +20,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/appscode/kubed/pkg/operator"
-	"github.com/appscode/kubed/pkg/syncer"
-	"github.com/appscode/kubed/test/e2e/framework"
+	"kubeops.dev/kubed/pkg/operator"
+	"kubeops.dev/kubed/pkg/syncer"
+	"kubeops.dev/kubed/test/e2e/framework"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -19,16 +19,15 @@ package syncer
 import (
 	context "context"
 
-	"github.com/appscode/go/log"
-	"github.com/appscode/kubed/pkg/eventer"
+	"kubeops.dev/kubed/pkg/eventer"
 
-	"github.com/golang/glog"
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/klog/v2"
 	core_util "kmodules.xyz/client-go/core/v1"
 )
 
@@ -40,7 +39,7 @@ func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
 		if err != nil {
 			return err
 		}
-		glog.Infof("configmap %s/%s will be synced into namespaces %v if needed", src.Namespace, src.Name, newNs.List())
+		klog.Infof("configmap %s/%s will be synced into namespaces %v if needed", src.Namespace, src.Name, newNs.List())
 		if err := s.syncConfigMapIntoNamespaces(s.kubeClient, src, newNs, true, ""); err != nil {
 			return err
 		}
@@ -92,7 +91,7 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 		if _, found := taken[ctx.Address]; !found {
 			err := s.syncConfigMapIntoNamespaces(ctx.Client, src, sets.NewString(), false, ctxName)
 			if err != nil {
-				log.Infoln(err)
+				klog.Infoln(err)
 			}
 			taken[ctx.Address] = struct{}{} // to avoid deleting form same cluster twice
 		}

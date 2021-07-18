@@ -20,21 +20,22 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/appscode/kubed/pkg/cmds"
+	"kubeops.dev/kubed/pkg/cmds"
 
+	"gomodules.xyz/logs"
 	_ "k8s.io/client-go/kubernetes/fake"
-	"kmodules.xyz/client-go/logs"
 )
 
 func main() {
-	logs.InitLogs()
+	rootCmd := cmds.NewCmdKubed(Version)
+	logs.Init(rootCmd, true)
 	defer logs.FlushLogs()
 
 	if len(os.Getenv("GOMAXPROCS")) == 0 {
 		runtime.GOMAXPROCS(runtime.NumCPU())
 	}
 
-	if err := cmds.NewCmdKubed(Version).Execute(); err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
