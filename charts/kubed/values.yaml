@@ -12,7 +12,7 @@ replicaCount: 1
 
 operator:
   # Docker registry used to pull Kubed operator image
-  registry: appscode
+  registry: registry.byte.builders/appscode
   # Kubed operator container image
   repository: kubed
   # Kubed operator container image tag
