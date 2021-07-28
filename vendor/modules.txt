@@ -21,6 +21,8 @@ github.com/NYTimes/gziphandler
 github.com/PuerkitoBio/purell
 # github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578
 github.com/PuerkitoBio/urlesc
+# github.com/aws/aws-sdk-go v1.35.24
+## explicit
 # github.com/beorn7/perks v1.0.1
 github.com/beorn7/perks/quantile
 # github.com/blang/semver v3.5.1+incompatible
@@ -605,7 +607,7 @@ k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v0.21.1 => github.com/kmodules/apiserver v0.21.2-0.20210617231348-daadbf0c8d5e
+# k8s.io/apiserver v0.21.1 => github.com/kmodules/apiserver v0.21.2-0.20210716212718-83e5493ac170
 ## explicit
 k8s.io/apiserver/pkg/admission
 k8s.io/apiserver/pkg/admission/configuration
@@ -1034,7 +1036,7 @@ k8s.io/utils/net
 k8s.io/utils/path
 k8s.io/utils/pointer
 k8s.io/utils/trace
-# kmodules.xyz/client-go v0.0.0-20210716105854-7476ab9f8556
+# kmodules.xyz/client-go v0.0.0-20210719120358-dd0503cf99cf
 ## explicit
 kmodules.xyz/client-go
 kmodules.xyz/client-go/api/v1
@@ -1175,10 +1177,10 @@ sigs.k8s.io/yaml
 # google.golang.org/api => google.golang.org/api v0.20.0
 # google.golang.org/genproto => google.golang.org/genproto v0.0.0-20201110150050-8816d57aaa9a
 # google.golang.org/grpc => google.golang.org/grpc v1.27.1
-# helm.sh/helm/v3 => github.com/kubepack/helm/v3 v3.1.0-rc.1.0.20210503022716-7e2d4913a125
+# helm.sh/helm/v3 => github.com/kubepack/helm/v3 v3.6.1-0.20210518225915-c3e0ce48dd1b
 # k8s.io/api => k8s.io/api v0.21.1
 # k8s.io/apimachinery => github.com/kmodules/apimachinery v0.21.2-rc.0.0.20210617231004-332981b97d2d
-# k8s.io/apiserver => github.com/kmodules/apiserver v0.21.2-0.20210617231348-daadbf0c8d5e
+# k8s.io/apiserver => github.com/kmodules/apiserver v0.21.2-0.20210716212718-83e5493ac170
 # k8s.io/cli-runtime => k8s.io/cli-runtime v0.21.1
 # k8s.io/client-go => k8s.io/client-go v0.21.1
 # k8s.io/component-base => k8s.io/component-base v0.21.1
@@ -1186,3 +1188,4 @@ sigs.k8s.io/yaml
 # k8s.io/kubernetes => github.com/kmodules/kubernetes v1.22.0-alpha.0.0.20210617232219-a432af45d932
 # k8s.io/utils => k8s.io/utils v0.0.0-20201110183641-67b214c5f920
 # sigs.k8s.io/application => github.com/kmodules/application v0.8.4-0.20210427030912-90eeee3bc4ad
+# github.com/satori/go.uuid => github.com/gofrs/uuid v4.0.0+incompatible
