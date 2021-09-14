@@ -59,7 +59,8 @@ func (s *configmapSyncer) OnUpdate(oldObj, newObj interface{}) {
 	}
 	if !reflect.DeepEqual(oldRes.Labels, newRes.Labels) ||
 		!reflect.DeepEqual(oldRes.Annotations, newRes.Annotations) ||
-		!reflect.DeepEqual(oldRes.Data, newRes.Data) {
+		!reflect.DeepEqual(oldRes.Data, newRes.Data) ||
+		!reflect.DeepEqual(oldRes.BinaryData, newRes.BinaryData) {
 
 		if err := s.SyncConfigMap(newRes); err != nil {
 			klog.Errorln(err)

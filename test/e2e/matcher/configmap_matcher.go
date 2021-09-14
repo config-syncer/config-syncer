@@ -45,7 +45,8 @@ func (matcher *configMapMatcher) Match(actual interface{}) (success bool, err er
 		return false, err
 	}
 
-	if !reflect.DeepEqual(matcher.expected.Data, found.Data) {
+	if !reflect.DeepEqual(matcher.expected.Data, found.Data) ||
+		!reflect.DeepEqual(matcher.expected.BinaryData, found.BinaryData) {
 		return false, err
 	}
 	return true, nil

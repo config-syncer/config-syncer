@@ -124,7 +124,7 @@ var _ = Describe("Config-Syncer", func() {
 			})
 		})
 
-		Context("Source Update", func() {
+		Context("Source Update ConfigMap Data", func() {
 
 			It("should update synced configMaps", func() {
 				shouldSyncConfigMapToAllNamespaces()
@@ -135,6 +135,26 @@ var _ = Describe("Config-Syncer", func() {
 
 				source, _, err = core_util.PatchConfigMap(context.TODO(), f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
 					obj.Data["data"] = "test"
+					return obj
+				}, metav1.PatchOptions{})
+				Expect(err).ShouldNot(HaveOccurred())
+
+				By("Checking synced configMaps has been updated")
+				f.EventuallySyncedConfigMapsUpdated(source).Should(BeTrue())
+			})
+		})
+
+		Context("Source Update ConfigMap BinaryData", func() {
+
+			It("should update synced configMaps", func() {
+				shouldSyncConfigMapToAllNamespaces()
+
+				By("Updating source configMap")
+				source, err := f.KubeClient.CoreV1().ConfigMaps(cfgMap.Namespace).Get(context.TODO(), cfgMap.Name, metav1.GetOptions{})
+				Expect(err).NotTo(HaveOccurred())
+
+				source, _, err = core_util.PatchConfigMap(context.TODO(), f.KubeClient, source, func(obj *core.ConfigMap) *core.ConfigMap {
+					obj.BinaryData["data"] = []byte("test")
 					return obj
 				}, metav1.PatchOptions{})
 				Expect(err).ShouldNot(HaveOccurred())

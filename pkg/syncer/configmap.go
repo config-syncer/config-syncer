@@ -155,6 +155,7 @@ func (s *ConfigSyncer) upsertConfigMap(kc kubernetes.Interface, src *core.Config
 		}
 
 		obj.Data = src.Data
+		obj.BinaryData = src.BinaryData
 		obj.Labels = labels.Merge(src.Labels, s.syncerLabels(src.Name, src.Namespace, s.clusterName))
 
 		ref := core.ObjectReference{
