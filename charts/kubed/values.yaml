@@ -16,7 +16,7 @@ operator:
   # Config Syncer operator container image
   repository: kubed
   # Config Syncer operator container image tag
-  tag: v0.13.0-beta.0
+  tag: v0.13.0-rc.0
   # Compute Resources required by the operator container
   resources: {}
   # Security options the operator container should run with

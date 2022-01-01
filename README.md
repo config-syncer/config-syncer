@@ -7,15 +7,6 @@
 
 Config Syncer by AppsCode keeps [ConfigMaps and Secrets synchronized across namespaces and/or clusters](https://appscode.com/products/kubed/latest/guides/config-syncer/).
 
-## Supported Versions
-
-Please pick a version of Config Syncer that matches your Kubernetes installation.
-
-| Config Syncer Version                                                                   | Docs                                                              | Kubernetes Version |
-| ------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------ |
-| [v0.13.0-beta.0](https://github.com/kubeops/config-syncer/releases/tag/v0.13.0-beta.0) | [User Guide](https://appscode.com/products/kubed/v0.13.0-beta.0/) | 1.11.x+            |
-| [v0.12.0](https://github.com/kubeops/config-syncer/releases/tag/v0.12.0)               | [User Guide](https://appscode.com/products/kubed/v0.12.0/)        | 1.11.x+            |
-
 ## Installation
 
 To install Config Syncer, please follow the guide [here](https://appscode.com/products/kubed/latest/setup/install/).
