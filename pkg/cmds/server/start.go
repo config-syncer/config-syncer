@@ -20,8 +20,8 @@ import (
 	"io"
 	"net"
 
-	"kubeops.dev/kubed/pkg/operator"
-	"kubeops.dev/kubed/pkg/server"
+	"kubeops.dev/config-syncer/pkg/operator"
+	"kubeops.dev/config-syncer/pkg/server"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/pflag"

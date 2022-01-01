@@ -30,8 +30,8 @@ development environment, please follow [these instructions](https://golang.org/d
 #### Download Source
 
 ```console
-$ go get kubeops.dev/kubed
-$ cd $(go env GOPATH)/src/kubeops.dev/kubed
+$ go get kubeops.dev/config-syncer
+$ cd $(go env GOPATH)/src/kubeops.dev/config-syncer
 ```
 
 #### Install Dev tools

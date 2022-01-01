@@ -20,7 +20,7 @@ import (
 	"context"
 	"reflect"
 
-	"kubeops.dev/kubed/pkg/syncer"
+	"kubeops.dev/config-syncer/pkg/syncer"
 
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"

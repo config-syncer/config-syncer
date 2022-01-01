@@ -19,7 +19,7 @@ package cmds
 import (
 	"io"
 
-	"kubeops.dev/kubed/pkg/cmds/server"
+	"kubeops.dev/config-syncer/pkg/cmds/server"
 
 	"github.com/spf13/cobra"
 	v "gomodules.xyz/x/version"
@@ -27,7 +27,7 @@ import (
 	"kmodules.xyz/client-go/tools/cli"
 )
 
-// runtime.GOPath() + "/src/kubeops.dev/kubed/hack/config/clusterconfig.yaml"
+// runtime.GOPath() + "/src/kubeops.dev/config-syncer/hack/config/clusterconfig.yaml"
 func NewCmdRun(out, errOut io.Writer, stopCh <-chan struct{}) *cobra.Command {
 	o := server.NewKubedOptions(out, errOut)
 

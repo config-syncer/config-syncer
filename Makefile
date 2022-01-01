@@ -20,8 +20,7 @@ REPO     := $(notdir $(shell pwd))
 BIN      := kubed
 COMPRESS ?= no
 
-# Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
-CRD_OPTIONS          ?= "crd:trivialVersions=true,preserveUnknownFields=false"
+CRD_OPTIONS          ?= "crd:allowDangerousTypes=true"
 CODE_GENERATOR_IMAGE ?= appscode/gengo:release-1.21
 API_GROUPS           ?= kubed:v1alpha1
 

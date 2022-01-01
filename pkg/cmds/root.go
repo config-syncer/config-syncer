@@ -30,7 +30,7 @@ func NewCmdKubed(version string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "kubed",
 		Short:             `Kubed by AppsCode - A Kubernetes Cluster Operator Daemon`,
-		Long:              `Kubed is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/kubeops/kubed/tree/master/docs`,
+		Long:              `Kubed is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/kubeops/config-syncer/tree/master/docs`,
 		DisableAutoGenTag: true,
 		PersistentPreRun: func(c *cobra.Command, args []string) {
 			cli.SendAnalytics(c, v.Version.Version)

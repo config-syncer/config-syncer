@@ -19,7 +19,7 @@ package server
 import (
 	"time"
 
-	"kubeops.dev/kubed/pkg/operator"
+	"kubeops.dev/config-syncer/pkg/operator"
 
 	"github.com/spf13/pflag"
 	"k8s.io/client-go/kubernetes"

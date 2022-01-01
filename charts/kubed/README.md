@@ -1,6 +1,6 @@
 # Kubed
 
-[Kubed by AppsCode](https://github.com/kubeops/kubed) - A Kubernetes cluster manager daemon
+[Kubed by AppsCode](https://github.com/kubeops/config-syncer) - A Kubernetes cluster manager daemon
 
 ## TL;DR;
 

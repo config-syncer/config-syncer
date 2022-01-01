@@ -19,7 +19,7 @@ package operator
 import (
 	"time"
 
-	"kubeops.dev/kubed/pkg/syncer"
+	"kubeops.dev/config-syncer/pkg/syncer"
 
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"

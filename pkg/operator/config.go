@@ -19,8 +19,8 @@ package operator
 import (
 	"time"
 
-	"kubeops.dev/kubed/pkg/eventer"
-	"kubeops.dev/kubed/pkg/syncer"
+	"kubeops.dev/config-syncer/pkg/eventer"
+	"kubeops.dev/config-syncer/pkg/syncer"
 
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"

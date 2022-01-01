@@ -22,10 +22,10 @@ import (
 	"reflect"
 	"strings"
 
-	"kubeops.dev/kubed/pkg/syncer"
+	"kubeops.dev/config-syncer/pkg/syncer"
 
 	. "github.com/onsi/gomega"
-	"gomodules.xyz/x/encoding/yaml"
+	"gomodules.xyz/encoding/yaml"
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

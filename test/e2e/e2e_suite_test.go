@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"kubeops.dev/kubed/test/e2e/framework"
+	"kubeops.dev/config-syncer/test/e2e/framework"
 
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/reporters"

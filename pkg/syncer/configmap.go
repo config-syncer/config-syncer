@@ -19,7 +19,7 @@ package syncer
 import (
 	context "context"
 
-	"kubeops.dev/kubed/pkg/eventer"
+	"kubeops.dev/config-syncer/pkg/eventer"
 
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"

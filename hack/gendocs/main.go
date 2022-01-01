@@ -25,7 +25,7 @@ import (
 	"strings"
 	"text/template"
 
-	"kubeops.dev/kubed/pkg/cmds"
+	"kubeops.dev/config-syncer/pkg/cmds"
 
 	"github.com/spf13/cobra/doc"
 	"gomodules.xyz/runtime"
@@ -69,7 +69,7 @@ aliases:
 // ref: https://github.com/spf13/cobra/blob/master/doc/md_docs.md
 func main() {
 	rootCmd := cmds.NewCmdKubed("")
-	dir := runtime.GOPath() + "/src/kubeops.dev/kubed/docs/reference"
+	dir := runtime.GOPath() + "/src/kubeops.dev/config-syncer/docs/reference"
 	fmt.Printf("Generating cli markdown tree in: %v\n", dir)
 	err := os.RemoveAll(dir)
 	if err != nil {
