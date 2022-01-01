@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import (
 	"context"
 	"reflect"
 
-	"kubeops.dev/kubed/pkg/syncer"
+	"kubeops.dev/config-syncer/pkg/syncer"
 
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"

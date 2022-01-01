@@ -20,8 +20,7 @@ REPO     := $(notdir $(shell pwd))
 BIN      := kubed
 COMPRESS ?= no
 
-# Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
-CRD_OPTIONS          ?= "crd:trivialVersions=true,preserveUnknownFields=false"
+CRD_OPTIONS          ?= "crd:allowDangerousTypes=true"
 CODE_GENERATOR_IMAGE ?= appscode/gengo:release-1.21
 API_GROUPS           ?= kubed:v1alpha1
 
@@ -52,8 +51,8 @@ endif
 ### These variables should not need tweaking.
 ###
 
-SRC_PKGS := pkg # directories which hold app source excluding tests (not vendored)
-SRC_DIRS := $(SRC_PKGS) *.go test hack # directories which hold app source (not vendored)
+SRC_PKGS := cmd pkg # directories which hold app source excluding tests (not vendored)
+SRC_DIRS := $(SRC_PKGS) test hack # directories which hold app source (not vendored)
 
 DOCKER_PLATFORMS := linux/amd64 linux/arm linux/arm64
 BIN_PLATFORMS    := $(DOCKER_PLATFORMS)

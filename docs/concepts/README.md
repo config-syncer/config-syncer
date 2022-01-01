@@ -1,5 +1,5 @@
 ---
-title: Concepts | Kubed
+title: Concepts | Config Syncer
 menu:
   product_kubed_{{ .version }}:
     identifier: concepts-readme
@@ -16,7 +16,7 @@ aliases:
 
 # Concepts
 
-Concepts help you learn about the different parts of the Kubed and the abstractions it uses.
+Concepts help you learn about the different parts of the Config Syncer and the abstractions it uses.
 
-- What is Kubed?
-  - [Overview](/docs/concepts/what-is-kubed/overview.md). Provides a conceptual introduction to Kubed, including the problems it solves and its high-level architecture.
+- What is Config Syncer?
+  - [Overview](/docs/concepts/what-is-kubed/overview.md). Provides a conceptual introduction to Config Syncer, including the problems it solves and its high-level architecture.

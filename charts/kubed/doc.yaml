@@ -1,9 +1,9 @@
 project:
-  name: Kubed by AppsCode
-  shortName: Kubed
-  url: https://github.com/kubeops/kubed
+  name: Config Syncer by AppsCode
+  shortName: Config Syncer
+  url: https://github.com/kubeops/config-syncer
   description: A Kubernetes cluster manager daemon
-  app: a Kubed operator
+  app: a Config Syncer operator
 repository:
   url: https://charts.appscode.com/stable/
   name: appscode

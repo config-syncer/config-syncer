@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package cmds
 import (
 	"io"
 
-	"kubeops.dev/kubed/pkg/cmds/server"
+	"kubeops.dev/config-syncer/pkg/cmds/server"
 
 	"github.com/spf13/cobra"
 	v "gomodules.xyz/x/version"
@@ -27,9 +27,9 @@ import (
 	"kmodules.xyz/client-go/tools/cli"
 )
 
-// runtime.GOPath() + "/src/kubeops.dev/kubed/hack/config/clusterconfig.yaml"
+// runtime.GOPath() + "/src/kubeops.dev/config-syncer/hack/config/clusterconfig.yaml"
 func NewCmdRun(out, errOut io.Writer, stopCh <-chan struct{}) *cobra.Command {
-	o := server.NewKubedOptions(out, errOut)
+	o := server.NewConfigSyncerOptions(out, errOut)
 
 	cmd := &cobra.Command{
 		Use:               "run",
@@ -40,7 +40,7 @@ func NewCmdRun(out, errOut io.Writer, stopCh <-chan struct{}) *cobra.Command {
 			cli.SendAnalytics(c, v.Version.Version)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			klog.Infoln("Starting kubed...")
+			klog.Infoln("Starting config-syncer...")
 
 			if err := o.Complete(); err != nil {
 				return err

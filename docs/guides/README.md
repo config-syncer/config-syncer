@@ -17,9 +17,9 @@ aliases:
 
 # Guides
 
-This section contains guides on how to use Kubed. Please visit the links below to learn more:
+This section contains guides on how to use Config Syncer. Please visit the links below to learn more:
 
 - Configuration Syncer
-  - [Synchronize Configuration across Namespaces](/docs/guides/config-syncer/intra-cluster.md): This tutorial will show you how Kubed can sync ConfigMaps/Secrets across Kubernetes namespaces.
-  - [Synchronize Configuration across Clusters](/docs/guides/config-syncer/inter-cluster.md): This tutorial will show you how Kubed can sync ConfigMaps/Secrets across Kubernetes cluster.
-- [Monitoring Kubed](/docs/guides/monitoring.md): This article described the various metrics exposed by Kubed operator.
+  - [Synchronize Configuration across Namespaces](/docs/guides/config-syncer/intra-cluster.md): This tutorial will show you how Config Syncer can sync ConfigMaps/Secrets across Kubernetes namespaces.
+  - [Synchronize Configuration across Clusters](/docs/guides/config-syncer/inter-cluster.md): This tutorial will show you how Config Syncer can sync ConfigMaps/Secrets across Kubernetes cluster.
+- [Monitoring Config Syncer](/docs/guides/monitoring.md): This article described the various metrics exposed by Config Syncer operator.

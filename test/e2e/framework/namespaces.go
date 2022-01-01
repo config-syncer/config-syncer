@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ func (f *Framework) NewNamespace(name string) *core.Namespace {
 func (fi *Invocation) NewNamespaceWithLabel() *core.Namespace {
 	return &core.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: rand.WithUniqSuffix("kubed-e2e-labeled"),
+			Name: rand.WithUniqSuffix("config-syncer-e2e-labeled"),
 			Labels: map[string]string{
 				"app": fi.App(),
 			},

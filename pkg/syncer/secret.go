@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package syncer
 import (
 	context "context"
 
-	"kubeops.dev/kubed/pkg/eventer"
+	"kubeops.dev/config-syncer/pkg/eventer"
 
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"

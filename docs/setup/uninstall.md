@@ -1,6 +1,6 @@
 ---
-title: Kubed Uninstall
-description: Kubed Uninstall
+title: Config Syncer Uninstall
+description: Config Syncer Uninstall
 menu:
   product_kubed_{{ .version }}:
     identifier: kubed-uninstall
@@ -12,11 +12,11 @@ menu_name: product_kubed_{{ .version }}
 section_menu_id: setup
 ---
 
-> New to Kubed? Please start [here](/docs/concepts/README.md).
+> New to Config Syncer? Please start [here](/docs/concepts/README.md).
 
-# Uninstall Kubed
+# Uninstall Config Syncer
 
-Please follow the steps below to uninstall Kubed:
+Please follow the steps below to uninstall Config Syncer:
 
 <ul class="nav nav-tabs" id="installerTab" role="tablist">
   <li class="nav-item">
@@ -54,7 +54,7 @@ $ helm delete kubed
 
 ## Using YAML (with helm 3)
 
-If you prefer to not use Helm, you can generate YAMLs from Kubed chart and uninstall using `kubectl`.
+If you prefer to not use Helm, you can generate YAMLs from Config Syncer chart and uninstall using `kubectl`.
 
 ```console
 $ helm template kubed appscode/kubed --namespace kube-system | kubectl delete -f -

@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package server
 import (
 	"time"
 
-	"kubeops.dev/kubed/pkg/operator"
+	"kubeops.dev/config-syncer/pkg/operator"
 
 	"github.com/spf13/pflag"
 	"k8s.io/client-go/kubernetes"

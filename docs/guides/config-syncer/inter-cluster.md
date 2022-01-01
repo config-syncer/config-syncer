@@ -12,23 +12,23 @@ menu_name: product_kubed_{{ .version }}
 section_menu_id: guides
 ---
 
-> New to Kubed? Please start [here](/docs/concepts/README.md).
+> New to Config Syncer? Please start [here](/docs/concepts/README.md).
 
 # Synchronize Configuration across Clusters
 
-You can synchronize a ConfigMap or a Secret into different clusters using Kubed. For this you need to provide a `kubeconfig` file consisting cluster contexts and specify context names in comma separated format using __`kubed.appscode.com/sync-contexts`__ annotation. Kubed will create a copy of that ConfigMap/Secret in all clusters specified by the annotation. _For each cluster, it will sync into source namespace by default, but if namespace specified in the context (in the `kubeconfig` file), it will sync into that namespace._ Note that, Kubed will not create any namespace, it has to be created beforehand.
+You can synchronize a ConfigMap or a Secret into different clusters using Config Syncer. For this you need to provide a `kubeconfig` file consisting cluster contexts and specify context names in comma separated format using __`kubed.appscode.com/sync-contexts`__ annotation. Config Syncer will create a copy of that ConfigMap/Secret in all clusters specified by the annotation. _For each cluster, it will sync into source namespace by default, but if namespace specified in the context (in the `kubeconfig` file), it will sync into that namespace._ Note that, Config Syncer will not create any namespace, it has to be created beforehand.
 
 If the data in the source ConfigMap/Secret is updated, all the copies will be updated. Either delete the source ConfigMap/Secret or remove the annotation from the source ConfigMap/Secret to remove the copies.
 
-If the list of contexts specified by the annotation is updated, Kubed will synchronize the ConfigMap/Secret accordingly, ie. it will create ConfigMap/Secret  in the clusters listed in new annotation (if not already exists) and delete ConfigMap/Secret from the clusters that were synced before but not listed in new annotation.
+If the list of contexts specified by the annotation is updated, Config Syncer will synchronize the ConfigMap/Secret accordingly, ie. it will create ConfigMap/Secret  in the clusters listed in new annotation (if not already exists) and delete ConfigMap/Secret from the clusters that were synced before but not listed in new annotation.
 
-Note that, Kubed will error out if multiple contexts listed in annotation point same cluster. Also Kubed assumes that none of cluster contexts in `kubeconfig` file points the source cluster.
+Note that, Config Syncer will error out if multiple contexts listed in annotation point same cluster. Also Config Syncer assumes that none of cluster contexts in `kubeconfig` file points the source cluster.
 
 ## Before You Begin
 
 At first, you need to have a Kubernetes cluster and the kubectl command-line tool must be configured to communicate with your cluster. If you do not already have a cluster, you can create one by using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/).
 
-## Deploy Kubed
+## Deploy Config Syncer
 
 To enable config syncer for different clusters, you need a `kubeconfig` file consisting cluster contexts where you want to sync your ConfigMap/Secret.
 
@@ -67,7 +67,7 @@ contexts:
     namespace: demo-cluster-2
 ```
 
-Now, deploy Kubed operator in your cluster following the steps [here](/docs/setup/install.md). Below you can see the command to install Kubed using Helm 3.
+Now, deploy Config Syncer operator in your cluster following the steps [here](/docs/setup/install.md). Below you can see the command to install Config Syncer using Helm 3.
 
 ```console
 $ helm install kubed appscode/kubed \
@@ -104,5 +104,5 @@ Other concepts like updating source configmap, removing annotation, origin annot
 
 ## Next Steps
 
-- Need to keep some configuration synchronized across namespaces? Try [Kubed config syncer](/docs/guides/config-syncer/intra-cluster.md).
-- Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).
+- Need to keep some configuration synchronized across namespaces? Try [Config Syncer config syncer](/docs/guides/config-syncer/intra-cluster.md).
+- Want to hack on Config Syncer? Check our [contribution guidelines](/docs/CONTRIBUTING.md).

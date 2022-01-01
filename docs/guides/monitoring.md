@@ -12,11 +12,11 @@ menu_name: product_kubed_{{ .version }}
 section_menu_id: guides
 ---
 
-> New to Kubed? Please start [here](/docs/concepts/README.md).
+> New to Config Syncer? Please start [here](/docs/concepts/README.md).
 
-# Monitoring Kubed
+# Monitoring Config Syncer
 
-Kubed operator exposes Prometheus ready metrics via the following endpoints on port `:8443`:
+Config Syncer operator exposes Prometheus ready metrics via the following endpoints on port `:8443`:
 
 - `/metrics`: Scrape this to monitor operator.
 
@@ -77,5 +77,5 @@ clusterrolebinding.rbac.authorization.k8s.io "appscode:system:metrics-collector"
 ```
 
 ## Next Steps
- - Need to keep configmaps/secrets synchronized across namespaces or clusters? Try [Kubed config syncer](/docs/guides/config-syncer/).
- - Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).
+ - Need to keep configmaps/secrets synchronized across namespaces or clusters? Try [Config Syncer config syncer](/docs/guides/config-syncer/).
+ - Want to hack on Config Syncer? Check our [contribution guidelines](/docs/CONTRIBUTING.md).

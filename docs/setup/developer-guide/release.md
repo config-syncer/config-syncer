@@ -1,5 +1,5 @@
 ---
-title: Release | Kubed
+title: Release | Config Syncer
 description: kubed Release
 menu:
   product_kubed_{{ .version }}:
@@ -21,7 +21,7 @@ The following steps must be done from a Linux x64 bit machine.
 - Push all the changes to remote repo.
 - Build and push kubed docker image:
 ```console
-$ cd ~/go/src/kubeops.dev/kubed
+$ cd ~/go/src/kubeops.dev/config-syncer
 $ env APPSCODE_ENV=prod ./hack/make.py build
 $ ./hack/docker/setup.sh; env APPSCODE_ENV=prod ./hack/docker/setup.sh release
 ```

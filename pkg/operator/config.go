@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package operator
 import (
 	"time"
 
-	"kubeops.dev/kubed/pkg/eventer"
-	"kubeops.dev/kubed/pkg/syncer"
+	"kubeops.dev/config-syncer/pkg/eventer"
+	"kubeops.dev/config-syncer/pkg/syncer"
 
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
@@ -61,7 +61,7 @@ func (c *OperatorConfig) New() (*Operator, error) {
 		KubeClient:   c.KubeClient,
 	}
 
-	op.recorder = eventer.NewEventRecorder(op.KubeClient, "kubed")
+	op.recorder = eventer.NewEventRecorder(op.KubeClient, "config-syncer")
 	op.configSyncer = syncer.New(op.KubeClient, op.recorder)
 
 	if err := op.Configure(); err != nil {

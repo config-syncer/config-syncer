@@ -1,5 +1,5 @@
 ---
-title: Guides | Kubed
+title: Guides | Config Syncer
 menu:
   product_kubed_{{ .version }}:
     identifier: guides

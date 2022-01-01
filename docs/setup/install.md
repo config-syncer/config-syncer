@@ -1,6 +1,6 @@
 ---
-title: Kubed Install
-description: Kubed Install
+title: Config Syncer Install
+description: Config Syncer Install
 menu:
   product_kubed_{{ .version }}:
     identifier: kubed-install
@@ -12,11 +12,11 @@ menu_name: product_kubed_{{ .version }}
 section_menu_id: setup
 ---
 
-> New to Kubed? Please start [here](/docs/concepts/README.md).
+> New to Config Syncer? Please start [here](/docs/concepts/README.md).
 
 # Installation Guide
 
-Kubed operator can be installed via a script or as a Helm chart.
+Config Syncer operator can be installed via a script or as a Helm chart.
 
 <ul class="nav nav-tabs" id="installerTab" role="tablist">
   <li class="nav-item">
@@ -34,56 +34,56 @@ Kubed operator can be installed via a script or as a Helm chart.
 
 ## Using Helm 3
 
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `kubed`:
+Config Syncer can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/kubeops/config-syncer/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `kubed`:
 
 ```console
 $ helm repo add appscode https://charts.appscode.com/stable/
 $ helm repo update
 $ helm search repo appscode/kubed --version {{< param "info.version" >}}
 NAME            CHART VERSION APP VERSION DESCRIPTION
-appscode/kubed  {{< param "info.version" >}}    {{< param "info.version" >}}  Kubed by AppsCode - Kubernetes daemon
+appscode/kubed  {{< param "info.version" >}}    {{< param "info.version" >}}  Config Syncer by AppsCode - Kubernetes daemon
 
 $ helm install kubed appscode/kubed \
   --version {{< param "info.version" >}} \
   --namespace kube-system
 ```
 
-To see the detailed configuration options, visit [here](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/charts/kubed).
+To see the detailed configuration options, visit [here](https://github.com/kubeops/config-syncer/tree/{{< param "info.version" >}}/charts/kubed).
 
 </div>
 <div class="tab-pane fade" id="helm2" role="tabpanel" aria-labelledby="helm2-tab">
 
 ## Using Helm 2
 
-Kubed can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `kubed`:
+Config Syncer can be installed via [Helm](https://helm.sh/) using the [chart](https://github.com/kubeops/config-syncer/tree/{{< param "info.version" >}}/charts/kubed) from [AppsCode Charts Repository](https://github.com/appscode/charts). To install the chart with the release name `kubed`:
 
 ```console
 $ helm repo add appscode https://charts.appscode.com/stable/
 $ helm repo update
 $ helm search appscode/kubed --version {{< param "info.version" >}}
 NAME            CHART VERSION APP VERSION DESCRIPTION
-appscode/kubed  {{< param "info.version" >}}    {{< param "info.version" >}}  Kubed by AppsCode - Kubernetes daemon
+appscode/kubed  {{< param "info.version" >}}    {{< param "info.version" >}}  Config Syncer by AppsCode - Kubernetes daemon
 
 $ helm install appscode/kubed --name kubed \
   --version {{< param "info.version" >}} \
   --namespace kube-system
 ```
 
-To see the detailed configuration options, visit [here](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/charts/kubed).
+To see the detailed configuration options, visit [here](https://github.com/kubeops/config-syncer/tree/{{< param "info.version" >}}/charts/kubed).
 
 </div>
 <div class="tab-pane fade" id="script" role="tabpanel" aria-labelledby="script-tab">
 
 ## Using YAML
 
-If you prefer to not use Helm, you can generate YAMLs from Kubed chart and deploy using `kubectl`. Here we are going to show the prodecure using Helm 3.
+If you prefer to not use Helm, you can generate YAMLs from Config Syncer chart and deploy using `kubectl`. Here we are going to show the prodecure using Helm 3.
 
 ```console
 $ helm repo add appscode https://charts.appscode.com/stable/
 $ helm repo update
 $ helm search repo appscode/kubed --version {{< param "info.version" >}}
 NAME            CHART VERSION APP VERSION DESCRIPTION
-appscode/kubed  {{< param "info.version" >}}    {{< param "info.version" >}}  Kubed by AppsCode - Kubernetes daemon
+appscode/kubed  {{< param "info.version" >}}    {{< param "info.version" >}}  Config Syncer by AppsCode - Kubernetes daemon
 
 $ helm template kubed appscode/kubed \
   --version {{< param "info.version" >}} \
@@ -91,14 +91,14 @@ $ helm template kubed appscode/kubed \
   --no-hooks | kubectl apply -f -
 ```
 
-To see the detailed configuration options, visit [here](https://github.com/kubeops/kubed/tree/{{< param "info.version" >}}/charts/kubed).
+To see the detailed configuration options, visit [here](https://github.com/kubeops/config-syncer/tree/{{< param "info.version" >}}/charts/kubed).
 
 </div>
 </div>
 
 ### Installing in GKE Cluster
 
-If you are installing Kubed on a GKE cluster, you will need cluster admin permissions to install Kubed operator. Run the following command to grant admin permision to the cluster.
+If you are installing Config Syncer on a GKE cluster, you will need cluster admin permissions to install Config Syncer operator. Run the following command to grant admin permision to the cluster.
 
 ```console
 $ kubectl create clusterrolebinding "cluster-admin-$(whoami)" \
@@ -110,7 +110,7 @@ In addition, if your GKE cluster is a [private cluster](https://cloud.google.com
 
 ## Verify installation
 
-Kubed includes a check command to verify a cluster config. Download the pre-built binary from [appscode/kubed Github releases](https://github.com/kubeops/kubed/releases) and put the binary to some directory in your `PATH`.
+Config Syncer includes a check command to verify a cluster config. Download the pre-built binary from [appscode/kubed Github releases](https://github.com/kubeops/config-syncer/releases) and put the binary to some directory in your `PATH`.
 
 ```console
 $ kubed check --clusterconfig=./hack/deploy/config.yaml

@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package operator
 import (
 	"time"
 
-	"kubeops.dev/kubed/pkg/syncer"
+	"kubeops.dev/config-syncer/pkg/syncer"
 
 	"github.com/pkg/errors"
 	core "k8s.io/api/core/v1"
@@ -49,7 +49,7 @@ type Operator struct {
 }
 
 func (op *Operator) Configure() error {
-	klog.Infoln("configuring kubed ...")
+	klog.Infoln("configuring config-syncer ...")
 
 	return op.configSyncer.Configure(op.Config.ClusterName, op.Config.KubeConfigFile)
 }
@@ -93,5 +93,5 @@ func (op *Operator) Run(stopCh <-chan struct{}) {
 	}
 
 	<-stopCh
-	klog.Infoln("Stopping kubed controller")
+	klog.Infoln("Stopping config-syncer controller")
 }

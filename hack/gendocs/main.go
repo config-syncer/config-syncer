@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import (
 	"strings"
 	"text/template"
 
-	"kubeops.dev/kubed/pkg/cmds"
+	"kubeops.dev/config-syncer/pkg/cmds"
 
 	"github.com/spf13/cobra/doc"
 	"gomodules.xyz/runtime"
@@ -35,7 +35,7 @@ import (
 var (
 	tplFrontMatter = template.Must(template.New("index").Parse(`---
 title: Reference
-description: Kubed CLI Reference
+description: Config Syncer CLI Reference
 menu:
   product_kubed_{{ "{{ .version }}" }}:
     identifier: reference
@@ -68,8 +68,8 @@ aliases:
 
 // ref: https://github.com/spf13/cobra/blob/master/doc/md_docs.md
 func main() {
-	rootCmd := cmds.NewCmdKubed("")
-	dir := runtime.GOPath() + "/src/kubeops.dev/kubed/docs/reference"
+	rootCmd := cmds.NewCmdConfigSyncer("")
+	dir := runtime.GOPath() + "/src/kubeops.dev/config-syncer/docs/reference"
 	fmt.Printf("Generating cli markdown tree in: %v\n", dir)
 	err := os.RemoveAll(dir)
 	if err != nil {

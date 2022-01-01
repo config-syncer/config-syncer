@@ -60,3 +60,65 @@ func (r ResourceID) GroupVersionResource() schema.GroupVersionResource {
 func (r ResourceID) GroupVersionKind() schema.GroupVersionKind {
 	return schema.GroupVersionKind{Group: r.Group, Version: r.Version, Kind: r.Kind}
 }
+
+func (r ResourceID) MetaGVR() metav1.GroupVersionResource {
+	return metav1.GroupVersionResource{Group: r.Group, Version: r.Version, Resource: r.Name}
+}
+
+func (r ResourceID) MetaGVK() metav1.GroupVersionKind {
+	return metav1.GroupVersionKind{Group: r.Group, Version: r.Version, Kind: r.Kind}
+}
+
+func FromMetaGVR(in metav1.GroupVersionResource) schema.GroupVersionResource {
+	return schema.GroupVersionResource{
+		Group:    in.Group,
+		Version:  in.Version,
+		Resource: in.Resource,
+	}
+}
+
+func ToMetaGVR(in schema.GroupVersionResource) metav1.GroupVersionResource {
+	return metav1.GroupVersionResource{
+		Group:    in.Group,
+		Version:  in.Version,
+		Resource: in.Resource,
+	}
+}
+
+func FromMetaGVK(in metav1.GroupVersionKind) schema.GroupVersionKind {
+	return schema.GroupVersionKind{
+		Group:   in.Group,
+		Version: in.Version,
+		Kind:    in.Kind,
+	}
+}
+
+func ToMetaGVK(in schema.GroupVersionKind) metav1.GroupVersionKind {
+	return metav1.GroupVersionKind{
+		Group:   in.Group,
+		Version: in.Version,
+		Kind:    in.Kind,
+	}
+}
+
+// FromAPIVersionAndKind returns a GVK representing the provided fields for types that
+// do not use TypeMeta. This method exists to support test types and legacy serializations
+// that have a distinct group and kind.
+func FromAPIVersionAndKind(apiVersion, kind string) metav1.GroupVersionKind {
+	if gv, err := schema.ParseGroupVersion(apiVersion); err == nil {
+		return metav1.GroupVersionKind{Group: gv.Group, Version: gv.Version, Kind: kind}
+	}
+	return metav1.GroupVersionKind{Kind: kind}
+}
+
+func EqualsGVK(a schema.GroupVersionKind, b metav1.GroupVersionKind) bool {
+	return a.Group == b.Group &&
+		a.Version == b.Version &&
+		a.Kind == b.Kind
+}
+
+func EqualsGVR(a schema.GroupVersionResource, b metav1.GroupVersionResource) bool {
+	return a.Group == b.Group &&
+		a.Version == b.Version &&
+		a.Resource == b.Resource
+}

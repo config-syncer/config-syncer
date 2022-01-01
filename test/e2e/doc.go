@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,4 +17,4 @@ limitations under the License.
 package e2e
 
 // This file is for avoiding this error:
-// go build kubeops.dev/kubed/test/e2e: no non-test Go files in /home/ac/go/src/kubeops.dev/kubed/test/e2e
+// go build kubeops.dev/config-syncer/test/e2e: no non-test Go files in /home/ac/go/src/kubeops.dev/config-syncer/test/e2e
