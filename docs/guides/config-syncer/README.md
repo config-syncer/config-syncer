@@ -17,7 +17,7 @@ aliases:
 
 # Configuration Syncer
 
-This section contains guides on how to use Kubed to synchronize Configmaps or Secrets across namespaces of a Kubernetes Cluster or across Kubernetes clusters.
+This section contains guides on how to use Config Syncer to synchronize Configmaps or Secrets across namespaces of a Kubernetes Cluster or across Kubernetes clusters.
 
-- [Synchronize Configuration across Namespaces](/docs/guides/config-syncer/intra-cluster.md): This tutorial will show you how Kubed can sync ConfigMaps/Secrets across Kubernetes namespaces.
-- [Synchronize Configuration across Clusters](/docs/guides/config-syncer/inter-cluster.md): This tutorial will show you how Kubed can sync ConfigMaps/Secrets across Kubernetes cluster.
+- [Synchronize Configuration across Namespaces](/docs/guides/config-syncer/intra-cluster.md): This tutorial will show you how Config Syncer can sync ConfigMaps/Secrets across Kubernetes namespaces.
+- [Synchronize Configuration across Clusters](/docs/guides/config-syncer/inter-cluster.md): This tutorial will show you how Config Syncer can sync ConfigMaps/Secrets across Kubernetes cluster.

@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import (
 
 const defaultEtcdPathPrefix = "/registry/kubed.appscode.com"
 
-type KubedOptions struct {
+type ConfigSyncerOptions struct {
 	RecommendedOptions *genericoptions.RecommendedOptions
 	OperatorOptions    *OperatorOptions
 
@@ -40,8 +40,8 @@ type KubedOptions struct {
 	StdErr io.Writer
 }
 
-func NewKubedOptions(out, errOut io.Writer) *KubedOptions {
-	o := &KubedOptions{
+func NewConfigSyncerOptions(out, errOut io.Writer) *ConfigSyncerOptions {
+	o := &ConfigSyncerOptions{
 		// TODO we will nil out the etcd storage options.  This requires a later level of k8s.io/apiserver
 		RecommendedOptions: genericoptions.NewRecommendedOptions(
 			defaultEtcdPathPrefix,
@@ -57,20 +57,20 @@ func NewKubedOptions(out, errOut io.Writer) *KubedOptions {
 	return o
 }
 
-func (o *KubedOptions) AddFlags(fs *pflag.FlagSet) {
+func (o *ConfigSyncerOptions) AddFlags(fs *pflag.FlagSet) {
 	o.RecommendedOptions.AddFlags(fs)
 	o.OperatorOptions.AddFlags(fs)
 }
 
-func (o KubedOptions) Validate(args []string) error {
+func (o ConfigSyncerOptions) Validate(args []string) error {
 	return nil
 }
 
-func (o *KubedOptions) Complete() error {
+func (o *ConfigSyncerOptions) Complete() error {
 	return nil
 }
 
-func (o KubedOptions) Config() (*server.KubedConfig, error) {
+func (o ConfigSyncerOptions) Config() (*server.ConfigSyncerConfig, error) {
 	// TODO have a "real" external address
 	if err := o.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", nil, []net.IP{net.ParseIP("127.0.0.1")}); err != nil {
 		return nil, errors.Errorf("error creating self-signed certificates: %v", err)
@@ -87,14 +87,14 @@ func (o KubedOptions) Config() (*server.KubedConfig, error) {
 		return nil, err
 	}
 
-	config := &server.KubedConfig{
+	config := &server.ConfigSyncerConfig{
 		GenericConfig:  serverConfig,
 		OperatorConfig: operatorConfig,
 	}
 	return config, nil
 }
 
-func (o KubedOptions) Run(stopCh <-chan struct{}) error {
+func (o ConfigSyncerOptions) Run(stopCh <-chan struct{}) error {
 	config, err := o.Config()
 	if err != nil {
 		return err

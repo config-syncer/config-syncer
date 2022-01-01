@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ func TestE2E(t *testing.T) {
 	RegisterFailHandler(Fail)
 	SetDefaultEventuallyTimeout(TestTimeout)
 	junitReporter := reporters.NewJUnitReporter("junit.xml")
-	RunSpecsWithDefaultAndCustomReporters(t, "Kubed E2E Suite", []Reporter{junitReporter})
+	RunSpecsWithDefaultAndCustomReporters(t, "Config Syncer E2E Suite", []Reporter{junitReporter})
 }
 
 var _ = BeforeSuite(func() {

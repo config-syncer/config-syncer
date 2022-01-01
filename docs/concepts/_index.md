@@ -1,6 +1,6 @@
 ---
 title: Concepts
-description: Kubed Concepts
+description: Config Syncer Concepts
 menu:
   product_kubed_{{ .version }}:
     identifier: concepts

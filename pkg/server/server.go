@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -50,18 +50,18 @@ func init() {
 	)
 }
 
-type KubedConfig struct {
+type ConfigSyncerConfig struct {
 	GenericConfig  *genericapiserver.RecommendedConfig
 	OperatorConfig *operator.OperatorConfig
 }
 
-// KubedServer contains state for a Kubernetes cluster daemon.
-type KubedServer struct {
+// ConfigSyncerServer contains state for a Kubernetes cluster daemon.
+type ConfigSyncerServer struct {
 	GenericAPIServer *genericapiserver.GenericAPIServer
 	Operator         *operator.Operator
 }
 
-func (op *KubedServer) Run(stopCh <-chan struct{}) error {
+func (op *ConfigSyncerServer) Run(stopCh <-chan struct{}) error {
 	go op.Operator.Run(stopCh)
 	return op.GenericAPIServer.PrepareRun().Run(stopCh)
 }
@@ -77,7 +77,7 @@ type CompletedConfig struct {
 }
 
 // Complete fills in any fields not set that are required to have valid data. It's mutating the receiver.
-func (c *KubedConfig) Complete() CompletedConfig {
+func (c *ConfigSyncerConfig) Complete() CompletedConfig {
 	completedCfg := completedConfig{
 		c.GenericConfig.Complete(),
 		c.OperatorConfig,
@@ -91,8 +91,8 @@ func (c *KubedConfig) Complete() CompletedConfig {
 	return CompletedConfig{&completedCfg}
 }
 
-// New returns a new instance of KubedServer from the given config.
-func (c completedConfig) New() (*KubedServer, error) {
+// New returns a new instance of ConfigSyncerServer from the given config.
+func (c completedConfig) New() (*ConfigSyncerServer, error) {
 	genericServer, err := c.GenericConfig.New("kubed-server", genericapiserver.NewEmptyDelegate()) // completion is done in Complete, no need for a second time
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (c completedConfig) New() (*KubedServer, error) {
 		return nil, err
 	}
 
-	s := &KubedServer{
+	s := &ConfigSyncerServer{
 		GenericAPIServer: genericServer,
 		Operator:         operator,
 	}

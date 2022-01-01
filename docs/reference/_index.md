@@ -1,6 +1,6 @@
 ---
 title: Reference
-description: Kubed CLI Reference
+description: Config Syncer CLI Reference
 menu:
   product_kubed_{{ .version }}:
     identifier: reference

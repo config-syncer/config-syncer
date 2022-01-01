@@ -1,5 +1,5 @@
 ---
-title: Contributing | Kubed
+title: Contributing | Config Syncer
 description: Contributing
 menu:
   product_kubed_{{ .version }}:
@@ -16,7 +16,7 @@ aliases:
 ---
 
 # Contribution Guidelines
-Want to hack on Kubed?
+Want to hack on Config Syncer?
 
 AppsCode projects are [Apache 2.0 licensed](https://github.com/kubeops/config-syncer/blob/master/LICENSE) and accept contributions via
 GitHub pull requests.  This document outlines some of the conventions on
@@ -33,16 +33,16 @@ contribution. See the [DCO](https://github.com/kubeops/config-syncer/blob/master
 ## Developer Guide
 
 We have a [Developer Guide](/docs/setup/developer-guide/overview.md) that outlines everything you need to know from setting up your
-dev environment to how to build and test Kubed. If you find something undocumented or incorrect along the way,
+dev environment to how to build and test Config Syncer. If you find something undocumented or incorrect along the way,
 please feel free to send a Pull Request.
 
 ## Getting Help
 
-If you have a question about Kubed or having problem using it, you can contact us on the [AppsCode Slack team](https://appscode.slack.com/messages/C6HSHCKBL/details/) channel `#kubed`. Follow [this link](https://slack.appscode.com) to get invitation to our Slack channel.
+If you have a question about Config Syncer or having problem using it, you can contact us on the [AppsCode Slack team](https://appscode.slack.com/messages/C6HSHCKBL/details/) channel `#kubed`. Follow [this link](https://slack.appscode.com) to get invitation to our Slack channel.
 
 ## Bugs/Feature request
 
-If you have found a bug with Kubed or want to request for new features, please [file an issue](https://github.com/kubeops/config-syncer/issues/new).
+If you have found a bug with Config Syncer or want to request for new features, please [file an issue](https://github.com/kubeops/config-syncer/issues/new).
 
 ## Submit PR
 
@@ -58,4 +58,4 @@ Thanks for your contributions!
 
 ## Spread the word
 
-If you have written blog post or tutorial on Kubed, please share it with us on [Twitter](https://twitter.com/AppsCodeHQ) or [Slack](https://slack.appscode.com).
+If you have written blog post or tutorial on Config Syncer, please share it with us on [Twitter](https://twitter.com/AppsCodeHQ) or [Slack](https://slack.appscode.com).

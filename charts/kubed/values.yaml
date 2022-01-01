@@ -7,15 +7,15 @@ nameOverride: ""
 # Overrides fullname template
 fullnameOverride: ""
 
-# Number of Kubed operator replicas to create (only 1 is supported)
+# Number of Config Syncer operator replicas to create (only 1 is supported)
 replicaCount: 1
 
 operator:
-  # Docker registry used to pull Kubed operator image
+  # Docker registry used to pull Config Syncer operator image
   registry: registry.byte.builders/appscode
-  # Kubed operator container image
+  # Config Syncer operator container image
   repository: kubed
-  # Kubed operator container image tag
+  # Config Syncer operator container image tag
   tag: v0.13.0-beta.0
   # Compute Resources required by the operator container
   resources: {}
@@ -34,7 +34,7 @@ imagePullSecrets: []
 # Container image pull policy
 imagePullPolicy: IfNotPresent
 
-# If true, installs Kubed operator as critical addon
+# If true, installs Config Syncer operator as critical addon
 criticalAddon: false
 
 # Log level for operator
@@ -70,7 +70,7 @@ serviceAccount:
   name: ""
 
 apiserver:
-  # Port used by Kubed server
+  # Port used by Config Syncer server
   securePort: "8443"
   # If true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 (default true)
   useKubeapiserverFqdnForAks: true
@@ -81,11 +81,11 @@ apiserver:
     # If true, generates on install/upgrade the certs that allow the kube-apiserver (and potentially ServiceMonitor)
     # to authenticate operators pods. Otherwise specify certs in `apiserver.servingCerts.{caCrt, serverCrt, serverKey}`.
     generate: true
-    # CA certficate used by serving certificate of Kubed server.
+    # CA certficate used by serving certificate of Config Syncer server.
     caCrt: ""
-    # Serving certficate used by Kubed server.
+    # Serving certficate used by Config Syncer server.
     serverCrt: ""
-    # Private key for the serving certificate used by Kubed server.
+    # Private key for the serving certificate used by Config Syncer server.
     serverKey: ""
 
 # If true, sends usage analytics

@@ -1,5 +1,5 @@
 ---
-title: Changelog | Kubed
+title: Changelog | Config Syncer
 description: Changelog
 menu:
   product_kubed_{{ .version }}:
@@ -45,7 +45,7 @@ aliases:
 - Context not found in kubeconfig file [\#389](https://github.com/kubeops/config-syncer/issues/389)
 - Crash when the namespace is terminating [\#380](https://github.com/kubeops/config-syncer/issues/380)
 - Don't regenerate a certificate authority and a certificate everytime you deploy the helm chart [\#371](https://github.com/kubeops/config-syncer/issues/371)
-- Kubed shows abnormal high I/O and memory usage [\#357](https://github.com/kubeops/config-syncer/issues/357)
+- Config Syncer shows abnormal high I/O and memory usage [\#357](https://github.com/kubeops/config-syncer/issues/357)
 
 **Merged pull requests:**
 
@@ -167,7 +167,7 @@ aliases:
 
 - Dependabot couldn't find a Gopkg.toml for this project [\#320](https://github.com/kubeops/config-syncer/issues/320)
 - New version release [\#318](https://github.com/kubeops/config-syncer/issues/318)
-- Kubed fails to start on initial start [\#316](https://github.com/kubeops/config-syncer/issues/316)
+- Config Syncer fails to start on initial start [\#316](https://github.com/kubeops/config-syncer/issues/316)
 - Resource Requests and Limits in helm chart [\#315](https://github.com/kubeops/config-syncer/issues/315)
 
 **Merged pull requests:**
@@ -279,7 +279,7 @@ aliases:
 - Extract docker LABELS [\#139](https://github.com/kubeops/config-syncer/issues/139)
 - Enforce Pod policy via admission webhook [\#118](https://github.com/kubeops/config-syncer/issues/118)
 - Rethink copying config/secret to kube-public namespace [\#113](https://github.com/kubeops/config-syncer/issues/113)
-- Kubed api features [\#86](https://github.com/kubeops/config-syncer/issues/86)
+- Config Syncer api features [\#86](https://github.com/kubeops/config-syncer/issues/86)
 - Log warnings against kubed-config [\#81](https://github.com/kubeops/config-syncer/issues/81)
 - Perform as a Image review process [\#72](https://github.com/kubeops/config-syncer/issues/72)
 - k8sguard [\#22](https://github.com/kubeops/config-syncer/issues/22)
@@ -332,7 +332,7 @@ aliases:
 - Used shared informer and queue [\#152](https://github.com/kubeops/config-syncer/issues/152)
 - Use separate bleve index for Events and other kube api objects [\#106](https://github.com/kubeops/config-syncer/issues/106)
 - Support soft loading of ClusterConfig [\#51](https://github.com/kubeops/config-syncer/issues/51)
-- Expose Kubed api server as a UAS [\#19](https://github.com/kubeops/config-syncer/issues/19)
+- Expose Config Syncer api server as a UAS [\#19](https://github.com/kubeops/config-syncer/issues/19)
 
 **Merged pull requests:**
 
@@ -446,7 +446,7 @@ aliases:
 - Make chart namespaced [\#140](https://github.com/kubeops/config-syncer/pull/140) ([tamalsaha](https://github.com/tamalsaha))
 - Add test event forward [\#138](https://github.com/kubeops/config-syncer/pull/138) ([a8uhnf](https://github.com/a8uhnf))
 - Use client-go 5.x [\#137](https://github.com/kubeops/config-syncer/pull/137) ([tamalsaha](https://github.com/tamalsaha))
-- Add test for Kubed [\#135](https://github.com/kubeops/config-syncer/pull/135) ([a8uhnf](https://github.com/a8uhnf))
+- Add test for Config Syncer [\#135](https://github.com/kubeops/config-syncer/pull/135) ([a8uhnf](https://github.com/a8uhnf))
 - This should be enableSearchIndex [\#134](https://github.com/kubeops/config-syncer/pull/134) ([a8uhnf](https://github.com/a8uhnf))
 
 ## [0.3.0](https://github.com/kubeops/config-syncer/tree/0.3.0) (2017-09-26)
@@ -510,9 +510,9 @@ aliases:
 **Implemented enhancements:**
 
 - Fix API Response Types [\#77](https://github.com/kubeops/config-syncer/pull/77) ([sadlil](https://github.com/sadlil))
-- WIP: Enable Kubed Health API [\#66](https://github.com/kubeops/config-syncer/pull/66) ([sadlil](https://github.com/sadlil))
+- WIP: Enable Config Syncer Health API [\#66](https://github.com/kubeops/config-syncer/pull/66) ([sadlil](https://github.com/sadlil))
 - Add Service to ServiceMonitor Reverse index [\#46](https://github.com/kubeops/config-syncer/pull/46) ([sadlil](https://github.com/sadlil))
-- Remove voyager and searchlight controller from Kubed [\#10](https://github.com/kubeops/config-syncer/pull/10) ([sadlil](https://github.com/sadlil))
+- Remove voyager and searchlight controller from Config Syncer [\#10](https://github.com/kubeops/config-syncer/pull/10) ([sadlil](https://github.com/sadlil))
 - Reverse index for ServiceMonitor to Prometheus [\#47](https://github.com/kubeops/config-syncer/pull/47) ([sadlil](https://github.com/sadlil))
 - Pod to service Reverse index and Full Text search [\#21](https://github.com/kubeops/config-syncer/pull/21) ([sadlil](https://github.com/sadlil))
 
@@ -526,7 +526,7 @@ aliases:
 
 **Closed issues:**
 
-- Remove Voyager & Searchlight from Kubed [\#7](https://github.com/kubeops/config-syncer/issues/7)
+- Remove Voyager & Searchlight from Config Syncer [\#7](https://github.com/kubeops/config-syncer/issues/7)
 - Move prometheus YAML here? [\#5](https://github.com/kubeops/config-syncer/issues/5)
 - Add README.md for promwatcher [\#2](https://github.com/kubeops/config-syncer/issues/2)
 - Local volumes does not work for cluster snapshot [\#52](https://github.com/kubeops/config-syncer/issues/52)

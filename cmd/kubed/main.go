@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,10 +24,11 @@ import (
 
 	"gomodules.xyz/logs"
 	_ "k8s.io/client-go/kubernetes/fake"
+	"k8s.io/klog/v2"
 )
 
 func main() {
-	rootCmd := cmds.NewCmdKubed(Version)
+	rootCmd := cmds.NewCmdConfigSyncer(Version)
 	logs.Init(rootCmd, true)
 	defer logs.FlushLogs()
 
@@ -36,6 +37,6 @@ func main() {
 	}
 
 	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
+		klog.Fatal(err)
 	}
 }

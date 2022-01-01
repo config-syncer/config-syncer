@@ -1,6 +1,6 @@
 ---
-title: Weclome | Kubed
-description: Welcome to Kubed
+title: Weclome | Config Syncer
+description: Welcome to Config Syncer
 menu:
   product_kubed_{{ .version }}:
     identifier: readme-kubed
@@ -16,15 +16,15 @@ aliases:
   - /products/kubed/{{ .version }}/README/
 ---
 
-# Kubed
-Kubed (pronounced Cube-Dee) by AppsCode is a Kubernetes Cluster Operator Daemon. From here you can learn all about Kubed's architecture and how to deploy and use Kubed.
+# Config Syncer
+Config Syncer (pronounced Cube-Dee) by AppsCode is a Kubernetes Cluster Operator Daemon. From here you can learn all about Config Syncer's architecture and how to deploy and use Config Syncer.
 
-- [Concepts](/docs/concepts/). Concepts explain some significant aspect of Kubed. This is where you can learn about what Kubed does and how it does it.
+- [Concepts](/docs/concepts/). Concepts explain some significant aspect of Config Syncer. This is where you can learn about what Config Syncer does and how it does it.
 
 - [Setup](/docs/setup/). Setup contains instructions for installing
-  the Kubed in various cloud providers.
+  the Config Syncer in various cloud providers.
 
-- [Guides](/docs/guides/). Guides show you how to perform tasks with Kubed.
+- [Guides](/docs/guides/). Guides show you how to perform tasks with Config Syncer.
 
 - [Reference](/docs/reference/). Detailed exhaustive lists of
 command-line options, configuration options, API definitions, and procedures.
@@ -34,6 +34,6 @@ make our docs better.
 
 ---
 
-**Kubed binaries collects anonymous usage statistics to help us learn how the software is being used and how we can improve it. To disable stats collection, run the operator with the flag** `--enable-analytics=false`.
+**Config Syncer binaries collects anonymous usage statistics to help us learn how the software is being used and how we can improve it. To disable stats collection, run the operator with the flag** `--enable-analytics=false`.
 
 ---

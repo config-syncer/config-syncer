@@ -17,10 +17,10 @@ aliases:
 
 # Setup
 
-Setup contains instructions for installing the Kubed and its various components in Kubernetes.
+Setup contains instructions for installing the Config Syncer and its various components in Kubernetes.
 
-- [Install Kubed](/docs/setup/install.md). Installation instructions for Kubed.
-- [Uninstall Kubed](/docs/setup/uninstall.md). Instructions for uninstallating Kubed.
+- [Install Config Syncer](/docs/setup/install.md). Installation instructions for Config Syncer.
+- [Uninstall Config Syncer](/docs/setup/uninstall.md). Instructions for uninstallating Config Syncer.
 - Developer Guide
-  - [Overview](/docs/setup/developer-guide/overview.md). Outlines everything you need to know from setting up your dev environment to how to build and test Kubed.
-  - [Release process](/docs/setup/developer-guide/release.md). Steps for releasing a new version of Kubed.
+  - [Overview](/docs/setup/developer-guide/overview.md). Outlines everything you need to know from setting up your dev environment to how to build and test Config Syncer.
+  - [Release process](/docs/setup/developer-guide/release.md). Steps for releasing a new version of Config Syncer.

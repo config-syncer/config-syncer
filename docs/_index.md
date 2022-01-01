@@ -1,6 +1,6 @@
 ---
-title: Docs | Kubed
-description: Kubed Docs
+title: Docs | Config Syncer
+description: Config Syncer Docs
 menu:
   product_kubed_{{ .version }}:
     identifier: welcome

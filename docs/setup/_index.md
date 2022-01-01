@@ -1,5 +1,5 @@
 ---
-title: Setup | Kubed
+title: Setup | Config Syncer
 menu:
   product_kubed_{{ .version }}:
     identifier: setup

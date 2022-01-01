@@ -12,17 +12,17 @@ menu_name: product_kubed_{{ .version }}
 section_menu_id: guides
 ---
 
-> New to Kubed? Please start [here](/docs/concepts/README.md).
+> New to Config Syncer? Please start [here](/docs/concepts/README.md).
 
 # Synchronize Configuration across Namespaces
 
-Say, you are using some Docker private registry. You want to keep its image pull secret synchronized across all namespaces of a Kubernetes cluster. Kubed can do that for you. If a ConfigMap or a Secret has the annotation __`kubed.appscode.com/sync: ""`__, Kubed will create a copy of that ConfigMap/Secret in all existing namespaces. Kubed will also create this ConfigMap/Secret, when you create a new namespace.
+Say, you are using some Docker private registry. You want to keep its image pull secret synchronized across all namespaces of a Kubernetes cluster. Config Syncer can do that for you. If a ConfigMap or a Secret has the annotation __`kubed.appscode.com/sync: ""`__, Config Syncer will create a copy of that ConfigMap/Secret in all existing namespaces. Config Syncer will also create this ConfigMap/Secret, when you create a new namespace.
 
-If you want to synchronize ConfigMap/Secret to some selected namespaces instead of all namespaces, you can do that by specifying namespace label-selector in the annotation. For example: __`kubed.appscode.com/sync: "app=kubed"`__. Kubed will create a copy of that  ConfigMap/Secret in all namespaces that matches the label-selector. Kubed will also create this Configmap/Secret in newly created namespace if it matches the label-selector.
+If you want to synchronize ConfigMap/Secret to some selected namespaces instead of all namespaces, you can do that by specifying namespace label-selector in the annotation. For example: __`kubed.appscode.com/sync: "app=kubed"`__. Config Syncer will create a copy of that  ConfigMap/Secret in all namespaces that matches the label-selector. Config Syncer will also create this Configmap/Secret in newly created namespace if it matches the label-selector.
 
 If the data in the source ConfigMap/Secret is updated, all the copies will be updated. Either delete the source ConfigMap/Secret or remove the annotation from the source ConfigMap/Secret to remove the copies. If the namespace with the source ConfigMap/Secret is deleted, the copies will also be deleted.
 
-If the value of label-selector specified by annotation is updated, Kubed will synchronize the ConfigMap/Secret accordingly, ie. it will create ConfigMap/Secret in the namespaces that are selected by new label-selector (if not already exists) and delete from namespaces that were synced before but not selected by new label-selector.
+If the value of label-selector specified by annotation is updated, Config Syncer will synchronize the ConfigMap/Secret accordingly, ie. it will create ConfigMap/Secret in the namespaces that are selected by new label-selector (if not already exists) and delete from namespaces that were synced before but not selected by new label-selector.
 
 ## Before You Begin
 
@@ -30,7 +30,7 @@ At first, you need to have a Kubernetes cluster and the kubectl command-line too
 
 ## Synchronize ConfigMap
 
-In this tutorial, a ConfigMap will be synced across all Kubernetes namespaces using Kubed. You can do the same for Secrets.
+In this tutorial, a ConfigMap will be synced across all Kubernetes namespaces using Config Syncer. You can do the same for Secrets.
 
 To keep things isolated, this tutorial uses a separate namespace called `demo` throughout this tutorial. Run the following command to prepare your cluster for this tutorial:
 
@@ -75,7 +75,7 @@ metadata:
   uid: 2988e9d5-7205-11e7-af79-08002738e55e
 ```
 
-Now, apply the `kubed.appscode.com/sync: ""` annotation to ConfigMap `omni`. Kubed operator will notice that and copy the ConfigMap in all existing namespaces.
+Now, apply the `kubed.appscode.com/sync: ""` annotation to ConfigMap `omni`. Config Syncer operator will notice that and copy the ConfigMap in all existing namespaces.
 
 ```console
 $ kubectl annotate configmap omni kubed.appscode.com/sync="" -n demo
@@ -108,7 +108,7 @@ metadata:
   uid: 2988e9d5-7205-11e7-af79-08002738e55e
 ```
 
-Now, create a new namespace called `other`. Kubed will copy ConfigMap `omni` into that namespace.
+Now, create a new namespace called `other`. Config Syncer will copy ConfigMap `omni` into that namespace.
 
 ```console
 $ kubectl create ns other
@@ -155,7 +155,7 @@ metadata:
   uid: b193f40f-7206-11e7-af79-08002738e55e
 ```
 
-Kubed operator notices that the source ConfigMap `omni` has been updated and propagates the change to all the copies in other namespaces.
+Config Syncer operator notices that the source ConfigMap `omni` has been updated and propagates the change to all the copies in other namespaces.
 
 ## Namespace Selector
 
@@ -169,8 +169,8 @@ $ kubectl get configmaps --all-namespaces | grep omni
 demo          omni                                 2         8m
 ```
 
-Kubed operator removes the ConfigMap from all namespaces (except source) since no namespace matches the label-selector `app=kubed`.
-Now, lets' apply `app=kubed` label to `other` namespace. Kubed operator will then sync the ConfigMap to `other` namespace.
+Config Syncer operator removes the ConfigMap from all namespaces (except source) since no namespace matches the label-selector `app=kubed`.
+Now, lets' apply `app=kubed` label to `other` namespace. Config Syncer operator will then sync the ConfigMap to `other` namespace.
 
 ```console
 $ kubectl label namespace other app=kubed
@@ -183,7 +183,7 @@ other         omni                                 2         5m
 
 ## Restricting Source Namespace
 
-By default, Kubed will watch all namespaces for configmaps and secrets with `kubed.appscode.com/sync` annotation. But you can restrict the source namespace for configmaps and secrets by passing `config.configSourceNamespace` value during installation.
+By default, Config Syncer will watch all namespaces for configmaps and secrets with `kubed.appscode.com/sync` annotation. But you can restrict the source namespace for configmaps and secrets by passing `config.configSourceNamespace` value during installation.
 
 ```console
 $ helm install kubed appscode/kubed \
@@ -206,19 +206,19 @@ demo          omni                                 2         18m
 
 ## Origin Annotation
 
-Since 0.9.0, Kubed operator will apply `kubed.appscode.com/origin` annotation on ConfigMap or Secret copies.
+Since 0.9.0, Config Syncer operator will apply `kubed.appscode.com/origin` annotation on ConfigMap or Secret copies.
 
 ![origin annotation](/docs/images/config-syncer/config-origin.png)
 
 ## Origin Labels
 
-Kubed  operator will apply following labels on ConfigMap or Secret copies:
+Config Syncer  operator will apply following labels on ConfigMap or Secret copies:
 
 - `kubed.appscode.com/origin.name`
 - `kubed.appscode.com/origin.namespace`
 - `kubed.appscode.com/origin.cluster`
 
-This annotations are used by Kubed operator to list the copies for a specific source ConfigMap/Secret.
+This annotations are used by Config Syncer operator to list the copies for a specific source ConfigMap/Secret.
 
 ## Cleaning up
 
@@ -232,9 +232,9 @@ $ kubectl delete ns demo
 namespace "demo" deleted
 ```
 
-To uninstall Kubed operator, please follow the steps [here](/docs/setup/uninstall.md).
+To uninstall Config Syncer operator, please follow the steps [here](/docs/setup/uninstall.md).
 
 ## Next Steps
 
 - Learn how to sync config-maps or secrets across multiple cluster [here](/docs/guides/config-syncer/inter-cluster.md).
-- Want to hack on Kubed? Check our [contribution guidelines](/docs/CONTRIBUTING.md).
+- Want to hack on Config Syncer? Check our [contribution guidelines](/docs/CONTRIBUTING.md).

@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,11 +26,11 @@ import (
 	"kmodules.xyz/client-go/tools/cli"
 )
 
-func NewCmdKubed(version string) *cobra.Command {
+func NewCmdConfigSyncer(version string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "kubed",
-		Short:             `Kubed by AppsCode - A Kubernetes Cluster Operator Daemon`,
-		Long:              `Kubed is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/kubeops/config-syncer/tree/master/docs`,
+		Short:             `Config Syncer by AppsCode - A Kubernetes Cluster Operator Daemon`,
+		Long:              `Config Syncer is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/kubeops/config-syncer/tree/master/docs`,
 		DisableAutoGenTag: true,
 		PersistentPreRun: func(c *cobra.Command, args []string) {
 			cli.SendAnalytics(c, v.Version.Version)

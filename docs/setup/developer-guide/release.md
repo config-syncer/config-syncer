@@ -1,5 +1,5 @@
 ---
-title: Release | Kubed
+title: Release | Config Syncer
 description: kubed Release
 menu:
   product_kubed_{{ .version }}:

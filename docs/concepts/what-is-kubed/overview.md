@@ -1,6 +1,6 @@
 ---
-title: Kubed Overview
-description: Kubed Overview
+title: Config Syncer Overview
+description: Config Syncer Overview
 menu:
   product_kubed_{{ .version }}:
     identifier: overview-concepts
@@ -12,8 +12,8 @@ menu_name: product_kubed_{{ .version }}
 section_menu_id: concepts
 ---
 
-# Kubed
+# Config Syncer
 
-Kubed (pronounced Cube-Dee) by AppsCode is a Kubernetes Cluster Operator Daemon. Kubed can do the following things for you:
+Config Syncer (pronounced Cube-Dee) by AppsCode is a Kubernetes Cluster Operator Daemon. Config Syncer can do the following things for you:
 
- - Kubed can keep [ConfigMaps and Secrets synchronized across Namespaces](/docs/guides/config-syncer/).
+ - Config Syncer can keep [ConfigMaps and Secrets synchronized across Namespaces](/docs/guides/config-syncer/).

@@ -1,5 +1,5 @@
 /*
-Copyright The Kubed Authors.
+Copyright The Config Syncer Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import (
 
 // runtime.GOPath() + "/src/kubeops.dev/config-syncer/hack/config/clusterconfig.yaml"
 func NewCmdRun(out, errOut io.Writer, stopCh <-chan struct{}) *cobra.Command {
-	o := server.NewKubedOptions(out, errOut)
+	o := server.NewConfigSyncerOptions(out, errOut)
 
 	cmd := &cobra.Command{
 		Use:               "run",

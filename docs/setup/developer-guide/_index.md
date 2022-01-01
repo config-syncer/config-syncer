@@ -1,6 +1,6 @@
 ---
-title: Developer Guide | Kubed
-description: Kubed Developer Guide
+title: Developer Guide | Config Syncer
+description: Config Syncer Developer Guide
 menu:
   product_kubed_{{ .version }}:
     identifier: developer-guide
