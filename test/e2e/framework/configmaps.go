@@ -146,7 +146,8 @@ func (fi *Invocation) EventuallySyncedConfigMapsUpdated(source *core.ConfigMap) 
 				if err != nil {
 					return false
 				}
-				if !reflect.DeepEqual(source.Data, cmReplica.Data) {
+				if !reflect.DeepEqual(source.Data, cmReplica.Data) ||
+					!reflect.DeepEqual(source.BinaryData, cmReplica.BinaryData) {
 					return false
 				}
 			}
