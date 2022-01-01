@@ -40,7 +40,7 @@ func NewCmdRun(out, errOut io.Writer, stopCh <-chan struct{}) *cobra.Command {
 			cli.SendAnalytics(c, v.Version.Version)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			klog.Infoln("Starting kubed...")
+			klog.Infoln("Starting config-syncer...")
 
 			if err := o.Complete(); err != nil {
 				return err

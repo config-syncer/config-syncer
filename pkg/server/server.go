@@ -93,7 +93,7 @@ func (c *ConfigSyncerConfig) Complete() CompletedConfig {
 
 // New returns a new instance of ConfigSyncerServer from the given config.
 func (c completedConfig) New() (*ConfigSyncerServer, error) {
-	genericServer, err := c.GenericConfig.New("kubed-server", genericapiserver.NewEmptyDelegate()) // completion is done in Complete, no need for a second time
+	genericServer, err := c.GenericConfig.New("config-syncer-server", genericapiserver.NewEmptyDelegate()) // completion is done in Complete, no need for a second time
 	if err != nil {
 		return nil, err
 	}

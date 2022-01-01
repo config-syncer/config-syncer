@@ -45,7 +45,7 @@ func New(config *rest.Config) *Framework {
 	Expect(err).NotTo(HaveOccurred())
 
 	return &Framework{
-		namespace: rand.WithUniqSuffix("test-kubed"),
+		namespace: rand.WithUniqSuffix("test-config-syncer"),
 
 		ClientConfig: config,
 		KubeClient:   clientset.NewForConfigOrDie(config),
@@ -56,7 +56,7 @@ func New(config *rest.Config) *Framework {
 func (f *Framework) Invoke() *Invocation {
 	return &Invocation{
 		Framework: f,
-		app:       rand.WithUniqSuffix("kubed-e2e"),
+		app:       rand.WithUniqSuffix("config-syncer-e2e"),
 	}
 }
 

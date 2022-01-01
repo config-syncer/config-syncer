@@ -49,7 +49,7 @@ type Operator struct {
 }
 
 func (op *Operator) Configure() error {
-	klog.Infoln("configuring kubed ...")
+	klog.Infoln("configuring config-syncer ...")
 
 	return op.configSyncer.Configure(op.Config.ClusterName, op.Config.KubeConfigFile)
 }
@@ -93,5 +93,5 @@ func (op *Operator) Run(stopCh <-chan struct{}) {
 	}
 
 	<-stopCh
-	klog.Infoln("Stopping kubed controller")
+	klog.Infoln("Stopping config-syncer controller")
 }

@@ -28,7 +28,7 @@ import (
 
 func NewCmdConfigSyncer(version string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:               "kubed",
+		Use:               "config-syncer",
 		Short:             `Config Syncer by AppsCode - A Kubernetes Cluster Operator Daemon`,
 		Long:              `Config Syncer is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/kubeops/config-syncer/tree/master/docs`,
 		DisableAutoGenTag: true,

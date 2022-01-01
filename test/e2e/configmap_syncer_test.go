@@ -287,7 +287,7 @@ var _ = Describe("Config-Syncer", func() {
 	Describe("Across Cluster", func() {
 		Context("ConfigMap Context Syncer Test", func() {
 			var (
-				kubeConfigPath = "/home/dipta/all/kubed-test/kubeconfig"
+				kubeConfigPath = "/home/dipta/all/config-syncer-test/kubeconfig"
 				ctx            = "gke_tigerworks-kube_us-central1-f_kite"
 			)
 

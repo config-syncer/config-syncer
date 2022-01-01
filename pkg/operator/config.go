@@ -61,7 +61,7 @@ func (c *OperatorConfig) New() (*Operator, error) {
 		KubeClient:   c.KubeClient,
 	}
 
-	op.recorder = eventer.NewEventRecorder(op.KubeClient, "kubed")
+	op.recorder = eventer.NewEventRecorder(op.KubeClient, "config-syncer")
 	op.configSyncer = syncer.New(op.KubeClient, op.recorder)
 
 	if err := op.Configure(); err != nil {
