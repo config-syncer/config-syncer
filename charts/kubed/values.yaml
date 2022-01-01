@@ -12,7 +12,7 @@ replicaCount: 1
 
 operator:
   # Docker registry used to pull Config Syncer operator image
-  registry: registry.byte.builders/appscode
+  registry: appscode
   # Config Syncer operator container image
   repository: kubed
   # Config Syncer operator container image tag
