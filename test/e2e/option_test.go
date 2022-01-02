@@ -23,7 +23,6 @@ import (
 	"testing"
 
 	"gomodules.xyz/logs"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/util/homedir"
 )
 
@@ -58,7 +57,6 @@ func enableLogging() {
 		logs.InitLogs()
 		defer logs.FlushLogs()
 	}()
-	utilruntime.Must(flag.Set("logtostderr", "true"))
 	logLevelFlag := flag.Lookup("v")
 	if logLevelFlag != nil {
 		if len(logLevelFlag.Value.String()) > 0 && logLevelFlag.Value.String() != "0" {

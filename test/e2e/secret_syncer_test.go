@@ -134,6 +134,9 @@ var _ = Describe("Secret-Syncer", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				source, _, err = core_util.PatchSecret(context.TODO(), f.KubeClient, source, func(obj *core.Secret) *core.Secret {
+					if obj.Data == nil {
+						obj.Data = map[string][]byte{}
+					}
 					obj.Data["data"] = []byte("test")
 					return obj
 				}, metav1.PatchOptions{})
@@ -289,7 +292,7 @@ var _ = Describe("Secret-Syncer", func() {
 				f.DeleteNamespaceForContext(kubeConfigPath, ctx)
 			})
 
-			It("Should add secret to contexts", func() {
+			XIt("Should add secret to contexts", func() {
 				By("Creating source ns in remote cluster")
 				f.EnsureNamespaceForContext(kubeConfigPath, ctx)
 
