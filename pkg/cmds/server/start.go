@@ -17,6 +17,7 @@ limitations under the License.
 package server
 
 import (
+	"fmt"
 	"io"
 	"net"
 
@@ -25,8 +26,10 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/pflag"
+	"k8s.io/apiserver/pkg/features"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
+	"k8s.io/apiserver/pkg/util/feature"
 	"kmodules.xyz/client-go/tools/clientcmd"
 )
 
@@ -41,6 +44,7 @@ type ConfigSyncerOptions struct {
 }
 
 func NewConfigSyncerOptions(out, errOut io.Writer) *ConfigSyncerOptions {
+	_ = feature.DefaultMutableFeatureGate.Set(fmt.Sprintf("%s=false", features.APIPriorityAndFairness))
 	o := &ConfigSyncerOptions{
 		// TODO we will nil out the etcd storage options.  This requires a later level of k8s.io/apiserver
 		RecommendedOptions: genericoptions.NewRecommendedOptions(
