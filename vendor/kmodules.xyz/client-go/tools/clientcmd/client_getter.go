@@ -23,9 +23,9 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
-	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 )
 
 type restClientGetter struct {
@@ -53,12 +53,11 @@ func (r restClientGetter) ToDiscoveryClient() (discovery.CachedDiscoveryInterfac
 }
 
 func (r restClientGetter) ToRESTMapper() (meta.RESTMapper, error) {
-	config, err := r.ToRESTConfig()
+	client, err := r.ToDiscoveryClient()
 	if err != nil {
 		return nil, err
 	}
-
-	return apiutil.NewDynamicRESTMapper(config)
+	return restmapper.NewDeferredDiscoveryRESTMapper(client), nil
 }
 
 func (r restClientGetter) ToRawKubeConfigLoader() clientcmd.ClientConfig {

@@ -23,7 +23,7 @@ require (
 	k8s.io/apiserver v0.21.1
 	k8s.io/client-go v0.21.1
 	k8s.io/klog/v2 v2.8.0
-	kmodules.xyz/client-go v0.0.0-20211231190151-a89b45cbdb3b
+	kmodules.xyz/client-go v0.0.0-20210719120358-dd0503cf99cf
 )
 
 require (

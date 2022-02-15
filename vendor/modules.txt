@@ -1141,8 +1141,8 @@ k8s.io/utils/net
 k8s.io/utils/path
 k8s.io/utils/pointer
 k8s.io/utils/trace
-# kmodules.xyz/client-go v0.0.0-20211231190151-a89b45cbdb3b
-## explicit; go 1.17
+# kmodules.xyz/client-go v0.0.0-20210719120358-dd0503cf99cf
+## explicit; go 1.12
 kmodules.xyz/client-go
 kmodules.xyz/client-go/api/v1
 kmodules.xyz/client-go/apiextensions/v1beta1
@@ -1160,9 +1160,7 @@ sigs.k8s.io/apiserver-network-proxy/konnectivity-client/pkg/client
 sigs.k8s.io/apiserver-network-proxy/konnectivity-client/proto/client
 # sigs.k8s.io/controller-runtime v0.9.0
 ## explicit; go 1.16
-sigs.k8s.io/controller-runtime/pkg/client
 sigs.k8s.io/controller-runtime/pkg/client/apiutil
-sigs.k8s.io/controller-runtime/pkg/log
 # sigs.k8s.io/kustomize/api v0.8.8
 ## explicit; go 1.16
 sigs.k8s.io/kustomize/api/builtins

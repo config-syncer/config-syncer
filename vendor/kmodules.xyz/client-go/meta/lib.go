@@ -72,7 +72,7 @@ func GetKind(v interface{}) string {
 }
 
 func FilterKeys(domainKey string, out, in map[string]string) map[string]string {
-	if len(in) == 0 {
+	if in == nil {
 		return out
 	}
 	if out == nil {
@@ -102,7 +102,7 @@ func FilterKeys(domainKey string, out, in map[string]string) map[string]string {
 }
 
 func MergeKeys(out, in map[string]string) map[string]string {
-	if len(in) == 0 {
+	if in == nil {
 		return out
 	}
 	if out == nil {
@@ -117,22 +117,16 @@ func MergeKeys(out, in map[string]string) map[string]string {
 	return out
 }
 
-func OverwriteKeys(out map[string]string, ins ...map[string]string) map[string]string {
-	if len(ins) == 0 {
+func OverwriteKeys(out, in map[string]string) map[string]string {
+	if in == nil {
 		return out
 	}
 	if out == nil {
-		n := 0
-		for _, in := range ins {
-			n += len(in)
-		}
-		out = make(map[string]string, n)
+		out = make(map[string]string, len(in))
 	}
 
-	for _, in := range ins {
-		for k, v := range in {
-			out[k] = v
-		}
+	for k, v := range in {
+		out[k] = v
 	}
 	return out
 }
