@@ -4,10 +4,11 @@
 
 ## TL;DR;
 
-```console
+```bash
 $ helm repo add appscode https://charts.appscode.com/stable/
 $ helm repo update
-$ helm install kubed appscode/kubed -n kube-system
+$ helm search repo appscode/kubed --version=v0.13.2
+$ helm upgrade -i kubed appscode/kubed -n kube-system --create-namespace --version=v0.13.2
 ```
 
 ## Introduction
@@ -20,10 +21,10 @@ This chart deploys a Config Syncer operator on a [Kubernetes](http://kubernetes.
 
 ## Installing the Chart
 
-To install the chart with the release name `kubed`:
+To install/upgrade the chart with the release name `kubed`:
 
-```console
-$ helm install kubed appscode/kubed -n kube-system
+```bash
+$ helm upgrade -i kubed appscode/kubed -n kube-system --create-namespace --version=v0.13.2
 ```
 
 The command deploys a Config Syncer operator on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
@@ -32,10 +33,10 @@ The command deploys a Config Syncer operator on the Kubernetes cluster in the de
 
 ## Uninstalling the Chart
 
-To uninstall/delete the `kubed`:
+To uninstall the `kubed`:
 
-```console
-$ helm delete kubed -n kube-system
+```bash
+$ helm uninstall kubed -n kube-system
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -80,15 +81,15 @@ The following table lists the configurable parameters of the `kubed` chart and t
 | config.kubeconfigContent             | kubeconfig file content for configmap and secret syncer                                                                                                                                                                            | <code>""</code>                |
 
 
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
+Specify each parameter using the `--set key=value[,key=value]` argument to `helm upgrade -i`. For example:
 
-```console
-$ helm install kubed appscode/kubed -n kube-system --set replicaCount=1
+```bash
+$ helm upgrade -i kubed appscode/kubed -n kube-system --create-namespace --version=v0.13.2 --set replicaCount=1
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while
 installing the chart. For example:
 
-```console
-$ helm install kubed appscode/kubed -n kube-system --values values.yaml
+```bash
+$ helm upgrade -i kubed appscode/kubed -n kube-system --create-namespace --version=v0.13.2 --values values.yaml
 ```
