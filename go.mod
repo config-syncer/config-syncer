@@ -4,12 +4,13 @@ go 1.17
 
 require (
 	github.com/gogo/protobuf v1.3.2
-	github.com/json-iterator/go v1.1.11
+	github.com/json-iterator/go v1.1.12
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.13.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5
+	golang.org/x/text v0.3.7
 	gomodules.xyz/blobfs v0.1.10
 	gomodules.xyz/cert v1.5.0
 	gomodules.xyz/encoding v0.0.2
@@ -78,7 +79,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/moby/spdystream v0.2.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
@@ -108,7 +109,6 @@ require (
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a // indirect
 	golang.org/x/sys v0.0.0-20210817190340-bfb29a6856f2 // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
-	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gomodules.xyz/clock v0.0.0-20200817085942-06523dba733f // indirect
