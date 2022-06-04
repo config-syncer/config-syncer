@@ -18,11 +18,7 @@ package healthz
 
 import (
 	"bytes"
-	"crypto/sha256"
-	"crypto/x509"
-	"encoding/hex"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strings"
@@ -34,7 +30,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apiserver/pkg/endpoints/metrics"
 	"k8s.io/apiserver/pkg/server/httplog"
-	"k8s.io/client-go/util/cert"
 	"k8s.io/klog/v2"
 )
 
@@ -145,6 +140,12 @@ func InstallReadyzHandler(mux mux, checks ...HealthChecker) {
 	InstallPathHandler(mux, "/readyz", checks...)
 }
 
+// InstallReadyzHandlerWithHealthyFunc is like InstallReadyzHandler, but in addition call firstTimeReady
+// the first time /readyz succeeds.
+func InstallReadyzHandlerWithHealthyFunc(mux mux, firstTimeReady func(), checks ...HealthChecker) {
+	InstallPathHandlerWithHealthyFunc(mux, "/readyz", firstTimeReady, checks...)
+}
+
 // InstallLivezHandler registers handlers for liveness checking on the path
 // "/livez" to mux. *All handlers* for mux must be specified in
 // exactly one call to InstallHandler. Calling InstallHandler more
@@ -159,6 +160,12 @@ func InstallLivezHandler(mux mux, checks ...HealthChecker) {
 // InstallPathHandler more than once for the same path and mux will
 // result in a panic.
 func InstallPathHandler(mux mux, path string, checks ...HealthChecker) {
+	InstallPathHandlerWithHealthyFunc(mux, path, nil, checks...)
+}
+
+// InstallPathHandlerWithHealthyFunc is like InstallPathHandler, but calls firstTimeHealthy exactly once
+// when the handler succeeds for the first time.
+func InstallPathHandlerWithHealthyFunc(mux mux, path string, firstTimeHealthy func(), checks ...HealthChecker) {
 	if len(checks) == 0 {
 		klog.V(5).Info("No default health checks specified. Installing the ping handler.")
 		checks = []HealthChecker{PingHealthz}
@@ -177,7 +184,7 @@ func InstallPathHandler(mux mux, path string, checks ...HealthChecker) {
 			/* component = */ "",
 			/* deprecated */ false,
 			/* removedRelease */ "",
-			handleRootHealth(name, checks...)))
+			handleRootHealth(name, firstTimeHealthy, checks...)))
 	for _, check := range checks {
 		mux.Handle(fmt.Sprintf("%s/%v", path, check.Name()), adaptCheckToHandler(check.Check))
 	}
@@ -214,8 +221,9 @@ func getExcludedChecks(r *http.Request) sets.String {
 }
 
 // handleRootHealth returns an http.HandlerFunc that serves the provided checks.
-func handleRootHealth(name string, checks ...HealthChecker) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func handleRootHealth(name string, firstTimeHealthy func(), checks ...HealthChecker) http.HandlerFunc {
+	var notifyOnce sync.Once
+	return func(w http.ResponseWriter, r *http.Request) {
 		excluded := getExcludedChecks(r)
 		// failedVerboseLogOutput is for output to the log.  It indicates detailed failed output information for the log.
 		var failedVerboseLogOutput bytes.Buffer
@@ -247,8 +255,14 @@ func handleRootHealth(name string, checks ...HealthChecker) http.HandlerFunc {
 		// always be verbose on failure
 		if len(failedChecks) > 0 {
 			klog.V(2).Infof("%s check failed: %s\n%v", strings.Join(failedChecks, ","), name, failedVerboseLogOutput.String())
-			http.Error(httplog.Unlogged(r, w), fmt.Sprintf("%s%s check failed", individualCheckOutput.String(), name), http.StatusInternalServerError)
+			httplog.SetStacktracePredicate(r.Context(), func(int) bool { return false })
+			http.Error(w, fmt.Sprintf("%s%s check failed", individualCheckOutput.String(), name), http.StatusInternalServerError)
 			return
+		}
+
+		// signal first time this is healthy
+		if firstTimeHealthy != nil {
+			notifyOnce.Do(firstTimeHealthy)
 		}
 
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
@@ -260,7 +274,7 @@ func handleRootHealth(name string, checks ...HealthChecker) http.HandlerFunc {
 
 		individualCheckOutput.WriteTo(w)
 		fmt.Fprintf(w, "%s check passed\n", name)
-	})
+	}
 }
 
 // adaptCheckToHandler returns an http.HandlerFunc that serves the provided checks.
@@ -293,70 +307,4 @@ func formatQuoted(names ...string) string {
 		quoted = append(quoted, fmt.Sprintf("%q", name))
 	}
 	return strings.Join(quoted, ",")
-}
-
-// CertHealthz returns true if tls.crt is unchanged when checked
-func NewCertHealthz(certFile string) (HealthChecker, error) {
-	var hash string
-	if certFile != "" {
-		var err error
-		hash, err = calculateHash(certFile)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return &certChecker{certFile: certFile, initialHash: hash}, nil
-}
-
-// certChecker fails health check if server certificate changes.
-type certChecker struct {
-	certFile    string
-	initialHash string
-}
-
-func (certChecker) Name() string {
-	return "cert-checker"
-}
-
-// CertHealthz is a health check that returns true.
-func (c certChecker) Check(_ *http.Request) error {
-	if c.certFile == "" {
-		return nil
-	}
-	hash, err := calculateHash(c.certFile)
-	if err != nil {
-		return err
-	}
-	if c.initialHash != hash {
-		return fmt.Errorf("certificate hash changed from %s to %s", c.initialHash, hash)
-	}
-	return nil
-}
-
-func calculateHash(certFile string) (string, error) {
-	crtBytes, err := ioutil.ReadFile(certFile)
-	if err != nil {
-		return "", fmt.Errorf("failed to read certificate `%s`. Reason: %v", certFile, err)
-	}
-	crt, err := cert.ParseCertsPEM(crtBytes)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse certificate `%s`. Reason: %v", certFile, err)
-	}
-	return Hash(crt[0]), nil
-}
-
-// ref: https://github.com/kubernetes/kubernetes/blob/197fc67693c2391dcbc652fc185ba85b5ef82a8e/cmd/kubeadm/app/util/pubkeypin/pubkeypin.go#L77
-
-const (
-	// formatSHA256 is the prefix for pins that are full-length SHA-256 hashes encoded in base 16 (hex)
-	formatSHA256 = "sha256"
-)
-
-// Hash calculates the SHA-256 hash of the Subject Public Key Information (SPKI)
-// object in an x509 certificate (in DER encoding). It returns the full hash as a
-// hex encoded string (suitable for passing to Set.Allow).
-func Hash(certificate *x509.Certificate) string {
-	// ref: https://tools.ietf.org/html/rfc5280#section-4.1.2.7
-	spkiHash := sha256.Sum256(certificate.RawSubjectPublicKeyInfo)
-	return formatSHA256 + ":" + strings.ToLower(hex.EncodeToString(spkiHash[:]))
 }

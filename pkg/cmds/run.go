@@ -22,9 +22,7 @@ import (
 	"kubeops.dev/config-syncer/pkg/cmds/server"
 
 	"github.com/spf13/cobra"
-	v "gomodules.xyz/x/version"
 	"k8s.io/klog/v2"
-	"kmodules.xyz/client-go/tools/cli"
 )
 
 // runtime.GOPath() + "/src/kubeops.dev/config-syncer/hack/config/clusterconfig.yaml"
@@ -36,9 +34,6 @@ func NewCmdRun(out, errOut io.Writer, stopCh <-chan struct{}) *cobra.Command {
 		Short:             "Launch Kubernetes Cluster Daemon",
 		Long:              "Launch Kubernetes Cluster Daemon",
 		DisableAutoGenTag: true,
-		PreRun: func(c *cobra.Command, args []string) {
-			cli.SendAnalytics(c, v.Version.Version)
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			klog.Infoln("Starting config-syncer...")
 

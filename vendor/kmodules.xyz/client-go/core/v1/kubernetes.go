@@ -19,8 +19,6 @@ package v1
 import (
 	"sort"
 
-	meta_util "kmodules.xyz/client-go/meta"
-
 	jsoniter "github.com/json-iterator/go"
 	"gomodules.xyz/mergo"
 	core "k8s.io/api/core/v1"
@@ -93,6 +91,7 @@ func UpsertContainer(containers []core.Container, upsert core.Container) []core.
 			container.Env = upsert.Env
 			container.VolumeMounts = upsert.VolumeMounts
 			container.VolumeDevices = upsert.VolumeDevices
+			container.Resources = upsert.Resources
 			containers[i] = container
 			return containers
 		}
@@ -101,11 +100,20 @@ func UpsertContainer(containers []core.Container, upsert core.Container) []core.
 }
 
 func UpsertContainers(containers []core.Container, addons []core.Container) []core.Container {
-	var out = containers
+	out := containers
 	for _, c := range addons {
 		out = UpsertContainer(out, c)
 	}
 	return out
+}
+
+func DeleteContainer(containers []core.Container, name string) []core.Container {
+	for i, v := range containers {
+		if v.Name == name {
+			return append(containers[:i], containers[i+1:]...)
+		}
+	}
+	return containers
 }
 
 func UpsertVolume(volumes []core.Volume, nv ...core.Volume) []core.Volume {
@@ -259,11 +267,6 @@ func EnsureEnvVarDeleted(vars []core.EnvVar, name string) []core.EnvVar {
 		}
 	}
 	return vars
-}
-
-// Deprecated use meta_util.OverwriteKeys()
-func UpsertMap(maps, upsert map[string]string) map[string]string {
-	return meta_util.OverwriteKeys(maps, upsert)
 }
 
 func MergeLocalObjectReferences(l1, l2 []core.LocalObjectReference) []core.LocalObjectReference {

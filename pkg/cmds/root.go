@@ -23,7 +23,6 @@ import (
 	v "gomodules.xyz/x/version"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	_ "k8s.io/client-go/kubernetes/fake"
-	"kmodules.xyz/client-go/tools/cli"
 )
 
 func NewCmdConfigSyncer(version string) *cobra.Command {
@@ -32,11 +31,7 @@ func NewCmdConfigSyncer(version string) *cobra.Command {
 		Short:             `Config Syncer by AppsCode - A Kubernetes Cluster Operator Daemon`,
 		Long:              `Config Syncer is a Kubernetes daemon to perform cluster management tasks. For more information, visit here: https://github.com/kubeops/config-syncer/tree/master/docs`,
 		DisableAutoGenTag: true,
-		PersistentPreRun: func(c *cobra.Command, args []string) {
-			cli.SendAnalytics(c, v.Version.Version)
-		},
 	}
-	cmd.PersistentFlags().BoolVar(&cli.EnableAnalytics, "enable-analytics", cli.EnableAnalytics, "send usage events to Google Analytics")
 
 	stopCh := genericapiserver.SetupSignalHandler()
 	cmd.AddCommand(NewCmdRun(os.Stdout, os.Stderr, stopCh))
