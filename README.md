@@ -1,6 +1,5 @@
 [![Build Status](https://github.com/kubeops/config-syncer/workflows/CI/badge.svg)](https://github.com/kubeops/config-syncer/actions?workflow=CI)
 [![Docker Pulls](https://img.shields.io/docker/pulls/appscode/kubed.svg)](https://hub.docker.com/r/appscode/kubed/)
-[![Slack](https://shields.io/badge/Join_Slack-salck?color=4A154B&logo=slack)](https://slack.appscode.com)
 [![Twitter](https://img.shields.io/twitter/follow/kubeops.svg?style=social&logo=twitter&label=Follow)](https://twitter.com/intent/follow?screen_name=Kubeops)
 
 # Config Syncer (previously Kubed)
@@ -27,6 +26,6 @@ Want to help improve Config Syncer? Please start [here](https://appscode.com/pro
 
 ## Support
 
-We use Slack for public discussions. To chit chat with us or the rest of the community, join us in the [AppsCode Slack team](https://appscode.slack.com/messages/C6HSHCKBL/details/) channel `#kubed`. To sign up, use our [Slack inviter](https://slack.appscode.com/).
+To speak with us, please leave a message on [our website](https://appscode.com/contact/). To receive product announcements, follow us on [Twitter](https://twitter.com/AppsCodeHQ).
 
 If you have found a bug with Config Syncer or want to request for new features, please [file an issue](https://github.com/kubeops/config-syncer/issues/new).
