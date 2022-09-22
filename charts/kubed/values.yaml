@@ -81,12 +81,13 @@ apiserver:
     # If true, generates on install/upgrade the certs that allow the kube-apiserver (and potentially ServiceMonitor)
     # to authenticate operators pods. Otherwise specify certs in `apiserver.servingCerts.{caCrt, serverCrt, serverKey}`.
     generate: true
-    # CA certficate used by serving certificate of Config Syncer server.
-    caCrt: ""
     # Serving certficate used by Config Syncer server.
     serverCrt: ""
     # Private key for the serving certificate used by Config Syncer server.
     serverKey: ""
+    # Use an existing secret instead of creating one. Takes presedence over
+    # `generate`, `caCrt`, `serverCrt` and `serverKey` if not empty.
+    existingSecret: ""
 
 # If true, sends usage analytics
 enableAnalytics: true
