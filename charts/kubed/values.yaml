@@ -40,6 +40,8 @@ criticalAddon: false
 # Log level for operator
 logLevel: 3
 
+podLabels: {}
+
 # Annotations applied to operator deployment
 annotations: {}
 
