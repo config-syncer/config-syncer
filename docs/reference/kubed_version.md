@@ -28,7 +28,6 @@ kubed version [flags]
 ### Options inherited from parent commands
 
 ```
-      --enable-analytics                 send usage events to Google Analytics (default true)
       --use-kubeapiserver-fqdn-for-aks   if true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 (default true)
 ```
 

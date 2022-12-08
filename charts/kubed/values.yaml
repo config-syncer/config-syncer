@@ -88,9 +88,6 @@ apiserver:
     # Private key for the serving certificate used by Config Syncer server.
     serverKey: ""
 
-# If true, sends usage analytics
-enableAnalytics: true
-
 config:
   # Set cluster-name to something meaningful to you, say, prod, prod-us-east, qa, etc.
   # so that you can distinguish notifications sent by kubed
