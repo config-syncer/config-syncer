@@ -26,6 +26,7 @@ API_GROUPS           ?= kubed:v1alpha1
 
 # Where to push the docker image.
 REGISTRY ?= appscode
+SRC_REG  ?=
 
 # This version-strategy uses git tags to set the version string
 git_branch       := $(shell git rev-parse --abbrev-ref HEAD)
@@ -232,6 +233,7 @@ $(OUTBIN): .go/$(OUTBIN).stamp
 DOTFILE_IMAGE    = $(subst /,_,$(IMAGE))-$(TAG)
 
 container: bin/.container-$(DOTFILE_IMAGE)-PROD bin/.container-$(DOTFILE_IMAGE)-DBG
+ifeq (,$(SRC_REG))
 bin/.container-$(DOTFILE_IMAGE)-%: bin/$(OS)_$(ARCH)/$(BIN) $(DOCKERFILE_%)
 	@echo "container: $(IMAGE):$(TAG_$*)"
 	@sed                                    \
@@ -240,9 +242,15 @@ bin/.container-$(DOTFILE_IMAGE)-%: bin/$(OS)_$(ARCH)/$(BIN) $(DOCKERFILE_%)
 		-e 's|{ARG_OS}|$(OS)|g'             \
 		-e 's|{ARG_FROM}|$(BASEIMAGE_$*)|g' \
 		$(DOCKERFILE_$*) > bin/.dockerfile-$*-$(OS)_$(ARCH)
-	@DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform $(OS)/$(ARCH) --load --pull -t $(IMAGE):$(TAG_$*) -f bin/.dockerfile-$*-$(OS)_$(ARCH) .
+	@docker buildx build --platform $(OS)/$(ARCH) --load --pull -t $(IMAGE):$(TAG_$*) -f bin/.dockerfile-$*-$(OS)_$(ARCH) .
 	@docker images -q $(IMAGE):$(TAG_$*) > $@
 	@echo
+else
+bin/.container-$(DOTFILE_IMAGE)-%:
+	@echo "container: $(IMAGE):$(TAG_$*)"
+	@docker tag $(SRC_REG)/$(BIN):$(TAG_$*) $(IMAGE):$(TAG_$*)
+	@echo
+endif
 
 push: bin/.push-$(DOTFILE_IMAGE)-PROD bin/.push-$(DOTFILE_IMAGE)-DBG
 bin/.push-$(DOTFILE_IMAGE)-%: bin/.container-$(DOTFILE_IMAGE)-%
@@ -253,8 +261,8 @@ bin/.push-$(DOTFILE_IMAGE)-%: bin/.container-$(DOTFILE_IMAGE)-%
 .PHONY: docker-manifest
 docker-manifest: docker-manifest-PROD docker-manifest-DBG
 docker-manifest-%:
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create -a $(IMAGE):$(VERSION_$*) $(foreach PLATFORM,$(DOCKER_PLATFORMS),$(IMAGE):$(VERSION_$*)_$(subst /,_,$(PLATFORM)))
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push $(IMAGE):$(VERSION_$*)
+	docker manifest create -a $(IMAGE):$(VERSION_$*) $(foreach PLATFORM,$(DOCKER_PLATFORMS),$(IMAGE):$(VERSION_$*)_$(subst /,_,$(PLATFORM)))
+	docker manifest push $(IMAGE):$(VERSION_$*)
 
 .PHONY: test
 test: unit-tests e2e-tests

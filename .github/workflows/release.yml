@@ -4,11 +4,12 @@ on:
   push:
     tags:
       - "*.*"
-
   workflow_dispatch:
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
+
 jobs:
   build:
     name: Build
@@ -31,7 +32,7 @@ jobs:
 
       - name: Publish to GitHub Container Registry
         env:
-          REGISTRY: ghcr.io/kubeops
+          REGISTRY: ghcr.io/appscode
           DOCKER_TOKEN: ${{ secrets.LGTM_GITHUB_TOKEN }}
           USERNAME: 1gtm
           APPSCODE_ENV: prod
@@ -41,6 +42,7 @@ jobs:
 
       - name: Publish to Docker Registry
         env:
+          SRC_REG: ghcr.io/appscode
           DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           USERNAME: 1gtm
           APPSCODE_ENV: prod
