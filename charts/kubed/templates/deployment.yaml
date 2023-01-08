@@ -96,7 +96,11 @@ spec:
       - name: serving-cert
         secret:
           defaultMode: 420
+          {{- if .Values.apiserver.servingCerts.existingSecret }}
+          secretName: {{ .Values.apiserver.servingCerts.existingSecret }}
+          {{- else }}
           secretName: {{ template "kubed.fullname" . }}-apiserver-cert
+          {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
     {{- if or .Values.tolerations $criticalAddon }}
