@@ -17,6 +17,8 @@ limitations under the License.
 package v1
 
 import (
+	"fmt"
+
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -43,7 +45,7 @@ type Condition struct {
 	Type string `json:"type" protobuf:"bytes,1,opt,name=type"`
 	// Status of the condition, one of True, False, Unknown.
 	// +required
-	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status"`
+	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
 	// If set, this represents the .metadata.generation that the condition was set based upon.
 	// For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
 	// with respect to the current state of the instance.
@@ -167,4 +169,38 @@ func IsConditionUnknown(conditions []Condition, condType string) bool {
 		}
 	}
 	return false
+}
+
+// Status defines the set of statuses a resource can have.
+// Based on kstatus: https://github.com/kubernetes-sigs/cli-utils/tree/master/pkg/kstatus
+// +kubebuilder:validation:Enum=InProgress;Failed;Current;Terminating;NotFound;Unknown
+type Status string
+
+const (
+	// The set of status conditions which can be assigned to resources.
+	InProgressStatus  Status = "InProgress"
+	FailedStatus      Status = "Failed"
+	CurrentStatus     Status = "Current"
+	TerminatingStatus Status = "Terminating"
+	NotFoundStatus    Status = "NotFound"
+	UnknownStatus     Status = "Unknown"
+)
+
+var Statuses = []Status{InProgressStatus, FailedStatus, CurrentStatus, TerminatingStatus, UnknownStatus}
+
+// String returns the status as a string.
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusFromStringOrDie turns a string into a Status. Will panic if the provided string is
+// not a valid status.
+func StatusFromStringOrDie(text string) Status {
+	s := Status(text)
+	for _, r := range Statuses {
+		if s == r {
+			return s
+		}
+	}
+	panic(fmt.Errorf("string has invalid status: %s", s))
 }

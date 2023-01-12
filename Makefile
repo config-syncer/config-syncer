@@ -370,7 +370,6 @@ lint: $(BUILD_DIRS)
 	    -v $$(pwd)/.go/cache:/.cache                            \
 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
-	    --env GO111MODULE=on                                    \
 	    --env GOFLAGS="-mod=vendor"                             \
 	    $(BUILD_IMAGE)                                          \
 	    golangci-lint run --enable $(ADDTL_LINTERS) --timeout=10m --skip-files="generated.*\.go$\" --skip-dirs-use-default --skip-dirs=client,vendor
@@ -378,7 +377,9 @@ lint: $(BUILD_DIRS)
 $(BUILD_DIRS):
 	@mkdir -p $@
 
-REGISTRY_SECRET ?=
+KUBE_NAMESPACE    ?= kubeops
+REGISTRY_SECRET   ?=
+IMAGE_PULL_POLICY ?= IfNotPresent
 
 ifeq ($(strip $(REGISTRY_SECRET)),)
 	IMAGE_PULL_SECRETS =
@@ -388,16 +389,17 @@ endif
 
 .PHONY: install
 install:
-	helm install config-syncer charts/config-syncer --wait \
-		--namespace=kubeops --create-namespace \
-		--set coperator.registry=$(REGISTRY) \
+	@helm upgrade -i config-syncer charts/config-syncer --wait \
+		--namespace=$(KUBE_NAMESPACE) --create-namespace \
+		--set operator.registry=$(REGISTRY) \
 		--set operator.tag=$(TAG) \
-		--set imagePullPolicy=Always \
+		--set imagePullPolicy=$(IMAGE_PULL_POLICY) \
 		$(IMAGE_PULL_SECRETS)
 
 .PHONY: uninstall
 uninstall:
-	@helm uninstall config-syncer --namespace=kubeops || true
+	@cd ../installer; \
+	helm uninstall config-syncer --namespace=$(KUBE_NAMESPACE) || true
 
 .PHONY: purge
 purge: uninstall
@@ -411,8 +413,8 @@ verify: verify-gen verify-modules
 
 .PHONY: verify-modules
 verify-modules:
-	GO111MODULE=on go mod tidy
-	GO111MODULE=on go mod vendor
+	go mod tidy
+	go mod vendor
 	@if !(git diff --exit-code HEAD); then \
 		echo "go module files are out of date"; exit 1; \
 	fi
@@ -482,10 +484,22 @@ clean:
 
 .PHONY: run
 run:
-	GO111MODULE=on go run -mod=vendor ./cmd/kubed run \
+	go run -mod=vendor ./cmd/config-syncer run \
 		--v=3 \
 		--secure-port=8443 \
 		--kubeconfig=$(KUBECONFIG) \
 		--authorization-kubeconfig=$(KUBECONFIG) \
 		--authentication-kubeconfig=$(KUBECONFIG) \
 		--authentication-skip-lookup
+
+.PHONY: push-to-kind
+push-to-kind: container
+	@echo "Loading docker image into kind cluster...."
+	@kind load docker-image $(IMAGE):$(TAG_PROD)
+	@echo "Image has been pushed successfully into kind cluster."
+
+.PHONY: deploy-to-kind
+deploy-to-kind: push-to-kind install
+
+.PHONY: deploy
+deploy: uninstall push install

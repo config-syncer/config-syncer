@@ -19,6 +19,8 @@ package discovery
 import (
 	"context"
 	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/pkg/errors"
@@ -27,6 +29,7 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
+	"kmodules.xyz/apiversion"
 )
 
 func GetVersion(client discovery.DiscoveryInterface) (string, error) {
@@ -96,7 +99,19 @@ func CheckAPIVersion(client discovery.DiscoveryInterface, constraint string) (bo
 }
 
 func IsPreferredAPIResource(client discovery.DiscoveryInterface, groupVersion, kind string) bool {
-	return ExistsGroupVersionKind(client, groupVersion, kind)
+	if resourceList, err := client.ServerPreferredResources(); discovery.IsGroupDiscoveryFailedError(err) || err == nil {
+		for _, resources := range resourceList {
+			if resources.GroupVersion != groupVersion {
+				continue
+			}
+			for _, resource := range resources.APIResources {
+				if resource.Kind == kind && !strings.ContainsRune(resource.Name, '/') {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 func ExistsGroupVersionKind(client discovery.DiscoveryInterface, groupVersion, kind string) bool {
@@ -106,7 +121,7 @@ func ExistsGroupVersionKind(client discovery.DiscoveryInterface, groupVersion, k
 				continue
 			}
 			for _, resource := range resources.APIResources {
-				if resource.Kind == kind {
+				if resource.Kind == kind && !strings.ContainsRune(resource.Name, '/') {
 					return true
 				}
 			}
@@ -126,7 +141,7 @@ func ExistsGroupKind(client discovery.DiscoveryInterface, group, kind string) bo
 				continue
 			}
 			for _, resource := range resources.APIResources {
-				if resource.Kind == kind {
+				if resource.Kind == kind && !strings.ContainsRune(resource.Name, '/') {
 					return true
 				}
 			}
@@ -266,4 +281,49 @@ func checkVersion(v *semver.Version, multiMaster bool, constraint string, blackL
 		}
 	}
 	return nil
+}
+
+func HasGVK(client discovery.DiscoveryInterface, groupVersion, kind string) (bool, error) {
+	_, resourceList, err := client.ServerGroupsAndResources()
+	if discovery.IsGroupDiscoveryFailedError(err) || err == nil {
+		for _, resources := range resourceList {
+			if resources.GroupVersion != groupVersion {
+				continue
+			}
+			for _, resource := range resources.APIResources {
+				if resource.Kind == kind && !strings.ContainsRune(resource.Name, '/') {
+					return true, nil
+				}
+			}
+		}
+	}
+	return false, err
+}
+
+func ListAPIVersions(c discovery.DiscoveryInterface, group, kind string) ([]string, error) {
+	_, resourceList, err := c.ServerGroupsAndResources()
+
+	out := make([]string, 0)
+	if discovery.IsGroupDiscoveryFailedError(err) || err == nil {
+		for _, resources := range resourceList {
+			gv, err := schema.ParseGroupVersion(resources.GroupVersion)
+			if err != nil {
+				return nil, err
+			}
+			if gv.Group != group {
+				continue
+			}
+			for _, resource := range resources.APIResources {
+				if resource.Kind == kind && !strings.ContainsRune(resource.Name, '/') {
+					out = append(out, gv.Version)
+				}
+			}
+		}
+	}
+	if len(out) > 1 {
+		sort.Slice(out, func(i, j int) bool {
+			return apiversion.MustCompare(out[i], out[j]) > 0
+		})
+	}
+	return out, nil
 }

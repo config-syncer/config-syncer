@@ -24,7 +24,7 @@ import (
 	"kubeops.dev/config-syncer/pkg/syncer"
 	"kubeops.dev/config-syncer/test/e2e/framework"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
