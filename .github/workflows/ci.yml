@@ -52,6 +52,12 @@ jobs:
         run: |
           make ci
 
+      - name: Test Vulnerability
+        run: |
+          # https://go.dev/blog/vuln
+          GOBIN=/usr/local/bin go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+
       - name: Build
         env:
           REGISTRY: appscodeci
@@ -107,7 +113,8 @@ jobs:
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
           echo
           echo "create docker-registry secret"
-          kubectl create secret docker-registry ${REGISTRY_SECRET} --namespace=kube-system --docker-server=https://index.docker.io/v1/ --docker-username=${USERNAME} --docker-password=${DOCKER_TOKEN}
+          kubectl create ns kubeops
+          kubectl create secret docker-registry ${REGISTRY_SECRET} --namespace=kubeops --docker-server=https://index.docker.io/v1/ --docker-username=${USERNAME} --docker-password=${DOCKER_TOKEN}
 
       - name: Test charts
         run: |
@@ -126,6 +133,6 @@ jobs:
           echo -n "$TEST_CREDENTIALS" > hack/config/.env
           echo >> hack/config/.env
           echo "GOOGLE_SERVICE_ACCOUNT_JSON_KEY=$(echo $GOOGLE_SERVICE_ACCOUNT_JSON_KEY)" >> hack/config/.env
-          make install || ( kubectl describe deployment -n kube-system vault-operator; kubectl logs -n kube-system deployment/vault-operator; exit 1; )
+          make install || ( kubectl describe deployment -n kubeops config-syncer; kubectl logs -n kubeops deployment/config-syncer; exit 1; )
           echo
           make e2e-tests

@@ -33,5 +33,5 @@ config-syncer version [flags]
 
 ### SEE ALSO
 
-* [config-syncer](/docs/reference/config-syncer.md)	 - Config Syncer by AppsCode - A Kubernetes Cluster Operator Daemon
+* [config-syncer](/docs/reference/config-syncer.md)	 - Config Syncer by AppsCode - A Kubernetes Configuration Syncer
 
