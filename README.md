@@ -18,12 +18,6 @@ Want to learn how to use Config Syncer? Please start [here](https://appscode.com
 
 Want to help improve Config Syncer? Please start [here](https://appscode.com/products/kubed/latest/welcome/contributing/).
 
----
-
-**Config Syncer binaries collects anonymous usage statistics to help us learn how the software is being used and how we can improve it. To disable stats collection, run the operator with the flag** `--enable-analytics=false`.
-
----
-
 ## Support
 
 To speak with us, please leave a message on [our website](https://appscode.com/contact/). To receive product announcements, follow us on [Twitter](https://twitter.com/AppsCodeHQ).

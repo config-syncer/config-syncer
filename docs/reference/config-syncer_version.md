@@ -1,20 +1,20 @@
 ---
-title: Kubed Version
+title: Config-Syncer Version
 menu:
   product_kubed_{{ .version }}:
-    identifier: kubed-version
-    name: Kubed Version
+    identifier: config-syncer-version
+    name: Config-Syncer Version
     parent: reference
 product_name: kubed
 menu_name: product_kubed_{{ .version }}
 section_menu_id: reference
 ---
-## kubed version
+## config-syncer version
 
 Prints binary version number.
 
 ```
-kubed version [flags]
+config-syncer version [flags]
 ```
 
 ### Options
@@ -28,11 +28,10 @@ kubed version [flags]
 ### Options inherited from parent commands
 
 ```
-      --enable-analytics                 send usage events to Google Analytics (default true)
       --use-kubeapiserver-fqdn-for-aks   if true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 (default true)
 ```
 
 ### SEE ALSO
 
-* [kubed](/docs/reference/kubed.md)	 - Config Syncer by AppsCode - A Kubernetes Cluster Operator Daemon
+* [config-syncer](/docs/reference/config-syncer.md)	 - Config Syncer by AppsCode - A Kubernetes Cluster Operator Daemon
 
