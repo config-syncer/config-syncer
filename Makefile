@@ -17,7 +17,7 @@ SHELL=/bin/bash -o pipefail
 
 GO_PKG   := kubeops.dev
 REPO     := $(notdir $(shell pwd))
-BIN      := kubed
+BIN      := config-syncer
 COMPRESS ?= no
 
 CRD_OPTIONS          ?= "crd:allowDangerousTypes=true"
@@ -136,7 +136,7 @@ version:
 	@echo ::set-output name=commit_timestamp::$(commit_timestamp)
 
 .PHONY: gen-chart-doc
-gen-chart-doc: gen-chart-doc-kubed
+gen-chart-doc: gen-chart-doc-config-syncer
 
 gen-chart-doc-%:
 	@echo "Generate $* chart docs"
@@ -388,16 +388,16 @@ endif
 
 .PHONY: install
 install:
-	helm install kubed charts/kubed --wait \
-		--namespace=kube-system \
-		--set kubed.registry=$(REGISTRY) \
-		--set kubed.tag=$(TAG) \
+	helm install config-syncer charts/config-syncer --wait \
+		--namespace=kubeops --create-namespace \
+		--set coperator.registry=$(REGISTRY) \
+		--set operator.tag=$(TAG) \
 		--set imagePullPolicy=Always \
 		$(IMAGE_PULL_SECRETS)
 
 .PHONY: uninstall
 uninstall:
-	@helm uninstall kubed --namespace=kube-system || true
+	@helm uninstall config-syncer --namespace=kubeops || true
 
 .PHONY: purge
 purge: uninstall

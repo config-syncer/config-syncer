@@ -4,10 +4,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "kubed.fullname" . }}
+  name: {{ include "config-syncer.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "kubed.labels" . | nindent 4 }}
+    {{- include "config-syncer.labels" . | nindent 4 }}
   {{- with .Values.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -16,11 +16,11 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "kubed.selectorLabels" . | nindent 6 }}
+      {{- include "config-syncer.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "kubed.selectorLabels" . | nindent 8 }}
+        {{- include "config-syncer.selectorLabels" . | nindent 8 }}
       annotations:
         checksum/apiregistration.yaml: {{ include (print $.Template.BasePath "/apiregistration.yaml") . | sha256sum }}
       {{- if $criticalAddon }}
@@ -34,12 +34,12 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      serviceAccountName: {{ include "kubed.serviceAccountName" . }}
+      serviceAccountName: {{ include "config-syncer.serviceAccountName" . }}
       containers:
-      - name: kubed
+      - name: app
         securityContext:
           {{- toYaml .Values.operator.securityContext | nindent 10 }}
-        image: {{ .Values.operator.registry }}/{{ .Values.operator.repository }}:{{ .Values.operator.tag }}
+        image: {{ .Values.operator.registry }}/{{ .Values.operator.repository }}:{{ .Values.operator.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         args:
         - run
@@ -57,7 +57,7 @@ spec:
         - --config-source-namespace={{ . }}
       {{- end }}
       {{- if .Values.config.kubeconfigContent }}
-        - --kubeconfig-file=/srv/kubed/kubeconfig
+        - --kubeconfig-file=/srv/config-syncer/kubeconfig
       {{- end }}
       {{- range .Values.config.additionalOptions }}
         - {{ . }}
@@ -82,7 +82,7 @@ spec:
           {{- toYaml .Values.operator.resources | nindent 10 }}
         volumeMounts:
         - name: config
-          mountPath: /srv/kubed
+          mountPath: /srv/config-syncer
         - name: scratch
           mountPath: /tmp
         - mountPath: /var/serving-cert
@@ -90,13 +90,13 @@ spec:
       volumes:
       - name: config
         secret:
-          secretName: {{ template "kubed.fullname" . }}
+          secretName: {{ template "config-syncer.fullname" . }}
       - name: scratch
         emptyDir: {}
       - name: serving-cert
         secret:
           defaultMode: 420
-          secretName: {{ template "kubed.fullname" . }}-apiserver-cert
+          secretName: {{ template "config-syncer.fullname" . }}-apiserver-cert
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
     {{- if or .Values.tolerations $criticalAddon }}
