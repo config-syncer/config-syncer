@@ -1,9 +1,9 @@
 ---
-title: Kubed
+title: Config-Syncer
 menu:
   product_kubed_{{ .version }}:
-    identifier: kubed
-    name: Kubed
+    identifier: config-syncer
+    name: Config-Syncer
     parent: reference
     weight: 0
 
@@ -14,7 +14,7 @@ aliases:
   - /products/kubed/{{ .version }}/reference/
 
 ---
-## kubed
+## config-syncer
 
 Config Syncer by AppsCode - A Kubernetes Cluster Operator Daemon
 
@@ -25,13 +25,12 @@ Config Syncer is a Kubernetes daemon to perform cluster management tasks. For mo
 ### Options
 
 ```
-      --enable-analytics                 send usage events to Google Analytics (default true)
-  -h, --help                             help for kubed
+  -h, --help                             help for config-syncer
       --use-kubeapiserver-fqdn-for-aks   if true, uses kube-apiserver FQDN for AKS cluster to workaround https://github.com/Azure/AKS/issues/522 (default true)
 ```
 
 ### SEE ALSO
 
-* [kubed run](/docs/reference/kubed_run.md)	 - Launch Kubernetes Cluster Daemon
-* [kubed version](/docs/reference/kubed_version.md)	 - Prints binary version number.
+* [config-syncer run](/docs/reference/config-syncer_run.md)	 - Launch Kubernetes Cluster Daemon
+* [config-syncer version](/docs/reference/config-syncer_version.md)	 - Prints binary version number.
 

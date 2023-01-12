@@ -31,9 +31,3 @@ command-line options, configuration options, API definitions, and procedures.
 
 We're always looking for help improving our documentation, so please don't hesitate to [file an issue](https://github.com/kubeops/config-syncer/issues/new) if you see some problem. Or better yet, submit your own [contributions](/docs/CONTRIBUTING.md) to help
 make our docs better.
-
----
-
-**Config Syncer binaries collects anonymous usage statistics to help us learn how the software is being used and how we can improve it. To disable stats collection, run the operator with the flag** `--enable-analytics=false`.
-
----
