@@ -379,7 +379,7 @@ $(BUILD_DIRS):
 
 KUBE_NAMESPACE    ?= kubeops
 REGISTRY_SECRET   ?=
-IMAGE_PULL_POLICY	?= IfNotPresent
+IMAGE_PULL_POLICY ?= IfNotPresent
 
 ifeq ($(strip $(REGISTRY_SECRET)),)
 	IMAGE_PULL_SECRETS =
