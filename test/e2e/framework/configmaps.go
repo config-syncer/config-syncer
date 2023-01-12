@@ -179,7 +179,7 @@ func (fi *Invocation) EventuallySyncedConfigMapsDeleted(source *core.ConfigMap) 
 
 func (fi *Invocation) ReadConfigMapFromRecycleBin(recycleBinLocation string, cm *core.ConfigMap) (*core.ConfigMap, error) {
 	deletedConfigMap := &core.ConfigMap{}
-	dir := filepath.Join(recycleBinLocation, filepath.Dir(cm.SelfLink))
+	dir := filepath.Join(recycleBinLocation, "api/v1/namespaces", cm.Namespace, "configmaps", cm.Name)
 
 	pod, err := fi.OperatorPod()
 	if err != nil {

@@ -1,4 +1,4 @@
-# Default values for kubed.
+# Default values for config-syncer.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -12,11 +12,11 @@ replicaCount: 1
 
 operator:
   # Docker registry used to pull Config Syncer operator image
-  registry: appscode
+  registry: ghcr.io/appscode
   # Config Syncer operator container image
-  repository: kubed
+  repository: config-syncer
   # Config Syncer operator container image tag
-  tag: v0.13.2
+  tag: ""
   # Compute Resources required by the operator container
   resources: {}
   # Security options the operator container should run with
@@ -26,7 +26,7 @@ operator:
 # Secrets must be manually created in the namespace.
 #
 # Example:
-# helm template charts/kubed \
+# helm template charts/config-syncer \
 #   --set imagePullSecrets[0].name=sec0 \
 #   --set imagePullSecrets[1].name=sec1
 imagePullSecrets: []
@@ -93,7 +93,7 @@ enableAnalytics: true
 
 config:
   # Set cluster-name to something meaningful to you, say, prod, prod-us-east, qa, etc.
-  # so that you can distinguish notifications sent by kubed
+  # so that you can distinguish notifications sent by config-syncer
   clusterName: unicorn
   # If set, configmaps and secrets from only this namespace will be synced
   configSourceNamespace: ""

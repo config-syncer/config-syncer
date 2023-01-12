@@ -2,17 +2,17 @@ project:
   name: Config Syncer by AppsCode
   shortName: Config Syncer
   url: https://github.com/kubeops/config-syncer
-  description: A Kubernetes cluster manager daemon
+  description: A Kubernetes configuration syncer
   app: a Config Syncer operator
 repository:
   url: https://charts.appscode.com/stable/
   name: appscode
 chart:
-  name: kubed
+  name: config-syncer
   values: "-- generate from values file --"
   valuesExample: "-- generate from values file --"
 prerequisites:
-- Kubernetes 1.11+
+- Kubernetes 1.18+
 release:
-  name: kubed
-  namespace: kube-system
+  name: config-syncer
+  namespace: kubeops

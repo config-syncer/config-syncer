@@ -2,7 +2,7 @@
 {{- $serverKey := "" }}
 {{- if .Values.apiserver.servingCerts.generate }}
 {{- $ca := genCA "ca" 3650 }}
-{{- $cn := include "kubed.fullname" . -}}
+{{- $cn := include "config-syncer.fullname" . -}}
 {{- $altName1 := printf "%s.%s" $cn .Release.Namespace }}
 {{- $altName2 := printf "%s.%s.svc" $cn .Release.Namespace }}
 {{- $server := genSignedCert $cn nil (list $altName1 $altName2) 3650 $ca }}
@@ -15,10 +15,10 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ template "kubed.fullname" . }}-apiserver-cert
+  name: {{ template "config-syncer.fullname" . }}-apiserver-cert
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "kubed.labels" . | nindent 4 }}
+    {{- include "config-syncer.labels" . | nindent 4 }}
 type: Opaque
 data:
   tls.crt: {{ $serverCrt }}
@@ -28,31 +28,31 @@ data:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ template "kubed.fullname" . }}-apiserver-extension-server-authentication-reader
+  name: {{ template "config-syncer.fullname" . }}-apiserver-extension-server-authentication-reader
   namespace: kube-system
   labels:
-    {{- include "kubed.labels" . | nindent 4 }}
+    {{- include "config-syncer.labels" . | nindent 4 }}
 roleRef:
   kind: Role
   apiGroup: rbac.authorization.k8s.io
   name: extension-apiserver-authentication-reader
 subjects:
 - kind: ServiceAccount
-  name: {{ template "kubed.serviceAccountName" . }}
+  name: {{ template "config-syncer.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 ---
 # to delegate authentication and authorization
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ template "kubed.fullname" . }}-apiserver-auth-delegator
+  name: {{ template "config-syncer.fullname" . }}-apiserver-auth-delegator
   labels:
-    {{- include "kubed.labels" . | nindent 4 }}
+    {{- include "config-syncer.labels" . | nindent 4 }}
 roleRef:
   kind: ClusterRole
   apiGroup: rbac.authorization.k8s.io
   name: system:auth-delegator
 subjects:
 - kind: ServiceAccount
-  name: {{ template "kubed.serviceAccountName" . }}
+  name: {{ template "config-syncer.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
