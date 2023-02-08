@@ -56,7 +56,7 @@ tolerations: []
 affinity: {}
 
 # Security options the operator pod should run with.
-podSecurityContext:  # +doc-gen:break
+podSecurityContext: # +doc-gen:break
   # ensure that s/a token is readable xref: https://issues.k8s.io/70679
   fsGroup: 65535
 
@@ -96,5 +96,11 @@ config:
   configSourceNamespace: ""
   # kubeconfig file content for configmap and secret syncer
   kubeconfigContent: ""
+  # Use existing secret
+  existingSecret:
+    # Name of existing secret
+    name: ""
+    # The kubeconfig key in secret
+    kubeconfigKey: kubeconfig
 #  additionalOptions:
 #    - --authentication-skip-lookup

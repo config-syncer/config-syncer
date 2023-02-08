@@ -57,6 +57,8 @@ spec:
       {{- end }}
       {{- if .Values.config.kubeconfigContent }}
         - --kubeconfig-file=/srv/config-syncer/kubeconfig
+      {{- else if .Values.config.existingSecret.name }}
+        - --kubeconfig-file=/srv/config-syncer/{{ default "kubeconfig" .Values.config.existingSecret.kubeconfigKey }}
       {{- end }}
       {{- range .Values.config.additionalOptions }}
         - {{ . }}
@@ -89,7 +91,11 @@ spec:
       volumes:
       - name: config
         secret:
+          {{- if .Values.config.existingSecret.name }}
+          secretName: {{ .Values.config.existingSecret.name }}
+          {{- else }}
           secretName: {{ template "config-syncer.fullname" . }}
+          {{- end }}
       - name: scratch
         emptyDir: {}
       - name: serving-cert
