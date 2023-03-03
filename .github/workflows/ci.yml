@@ -20,10 +20,10 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - name: Set up Go 1.19
+      - name: Set up Go 1.20
         uses: actions/setup-go@v1
         with:
-          go-version: 1.19
+          go-version: 1.20
         id: go
 
       - uses: actions/checkout@v1
@@ -83,7 +83,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        k8s: [v1.18.20, v1.19.16, v1.20.15, v1.21.14, v1.22.15, v1.23.12, v1.24.6, v1.25.2]
+        k8s: [v1.20.15, v1.21.14, v1.22.15, v1.23.13, v1.24.7, v1.25.3, v1.26.0]
 
     steps:
       - uses: actions/checkout@v1
@@ -92,7 +92,7 @@ jobs:
         id: kind
         uses: engineerd/setup-kind@v0.5.0
         with:
-          version: v0.16.0
+          version: v0.17.0
           config: hack/kubernetes/kind.yaml
           image: kindest/node:${{ matrix.k8s }}
 
