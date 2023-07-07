@@ -389,6 +389,8 @@ endif
 
 .PHONY: install
 install:
+	@cd ../installer; \
+	kubectl label ns $(KUBE_NAMESPACE) pod-security.kubernetes.io/enforce=restricted; \
 	@helm upgrade -i config-syncer charts/config-syncer --wait \
 		--namespace=$(KUBE_NAMESPACE) --create-namespace \
 		--set operator.registry=$(REGISTRY) \
