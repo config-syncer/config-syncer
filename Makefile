@@ -389,7 +389,9 @@ endif
 
 .PHONY: install
 install:
-	@helm upgrade -i config-syncer charts/config-syncer --wait \
+	@kubectl create ns $(KUBE_NAMESPACE) || true; \
+	kubectl label ns $(KUBE_NAMESPACE) pod-security.kubernetes.io/enforce=restricted; \
+	helm upgrade -i config-syncer charts/config-syncer --wait \
 		--namespace=$(KUBE_NAMESPACE) --create-namespace \
 		--set operator.registry=$(REGISTRY) \
 		--set operator.tag=$(TAG) \
