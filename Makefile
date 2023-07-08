@@ -135,23 +135,9 @@ version:
 	@echo ::set-output name=commit_hash::$(commit_hash)
 	@echo ::set-output name=commit_timestamp::$(commit_timestamp)
 
-.PHONY: gen-chart-doc
-gen-chart-doc: gen-chart-doc-config-syncer
-
-gen-chart-doc-%:
-	@echo "Generate $* chart docs"
-	@docker run --rm 	                                 \
-		-u $$(id -u):$$(id -g)                           \
-		-v /tmp:/.cache                                  \
-		-v $$(pwd):$(DOCKER_REPO_ROOT)                   \
-		-w $(DOCKER_REPO_ROOT)                           \
-		--env HTTP_PROXY=$(HTTP_PROXY)                   \
-		--env HTTPS_PROXY=$(HTTPS_PROXY)                 \
-		$(BUILD_IMAGE)                                   \
-		chart-doc-gen -d ./charts/$*/doc.yaml -v ./charts/$*/values.yaml > ./charts/$*/README.md
-
 .PHONY: gen
-gen: gen-chart-doc
+gen:
+	@true
 
 fmt: $(BUILD_DIRS)
 	@docker run                                                 \
@@ -334,26 +320,6 @@ e2e-tests: $(BUILD_DIRS)
 e2e-parallel:
 	@$(MAKE) e2e-tests GINKGO_ARGS="-p -stream --flakeAttempts=2" --no-print-directory
 
-.PHONY: ct
-ct: $(BUILD_DIRS)
-	@docker run                                                 \
-	    -i                                                      \
-	    --rm                                                    \
-	    -v $$(pwd):/src                                         \
-	    -w /src                                                 \
-	    --net=host                                              \
-	    -v $(HOME)/.kube:/.kube                                 \
-	    -v $(HOME)/.minikube:$(HOME)/.minikube                  \
-	    -v $(HOME)/.credentials:$(HOME)/.credentials            \
-	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
-	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
-	    -v $$(pwd)/.go/cache:/.cache                            \
-	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
-	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
-	    --env KUBECONFIG=$(subst $(HOME),,$(KUBECONFIG))        \
-	    $(CHART_TEST_IMAGE)                                     \
-	    ct lint-and-install --all
-
 ADDTL_LINTERS   := goconst,gofmt,goimports,unparam
 
 .PHONY: lint
@@ -389,7 +355,8 @@ endif
 
 .PHONY: install
 install:
-	@kubectl create ns $(KUBE_NAMESPACE) || true; \
+	@cd ../installer; \
+	kubectl create ns $(KUBE_NAMESPACE) || true; \
 	kubectl label ns $(KUBE_NAMESPACE) pod-security.kubernetes.io/enforce=restricted; \
 	helm upgrade -i config-syncer charts/config-syncer --wait \
 		--namespace=$(KUBE_NAMESPACE) --create-namespace \
