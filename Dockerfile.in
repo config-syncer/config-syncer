@@ -18,7 +18,6 @@ LABEL org.opencontainers.image.source https://github.com/kubeops/config-syncer
 
 ADD bin/{ARG_OS}_{ARG_ARCH}/{ARG_BIN} /{ARG_BIN}
 
-# USER 65534
 USER 65534
 
 ENTRYPOINT ["/{ARG_BIN}"]
