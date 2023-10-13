@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+//go:generate go-enum --mustparse --names --values
 package v1
 
 import (
@@ -143,6 +144,14 @@ func ParseObjectID(key OID) (*ObjectID, error) {
 	return &id, nil
 }
 
+func MustParseObjectID(key OID) *ObjectID {
+	oid, err := ParseObjectID(key)
+	if err != nil {
+		panic(err)
+	}
+	return oid
+}
+
 func ObjectIDMap(key OID) (map[string]interface{}, error) {
 	id := map[string]interface{}{
 		"group":     "",
@@ -207,30 +216,13 @@ type ObjectInfo struct {
 	Ref      ObjectReference `json:"ref" protobuf:"bytes,2,opt,name=ref"`
 }
 
-// +kubebuilder:validation:Enum=id;config;backup_via;catalog;connect_via;exposed_by;monitored_by;offshoot;restore_into;scaled_by;view;cert_issuer;policy;recommended_for;ops
+// +kubebuilder:validation:Enum=authn;authz;auth_secret;backup_via;catalog;cert_issuer;config;connect_via;exposed_by;event;located_on;monitored_by;ocm_bind;offshoot;ops;placed_into;policy;recommended_for;restore_into;scaled_by;storage;view
+// ENUM(authn,authz,auth_secret,backup_via,catalog,cert_issuer,config,connect_via,exposed_by,event,located_on,monitored_by,ocm_bind,offshoot,ops,placed_into,policy,recommended_for,restore_into,scaled_by,storage,view)
 type EdgeLabel string
 
-const (
-	EdgeId             EdgeLabel = "id"
-	EdgeConfig         EdgeLabel = "config"
-	EdgeBackupVia      EdgeLabel = "backup_via"
-	EdgeCatalog        EdgeLabel = "catalog"
-	EdgeConnectVia     EdgeLabel = "connect_via"
-	EdgeExposedBy      EdgeLabel = "exposed_by"
-	EdgeMonitoredBy    EdgeLabel = "monitored_by"
-	EdgeOffshoot       EdgeLabel = "offshoot"
-	EdgeRestoreInto    EdgeLabel = "restore_into"
-	EdgeScaledBy       EdgeLabel = "scaled_by"
-	EdgeView           EdgeLabel = "view"
-	EdgeCertIssuer     EdgeLabel = "cert_issuer"
-	EdgePolicy         EdgeLabel = "policy"
-	EdgeOps            EdgeLabel = "ops"
-	EdgeRecommendedFor EdgeLabel = "recommended_for"
-)
-
 func (e EdgeLabel) Direct() bool {
-	return e == EdgeOffshoot ||
-		e == EdgeView ||
-		e == EdgeOps ||
-		e == EdgeRecommendedFor
+	return e == EdgeLabelOffshoot ||
+		e == EdgeLabelView ||
+		e == EdgeLabelOps ||
+		e == EdgeLabelRecommendedFor
 }
