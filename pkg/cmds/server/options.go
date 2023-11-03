@@ -17,6 +17,11 @@ limitations under the License.
 package server
 
 import (
+	"fmt"
+	licenseapi "go.bytebuilders.dev/license-verifier/apis/licenses/v1alpha1"
+	"go.bytebuilders.dev/license-verifier/info"
+	license "go.bytebuilders.dev/license-verifier/kubernetes"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"time"
 
 	"kubeops.dev/config-syncer/pkg/operator"
@@ -33,6 +38,9 @@ type OperatorOptions struct {
 	QPS          float32
 	Burst        int
 	ResyncPeriod time.Duration
+
+	LicenseFile       string
+	LicenseApiService string
 }
 
 func NewOperatorOptions() *OperatorOptions {
@@ -57,11 +65,15 @@ func (s *OperatorOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.Float32Var(&s.QPS, "qps", s.QPS, "The maximum QPS to the master from this client")
 	fs.IntVar(&s.Burst, "burst", s.Burst, "The maximum burst for throttle")
 	fs.DurationVar(&s.ResyncPeriod, "resync-period", s.ResyncPeriod, "If non-zero, will re-list this often. Otherwise, re-list will be delayed aslong as possible (until the upstream source closes the watch or times out.")
+	fs.StringVar(&s.LicenseFile, "license-file", s.LicenseFile, "Path to license file")
+	fs.StringVar(&s.LicenseApiService, "license-apiservice", s.LicenseApiService, "Name of the ApiService to use by the addons to identify the respective service and certificate for license verification request")
 }
 
 func (s *OperatorOptions) ApplyTo(cfg *operator.OperatorConfig) error {
 	var err error
 
+	cfg.LicenseFile = s.LicenseFile
+	cfg.LicenseApiService = s.LicenseApiService
 	cfg.ClientConfig.QPS = s.QPS
 	cfg.ClientConfig.Burst = s.Burst
 	cfg.ResyncPeriod = s.ResyncPeriod
@@ -74,6 +86,17 @@ func (s *OperatorOptions) ApplyTo(cfg *operator.OperatorConfig) error {
 	cfg.ClusterName = s.ClusterName
 	cfg.ConfigSourceNamespace = s.ConfigSourceNamespace
 	cfg.KubeConfigFile = s.KubeConfigFile
+
+	if cfg.LicenseProvided() {
+		l := license.MustLicenseEnforcer(cfg.ClientConfig, cfg.LicenseFile).LoadLicense()
+		if l.Status != licenseapi.LicenseActive {
+			return fmt.Errorf("license status %s, reason: %s", l.Status, l.Reason)
+		}
+		if !sets.NewString(l.Features...).HasAny(info.Features()...) {
+			return fmt.Errorf("not a valid license for this product")
+		}
+		cfg.License = l
+	}
 
 	return nil
 }

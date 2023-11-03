@@ -22,6 +22,8 @@ import (
 	"kubeops.dev/config-syncer/pkg/eventer"
 	"kubeops.dev/config-syncer/pkg/syncer"
 
+	proxyserver "go.bytebuilders.dev/license-proxyserver/apis/proxyserver/v1alpha1"
+	licenseapi "go.bytebuilders.dev/license-verifier/apis/licenses/v1alpha1"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -32,9 +34,14 @@ type Config struct {
 	ClusterName           string
 	ConfigSourceNamespace string
 	KubeConfigFile        string
+	KubeClient            kubernetes.Interface
 
 	ResyncPeriod time.Duration
 	Test         bool
+
+	LicenseFile       string
+	License           licenseapi.License
+	LicenseApiService string
 }
 
 type OperatorConfig struct {
@@ -78,4 +85,16 @@ func (c *OperatorConfig) New() (*Operator, error) {
 		return nil, err
 	}
 	return op, nil
+}
+
+func (c Config) LicenseProvided() bool {
+	if c.LicenseFile != "" {
+		return true
+	}
+
+	ok, _ := discovery.HasGVK(
+		c.KubeClient.Discovery(),
+		proxyserver.SchemeGroupVersion.String(),
+		proxyserver.ResourceKindLicenseRequest)
+	return ok
 }
