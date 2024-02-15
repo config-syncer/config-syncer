@@ -1,5 +1,4 @@
 [![Build Status](https://github.com/kubeops/config-syncer/workflows/CI/badge.svg)](https://github.com/kubeops/config-syncer/actions?workflow=CI)
-[![Docker Pulls](https://img.shields.io/docker/pulls/appscode/kubed.svg)](https://hub.docker.com/r/appscode/kubed/)
 [![Twitter](https://img.shields.io/twitter/follow/kubeops.svg?style=social&logo=twitter&label=Follow)](https://twitter.com/intent/follow?screen_name=Kubeops)
 
 # Config Syncer (previously Kubed)
