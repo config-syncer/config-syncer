@@ -38,19 +38,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
-      - uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3
-        id: app-token
-        with:
-          client-id: ${{ secrets.GHCRX_APP_CLIENT_ID }}
-          private-key: ${{ secrets.GHCRX_APP_PRIVATE_KEY }}
-          owner: appscode
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
         with:
           registry: ghcr.io
-          username: ${{ steps.app-token.outputs.app-slug }}[bot]
-          password: ${{ steps.app-token.outputs.token }}
+          username: 1gtm
+          password: ${{ secrets.LGTM_GITHUB_TOKEN }}
 
       - name: Publish to GitHub Container Registry
         env:
