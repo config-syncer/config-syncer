@@ -51,6 +51,7 @@ func (f *Framework) NewNamespace(name string) *core.Namespace {
 		},
 	}
 }
+
 func (fi *Invocation) NewNamespaceWithLabel() *core.Namespace {
 	return &core.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
@@ -72,6 +73,7 @@ func (f *Framework) CreateNamespace(ns *core.Namespace) error {
 	_, err := f.KubeClient.CoreV1().Namespaces().Create(context.TODO(), ns, metav1.CreateOptions{})
 	return err
 }
+
 func (f *Framework) DeleteNamespace(name string) error {
 	return f.KubeClient.CoreV1().Namespaces().Delete(context.TODO(), name, metav1.DeleteOptions{})
 }

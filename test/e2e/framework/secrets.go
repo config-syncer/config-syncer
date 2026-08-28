@@ -82,7 +82,6 @@ func (fi *Invocation) EventuallySecretSynced(source *core.Secret) GomegaAsyncAss
 	opt := syncer.GetSyncOptions(source.Annotations)
 
 	return Eventually(func() bool {
-
 		if opt.NamespaceSelector != nil {
 			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
@@ -103,7 +102,6 @@ func (fi *Invocation) EventuallySecretSynced(source *core.Secret) GomegaAsyncAss
 }
 
 func (fi *Invocation) EventuallySecretNotSynced(source *core.Secret) GomegaAsyncAssertion {
-
 	return Eventually(func() bool {
 		namespaces, err := fi.KubeClient.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 		Expect(err).NotTo(HaveOccurred())
@@ -132,7 +130,6 @@ func (fi *Invocation) EventuallySyncedSecretsUpdated(source *core.Secret) Gomega
 	opt := syncer.GetSyncOptions(source.Annotations)
 
 	return Eventually(func() bool {
-
 		if opt.NamespaceSelector != nil {
 			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
@@ -159,7 +156,6 @@ func (fi *Invocation) EventuallySyncedSecretsDeleted(source *core.Secret) Gomega
 	opt := syncer.GetSyncOptions(source.Annotations)
 
 	return Eventually(func() bool {
-
 		if opt.NamespaceSelector != nil {
 			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())

@@ -83,7 +83,6 @@ func (fi *Invocation) EventuallyConfigMapSynced(source *core.ConfigMap) GomegaAs
 	opt := syncer.GetSyncOptions(source.Annotations)
 
 	return Eventually(func() bool {
-
 		if opt.NamespaceSelector != nil {
 			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
@@ -104,7 +103,6 @@ func (fi *Invocation) EventuallyConfigMapSynced(source *core.ConfigMap) GomegaAs
 }
 
 func (fi *Invocation) EventuallyConfigMapNotSynced(source *core.ConfigMap) GomegaAsyncAssertion {
-
 	return Eventually(func() bool {
 		namespaces, err := fi.KubeClient.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 		Expect(err).NotTo(HaveOccurred())
@@ -133,7 +131,6 @@ func (fi *Invocation) EventuallySyncedConfigMapsUpdated(source *core.ConfigMap) 
 	opt := syncer.GetSyncOptions(source.Annotations)
 
 	return Eventually(func() bool {
-
 		if opt.NamespaceSelector != nil {
 			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
@@ -161,7 +158,6 @@ func (fi *Invocation) EventuallySyncedConfigMapsDeleted(source *core.ConfigMap) 
 	opt := syncer.GetSyncOptions(source.Annotations)
 
 	return Eventually(func() bool {
-
 		if opt.NamespaceSelector != nil {
 			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
@@ -236,6 +232,7 @@ func (fi *Invocation) DeleteAllConfigmaps() {
 func (fi *Invocation) CreateConfigMap(configMap *core.ConfigMap) (*core.ConfigMap, error) {
 	return fi.KubeClient.CoreV1().ConfigMaps(configMap.Namespace).Create(context.TODO(), configMap, metav1.CreateOptions{})
 }
+
 func (fi *Invocation) DeleteConfigMap(meta metav1.ObjectMeta) error {
 	return fi.KubeClient.CoreV1().ConfigMaps(meta.Namespace).Delete(context.TODO(), meta.Name, metav1.DeleteOptions{})
 }
