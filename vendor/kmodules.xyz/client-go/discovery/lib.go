@@ -223,7 +223,8 @@ func IsDefaultSupportedVersion(kc kubernetes.Interface) error {
 		kc,
 		DefaultConstraint,
 		DefaultBlackListedVersions,
-		DefaultBlackListedMultiMasterVersions)
+		DefaultBlackListedMultiMasterVersions,
+	)
 }
 
 func IsSupportedVersion(kc kubernetes.Interface, constraint string, blackListedVersions map[string]error, blackListedMultiMasterVersions map[string]error) error {

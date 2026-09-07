@@ -27,7 +27,6 @@ import (
 	"github.com/spf13/pflag"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
-	basecompatibility "k8s.io/component-base/compatibility"
 	"kmodules.xyz/client-go/tools/clientcmd"
 )
 
@@ -78,7 +77,6 @@ func (o ConfigSyncerOptions) Config() (*server.ConfigSyncerConfig, error) {
 	}
 
 	serverConfig := genericapiserver.NewRecommendedConfig(server.Codecs)
-	serverConfig.EffectiveVersion = basecompatibility.NewEffectiveVersionFromString("v1.1.0", "", "")
 	if err := o.RecommendedOptions.ApplyTo(serverConfig); err != nil {
 		return nil, err
 	}

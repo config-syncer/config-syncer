@@ -37,7 +37,8 @@ func (s PreConditionSet) PreconditionFunc() []mergepatch.PreconditionFunc {
 	}
 
 	for _, field := range sets.List[string](s.Set) {
-		preconditions = append(preconditions,
+		preconditions = append(
+			preconditions,
 			RequireChainKeyUnchanged(field),
 		)
 	}

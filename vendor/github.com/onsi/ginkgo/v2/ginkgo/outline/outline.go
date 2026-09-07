@@ -1,10 +1,13 @@
 package outline
 
 import (
+	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/token"
+	"strconv"
 	"strings"
 
 	"golang.org/x/tools/go/ast/inspector"
@@ -51,6 +54,7 @@ func FromASTFile(fset *token.FileSet, src *ast.File) (*outline, error) {
 			// Node is not a Ginkgo spec or container, so it was not pushed onto the stack, continue
 			return true
 		}
+		expandSubtree(lastVisitedGinkgoNode)
 		stack = stack[0 : len(stack)-1]
 		return true
 	})
@@ -84,8 +88,10 @@ func (o *outline) String() string {
 // StringIndent returns a CSV-formated outline, but every line is indented by
 // one 'width' of spaces for every level of nesting.
 func (o *outline) StringIndent(width int) string {
-	var b strings.Builder
+	var b bytes.Buffer
 	b.WriteString("Name,Text,Start,End,Spec,Focused,Pending,Labels\n")
+
+	csvWriter := csv.NewWriter(&b)
 
 	currentIndent := 0
 	pre := func(n *ginkgoNode) {
@@ -96,8 +102,22 @@ func (o *outline) StringIndent(width int) string {
 		} else {
 			labels = strings.Join(n.Labels, ", ")
 		}
-		//enclosing labels in a double quoted comma separate listed so that when inmported into a CSV app the Labels column has comma separate strings
-		b.WriteString(fmt.Sprintf("%s,%s,%d,%d,%t,%t,%t,\"%s\"\n", n.Name, n.Text, n.Start, n.End, n.Spec, n.Focused, n.Pending, labels))
+
+		row := []string{
+			n.Name,
+			n.Text,
+			strconv.Itoa(n.Start),
+			strconv.Itoa(n.End),
+			strconv.FormatBool(n.Spec),
+			strconv.FormatBool(n.Focused),
+			strconv.FormatBool(n.Pending),
+			labels,
+		}
+		csvWriter.Write(row)
+
+		// Ensure we write to `b' before the next `b.WriteString()', which might be adding indentation
+		csvWriter.Flush()
+
 		currentIndent += width
 	}
 	post := func(n *ginkgoNode) {
@@ -106,5 +126,32 @@ func (o *outline) StringIndent(width int) string {
 	for _, n := range o.Nodes {
 		n.Walk(pre, post)
 	}
+
 	return b.String()
+}
+
+// expandSubtree restructures a DescribeTableSubtree node so that each Entry
+// child gets a copy of the subtree's spec nodes as its children. This mirrors
+// the runtime behavior where each Entry generates a container with the specs
+// defined in the DescribeTableSubtree body.
+func expandSubtree(gn *ginkgoNode) {
+	if !strings.Contains(gn.Name, "DescribeTableSubtree") {
+		return
+	}
+	subNodes, entries := splitSubtreeSubnodes(gn.Nodes)
+	gn.Nodes = entries
+	for _, entry := range entries {
+		entry.Nodes = subNodes
+	}
+}
+
+// splitSubtreeSubnodes splits the child nodes of a DescribeTableSubtree into
+// spec/container nodes (defined in the body) and Entry nodes.
+func splitSubtreeSubnodes(nodes []*ginkgoNode) ([]*ginkgoNode, []*ginkgoNode) {
+	for i, node := range nodes {
+		if strings.Contains(node.Name, "Entry") {
+			return nodes[:i], nodes[i:]
+		}
+	}
+	return nodes, nil
 }
