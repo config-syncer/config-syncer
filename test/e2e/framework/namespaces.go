@@ -56,7 +56,7 @@ func (fi *Invocation) NewNamespaceWithLabel() *core.Namespace {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: rand.WithUniqSuffix("config-syncer-e2e-labeled"),
 			Labels: map[string]string{
-				"app": fi.App(),
+				AppLabelKey: fi.App(),
 			},
 		},
 	}

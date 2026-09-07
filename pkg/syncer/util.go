@@ -43,7 +43,7 @@ func GetSyncOptions(annotations map[string]string) SyncOptions {
 		}
 	}
 	if contexts, _ := meta.GetStringValue(annotations, ConfigSyncContexts); contexts != "" {
-		opts.Contexts = sets.New[string](strings.Split(contexts, ",")...)
+		opts.Contexts = sets.New(strings.Split(contexts, ",")...)
 	}
 	return opts
 }

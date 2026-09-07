@@ -42,7 +42,7 @@ func (fi *Invocation) NewConfigMap() *core.ConfigMap {
 			Name:      fi.App(),
 			Namespace: fi.Namespace(),
 			Labels: map[string]string{
-				"app": fi.App(),
+				AppLabelKey: fi.App(),
 			},
 		},
 		Data: map[string]string{
@@ -72,7 +72,7 @@ func (fi *Invocation) EventuallyNumOfConfigmapsForClient(client kubernetes.Inter
 	return Eventually(func() int {
 		cfgMaps, err := client.CoreV1().ConfigMaps(namespace).List(context.TODO(), metav1.ListOptions{
 			LabelSelector: labels.Set{
-				"app": fi.App(),
+				AppLabelKey: fi.App(),
 			}.String(),
 		})
 		Expect(err).NotTo(HaveOccurred())
@@ -217,7 +217,7 @@ func (fi *Invocation) ReadConfigMapFromRecycleBin(recycleBinLocation string, cm 
 func (fi *Invocation) DeleteAllConfigmaps() {
 	cfgMaps, err := fi.KubeClient.CoreV1().ConfigMaps(metav1.NamespaceAll).List(context.TODO(), metav1.ListOptions{
 		LabelSelector: labels.Set{
-			"app": fi.App(),
+			AppLabelKey: fi.App(),
 		}.String(),
 	})
 	Expect(err).NotTo(HaveOccurred())
