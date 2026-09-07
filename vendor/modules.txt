@@ -638,7 +638,7 @@ gomodules.xyz/flags
 # gomodules.xyz/jsonpatch/v2 v2.4.0
 ## explicit; go 1.20
 gomodules.xyz/jsonpatch/v2
-# gomodules.xyz/logs v0.0.6
+# gomodules.xyz/logs v0.0.7
 ## explicit; go 1.16
 gomodules.xyz/logs
 # gomodules.xyz/mergo v0.3.13

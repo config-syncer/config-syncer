@@ -14,7 +14,7 @@ require (
 	gomodules.xyz/blobfs v0.1.11
 	gomodules.xyz/cert v1.5.0
 	gomodules.xyz/encoding v0.0.7
-	gomodules.xyz/logs v0.0.6
+	gomodules.xyz/logs v0.0.7
 	gomodules.xyz/pointer v0.1.0
 	gomodules.xyz/runtime v0.3.0
 	gomodules.xyz/x v0.0.17
