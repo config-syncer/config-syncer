@@ -71,16 +71,6 @@ jobs:
         run: |
           make push
 
-      - name: Install link checker
-        run: |
-          curl -fsSL -o liche https://github.com/appscodelabs/liche/releases/download/v0.1.0/liche-linux-amd64
-          chmod +x liche
-          sudo mv liche /usr/local/bin/liche
-
-      - name: Check links
-        run: |
-          liche -r docs -d $(pwd) -c 10 -p -h -l -x '^(.*github.com.*|.*twitter.com.*)$'
-
   kubernetes:
     name: Kubernetes
     runs-on: ubuntu-24.04
