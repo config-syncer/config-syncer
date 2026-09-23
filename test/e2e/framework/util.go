@@ -39,8 +39,8 @@ func deleteInForeground() *metav1.DeleteOptions {
 }
 
 func (fi *Invocation) WaitUntilDeploymentReady(meta metav1.ObjectMeta) error {
-	return wait.PollImmediate(kutil.RetryInterval, kutil.ReadinessTimeout, func() (done bool, err error) {
-		if obj, err := fi.KubeClient.AppsV1().Deployments(meta.Namespace).Get(context.TODO(), meta.Name, metav1.GetOptions{}); err == nil {
+	return wait.PollUntilContextTimeout(context.TODO(), kutil.RetryInterval, kutil.ReadinessTimeout, true, func(ctx context.Context) (done bool, err error) {
+		if obj, err := fi.KubeClient.AppsV1().Deployments(meta.Namespace).Get(ctx, meta.Name, metav1.GetOptions{}); err == nil {
 			return pointer.Int32(obj.Spec.Replicas) == obj.Status.ReadyReplicas, nil
 		}
 		return false, nil
@@ -48,8 +48,8 @@ func (fi *Invocation) WaitUntilDeploymentReady(meta metav1.ObjectMeta) error {
 }
 
 func (fi *Invocation) WaitUntilDeploymentTerminated(meta metav1.ObjectMeta) error {
-	return wait.PollImmediate(kutil.RetryInterval, kutil.GCTimeout, func() (done bool, err error) {
-		if pods, err := fi.KubeClient.CoreV1().Pods(meta.Namespace).List(context.TODO(), metav1.ListOptions{}); err == nil {
+	return wait.PollUntilContextTimeout(context.TODO(), kutil.RetryInterval, kutil.GCTimeout, true, func(ctx context.Context) (done bool, err error) {
+		if pods, err := fi.KubeClient.CoreV1().Pods(meta.Namespace).List(ctx, metav1.ListOptions{}); err == nil {
 			return len(pods.Items) == 0, nil
 		}
 		return false, nil

@@ -30,7 +30,7 @@ import (
 
 type SyncOptions struct {
 	NamespaceSelector *string // if nil, delete from cluster
-	Contexts          sets.String
+	Contexts          sets.Set[string]
 }
 
 func GetSyncOptions(annotations map[string]string) SyncOptions {
@@ -43,19 +43,19 @@ func GetSyncOptions(annotations map[string]string) SyncOptions {
 		}
 	}
 	if contexts, _ := meta.GetStringValue(annotations, ConfigSyncContexts); contexts != "" {
-		opts.Contexts = sets.NewString(strings.Split(contexts, ",")...)
+		opts.Contexts = sets.New[string](strings.Split(contexts, ",")...)
 	}
 	return opts
 }
 
-func NamespacesForSelector(kc kubernetes.Interface, selector string) (sets.String, error) {
+func NamespacesForSelector(kc kubernetes.Interface, selector string) (sets.Set[string], error) {
 	namespaces, err := kc.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {
 		return nil, err
 	}
-	ns := sets.NewString()
+	ns := sets.New[string]()
 	for _, obj := range namespaces.Items {
 		ns.Insert(obj.Name)
 	}

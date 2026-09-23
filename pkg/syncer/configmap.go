@@ -39,12 +39,12 @@ func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
 		if err != nil {
 			return err
 		}
-		klog.Infof("configmap %s/%s will be synced into namespaces %v if needed", src.Namespace, src.Name, newNs.List())
+		klog.Infof("configmap %s/%s will be synced into namespaces %v if needed", src.Namespace, src.Name, sets.List(newNs))
 		if err := s.syncConfigMapIntoNamespaces(s.kubeClient, src, newNs, true, ""); err != nil {
 			return err
 		}
 	} else { // no sync, delete that were previously added
-		if err := s.syncConfigMapIntoNamespaces(s.kubeClient, src, sets.NewString(), true, ""); err != nil {
+		if err := s.syncConfigMapIntoNamespaces(s.kubeClient, src, sets.New[string](), true, ""); err != nil {
 			return err
 		}
 	}
@@ -54,16 +54,16 @@ func (s *ConfigSyncer) SyncConfigMap(src *core.ConfigMap) error {
 
 // source deleted, delete that were previously added
 func (s *ConfigSyncer) SyncDeletedConfigMap(src *core.ConfigMap) error {
-	if err := s.syncConfigMapIntoNamespaces(s.kubeClient, src, sets.NewString(), true, ""); err != nil {
+	if err := s.syncConfigMapIntoNamespaces(s.kubeClient, src, sets.New[string](), true, ""); err != nil {
 		return err
 	}
-	return s.syncConfigMapIntoContexts(src, sets.NewString())
+	return s.syncConfigMapIntoContexts(src, sets.New[string]())
 }
 
-func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts sets.String) error {
+func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts sets.Set[string]) error {
 	// validate contexts specified via annotation
 	taken := map[string]struct{}{}
-	for _, ctx := range contexts.List() {
+	for _, ctx := range sets.List(contexts) {
 		context, found := s.contexts[ctx]
 		if !found {
 			return errors.Errorf("context %s not found in kubeconfig file", ctx)
@@ -75,12 +75,12 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 	}
 
 	// sync to contexts specified via annotation, do not ignore errors here
-	for _, ctx := range contexts.List() {
+	for _, ctx := range sets.List(contexts) {
 		context := s.contexts[ctx]
 		if context.Namespace == "" { // use source namespace if not specified via context
 			context.Namespace = src.Namespace
 		}
-		err := s.syncConfigMapIntoNamespaces(context.Client, src, sets.NewString(context.Namespace), false, ctx)
+		err := s.syncConfigMapIntoNamespaces(context.Client, src, sets.New[string](context.Namespace), false, ctx)
 		if err != nil {
 			return err
 		}
@@ -89,7 +89,7 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 	// delete from other contexts, ignore errors here
 	for ctxName, ctx := range s.contexts {
 		if _, found := taken[ctx.Address]; !found {
-			err := s.syncConfigMapIntoNamespaces(ctx.Client, src, sets.NewString(), false, ctxName)
+			err := s.syncConfigMapIntoNamespaces(ctx.Client, src, sets.New[string](), false, ctxName)
 			if err != nil {
 				klog.Infoln(err)
 			}
@@ -102,7 +102,7 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 
 // upsert into newNs set, delete from (oldNs-newNs) set
 // use skipSrcNs = true for sync in source cluster
-func (s *ConfigSyncer) syncConfigMapIntoNamespaces(kc kubernetes.Interface, src *core.ConfigMap, newNs sets.String, skipSrcNs bool, ctx string) error {
+func (s *ConfigSyncer) syncConfigMapIntoNamespaces(kc kubernetes.Interface, src *core.ConfigMap, newNs sets.Set[string], skipSrcNs bool, ctx string) error {
 	oldNs, err := namespaceSetForConfigMapSelector(kc, s.syncerLabelSelector(src.Name, src.Namespace, s.clusterName))
 	if err != nil {
 		return err
@@ -112,12 +112,12 @@ func (s *ConfigSyncer) syncConfigMapIntoNamespaces(kc kubernetes.Interface, src 
 		oldNs.Delete(src.Namespace)
 		newNs.Delete(src.Namespace)
 	}
-	for _, ns := range oldNs.List() {
+	for _, ns := range sets.List(oldNs) {
 		if err := kc.CoreV1().ConfigMaps(ns).Delete(context.TODO(), src.Name, metav1.DeleteOptions{}); err != nil {
 			return err
 		}
 	}
-	for _, ns := range newNs.List() {
+	for _, ns := range sets.List(newNs) {
 		if err = s.upsertConfigMap(kc, src, ns, ctx); err != nil {
 			return err
 		}
@@ -174,14 +174,14 @@ func (s *ConfigSyncer) upsertConfigMap(kc kubernetes.Interface, src *core.Config
 	return err
 }
 
-func namespaceSetForConfigMapSelector(kc kubernetes.Interface, selector string) (sets.String, error) {
+func namespaceSetForConfigMapSelector(kc kubernetes.Interface, selector string) (sets.Set[string], error) {
 	cfgMaps, err := kc.CoreV1().ConfigMaps(metav1.NamespaceAll).List(context.TODO(), metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {
 		return nil, err
 	}
-	ns := sets.NewString()
+	ns := sets.New[string]()
 	for _, obj := range cfgMaps.Items {
 		ns.Insert(obj.Namespace)
 	}

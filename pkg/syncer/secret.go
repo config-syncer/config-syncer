@@ -39,12 +39,12 @@ func (s *ConfigSyncer) SyncSecret(src *core.Secret) error {
 		if err != nil {
 			return err
 		}
-		klog.Infof("secret %s/%s will be synced into namespaces %v if needed", src.Namespace, src.Name, newNs.List())
+		klog.Infof("secret %s/%s will be synced into namespaces %v if needed", src.Namespace, src.Name, sets.List(newNs))
 		if err := s.syncSecretIntoNamespaces(s.kubeClient, src, newNs, true, ""); err != nil {
 			return err
 		}
 	} else { // no sync, delete that were previously added
-		if err := s.syncSecretIntoNamespaces(s.kubeClient, src, sets.NewString(), true, ""); err != nil {
+		if err := s.syncSecretIntoNamespaces(s.kubeClient, src, sets.New[string](), true, ""); err != nil {
 			return err
 		}
 	}
@@ -54,16 +54,16 @@ func (s *ConfigSyncer) SyncSecret(src *core.Secret) error {
 
 // source deleted, delete that were previously added
 func (s *ConfigSyncer) SyncDeletedSecret(src *core.Secret) error {
-	if err := s.syncSecretIntoNamespaces(s.kubeClient, src, sets.NewString(), true, ""); err != nil {
+	if err := s.syncSecretIntoNamespaces(s.kubeClient, src, sets.New[string](), true, ""); err != nil {
 		return err
 	}
-	return s.syncSecretIntoContexts(src, sets.NewString())
+	return s.syncSecretIntoContexts(src, sets.New[string]())
 }
 
-func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.String) error {
+func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.Set[string]) error {
 	// validate contexts specified via annotation
 	taken := map[string]struct{}{}
-	for _, ctx := range contexts.List() {
+	for _, ctx := range sets.List(contexts) {
 		context, found := s.contexts[ctx]
 		if !found {
 			return errors.Errorf("context %s not found in kubeconfig file", ctx)
@@ -75,12 +75,12 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 	}
 
 	// sync to contexts specified via annotation, do not ignore errors here
-	for _, ctx := range contexts.List() {
+	for _, ctx := range sets.List(contexts) {
 		context := s.contexts[ctx]
 		if context.Namespace == "" { // use source namespace if not specified via context
 			context.Namespace = src.Namespace
 		}
-		err := s.syncSecretIntoNamespaces(context.Client, src, sets.NewString(context.Namespace), false, ctx)
+		err := s.syncSecretIntoNamespaces(context.Client, src, sets.New[string](context.Namespace), false, ctx)
 		if err != nil {
 			return err
 		}
@@ -89,7 +89,7 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 	// delete from other contexts, ignore errors here
 	for ctxName, ctx := range s.contexts {
 		if _, found := taken[ctx.Address]; !found {
-			err := s.syncSecretIntoNamespaces(ctx.Client, src, sets.NewString(), false, ctxName)
+			err := s.syncSecretIntoNamespaces(ctx.Client, src, sets.New[string](), false, ctxName)
 			if err != nil {
 				klog.Infoln(err)
 			}
@@ -102,7 +102,7 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.St
 
 // upsert into newNs set, delete from (oldNs-newNs) set
 // use skipSrcNs = true for sync in source cluster
-func (s *ConfigSyncer) syncSecretIntoNamespaces(kc kubernetes.Interface, src *core.Secret, newNs sets.String, skipSrcNs bool, ctx string) error {
+func (s *ConfigSyncer) syncSecretIntoNamespaces(kc kubernetes.Interface, src *core.Secret, newNs sets.Set[string], skipSrcNs bool, ctx string) error {
 	oldNs, err := namespaceSetForSecretSelector(kc, s.syncerLabelSelector(src.Name, src.Namespace, s.clusterName))
 	if err != nil {
 		return err
@@ -112,12 +112,12 @@ func (s *ConfigSyncer) syncSecretIntoNamespaces(kc kubernetes.Interface, src *co
 		oldNs.Delete(src.Namespace)
 		newNs.Delete(src.Namespace)
 	}
-	for _, ns := range oldNs.List() {
+	for _, ns := range sets.List(oldNs) {
 		if err := kc.CoreV1().Secrets(ns).Delete(context.TODO(), src.Name, metav1.DeleteOptions{}); err != nil {
 			return err
 		}
 	}
-	for _, ns := range newNs.List() {
+	for _, ns := range sets.List(newNs) {
 		if err = s.upsertSecret(kc, src, ns, ctx); err != nil {
 			return err
 		}
@@ -175,14 +175,14 @@ func (s *ConfigSyncer) upsertSecret(kc kubernetes.Interface, src *core.Secret, n
 	return err
 }
 
-func namespaceSetForSecretSelector(kc kubernetes.Interface, selector string) (sets.String, error) {
+func namespaceSetForSecretSelector(kc kubernetes.Interface, selector string) (sets.Set[string], error) {
 	secret, err := kc.CoreV1().Secrets(metav1.NamespaceAll).List(context.TODO(), metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {
 		return nil, err
 	}
-	ns := sets.NewString()
+	ns := sets.New[string]()
 	for _, obj := range secret.Items {
 		ns.Insert(obj.Namespace)
 	}
