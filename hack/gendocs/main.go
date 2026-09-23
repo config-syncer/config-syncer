@@ -90,8 +90,8 @@ func main() {
 			Name    string
 			RootCmd bool
 		}{
-			strings.Replace(base, "_", "-", -1),
-			cases.Title(language.English).String(strings.Replace(base, "_", " ", -1)),
+			strings.ReplaceAll(base, "_", "-"),
+			cases.Title(language.English).String(strings.ReplaceAll(base, "_", " ")),
 			!strings.ContainsRune(base, '_'),
 		}
 		var buf bytes.Buffer

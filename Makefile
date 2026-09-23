@@ -30,7 +30,7 @@ SRC_REG  ?=
 
 # This version-strategy uses git tags to set the version string
 git_branch       := $(shell git rev-parse --abbrev-ref HEAD)
-git_tag          := $(shell git describe --exact-match --abbrev=0 2>/dev/null || echo "")
+git_tag          := $(shell git describe --tags --exact-match --abbrev=0 2>/dev/null || echo "")
 commit_hash      := $(shell git rev-parse --verify HEAD)
 commit_timestamp := $(shell date --date="@$$(git show -s --format=%ct)" --utc +%FT%T)
 
@@ -55,7 +55,7 @@ endif
 SRC_PKGS := cmd pkg # directories which hold app source excluding tests (not vendored)
 SRC_DIRS := $(SRC_PKGS) test hack # directories which hold app source (not vendored)
 
-DOCKER_PLATFORMS := linux/amd64 linux/arm64 linux/ppc64le linux/s390x
+DOCKER_PLATFORMS := linux/amd64 linux/arm64
 BIN_PLATFORMS    := $(DOCKER_PLATFORMS)
 
 # Used internally.  Users should pass GOOS and/or GOARCH.
@@ -320,8 +320,6 @@ e2e-tests: $(BUILD_DIRS)
 e2e-parallel:
 	@$(MAKE) e2e-tests GINKGO_ARGS="-p -stream --flakeAttempts=2" --no-print-directory
 
-ADDTL_LINTERS   := goconst,gofmt,goimports,unparam
-
 .PHONY: lint
 lint: $(BUILD_DIRS)
 	@echo "running linter"
@@ -338,7 +336,7 @@ lint: $(BUILD_DIRS)
 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 	    --env GOFLAGS="-mod=vendor"                             \
 	    $(BUILD_IMAGE)                                          \
-	    golangci-lint run --enable $(ADDTL_LINTERS) --timeout=10m --skip-files="generated.*\.go$\" --exclude-dirs=client,vendor
+	    golangci-lint run
 
 $(BUILD_DIRS):
 	@mkdir -p $@

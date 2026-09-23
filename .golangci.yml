@@ -1,0 +1,29 @@
+version: "2"
+linters:
+  default: standard
+  enable:
+    - goconst
+    - unparam
+  exclusions:
+    rules:
+      - path: ^test/
+        linters:
+          - staticcheck
+        text: ST1001
+    paths:
+      - generated.*\.go
+      - client
+      - vendor
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    paths:
+      - generated.*\.go
+      - client
+      - vendor
+
+run:
+  timeout: 10m

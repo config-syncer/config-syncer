@@ -95,9 +95,10 @@ func (s *ConfigSyncer) Configure(clusterName string, kubeconfigFile string) erro
 			host := u.Hostname()
 			port := u.Port()
 			if port == "" {
-				if u.Scheme == "https" {
+				switch u.Scheme {
+				case "https":
 					port = "443"
-				} else if u.Scheme == "http" {
+				case "http":
 					port = "80"
 				}
 			}
