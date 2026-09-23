@@ -19,6 +19,7 @@ package openapi
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	"k8s.io/client-go/rest"
 	"k8s.io/kube-openapi/pkg/handler3"
@@ -55,10 +56,18 @@ func (c *client) Paths() (map[string]GroupVersion, error) {
 		return nil, err
 	}
 
+	// Calculate the client-side prefix for a "root" request
+	rootPrefix := strings.TrimSuffix(c.restClient.Get().AbsPath("/").URL().Path, "/")
 	// Create GroupVersions for each element of the result
 	result := map[string]GroupVersion{}
 	for k, v := range discoMap.Paths {
-		result[k] = newGroupVersion(c, v)
+		// Trim off the prefix that will always be added in client-side
+		v.ServerRelativeURL = strings.TrimPrefix(v.ServerRelativeURL, rootPrefix)
+		// If the server returned a URL rooted at /openapi/v3, preserve any additional client-side prefix.
+		// If the server returned a URL not rooted at /openapi/v3, treat it as an actual server-relative URL.
+		// See https://github.com/kubernetes/kubernetes/issues/117463 for details
+		useClientPrefix := strings.HasPrefix(v.ServerRelativeURL, "/openapi/v3")
+		result[k] = newGroupVersion(c, v, useClientPrefix)
 	}
 	return result, nil
 }

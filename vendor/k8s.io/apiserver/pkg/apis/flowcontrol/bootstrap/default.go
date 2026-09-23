@@ -19,10 +19,11 @@ package bootstrap
 import (
 	coordinationv1 "k8s.io/api/coordination/v1"
 	corev1 "k8s.io/api/core/v1"
-	flowcontrol "k8s.io/api/flowcontrol/v1beta2"
+	flowcontrol "k8s.io/api/flowcontrol/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/authentication/serviceaccount"
 	"k8s.io/apiserver/pkg/authentication/user"
+	"k8s.io/utils/ptr"
 )
 
 // The objects that define an apiserver's initial behavior.  The
@@ -72,8 +73,6 @@ var (
 		SuggestedFlowSchemaSystemNodeHigh,            // references "node-high" priority-level
 		SuggestedFlowSchemaProbes,                    // references "exempt" priority-level
 		SuggestedFlowSchemaSystemLeaderElection,      // references "leader-election" priority-level
-		SuggestedFlowSchemaWorkloadLeaderElection,    // references "leader-election" priority-level
-		SuggestedFlowSchemaEndpointsController,       // references "workload-high" priority-level
 		SuggestedFlowSchemaKubeControllerManager,     // references "workload-high" priority-level
 		SuggestedFlowSchemaKubeScheduler,             // references "workload-high" priority-level
 		SuggestedFlowSchemaKubeSystemServiceAccounts, // references "workload-high" priority-level
@@ -88,6 +87,10 @@ var (
 		flowcontrol.PriorityLevelConfigurationNameExempt,
 		flowcontrol.PriorityLevelConfigurationSpec{
 			Type: flowcontrol.PriorityLevelEnablementExempt,
+			Exempt: &flowcontrol.ExemptPriorityLevelConfiguration{
+				NominalConcurrencyShares: ptr.To(int32(0)),
+				LendablePercent:          ptr.To(int32(0)),
+			},
 		},
 	)
 	MandatoryPriorityLevelConfigurationCatchAll = newPriorityLevelConfiguration(
@@ -95,7 +98,8 @@ var (
 		flowcontrol.PriorityLevelConfigurationSpec{
 			Type: flowcontrol.PriorityLevelEnablementLimited,
 			Limited: &flowcontrol.LimitedPriorityLevelConfiguration{
-				AssuredConcurrencyShares: 5,
+				NominalConcurrencyShares: ptr.To(int32(5)),
+				LendablePercent:          ptr.To(int32(0)),
 				LimitResponse: flowcontrol.LimitResponse{
 					Type: flowcontrol.LimitResponseTypeReject,
 				},
@@ -167,7 +171,8 @@ var (
 		flowcontrol.PriorityLevelConfigurationSpec{
 			Type: flowcontrol.PriorityLevelEnablementLimited,
 			Limited: &flowcontrol.LimitedPriorityLevelConfiguration{
-				AssuredConcurrencyShares: 30,
+				NominalConcurrencyShares: ptr.To(int32(30)),
+				LendablePercent:          ptr.To(int32(33)),
 				LimitResponse: flowcontrol.LimitResponse{
 					Type: flowcontrol.LimitResponseTypeQueue,
 					Queuing: &flowcontrol.QueuingConfiguration{
@@ -183,7 +188,8 @@ var (
 		flowcontrol.PriorityLevelConfigurationSpec{
 			Type: flowcontrol.PriorityLevelEnablementLimited,
 			Limited: &flowcontrol.LimitedPriorityLevelConfiguration{
-				AssuredConcurrencyShares: 40,
+				NominalConcurrencyShares: ptr.To(int32(40)),
+				LendablePercent:          ptr.To(int32(25)),
 				LimitResponse: flowcontrol.LimitResponse{
 					Type: flowcontrol.LimitResponseTypeQueue,
 					Queuing: &flowcontrol.QueuingConfiguration{
@@ -200,7 +206,8 @@ var (
 		flowcontrol.PriorityLevelConfigurationSpec{
 			Type: flowcontrol.PriorityLevelEnablementLimited,
 			Limited: &flowcontrol.LimitedPriorityLevelConfiguration{
-				AssuredConcurrencyShares: 10,
+				NominalConcurrencyShares: ptr.To(int32(10)),
+				LendablePercent:          ptr.To(int32(0)),
 				LimitResponse: flowcontrol.LimitResponse{
 					Type: flowcontrol.LimitResponseTypeQueue,
 					Queuing: &flowcontrol.QueuingConfiguration{
@@ -217,7 +224,8 @@ var (
 		flowcontrol.PriorityLevelConfigurationSpec{
 			Type: flowcontrol.PriorityLevelEnablementLimited,
 			Limited: &flowcontrol.LimitedPriorityLevelConfiguration{
-				AssuredConcurrencyShares: 40,
+				NominalConcurrencyShares: ptr.To(int32(40)),
+				LendablePercent:          ptr.To(int32(50)),
 				LimitResponse: flowcontrol.LimitResponse{
 					Type: flowcontrol.LimitResponseTypeQueue,
 					Queuing: &flowcontrol.QueuingConfiguration{
@@ -234,7 +242,8 @@ var (
 		flowcontrol.PriorityLevelConfigurationSpec{
 			Type: flowcontrol.PriorityLevelEnablementLimited,
 			Limited: &flowcontrol.LimitedPriorityLevelConfiguration{
-				AssuredConcurrencyShares: 100,
+				NominalConcurrencyShares: ptr.To(int32(100)),
+				LendablePercent:          ptr.To(int32(90)),
 				LimitResponse: flowcontrol.LimitResponse{
 					Type: flowcontrol.LimitResponseTypeQueue,
 					Queuing: &flowcontrol.QueuingConfiguration{
@@ -251,7 +260,8 @@ var (
 		flowcontrol.PriorityLevelConfigurationSpec{
 			Type: flowcontrol.PriorityLevelEnablementLimited,
 			Limited: &flowcontrol.LimitedPriorityLevelConfiguration{
-				AssuredConcurrencyShares: 20,
+				NominalConcurrencyShares: ptr.To(int32(20)),
+				LendablePercent:          ptr.To(int32(50)),
 				LimitResponse: flowcontrol.LimitResponse{
 					Type: flowcontrol.LimitResponseTypeQueue,
 					Queuing: &flowcontrol.QueuingConfiguration{
@@ -289,52 +299,6 @@ var (
 				users(user.KubeControllerManager, user.KubeScheduler),
 				kubeSystemServiceAccount(flowcontrol.NameAll)...),
 			ResourceRules: []flowcontrol.ResourcePolicyRule{
-				resourceRule(
-					[]string{"get", "create", "update"},
-					[]string{coordinationv1.GroupName},
-					[]string{"leases"},
-					[]string{flowcontrol.NamespaceEvery},
-					false),
-			},
-		},
-	)
-	// We add an explicit rule for endpoint-controller with high precedence
-	// to ensure that those calls won't get caught by the following
-	// <workload-leader-election> flow-schema.
-	//
-	// TODO(#80289): Get rid of this rule once we get rid of support for
-	//   using endpoints and configmaps objects for leader election.
-	SuggestedFlowSchemaEndpointsController = newFlowSchema(
-		"endpoint-controller", "workload-high", 150,
-		flowcontrol.FlowDistinguisherMethodByUserType,
-		flowcontrol.PolicyRulesWithSubjects{
-			Subjects: append(
-				users(user.KubeControllerManager),
-				kubeSystemServiceAccount("endpoint-controller", "endpointslicemirroring-controller")...),
-			ResourceRules: []flowcontrol.ResourcePolicyRule{
-				resourceRule(
-					[]string{"get", "create", "update"},
-					[]string{corev1.GroupName},
-					[]string{"endpoints"},
-					[]string{flowcontrol.NamespaceEvery},
-					false),
-			},
-		},
-	)
-	// TODO(#80289): Get rid of this rule once we get rid of support for
-	//   using endpoints and configmaps objects for leader election.
-	SuggestedFlowSchemaWorkloadLeaderElection = newFlowSchema(
-		"workload-leader-election", "leader-election", 200,
-		flowcontrol.FlowDistinguisherMethodByUserType,
-		flowcontrol.PolicyRulesWithSubjects{
-			Subjects: kubeSystemServiceAccount(flowcontrol.NameAll),
-			ResourceRules: []flowcontrol.ResourcePolicyRule{
-				resourceRule(
-					[]string{"get", "create", "update"},
-					[]string{corev1.GroupName},
-					[]string{"endpoints", "configmaps"},
-					[]string{flowcontrol.NamespaceEvery},
-					false),
 				resourceRule(
 					[]string{"get", "create", "update"},
 					[]string{coordinationv1.GroupName},

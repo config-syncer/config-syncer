@@ -46,4 +46,11 @@ const (
 	defaultWriteQuota              = 64 * 1024
 	defaultClientMaxHeaderListSize = uint32(16 << 20)
 	defaultServerMaxHeaderListSize = uint32(16 << 20)
+	upcomingDefaultHeaderListSize  = uint32(8 << 10)
 )
+
+// MaxStreamID is the upper bound for the stream ID before the current
+// transport gracefully closes and new transport is created for subsequent RPCs.
+// This is set to 75% of 2^31-1. Streams are identified with an unsigned 31-bit
+// integer. It's exported so that tests can override it.
+var MaxStreamID = uint32(math.MaxInt32 * 3 / 4)

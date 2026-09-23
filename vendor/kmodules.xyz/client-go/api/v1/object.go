@@ -27,7 +27,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// TypedObjectReference represents an typed namespaced object.
+// TypeReference represents an object type.
+type TypeReference struct {
+	APIGroup string `json:"apiGroup,omitempty" protobuf:"bytes,1,opt,name=apiGroup"`
+	Kind     string `json:"kind,omitempty" protobuf:"bytes,2,opt,name=kind"`
+}
+
+// TypedObjectReference represents a typed namespaced object.
 type TypedObjectReference struct {
 	APIGroup string `json:"apiGroup,omitempty" protobuf:"bytes,1,opt,name=apiGroup"`
 	Kind     string `json:"kind,omitempty" protobuf:"bytes,2,opt,name=kind"`
@@ -109,8 +115,8 @@ func NewObjectID(obj client.Object) *ObjectID {
 func ParseObjectID(key OID) (*ObjectID, error) {
 	var id ObjectID
 
-	chunks := strings.Split(string(key), ",")
-	for _, chunk := range chunks {
+	chunks := strings.SplitSeq(string(key), ",")
+	for chunk := range chunks {
 		parts := strings.FieldsFunc(chunk, func(r rune) bool {
 			return r == '=' || unicode.IsSpace(r)
 		})
@@ -152,16 +158,16 @@ func MustParseObjectID(key OID) *ObjectID {
 	return oid
 }
 
-func ObjectIDMap(key OID) (map[string]interface{}, error) {
-	id := map[string]interface{}{
+func ObjectIDMap(key OID) (map[string]any, error) {
+	id := map[string]any{
 		"group":     "",
 		"kind":      "",
 		"namespace": "",
 		"name":      "",
 	}
 
-	chunks := strings.Split(string(key), ",")
-	for _, chunk := range chunks {
+	chunks := strings.SplitSeq(string(key), ",")
+	for chunk := range chunks {
 		parts := strings.FieldsFunc(chunk, func(r rune) bool {
 			return r == '=' || unicode.IsSpace(r)
 		})
@@ -216,8 +222,8 @@ type ObjectInfo struct {
 	Ref      ObjectReference `json:"ref" protobuf:"bytes,2,opt,name=ref"`
 }
 
-// +kubebuilder:validation:Enum=authn;authz;auth_secret;backup_via;catalog;cert_issuer;config;connect_via;exposed_by;event;located_on;monitored_by;ocm_bind;offshoot;ops;placed_into;policy;recommended_for;restore_into;scaled_by;storage;view
-// ENUM(authn,authz,auth_secret,backup_via,catalog,cert_issuer,config,connect_via,exposed_by,event,located_on,monitored_by,ocm_bind,offshoot,ops,placed_into,policy,recommended_for,restore_into,scaled_by,storage,view)
+// +kubebuilder:validation:Enum=authn;authz;auth_secret;backup_via;catalog;cert_issuer;config;connect_via;exposed_by;event;located_on;monitored_by;ocm_bind;offshoot;ops;policy;recommended_for;restore_into;scaled_by;source;storage;view
+// ENUM(authn,authz,auth_secret,backup_via,catalog,cert_issuer,config,connect_via,exposed_by,event,located_on,monitored_by,ocm_bind,offshoot,ops,policy,recommended_for,restore_into,scaled_by,source,storage,view)
 type EdgeLabel string
 
 func (e EdgeLabel) Direct() bool {

@@ -14,113 +14,173 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+//go:generate go-enum --mustparse --names --values
 package v1
 
-import "strings"
+import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+)
 
-// +kubebuilder:validation:Enum=Aws;Azure;DigitalOcean;GoogleCloud;Linode;Packet;Scaleway;Vultr;BareMetal;KIND;Generic;Private
+// +kubebuilder:validation:Enum=AKS;DigitalOcean;EKS;Exoscale;Generic;GKE;Linode;Packet;Rancher;Scaleway;Vultr
 type HostingProvider string
 
 const (
-	HostingProviderAWS          HostingProvider = "Aws"
-	HostingProviderAzure        HostingProvider = "Azure"
+	HostingProviderAKS          HostingProvider = "AKS"
 	HostingProviderDigitalOcean HostingProvider = "DigitalOcean"
-	HostingProviderGoogleCloud  HostingProvider = "GoogleCloud"
+	HostingProviderEKS          HostingProvider = "EKS"
+	HostingProviderExoscale     HostingProvider = "Exoscale"
+	HostingProviderGeneric      HostingProvider = "Generic"
+	HostingProviderGKE          HostingProvider = "GKE"
 	HostingProviderLinode       HostingProvider = "Linode"
+	HostingProviderAkamai       HostingProvider = "Akamai"
 	HostingProviderPacket       HostingProvider = "Packet"
+	HostingProviderRancher      HostingProvider = "Rancher"
 	HostingProviderScaleway     HostingProvider = "Scaleway"
 	HostingProviderVultr        HostingProvider = "Vultr"
-	HostingProviderBareMetal    HostingProvider = "BareMetal"
-	HostingProviderKIND         HostingProvider = "KIND"
-	HostingProviderGeneric      HostingProvider = "Generic"
-	HostingProviderPrivate      HostingProvider = "Private"
 )
 
+func (h HostingProvider) ConvertToPreferredProvider() HostingProvider {
+	switch h {
+	case HostingProviderLinode:
+		return HostingProviderAkamai
+	}
+	return h
+}
+
 const (
+	AceInfoConfigMapName = "ace-info"
+	AceMachineProfileKey = "kubernetes.io/instance-type"
+
 	ClusterNameKey         string = "cluster.appscode.com/name"
 	ClusterDisplayNameKey  string = "cluster.appscode.com/display-name"
 	ClusterProviderNameKey string = "cluster.appscode.com/provider"
+	ClusterModeKey         string = "cluster.appscode.com/mode"
+	ClusterProfileLabel    string = "cluster.appscode.com/profile"
+
+	AceOrgIDKey               string = "ace.appscode.com/org-id"
+	AceEnableResourceTrialKey string = "ace.appscode.com/enable-resource-trial"
+	ClientOrgKey              string = "ace.appscode.com/client-org"
+	ClientOrgMonitoringKey    string = "ace.appscode.com/client-org-monitoring"
+	ClientKeyPrefix           string = "client.ace.appscode.com/"
+
+	ClusterClaimKeyID       string = "id.k8s.io"
+	ClusterClaimKeyInfo     string = "cluster.ace.info"
+	ClusterClaimKeyFeatures string = "features.ace.info"
 )
 
 type ClusterMetadata struct {
-	UID         string          `json:"uid" protobuf:"bytes,1,opt,name=uid"`
-	Name        string          `json:"name,omitempty" protobuf:"bytes,2,opt,name=name"`
-	DisplayName string          `json:"displayName,omitempty" protobuf:"bytes,3,opt,name=displayName"`
-	Provider    HostingProvider `json:"provider,omitempty" protobuf:"bytes,4,opt,name=provider,casttype=HostingProvider"`
+	UID                  string          `json:"uid" protobuf:"bytes,1,opt,name=uid"`
+	Name                 string          `json:"name,omitempty" protobuf:"bytes,2,opt,name=name"`
+	DisplayName          string          `json:"displayName,omitempty" protobuf:"bytes,3,opt,name=displayName"`
+	Provider             HostingProvider `json:"provider,omitempty" protobuf:"bytes,4,opt,name=provider,casttype=HostingProvider"`
+	OwnerID              string          `json:"ownerID,omitempty" protobuf:"bytes,5,opt,name=ownerID"`
+	OwnerType            string          `json:"ownerType,omitempty" protobuf:"bytes,6,opt,name=ownerType"`
+	APIEndpoint          string          `json:"apiEndpoint,omitempty" protobuf:"bytes,7,opt,name=apiEndpoint"`
+	CABundle             string          `json:"caBundle,omitempty" protobuf:"bytes,8,opt,name=caBundle"`
+	ManagerID            string          `json:"managerID,omitempty" protobuf:"bytes,9,opt,name=managerID"`
+	HubClusterID         string          `json:"hubClusterID,omitempty" protobuf:"bytes,10,opt,name=hubClusterID"`
+	CloudServiceAuthMode string          `json:"cloudServiceAuthMode,omitempty" protobuf:"bytes,11,opt,name=cloudServiceAuthMode"`
+	Mode                 ClusterMode     `json:"mode,omitempty" protobuf:"bytes,12,opt,name=mode,casttype=ClusterMode"`
 }
 
-type ClusterManager int
-
-const (
-	ClusterManagerACE ClusterManager = 1 << iota
-	ClusterManagerOCMHub
-	ClusterManagerOCMSpoke
-	ClusterManagerOCMMulticlusterControlplane
-	ClusterManagerRancher
-	ClusterManagerOpenShift
-	ClusterManagerVirtualCluster
-)
-
-func (cm ClusterManager) ManagedByACE() bool {
-	return cm&ClusterManagerACE == ClusterManagerACE
-}
-
-func (cm ClusterManager) ManagedByOCMHub() bool {
-	return cm&ClusterManagerOCMHub == ClusterManagerOCMHub
-}
-
-func (cm ClusterManager) ManagedByOCMSpoke() bool {
-	return cm&ClusterManagerOCMSpoke == ClusterManagerOCMSpoke
-}
-
-func (cm ClusterManager) ManagedByOCMMulticlusterControlplane() bool {
-	return cm&ClusterManagerOCMMulticlusterControlplane == ClusterManagerOCMMulticlusterControlplane
-}
-
-func (cm ClusterManager) ManagedByRancher() bool {
-	return cm&ClusterManagerRancher == ClusterManagerRancher
-}
-
-func (cm ClusterManager) ManagedByOpenShift() bool {
-	return cm&ClusterManagerOpenShift == ClusterManagerOpenShift
-}
-
-func (cm ClusterManager) ManagedByVirtualCluster() bool {
-	return cm&ClusterManagerVirtualCluster == ClusterManagerVirtualCluster
-}
-
-func (cm ClusterManager) Strings() []string {
-	out := make([]string, 0, 7)
-	if cm.ManagedByACE() {
-		out = append(out, "ACE")
+func (md ClusterMetadata) Manager() string {
+	if md.ManagerID != "" && md.ManagerID != "0" {
+		return md.ManagerID
 	}
-	if cm.ManagedByOCMHub() {
-		out = append(out, "OCMHub")
-	}
-	if cm.ManagedByOCMSpoke() {
-		out = append(out, "OCMSpoke")
-	}
-	if cm.ManagedByOCMMulticlusterControlplane() {
-		out = append(out, "OCMMulticlusterControlplane")
-	}
-	if cm.ManagedByRancher() {
-		out = append(out, "Rancher")
-	}
-	if cm.ManagedByOpenShift() {
-		out = append(out, "OpenShift")
-	}
-	if cm.ManagedByVirtualCluster() {
-		out = append(out, "vcluster")
-	}
-	return out
+	return md.OwnerID
 }
 
-func (cm ClusterManager) String() string {
-	return strings.Join(cm.Strings(), ",")
+func (md ClusterMetadata) State() string {
+	hasher := hmac.New(sha256.New, []byte(md.UID))
+	state := fmt.Sprintf("%s,%s", md.APIEndpoint, md.Manager())
+	hasher.Write([]byte(state))
+	return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 }
+
+// +kubebuilder:validation:Enum=prod;qa;staging;dev
+// ENUM(prod,qa,staging,dev)
+type ClusterMode string
+
+//
+//const (
+//	ClusterModeProd    ClusterMode = "prod"
+//	ClusterModeQA      ClusterMode = "qa"
+//	ClusterModeStaging ClusterMode = "staging"
+//	ClusterModeDev     ClusterMode = "dev"
+//)
 
 type CAPIClusterInfo struct {
-	Provider    string `json:"provider,omitempty"`
-	Namespace   string `json:"namespace,omitempty"`
-	ClusterName string `json:"clusterName,omitempty"`
+	Provider    CAPIProvider `json:"provider" protobuf:"bytes,1,opt,name=provider,casttype=CAPIProvider"`
+	Namespace   string       `json:"namespace" protobuf:"bytes,2,opt,name=namespace"`
+	ClusterName string       `json:"clusterName" protobuf:"bytes,3,opt,name=clusterName"`
+}
+
+// ClusterInfo used in ace-installer
+type ClusterInfo struct {
+	UID             string   `json:"uid" protobuf:"bytes,1,opt,name=uid"`
+	Name            string   `json:"name" protobuf:"bytes,2,opt,name=name"`
+	ClusterManagers []string `json:"clusterManagers" protobuf:"bytes,3,rep,name=clusterManagers"`
+	// +optional
+	CAPI *CAPIClusterInfo `json:"capi" protobuf:"bytes,4,opt,name=capi"`
+}
+
+// +kubebuilder:validation:Enum=capa;capg;capz;caph;capk
+type CAPIProvider string
+
+const (
+	CAPIProviderCAPA CAPIProvider = "capa"
+	CAPIProviderCAPG CAPIProvider = "capg"
+	CAPIProviderCAPZ CAPIProvider = "capz"
+	CAPIProviderCAPH CAPIProvider = "caph"
+	CAPIProviderCAPK CAPIProvider = "capk"
+)
+
+type ClusterClaimInfo struct {
+	ClusterMetadata ClusterInfo `json:"clusterMetadata" protobuf:"bytes,1,opt,name=clusterMetadata"`
+}
+
+type ClusterClaimFeatures struct {
+	EnabledFeatures           map[string]string `json:"enabledFeatures,omitempty" protobuf:"bytes,1,opt,name=enabledFeatures"`
+	ExternallyManagedFeatures []string          `json:"externallyManagedFeatures,omitempty" protobuf:"bytes,2,opt,name=externallyManagedFeatures"`
+	DisabledFeatures          []string          `json:"disabledFeatures,omitempty" protobuf:"bytes,3,opt,name=disabledFeatures"`
+}
+
+func (f *ClusterClaimFeatures) UnmarshalJSON(data []byte) error {
+	aux := &struct {
+		EnabledFeatures           any      `json:"enabledFeatures,omitempty"`
+		ExternallyManagedFeatures []string `json:"externallyManagedFeatures,omitempty"`
+		DisabledFeatures          []string `json:"disabledFeatures,omitempty"`
+	}{}
+
+	if err := json.Unmarshal(data, aux); err != nil {
+		return err
+	}
+
+	f.EnabledFeatures = toStringMap(aux.EnabledFeatures)
+	f.ExternallyManagedFeatures = aux.ExternallyManagedFeatures
+	f.DisabledFeatures = aux.DisabledFeatures
+	return nil
+}
+
+func toStringMap(v any) map[string]string {
+	result := make(map[string]string)
+	switch val := v.(type) {
+	case []any:
+		for _, item := range val {
+			if str, ok := item.(string); ok {
+				result[str] = ""
+			}
+		}
+	case map[string]any:
+		for k, item := range val {
+			if str, ok := item.(string); ok {
+				result[k] = str
+			}
+		}
+	}
+	return result
 }

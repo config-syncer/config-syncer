@@ -19,7 +19,9 @@ package clientcmd
 import (
 	"net"
 	"os"
+	"slices"
 
+	"kmodules.xyz/client-go/cluster"
 	"kmodules.xyz/client-go/meta"
 
 	"github.com/pkg/errors"
@@ -108,13 +110,17 @@ func Fix(cfg *rest.Config) *rest.Config {
 	host, port := os.Getenv("KUBERNETES_SERVICE_HOST"), os.Getenv("KUBERNETES_SERVICE_PORT")
 	if len(host) > 0 &&
 		len(port) > 0 &&
-		in(cfg.Host, "https://"+net.JoinHostPort(host, port), "https://kubernetes.default.svc", "https://kubernetes.default.svc:443") {
+		slices.Contains([]string{
+			"https://" + net.JoinHostPort(host, port),
+			"https://kubernetes.default.svc",
+			"https://kubernetes.default.svc:443",
+		}, cfg.Host) {
 		// uses service ip or cluster dns
 
-		if cert, err := meta.APIServerCertificate(cfg); err == nil {
+		if cert, err := cluster.APIServerCertificate(cfg); err == nil {
 			// kube-apiserver cert found
 
-			if host, err := meta.TestAKS(cert); err == nil {
+			if host, err := cluster.TestAKS(cert); err == nil {
 				// AKS cluster
 
 				h := "https://" + host
@@ -124,13 +130,4 @@ func Fix(cfg *rest.Config) *rest.Config {
 		}
 	}
 	return cfg
-}
-
-func in(x string, a ...string) bool {
-	for _, v := range a {
-		if x == v {
-			return true
-		}
-	}
-	return false
 }

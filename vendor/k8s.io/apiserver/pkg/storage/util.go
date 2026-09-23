@@ -22,6 +22,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/validation/path"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -33,10 +34,6 @@ func SimpleUpdate(fn SimpleUpdateFunc) UpdateFunc {
 		out, err := fn(input)
 		return out, nil, err
 	}
-}
-
-func EverythingFunc(runtime.Object) bool {
-	return true
 }
 
 func NamespaceKeyFunc(prefix string, obj runtime.Object) (string, error) {
@@ -78,4 +75,34 @@ func (hwm *HighWaterMark) Update(current int64) bool {
 			return true
 		}
 	}
+}
+
+// AnnotateInitialEventsEndBookmark adds a special annotation to the given object
+// which indicates that the initial events have been sent.
+//
+// Note that this function assumes that the obj's annotation
+// field is a reference type (i.e. a map).
+func AnnotateInitialEventsEndBookmark(obj runtime.Object) error {
+	objMeta, err := meta.Accessor(obj)
+	if err != nil {
+		return err
+	}
+	objAnnotations := objMeta.GetAnnotations()
+	if objAnnotations == nil {
+		objAnnotations = map[string]string{}
+	}
+	objAnnotations[metav1.InitialEventsAnnotationKey] = "true"
+	objMeta.SetAnnotations(objAnnotations)
+	return nil
+}
+
+// HasInitialEventsEndBookmarkAnnotation checks the presence of the
+// special annotation which marks that the initial events have been sent.
+func HasInitialEventsEndBookmarkAnnotation(obj runtime.Object) (bool, error) {
+	objMeta, err := meta.Accessor(obj)
+	if err != nil {
+		return false, err
+	}
+	objAnnotations := objMeta.GetAnnotations()
+	return objAnnotations[metav1.InitialEventsAnnotationKey] == "true", nil
 }

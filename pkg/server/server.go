@@ -23,7 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
-	"k8s.io/apimachinery/pkg/version"
+	"k8s.io/apimachinery/pkg/util/wait"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 )
 
@@ -64,7 +64,7 @@ type ConfigSyncerServer struct {
 
 func (op *ConfigSyncerServer) Run(stopCh <-chan struct{}) error {
 	go op.Operator.Run(stopCh)
-	return op.GenericAPIServer.PrepareRun().Run(stopCh)
+	return op.GenericAPIServer.PrepareRun().RunWithContext(wait.ContextForChannel(stopCh))
 }
 
 type completedConfig struct {
@@ -82,11 +82,6 @@ func (c *ConfigSyncerConfig) Complete() CompletedConfig {
 	completedCfg := completedConfig{
 		c.GenericConfig.Complete(),
 		c.OperatorConfig,
-	}
-
-	completedCfg.GenericConfig.Version = &version.Info{
-		Major: "1",
-		Minor: "1",
 	}
 
 	return CompletedConfig{&completedCfg}

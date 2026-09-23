@@ -20,39 +20,33 @@ package transport
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"math"
-	"net"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/proto"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/hpack"
-	spb "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/grpclog"
-	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/internal/envconfig"
+	imem "google.golang.org/grpc/internal/mem"
+	"google.golang.org/grpc/internal/transport/readyreader"
+	"google.golang.org/grpc/mem"
 )
 
 const (
 	// http2MaxFrameLen specifies the max length of a HTTP2 frame.
 	http2MaxFrameLen = 16384 // 16KB frame
-	// http://http2.github.io/http2-spec/#SettingValues
+	// https://httpwg.org/specs/rfc7540.html#SettingValues
 	http2InitHeaderTableSize = 4096
-	// baseContentType is the base content-type for gRPC.  This is a valid
-	// content-type on it's own, but can also include a content-subtype such as
-	// "proto" as a suffix after "+" or ";".  See
-	// https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests
-	// for more details.
-
 )
 
 var (
@@ -92,8 +86,9 @@ var (
 		// 504 Gateway timeout - UNAVAILABLE.
 		http.StatusGatewayTimeout: codes.Unavailable,
 	}
-	logger = grpclog.Component("transport")
 )
+
+var grpcStatusDetailsBinHeader = "grpc-status-details-bin"
 
 // isReservedHeader checks whether hdr belongs to HTTP2 headers
 // reserved by gRPC protocol. Any other headers are classified as the
@@ -110,7 +105,6 @@ func isReservedHeader(hdr string) bool {
 		"grpc-message",
 		"grpc-status",
 		"grpc-timeout",
-		"grpc-status-details-bin",
 		// Intentionally exclude grpc-previous-rpc-attempts and
 		// grpc-retry-pushback-ms, which are "reserved", but their API
 		// intentionally works via metadata.
@@ -161,18 +155,6 @@ func decodeMetadataHeader(k, v string) (string, error) {
 	return v, nil
 }
 
-func decodeGRPCStatusDetails(rawDetails string) (*status.Status, error) {
-	v, err := decodeBinHeader(rawDetails)
-	if err != nil {
-		return nil, err
-	}
-	st := &spb.Status{}
-	if err = proto.Unmarshal(v, st); err != nil {
-		return nil, err
-	}
-	return status.FromProto(st), nil
-}
-
 type timeoutUnit uint8
 
 const (
@@ -217,11 +199,11 @@ func decodeTimeout(s string) (time.Duration, error) {
 	if !ok {
 		return 0, fmt.Errorf("transport: timeout unit is not recognized: %q", s)
 	}
-	t, err := strconv.ParseInt(s[:size-1], 10, 64)
+	t, err := strconv.ParseUint(s[:size-1], 10, 64)
 	if err != nil {
 		return 0, err
 	}
-	const maxHours = math.MaxInt64 / int64(time.Hour)
+	const maxHours = math.MaxInt64 / uint64(time.Hour)
 	if d == time.Hour && t > maxHours {
 		// This timeout would overflow math.MaxInt64; clamp it.
 		return time.Duration(math.MaxInt64), nil
@@ -257,13 +239,13 @@ func encodeGrpcMessage(msg string) string {
 }
 
 func encodeGrpcMessageUnchecked(msg string) string {
-	var buf bytes.Buffer
+	var sb strings.Builder
 	for len(msg) > 0 {
 		r, size := utf8.DecodeRuneInString(msg)
 		for _, b := range []byte(string(r)) {
 			if size > 1 {
 				// If size > 1, r is not ascii. Always do percent encoding.
-				buf.WriteString(fmt.Sprintf("%%%02X", b))
+				fmt.Fprintf(&sb, "%%%02X", b)
 				continue
 			}
 
@@ -272,14 +254,14 @@ func encodeGrpcMessageUnchecked(msg string) string {
 			//
 			// fmt.Sprintf("%%%02X", utf8.RuneError) gives "%FFFD".
 			if b >= spaceByte && b <= tildeByte && b != percentByte {
-				buf.WriteByte(b)
+				sb.WriteByte(b)
 			} else {
-				buf.WriteString(fmt.Sprintf("%%%02X", b))
+				fmt.Fprintf(&sb, "%%%02X", b)
 			}
 		}
 		msg = msg[size:]
 	}
-	return buf.String()
+	return sb.String()
 }
 
 // decodeGrpcMessage decodes the msg encoded by encodeGrpcMessage.
@@ -297,94 +279,168 @@ func decodeGrpcMessage(msg string) string {
 }
 
 func decodeGrpcMessageUnchecked(msg string) string {
-	var buf bytes.Buffer
+	var sb strings.Builder
 	lenMsg := len(msg)
 	for i := 0; i < lenMsg; i++ {
 		c := msg[i]
 		if c == percentByte && i+2 < lenMsg {
 			parsed, err := strconv.ParseUint(msg[i+1:i+3], 16, 8)
 			if err != nil {
-				buf.WriteByte(c)
+				sb.WriteByte(c)
 			} else {
-				buf.WriteByte(byte(parsed))
+				sb.WriteByte(byte(parsed))
 				i += 2
 			}
 		} else {
-			buf.WriteByte(c)
+			sb.WriteByte(c)
 		}
 	}
-	return buf.String()
+	return sb.String()
 }
 
 type bufWriter struct {
+	pool      *imem.SimpleBufferPool
 	buf       []byte
 	offset    int
 	batchSize int
-	conn      net.Conn
+	conn      io.Writer
 	err       error
-
-	onFlush func()
 }
 
-func newBufWriter(conn net.Conn, batchSize int) *bufWriter {
-	return &bufWriter{
-		buf:       make([]byte, batchSize*2),
+func newBufWriter(conn io.Writer, batchSize int, pool *imem.SimpleBufferPool) *bufWriter {
+	w := &bufWriter{
 		batchSize: batchSize,
 		conn:      conn,
+		pool:      pool,
 	}
+	// this indicates that we should use non shared buf
+	if pool == nil {
+		w.buf = make([]byte, batchSize)
+	}
+	return w
 }
 
-func (w *bufWriter) Write(b []byte) (n int, err error) {
+func (w *bufWriter) Write(b []byte) (int, error) {
 	if w.err != nil {
 		return 0, w.err
 	}
 	if w.batchSize == 0 { // Buffer has been disabled.
-		return w.conn.Write(b)
+		n, err := w.conn.Write(b)
+		return n, toIOError(err)
 	}
+	if w.buf == nil {
+		b := w.pool.Get(w.batchSize)
+		w.buf = *b
+	}
+	written := 0
 	for len(b) > 0 {
-		nn := copy(w.buf[w.offset:], b)
-		b = b[nn:]
-		w.offset += nn
-		n += nn
-		if w.offset >= w.batchSize {
-			err = w.Flush()
+		copied := copy(w.buf[w.offset:], b)
+		b = b[copied:]
+		written += copied
+		w.offset += copied
+		if w.offset < w.batchSize {
+			continue
+		}
+		if err := w.flushKeepBuffer(); err != nil {
+			return written, err
 		}
 	}
-	return n, err
+	return written, nil
 }
 
 func (w *bufWriter) Flush() error {
+	err := w.flushKeepBuffer()
+	// Only release the buffer if we are in a "shared" mode
+	if w.buf != nil && w.pool != nil {
+		b := w.buf
+		w.pool.Put(&b)
+		w.buf = nil
+	}
+	return err
+}
+
+func (w *bufWriter) flushKeepBuffer() error {
 	if w.err != nil {
 		return w.err
 	}
 	if w.offset == 0 {
 		return nil
 	}
-	if w.onFlush != nil {
-		w.onFlush()
-	}
 	_, w.err = w.conn.Write(w.buf[:w.offset])
+	w.err = toIOError(w.err)
 	w.offset = 0
 	return w.err
 }
 
-type framer struct {
-	writer *bufWriter
-	fr     *http2.Framer
+type ioError struct {
+	error
 }
 
-func newFramer(conn net.Conn, writeBufferSize, readBufferSize int, maxHeaderListSize uint32) *framer {
+func (i ioError) Unwrap() error {
+	return i.error
+}
+
+func isIOError(err error) bool {
+	return errors.As(err, &ioError{})
+}
+
+func toIOError(err error) error {
+	if err == nil {
+		return nil
+	}
+	return ioError{error: err}
+}
+
+type parsedDataFrame struct {
+	http2.FrameHeader
+	data mem.Buffer
+}
+
+func (df *parsedDataFrame) StreamEnded() bool {
+	return df.FrameHeader.Flags.Has(http2.FlagDataEndStream)
+}
+
+type framer struct {
+	writer    *bufWriter
+	fr        *http2.Framer
+	headerBuf []byte // cached slice for framer headers to reduce heap allocs.
+	reader    io.Reader
+	dataFrame parsedDataFrame // Cached data frame to avoid heap allocations.
+	pool      mem.BufferPool
+	errDetail error
+}
+
+var ioBufferPoolMap = make(map[int]*imem.SimpleBufferPool)
+var ioBufferMutex sync.Mutex
+
+func bufferedReader(r io.Reader, bufSize int) io.Reader {
+	if bufSize <= 0 {
+		return r
+	}
+	if envconfig.EnableHTTPFramerReadBufferPooling {
+		if rr := readyreader.NewNonBlocking(r); rr != nil {
+			readPool := ioBufferPool(bufSize)
+			return readyreader.NewBuffered(rr, bufSize, readPool)
+		}
+	}
+	return bufio.NewReaderSize(r, bufSize)
+}
+
+func newFramer(conn io.ReadWriter, writeBufferSize, readBufferSize int, sharedWriteBuffer bool, maxHeaderListSize uint32, memPool mem.BufferPool) *framer {
 	if writeBufferSize < 0 {
 		writeBufferSize = 0
 	}
-	var r io.Reader = conn
-	if readBufferSize > 0 {
-		r = bufio.NewReaderSize(r, readBufferSize)
+	r := bufferedReader(conn, readBufferSize)
+	var writePool *imem.SimpleBufferPool
+	if sharedWriteBuffer {
+		writePool = ioBufferPool(writeBufferSize)
 	}
-	w := newBufWriter(conn, writeBufferSize)
+	w := newBufWriter(conn, writeBufferSize, writePool)
 	f := &framer{
 		writer: w,
 		fr:     http2.NewFramer(w, r),
+		reader: r,
+		pool:   memPool,
 	}
 	f.fr.SetMaxReadFrameSize(http2MaxFrameLen)
 	// Opt-in to Frame reuse API on framer to reduce garbage.
@@ -395,8 +451,160 @@ func newFramer(conn net.Conn, writeBufferSize, readBufferSize int, maxHeaderList
 	return f
 }
 
-// parseDialTarget returns the network and address to pass to dialer.
-func parseDialTarget(target string) (string, string) {
+// writeData writes a DATA frame.
+//
+// It is the caller's responsibility not to violate the maximum frame size.
+func (f *framer) writeData(streamID uint32, endStream bool, data [][]byte) error {
+	var flags http2.Flags
+	if endStream {
+		flags = http2.FlagDataEndStream
+	}
+	length := uint32(0)
+	for _, d := range data {
+		length += uint32(len(d))
+	}
+	// TODO: Replace the header write with the framer API being added in
+	// https://github.com/golang/go/issues/66655.
+	f.headerBuf = append(f.headerBuf[:0],
+		byte(length>>16),
+		byte(length>>8),
+		byte(length),
+		byte(http2.FrameData),
+		byte(flags),
+		byte(streamID>>24),
+		byte(streamID>>16),
+		byte(streamID>>8),
+		byte(streamID))
+	if _, err := f.writer.Write(f.headerBuf); err != nil {
+		return err
+	}
+	for _, d := range data {
+		if _, err := f.writer.Write(d); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// readFrame reads a single frame. The returned Frame is only valid
+// until the next call to readFrame.
+func (f *framer) readFrame() (any, error) {
+	f.errDetail = nil
+	fh, err := f.fr.ReadFrameHeader()
+	if err != nil {
+		f.errDetail = f.fr.ErrorDetail()
+		return nil, err
+	}
+	// Read the data frame directly from the underlying io.Reader to avoid
+	// copies.
+	if fh.Type == http2.FrameData {
+		err = f.readDataFrame(fh)
+		return &f.dataFrame, err
+	}
+	fr, err := f.fr.ReadFrameForHeader(fh)
+	if err != nil {
+		f.errDetail = f.fr.ErrorDetail()
+		return nil, err
+	}
+	return fr, err
+}
+
+// errorDetail returns a more detailed error of the last error
+// returned by framer.readFrame. For instance, if readFrame
+// returns a StreamError with code PROTOCOL_ERROR, errorDetail
+// will say exactly what was invalid. errorDetail is not guaranteed
+// to return a non-nil value.
+// errorDetail is reset after the next call to readFrame.
+func (f *framer) errorDetail() error {
+	return f.errDetail
+}
+
+func (f *framer) readDataFrame(fh http2.FrameHeader) (err error) {
+	if fh.StreamID == 0 {
+		// DATA frames MUST be associated with a stream. If a
+		// DATA frame is received whose stream identifier
+		// field is 0x0, the recipient MUST respond with a
+		// connection error (Section 5.4.1) of type
+		// PROTOCOL_ERROR.
+		f.errDetail = errors.New("DATA frame with stream ID 0")
+		return http2.ConnectionError(http2.ErrCodeProtocol)
+	}
+	// Converting a *[]byte to a mem.SliceBuffer incurs a heap allocation. This
+	// conversion is performed by mem.NewBuffer. To avoid the extra allocation
+	// a []byte is allocated directly if required and cast to a mem.SliceBuffer.
+	var buf []byte
+	// poolHandle is the pointer returned by the buffer pool (if it's used.).
+	var poolHandle *[]byte
+	useBufferPool := !mem.IsBelowBufferPoolingThreshold(int(fh.Length))
+	if useBufferPool {
+		poolHandle = f.pool.Get(int(fh.Length))
+		buf = *poolHandle
+		defer func() {
+			if err != nil {
+				f.pool.Put(poolHandle)
+			}
+		}()
+	} else {
+		buf = make([]byte, int(fh.Length))
+	}
+	if fh.Flags.Has(http2.FlagDataPadded) {
+		if fh.Length == 0 {
+			return io.ErrUnexpectedEOF
+		}
+		// This initial 1-byte read can be inefficient for unbuffered readers,
+		// but it allows the rest of the payload to be read directly to the
+		// start of the destination slice. This makes it easy to return the
+		// original slice back to the buffer pool.
+		if _, err := io.ReadFull(f.reader, buf[:1]); err != nil {
+			return err
+		}
+		padSize := buf[0]
+		buf = buf[:len(buf)-1]
+		if int(padSize) > len(buf) {
+			// If the length of the padding is greater than the
+			// length of the frame payload, the recipient MUST
+			// treat this as a connection error.
+			// Filed: https://github.com/http2/http2-spec/issues/610
+			f.errDetail = errors.New("pad size larger than data payload")
+			return http2.ConnectionError(http2.ErrCodeProtocol)
+		}
+		if _, err := io.ReadFull(f.reader, buf); err != nil {
+			return err
+		}
+		buf = buf[:len(buf)-int(padSize)]
+	} else if _, err := io.ReadFull(f.reader, buf); err != nil {
+		return err
+	}
+
+	f.dataFrame.FrameHeader = fh
+	if useBufferPool {
+		// Update the handle to point to the (potentially re-sliced) buf.
+		*poolHandle = buf
+		f.dataFrame.data = mem.NewBuffer(poolHandle, f.pool)
+	} else {
+		f.dataFrame.data = mem.SliceBuffer(buf)
+	}
+	return nil
+}
+
+func (df *parsedDataFrame) Header() http2.FrameHeader {
+	return df.FrameHeader
+}
+
+func ioBufferPool(size int) *imem.SimpleBufferPool {
+	ioBufferMutex.Lock()
+	defer ioBufferMutex.Unlock()
+	pool, ok := ioBufferPoolMap[size]
+	if ok {
+		return pool
+	}
+	pool = imem.NewDirtySimplePool()
+	ioBufferPoolMap[size] = pool
+	return pool
+}
+
+// ParseDialTarget returns the network and address to pass to dialer.
+func ParseDialTarget(target string) (string, string) {
 	net := "tcp"
 	m1 := strings.Index(target, ":")
 	m2 := strings.Index(target, ":/")

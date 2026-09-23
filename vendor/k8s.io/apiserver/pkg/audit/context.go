@@ -18,9 +18,18 @@ package audit
 
 import (
 	"context"
+	"errors"
+	"maps"
 	"sync"
+	"sync/atomic"
+	"time"
 
+	authnv1 "k8s.io/api/authentication/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	auditinternal "k8s.io/apiserver/pkg/apis/audit"
+	"k8s.io/apiserver/pkg/authentication/user"
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/klog/v2"
 )
@@ -28,38 +37,229 @@ import (
 // The key type is unexported to prevent collisions
 type key int
 
-const (
-	// auditAnnotationsKey is the context key for the audit annotations.
-	// TODO: consolidate all audit info under the AuditContext, rather than storing 3 separate keys.
-	auditAnnotationsKey key = iota
+// auditKey is the context key for storing the audit context that is being
+// captured and the evaluated policy that applies to the given request.
+const auditKey key = iota
 
-	// auditKey is the context key for storing the audit event that is being
-	// captured and the evaluated policy that applies to the given request.
-	auditKey
+// AuditContext holds the information for constructing the audit events for the current request.
+type AuditContext struct {
+	// initialized indicates whether requestAuditConfig and sink have been populated and are safe to read unguarded.
+	// This should only be set via Init().
+	initialized atomic.Bool
+	// requestAuditConfig is the audit configuration that applies to the request.
+	// This should only be written via Init(RequestAuditConfig, Sink), and only read when initialized.Load() is true.
+	requestAuditConfig RequestAuditConfig
+	// sink is the sink to use when processing event stages.
+	// This should only be written via Init(RequestAuditConfig, Sink), and only read when initialized.Load() is true.
+	sink Sink
 
-	// auditAnnotationsMutexKey is the context key for the audit annotations mutex.
-	auditAnnotationsMutexKey
-)
+	// lock guards event
+	lock sync.Mutex
 
-// annotations = *[]annotation instead of a map to preserve order of insertions
-type annotation struct {
-	key, value string
+	// event is the audit Event object that is being captured to be written in
+	// the API audit log.
+	event auditinternal.Event
+
+	// unguarded copy of auditID from the event
+	auditID atomic.Value
 }
 
-// WithAuditAnnotations returns a new context that can store audit annotations
-// via the AddAuditAnnotation function.  This function is meant to be called from
-// an early request handler to allow all later layers to set audit annotations.
-// This is required to support flows where handlers that come before WithAudit
-// (such as WithAuthentication) wish to set audit annotations.
-func WithAuditAnnotations(parent context.Context) context.Context {
-	// this should never really happen, but prevent double registration of this slice
-	if _, ok := parent.Value(auditAnnotationsKey).(*[]annotation); ok {
-		return parent
+// Enabled checks whether auditing is enabled for this audit context.
+func (ac *AuditContext) Enabled() bool {
+	if ac == nil {
+		// protect against nil pointers
+		return false
 	}
-	parent = withAuditAnnotationsMutex(parent)
+	if !ac.initialized.Load() {
+		// Note: An unset Level should be considered Enabled, so that request data (e.g. annotations)
+		// can still be captured before the audit policy is evaluated.
+		return true
+	}
+	return ac.requestAuditConfig.Level != auditinternal.LevelNone
+}
 
-	var annotations []annotation // avoid allocations until we actually need it
-	return genericapirequest.WithValue(parent, auditAnnotationsKey, &annotations)
+func (ac *AuditContext) Init(requestAuditConfig RequestAuditConfig, sink Sink) error {
+	ac.lock.Lock()
+	defer ac.lock.Unlock()
+	if ac.initialized.Load() {
+		return errors.New("audit context was already initialized")
+	}
+	ac.requestAuditConfig = requestAuditConfig
+	ac.sink = sink
+	ac.event.Level = requestAuditConfig.Level
+	ac.initialized.Store(true)
+	return nil
+}
+
+func (ac *AuditContext) AuditID() types.UID {
+	// return the unguarded copy of the auditID
+	id, _ := ac.auditID.Load().(types.UID)
+	return id
+}
+
+func (ac *AuditContext) visitEvent(f func(event *auditinternal.Event)) {
+	ac.lock.Lock()
+	defer ac.lock.Unlock()
+	f(&ac.event)
+}
+
+// ProcessEventStage returns true on success, false if there was an error processing the stage.
+func (ac *AuditContext) ProcessEventStage(ctx context.Context, stage auditinternal.Stage) bool {
+	if ac == nil || !ac.initialized.Load() {
+		return true
+	}
+	if ac.sink == nil {
+		return true
+	}
+	for _, omitStage := range ac.requestAuditConfig.OmitStages {
+		if stage == omitStage {
+			return true
+		}
+	}
+
+	processed := false
+	ac.visitEvent(func(event *auditinternal.Event) {
+		event.Stage = stage
+		if stage == auditinternal.StageRequestReceived {
+			event.StageTimestamp = event.RequestReceivedTimestamp
+		} else {
+			event.StageTimestamp = metav1.NewMicroTime(time.Now())
+		}
+
+		ObserveEvent(ctx)
+		processed = ac.sink.ProcessEvents(event)
+	})
+	return processed
+}
+
+func (ac *AuditContext) LogImpersonatedUser(user user.Info) {
+	ac.visitEvent(func(ev *auditinternal.Event) {
+		if ev == nil || ev.Level.Less(auditinternal.LevelMetadata) {
+			return
+		}
+		ev.ImpersonatedUser = &authnv1.UserInfo{
+			Username: user.GetName(),
+		}
+		ev.ImpersonatedUser.Groups = user.GetGroups()
+		ev.ImpersonatedUser.UID = user.GetUID()
+		ev.ImpersonatedUser.Extra = map[string]authnv1.ExtraValue{}
+		for k, v := range user.GetExtra() {
+			ev.ImpersonatedUser.Extra[k] = authnv1.ExtraValue(v)
+		}
+	})
+}
+
+func (ac *AuditContext) LogResponseObject(status *metav1.Status, obj *runtime.Unknown) {
+	ac.visitEvent(func(ae *auditinternal.Event) {
+		if status != nil {
+			// selectively copy the bounded fields.
+			ae.ResponseStatus = &metav1.Status{
+				Status:  status.Status,
+				Message: status.Message,
+				Reason:  status.Reason,
+				Details: status.Details,
+				Code:    status.Code,
+			}
+		}
+		if ae.Level.Less(auditinternal.LevelRequestResponse) {
+			return
+		}
+		ae.ResponseObject = obj
+	})
+}
+
+// LogRequestPatch fills in the given patch as the request object into an audit event.
+func (ac *AuditContext) LogRequestPatch(patch []byte) {
+	ac.visitEvent(func(ae *auditinternal.Event) {
+		ae.RequestObject = &runtime.Unknown{
+			Raw:         patch,
+			ContentType: runtime.ContentTypeJSON,
+		}
+	})
+}
+
+func (ac *AuditContext) GetEventAnnotation(key string) (string, bool) {
+	var val string
+	var ok bool
+	ac.visitEvent(func(event *auditinternal.Event) {
+		val, ok = event.Annotations[key]
+	})
+	return val, ok
+}
+
+func (ac *AuditContext) GetEventLevel() auditinternal.Level {
+	var level auditinternal.Level
+	ac.visitEvent(func(event *auditinternal.Event) {
+		level = event.Level
+	})
+	return level
+}
+
+func (ac *AuditContext) SetEventStage(stage auditinternal.Stage) {
+	ac.visitEvent(func(event *auditinternal.Event) {
+		event.Stage = stage
+	})
+}
+
+func (ac *AuditContext) GetEventStage() auditinternal.Stage {
+	var stage auditinternal.Stage
+	ac.visitEvent(func(event *auditinternal.Event) {
+		stage = event.Stage
+	})
+	return stage
+}
+
+func (ac *AuditContext) SetEventStageTimestamp(timestamp metav1.MicroTime) {
+	ac.visitEvent(func(event *auditinternal.Event) {
+		event.StageTimestamp = timestamp
+	})
+}
+
+func (ac *AuditContext) GetEventResponseStatus() *metav1.Status {
+	var status *metav1.Status
+	ac.visitEvent(func(event *auditinternal.Event) {
+		status = event.ResponseStatus
+	})
+	return status
+}
+
+func (ac *AuditContext) GetEventRequestReceivedTimestamp() metav1.MicroTime {
+	var timestamp metav1.MicroTime
+	ac.visitEvent(func(event *auditinternal.Event) {
+		timestamp = event.RequestReceivedTimestamp
+	})
+	return timestamp
+}
+
+func (ac *AuditContext) GetEventStageTimestamp() metav1.MicroTime {
+	var timestamp metav1.MicroTime
+	ac.visitEvent(func(event *auditinternal.Event) {
+		timestamp = event.StageTimestamp
+	})
+	return timestamp
+}
+
+func (ac *AuditContext) SetEventResponseStatus(status *metav1.Status) {
+	ac.visitEvent(func(event *auditinternal.Event) {
+		event.ResponseStatus = status
+	})
+}
+
+func (ac *AuditContext) SetEventResponseStatusCode(statusCode int32) {
+	ac.visitEvent(func(event *auditinternal.Event) {
+		if event.ResponseStatus == nil {
+			event.ResponseStatus = &metav1.Status{}
+		}
+		event.ResponseStatus.Code = statusCode
+	})
+}
+
+func (ac *AuditContext) GetEventAnnotations() map[string]string {
+	var annotations map[string]string
+	ac.visitEvent(func(event *auditinternal.Event) {
+		annotations = maps.Clone(event.Annotations)
+	})
+	return annotations
 }
 
 // AddAuditAnnotation sets the audit annotation for the given key, value pair.
@@ -70,111 +270,56 @@ func WithAuditAnnotations(parent context.Context) context.Context {
 // Handlers that are unaware of their position in the overall request flow should
 // prefer AddAuditAnnotation over LogAnnotation to avoid dropping annotations.
 func AddAuditAnnotation(ctx context.Context, key, value string) {
-	mutex, ok := auditAnnotationsMutex(ctx)
-	if !ok {
-		// auditing is not enabled
+	ac := AuditContextFrom(ctx)
+	if !ac.Enabled() {
 		return
 	}
 
-	mutex.Lock()
-	defer mutex.Unlock()
+	ac.lock.Lock()
+	defer ac.lock.Unlock()
 
-	ae := AuditEventFrom(ctx)
-	var ctxAnnotations *[]annotation
-	if ae == nil {
-		ctxAnnotations, _ = ctx.Value(auditAnnotationsKey).(*[]annotation)
-	}
-
-	addAuditAnnotationLocked(ae, ctxAnnotations, key, value)
+	addAuditAnnotationLocked(ac, key, value)
 }
 
 // AddAuditAnnotations is a bulk version of AddAuditAnnotation. Refer to AddAuditAnnotation for
 // restrictions on when this can be called.
 // keysAndValues are the key-value pairs to add, and must have an even number of items.
 func AddAuditAnnotations(ctx context.Context, keysAndValues ...string) {
-	mutex, ok := auditAnnotationsMutex(ctx)
-	if !ok {
-		// auditing is not enabled
+	ac := AuditContextFrom(ctx)
+	if !ac.Enabled() {
 		return
 	}
 
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	ae := AuditEventFrom(ctx)
-	var ctxAnnotations *[]annotation
-	if ae == nil {
-		ctxAnnotations, _ = ctx.Value(auditAnnotationsKey).(*[]annotation)
-	}
+	ac.lock.Lock()
+	defer ac.lock.Unlock()
 
 	if len(keysAndValues)%2 != 0 {
 		klog.Errorf("Dropping mismatched audit annotation %q", keysAndValues[len(keysAndValues)-1])
 	}
 	for i := 0; i < len(keysAndValues); i += 2 {
-		addAuditAnnotationLocked(ae, ctxAnnotations, keysAndValues[i], keysAndValues[i+1])
+		addAuditAnnotationLocked(ac, keysAndValues[i], keysAndValues[i+1])
 	}
 }
 
 // AddAuditAnnotationsMap is a bulk version of AddAuditAnnotation. Refer to AddAuditAnnotation for
 // restrictions on when this can be called.
 func AddAuditAnnotationsMap(ctx context.Context, annotations map[string]string) {
-	mutex, ok := auditAnnotationsMutex(ctx)
-	if !ok {
-		// auditing is not enabled
+	ac := AuditContextFrom(ctx)
+	if !ac.Enabled() {
 		return
 	}
 
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	ae := AuditEventFrom(ctx)
-	var ctxAnnotations *[]annotation
-	if ae == nil {
-		ctxAnnotations, _ = ctx.Value(auditAnnotationsKey).(*[]annotation)
-	}
+	ac.lock.Lock()
+	defer ac.lock.Unlock()
 
 	for k, v := range annotations {
-		addAuditAnnotationLocked(ae, ctxAnnotations, k, v)
+		addAuditAnnotationLocked(ac, k, v)
 	}
 }
 
-// addAuditAnnotationLocked is the shared code for recording an audit annotation. This method should
-// only be called while the auditAnnotationsMutex is locked.
-func addAuditAnnotationLocked(ae *auditinternal.Event, annotations *[]annotation, key, value string) {
-	if ae != nil {
-		logAnnotation(ae, key, value)
-	} else if annotations != nil {
-		*annotations = append(*annotations, annotation{key: key, value: value})
-	}
-}
-
-// This is private to prevent reads/write to the slice from outside of this package.
-// The audit event should be directly read to get access to the annotations.
-func addAuditAnnotationsFrom(ctx context.Context, ev *auditinternal.Event) {
-	mutex, ok := auditAnnotationsMutex(ctx)
-	if !ok {
-		// auditing is not enabled
-		return
-	}
-
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	annotations, ok := ctx.Value(auditAnnotationsKey).(*[]annotation)
-	if !ok {
-		return // no annotations to copy
-	}
-
-	for _, kv := range *annotations {
-		logAnnotation(ev, kv.key, kv.value)
-	}
-}
-
-// LogAnnotation fills in the Annotations according to the key value pair.
-func logAnnotation(ae *auditinternal.Event, key, value string) {
-	if ae == nil || ae.Level.Less(auditinternal.LevelMetadata) {
-		return
-	}
+// addAuditAnnotationLocked records the audit annotation on the event.
+func addAuditAnnotationLocked(ac *AuditContext, key, value string) {
+	ae := &ac.event
 	if ae.Annotations == nil {
 		ae.Annotations = make(map[string]string)
 	}
@@ -185,20 +330,17 @@ func logAnnotation(ae *auditinternal.Event, key, value string) {
 	ae.Annotations[key] = value
 }
 
-// WithAuditContext returns a new context that stores the pair of the audit
-// configuration object that applies to the given request and
-// the audit event that is going to be written to the API audit log.
-func WithAuditContext(parent context.Context, ev *AuditContext) context.Context {
-	parent = withAuditAnnotationsMutex(parent)
-	return genericapirequest.WithValue(parent, auditKey, ev)
-}
-
-// AuditEventFrom returns the audit event struct on the ctx
-func AuditEventFrom(ctx context.Context) *auditinternal.Event {
-	if o := AuditContextFrom(ctx); o != nil {
-		return o.Event
+// WithAuditContext returns a new context that stores the AuditContext.
+func WithAuditContext(parent context.Context) context.Context {
+	if AuditContextFrom(parent) != nil {
+		return parent // Avoid double registering.
 	}
-	return nil
+
+	return genericapirequest.WithValue(parent, auditKey, &AuditContext{
+		event: auditinternal.Event{
+			Stage: auditinternal.StageResponseStarted,
+		},
+	})
 }
 
 // AuditContextFrom returns the pair of the audit configuration object
@@ -209,17 +351,46 @@ func AuditContextFrom(ctx context.Context) *AuditContext {
 	return ev
 }
 
-// WithAuditAnnotationMutex adds a mutex for guarding context.AddAuditAnnotation.
-func withAuditAnnotationsMutex(parent context.Context) context.Context {
-	if _, ok := parent.Value(auditAnnotationsMutexKey).(*sync.Mutex); ok {
-		return parent
+// WithAuditID sets the AuditID on the AuditContext. The AuditContext must already be present in the
+// request context. If the specified auditID is empty, no value is set.
+func WithAuditID(ctx context.Context, auditID types.UID) {
+	if auditID == "" {
+		return
 	}
-	var mutex sync.Mutex
-	return genericapirequest.WithValue(parent, auditAnnotationsMutexKey, &mutex)
+	if ac := AuditContextFrom(ctx); ac != nil {
+		ac.visitEvent(func(event *auditinternal.Event) {
+			ac.auditID.Store(auditID)
+			event.AuditID = auditID
+		})
+	}
 }
 
-// AuditAnnotationsMutex returns the audit annotations mutex from the context.
-func auditAnnotationsMutex(ctx context.Context) (*sync.Mutex, bool) {
-	mutex, ok := ctx.Value(auditAnnotationsMutexKey).(*sync.Mutex)
-	return mutex, ok
+// AuditIDFrom returns the value of the audit ID from the request context, along with whether
+// auditing is enabled.
+func AuditIDFrom(ctx context.Context) (types.UID, bool) {
+	if ac := AuditContextFrom(ctx); ac != nil {
+		id, _ := ac.auditID.Load().(types.UID)
+		return id, true
+	}
+	return "", false
+}
+
+// GetAuditIDTruncated returns the audit ID (truncated) from the request context.
+// If the length of the Audit-ID value exceeds the limit, we truncate it to keep
+// the first N (maxAuditIDLength) characters.
+// This is intended to be used in logging only.
+func GetAuditIDTruncated(ctx context.Context) string {
+	auditID, ok := AuditIDFrom(ctx)
+	if !ok {
+		return ""
+	}
+
+	// if the user has specified a very long audit ID then we will use the first N characters
+	// Note: assuming Audit-ID header is in ASCII
+	const maxAuditIDLength = 64
+	if len(auditID) > maxAuditIDLength {
+		auditID = auditID[:maxAuditIDLength]
+	}
+
+	return string(auditID)
 }

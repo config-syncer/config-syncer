@@ -16,21 +16,22 @@ package prometheus
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
 )
 
 type processCollector struct {
-	collectFn       func(chan<- Metric)
-	pidFn           func() (int, error)
-	reportErrors    bool
-	cpuTotal        *Desc
-	openFDs, maxFDs *Desc
-	vsize, maxVsize *Desc
-	rss             *Desc
-	startTime       *Desc
+	collectFn         func(chan<- Metric)
+	describeFn        func(chan<- *Desc)
+	pidFn             func() (int, error)
+	reportErrors      bool
+	cpuTotal          *Desc
+	openFDs, maxFDs   *Desc
+	vsize, maxVsize   *Desc
+	rss               *Desc
+	startTime         *Desc
+	inBytes, outBytes *Desc
 }
 
 // ProcessCollectorOpts defines the behavior of a process metrics collector
@@ -101,11 +102,20 @@ func NewProcessCollector(opts ProcessCollectorOpts) Collector {
 			"Start time of the process since unix epoch in seconds.",
 			nil, nil,
 		),
+		inBytes: NewDesc(
+			ns+"process_network_receive_bytes_total",
+			"Number of bytes received by the process over the network.",
+			nil, nil,
+		),
+		outBytes: NewDesc(
+			ns+"process_network_transmit_bytes_total",
+			"Number of bytes sent by the process over the network.",
+			nil, nil,
+		),
 	}
 
 	if opts.PidFn == nil {
-		pid := os.Getpid()
-		c.pidFn = func() (int, error) { return pid, nil }
+		c.pidFn = getPIDFn()
 	} else {
 		c.pidFn = opts.PidFn
 	}
@@ -113,29 +123,33 @@ func NewProcessCollector(opts ProcessCollectorOpts) Collector {
 	// Set up process metric collection if supported by the runtime.
 	if canCollectProcess() {
 		c.collectFn = c.processCollect
+		c.describeFn = c.describe
 	} else {
-		c.collectFn = func(ch chan<- Metric) {
-			c.reportError(ch, nil, errors.New("process metrics not supported on this platform"))
-		}
+		c.collectFn = c.errorCollectFn
+		c.describeFn = c.errorDescribeFn
 	}
 
 	return c
 }
 
-// Describe returns all descriptions of the collector.
-func (c *processCollector) Describe(ch chan<- *Desc) {
-	ch <- c.cpuTotal
-	ch <- c.openFDs
-	ch <- c.maxFDs
-	ch <- c.vsize
-	ch <- c.maxVsize
-	ch <- c.rss
-	ch <- c.startTime
+func (c *processCollector) errorCollectFn(ch chan<- Metric) {
+	c.reportError(ch, nil, errors.New("process metrics not supported on this platform"))
+}
+
+func (c *processCollector) errorDescribeFn(ch chan<- *Desc) {
+	if c.reportErrors {
+		ch <- NewInvalidDesc(errors.New("process metrics not supported on this platform"))
+	}
 }
 
 // Collect returns the current state of all metrics of the collector.
 func (c *processCollector) Collect(ch chan<- Metric) {
 	c.collectFn(ch)
+}
+
+// Describe returns all descriptions of the collector.
+func (c *processCollector) Describe(ch chan<- *Desc) {
+	c.describeFn(ch)
 }
 
 func (c *processCollector) reportError(ch chan<- Metric, desc *Desc, err error) {
@@ -152,13 +166,13 @@ func (c *processCollector) reportError(ch chan<- Metric, desc *Desc, err error) 
 // It is meant to be used for the PidFn field in ProcessCollectorOpts.
 func NewPidFileFn(pidFilePath string) func() (int, error) {
 	return func() (int, error) {
-		content, err := ioutil.ReadFile(pidFilePath)
+		content, err := os.ReadFile(pidFilePath)
 		if err != nil {
-			return 0, fmt.Errorf("can't read pid file %q: %+v", pidFilePath, err)
+			return 0, fmt.Errorf("can't read pid file %q: %w", pidFilePath, err)
 		}
 		pid, err := strconv.Atoi(strings.TrimSpace(string(content)))
 		if err != nil {
-			return 0, fmt.Errorf("can't parse pid file %q: %+v", pidFilePath, err)
+			return 0, fmt.Errorf("can't parse pid file %q: %w", pidFilePath, err)
 		}
 
 		return pid, nil

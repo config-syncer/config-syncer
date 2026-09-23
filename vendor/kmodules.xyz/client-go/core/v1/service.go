@@ -81,7 +81,7 @@ func PatchServiceObject(ctx context.Context, c kubernetes.Interface, cur, mod *c
 
 func TryUpdateService(ctx context.Context, c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*core.Service) *core.Service, opts metav1.UpdateOptions) (result *core.Service, err error) {
 	attempt := 0
-	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
+	err = wait.PollUntilContextTimeout(ctx, kutil.RetryInterval, kutil.RetryTimeout, true, func(ctx context.Context) (bool, error) {
 		attempt++
 		cur, e2 := c.CoreV1().Services(meta.Namespace).Get(ctx, meta.Name, metav1.GetOptions{})
 		if kerr.IsNotFound(e2) {
@@ -93,7 +93,6 @@ func TryUpdateService(ctx context.Context, c kubernetes.Interface, meta metav1.O
 		klog.Errorf("Attempt %d failed to update Service %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)
 		return false, nil
 	})
-
 	if err != nil {
 		err = errors.Errorf("failed to update Service %s/%s after %d attempts due to %v", meta.Namespace, meta.Name, attempt, err)
 	}
@@ -141,7 +140,7 @@ func WaitUntilServiceDeletedBySelector(ctx context.Context, c kubernetes.Interfa
 		return err
 	}
 
-	return wait.PollImmediate(kutil.RetryInterval, kutil.ReadinessTimeout, func() (bool, error) {
+	return wait.PollUntilContextTimeout(ctx, kutil.RetryInterval, kutil.ReadinessTimeout, true, func(ctx context.Context) (bool, error) {
 		svcList, err := c.CoreV1().Services(namespace).List(ctx, metav1.ListOptions{
 			LabelSelector: sel.String(),
 		})
