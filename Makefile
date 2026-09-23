@@ -55,7 +55,7 @@ endif
 SRC_PKGS := cmd pkg # directories which hold app source excluding tests (not vendored)
 SRC_DIRS := $(SRC_PKGS) test hack # directories which hold app source (not vendored)
 
-DOCKER_PLATFORMS := linux/amd64 linux/arm64 linux/ppc64le linux/s390x
+DOCKER_PLATFORMS := linux/amd64 linux/arm64
 BIN_PLATFORMS    := $(DOCKER_PLATFORMS)
 
 # Used internally.  Users should pass GOOS and/or GOARCH.
