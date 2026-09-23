@@ -23,7 +23,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
-	"k8s.io/apimachinery/pkg/version"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 )
 
@@ -82,11 +81,6 @@ func (c *ConfigSyncerConfig) Complete() CompletedConfig {
 	completedCfg := completedConfig{
 		c.GenericConfig.Complete(),
 		c.OperatorConfig,
-	}
-
-	completedCfg.GenericConfig.Version = &version.Info{
-		Major: "1",
-		Minor: "1",
 	}
 
 	return CompletedConfig{&completedCfg}

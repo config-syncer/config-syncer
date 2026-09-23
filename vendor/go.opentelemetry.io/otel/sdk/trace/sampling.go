@@ -1,16 +1,5 @@
 // Copyright The OpenTelemetry Authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// SPDX-License-Identifier: Apache-2.0
 
 package trace // import "go.opentelemetry.io/otel/sdk/trace"
 
@@ -25,8 +14,19 @@ import (
 
 // Sampler decides whether a trace should be sampled and exported.
 type Sampler interface {
+	// DO NOT CHANGE: any modification will not be backwards compatible and
+	// must never be done outside of a new major release.
+
+	// ShouldSample returns a SamplingResult based on a decision made from the
+	// passed parameters.
 	ShouldSample(parameters SamplingParameters) SamplingResult
+	// DO NOT CHANGE: any modification will not be backwards compatible and
+	// must never be done outside of a new major release.
+
+	// Description returns information describing the Sampler.
 	Description() string
+	// DO NOT CHANGE: any modification will not be backwards compatible and
+	// must never be done outside of a new major release.
 }
 
 // SamplingParameters contains the values passed to a Sampler.
@@ -42,17 +42,17 @@ type SamplingParameters struct {
 // SamplingDecision indicates whether a span is dropped, recorded and/or sampled.
 type SamplingDecision uint8
 
-// Valid sampling decisions
+// Valid sampling decisions.
 const (
-	// Drop will not record the span and all attributes/events will be dropped
+	// Drop will not record the span and all attributes/events will be dropped.
 	Drop SamplingDecision = iota
 
-	// Record indicates the span's `IsRecording() == true`, but `Sampled` flag
-	// *must not* be set
+	// RecordOnly indicates the span's IsRecording method returns true, but trace.FlagsSampled flag
+	// must not be set.
 	RecordOnly
 
-	// RecordAndSample has span's `IsRecording() == true` and `Sampled` flag
-	// *must* be set
+	// RecordAndSample indicates the span's IsRecording method returns true and trace.FlagsSampled flag
+	// must be set.
 	RecordAndSample
 )
 
@@ -69,17 +69,17 @@ type traceIDRatioSampler struct {
 }
 
 func (ts traceIDRatioSampler) ShouldSample(p SamplingParameters) SamplingResult {
-	psc := trace.SpanContextFromContext(p.ParentContext)
-	x := binary.BigEndian.Uint64(p.TraceID[0:8]) >> 1
+	state := trace.SpanContextFromContext(p.ParentContext).TraceState()
+	x := binary.BigEndian.Uint64(p.TraceID[8:16]) >> 1
 	if x < ts.traceIDUpperBound {
 		return SamplingResult{
 			Decision:   RecordAndSample,
-			Tracestate: psc.TraceState(),
+			Tracestate: state,
 		}
 	}
 	return SamplingResult{
 		Decision:   Drop,
-		Tracestate: psc.TraceState(),
+		Tracestate: state,
 	}
 }
 
@@ -91,14 +91,23 @@ func (ts traceIDRatioSampler) Description() string {
 // always sample. Fractions < 0 are treated as zero. To respect the
 // parent trace's `SampledFlag`, the `TraceIDRatioBased` sampler should be used
 // as a delegate of a `Parent` sampler.
-//nolint:golint // golint complains about stutter of `trace.TraceIDRatioBased`
+//
+//nolint:revive // revive complains about stutter of `trace.TraceIDRatioBased`
 func TraceIDRatioBased(fraction float64) Sampler {
+	// Cannot use AlwaysSample() and NeverSample(), must return spec-compliant descriptions.
+	// See https://opentelemetry.io/docs/specs/otel/trace/sdk/#traceidratiobased.
 	if fraction >= 1 {
-		return AlwaysSample()
+		return predeterminedSampler{
+			description: "TraceIDRatioBased{1}",
+			decision:    RecordAndSample,
+		}
 	}
 
 	if fraction <= 0 {
-		fraction = 0
+		return predeterminedSampler{
+			description: "TraceIDRatioBased{0}",
+			decision:    Drop,
+		}
 	}
 
 	return &traceIDRatioSampler{
@@ -109,14 +118,15 @@ func TraceIDRatioBased(fraction float64) Sampler {
 
 type alwaysOnSampler struct{}
 
-func (as alwaysOnSampler) ShouldSample(p SamplingParameters) SamplingResult {
+func (alwaysOnSampler) ShouldSample(p SamplingParameters) SamplingResult {
 	return SamplingResult{
 		Decision:   RecordAndSample,
 		Tracestate: trace.SpanContextFromContext(p.ParentContext).TraceState(),
 	}
 }
 
-func (as alwaysOnSampler) Description() string {
+func (alwaysOnSampler) Description() string {
+	// https://opentelemetry.io/docs/specs/otel/trace/sdk/#alwayson
 	return "AlwaysOnSampler"
 }
 
@@ -130,14 +140,15 @@ func AlwaysSample() Sampler {
 
 type alwaysOffSampler struct{}
 
-func (as alwaysOffSampler) ShouldSample(p SamplingParameters) SamplingResult {
+func (alwaysOffSampler) ShouldSample(p SamplingParameters) SamplingResult {
 	return SamplingResult{
 		Decision:   Drop,
 		Tracestate: trace.SpanContextFromContext(p.ParentContext).TraceState(),
 	}
 }
 
-func (as alwaysOffSampler) Description() string {
+func (alwaysOffSampler) Description() string {
+	// https://opentelemetry.io/docs/specs/otel/trace/sdk/#alwaysoff
 	return "AlwaysOffSampler"
 }
 
@@ -146,15 +157,31 @@ func NeverSample() Sampler {
 	return alwaysOffSampler{}
 }
 
-// ParentBased returns a composite sampler which behaves differently,
+type predeterminedSampler struct {
+	description string
+	decision    SamplingDecision
+}
+
+func (s predeterminedSampler) ShouldSample(p SamplingParameters) SamplingResult {
+	return SamplingResult{
+		Decision:   s.decision,
+		Tracestate: trace.SpanContextFromContext(p.ParentContext).TraceState(),
+	}
+}
+
+func (s predeterminedSampler) Description() string {
+	return s.description
+}
+
+// ParentBased returns a sampler decorator which behaves differently,
 // based on the parent of the span. If the span has no parent,
-// the root(Sampler) is used to make sampling decision. If the span has
+// the decorated sampler is used to make sampling decision. If the span has
 // a parent, depending on whether the parent is remote and whether it
 // is sampled, one of the following samplers will apply:
-// - remoteParentSampled(Sampler) (default: AlwaysOn)
-// - remoteParentNotSampled(Sampler) (default: AlwaysOff)
-// - localParentSampled(Sampler) (default: AlwaysOn)
-// - localParentNotSampled(Sampler) (default: AlwaysOff)
+//   - remoteParentSampled(Sampler) (default: AlwaysOn)
+//   - remoteParentNotSampled(Sampler) (default: AlwaysOff)
+//   - localParentSampled(Sampler) (default: AlwaysOn)
+//   - localParentNotSampled(Sampler) (default: AlwaysOff)
 func ParentBased(root Sampler, samplers ...ParentBasedSamplerOption) Sampler {
 	return parentBased{
 		root:   root,
@@ -164,11 +191,11 @@ func ParentBased(root Sampler, samplers ...ParentBasedSamplerOption) Sampler {
 
 type parentBased struct {
 	root   Sampler
-	config config
+	config samplerConfig
 }
 
-func configureSamplersForParentBased(samplers []ParentBasedSamplerOption) config {
-	c := config{
+func configureSamplersForParentBased(samplers []ParentBasedSamplerOption) samplerConfig {
+	c := samplerConfig{
 		remoteParentSampled:    AlwaysSample(),
 		remoteParentNotSampled: NeverSample(),
 		localParentSampled:     AlwaysSample(),
@@ -176,26 +203,21 @@ func configureSamplersForParentBased(samplers []ParentBasedSamplerOption) config
 	}
 
 	for _, so := range samplers {
-		so.Apply(&c)
+		c = so.apply(c)
 	}
 
 	return c
 }
 
-// config is a group of options for parentBased sampler.
-type config struct {
+// samplerConfig is a group of options for parentBased sampler.
+type samplerConfig struct {
 	remoteParentSampled, remoteParentNotSampled Sampler
 	localParentSampled, localParentNotSampled   Sampler
 }
 
 // ParentBasedSamplerOption configures the sampler for a particular sampling case.
 type ParentBasedSamplerOption interface {
-	Apply(*config)
-
-	// A private method to prevent users implementing the
-	// interface and so future additions to it will not
-	// violate compatibility.
-	private()
+	apply(samplerConfig) samplerConfig
 }
 
 // WithRemoteParentSampled sets the sampler for the case of sampled remote parent.
@@ -207,11 +229,10 @@ type remoteParentSampledOption struct {
 	s Sampler
 }
 
-func (o remoteParentSampledOption) Apply(config *config) {
+func (o remoteParentSampledOption) apply(config samplerConfig) samplerConfig {
 	config.remoteParentSampled = o.s
+	return config
 }
-
-func (remoteParentSampledOption) private() {}
 
 // WithRemoteParentNotSampled sets the sampler for the case of remote parent
 // which is not sampled.
@@ -223,11 +244,10 @@ type remoteParentNotSampledOption struct {
 	s Sampler
 }
 
-func (o remoteParentNotSampledOption) Apply(config *config) {
+func (o remoteParentNotSampledOption) apply(config samplerConfig) samplerConfig {
 	config.remoteParentNotSampled = o.s
+	return config
 }
-
-func (remoteParentNotSampledOption) private() {}
 
 // WithLocalParentSampled sets the sampler for the case of sampled local parent.
 func WithLocalParentSampled(s Sampler) ParentBasedSamplerOption {
@@ -238,11 +258,10 @@ type localParentSampledOption struct {
 	s Sampler
 }
 
-func (o localParentSampledOption) Apply(config *config) {
+func (o localParentSampledOption) apply(config samplerConfig) samplerConfig {
 	config.localParentSampled = o.s
+	return config
 }
-
-func (localParentSampledOption) private() {}
 
 // WithLocalParentNotSampled sets the sampler for the case of local parent
 // which is not sampled.
@@ -254,11 +273,10 @@ type localParentNotSampledOption struct {
 	s Sampler
 }
 
-func (o localParentNotSampledOption) Apply(config *config) {
+func (o localParentNotSampledOption) apply(config samplerConfig) samplerConfig {
 	config.localParentNotSampled = o.s
+	return config
 }
-
-func (localParentNotSampledOption) private() {}
 
 func (pb parentBased) ShouldSample(p SamplingParameters) SamplingResult {
 	psc := trace.SpanContextFromContext(p.ParentContext)
@@ -279,12 +297,41 @@ func (pb parentBased) ShouldSample(p SamplingParameters) SamplingResult {
 }
 
 func (pb parentBased) Description() string {
-	return fmt.Sprintf("ParentBased{root:%s,remoteParentSampled:%s,"+
-		"remoteParentNotSampled:%s,localParentSampled:%s,localParentNotSampled:%s}",
+	return fmt.Sprintf(
+		"ParentBased{root:%s,remoteParentSampled:%s,"+
+			"remoteParentNotSampled:%s,localParentSampled:%s,localParentNotSampled:%s}",
 		pb.root.Description(),
 		pb.config.remoteParentSampled.Description(),
 		pb.config.remoteParentNotSampled.Description(),
 		pb.config.localParentSampled.Description(),
 		pb.config.localParentNotSampled.Description(),
 	)
+}
+
+// AlwaysRecord returns a sampler decorator which ensures that every span
+// is passed to the SpanProcessor, even those that would be normally dropped.
+// It converts `Drop` decisions from the root sampler into `RecordOnly` decisions,
+// allowing processors to see all spans without sending them to exporters. This is
+// typically used to enable accurate span-to-metrics processing.
+func AlwaysRecord(root Sampler) Sampler {
+	return alwaysRecord{root}
+}
+
+type alwaysRecord struct {
+	root Sampler
+}
+
+func (ar alwaysRecord) ShouldSample(p SamplingParameters) SamplingResult {
+	rootSamplerSamplingResult := ar.root.ShouldSample(p)
+	if rootSamplerSamplingResult.Decision == Drop {
+		return SamplingResult{
+			Decision:   RecordOnly,
+			Tracestate: trace.SpanContextFromContext(p.ParentContext).TraceState(),
+		}
+	}
+	return rootSamplerSamplingResult
+}
+
+func (ar alwaysRecord) Description() string {
+	return "AlwaysRecord{root:" + ar.root.Description() + "}"
 }

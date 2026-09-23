@@ -1,16 +1,5 @@
 // Copyright The OpenTelemetry Authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// SPDX-License-Identifier: Apache-2.0
 
 package resource // import "go.opentelemetry.io/otel/sdk/resource"
 
@@ -20,77 +9,85 @@ import (
 	"os"
 	"path/filepath"
 
-	"go.opentelemetry.io/otel"
+	"github.com/google/uuid"
+
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/semconv"
+	"go.opentelemetry.io/otel/sdk"
+	semconv "go.opentelemetry.io/otel/semconv/v1.41.0"
 )
 
 type (
-	// TelemetrySDK is a Detector that provides information about
+	// telemetrySDK is a Detector that provides information about
 	// the OpenTelemetry SDK used.  This Detector is included as a
 	// builtin. If these resource attributes are not wanted, use
-	// the WithTelemetrySDK(nil) or WithoutBuiltin() options to
-	// explicitly disable them.
-	TelemetrySDK struct{}
+	// resource.New() to explicitly disable them.
+	telemetrySDK struct{}
 
-	// Host is a Detector that provides information about the host
+	// host is a Detector that provides information about the host
 	// being run on. This Detector is included as a builtin. If
 	// these resource attributes are not wanted, use the
-	// WithHost(nil) or WithoutBuiltin() options to explicitly
-	// disable them.
-	Host struct{}
+	// resource.New() to explicitly disable them.
+	host struct{}
 
 	stringDetector struct {
-		K attribute.Key
-		F func() (string, error)
+		schemaURL string
+		K         attribute.Key
+		F         func() (string, error)
 	}
 
 	defaultServiceNameDetector struct{}
+
+	defaultServiceInstanceIDDetector struct{}
 )
 
 var (
-	_ Detector = TelemetrySDK{}
-	_ Detector = Host{}
+	_ Detector = telemetrySDK{}
+	_ Detector = host{}
 	_ Detector = stringDetector{}
 	_ Detector = defaultServiceNameDetector{}
+	_ Detector = defaultServiceInstanceIDDetector{}
 )
 
 // Detect returns a *Resource that describes the OpenTelemetry SDK used.
-func (TelemetrySDK) Detect(context.Context) (*Resource, error) {
+func (telemetrySDK) Detect(context.Context) (*Resource, error) {
 	return NewWithAttributes(
-		semconv.TelemetrySDKNameKey.String("opentelemetry"),
-		semconv.TelemetrySDKLanguageKey.String("go"),
-		semconv.TelemetrySDKVersionKey.String(otel.Version()),
+		semconv.SchemaURL,
+		semconv.TelemetrySDKName("opentelemetry"),
+		semconv.TelemetrySDKLanguageGo,
+		semconv.TelemetrySDKVersion(sdk.Version()),
 	), nil
 }
 
 // Detect returns a *Resource that describes the host being run on.
-func (Host) Detect(ctx context.Context) (*Resource, error) {
-	return StringDetector(semconv.HostNameKey, os.Hostname).Detect(ctx)
+func (host) Detect(ctx context.Context) (*Resource, error) {
+	return StringDetector(semconv.SchemaURL, semconv.HostNameKey, os.Hostname).Detect(ctx)
 }
 
 // StringDetector returns a Detector that will produce a *Resource
-// containing the string as a value corresponding to k.
-func StringDetector(k attribute.Key, f func() (string, error)) Detector {
-	return stringDetector{K: k, F: f}
+// containing the string as a value corresponding to k. The resulting Resource
+// will have the specified schemaURL.
+func StringDetector(schemaURL string, k attribute.Key, f func() (string, error)) Detector {
+	return stringDetector{schemaURL: schemaURL, K: k, F: f}
 }
 
-// Detect implements Detector.
-func (sd stringDetector) Detect(ctx context.Context) (*Resource, error) {
+// Detect returns a *Resource that describes the string as a value
+// corresponding to attribute.Key as well as the specific schemaURL.
+func (sd stringDetector) Detect(context.Context) (*Resource, error) {
 	value, err := sd.F()
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", string(sd.K), err)
 	}
 	a := sd.K.String(value)
 	if !a.Valid() {
-		return nil, fmt.Errorf("invalid attribute: %q -> %q", a.Key, a.Value.Emit())
+		return nil, fmt.Errorf("invalid attribute: %q -> %q", a.Key, a.Value.String())
 	}
-	return NewWithAttributes(sd.K.String(value)), nil
+	return NewWithAttributes(sd.schemaURL, sd.K.String(value)), nil
 }
 
-// Detect implements Detector
+// Detect implements Detector.
 func (defaultServiceNameDetector) Detect(ctx context.Context) (*Resource, error) {
 	return StringDetector(
+		semconv.SchemaURL,
 		semconv.ServiceNameKey,
 		func() (string, error) {
 			executable, err := os.Executable()
@@ -98,6 +95,22 @@ func (defaultServiceNameDetector) Detect(ctx context.Context) (*Resource, error)
 				return "unknown_service:go", nil
 			}
 			return "unknown_service:" + filepath.Base(executable), nil
+		},
+	).Detect(ctx)
+}
+
+// Detect implements Detector.
+func (defaultServiceInstanceIDDetector) Detect(ctx context.Context) (*Resource, error) {
+	return StringDetector(
+		semconv.SchemaURL,
+		semconv.ServiceInstanceIDKey,
+		func() (string, error) {
+			version4Uuid, err := uuid.NewRandom()
+			if err != nil {
+				return "", err
+			}
+
+			return version4Uuid.String(), nil
 		},
 	).Detect(ctx)
 }

@@ -18,6 +18,7 @@ package metrics
 
 import (
 	"context"
+	"sync"
 
 	"github.com/blang/semver/v4"
 	"github.com/prometheus/client_golang/prometheus"
@@ -46,7 +47,7 @@ func NewGauge(opts *GaugeOpts) *Gauge {
 
 	kc := &Gauge{
 		GaugeOpts:  opts,
-		lazyMetric: lazyMetric{},
+		lazyMetric: lazyMetric{stabilityLevel: opts.StabilityLevel},
 	}
 	kc.setPrometheusGauge(noop)
 	kc.lazyInit(kc, BuildFQName(opts.Namespace, opts.Subsystem, opts.Name))
@@ -105,17 +106,12 @@ func NewGaugeVec(opts *GaugeOpts, labels []string) *GaugeVec {
 	opts.StabilityLevel.setDefaults()
 
 	fqName := BuildFQName(opts.Namespace, opts.Subsystem, opts.Name)
-	allowListLock.RLock()
-	if allowList, ok := labelValueAllowLists[fqName]; ok {
-		opts.LabelValueAllowLists = allowList
-	}
-	allowListLock.RUnlock()
 
 	cv := &GaugeVec{
 		GaugeVec:       noopGaugeVec,
 		GaugeOpts:      opts,
 		originalLabels: labels,
-		lazyMetric:     lazyMetric{},
+		lazyMetric:     lazyMetric{stabilityLevel: opts.StabilityLevel},
 	}
 	cv.lazyInit(cv, fqName)
 	return cv
@@ -147,11 +143,22 @@ func (v *GaugeVec) WithLabelValuesChecked(lvs ...string) (GaugeMetric, error) {
 		}
 		return noop, errNotRegistered // return no-op gauge
 	}
+
+	// Initialize label allow lists if not already initialized
+	v.initializeLabelAllowListsOnce.Do(func() {
+		allowListLock.RLock()
+		if allowList, ok := labelValueAllowLists[v.FQName()]; ok {
+			v.LabelValueAllowLists = allowList
+		}
+		allowListLock.RUnlock()
+	})
+
+	// Constrain label values to allowed values
 	if v.LabelValueAllowLists != nil {
 		v.LabelValueAllowLists.ConstrainToAllowedList(v.originalLabels, lvs)
 	}
-	elt, err := v.GaugeVec.GetMetricWithLabelValues(lvs...)
-	return elt, err
+
+	return v.GetMetricWithLabelValues(lvs...)
 }
 
 // Default Prometheus Vec behavior is that member extraction results in creation of a new element
@@ -184,11 +191,22 @@ func (v *GaugeVec) WithChecked(labels map[string]string) (GaugeMetric, error) {
 		}
 		return noop, errNotRegistered // return no-op gauge
 	}
+
+	// Initialize label allow lists if not already initialized
+	v.initializeLabelAllowListsOnce.Do(func() {
+		allowListLock.RLock()
+		if allowList, ok := labelValueAllowLists[v.FQName()]; ok {
+			v.LabelValueAllowLists = allowList
+		}
+		allowListLock.RUnlock()
+	})
+
+	// Constrain label map to allowed values
 	if v.LabelValueAllowLists != nil {
 		v.LabelValueAllowLists.ConstrainLabelMap(labels)
 	}
-	elt, err := v.GaugeVec.GetMetricWith(labels)
-	return elt, err
+
+	return v.GetMetricWith(labels)
 }
 
 // With returns the GaugeMetric for the given Labels map (the label names
@@ -224,6 +242,13 @@ func (v *GaugeVec) Reset() {
 	}
 
 	v.GaugeVec.Reset()
+}
+
+// ResetLabelAllowLists resets the label allow list for the GaugeVec.
+// NOTE: This should only be used in test.
+func (v *GaugeVec) ResetLabelAllowLists() {
+	v.initializeLabelAllowListsOnce = sync.Once{}
+	v.LabelValueAllowLists = nil
 }
 
 func newGaugeFunc(opts *GaugeOpts, function func() float64, v semver.Version) GaugeFunc {

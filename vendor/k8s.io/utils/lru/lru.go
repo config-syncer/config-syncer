@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,12 +16,14 @@ limitations under the License.
 package lru
 
 import (
+	"fmt"
 	"sync"
 
 	groupcache "k8s.io/utils/internal/third_party/forked/golang/golang-lru"
 )
 
 type Key = groupcache.Key
+type EvictionFunc = func(key Key, value interface{})
 
 // Cache is a thread-safe fixed size LRU cache.
 type Cache struct {
@@ -34,6 +36,24 @@ func New(size int) *Cache {
 	return &Cache{
 		cache: groupcache.New(size),
 	}
+}
+
+// NewWithEvictionFunc creates an LRU of the given size with the given eviction func.
+func NewWithEvictionFunc(size int, f EvictionFunc) *Cache {
+	c := New(size)
+	c.cache.OnEvicted = f
+	return c
+}
+
+// SetEvictionFunc updates the eviction func
+func (c *Cache) SetEvictionFunc(f EvictionFunc) error {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	if c.cache.OnEvicted != nil {
+		return fmt.Errorf("lru cache eviction function is already set")
+	}
+	c.cache.OnEvicted = f
+	return nil
 }
 
 // Add adds a value to the cache.

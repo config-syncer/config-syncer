@@ -89,7 +89,7 @@ func PatchNodeObject(ctx context.Context, c kubernetes.Interface, cur, mod *core
 
 func TryUpdateNode(ctx context.Context, c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*core.Node) *core.Node, opts metav1.UpdateOptions) (result *core.Node, err error) {
 	attempt := 0
-	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
+	err = wait.PollUntilContextTimeout(ctx, kutil.RetryInterval, kutil.RetryTimeout, true, func(ctx context.Context) (bool, error) {
 		attempt++
 		cur, e2 := c.CoreV1().Nodes().Get(ctx, meta.Name, metav1.GetOptions{})
 		if kerr.IsNotFound(e2) {
@@ -101,7 +101,6 @@ func TryUpdateNode(ctx context.Context, c kubernetes.Interface, meta metav1.Obje
 		klog.Errorf("Attempt %d failed to update Node %s due to %v.", attempt, cur.Name, e2)
 		return false, nil
 	})
-
 	if err != nil {
 		err = errors.Errorf("failed to update Node %s after %d attempts due to %v", meta.Name, attempt, err)
 	}
@@ -134,18 +133,6 @@ type Topology struct {
 	LabelZone         string
 	LabelRegion       string
 	LabelInstanceType string
-
-	// https://github.com/kubernetes/kubernetes/blob/v1.17.2/staging/src/k8s.io/api/core/v1/well_known_labels.go
-
-	//LabelHostname = "kubernetes.io/hostname"
-	//
-	//LabelZoneFailureDomain       = "failure-domain.beta.kubernetes.io/zone"
-	//LabelZoneRegion              = "failure-domain.beta.kubernetes.io/region"
-	//LabelZoneFailureDomainStable = "topology.kubernetes.io/zone"
-	//LabelZoneRegionStable        = "topology.kubernetes.io/region"
-	//
-	//LabelInstanceType       = "beta.kubernetes.io/instance-type"
-	//LabelInstanceTypeStable = "node.kubernetes.io/instance-type"
 }
 
 func (t Topology) ConvertAffinity(affinity *core.Affinity) {
@@ -204,7 +191,7 @@ func DetectTopology(ctx context.Context, mc metadata.Interface) (*Topology, erro
 	var topology Topology
 	topology.TotalNodes = 0
 
-	mapRegion := make(map[string]sets.String)
+	mapRegion := make(map[string]sets.Set[string])
 	instances := make(map[string]int)
 	first := true
 
@@ -226,16 +213,16 @@ func DetectTopology(ctx context.Context, mc metadata.Interface) (*Topology, erro
 		labels := m.GetLabels()
 
 		if first {
-			if _, ok := labels[core.LabelZoneRegionStable]; ok {
-				topology.LabelRegion = core.LabelZoneRegionStable
+			if _, ok := labels[core.LabelTopologyRegion]; ok {
+				topology.LabelRegion = core.LabelTopologyRegion
 			} else {
-				topology.LabelRegion = core.LabelZoneRegion
+				topology.LabelRegion = core.LabelFailureDomainBetaRegion
 			}
 
-			if _, ok := labels[core.LabelZoneFailureDomainStable]; ok {
-				topology.LabelZone = core.LabelZoneFailureDomainStable
+			if _, ok := labels[core.LabelTopologyZone]; ok {
+				topology.LabelZone = core.LabelTopologyZone
 			} else {
-				topology.LabelZone = core.LabelZoneFailureDomain
+				topology.LabelZone = core.LabelFailureDomainBetaZone
 			}
 
 			if _, ok := labels[core.LabelInstanceTypeStable]; ok {
@@ -251,17 +238,15 @@ func DetectTopology(ctx context.Context, mc metadata.Interface) (*Topology, erro
 		if os != "linux" {
 			return nil
 		}
-		arch, _ := meta_util.GetStringValueForKeys(labels, core.LabelArchStable, "beta.kubernetes.io/arch")
-		if arch != "amd64" {
-			return nil
-		}
 
-		region, _ := meta_util.GetStringValueForKeys(labels, topology.LabelRegion)
-		zone, _ := meta_util.GetStringValueForKeys(labels, topology.LabelZone)
-		if _, ok := mapRegion[region]; !ok {
-			mapRegion[region] = sets.NewString()
+		if region, ok := labels[topology.LabelRegion]; ok {
+			if _, ok := mapRegion[region]; !ok {
+				mapRegion[region] = sets.Set[string]{}
+			}
+			if zone, ok := labels[topology.LabelZone]; ok {
+				mapRegion[region].Insert(zone)
+			}
 		}
-		mapRegion[region].Insert(zone)
 
 		instance, _ := meta_util.GetStringValueForKeys(labels, topology.LabelInstanceType)
 		if n, ok := instances[instance]; ok {
@@ -278,7 +263,7 @@ func DetectTopology(ctx context.Context, mc metadata.Interface) (*Topology, erro
 
 	regions := make(map[string][]string)
 	for k, v := range mapRegion {
-		regions[k] = v.List()
+		regions[k] = sets.List(v)
 	}
 	topology.Regions = regions
 	topology.InstanceTypes = instances
