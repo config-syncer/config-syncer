@@ -28,6 +28,9 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+// AppLabelKey is the label key used to mark e2e test resources.
+const AppLabelKey = "app"
+
 type Framework struct {
 	KubeClient     clientset.Interface
 	namespace      string

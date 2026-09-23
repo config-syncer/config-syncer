@@ -57,7 +57,7 @@ var Indent = "    "
 
 var longFormThreshold = 20
 
-// GomegaStringer allows for custom formating of objects for gomega.
+// GomegaStringer allows for custom formatting of objects for gomega.
 type GomegaStringer interface {
 	// GomegaString will be used to custom format an object.
 	// It does not follow UseStringerRepresentation value and will always be called regardless.
@@ -73,7 +73,7 @@ If the CustomFormatter does not want to handle the object it should return ("", 
 
 Strings returned by CustomFormatters are not truncated
 */
-type CustomFormatter func(value interface{}) (string, bool)
+type CustomFormatter func(value any) (string, bool)
 type CustomFormatterKey uint
 
 var customFormatterKey CustomFormatterKey = 1
@@ -125,7 +125,7 @@ If expected is omitted, then the message looks like:
 		<pretty printed actual>
 	<message>
 */
-func Message(actual interface{}, message string, expected ...interface{}) string {
+func Message(actual any, message string, expected ...any) string {
 	if len(expected) == 0 {
 		return fmt.Sprintf("Expected\n%s\n%s", Object(actual, 1), message)
 	}
@@ -255,14 +255,14 @@ recursing into the object.
 
 Set PrintContextObjects to true to print the content of objects implementing context.Context
 */
-func Object(object interface{}, indentation uint) string {
+func Object(object any, indentation uint) string {
 	indent := strings.Repeat(Indent, int(indentation))
 	value := reflect.ValueOf(object)
 	commonRepresentation := ""
 	if err, ok := object.(error); ok && !isNilValue(value) { // isNilValue check needed here to avoid nil deref due to boxed nil
 		commonRepresentation += "\n" + IndentString(err.Error(), indentation) + "\n" + indent
 	}
-	return fmt.Sprintf("%s<%s>: %s%s", indent, formatType(value), commonRepresentation, formatValue(value, indentation))
+	return fmt.Sprintf("%s<%s>: %s%s", indent, formatType(value), commonRepresentation, formatValue(value, indentation, true, map[uintptr]struct{}{}))
 }
 
 /*
@@ -306,7 +306,7 @@ func formatType(v reflect.Value) string {
 	}
 }
 
-func formatValue(value reflect.Value, indentation uint) string {
+func formatValue(value reflect.Value, indentation uint, isTopLevel bool, visited map[uintptr]struct{}) string {
 	if indentation > MaxDepth {
 		return "..."
 	}
@@ -367,23 +367,28 @@ func formatValue(value reflect.Value, indentation uint) string {
 	case reflect.Func:
 		return fmt.Sprintf("0x%x", value.Pointer())
 	case reflect.Ptr:
-		return formatValue(value.Elem(), indentation)
+		ptr := value.Pointer()
+		if _, ok := visited[ptr]; ok {
+			return fmt.Sprintf("0x%x (cyclic reference)", ptr)
+		}
+		visited[ptr] = struct{}{}
+		return formatValue(value.Elem(), indentation, isTopLevel, visited)
 	case reflect.Slice:
-		return truncateLongStrings(formatSlice(value, indentation))
+		return truncateLongStrings(formatSlice(value, indentation, visited))
 	case reflect.String:
-		return truncateLongStrings(formatString(value.String(), indentation))
+		return truncateLongStrings(formatString(value.String(), indentation, isTopLevel))
 	case reflect.Array:
-		return truncateLongStrings(formatSlice(value, indentation))
+		return truncateLongStrings(formatSlice(value, indentation, visited))
 	case reflect.Map:
-		return truncateLongStrings(formatMap(value, indentation))
+		return truncateLongStrings(formatMap(value, indentation, visited))
 	case reflect.Struct:
 		if value.Type() == timeType && value.CanInterface() {
 			t, _ := value.Interface().(time.Time)
 			return t.Format(time.RFC3339Nano)
 		}
-		return truncateLongStrings(formatStruct(value, indentation))
+		return truncateLongStrings(formatStruct(value, indentation, visited))
 	case reflect.Interface:
-		return formatInterface(value, indentation)
+		return formatInterface(value, indentation, visited)
 	default:
 		if value.CanInterface() {
 			return truncateLongStrings(fmt.Sprintf("%#v", value.Interface()))
@@ -392,8 +397,8 @@ func formatValue(value reflect.Value, indentation uint) string {
 	}
 }
 
-func formatString(object interface{}, indentation uint) string {
-	if indentation == 1 {
+func formatString(object any, indentation uint, isTopLevel bool) string {
+	if isTopLevel {
 		s := fmt.Sprintf("%s", object)
 		components := strings.Split(s, "\n")
 		result := ""
@@ -414,16 +419,16 @@ func formatString(object interface{}, indentation uint) string {
 	}
 }
 
-func formatSlice(v reflect.Value, indentation uint) string {
+func formatSlice(v reflect.Value, indentation uint, visited map[uintptr]struct{}) string {
 	if v.Kind() == reflect.Slice && v.Type().Elem().Kind() == reflect.Uint8 && isPrintableString(string(v.Bytes())) {
-		return formatString(v.Bytes(), indentation)
+		return formatString(v.Bytes(), indentation, false)
 	}
 
 	l := v.Len()
 	result := make([]string, l)
 	longest := 0
-	for i := 0; i < l; i++ {
-		result[i] = formatValue(v.Index(i), indentation+1)
+	for i := range l {
+		result[i] = formatValue(v.Index(i), indentation+1, false, visited)
 		if len(result[i]) > longest {
 			longest = len(result[i])
 		}
@@ -436,14 +441,14 @@ func formatSlice(v reflect.Value, indentation uint) string {
 	return fmt.Sprintf("[%s]", strings.Join(result, ", "))
 }
 
-func formatMap(v reflect.Value, indentation uint) string {
+func formatMap(v reflect.Value, indentation uint, visited map[uintptr]struct{}) string {
 	l := v.Len()
 	result := make([]string, l)
 
 	longest := 0
 	for i, key := range v.MapKeys() {
 		value := v.MapIndex(key)
-		result[i] = fmt.Sprintf("%s: %s", formatValue(key, indentation+1), formatValue(value, indentation+1))
+		result[i] = fmt.Sprintf("%s: %s", formatValue(key, indentation+1, false, visited), formatValue(value, indentation+1, false, visited))
 		if len(result[i]) > longest {
 			longest = len(result[i])
 		}
@@ -456,16 +461,16 @@ func formatMap(v reflect.Value, indentation uint) string {
 	return fmt.Sprintf("{%s}", strings.Join(result, ", "))
 }
 
-func formatStruct(v reflect.Value, indentation uint) string {
+func formatStruct(v reflect.Value, indentation uint, visited map[uintptr]struct{}) string {
 	t := v.Type()
 
 	l := v.NumField()
 	result := []string{}
 	longest := 0
-	for i := 0; i < l; i++ {
+	for i := range l {
 		structField := t.Field(i)
 		fieldEntry := v.Field(i)
-		representation := fmt.Sprintf("%s: %s", structField.Name, formatValue(fieldEntry, indentation+1))
+		representation := fmt.Sprintf("%s: %s", structField.Name, formatValue(fieldEntry, indentation+1, false, visited))
 		result = append(result, representation)
 		if len(representation) > longest {
 			longest = len(representation)
@@ -478,8 +483,8 @@ func formatStruct(v reflect.Value, indentation uint) string {
 	return fmt.Sprintf("{%s}", strings.Join(result, ", "))
 }
 
-func formatInterface(v reflect.Value, indentation uint) string {
-	return fmt.Sprintf("<%s>%s", formatType(v.Elem()), formatValue(v.Elem(), indentation))
+func formatInterface(v reflect.Value, indentation uint, visited map[uintptr]struct{}) string {
+	return fmt.Sprintf("<%s>%s", formatType(v.Elem()), formatValue(v.Elem(), indentation, false, visited))
 }
 
 func isNilValue(a reflect.Value) bool {

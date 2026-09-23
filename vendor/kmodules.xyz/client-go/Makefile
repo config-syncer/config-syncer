@@ -19,11 +19,11 @@ REPO     := $(notdir $(shell pwd))
 BIN      := client-go
 
 # https://github.com/appscodelabs/gengo-builder
-CODE_GENERATOR_IMAGE ?= ghcr.io/appscode/gengo:release-1.32
+CODE_GENERATOR_IMAGE ?= ghcr.io/appscode/gengo:release-1.34
 
 # This version-strategy uses git tags to set the version string
 git_branch       := $(shell git rev-parse --abbrev-ref HEAD)
-git_tag          := $(shell git describe --exact-match --abbrev=0 2>/dev/null || echo "")
+git_tag          := $(shell git describe --tags --exact-match --abbrev=0 2>/dev/null || echo "")
 commit_hash      := $(shell git rev-parse --verify HEAD)
 commit_timestamp := $(shell date --date="@$$(git show -s --format=%ct)" --utc +%FT%T)
 
@@ -114,8 +114,8 @@ clientset:
 		$(CODE_GENERATOR_IMAGE)                          \
 		deepcopy-gen                                     \
 			--go-header-file "./hack/license/go.txt"       \
-			--input-dirs "$(GO_PKG)/$(REPO)/api/v1"        \
-			--output-file-base zz_generated.deepcopy
+			--output-file zz_generated.deepcopy.go         \
+			$(GO_PKG)/$(REPO)/api/v1
 
 # Generate openapi schema
 .PHONY: openapi
@@ -132,9 +132,11 @@ openapi:
 		openapi-gen                                      \
 			--v 1 --logtostderr                          \
 			--go-header-file "./hack/license/go.txt"     \
-			--input-dirs "$(GO_PKG)/$(REPO)/api/v1"      \
-			--output-package "$(GO_PKG)/$(REPO)/api/v1"  \
-			--report-filename /tmp/violation_exceptions.list
+			--output-dir "$(DOCKER_REPO_ROOT)/api/v1"    \
+			--output-pkg "$(GO_PKG)/$(REPO)/api/v1"      \
+			--output-file "openapi_generated.go"         \
+			--report-filename /tmp/violation_exceptions.list \
+			$(GO_PKG)/$(REPO)/api/v1
 
 .PHONY: gen-crd-protos
 gen-crd-protos:

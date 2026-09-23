@@ -80,7 +80,7 @@ func (s *ConfigSyncer) syncSecretIntoContexts(src *core.Secret, contexts sets.Se
 		if context.Namespace == "" { // use source namespace if not specified via context
 			context.Namespace = src.Namespace
 		}
-		err := s.syncSecretIntoNamespaces(context.Client, src, sets.New[string](context.Namespace), false, ctx)
+		err := s.syncSecretIntoNamespaces(context.Client, src, sets.New(context.Namespace), false, ctx)
 		if err != nil {
 			return err
 		}

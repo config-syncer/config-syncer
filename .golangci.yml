@@ -1,4 +1,16 @@
+# Configuration for golangci-lint v2 (golang-dev images ship v2.x).
 version: "2"
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    paths:
+      - generated.*\.go
+      - client
+      - vendor
+
 linters:
   default: standard
   enable:
@@ -6,20 +18,11 @@ linters:
     - unparam
   exclusions:
     rules:
-      - path: ^test/
+      # gomega is dot-imported by convention throughout the ginkgo e2e suite.
+      - path: test/e2e/
         linters:
           - staticcheck
-        text: ST1001
-    paths:
-      - generated.*\.go
-      - client
-      - vendor
-
-formatters:
-  enable:
-    - gofmt
-    - goimports
-  exclusions:
+        text: dot imports
     paths:
       - generated.*\.go
       - client

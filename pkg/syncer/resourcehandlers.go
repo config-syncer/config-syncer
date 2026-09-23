@@ -141,7 +141,7 @@ type nsSyncer struct {
 	*ConfigSyncer
 }
 
-var _ cache.ResourceEventHandler = &secretSyncer{}
+var _ cache.ResourceEventHandler = &nsSyncer{}
 
 func (s *nsSyncer) OnAdd(obj interface{}, _ bool) {
 	s.lock.RLock()

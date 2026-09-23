@@ -80,7 +80,7 @@ func (s *ConfigSyncer) syncConfigMapIntoContexts(src *core.ConfigMap, contexts s
 		if context.Namespace == "" { // use source namespace if not specified via context
 			context.Namespace = src.Namespace
 		}
-		err := s.syncConfigMapIntoNamespaces(context.Client, src, sets.New[string](context.Namespace), false, ctx)
+		err := s.syncConfigMapIntoNamespaces(context.Client, src, sets.New(context.Namespace), false, ctx)
 		if err != nil {
 			return err
 		}

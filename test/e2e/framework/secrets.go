@@ -40,7 +40,7 @@ func (fi *Invocation) NewSecret() *core.Secret {
 			Name:      fi.App(),
 			Namespace: fi.Namespace(),
 			Labels: map[string]string{
-				"app": fi.App(),
+				AppLabelKey: fi.App(),
 			},
 		},
 		StringData: map[string]string{
@@ -71,7 +71,7 @@ func (fi *Invocation) EventuallyNumOfSecretsForClient(client kubernetes.Interfac
 	return Eventually(func() int {
 		secrets, err := client.CoreV1().Secrets(namespace).List(context.TODO(), metav1.ListOptions{
 			LabelSelector: labels.Set{
-				"app": fi.App(),
+				AppLabelKey: fi.App(),
 			}.String(),
 		})
 		Expect(err).NotTo(HaveOccurred())
@@ -179,7 +179,7 @@ func (fi *Invocation) EventuallySyncedSecretsDeleted(source *core.Secret) Gomega
 func (fi *Invocation) DeleteAllSecrets() {
 	secrets, err := fi.KubeClient.CoreV1().Secrets(metav1.NamespaceAll).List(context.TODO(), metav1.ListOptions{
 		LabelSelector: labels.Set{
-			"app": fi.App(),
+			AppLabelKey: fi.App(),
 		}.String(),
 	})
 	Expect(err).NotTo(HaveOccurred())
@@ -219,7 +219,7 @@ func (fi *Invocation) SecretForWebhookNotifier() *core.Secret {
 }
 
 func (fi *Invocation) WaitUntilSecretCreated(meta metav1.ObjectMeta) error {
-	return wait.PollUntilContextTimeout(context.TODO(), kutil.RetryInterval, kutil.ReadinessTimeout, true, func(ctx context.Context) (done bool, err error) {
+	return wait.PollUntilContextTimeout(context.TODO(), kutil.RetryInterval, kutil.ReadinessTimeout, true, func(ctx context.Context) (bool, error) {
 		if _, err := fi.KubeClient.CoreV1().Secrets(meta.Namespace).Get(ctx, meta.Name, metav1.GetOptions{}); err != nil {
 			if kerr.IsNotFound(err) {
 				return false, nil
@@ -232,7 +232,7 @@ func (fi *Invocation) WaitUntilSecretCreated(meta metav1.ObjectMeta) error {
 }
 
 func (fi *Invocation) WaitUntilSecretDeleted(meta metav1.ObjectMeta) error {
-	return wait.PollUntilContextTimeout(context.TODO(), kutil.RetryInterval, kutil.GCTimeout, true, func(ctx context.Context) (done bool, err error) {
+	return wait.PollUntilContextTimeout(context.TODO(), kutil.RetryInterval, kutil.GCTimeout, true, func(ctx context.Context) (bool, error) {
 		if _, err := fi.KubeClient.CoreV1().Secrets(meta.Namespace).Get(ctx, meta.Name, metav1.GetOptions{}); err != nil {
 			if kerr.IsNotFound(err) {
 				return true, nil

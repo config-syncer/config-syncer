@@ -305,7 +305,6 @@ func (s *SecureServingOptions) ApplyTo(config **server.SecureServingInfo) error 
 		if err != nil {
 			return err
 		}
-		c.CertFile = serverCertFile
 	} else if s.ServerCert.GeneratedCert != nil {
 		c.Cert = s.ServerCert.GeneratedCert
 	}

@@ -100,13 +100,38 @@ func (d *DelegatingClient) RestConfig() *restclient.Config {
 	return d.config
 }
 
+// aceExtraPrefix is the only extra-key namespace impersonated identities carry
+// through. See impersonableExtra.
+const aceExtraPrefix = "ace.appscode.com/"
+
+// impersonableExtra keeps only the ACE extras. Every other extra key is provider
+// bookkeeping injected by the apiserver or the platform -- Rancher's principalid,
+// EKS' arn, the reserved authentication.kubernetes.io/* keys -- and impersonating
+// any of them needs an `impersonate` grant on userextras/<key> that callers do not
+// hold, which fails the whole request during impersonation authorization. RBAC
+// ignores extras, so dropping them changes no authorization decision.
+func impersonableExtra(in map[string][]string) map[string][]string {
+	out := make(map[string][]string, len(in))
+	for k, v := range in {
+		if strings.HasPrefix(k, aceExtraPrefix) {
+			out[k] = v
+		}
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
+}
+
 func (d *DelegatingClient) Impersonate(u user.Info) (*restclient.Config, client.Client, error) {
+	extra := impersonableExtra(u.GetExtra())
+
 	config := restclient.CopyConfig(d.config)
 	config.Impersonate = restclient.ImpersonationConfig{
 		UserName: u.GetName(),
 		UID:      u.GetUID(),
 		Groups:   u.GetGroups(),
-		Extra:    u.GetExtra(),
+		Extra:    extra,
 	}
 
 	// share the transport between all clients
@@ -117,7 +142,7 @@ func (d *DelegatingClient) Impersonate(u user.Info) (*restclient.Config, client.
 				UserName: u.GetName(),
 				UID:      u.GetUID(),
 				Groups:   u.GetGroups(),
-				Extra:    u.GetExtra(),
+				Extra:    extra,
 			}, d.options.HTTPClient.Transport),
 		}
 	}

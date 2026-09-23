@@ -17,13 +17,14 @@ limitations under the License.
 package server
 
 import (
+	"context"
+
 	"kubeops.dev/config-syncer/pkg/operator"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
-	"k8s.io/apimachinery/pkg/util/wait"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 )
 
@@ -64,7 +65,13 @@ type ConfigSyncerServer struct {
 
 func (op *ConfigSyncerServer) Run(stopCh <-chan struct{}) error {
 	go op.Operator.Run(stopCh)
-	return op.GenericAPIServer.PrepareRun().RunWithContext(wait.ContextForChannel(stopCh))
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func() {
+		<-stopCh
+		cancel()
+	}()
+	return op.GenericAPIServer.PrepareRun().RunWithContext(ctx)
 }
 
 type completedConfig struct {

@@ -16,31 +16,42 @@ limitations under the License.
 
 package meta
 
-import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+import (
+	"maps"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
 
 func LabelsForLabelSelector(sel *metav1.LabelSelector) (map[string]string, bool) {
-	if sel != nil {
-		if len(sel.MatchExpressions) > 0 {
-			expr := sel.MatchExpressions[0]
-			switch expr.Operator {
-			case metav1.LabelSelectorOpIn:
-				return map[string]string{
-					expr.Key: expr.Values[0],
-				}, false
-			case metav1.LabelSelectorOpNotIn:
-				return map[string]string{
-					expr.Key: "not-" + expr.Values[0],
-				}, false
-			case metav1.LabelSelectorOpExists:
-				return map[string]string{
-					expr.Key: "",
-				}, false
-			case metav1.LabelSelectorOpDoesNotExist:
-				return make(map[string]string), false
+	if sel == nil {
+		return make(map[string]string), true
+	}
+
+	labels := make(map[string]string, len(sel.MatchLabels)+len(sel.MatchExpressions))
+	maps.Copy(labels, sel.MatchLabels)
+
+	for _, expr := range sel.MatchExpressions {
+		switch expr.Operator {
+		case metav1.LabelSelectorOpIn:
+			if len(expr.Values) > 0 {
+				labels[expr.Key] = expr.Values[0]
 			}
-		} else {
-			return sel.MatchLabels, true
+		case metav1.LabelSelectorOpNotIn:
+			if len(expr.Values) > 0 {
+				v := expr.Values[0]
+				if v == "true" && len(expr.Values) == 1 {
+					labels[expr.Key] = "false"
+				} else if v == "false" && len(expr.Values) == 1 {
+					labels[expr.Key] = "true"
+				} else {
+					labels[expr.Key] = "not-" + v
+				}
+			}
+		case metav1.LabelSelectorOpExists:
+			labels[expr.Key] = ""
+		case metav1.LabelSelectorOpDoesNotExist:
+			delete(labels, expr.Key)
 		}
 	}
-	return make(map[string]string), true
+	return labels, len(sel.MatchExpressions) == 0
 }
