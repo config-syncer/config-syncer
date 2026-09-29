@@ -18,9 +18,25 @@ limitations under the License.
 
 package v1beta1
 
+// MutatingAdmissionPolicyListerExpansion allows custom methods to be added to
+// MutatingAdmissionPolicyLister.
+type MutatingAdmissionPolicyListerExpansion interface{}
+
+// MutatingAdmissionPolicyBindingListerExpansion allows custom methods to be added to
+// MutatingAdmissionPolicyBindingLister.
+type MutatingAdmissionPolicyBindingListerExpansion interface{}
+
 // MutatingWebhookConfigurationListerExpansion allows custom methods to be added to
 // MutatingWebhookConfigurationLister.
 type MutatingWebhookConfigurationListerExpansion interface{}
+
+// ValidatingAdmissionPolicyListerExpansion allows custom methods to be added to
+// ValidatingAdmissionPolicyLister.
+type ValidatingAdmissionPolicyListerExpansion interface{}
+
+// ValidatingAdmissionPolicyBindingListerExpansion allows custom methods to be added to
+// ValidatingAdmissionPolicyBindingLister.
+type ValidatingAdmissionPolicyBindingListerExpansion interface{}
 
 // ValidatingWebhookConfigurationListerExpansion allows custom methods to be added to
 // ValidatingWebhookConfigurationLister.

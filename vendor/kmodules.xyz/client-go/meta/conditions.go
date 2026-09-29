@@ -18,6 +18,7 @@ package meta
 
 import (
 	"fmt"
+	"slices"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -156,10 +157,8 @@ func (s Status) String() string {
 // not a valid status.
 func StatusFromStringOrDie(text string) Status {
 	s := Status(text)
-	for _, r := range Statuses {
-		if s == r {
-			return s
-		}
+	if slices.Contains(Statuses, s) {
+		return s
 	}
 	panic(fmt.Errorf("string has invalid status: %s", s))
 }

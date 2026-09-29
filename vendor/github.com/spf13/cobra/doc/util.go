@@ -1,4 +1,4 @@
-// Copyright 2013-2022 The Cobra Authors
+// Copyright 2013-2023 The Cobra Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ func hasSeeAlso(cmd *cobra.Command) bool {
 // that do not contain \n.
 func forceMultiLine(s string) string {
 	if len(s) > 60 && !strings.Contains(s, "\n") {
-		s = s + "\n"
+		s += "\n"
 	}
 	return s
 }

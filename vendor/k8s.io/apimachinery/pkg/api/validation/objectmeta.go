@@ -50,7 +50,7 @@ func ValidateAnnotations(annotations map[string]string, fldPath *field.Path) fie
 		}
 	}
 	if err := ValidateAnnotationsSize(annotations); err != nil {
-		allErrs = append(allErrs, field.TooLong(fldPath, "", TotalAnnotationSizeLimitB))
+		allErrs = append(allErrs, field.TooLong(fldPath, "" /*unused*/, TotalAnnotationSizeLimitB))
 	}
 	return allErrs
 }
@@ -74,13 +74,13 @@ func validateOwnerReference(ownerReference metav1.OwnerReference, fldPath *field
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("apiVersion"), ownerReference.APIVersion, "version must not be empty"))
 	}
 	if len(gvk.Kind) == 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("kind"), ownerReference.Kind, "kind must not be empty"))
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("kind"), ownerReference.Kind, "must not be empty"))
 	}
 	if len(ownerReference.Name) == 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), ownerReference.Name, "name must not be empty"))
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), ownerReference.Name, "must not be empty"))
 	}
 	if len(ownerReference.UID) == 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("uid"), ownerReference.UID, "uid must not be empty"))
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("uid"), ownerReference.UID, "must not be empty"))
 	}
 	if _, ok := BannedOwners[gvk]; ok {
 		allErrs = append(allErrs, field.Invalid(fldPath, ownerReference, fmt.Sprintf("%s is disallowed from being an owner", gvk)))
@@ -91,15 +91,16 @@ func validateOwnerReference(ownerReference metav1.OwnerReference, fldPath *field
 // ValidateOwnerReferences validates that a set of owner references are correctly defined.
 func ValidateOwnerReferences(ownerReferences []metav1.OwnerReference, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	controllerName := ""
+	firstControllerName := ""
 	for _, ref := range ownerReferences {
 		allErrs = append(allErrs, validateOwnerReference(ref, fldPath)...)
 		if ref.Controller != nil && *ref.Controller {
-			if controllerName != "" {
+			curControllerName := ref.Kind + "/" + ref.Name
+			if firstControllerName != "" {
 				allErrs = append(allErrs, field.Invalid(fldPath, ownerReferences,
-					fmt.Sprintf("Only one reference can have Controller set to true. Found \"true\" in references for %v and %v", controllerName, ref.Name)))
+					fmt.Sprintf("Only one reference can have Controller set to true. Found \"true\" in references for %v and %v", firstControllerName, curControllerName)))
 			} else {
-				controllerName = ref.Name
+				firstControllerName = curControllerName
 			}
 		}
 	}
