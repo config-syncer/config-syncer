@@ -81,7 +81,7 @@ func PatchServiceAccountObject(ctx context.Context, c kubernetes.Interface, cur,
 
 func TryUpdateServiceAccount(ctx context.Context, c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*core.ServiceAccount) *core.ServiceAccount, opts metav1.UpdateOptions) (result *core.ServiceAccount, err error) {
 	attempt := 0
-	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
+	err = wait.PollUntilContextTimeout(ctx, kutil.RetryInterval, kutil.RetryTimeout, true, func(ctx context.Context) (bool, error) {
 		attempt++
 		cur, e2 := c.CoreV1().ServiceAccounts(meta.Namespace).Get(ctx, meta.Name, metav1.GetOptions{})
 		if kerr.IsNotFound(e2) {
@@ -93,7 +93,6 @@ func TryUpdateServiceAccount(ctx context.Context, c kubernetes.Interface, meta m
 		klog.Errorf("Attempt %d failed to update ServiceAccount %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)
 		return false, nil
 	})
-
 	if err != nil {
 		err = errors.Errorf("failed to update ServiceAccount %s/%s after %d attempts due to %v", meta.Namespace, meta.Name, attempt, err)
 	}
@@ -101,7 +100,7 @@ func TryUpdateServiceAccount(ctx context.Context, c kubernetes.Interface, meta m
 }
 
 func WaitUntillServiceAccountDeleted(ctx context.Context, c kubernetes.Interface, meta metav1.ObjectMeta) error {
-	return wait.PollImmediate(kutil.RetryInterval, kutil.GCTimeout, func() (bool, error) {
+	return wait.PollUntilContextTimeout(ctx, kutil.RetryInterval, kutil.GCTimeout, true, func(ctx context.Context) (bool, error) {
 		_, err := c.CoreV1().ServiceAccounts(meta.Namespace).Get(ctx, meta.Name, metav1.GetOptions{})
 		if err != nil && kerr.IsNotFound(err) {
 			return true, nil

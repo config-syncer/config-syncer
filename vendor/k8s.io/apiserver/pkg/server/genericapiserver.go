@@ -17,6 +17,8 @@ limitations under the License.
 package server
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	gpath "path"
@@ -26,37 +28,43 @@ import (
 
 	systemd "github.com/coreos/go-systemd/v22/daemon"
 
+	"golang.org/x/time/rate"
+	apidiscoveryv2 "k8s.io/api/apidiscovery/v2"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/apimachinery/pkg/runtime/serializer/cbor"
+	"k8s.io/apimachinery/pkg/util/managedfields"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/apimachinery/pkg/util/wait"
 	utilwaitgroup "k8s.io/apimachinery/pkg/util/waitgroup"
-	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/audit"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
 	genericapi "k8s.io/apiserver/pkg/endpoints"
 	"k8s.io/apiserver/pkg/endpoints/discovery"
-	"k8s.io/apiserver/pkg/endpoints/handlers/fieldmanager"
+	discoveryendpoint "k8s.io/apiserver/pkg/endpoints/discovery/aggregated"
 	"k8s.io/apiserver/pkg/features"
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/server/healthz"
 	"k8s.io/apiserver/pkg/server/routes"
 	"k8s.io/apiserver/pkg/storageversion"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
-	utilopenapi "k8s.io/apiserver/pkg/util/openapi"
 	restclient "k8s.io/client-go/rest"
+	basecompatibility "k8s.io/component-base/compatibility"
+	"k8s.io/component-base/featuregate"
+	zpagesfeatures "k8s.io/component-base/zpages/features"
+	"k8s.io/component-base/zpages/statusz"
 	"k8s.io/klog/v2"
-	openapibuilder2 "k8s.io/kube-openapi/pkg/builder"
+	openapibuilder3 "k8s.io/kube-openapi/pkg/builder3"
 	openapicommon "k8s.io/kube-openapi/pkg/common"
 	"k8s.io/kube-openapi/pkg/handler"
 	"k8s.io/kube-openapi/pkg/handler3"
 	openapiutil "k8s.io/kube-openapi/pkg/util"
-	openapiproto "k8s.io/kube-openapi/pkg/util/proto"
 	"k8s.io/kube-openapi/pkg/validation/spec"
-	"k8s.io/utils/clock"
 )
 
 // Info about an API group.
@@ -86,7 +94,7 @@ type APIGroupInfo struct {
 
 	// StaticOpenAPISpec is the spec derived from the definitions of all resources installed together.
 	// It is set during InstallAPIGroups, InstallAPIGroup, and InstallLegacyAPIGroup.
-	StaticOpenAPISpec *spec.Swagger
+	StaticOpenAPISpec map[string]*spec.Schema
 }
 
 func (a *APIGroupInfo) destroyStorage() {
@@ -134,17 +142,27 @@ type GenericAPIServer struct {
 	// Handler holds the handlers being used by this API server
 	Handler *APIServerHandler
 
+	// UnprotectedDebugSocket is used to serve pprof information in a unix-domain socket. This socket is
+	// not protected by authentication/authorization.
+	UnprotectedDebugSocket *routes.DebugSocket
+
 	// listedPathProvider is a lister which provides the set of paths to show at /
 	listedPathProvider routes.ListedPathProvider
 
-	// DiscoveryGroupManager serves /apis
+	// DiscoveryGroupManager serves /apis in an unaggregated form.
 	DiscoveryGroupManager discovery.GroupManager
+
+	// AggregatedDiscoveryGroupManager serves /apis in an aggregated form.
+	AggregatedDiscoveryGroupManager discoveryendpoint.ResourceManager
+
+	// AggregatedLegacyDiscoveryGroupManager serves /api in an aggregated form.
+	AggregatedLegacyDiscoveryGroupManager discoveryendpoint.ResourceManager
 
 	// Enable swagger and/or OpenAPI if these configs are non-nil.
 	openAPIConfig *openapicommon.Config
 
 	// Enable swagger and/or OpenAPI V3 if these configs are non-nil.
-	openAPIV3Config *openapicommon.Config
+	openAPIV3Config *openapicommon.OpenAPIV3Config
 
 	// SkipOpenAPIInstallation indicates not to install the OpenAPI handler
 	// during PrepareRun.
@@ -177,19 +195,11 @@ type GenericAPIServer struct {
 	preShutdownHooksCalled bool
 
 	// healthz checks
-	healthzLock            sync.Mutex
-	healthzChecks          []healthz.HealthChecker
-	healthzChecksInstalled bool
-	// livez checks
-	livezLock            sync.Mutex
-	livezChecks          []healthz.HealthChecker
-	livezChecksInstalled bool
-	// readyz checks
-	readyzLock            sync.Mutex
-	readyzChecks          []healthz.HealthChecker
-	readyzChecksInstalled bool
-	livezGracePeriod      time.Duration
-	livezClock            clock.Clock
+	healthzRegistry healthCheckRegistry
+	readyzRegistry  healthCheckRegistry
+	livezRegistry   healthCheckRegistry
+
+	livezGracePeriod time.Duration
 
 	// auditing. The backend is started before the server starts listening.
 	AuditBackend audit.Backend
@@ -206,8 +216,14 @@ type GenericAPIServer struct {
 	// delegationTarget is the next delegate in the chain. This is never nil.
 	delegationTarget DelegationTarget
 
-	// HandlerChainWaitGroup allows you to wait for all chain handlers finish after the server shutdown.
-	HandlerChainWaitGroup *utilwaitgroup.SafeWaitGroup
+	// NonLongRunningRequestWaitGroup allows you to wait for all chain
+	// handlers associated with non long-running requests
+	// to complete while the server is shuting down.
+	NonLongRunningRequestWaitGroup *utilwaitgroup.SafeWaitGroup
+	// WatchRequestWaitGroup allows us to wait for all chain
+	// handlers associated with active watch requests to
+	// complete while the server is shuting down.
+	WatchRequestWaitGroup *utilwaitgroup.RateLimitedSafeWaitGroup
 
 	// ShutdownDelayDuration allows to block shutdown for some time, e.g. until endpoints pointing to this API server
 	// have converged on all node. During this time, the API server keeps serving, /healthz will return 200,
@@ -221,11 +237,29 @@ type GenericAPIServer struct {
 	// APIServerID is the ID of this API server
 	APIServerID string
 
+	// StorageReadinessHook implements post-start-hook functionality for checking readiness
+	// of underlying storage for registered resources.
+	StorageReadinessHook *StorageReadinessHook
+
 	// StorageVersionManager holds the storage versions of the API resources installed by this server.
 	StorageVersionManager storageversion.Manager
 
-	// Version will enable the /version endpoint if non-nil
-	Version *version.Info
+	// EffectiveVersion determines which apis and features are available
+	// based on when the api/feature lifecyle.
+	EffectiveVersion basecompatibility.EffectiveVersion
+	// EmulationForwardCompatible is an option to implicitly enable all APIs which are introduced after the emulation version and
+	// have higher priority than APIs of the same group resource enabled at the emulation version.
+	// If true, all APIs that have higher priority than the APIs(beta+) of the same group resource enabled at the emulation version will be installed.
+	// This is needed when a controller implementation migrates to newer API versions, for the binary version, and also uses the newer API versions even when emulation version is set.
+	// Not applicable to alpha APIs.
+	EmulationForwardCompatible bool
+	// RuntimeConfigEmulationForwardCompatible is an option to explicitly enable specific APIs introduced after the emulation version through the runtime-config.
+	// If true, APIs identified by group/version that are enabled in the --runtime-config flag will be installed even if it is introduced after the emulation version. --runtime-config flag values that identify multiple APIs, such as api/all,api/ga,api/beta, are not influenced by this flag and will only enable APIs available at the current emulation version.
+	// If false, error would be thrown if any GroupVersion or GroupVersionResource explicitly enabled in the --runtime-config flag is introduced after the emulation version.
+	RuntimeConfigEmulationForwardCompatible bool
+
+	// FeatureGate is a way to plumb feature gate through if you have them.
+	FeatureGate featuregate.FeatureGate
 
 	// lifecycleSignals provides access to the various signals that happen during the life cycle of the apiserver.
 	lifecycleSignals lifecycleSignals
@@ -247,6 +281,23 @@ type GenericAPIServer struct {
 	// If enabled, after ShutdownDelayDuration elapses, any incoming request is
 	// rejected with a 429 status code and a 'Retry-After' response.
 	ShutdownSendRetryAfter bool
+
+	// ShutdownWatchTerminationGracePeriod, if set to a positive value,
+	// is the maximum duration the apiserver will wait for all active
+	// watch request(s) to drain.
+	// Once this grace period elapses, the apiserver will no longer
+	// wait for any active watch request(s) in flight to drain, it will
+	// proceed to the next step in the graceful server shutdown process.
+	// If set to a positive value, the apiserver will keep track of the
+	// number of active watch request(s) in flight and during shutdown
+	// it will wait, at most, for the specified duration and allow these
+	// active watch requests to drain with some rate limiting in effect.
+	// The default is zero, which implies the apiserver will not keep
+	// track of active watch request(s) in flight and will not wait
+	// for them to drain, this maintains backward compatibility.
+	// This grace period is orthogonal to other grace periods, and
+	// it is not overridden by any other grace period.
+	ShutdownWatchTerminationGracePeriod time.Duration
 }
 
 // DelegationTarget is an interface which allows for composition of API servers with top level handling that works
@@ -293,7 +344,7 @@ func (s *GenericAPIServer) PreShutdownHooks() map[string]preShutdownHookEntry {
 	return s.preShutdownHooks
 }
 func (s *GenericAPIServer) HealthzChecks() []healthz.HealthChecker {
-	return s.healthzChecks
+	return s.healthzRegistry.checks
 }
 func (s *GenericAPIServer) ListedPaths() []string {
 	return s.listedPathProvider.ListedPaths()
@@ -393,11 +444,9 @@ func (s *GenericAPIServer) PrepareRun() preparedGenericAPIServer {
 	}
 
 	if s.openAPIV3Config != nil && !s.skipOpenAPIInstallation {
-		if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPIV3) {
-			s.OpenAPIV3VersionedService = routes.OpenAPI{
-				Config: s.openAPIV3Config,
-			}.InstallV3(s.Handler.GoRestfulContainer, s.Handler.NonGoRestfulMux)
-		}
+		s.OpenAPIV3VersionedService = routes.OpenAPI{
+			V3Config: s.openAPIV3Config,
+		}.InstallV3(s.Handler.GoRestfulContainer, s.Handler.NonGoRestfulMux)
 	}
 
 	s.installHealthz()
@@ -411,57 +460,80 @@ func (s *GenericAPIServer) PrepareRun() preparedGenericAPIServer {
 	}
 	s.installReadyz()
 
+	if utilfeature.DefaultFeatureGate.Enabled(zpagesfeatures.ComponentStatusz) {
+		statusz.Install(s.Handler.NonGoRestfulMux, "apiserver", statusz.NewRegistry(s.EffectiveVersion, statusz.WithListedPaths(s.ListedPaths())))
+	}
+
 	return preparedGenericAPIServer{s}
 }
 
 // Run spawns the secure http server. It only returns if stopCh is closed
 // or the secure port cannot be listened on initially.
-// This is the diagram of what channels/signals are dependent on each other:
 //
-//	                              stopCh
-//	                                |
-//	       ---------------------------------------------------------
-//	       |                                                       |
-//	ShutdownInitiated (shutdownInitiatedCh)                        |
-//	       |                                                       |
-//
-// (ShutdownDelayDuration)                                    (PreShutdownHooks)
-//
-//	         |                                                       |
-//	AfterShutdownDelayDuration (delayedStopCh)   PreShutdownHooksStopped (preShutdownHooksHasStoppedCh)
-//	         |                                                       |
-//	         |-------------------------------------------------------|
-//	                                  |
-//	                                  |
-//	             NotAcceptingNewRequest (notAcceptingNewRequestCh)
-//	                                  |
-//	                                  |
-//	         |---------------------------------------------------------|
-//	         |                        |              |                 |
-//	      [without                 [with             |                 |
-//
-// ShutdownSendRetryAfter]  ShutdownSendRetryAfter]  |                 |
-//
-//	     |                        |              |                 |
-//	     |                        ---------------|                 |
-//	     |                                       |                 |
-//	     |                         (HandlerChainWaitGroup::Wait)   |
-//	     |                                       |                 |
-//	     |                    InFlightRequestsDrained (drainedCh)  |
-//	     |                                       |                 |
-//	     ----------------------------------------|-----------------|
-//	                           |                 |
-//	                 stopHttpServerCh     (AuditBackend::Shutdown())
-//	                           |
-//	                 listenerStoppedCh
-//	                           |
-//	HTTPServerStoppedListening (httpServerStoppedListeningCh)
+// Deprecated: use RunWithContext instead. Run will not get removed to avoid
+// breaking consumers, but should not be used in new code.
 func (s preparedGenericAPIServer) Run(stopCh <-chan struct{}) error {
+	ctx := wait.ContextForChannel(stopCh)
+	return s.RunWithContext(ctx)
+}
+
+// RunWithContext spawns the secure http server. It only returns if ctx is canceled
+// or the secure port cannot be listened on initially.
+// This is the diagram of what contexts/channels/signals are dependent on each other:
+//
+// |                                   ctx
+// |                                    |
+// |           ---------------------------------------------------------
+// |           |                                                       |
+// |    ShutdownInitiated (shutdownInitiatedCh)                        |
+// |           |                                                       |
+// | (ShutdownDelayDuration)                                    (PreShutdownHooks)
+// |           |                                                       |
+// |  AfterShutdownDelayDuration (delayedStopCh)   PreShutdownHooksStopped (preShutdownHooksHasStoppedCh)
+// |           |                                                       |
+// |           |-------------------------------------------------------|
+// |                                    |
+// |                                    |
+// |               NotAcceptingNewRequest (notAcceptingNewRequestCh)
+// |                                    |
+// |                                    |
+// |           |----------------------------------------------------------------------------------|
+// |           |                        |              |                                          |
+// |        [without                 [with             |                                          |
+// | ShutdownSendRetryAfter]  ShutdownSendRetryAfter]  |                                          |
+// |           |                        |              |                                          |
+// |           |                        ---------------|                                          |
+// |           |                                       |                                          |
+// |           |                      |----------------|-----------------------|                  |
+// |           |                      |                                        |                  |
+// |           |         (NonLongRunningRequestWaitGroup::Wait)   (WatchRequestWaitGroup::Wait)   |
+// |           |                      |                                        |                  |
+// |           |                      |------------------|---------------------|                  |
+// |           |                                         |                                        |
+// |           |                         InFlightRequestsDrained (drainedCh)                      |
+// |           |                                         |                                        |
+// |           |-------------------|---------------------|----------------------------------------|
+// |                               |                     |
+// |                       stopHttpServerCtx     (AuditBackend::Shutdown())
+// |                               |
+// |                       listenerStoppedCh
+// |                               |
+// |      HTTPServerStoppedListening (httpServerStoppedListeningCh)
+func (s preparedGenericAPIServer) RunWithContext(ctx context.Context) error {
+	stopCh := ctx.Done()
 	delayedStopCh := s.lifecycleSignals.AfterShutdownDelayDuration
 	shutdownInitiatedCh := s.lifecycleSignals.ShutdownInitiated
 
 	// Clean up resources on shutdown.
 	defer s.Destroy()
+
+	// If UDS profiling is enabled, start a local http server listening on that socket
+	if s.UnprotectedDebugSocket != nil {
+		go func() {
+			defer utilruntime.HandleCrash()
+			klog.Error(s.UnprotectedDebugSocket.Run(stopCh))
+		}()
+	}
 
 	// spawn a new goroutine for closing the MuxAndDiscoveryComplete signal
 	// registration happens during construction of the generic api server
@@ -505,14 +577,16 @@ func (s preparedGenericAPIServer) Run(stopCh <-chan struct{}) error {
 		//   net/http waits for 1s for the peer to respond to a GO_AWAY frame, so
 		//   we should wait for a minimum of 2s
 		shutdownTimeout = 2 * time.Second
-		klog.V(1).InfoS("[graceful-termination] using HTTP Server shutdown timeout", "ShutdownTimeout", shutdownTimeout)
+		klog.V(1).InfoS("[graceful-termination] using HTTP Server shutdown timeout", "shutdownTimeout", shutdownTimeout)
 	}
 
 	notAcceptingNewRequestCh := s.lifecycleSignals.NotAcceptingNewRequest
 	drainedCh := s.lifecycleSignals.InFlightRequestsDrained
-	stopHttpServerCh := make(chan struct{})
+	// Canceling the parent context does not immediately cancel the HTTP server.
+	// We only inherit context values here and deal with cancellation ourselves.
+	stopHTTPServerCtx, stopHTTPServer := context.WithCancelCause(context.WithoutCancel(ctx))
 	go func() {
-		defer close(stopHttpServerCh)
+		defer stopHTTPServer(errors.New("time to stop HTTP server"))
 
 		timeToStopHttpServerCh := notAcceptingNewRequestCh.Signaled()
 		if s.ShutdownSendRetryAfter {
@@ -531,7 +605,7 @@ func (s preparedGenericAPIServer) Run(stopCh <-chan struct{}) error {
 		}
 	}
 
-	stoppedCh, listenerStoppedCh, err := s.NonBlockingRun(stopHttpServerCh, shutdownTimeout)
+	stoppedCh, listenerStoppedCh, err := s.NonBlockingRunWithContext(stopHTTPServerCtx, shutdownTimeout)
 	if err != nil {
 		return err
 	}
@@ -559,15 +633,17 @@ func (s preparedGenericAPIServer) Run(stopCh <-chan struct{}) error {
 		<-preShutdownHooksHasStoppedCh.Signaled()
 	}()
 
+	// wait for all in-flight non-long running requests to finish
+	nonLongRunningRequestDrainedCh := make(chan struct{})
 	go func() {
-		defer klog.V(1).InfoS("[graceful-termination] shutdown event", "name", drainedCh.Name())
-		defer drainedCh.Signal()
+		defer close(nonLongRunningRequestDrainedCh)
+		defer klog.V(1).Info("[graceful-termination] in-flight non long-running request(s) have drained")
 
 		// wait for the delayed stopCh before closing the handler chain (it rejects everything after Wait has been called).
 		<-notAcceptingNewRequestCh.Signaled()
 
 		// Wait for all requests to finish, which are bounded by the RequestTimeout variable.
-		// once HandlerChainWaitGroup.Wait is invoked, the apiserver is
+		// once NonLongRunningRequestWaitGroup.Wait is invoked, the apiserver is
 		// expected to reject any incoming request with a {503, Retry-After}
 		// response via the WithWaitGroup filter. On the contrary, we observe
 		// that incoming request(s) get a 'connection refused' error, this is
@@ -579,7 +655,48 @@ func (s preparedGenericAPIServer) Run(stopCh <-chan struct{}) error {
 		// 'Server.Shutdown' will be invoked only after in-flight requests
 		// have been drained.
 		// TODO: can we consolidate these two modes of graceful termination?
-		s.HandlerChainWaitGroup.Wait()
+		s.NonLongRunningRequestWaitGroup.Wait()
+	}()
+
+	// wait for all in-flight watches to finish
+	activeWatchesDrainedCh := make(chan struct{})
+	go func() {
+		defer close(activeWatchesDrainedCh)
+
+		<-notAcceptingNewRequestCh.Signaled()
+		if s.ShutdownWatchTerminationGracePeriod <= time.Duration(0) {
+			klog.V(1).InfoS("[graceful-termination] not going to wait for active watch request(s) to drain")
+			return
+		}
+
+		// Wait for all active watches to finish
+		grace := s.ShutdownWatchTerminationGracePeriod
+		activeBefore, activeAfter, err := s.WatchRequestWaitGroup.Wait(func(count int) (utilwaitgroup.RateLimiter, context.Context, context.CancelFunc) {
+			qps := float64(count) / grace.Seconds()
+			// TODO: we don't want the QPS (max requests drained per second) to
+			//  get below a certain floor value, since we want the server to
+			//  drain the active watch requests as soon as possible.
+			//  For now, it's hard coded to 200, and it is subject to change
+			//  based on the result from the scale testing.
+			if qps < 200 {
+				qps = 200
+			}
+
+			ctx, cancel := context.WithTimeout(context.Background(), grace)
+			// We don't expect more than one token to be consumed
+			// in a single Wait call, so setting burst to 1.
+			return rate.NewLimiter(rate.Limit(qps), 1), ctx, cancel
+		})
+		klog.V(1).InfoS("[graceful-termination] active watch request(s) have drained",
+			"duration", grace, "activeWatchesBefore", activeBefore, "activeWatchesAfter", activeAfter, "error", err)
+	}()
+
+	go func() {
+		defer klog.V(1).InfoS("[graceful-termination] shutdown event", "name", drainedCh.Name())
+		defer drainedCh.Signal()
+
+		<-nonLongRunningRequestDrainedCh
+		<-activeWatchesDrainedCh
 	}()
 
 	klog.V(1).Info("[graceful-termination] waiting for shutdown to be initiated")
@@ -617,7 +734,18 @@ func (s preparedGenericAPIServer) Run(stopCh <-chan struct{}) error {
 // NonBlockingRun spawns the secure http server. An error is
 // returned if the secure port cannot be listened on.
 // The returned channel is closed when the (asynchronous) termination is finished.
+//
+// Deprecated: use RunWithContext instead. Run will not get removed to avoid
+// breaking consumers, but should not be used in new code.
 func (s preparedGenericAPIServer) NonBlockingRun(stopCh <-chan struct{}, shutdownTimeout time.Duration) (<-chan struct{}, <-chan struct{}, error) {
+	ctx := wait.ContextForChannel(stopCh)
+	return s.NonBlockingRunWithContext(ctx, shutdownTimeout)
+}
+
+// NonBlockingRunWithContext spawns the secure http server. An error is
+// returned if the secure port cannot be listened on.
+// The returned channel is closed when the (asynchronous) termination is finished.
+func (s preparedGenericAPIServer) NonBlockingRunWithContext(ctx context.Context, shutdownTimeout time.Duration) (<-chan struct{}, <-chan struct{}, error) {
 	// Use an internal stop channel to allow cleanup of the listeners on error.
 	internalStopCh := make(chan struct{})
 	var stoppedCh <-chan struct{}
@@ -635,11 +763,11 @@ func (s preparedGenericAPIServer) NonBlockingRun(stopCh <-chan struct{}, shutdow
 	// responsibility of the caller to close the provided channel to
 	// ensure cleanup.
 	go func() {
-		<-stopCh
+		<-ctx.Done()
 		close(internalStopCh)
 	}()
 
-	s.RunPostStartHooks(stopCh)
+	s.RunPostStartHooks(ctx)
 
 	if _, err := systemd.SdNotify(true, "READY=1\n"); err != nil {
 		klog.Errorf("Unable to send systemd daemon successful start message: %v\n", err)
@@ -649,7 +777,7 @@ func (s preparedGenericAPIServer) NonBlockingRun(stopCh <-chan struct{}, shutdow
 }
 
 // installAPIResources is a private method for installing the REST storage backing each api groupversionresource
-func (s *GenericAPIServer) installAPIResources(apiPrefix string, apiGroupInfo *APIGroupInfo, openAPIModels openapiproto.Models) error {
+func (s *GenericAPIServer) installAPIResources(apiPrefix string, apiGroupInfo *APIGroupInfo, typeConverter managedfields.TypeConverter) error {
 	var resourceInfos []*storageversion.ResourceInfo
 	for _, groupVersion := range apiGroupInfo.PrioritizedVersions {
 		if len(apiGroupInfo.VersionedResourcesStorageMap[groupVersion.Version]) == 0 {
@@ -664,29 +792,44 @@ func (s *GenericAPIServer) installAPIResources(apiPrefix string, apiGroupInfo *A
 		if apiGroupInfo.OptionsExternalVersion != nil {
 			apiGroupVersion.OptionsExternalVersion = apiGroupInfo.OptionsExternalVersion
 		}
-		apiGroupVersion.OpenAPIModels = openAPIModels
-
-		if openAPIModels != nil && utilfeature.DefaultFeatureGate.Enabled(features.ServerSideApply) {
-			typeConverter, err := fieldmanager.NewTypeConverter(openAPIModels, false)
-			if err != nil {
-				return err
-			}
-			apiGroupVersion.TypeConverter = typeConverter
-		}
-
+		apiGroupVersion.TypeConverter = typeConverter
 		apiGroupVersion.MaxRequestBodyBytes = s.maxRequestBodyBytes
 
-		r, err := apiGroupVersion.InstallREST(s.Handler.GoRestfulContainer)
+		discoveryAPIResources, r, err := apiGroupVersion.InstallREST(s.Handler.GoRestfulContainer)
+
 		if err != nil {
 			return fmt.Errorf("unable to setup API %v: %v", apiGroupInfo, err)
 		}
 		resourceInfos = append(resourceInfos, r...)
+
+		// Aggregated discovery only aggregates resources under /apis
+		if apiPrefix == APIGroupPrefix {
+			s.AggregatedDiscoveryGroupManager.AddGroupVersion(
+				groupVersion.Group,
+				apidiscoveryv2.APIVersionDiscovery{
+					Freshness: apidiscoveryv2.DiscoveryFreshnessCurrent,
+					Version:   groupVersion.Version,
+					Resources: discoveryAPIResources,
+				},
+			)
+		} else {
+			// There is only one group version for legacy resources, priority can be defaulted to 0.
+			s.AggregatedLegacyDiscoveryGroupManager.AddGroupVersion(
+				groupVersion.Group,
+				apidiscoveryv2.APIVersionDiscovery{
+					Freshness: apidiscoveryv2.DiscoveryFreshnessCurrent,
+					Version:   groupVersion.Version,
+					Resources: discoveryAPIResources,
+				},
+			)
+		}
+
 	}
 
 	s.RegisterDestroyFunc(apiGroupInfo.destroyStorage)
 
-	if utilfeature.DefaultFeatureGate.Enabled(features.StorageVersionAPI) &&
-		utilfeature.DefaultFeatureGate.Enabled(features.APIServerIdentity) {
+	if s.FeatureGate.Enabled(features.StorageVersionAPI) &&
+		s.FeatureGate.Enabled(features.APIServerIdentity) {
 		// API installation happens before we start listening on the handlers,
 		// therefore it is safe to register ResourceInfos here. The handler will block
 		// write requests until the storage versions of the targeting resources are updated.
@@ -715,7 +858,10 @@ func (s *GenericAPIServer) InstallLegacyAPIGroup(apiPrefix string, apiGroupInfo 
 
 	// Install the version handler.
 	// Add a handler at /<apiPrefix> to enumerate the supported api versions.
-	s.Handler.GoRestfulContainer.Add(discovery.NewLegacyRootAPIHandler(s.discoveryAddresses, s.Serializer, apiPrefix).WebService())
+	legacyRootAPIHandler := discovery.NewLegacyRootAPIHandler(s.discoveryAddresses, s.Serializer, apiPrefix)
+	wrapped := discoveryendpoint.WrapAggregatedDiscoveryToHandler(legacyRootAPIHandler, s.AggregatedLegacyDiscoveryGroupManager)
+	s.Handler.GoRestfulContainer.Add(wrapped.GenerateWebService("/api", metav1.APIVersions{}))
+	s.registerStorageReadinessCheck("", apiGroupInfo)
 
 	return nil
 }
@@ -725,6 +871,9 @@ func (s *GenericAPIServer) InstallLegacyAPIGroup(apiPrefix string, apiGroupInfo 
 // underlying storage will be destroyed on this servers shutdown.
 func (s *GenericAPIServer) InstallAPIGroups(apiGroupInfos ...*APIGroupInfo) error {
 	for _, apiGroupInfo := range apiGroupInfos {
+		if len(apiGroupInfo.PrioritizedVersions) == 0 {
+			return fmt.Errorf("no version priority set for %#v", *apiGroupInfo)
+		}
 		// Do not register empty group or empty version.  Doing so claims /apis/ for the wrong entity to be returned.
 		// Catching these here places the error  much closer to its origin
 		if len(apiGroupInfo.PrioritizedVersions[0].Group) == 0 {
@@ -771,8 +920,26 @@ func (s *GenericAPIServer) InstallAPIGroups(apiGroupInfos ...*APIGroupInfo) erro
 
 		s.DiscoveryGroupManager.AddGroup(apiGroup)
 		s.Handler.GoRestfulContainer.Add(discovery.NewAPIGroupHandler(s.Serializer, apiGroup).WebService())
+		s.registerStorageReadinessCheck(apiGroupInfo.PrioritizedVersions[0].Group, apiGroupInfo)
 	}
 	return nil
+}
+
+// registerStorageReadinessCheck registers the readiness checks for all underlying storages
+// for a given APIGroup.
+func (s *GenericAPIServer) registerStorageReadinessCheck(groupName string, apiGroupInfo *APIGroupInfo) {
+	for version, storageMap := range apiGroupInfo.VersionedResourcesStorageMap {
+		for resource, storage := range storageMap {
+			if withReadiness, ok := storage.(rest.StorageWithReadiness); ok {
+				gvr := metav1.GroupVersionResource{
+					Group:    groupName,
+					Version:  version,
+					Resource: resource,
+				}
+				s.StorageReadinessHook.RegisterStorage(gvr, withReadiness)
+			}
+		}
+	}
 }
 
 // InstallAPIGroup exposes the given api group in the API.
@@ -797,9 +964,22 @@ func (s *GenericAPIServer) getAPIGroupVersion(apiGroupInfo *APIGroupInfo, groupV
 }
 
 func (s *GenericAPIServer) newAPIGroupVersion(apiGroupInfo *APIGroupInfo, groupVersion schema.GroupVersion) *genericapi.APIGroupVersion {
+
+	allServedVersionsByResource := map[string][]string{}
+	for version, resourcesInVersion := range apiGroupInfo.VersionedResourcesStorageMap {
+		for resource := range resourcesInVersion {
+			if len(groupVersion.Group) == 0 {
+				allServedVersionsByResource[resource] = append(allServedVersionsByResource[resource], version)
+			} else {
+				allServedVersionsByResource[resource] = append(allServedVersionsByResource[resource], fmt.Sprintf("%s/%s", groupVersion.Group, version))
+			}
+		}
+	}
+
 	return &genericapi.APIGroupVersion{
-		GroupVersion:     groupVersion,
-		MetaGroupVersion: apiGroupInfo.MetaGroupVersion,
+		GroupVersion:                groupVersion,
+		AllServedVersionsByResource: allServedVersionsByResource,
+		MetaGroupVersion:            apiGroupInfo.MetaGroupVersion,
 
 		ParameterCodec:        apiGroupInfo.ParameterCodec,
 		Serializer:            apiGroupInfo.NegotiatedSerializer,
@@ -822,6 +1002,19 @@ func (s *GenericAPIServer) newAPIGroupVersion(apiGroupInfo *APIGroupInfo, groupV
 // NewDefaultAPIGroupInfo returns an APIGroupInfo stubbed with "normal" values
 // exposed for easier composition from other packages
 func NewDefaultAPIGroupInfo(group string, scheme *runtime.Scheme, parameterCodec runtime.ParameterCodec, codecs serializer.CodecFactory) APIGroupInfo {
+	opts := []serializer.CodecFactoryOptionsMutator{}
+	if utilfeature.DefaultFeatureGate.Enabled(features.CBORServingAndStorage) {
+		opts = append(opts, serializer.WithSerializer(cbor.NewSerializerInfo))
+	}
+	if utilfeature.DefaultFeatureGate.Enabled(features.StreamingCollectionEncodingToJSON) {
+		opts = append(opts, serializer.WithStreamingCollectionEncodingToJSON())
+	}
+	if utilfeature.DefaultFeatureGate.Enabled(features.StreamingCollectionEncodingToProtobuf) {
+		opts = append(opts, serializer.WithStreamingCollectionEncodingToProtobuf())
+	}
+	if len(opts) != 0 {
+		codecs = serializer.NewCodecFactory(scheme, opts...)
+	}
 	return APIGroupInfo{
 		PrioritizedVersions:          scheme.PrioritizedVersionsForGroup(group),
 		VersionedResourcesStorageMap: map[string]map[string]rest.Storage{},
@@ -834,11 +1027,13 @@ func NewDefaultAPIGroupInfo(group string, scheme *runtime.Scheme, parameterCodec
 }
 
 // getOpenAPIModels is a private method for getting the OpenAPI models
-func (s *GenericAPIServer) getOpenAPIModels(apiPrefix string, apiGroupInfos ...*APIGroupInfo) (openapiproto.Models, error) {
-	if s.openAPIConfig == nil {
-		return nil, nil
+func (s *GenericAPIServer) getOpenAPIModels(apiPrefix string, apiGroupInfos ...*APIGroupInfo) (managedfields.TypeConverter, error) {
+	if s.openAPIV3Config == nil {
+		// SSA is GA and requires OpenAPI config to be set
+		// to create models.
+		return nil, errors.New("OpenAPIV3 config must not be nil")
 	}
-	pathsToIgnore := openapiutil.NewTrie(s.openAPIConfig.IgnorePrefixes)
+	pathsToIgnore := openapiutil.NewTrie(s.openAPIV3Config.IgnorePrefixes)
 	resourceNames := make([]string, 0)
 	for _, apiGroupInfo := range apiGroupInfos {
 		groupResources, err := getResourceNamesForGroup(apiPrefix, apiGroupInfo, pathsToIgnore)
@@ -849,14 +1044,20 @@ func (s *GenericAPIServer) getOpenAPIModels(apiPrefix string, apiGroupInfos ...*
 	}
 
 	// Build the openapi definitions for those resources and convert it to proto models
-	openAPISpec, err := openapibuilder2.BuildOpenAPIDefinitionsForResources(s.openAPIConfig, resourceNames...)
+	openAPISpec, err := openapibuilder3.BuildOpenAPIDefinitionsForResources(s.openAPIV3Config, resourceNames...)
 	if err != nil {
 		return nil, err
 	}
 	for _, apiGroupInfo := range apiGroupInfos {
 		apiGroupInfo.StaticOpenAPISpec = openAPISpec
 	}
-	return utilopenapi.ToProtoModels(openAPISpec)
+
+	typeConverter, err := managedfields.NewTypeConverter(openAPISpec, false)
+	if err != nil {
+		return nil, err
+	}
+
+	return typeConverter, nil
 }
 
 // getResourceNamesForGroup is a private method for getting the canonical names for each resource to build in an api group

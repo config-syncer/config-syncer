@@ -30,6 +30,7 @@ import (
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 	"kmodules.xyz/client-go/tools/clientcmd"
 	"kmodules.xyz/client-go/tools/exec"
@@ -87,7 +88,7 @@ func (fi *Invocation) EventuallyConfigMapSynced(source *core.ConfigMap) GomegaAs
 			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
 
-			for _, ns := range namespaces.List() {
+			for _, ns := range sets.List(namespaces) {
 				if ns == source.Name {
 					continue
 				}
@@ -135,7 +136,7 @@ func (fi *Invocation) EventuallySyncedConfigMapsUpdated(source *core.ConfigMap) 
 			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
 
-			for _, ns := range namespaces.List() {
+			for _, ns := range sets.List(namespaces) {
 				if ns == source.Namespace {
 					continue
 				}
@@ -162,7 +163,7 @@ func (fi *Invocation) EventuallySyncedConfigMapsDeleted(source *core.ConfigMap) 
 			namespaces, err := syncer.NamespacesForSelector(fi.KubeClient, *opt.NamespaceSelector)
 			Expect(err).NotTo(HaveOccurred())
 
-			for _, ns := range namespaces.List() {
+			for _, ns := range sets.List(namespaces) {
 				if ns == source.Namespace {
 					continue
 				}

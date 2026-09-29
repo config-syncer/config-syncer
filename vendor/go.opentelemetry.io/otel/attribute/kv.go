@@ -1,23 +1,10 @@
 // Copyright The OpenTelemetry Authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// SPDX-License-Identifier: Apache-2.0
 
-package attribute // import "go.opentelemetry.io/otel/attribute"
+package attribute
 
 import (
-	"encoding/json"
 	"fmt"
-	"reflect"
 )
 
 // KeyValue holds a key and value pair.
@@ -26,83 +13,127 @@ type KeyValue struct {
 	Value Value
 }
 
-// Valid returns if kv is a valid OpenTelemetry attribute.
+// Valid reports whether kv is a valid OpenTelemetry attribute.
 func (kv KeyValue) Valid() bool {
-	return kv.Key != "" && kv.Value.Type() != INVALID
+	return kv.Key.Defined()
 }
 
-// Bool creates a new key-value pair with a passed name and a bool
-// value.
+// Bool returns a [KeyValue] for a bool value.
 func Bool(k string, v bool) KeyValue {
 	return Key(k).Bool(v)
 }
 
-// Int64 creates a new key-value pair with a passed name and an int64
-// value.
+// BoolSlice returns a [KeyValue] for a []bool value.
+//
+// Note that many observability backends are not optimized to query, index, or
+// aggregate complex attribute values. Complex values may also carry
+// additional performance overhead. Prefer primitive values when
+// possible.
+func BoolSlice(k string, v []bool) KeyValue {
+	return Key(k).BoolSlice(v)
+}
+
+// Int returns a [KeyValue] for an int value.
+//
+// It is provided as a convenience for [Int64].
+func Int(k string, v int) KeyValue {
+	return Key(k).Int(v)
+}
+
+// IntSlice returns a [KeyValue] for a []int value.
+//
+// It is provided as a convenience for [Int64Slice].
+//
+// Note that many observability backends are not optimized to query, index, or
+// aggregate complex attribute values. Complex values may also carry
+// additional performance overhead. Prefer primitive values when
+// possible.
+func IntSlice(k string, v []int) KeyValue {
+	return Key(k).IntSlice(v)
+}
+
+// Int64 returns a [KeyValue] for an int64 value.
 func Int64(k string, v int64) KeyValue {
 	return Key(k).Int64(v)
 }
 
-// Float64 creates a new key-value pair with a passed name and a float64
-// value.
+// Int64Slice returns a [KeyValue] for a []int64 value.
+//
+// Note that many observability backends are not optimized to query, index, or
+// aggregate complex attribute values. Complex values may also carry
+// additional performance overhead. Prefer primitive values when
+// possible.
+func Int64Slice(k string, v []int64) KeyValue {
+	return Key(k).Int64Slice(v)
+}
+
+// Float64 returns a [KeyValue] for a float64 value.
 func Float64(k string, v float64) KeyValue {
 	return Key(k).Float64(v)
 }
 
-// String creates a new key-value pair with a passed name and a string
-// value.
+// Float64Slice returns a [KeyValue] for a []float64 value.
+//
+// Note that many observability backends are not optimized to query, index, or
+// aggregate complex attribute values. Complex values may also carry
+// additional performance overhead. Prefer primitive values when
+// possible.
+func Float64Slice(k string, v []float64) KeyValue {
+	return Key(k).Float64Slice(v)
+}
+
+// String returns a [KeyValue] for a string value.
 func String(k, v string) KeyValue {
 	return Key(k).String(v)
+}
+
+// StringSlice returns a [KeyValue] for a []string value.
+//
+// Note that many observability backends are not optimized to query, index, or
+// aggregate complex attribute values. Complex values may also carry
+// additional performance overhead. Prefer primitive values when
+// possible.
+func StringSlice(k string, v []string) KeyValue {
+	return Key(k).StringSlice(v)
+}
+
+// ByteSlice returns a [KeyValue] for a []byte value.
+//
+// Note that many observability backends are not optimized to query, index, or
+// aggregate complex attribute values. Complex values may also carry
+// additional performance overhead. Prefer primitive values when
+// possible.
+func ByteSlice(k string, v []byte) KeyValue {
+	return Key(k).ByteSlice(v)
+}
+
+// Slice returns a [KeyValue] for a []Value value.
+//
+// Note that many observability backends are not optimized to query, index, or
+// aggregate complex attribute values. Complex values may also carry
+// additional performance overhead. Prefer primitive values when
+// possible.
+func Slice(k string, v ...Value) KeyValue {
+	return Key(k).Slice(v...)
+}
+
+// Map returns a [KeyValue] for a []KeyValue value.
+//
+// Note that many observability backends are not optimized to query, index, or
+// aggregate complex attribute values. Complex values may also carry
+// additional performance overhead. Prefer primitive values when
+// possible.
+//
+// Users should avoid providing duplicate keys; many receivers handle maps
+// containing duplicate keys unpredictably.
+//
+// The order of v is not preserved.
+func Map(k string, v ...KeyValue) KeyValue {
+	return Key(k).Map(v...)
 }
 
 // Stringer creates a new key-value pair with a passed name and a string
 // value generated by the passed Stringer interface.
 func Stringer(k string, v fmt.Stringer) KeyValue {
 	return Key(k).String(v.String())
-}
-
-// Int creates a new key-value pair instance with a passed name and
-// either an int32 or an int64 value, depending on whether the int
-// type is 32 or 64 bits wide.
-func Int(k string, v int) KeyValue {
-	return Key(k).Int(v)
-}
-
-// Array creates a new key-value pair with a passed name and a array.
-// Only arrays of primitive type are supported.
-func Array(k string, v interface{}) KeyValue {
-	return Key(k).Array(v)
-}
-
-// Any creates a new key-value pair instance with a passed name and
-// automatic type inference. This is slower, and not type-safe.
-func Any(k string, value interface{}) KeyValue {
-	if value == nil {
-		return String(k, "<nil>")
-	}
-
-	if stringer, ok := value.(fmt.Stringer); ok {
-		return String(k, stringer.String())
-	}
-
-	rv := reflect.ValueOf(value)
-
-	switch rv.Kind() {
-	case reflect.Array, reflect.Slice:
-		return Array(k, value)
-	case reflect.Bool:
-		return Bool(k, rv.Bool())
-	case reflect.Int, reflect.Int8, reflect.Int16:
-		return Int(k, int(rv.Int()))
-	case reflect.Int64:
-		return Int64(k, rv.Int())
-	case reflect.Float64:
-		return Float64(k, rv.Float())
-	case reflect.String:
-		return String(k, rv.String())
-	}
-	if b, err := json.Marshal(value); b != nil && err == nil {
-		return String(k, string(b))
-	}
-	return String(k, fmt.Sprint(value))
 }

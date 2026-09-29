@@ -71,7 +71,9 @@ func (c *OperatorConfig) New() (*Operator, error) {
 	// ---------------------------
 	op.kubeInformerFactory = informers.NewSharedInformerFactory(op.KubeClient, c.ResyncPeriod)
 	// ---------------------------
-	op.setupConfigInformers()
+	if err := op.setupConfigInformers(); err != nil {
+		return nil, err
+	}
 	// ---------------------------
 
 	if err := op.Configure(); err != nil {

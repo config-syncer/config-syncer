@@ -22,7 +22,6 @@ import (
 	. "github.com/onsi/gomega"
 	"gomodules.xyz/x/crypto/rand"
 	core "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"kmodules.xyz/client-go/tools/clientcmd"
@@ -34,7 +33,7 @@ func (f *Framework) Namespace() string {
 
 func (f *Framework) EnsureNamespace() error {
 	_, err := f.KubeClient.CoreV1().Namespaces().Get(context.TODO(), f.namespace, metav1.GetOptions{})
-	if errors.IsNotFound(err) {
+	if kerr.IsNotFound(err) {
 		_, err = f.KubeClient.CoreV1().Namespaces().Create(context.TODO(), &core.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: f.namespace,
@@ -96,7 +95,7 @@ func (fi *Invocation) EnsureNamespaceForContext(kubeConfigPath string, ctx strin
 	}
 
 	_, err = client.CoreV1().Namespaces().Get(context.TODO(), ns, metav1.GetOptions{})
-	if errors.IsNotFound(err) {
+	if kerr.IsNotFound(err) {
 		_, err = client.CoreV1().Namespaces().Create(context.TODO(), &core.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: ns,
@@ -122,7 +121,7 @@ func (fi *Invocation) DeleteNamespaceForContext(kubeConfigPath string, ctx strin
 	}
 
 	err = client.CoreV1().Namespaces().Delete(context.TODO(), ns, metav1.DeleteOptions{})
-	if errors.IsNotFound(err) {
+	if kerr.IsNotFound(err) {
 		err = nil
 	}
 	Expect(err).ShouldNot(HaveOccurred())

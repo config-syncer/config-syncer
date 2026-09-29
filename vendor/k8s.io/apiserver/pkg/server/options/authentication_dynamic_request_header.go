@@ -39,7 +39,7 @@ type DynamicRequestHeaderController struct {
 }
 
 // newDynamicRequestHeaderController creates a new controller that implements DynamicRequestHeaderController
-func newDynamicRequestHeaderController(client kubernetes.Interface) (*DynamicRequestHeaderController, error) {
+func newDynamicRequestHeaderController(client kubernetes.Interface, authenticationConfigMapNamespace string) (*DynamicRequestHeaderController, error) {
 	requestHeaderCAController, err := dynamiccertificates.NewDynamicCAFromConfigMapController(
 		"client-ca",
 		authenticationConfigMapNamespace,
@@ -55,6 +55,7 @@ func newDynamicRequestHeaderController(client kubernetes.Interface) (*DynamicReq
 		authenticationConfigMapNamespace,
 		client,
 		"requestheader-username-headers",
+		"requestheader-uid-headers",
 		"requestheader-group-headers",
 		"requestheader-extra-headers-prefix",
 		"requestheader-allowed-names",
