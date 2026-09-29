@@ -51,34 +51,39 @@ type Operator struct {
 func (op *Operator) Configure() error {
 	klog.Infoln("configuring config-syncer ...")
 
-	return op.configSyncer.Configure(op.Config.ClusterName, op.Config.KubeConfigFile)
+	return op.configSyncer.Configure(op.ClusterName, op.KubeConfigFile)
 }
 
-func (op *Operator) setupConfigInformers() {
+func (op *Operator) setupConfigInformers() error {
 	configMapInformer := op.kubeInformerFactory.InformerFor(&core.ConfigMap{}, func(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
 		return core_informers.NewFilteredConfigMapInformer(
 			client,
-			op.Config.ConfigSourceNamespace,
+			op.ConfigSourceNamespace,
 			resyncPeriod,
 			cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
 			func(options *metav1.ListOptions) {},
 		)
 	})
-	configMapInformer.AddEventHandler(op.configSyncer.ConfigMapHandler())
+	if _, err := configMapInformer.AddEventHandler(op.configSyncer.ConfigMapHandler()); err != nil {
+		return err
+	}
 
 	secretInformer := op.kubeInformerFactory.InformerFor(&core.Secret{}, func(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
 		return core_informers.NewFilteredSecretInformer(
 			client,
-			op.Config.ConfigSourceNamespace,
+			op.ConfigSourceNamespace,
 			resyncPeriod,
 			cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
 			func(options *metav1.ListOptions) {},
 		)
 	})
-	secretInformer.AddEventHandler(op.configSyncer.SecretHandler())
+	if _, err := secretInformer.AddEventHandler(op.configSyncer.SecretHandler()); err != nil {
+		return err
+	}
 
 	nsInformer := op.kubeInformerFactory.Core().V1().Namespaces().Informer()
-	nsInformer.AddEventHandler(op.configSyncer.NamespaceHandler())
+	_, err := nsInformer.AddEventHandler(op.configSyncer.NamespaceHandler())
+	return err
 }
 
 func (op *Operator) Run(stopCh <-chan struct{}) {

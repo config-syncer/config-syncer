@@ -1,98 +1,49 @@
 // Copyright The OpenTelemetry Authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// SPDX-License-Identifier: Apache-2.0
 
 package metric // import "go.opentelemetry.io/otel/metric"
 
 import (
-	"go.opentelemetry.io/otel/unit"
+	"slices"
+
+	"go.opentelemetry.io/otel/attribute"
 )
-
-// InstrumentConfig contains options for metric instrument descriptors.
-type InstrumentConfig struct {
-	// Description describes the instrument in human-readable terms.
-	Description string
-	// Unit describes the measurement unit for a instrument.
-	Unit unit.Unit
-	// InstrumentationName is the name of the library providing
-	// instrumentation.
-	InstrumentationName string
-	// InstrumentationVersion is the version of the library providing
-	// instrumentation.
-	InstrumentationVersion string
-}
-
-// InstrumentOption is an interface for applying metric instrument options.
-type InstrumentOption interface {
-	// ApplyMeter is used to set a InstrumentOption value of a
-	// InstrumentConfig.
-	ApplyInstrument(*InstrumentConfig)
-}
-
-// NewInstrumentConfig creates a new InstrumentConfig
-// and applies all the given options.
-func NewInstrumentConfig(opts ...InstrumentOption) InstrumentConfig {
-	var config InstrumentConfig
-	for _, o := range opts {
-		o.ApplyInstrument(&config)
-	}
-	return config
-}
-
-// WithDescription applies provided description.
-func WithDescription(desc string) InstrumentOption {
-	return descriptionOption(desc)
-}
-
-type descriptionOption string
-
-func (d descriptionOption) ApplyInstrument(config *InstrumentConfig) {
-	config.Description = string(d)
-}
-
-// WithUnit applies provided unit.
-func WithUnit(unit unit.Unit) InstrumentOption {
-	return unitOption(unit)
-}
-
-type unitOption unit.Unit
-
-func (u unitOption) ApplyInstrument(config *InstrumentConfig) {
-	config.Unit = unit.Unit(u)
-}
-
-// WithInstrumentationName sets the instrumentation name.
-func WithInstrumentationName(name string) InstrumentOption {
-	return instrumentationNameOption(name)
-}
-
-type instrumentationNameOption string
-
-func (i instrumentationNameOption) ApplyInstrument(config *InstrumentConfig) {
-	config.InstrumentationName = string(i)
-}
 
 // MeterConfig contains options for Meters.
 type MeterConfig struct {
-	// InstrumentationVersion is the version of the library providing
-	// instrumentation.
-	InstrumentationVersion string
+	instrumentationVersion string
+	schemaURL              string
+	attrs                  attribute.Set
+
+	// Ensure forward compatibility by explicitly making this not comparable.
+	noCmp [0]func() //nolint: unused  // This is indeed used.
+}
+
+// InstrumentationVersion returns the version of the library providing
+// instrumentation.
+func (cfg MeterConfig) InstrumentationVersion() string {
+	return cfg.instrumentationVersion
+}
+
+// InstrumentationAttributes returns the attributes associated with the library
+// providing instrumentation.
+func (cfg MeterConfig) InstrumentationAttributes() attribute.Set {
+	return cfg.attrs
+}
+
+// SchemaURL is the schema_url of the library providing instrumentation.
+func (cfg MeterConfig) SchemaURL() string {
+	return cfg.schemaURL
 }
 
 // MeterOption is an interface for applying Meter options.
 type MeterOption interface {
-	// ApplyMeter is used to set a MeterOption value of a MeterConfig.
-	ApplyMeter(*MeterConfig)
+	// applyMeter is used to set a MeterOption value of a MeterConfig.
+	applyMeter(MeterConfig) MeterConfig
+}
+
+type experimentalOption interface {
+	Experimental()
 }
 
 // NewMeterConfig creates a new MeterConfig and applies
@@ -100,29 +51,68 @@ type MeterOption interface {
 func NewMeterConfig(opts ...MeterOption) MeterConfig {
 	var config MeterConfig
 	for _, o := range opts {
-		o.ApplyMeter(&config)
+		if _, ok := o.(experimentalOption); ok {
+			continue
+		}
+		config = o.applyMeter(config)
 	}
 	return config
 }
 
-// InstrumentationOption is an interface for applying instrumentation specific
-// options.
-type InstrumentationOption interface {
-	InstrumentOption
-	MeterOption
+type meterOptionFunc func(MeterConfig) MeterConfig
+
+func (fn meterOptionFunc) applyMeter(cfg MeterConfig) MeterConfig {
+	return fn(cfg)
 }
 
 // WithInstrumentationVersion sets the instrumentation version.
-func WithInstrumentationVersion(version string) InstrumentationOption {
-	return instrumentationVersionOption(version)
+func WithInstrumentationVersion(version string) MeterOption {
+	return meterOptionFunc(func(config MeterConfig) MeterConfig {
+		config.instrumentationVersion = version
+		return config
+	})
 }
 
-type instrumentationVersionOption string
-
-func (i instrumentationVersionOption) ApplyMeter(config *MeterConfig) {
-	config.InstrumentationVersion = string(i)
+// WithInstrumentationAttributes adds the instrumentation attributes.
+//
+// This is equivalent to calling [WithInstrumentationAttributeSet] with an
+// [attribute.Set] created from a clone of the passed attributes.
+// [WithInstrumentationAttributeSet] is recommended for more control.
+//
+// If multiple [WithInstrumentationAttributes] or [WithInstrumentationAttributeSet]
+// options are passed, the attributes will be merged together in the order
+// they are passed. Attributes with duplicate keys will use the last value passed.
+func WithInstrumentationAttributes(attr ...attribute.KeyValue) MeterOption {
+	set := attribute.NewSet(slices.Clone(attr)...)
+	return WithInstrumentationAttributeSet(set)
 }
 
-func (i instrumentationVersionOption) ApplyInstrument(config *InstrumentConfig) {
-	config.InstrumentationVersion = string(i)
+// WithInstrumentationAttributeSet adds the instrumentation attributes.
+//
+// If multiple [WithInstrumentationAttributes] or [WithInstrumentationAttributeSet]
+// options are passed, the attributes will be merged together in the order
+// they are passed. Attributes with duplicate keys will use the last value passed.
+func WithInstrumentationAttributeSet(set attribute.Set) MeterOption {
+	if set.Len() == 0 {
+		return meterOptionFunc(func(config MeterConfig) MeterConfig {
+			return config
+		})
+	}
+
+	return meterOptionFunc(func(config MeterConfig) MeterConfig {
+		if config.attrs.Len() == 0 {
+			config.attrs = set
+		} else {
+			config.attrs = mergeSets(config.attrs, set)
+		}
+		return config
+	})
+}
+
+// WithSchemaURL sets the schema URL.
+func WithSchemaURL(schemaURL string) MeterOption {
+	return meterOptionFunc(func(config MeterConfig) MeterConfig {
+		config.schemaURL = schemaURL
+		return config
+	})
 }

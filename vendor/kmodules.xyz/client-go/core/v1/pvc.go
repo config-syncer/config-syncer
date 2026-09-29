@@ -81,7 +81,7 @@ func PatchPVCObject(ctx context.Context, c kubernetes.Interface, cur, mod *core.
 
 func TryUpdatePVC(ctx context.Context, c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*core.PersistentVolumeClaim) *core.PersistentVolumeClaim, opts metav1.UpdateOptions) (result *core.PersistentVolumeClaim, err error) {
 	attempt := 0
-	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
+	err = wait.PollUntilContextTimeout(ctx, kutil.RetryInterval, kutil.RetryTimeout, true, func(ctx context.Context) (bool, error) {
 		attempt++
 		cur, e2 := c.CoreV1().PersistentVolumeClaims(meta.Namespace).Get(ctx, meta.Name, metav1.GetOptions{})
 		if kerr.IsNotFound(e2) {
@@ -93,7 +93,6 @@ func TryUpdatePVC(ctx context.Context, c kubernetes.Interface, meta metav1.Objec
 		klog.Errorf("Attempt %d failed to update PersistentVolumeClaim %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)
 		return false, nil
 	})
-
 	if err != nil {
 		err = errors.Errorf("failed to update PersistentVolumeClaim %s/%s after %d attempts due to %v", meta.Namespace, meta.Name, attempt, err)
 	}

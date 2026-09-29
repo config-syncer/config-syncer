@@ -70,7 +70,7 @@ func TryUpdateCustomResourceDefinition(
 	opts metav1.UpdateOptions,
 ) (result *api.CustomResourceDefinition, err error) {
 	attempt := 0
-	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
+	err = wait.PollUntilContextTimeout(ctx, kutil.RetryInterval, kutil.RetryTimeout, true, func(ctx context.Context) (bool, error) {
 		attempt++
 		cur, e2 := c.ApiextensionsV1beta1().CustomResourceDefinitions().Get(ctx, name, metav1.GetOptions{})
 		if kerr.IsNotFound(e2) {
@@ -82,7 +82,6 @@ func TryUpdateCustomResourceDefinition(
 		klog.Errorf("Attempt %d failed to update CustomResourceDefinition %s due to %v.", attempt, cur.Name, e2)
 		return false, nil
 	})
-
 	if err != nil {
 		err = errors.Errorf("failed to update CustomResourceDefinition %s after %d attempts due to %v", name, attempt, err)
 	}
