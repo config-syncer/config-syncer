@@ -3,12 +3,9 @@
 // license that can be found in the LICENSE file.
 
 //go:build linux && (mips64 || mips64le)
-// +build linux
-// +build mips64 mips64le
 
 package unix
 
-//sys	EpollWait(epfd int, events []EpollEvent, msec int) (n int, err error)
 //sys	Fadvise(fd int, offset int64, length int64, advice int) (err error) = SYS_FADVISE64
 //sys	Fchown(fd int, uid int, gid int) (err error)
 //sys	Fstatfs(fd int, buf *Statfs_t) (err error)

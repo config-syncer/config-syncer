@@ -33,7 +33,7 @@ import (
 	"k8s.io/client-go/tools/remotecommand"
 )
 
-var NotRunning = errors.New("container not running")
+var ErrNotRunning = errors.New("container not running")
 
 type Options struct {
 	core.PodExecOptions
@@ -68,31 +68,38 @@ func Input(in string) func(*Options) {
 
 func TTY(enable bool) func(*Options) {
 	return func(opts *Options) {
-		opts.PodExecOptions.TTY = enable
+		opts.TTY = enable
 	}
 }
 
 func Exec(config *rest.Config, pod types.NamespacedName, options ...func(*Options)) (string, error) {
+	ctx := context.Background()
+
 	kc, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return "", err
 	}
-	p, err := kc.CoreV1().Pods(pod.Namespace).Get(context.TODO(), pod.Name, metav1.GetOptions{})
+	p, err := kc.CoreV1().Pods(pod.Namespace).Get(ctx, pod.Name, metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
-	return execIntoPod(config, kc, p, options...)
+	return execIntoPod(ctx, config, kc, p, options...)
+}
+
+func ExecIntoPodWithContext(ctx context.Context, config *rest.Config, pod *core.Pod, options ...func(*Options)) (string, error) {
+	kc, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return "", err
+	}
+	return execIntoPod(ctx, config, kc, pod, options...)
 }
 
 func ExecIntoPod(config *rest.Config, pod *core.Pod, options ...func(*Options)) (string, error) {
-	kc, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return "", err
-	}
-	return execIntoPod(config, kc, pod, options...)
+	ctx := context.Background()
+	return ExecIntoPodWithContext(ctx, config, pod, options...)
 }
 
-func execIntoPod(config *rest.Config, kc kubernetes.Interface, pod *core.Pod, options ...func(*Options)) (string, error) {
+func execIntoPod(ctx context.Context, config *rest.Config, kc kubernetes.Interface, pod *core.Pod, options ...func(*Options)) (string, error) {
 	var (
 		execOut bytes.Buffer
 		execErr bytes.Buffer
@@ -114,16 +121,16 @@ func execIntoPod(config *rest.Config, kc kubernetes.Interface, pod *core.Pod, op
 
 	if opts.CheckForRunningContainer {
 		for _, status := range pod.Status.ContainerStatuses {
-			if status.Name == opts.PodExecOptions.Container {
+			if status.Name == opts.Container {
 				if status.State.Running == nil {
-					return "", NotRunning
+					return "", ErrNotRunning
 				}
 			}
 		}
 		for _, status := range pod.Status.InitContainerStatuses {
-			if status.Name == opts.PodExecOptions.Container {
+			if status.Name == opts.Container {
 				if status.State.Running == nil {
-					return "", NotRunning
+					return "", ErrNotRunning
 				}
 			}
 		}
@@ -141,7 +148,7 @@ func execIntoPod(config *rest.Config, kc kubernetes.Interface, pod *core.Pod, op
 		return "", fmt.Errorf("failed to init executor: %v", err)
 	}
 
-	err = exec.Stream(opts.StreamOptions)
+	err = exec.StreamWithContext(ctx, opts.StreamOptions)
 	if err != nil {
 		return "", fmt.Errorf("could not execute: %v", err)
 	}

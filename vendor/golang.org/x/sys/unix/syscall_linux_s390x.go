@@ -3,7 +3,6 @@
 // license that can be found in the LICENSE file.
 
 //go:build s390x && linux
-// +build s390x,linux
 
 package unix
 
@@ -11,7 +10,6 @@ import (
 	"unsafe"
 )
 
-//sys	EpollWait(epfd int, events []EpollEvent, msec int) (n int, err error)
 //sys	Fadvise(fd int, offset int64, length int64, advice int) (err error) = SYS_FADVISE64
 //sys	Fchown(fd int, uid int, gid int) (err error)
 //sys	Fstat(fd int, stat *Stat_t) (err error)

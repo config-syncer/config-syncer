@@ -17,7 +17,10 @@ limitations under the License.
 package v1
 
 import (
+	"slices"
 	"sort"
+
+	"kmodules.xyz/client-go/meta"
 
 	jsoniter "github.com/json-iterator/go"
 	"gomodules.xyz/mergo"
@@ -29,22 +32,15 @@ import (
 var json = jsoniter.ConfigFastest
 
 func AddFinalizer(m metav1.ObjectMeta, finalizer string) metav1.ObjectMeta {
-	for _, name := range m.Finalizers {
-		if name == finalizer {
-			return m
-		}
+	if slices.Contains(m.Finalizers, finalizer) {
+		return m
 	}
 	m.Finalizers = append(m.Finalizers, finalizer)
 	return m
 }
 
 func HasFinalizer(m metav1.ObjectMeta, finalizer string) bool {
-	for _, name := range m.Finalizers {
-		if name == finalizer {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(m.Finalizers, finalizer)
 }
 
 func RemoveFinalizer(m metav1.ObjectMeta, finalizer string) metav1.ObjectMeta {
@@ -66,6 +62,24 @@ func EnsureContainerDeleted(containers []core.Container, name string) []core.Con
 		}
 	}
 	return containers
+}
+
+func GetContainerByName(containers []core.Container, name string) *core.Container {
+	for i := range containers {
+		if containers[i].Name == name {
+			return &containers[i]
+		}
+	}
+	return nil
+}
+
+func GetContainerIdByName(containers []core.Container, name string) int {
+	for i := range containers {
+		if containers[i].Name == name {
+			return i
+		}
+	}
+	return -1
 }
 
 func UpsertContainer(containers []core.Container, upsert core.Container) []core.Container {
@@ -99,6 +113,33 @@ func UpsertContainer(containers []core.Container, upsert core.Container) []core.
 	return append(containers, upsert)
 }
 
+func MergeContainer(container core.Container, containerTemplate core.Container) core.Container {
+	if len(containerTemplate.Command) > 0 {
+		container.Command = containerTemplate.Command
+	}
+	container.Args = meta.UpsertArgumentList(container.Args, containerTemplate.Args)
+	container.WorkingDir = containerTemplate.WorkingDir
+	container.EnvFrom = containerTemplate.EnvFrom
+	container.Env = UpsertEnvVars(container.Env, containerTemplate.Env...)
+	container.Ports = UpsertContainerPorts(container.Ports, containerTemplate.Ports...)
+	container.Resources = containerTemplate.Resources
+	container.ResizePolicy = containerTemplate.ResizePolicy
+	container.RestartPolicy = containerTemplate.RestartPolicy
+	container.VolumeMounts = UpsertVolumeMount(container.VolumeMounts, containerTemplate.VolumeMounts...)
+	container.VolumeDevices = containerTemplate.VolumeDevices
+	container.LivenessProbe = containerTemplate.LivenessProbe
+	container.ReadinessProbe = containerTemplate.ReadinessProbe
+	container.StartupProbe = containerTemplate.StartupProbe
+	container.Lifecycle = containerTemplate.Lifecycle
+	container.TerminationMessagePath = containerTemplate.TerminationMessagePath
+	container.TerminationMessagePolicy = containerTemplate.TerminationMessagePolicy
+	container.ImagePullPolicy = containerTemplate.ImagePullPolicy
+	container.SecurityContext = containerTemplate.SecurityContext
+	container.StdinOnce = containerTemplate.StdinOnce
+	container.TTY = containerTemplate.TTY
+	return container
+}
+
 func UpsertContainers(containers []core.Container, addons []core.Container) []core.Container {
 	out := containers
 	for _, c := range addons {
@@ -114,6 +155,15 @@ func DeleteContainer(containers []core.Container, name string) []core.Container 
 		}
 	}
 	return containers
+}
+
+func GetVolumeByName(volumes []core.Volume, name string) *core.Volume {
+	for i := range volumes {
+		if volumes[i].Name == name {
+			return &volumes[i]
+		}
+	}
+	return nil
 }
 
 func UpsertVolume(volumes []core.Volume, nv ...core.Volume) []core.Volume {
@@ -192,10 +242,19 @@ func EnsureVolumeDeleted(volumes []core.Volume, name string) []core.Volume {
 	return volumes
 }
 
+func GetVolumeMountByName(volumeMounts []core.VolumeMount, name string) *core.VolumeMount {
+	for i := range volumeMounts {
+		if volumeMounts[i].Name == name {
+			return &volumeMounts[i]
+		}
+	}
+	return nil
+}
+
 func UpsertVolumeMount(mounts []core.VolumeMount, nv ...core.VolumeMount) []core.VolumeMount {
 	upsert := func(m core.VolumeMount) {
 		for i, vol := range mounts {
-			if vol.Name == m.Name {
+			if vol.MountPath == m.MountPath {
 				mounts[i] = m
 				return
 			}
@@ -235,6 +294,35 @@ func EnsureVolumeMountDeletedByPath(mounts []core.VolumeMount, mountPath string)
 		}
 	}
 	return mounts
+}
+
+func UpsertContainerPorts(ports []core.ContainerPort, np ...core.ContainerPort) []core.ContainerPort {
+	upsert := func(p core.ContainerPort) {
+		for i, port := range ports {
+			if port.Name == p.Name {
+				err := mergo.Merge(&ports[i], p, mergo.WithOverride)
+				if err != nil {
+					panic(err)
+				}
+				return
+			}
+		}
+		ports = append(ports, p)
+	}
+
+	for _, port := range np {
+		upsert(port)
+	}
+	return ports
+}
+
+func GetEnvByName(envs []core.EnvVar, name string) *core.EnvVar {
+	for i := range envs {
+		if envs[i].Name == name {
+			return &envs[i]
+		}
+	}
+	return nil
 }
 
 func UpsertEnvVars(vars []core.EnvVar, nv ...core.EnvVar) []core.EnvVar {

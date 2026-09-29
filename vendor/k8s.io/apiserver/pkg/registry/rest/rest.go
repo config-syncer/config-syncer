@@ -22,12 +22,13 @@ import (
 	"net/http"
 	"net/url"
 
+	"sigs.k8s.io/structured-merge-diff/v6/fieldpath"
+
 	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
-	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
 //TODO:
@@ -52,6 +53,8 @@ import (
 // Storage is a generic interface for RESTful storage services.
 // Resources which are exported to the RESTful API of apiserver need to implement this interface. It is expected
 // that objects may implement any of the below interfaces.
+//
+// Consider using StorageWithReadiness whenever possible.
 type Storage interface {
 	// New returns an empty object that can be used with Create and Update after request data has been put into it.
 	// This object must be a pointer type for use with Codec.DecodeInto([]byte, runtime.Object)
@@ -61,6 +64,14 @@ type Storage interface {
 	// Destroy has to be implemented in thread-safe way and be prepared
 	// for being called more than once.
 	Destroy()
+}
+
+// StorageWithReadiness extends Storage interface with the readiness check.
+type StorageWithReadiness interface {
+	Storage
+
+	// ReadinessCheck allows for checking storage readiness.
+	ReadinessCheck() error
 }
 
 // Scoper indicates what scope the resource is at. It must be specified.
@@ -87,6 +98,12 @@ type ShortNamesProvider interface {
 // be used by API clients to refer to a batch of resources by using a single name (e.g. "all" could translate to "pod,rc,svc,...").
 type CategoriesProvider interface {
 	Categories() []string
+}
+
+// SingularNameProvider returns singular name of resources. This is used by kubectl discovery to have singular
+// name representation of resources. In case of shortcut conflicts(with CRD shortcuts) singular name should always map to this resource.
+type SingularNameProvider interface {
+	GetSingularName() string
 }
 
 // GroupVersionKindProvider is used to specify a particular GroupVersionKind to discovery.  This is used for polymorphic endpoints
@@ -201,6 +218,13 @@ type NamedCreater interface {
 	// This is needed for create operations on subresources which include the name of the parent
 	// resource in the path.
 	Create(ctx context.Context, name string, obj runtime.Object, createValidation ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error)
+}
+
+// SubresourceObjectMetaPreserver adds configuration options to a Creater for subresources.
+type SubresourceObjectMetaPreserver interface {
+	// PreserveRequestObjectMetaSystemFieldsOnSubresourceCreate indicates that a
+	// handler should preserve fields of ObjectMeta that are managed by the system.
+	PreserveRequestObjectMetaSystemFieldsOnSubresourceCreate() bool
 }
 
 // UpdatedObjectInfo provides information about an updated object to an Updater.
@@ -364,6 +388,12 @@ type ResetFieldsStrategy interface {
 	GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set
 }
 
+// ResetFieldsFilterStrategy is an optional interface that a storage object can
+// implement if it wishes to provide a fields filter reset by its strategies.
+type ResetFieldsFilterStrategy interface {
+	GetResetFieldsFilter() map[fieldpath.APIVersion]fieldpath.Filter
+}
+
 // CreateUpdateResetFieldsStrategy is a union of RESTCreateUpdateStrategy
 // and ResetFieldsStrategy.
 type CreateUpdateResetFieldsStrategy interface {
@@ -376,4 +406,11 @@ type CreateUpdateResetFieldsStrategy interface {
 type UpdateResetFieldsStrategy interface {
 	RESTUpdateStrategy
 	ResetFieldsStrategy
+}
+
+// CorruptObjectDeleterProvider is an interface the storage implements
+// to support unsafe deletion of corrupt object(s). It returns a
+// GracefulDeleter that is used to perform unsafe deletion of corrupt object(s).
+type CorruptObjectDeleterProvider interface {
+	GetCorruptObjDeleter() GracefulDeleter
 }

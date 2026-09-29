@@ -81,7 +81,7 @@ func PatchEventObject(ctx context.Context, c kubernetes.Interface, cur, mod *cor
 
 func TryUpdateEvent(ctx context.Context, c kubernetes.Interface, meta metav1.ObjectMeta, transform func(*core.Event) *core.Event, opts metav1.UpdateOptions) (result *core.Event, err error) {
 	attempt := 0
-	err = wait.PollImmediate(kutil.RetryInterval, kutil.RetryTimeout, func() (bool, error) {
+	err = wait.PollUntilContextTimeout(ctx, kutil.RetryInterval, kutil.RetryTimeout, true, func(ctx context.Context) (bool, error) {
 		attempt++
 		cur, e2 := c.CoreV1().Events(meta.Namespace).Get(ctx, meta.Name, metav1.GetOptions{})
 		if kerr.IsNotFound(e2) {
@@ -93,7 +93,6 @@ func TryUpdateEvent(ctx context.Context, c kubernetes.Interface, meta metav1.Obj
 		klog.Errorf("Attempt %d failed to update Event %s/%s due to %v.", attempt, cur.Namespace, cur.Name, e2)
 		return false, nil
 	})
-
 	if err != nil {
 		err = errors.Errorf("failed to update Event %s/%s after %d attempts due to %v", meta.Namespace, meta.Name, attempt, err)
 	}
