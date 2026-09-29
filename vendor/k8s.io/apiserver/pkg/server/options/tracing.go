@@ -19,13 +19,15 @@ package options
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net"
+	"os"
 
 	"github.com/spf13/pflag"
-	"go.opentelemetry.io/otel/exporters/otlp/otlpgrpc"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/metric/noop"
 	"go.opentelemetry.io/otel/sdk/resource"
-	"go.opentelemetry.io/otel/semconv"
+	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 	"google.golang.org/grpc"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -45,8 +47,14 @@ const apiserverService = "apiserver"
 
 var (
 	cfgScheme = runtime.NewScheme()
-	codecs    = serializer.NewCodecFactory(cfgScheme)
+	codecs    = serializer.NewCodecFactory(cfgScheme, serializer.EnableStrict)
 )
+
+func init() {
+	// Prevent memory leak from OTel metrics, which we don't use:
+	// https://github.com/open-telemetry/opentelemetry-go-contrib/issues/5190
+	otel.SetMeterProvider(noop.NewMeterProvider())
+}
 
 func init() {
 	install.Install(cfgScheme)
@@ -93,7 +101,7 @@ func (o *TracingOptions) ApplyTo(es *egressselector.EgressSelector, c *server.Co
 		return fmt.Errorf("failed to validate tracing configuration: %v", errs.ToAggregate())
 	}
 
-	opts := []otlpgrpc.Option{}
+	opts := []otlptracegrpc.Option{}
 	if es != nil {
 		// Only use the egressselector dialer if egressselector is enabled.
 		// Endpoint is on the "ControlPlane" network
@@ -101,11 +109,12 @@ func (o *TracingOptions) ApplyTo(es *egressselector.EgressSelector, c *server.Co
 		if err != nil {
 			return err
 		}
-
-		otelDialer := func(ctx context.Context, addr string) (net.Conn, error) {
-			return egressDialer(ctx, "tcp", addr)
+		if egressDialer != nil {
+			otelDialer := func(ctx context.Context, addr string) (net.Conn, error) {
+				return egressDialer(ctx, "tcp", addr)
+			}
+			opts = append(opts, otlptracegrpc.WithDialOption(grpc.WithContextDialer(otelDialer)))
 		}
-		opts = append(opts, otlpgrpc.WithDialOption(grpc.WithContextDialer(otelDialer)))
 	}
 
 	resourceOpts := []resource.Option{
@@ -144,7 +153,7 @@ func ReadTracingConfiguration(configFilePath string) (*tracingapi.TracingConfigu
 	if configFilePath == "" {
 		return nil, fmt.Errorf("tracing config file was empty")
 	}
-	data, err := ioutil.ReadFile(configFilePath)
+	data, err := os.ReadFile(configFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read tracing configuration from %q: %v", configFilePath, err)
 	}
@@ -153,9 +162,5 @@ func ReadTracingConfiguration(configFilePath string) (*tracingapi.TracingConfigu
 	if err := runtime.DecodeInto(codecs.UniversalDecoder(), data, internalConfig); err != nil {
 		return nil, fmt.Errorf("unable to decode tracing configuration data: %v", err)
 	}
-	tc := &tracingapi.TracingConfiguration{
-		Endpoint:               internalConfig.Endpoint,
-		SamplingRatePerMillion: internalConfig.SamplingRatePerMillion,
-	}
-	return tc, nil
+	return &internalConfig.TracingConfiguration, nil
 }
