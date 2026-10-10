@@ -41,7 +41,8 @@ func init() {
 
 	// TODO: keep the generic API server from wanting this
 	unversioned := schema.GroupVersion{Group: "", Version: "v1"}
-	Scheme.AddUnversionedTypes(unversioned,
+	Scheme.AddUnversionedTypes(
+		unversioned,
 		&metav1.Status{},
 		&metav1.APIVersions{},
 		&metav1.APIGroupList{},
